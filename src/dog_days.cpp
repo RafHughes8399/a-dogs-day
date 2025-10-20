@@ -7,6 +7,9 @@ int main(){
         while(! WindowShouldClose()){
             BeginDrawing();
                 ClearBackground(WHITE);
+                //ShowCursor();
+                auto mouse_position = GetMousePosition();
+                DrawText(TextFormat("mouse position: %f, %f", mouse_position.x, mouse_position.y), 100, 100, 14, BLUE);
             EndDrawing();    
         }
     CloseWindow();

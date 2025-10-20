@@ -1,0 +1,10 @@
+project setup:
+    -> quad tree
+    -> entities
+    -> events
+    -> player
+    -> player controls
+    -> hud
+
+-> draw the dogs
+-> move the dogs
