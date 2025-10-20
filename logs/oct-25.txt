@@ -1,0 +1,42 @@
+project setup:
+    -> quad tree
+    -> entities
+    -> events
+    -> player
+    -> player controls
+    -> hud
+
+-> draw the dogs
+-> move the dogs
+
+
+
+
+moving the screen around, just a quick experiment for now
+
+/**
+    
+        while(! WindowShouldClose()){
+            BeginDrawing();
+                //ClearBackground(WHITE);
+                //DrawTexture(background, 0, 0, WHITE);
+                DrawTextureRec(background, view_frame, background_position, WHITE);
+                ShowCursor();
+                // trying to emulate some form of dragging
+                if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+                    mouse_delta = GetMouseDelta();
+                }
+                else{
+                    mouse_delta = Vector2Zero();
+                }
+                auto frame_offset = Vector2Scale(mouse_delta, -1);
+                // ! these values need to be clamped to avoid the repeating texture thing 
+                view_frame.x +=  frame_offset.x;
+                view_frame.y += frame_offset.y; 
+                auto mouse_position = GetMousePosition();
+                DrawText(TextFormat("mouse position: %f, %f", mouse_position.x, mouse_position.y), 100, 100, 14, BLUE);
+                DrawText(TextFormat("mouse delta: %f, %f", mouse_delta.x, mouse_delta.y), 100, 120, 14, BLUE);
+                DrawText(TextFormat("frame offset: %f, %f", frame_offset.x, frame_offset.y), 100, 140, 14, BLUE);
+            EndDrawing();    
+        }
+*/ there is moving the screen around

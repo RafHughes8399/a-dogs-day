@@ -107,6 +107,8 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/level.dir/DependInfo.cmake"
+  "CMakeFiles/game.dir/DependInfo.cmake"
   "CMakeFiles/dog-days.dir/DependInfo.cmake"
   "_deps/raylib-build/CMakeFiles/uninstall.dir/DependInfo.cmake"
   "_deps/raylib-build/raylib/CMakeFiles/raylib.dir/DependInfo.cmake"

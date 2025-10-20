@@ -1,3 +1,5 @@
+C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/level.dir
+C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/game.dir
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/dog-days.dir
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/package.dir
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/package_source.dir

@@ -181,6 +181,32 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named level
+
+# Build rule for target.
+level: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 level
+.PHONY : level
+
+# fast build rule for target.
+level/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\level.dir\build.make CMakeFiles/level.dir/build
+.PHONY : level/fast
+
+#=============================================================================
+# Target rules for targets named game
+
+# Build rule for target.
+game: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 game
+.PHONY : game
+
+# fast build rule for target.
+game/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\game.dir\build.make CMakeFiles/game.dir/build
+.PHONY : game/fast
+
+#=============================================================================
 # Target rules for targets named dog-days
 
 # Build rule for target.
@@ -269,6 +295,54 @@ src/dog_days.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\dog-days.dir\build.make CMakeFiles/dog-days.dir/src/dog_days.cpp.s
 .PHONY : src/dog_days.cpp.s
 
+src/game.obj: src/game.cpp.obj
+.PHONY : src/game.obj
+
+# target to build an object file
+src/game.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\game.dir\build.make CMakeFiles/game.dir/src/game.cpp.obj
+.PHONY : src/game.cpp.obj
+
+src/game.i: src/game.cpp.i
+.PHONY : src/game.i
+
+# target to preprocess a source file
+src/game.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\game.dir\build.make CMakeFiles/game.dir/src/game.cpp.i
+.PHONY : src/game.cpp.i
+
+src/game.s: src/game.cpp.s
+.PHONY : src/game.s
+
+# target to generate assembly for a file
+src/game.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\game.dir\build.make CMakeFiles/game.dir/src/game.cpp.s
+.PHONY : src/game.cpp.s
+
+src/level.obj: src/level.cpp.obj
+.PHONY : src/level.obj
+
+# target to build an object file
+src/level.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\level.dir\build.make CMakeFiles/level.dir/src/level.cpp.obj
+.PHONY : src/level.cpp.obj
+
+src/level.i: src/level.cpp.i
+.PHONY : src/level.i
+
+# target to preprocess a source file
+src/level.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\level.dir\build.make CMakeFiles/level.dir/src/level.cpp.i
+.PHONY : src/level.cpp.i
+
+src/level.s: src/level.cpp.s
+.PHONY : src/level.s
+
+# target to generate assembly for a file
+src/level.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\level.dir\build.make CMakeFiles/level.dir/src/level.cpp.s
+.PHONY : src/level.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -286,11 +360,19 @@ help:
 	@echo ... uninstall
 	@echo ... update_mappings
 	@echo ... dog-days
+	@echo ... game
 	@echo ... glfw
+	@echo ... level
 	@echo ... raylib
 	@echo ... src/dog_days.obj
 	@echo ... src/dog_days.i
 	@echo ... src/dog_days.s
+	@echo ... src/game.obj
+	@echo ... src/game.i
+	@echo ... src/game.s
+	@echo ... src/level.obj
+	@echo ... src/level.i
+	@echo ... src/level.s
 .PHONY : help
 
 

@@ -92,7 +92,10 @@ dog__days_EXTERNAL_OBJECTS =
 
 dog-days.exe: CMakeFiles/dog-days.dir/src/dog_days.cpp.obj
 dog-days.exe: CMakeFiles/dog-days.dir/build.make
+dog-days.exe: liblevel.a
+dog-days.exe: libgame.a
 dog-days.exe: _deps/raylib-build/raylib/libraylib.a
+dog-days.exe: liblevel.a
 dog-days.exe: CMakeFiles/dog-days.dir/linkLibs.rsp
 dog-days.exe: CMakeFiles/dog-days.dir/objects1.rsp
 dog-days.exe: CMakeFiles/dog-days.dir/link.txt

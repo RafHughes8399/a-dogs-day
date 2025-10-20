@@ -172,4 +172,6 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:/Strawberry/c/include/c++/13.2.0/tr1/poly_hermite.tcc \
  C:/Strawberry/c/include/c++/13.2.0/tr1/poly_laguerre.tcc \
  C:/Strawberry/c/include/c++/13.2.0/tr1/riemann_zeta.tcc \
- C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\config.h
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\config.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\game.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\level.h
