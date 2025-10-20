@@ -1,0 +1,28 @@
+_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rshapes.c.obj: \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\_deps\raylib-src\src\rshapes.c \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\_deps\raylib-src\src\raylib.h \
+ C:/Strawberry/c/lib/gcc/x86_64-w64-mingw32/13.2.0/include/stdarg.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/stdarg.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw_stdarg.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/vadefs.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw_mac.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw_secapi.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+ C:/Strawberry/c/lib/gcc/x86_64-w64-mingw32/13.2.0/include/stdbool.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\_deps\raylib-src\src\config.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\_deps\raylib-src\src\rlgl.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/math.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/crtdefs.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/corecrt.h \
+ C:/Strawberry/c/lib/gcc/x86_64-w64-mingw32/13.2.0/include/float.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/float.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/stdlib.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+ C:/Strawberry/c/lib/gcc/x86_64-w64-mingw32/13.2.0/include/limits.h \
+ C:/Strawberry/c/lib/gcc/x86_64-w64-mingw32/13.2.0/include/syslimits.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/limits.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/malloc.h \
+ C:/Strawberry/c/lib/gcc/x86_64-w64-mingw32/13.2.0/include/mm_malloc.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/errno.h
