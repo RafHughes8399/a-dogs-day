@@ -29,7 +29,6 @@ set(MY_COMPILE_OPTIONS
   -Wno-double-promotion
   -Wno-missing-field-initializers
 )
-
 # setup raylib
 # Dependencies
 set(RAYLIB_VERSION 5.5)

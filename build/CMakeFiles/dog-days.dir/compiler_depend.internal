@@ -49,6 +49,7 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj
  C:/Strawberry/c/include/c++/13.2.0/bits/ranges_util.h
  C:/Strawberry/c/include/c++/13.2.0/bits/refwrap.h
  C:/Strawberry/c/include/c++/13.2.0/bits/requires_hosted.h
+ C:/Strawberry/c/include/c++/13.2.0/bits/specfun.h
  C:/Strawberry/c/include/c++/13.2.0/bits/std_abs.h
  C:/Strawberry/c/include/c++/13.2.0/bits/stl_algobase.h
  C:/Strawberry/c/include/c++/13.2.0/bits/stl_construct.h
@@ -67,6 +68,7 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj
  C:/Strawberry/c/include/c++/13.2.0/cctype
  C:/Strawberry/c/include/c++/13.2.0/cerrno
  C:/Strawberry/c/include/c++/13.2.0/clocale
+ C:/Strawberry/c/include/c++/13.2.0/cmath
  C:/Strawberry/c/include/c++/13.2.0/compare
  C:/Strawberry/c/include/c++/13.2.0/concepts
  C:/Strawberry/c/include/c++/13.2.0/cstddef
@@ -87,6 +89,8 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj
  C:/Strawberry/c/include/c++/13.2.0/iosfwd
  C:/Strawberry/c/include/c++/13.2.0/iostream
  C:/Strawberry/c/include/c++/13.2.0/istream
+ C:/Strawberry/c/include/c++/13.2.0/limits
+ C:/Strawberry/c/include/c++/13.2.0/math.h
  C:/Strawberry/c/include/c++/13.2.0/new
  C:/Strawberry/c/include/c++/13.2.0/numbers
  C:/Strawberry/c/include/c++/13.2.0/ostream
@@ -97,6 +101,18 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj
  C:/Strawberry/c/include/c++/13.2.0/string
  C:/Strawberry/c/include/c++/13.2.0/string_view
  C:/Strawberry/c/include/c++/13.2.0/system_error
+ C:/Strawberry/c/include/c++/13.2.0/tr1/bessel_function.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/beta_function.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/ell_integral.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/exp_integral.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/gamma.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/hypergeometric.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/legendre_function.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/modified_bessel_func.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/poly_hermite.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/poly_laguerre.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/riemann_zeta.tcc
+ C:/Strawberry/c/include/c++/13.2.0/tr1/special_function_util.h
  C:/Strawberry/c/include/c++/13.2.0/tuple
  C:/Strawberry/c/include/c++/13.2.0/type_traits
  C:/Strawberry/c/include/c++/13.2.0/typeinfo
@@ -133,6 +149,7 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj
  C:/Strawberry/c/x86_64-w64-mingw32/include/limits.h
  C:/Strawberry/c/x86_64-w64-mingw32/include/locale.h
  C:/Strawberry/c/x86_64-w64-mingw32/include/malloc.h
+ C:/Strawberry/c/x86_64-w64-mingw32/include/math.h
  C:/Strawberry/c/x86_64-w64-mingw32/include/process.h
  C:/Strawberry/c/x86_64-w64-mingw32/include/pthread.h
  C:/Strawberry/c/x86_64-w64-mingw32/include/pthread_compat.h
@@ -157,4 +174,6 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj
  C:/Strawberry/c/x86_64-w64-mingw32/include/wchar.h
  C:/Strawberry/c/x86_64-w64-mingw32/include/wctype.h
  C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/_deps/raylib-src/src/raylib.h
+ C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/_deps/raylib-src/src/raymath.h
+ C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/config.h
 

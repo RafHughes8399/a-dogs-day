@@ -153,4 +153,23 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/_deps/raylib-src/src/raylib.h \
  C:/Strawberry/c/lib/gcc/x86_64-w64-mingw32/13.2.0/include/stdarg.h \
  C:/Strawberry/c/x86_64-w64-mingw32/include/stdarg.h \
- C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw_stdarg.h
+ C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw_stdarg.h \
+ C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/_deps/raylib-src/src/raymath.h \
+ C:/Strawberry/c/include/c++/13.2.0/math.h \
+ C:/Strawberry/c/include/c++/13.2.0/cmath \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/math.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/specfun.h \
+ C:/Strawberry/c/include/c++/13.2.0/limits \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/gamma.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/special_function_util.h \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/bessel_function.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/beta_function.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/ell_integral.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/exp_integral.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/hypergeometric.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/legendre_function.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/modified_bessel_func.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/poly_hermite.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/poly_laguerre.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/tr1/riemann_zeta.tcc \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\config.h
