@@ -57,6 +57,14 @@ link_libraries(raglib)
 add_library(events src/events.cpp)
 link_libraries(events)
 
+add_library(animation src/animation.cpp)
+link_libraries(animation)
+
+add_library(sprite src/sprite.cpp)
+link_libraries(sprite)
+
+add_library(player src/player.cpp)
+link_libraries(player)
 add_library(entities src/entities.cpp)
 link_libraries(entities)
 

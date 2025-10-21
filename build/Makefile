@@ -207,6 +207,45 @@ events/fast:
 .PHONY : events/fast
 
 #=============================================================================
+# Target rules for targets named animation
+
+# Build rule for target.
+animation: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 animation
+.PHONY : animation
+
+# fast build rule for target.
+animation/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\animation.dir\build.make CMakeFiles/animation.dir/build
+.PHONY : animation/fast
+
+#=============================================================================
+# Target rules for targets named sprite
+
+# Build rule for target.
+sprite: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 sprite
+.PHONY : sprite
+
+# fast build rule for target.
+sprite/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sprite.dir\build.make CMakeFiles/sprite.dir/build
+.PHONY : sprite/fast
+
+#=============================================================================
+# Target rules for targets named player
+
+# Build rule for target.
+player: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 player
+.PHONY : player
+
+# fast build rule for target.
+player/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\player.dir\build.make CMakeFiles/player.dir/build
+.PHONY : player/fast
+
+#=============================================================================
 # Target rules for targets named entities
 
 # Build rule for target.
@@ -322,6 +361,30 @@ update_mappings: cmake_check_build_system
 update_mappings/fast:
 	$(MAKE) $(MAKESILENT) -f _deps\raylib-build\raylib\external\glfw\src\CMakeFiles\update_mappings.dir\build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build
 .PHONY : update_mappings/fast
+
+src/animation.obj: src/animation.cpp.obj
+.PHONY : src/animation.obj
+
+# target to build an object file
+src/animation.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\animation.dir\build.make CMakeFiles/animation.dir/src/animation.cpp.obj
+.PHONY : src/animation.cpp.obj
+
+src/animation.i: src/animation.cpp.i
+.PHONY : src/animation.i
+
+# target to preprocess a source file
+src/animation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\animation.dir\build.make CMakeFiles/animation.dir/src/animation.cpp.i
+.PHONY : src/animation.cpp.i
+
+src/animation.s: src/animation.cpp.s
+.PHONY : src/animation.s
+
+# target to generate assembly for a file
+src/animation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\animation.dir\build.make CMakeFiles/animation.dir/src/animation.cpp.s
+.PHONY : src/animation.cpp.s
 
 src/dog_days.obj: src/dog_days.cpp.obj
 .PHONY : src/dog_days.obj
@@ -443,6 +506,30 @@ src/level.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\level.dir\build.make CMakeFiles/level.dir/src/level.cpp.s
 .PHONY : src/level.cpp.s
 
+src/player.obj: src/player.cpp.obj
+.PHONY : src/player.obj
+
+# target to build an object file
+src/player.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\player.dir\build.make CMakeFiles/player.dir/src/player.cpp.obj
+.PHONY : src/player.cpp.obj
+
+src/player.i: src/player.cpp.i
+.PHONY : src/player.i
+
+# target to preprocess a source file
+src/player.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\player.dir\build.make CMakeFiles/player.dir/src/player.cpp.i
+.PHONY : src/player.cpp.i
+
+src/player.s: src/player.cpp.s
+.PHONY : src/player.s
+
+# target to generate assembly for a file
+src/player.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\player.dir\build.make CMakeFiles/player.dir/src/player.cpp.s
+.PHONY : src/player.cpp.s
+
 src/quadtree.obj: src/quadtree.cpp.obj
 .PHONY : src/quadtree.obj
 
@@ -491,6 +578,30 @@ src/raglib.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\raglib.dir\build.make CMakeFiles/raglib.dir/src/raglib.cpp.s
 .PHONY : src/raglib.cpp.s
 
+src/sprite.obj: src/sprite.cpp.obj
+.PHONY : src/sprite.obj
+
+# target to build an object file
+src/sprite.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sprite.dir\build.make CMakeFiles/sprite.dir/src/sprite.cpp.obj
+.PHONY : src/sprite.cpp.obj
+
+src/sprite.i: src/sprite.cpp.i
+.PHONY : src/sprite.i
+
+# target to preprocess a source file
+src/sprite.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sprite.dir\build.make CMakeFiles/sprite.dir/src/sprite.cpp.i
+.PHONY : src/sprite.cpp.i
+
+src/sprite.s: src/sprite.cpp.s
+.PHONY : src/sprite.s
+
+# target to generate assembly for a file
+src/sprite.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sprite.dir\build.make CMakeFiles/sprite.dir/src/sprite.cpp.s
+.PHONY : src/sprite.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -507,15 +618,21 @@ help:
 	@echo ... rebuild_cache
 	@echo ... uninstall
 	@echo ... update_mappings
+	@echo ... animation
 	@echo ... dog-days
 	@echo ... entities
 	@echo ... events
 	@echo ... game
 	@echo ... glfw
 	@echo ... level
+	@echo ... player
 	@echo ... quadtree
 	@echo ... raglib
 	@echo ... raylib
+	@echo ... sprite
+	@echo ... src/animation.obj
+	@echo ... src/animation.i
+	@echo ... src/animation.s
 	@echo ... src/dog_days.obj
 	@echo ... src/dog_days.i
 	@echo ... src/dog_days.s
@@ -531,12 +648,18 @@ help:
 	@echo ... src/level.obj
 	@echo ... src/level.i
 	@echo ... src/level.s
+	@echo ... src/player.obj
+	@echo ... src/player.i
+	@echo ... src/player.s
 	@echo ... src/quadtree.obj
 	@echo ... src/quadtree.i
 	@echo ... src/quadtree.s
 	@echo ... src/raglib.obj
 	@echo ... src/raglib.i
 	@echo ... src/raglib.s
+	@echo ... src/sprite.obj
+	@echo ... src/sprite.i
+	@echo ... src/sprite.s
 .PHONY : help
 
 

@@ -1,5 +1,8 @@
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/raglib.dir
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/events.dir
+C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/animation.dir
+C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/sprite.dir
+C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/player.dir
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/entities.dir
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/quadtree.dir
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/build/CMakeFiles/level.dir

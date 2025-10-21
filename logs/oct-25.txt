@@ -40,3 +40,11 @@ moving the screen around, just a quick experiment for now
             EndDrawing();    
         }
 */ there is moving the screen around
+
+
+
+-> bring over sprite and animation
+-> fill out entities 
+-> outline basic entity hierarchy
+-> setup player controller
+-> and hud 

@@ -64,6 +64,9 @@ CMAKE_BINARY_DIR = C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build
 # The main recursive "all" target.
 all: CMakeFiles/raglib.dir/all
 all: CMakeFiles/events.dir/all
+all: CMakeFiles/animation.dir/all
+all: CMakeFiles/sprite.dir/all
+all: CMakeFiles/player.dir/all
 all: CMakeFiles/entities.dir/all
 all: CMakeFiles/quadtree.dir/all
 all: CMakeFiles/level.dir/all
@@ -79,6 +82,9 @@ preinstall: _deps/raylib-build/preinstall
 # The main recursive "clean" target.
 clean: CMakeFiles/raglib.dir/clean
 clean: CMakeFiles/events.dir/clean
+clean: CMakeFiles/animation.dir/clean
+clean: CMakeFiles/sprite.dir/clean
+clean: CMakeFiles/player.dir/clean
 clean: CMakeFiles/entities.dir/clean
 clean: CMakeFiles/quadtree.dir/clean
 clean: CMakeFiles/level.dir/clean
@@ -159,7 +165,7 @@ CMakeFiles/raglib.dir/all: _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
 CMakeFiles/raglib.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\raglib.dir\build.make CMakeFiles/raglib.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\raglib.dir\build.make CMakeFiles/raglib.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=34,35 "Built target raglib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=38,39 "Built target raglib"
 .PHONY : CMakeFiles/raglib.dir/all
 
 # Build rule for subdir invocation for target.
@@ -187,7 +193,7 @@ CMakeFiles/events.dir/all: _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
 CMakeFiles/events.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\events.dir\build.make CMakeFiles/events.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\events.dir\build.make CMakeFiles/events.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=5,6 "Built target events"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=7,8 "Built target events"
 .PHONY : CMakeFiles/events.dir/all
 
 # Build rule for subdir invocation for target.
@@ -207,21 +213,114 @@ CMakeFiles/events.dir/clean:
 .PHONY : CMakeFiles/events.dir/clean
 
 #=============================================================================
+# Target rules for target CMakeFiles/animation.dir
+
+# All Build rule for target.
+CMakeFiles/animation.dir/all: CMakeFiles/raglib.dir/all
+CMakeFiles/animation.dir/all: CMakeFiles/events.dir/all
+CMakeFiles/animation.dir/all: _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
+CMakeFiles/animation.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\animation.dir\build.make CMakeFiles/animation.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\animation.dir\build.make CMakeFiles/animation.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=1,2 "Built target animation"
+.PHONY : CMakeFiles/animation.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/animation.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 35
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/animation.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 0
+.PHONY : CMakeFiles/animation.dir/rule
+
+# Convenience name for target.
+animation: CMakeFiles/animation.dir/rule
+.PHONY : animation
+
+# clean rule for target.
+CMakeFiles/animation.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\animation.dir\build.make CMakeFiles/animation.dir/clean
+.PHONY : CMakeFiles/animation.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/sprite.dir
+
+# All Build rule for target.
+CMakeFiles/sprite.dir/all: CMakeFiles/raglib.dir/all
+CMakeFiles/sprite.dir/all: CMakeFiles/events.dir/all
+CMakeFiles/sprite.dir/all: CMakeFiles/animation.dir/all
+CMakeFiles/sprite.dir/all: _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
+CMakeFiles/sprite.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sprite.dir\build.make CMakeFiles/sprite.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sprite.dir\build.make CMakeFiles/sprite.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=48,49 "Built target sprite"
+.PHONY : CMakeFiles/sprite.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/sprite.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 37
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/sprite.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 0
+.PHONY : CMakeFiles/sprite.dir/rule
+
+# Convenience name for target.
+sprite: CMakeFiles/sprite.dir/rule
+.PHONY : sprite
+
+# clean rule for target.
+CMakeFiles/sprite.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\sprite.dir\build.make CMakeFiles/sprite.dir/clean
+.PHONY : CMakeFiles/sprite.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/player.dir
+
+# All Build rule for target.
+CMakeFiles/player.dir/all: CMakeFiles/raglib.dir/all
+CMakeFiles/player.dir/all: CMakeFiles/events.dir/all
+CMakeFiles/player.dir/all: CMakeFiles/animation.dir/all
+CMakeFiles/player.dir/all: CMakeFiles/sprite.dir/all
+CMakeFiles/player.dir/all: _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
+CMakeFiles/player.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\player.dir\build.make CMakeFiles/player.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\player.dir\build.make CMakeFiles/player.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=34,35 "Built target player"
+.PHONY : CMakeFiles/player.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/player.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 39
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/player.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 0
+.PHONY : CMakeFiles/player.dir/rule
+
+# Convenience name for target.
+player: CMakeFiles/player.dir/rule
+.PHONY : player
+
+# clean rule for target.
+CMakeFiles/player.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\player.dir\build.make CMakeFiles/player.dir/clean
+.PHONY : CMakeFiles/player.dir/clean
+
+#=============================================================================
 # Target rules for target CMakeFiles/entities.dir
 
 # All Build rule for target.
 CMakeFiles/entities.dir/all: CMakeFiles/raglib.dir/all
 CMakeFiles/entities.dir/all: CMakeFiles/events.dir/all
+CMakeFiles/entities.dir/all: CMakeFiles/animation.dir/all
+CMakeFiles/entities.dir/all: CMakeFiles/sprite.dir/all
+CMakeFiles/entities.dir/all: CMakeFiles/player.dir/all
 CMakeFiles/entities.dir/all: _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
 CMakeFiles/entities.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\entities.dir\build.make CMakeFiles/entities.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\entities.dir\build.make CMakeFiles/entities.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=3,4 "Built target entities"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=5,6 "Built target entities"
 .PHONY : CMakeFiles/entities.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/entities.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 35
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 41
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/entities.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 0
 .PHONY : CMakeFiles/entities.dir/rule
@@ -241,17 +340,20 @@ CMakeFiles/entities.dir/clean:
 # All Build rule for target.
 CMakeFiles/quadtree.dir/all: CMakeFiles/raglib.dir/all
 CMakeFiles/quadtree.dir/all: CMakeFiles/events.dir/all
+CMakeFiles/quadtree.dir/all: CMakeFiles/animation.dir/all
+CMakeFiles/quadtree.dir/all: CMakeFiles/sprite.dir/all
+CMakeFiles/quadtree.dir/all: CMakeFiles/player.dir/all
 CMakeFiles/quadtree.dir/all: CMakeFiles/entities.dir/all
 CMakeFiles/quadtree.dir/all: _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
 CMakeFiles/quadtree.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quadtree.dir\build.make CMakeFiles/quadtree.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quadtree.dir\build.make CMakeFiles/quadtree.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=32,33 "Built target quadtree"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=36,37 "Built target quadtree"
 .PHONY : CMakeFiles/quadtree.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/quadtree.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 37
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 43
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/quadtree.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 0
 .PHONY : CMakeFiles/quadtree.dir/rule
@@ -271,18 +373,21 @@ CMakeFiles/quadtree.dir/clean:
 # All Build rule for target.
 CMakeFiles/level.dir/all: CMakeFiles/raglib.dir/all
 CMakeFiles/level.dir/all: CMakeFiles/events.dir/all
+CMakeFiles/level.dir/all: CMakeFiles/animation.dir/all
+CMakeFiles/level.dir/all: CMakeFiles/sprite.dir/all
+CMakeFiles/level.dir/all: CMakeFiles/player.dir/all
 CMakeFiles/level.dir/all: CMakeFiles/entities.dir/all
 CMakeFiles/level.dir/all: CMakeFiles/quadtree.dir/all
 CMakeFiles/level.dir/all: _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
 CMakeFiles/level.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\level.dir\build.make CMakeFiles/level.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\level.dir\build.make CMakeFiles/level.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=30,31 "Built target level"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=32,33 "Built target level"
 .PHONY : CMakeFiles/level.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/level.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 39
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 45
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/level.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 0
 .PHONY : CMakeFiles/level.dir/rule
@@ -302,6 +407,9 @@ CMakeFiles/level.dir/clean:
 # All Build rule for target.
 CMakeFiles/game.dir/all: CMakeFiles/raglib.dir/all
 CMakeFiles/game.dir/all: CMakeFiles/events.dir/all
+CMakeFiles/game.dir/all: CMakeFiles/animation.dir/all
+CMakeFiles/game.dir/all: CMakeFiles/sprite.dir/all
+CMakeFiles/game.dir/all: CMakeFiles/player.dir/all
 CMakeFiles/game.dir/all: CMakeFiles/entities.dir/all
 CMakeFiles/game.dir/all: CMakeFiles/quadtree.dir/all
 CMakeFiles/game.dir/all: CMakeFiles/level.dir/all
@@ -309,12 +417,12 @@ CMakeFiles/game.dir/all: _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
 CMakeFiles/game.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\game.dir\build.make CMakeFiles/game.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\game.dir\build.make CMakeFiles/game.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=7,8 "Built target game"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=9,10 "Built target game"
 .PHONY : CMakeFiles/game.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/game.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 41
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 47
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/game.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 0
 .PHONY : CMakeFiles/game.dir/rule
@@ -334,6 +442,9 @@ CMakeFiles/game.dir/clean:
 # All Build rule for target.
 CMakeFiles/dog-days.dir/all: CMakeFiles/raglib.dir/all
 CMakeFiles/dog-days.dir/all: CMakeFiles/events.dir/all
+CMakeFiles/dog-days.dir/all: CMakeFiles/animation.dir/all
+CMakeFiles/dog-days.dir/all: CMakeFiles/sprite.dir/all
+CMakeFiles/dog-days.dir/all: CMakeFiles/player.dir/all
 CMakeFiles/dog-days.dir/all: CMakeFiles/entities.dir/all
 CMakeFiles/dog-days.dir/all: CMakeFiles/quadtree.dir/all
 CMakeFiles/dog-days.dir/all: CMakeFiles/level.dir/all
@@ -342,12 +453,12 @@ CMakeFiles/dog-days.dir/all: _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
 CMakeFiles/dog-days.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\dog-days.dir\build.make CMakeFiles/dog-days.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\dog-days.dir\build.make CMakeFiles/dog-days.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=1,2 "Built target dog-days"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=3,4 "Built target dog-days"
 .PHONY : CMakeFiles/dog-days.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/dog-days.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 43
+	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 49
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/dog-days.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles 0
 .PHONY : CMakeFiles/dog-days.dir/rule
@@ -394,7 +505,7 @@ _deps/raylib-build/CMakeFiles/uninstall.dir/clean:
 _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all: _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
 	$(MAKE) $(MAKESILENT) -f _deps\raylib-build\raylib\CMakeFiles\raylib.dir\build.make _deps/raylib-build/raylib/CMakeFiles/raylib.dir/depend
 	$(MAKE) $(MAKESILENT) -f _deps\raylib-build\raylib\CMakeFiles\raylib.dir\build.make _deps/raylib-build/raylib/CMakeFiles/raylib.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=36,37,38,39,40,41,42,43 "Built target raylib"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=40,41,42,43,44,45,46,47 "Built target raylib"
 .PHONY : _deps/raylib-build/raylib/CMakeFiles/raylib.dir/all
 
 # Build rule for subdir invocation for target.
@@ -420,7 +531,7 @@ _deps/raylib-build/raylib/CMakeFiles/raylib.dir/clean:
 _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all:
 	$(MAKE) $(MAKESILENT) -f _deps\raylib-build\raylib\external\glfw\src\CMakeFiles\glfw.dir\build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/depend
 	$(MAKE) $(MAKESILENT) -f _deps\raylib-build\raylib\external\glfw\src\CMakeFiles\glfw.dir\build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29 "Built target glfw"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 "Built target glfw"
 .PHONY : _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/all
 
 # Build rule for subdir invocation for target.
@@ -446,7 +557,7 @@ _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/glfw.dir/clean:
 _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/all:
 	$(MAKE) $(MAKESILENT) -f _deps\raylib-build\raylib\external\glfw\src\CMakeFiles\update_mappings.dir\build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/depend
 	$(MAKE) $(MAKESILENT) -f _deps\raylib-build\raylib\external\glfw\src\CMakeFiles\update_mappings.dir\build.make _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=44 "Built target update_mappings"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\build\CMakeFiles --progress-num=50 "Built target update_mappings"
 .PHONY : _deps/raylib-build/raylib/external/glfw/src/CMakeFiles/update_mappings.dir/all
 
 # Build rule for subdir invocation for target.

@@ -109,6 +109,9 @@ set(CMAKE_MAKEFILE_PRODUCTS
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/raglib.dir/DependInfo.cmake"
   "CMakeFiles/events.dir/DependInfo.cmake"
+  "CMakeFiles/animation.dir/DependInfo.cmake"
+  "CMakeFiles/sprite.dir/DependInfo.cmake"
+  "CMakeFiles/player.dir/DependInfo.cmake"
   "CMakeFiles/entities.dir/DependInfo.cmake"
   "CMakeFiles/quadtree.dir/DependInfo.cmake"
   "CMakeFiles/level.dir/DependInfo.cmake"
