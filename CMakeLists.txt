@@ -48,14 +48,27 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
 endif()
 
 # Our Project
-
+link_libraries(raylib)
 # add_library(lib_name src/lib_name.cpp)
 # link_libraries(lib_name)
+add_library(raglib src/raglib.cpp)
+link_libraries(raglib)
+
+add_library(events src/events.cpp)
+link_libraries(events)
+
+add_library(entities src/entities.cpp)
+link_libraries(entities)
+
+add_library(quadtree src/quadtree.cpp)
+link_libraries(quadtree)
+
 add_library(level src/level.cpp)
 link_libraries(level)
 
 add_library(game src/game.cpp)
 link_libraries(game)
+
 add_executable(${PROJECT_NAME} src/dog_days.cpp)
 target_link_libraries(${PROJECT_NAME} raylib)
 

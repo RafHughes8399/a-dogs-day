@@ -181,6 +181,58 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named raglib
+
+# Build rule for target.
+raglib: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 raglib
+.PHONY : raglib
+
+# fast build rule for target.
+raglib/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\raglib.dir\build.make CMakeFiles/raglib.dir/build
+.PHONY : raglib/fast
+
+#=============================================================================
+# Target rules for targets named events
+
+# Build rule for target.
+events: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 events
+.PHONY : events
+
+# fast build rule for target.
+events/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\events.dir\build.make CMakeFiles/events.dir/build
+.PHONY : events/fast
+
+#=============================================================================
+# Target rules for targets named entities
+
+# Build rule for target.
+entities: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 entities
+.PHONY : entities
+
+# fast build rule for target.
+entities/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\entities.dir\build.make CMakeFiles/entities.dir/build
+.PHONY : entities/fast
+
+#=============================================================================
+# Target rules for targets named quadtree
+
+# Build rule for target.
+quadtree: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 quadtree
+.PHONY : quadtree
+
+# fast build rule for target.
+quadtree/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quadtree.dir\build.make CMakeFiles/quadtree.dir/build
+.PHONY : quadtree/fast
+
+#=============================================================================
 # Target rules for targets named level
 
 # Build rule for target.
@@ -295,6 +347,54 @@ src/dog_days.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\dog-days.dir\build.make CMakeFiles/dog-days.dir/src/dog_days.cpp.s
 .PHONY : src/dog_days.cpp.s
 
+src/entities.obj: src/entities.cpp.obj
+.PHONY : src/entities.obj
+
+# target to build an object file
+src/entities.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\entities.dir\build.make CMakeFiles/entities.dir/src/entities.cpp.obj
+.PHONY : src/entities.cpp.obj
+
+src/entities.i: src/entities.cpp.i
+.PHONY : src/entities.i
+
+# target to preprocess a source file
+src/entities.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\entities.dir\build.make CMakeFiles/entities.dir/src/entities.cpp.i
+.PHONY : src/entities.cpp.i
+
+src/entities.s: src/entities.cpp.s
+.PHONY : src/entities.s
+
+# target to generate assembly for a file
+src/entities.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\entities.dir\build.make CMakeFiles/entities.dir/src/entities.cpp.s
+.PHONY : src/entities.cpp.s
+
+src/events.obj: src/events.cpp.obj
+.PHONY : src/events.obj
+
+# target to build an object file
+src/events.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\events.dir\build.make CMakeFiles/events.dir/src/events.cpp.obj
+.PHONY : src/events.cpp.obj
+
+src/events.i: src/events.cpp.i
+.PHONY : src/events.i
+
+# target to preprocess a source file
+src/events.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\events.dir\build.make CMakeFiles/events.dir/src/events.cpp.i
+.PHONY : src/events.cpp.i
+
+src/events.s: src/events.cpp.s
+.PHONY : src/events.s
+
+# target to generate assembly for a file
+src/events.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\events.dir\build.make CMakeFiles/events.dir/src/events.cpp.s
+.PHONY : src/events.cpp.s
+
 src/game.obj: src/game.cpp.obj
 .PHONY : src/game.obj
 
@@ -343,6 +443,54 @@ src/level.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\level.dir\build.make CMakeFiles/level.dir/src/level.cpp.s
 .PHONY : src/level.cpp.s
 
+src/quadtree.obj: src/quadtree.cpp.obj
+.PHONY : src/quadtree.obj
+
+# target to build an object file
+src/quadtree.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quadtree.dir\build.make CMakeFiles/quadtree.dir/src/quadtree.cpp.obj
+.PHONY : src/quadtree.cpp.obj
+
+src/quadtree.i: src/quadtree.cpp.i
+.PHONY : src/quadtree.i
+
+# target to preprocess a source file
+src/quadtree.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quadtree.dir\build.make CMakeFiles/quadtree.dir/src/quadtree.cpp.i
+.PHONY : src/quadtree.cpp.i
+
+src/quadtree.s: src/quadtree.cpp.s
+.PHONY : src/quadtree.s
+
+# target to generate assembly for a file
+src/quadtree.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quadtree.dir\build.make CMakeFiles/quadtree.dir/src/quadtree.cpp.s
+.PHONY : src/quadtree.cpp.s
+
+src/raglib.obj: src/raglib.cpp.obj
+.PHONY : src/raglib.obj
+
+# target to build an object file
+src/raglib.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\raglib.dir\build.make CMakeFiles/raglib.dir/src/raglib.cpp.obj
+.PHONY : src/raglib.cpp.obj
+
+src/raglib.i: src/raglib.cpp.i
+.PHONY : src/raglib.i
+
+# target to preprocess a source file
+src/raglib.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\raglib.dir\build.make CMakeFiles/raglib.dir/src/raglib.cpp.i
+.PHONY : src/raglib.cpp.i
+
+src/raglib.s: src/raglib.cpp.s
+.PHONY : src/raglib.s
+
+# target to generate assembly for a file
+src/raglib.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\raglib.dir\build.make CMakeFiles/raglib.dir/src/raglib.cpp.s
+.PHONY : src/raglib.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -360,19 +508,35 @@ help:
 	@echo ... uninstall
 	@echo ... update_mappings
 	@echo ... dog-days
+	@echo ... entities
+	@echo ... events
 	@echo ... game
 	@echo ... glfw
 	@echo ... level
+	@echo ... quadtree
+	@echo ... raglib
 	@echo ... raylib
 	@echo ... src/dog_days.obj
 	@echo ... src/dog_days.i
 	@echo ... src/dog_days.s
+	@echo ... src/entities.obj
+	@echo ... src/entities.i
+	@echo ... src/entities.s
+	@echo ... src/events.obj
+	@echo ... src/events.i
+	@echo ... src/events.s
 	@echo ... src/game.obj
 	@echo ... src/game.i
 	@echo ... src/game.s
 	@echo ... src/level.obj
 	@echo ... src/level.i
 	@echo ... src/level.s
+	@echo ... src/quadtree.obj
+	@echo ... src/quadtree.i
+	@echo ... src/quadtree.s
+	@echo ... src/raglib.obj
+	@echo ... src/raglib.i
+	@echo ... src/raglib.s
 .PHONY : help
 
 

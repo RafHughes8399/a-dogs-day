@@ -107,6 +107,10 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/raglib.dir/DependInfo.cmake"
+  "CMakeFiles/events.dir/DependInfo.cmake"
+  "CMakeFiles/entities.dir/DependInfo.cmake"
+  "CMakeFiles/quadtree.dir/DependInfo.cmake"
   "CMakeFiles/level.dir/DependInfo.cmake"
   "CMakeFiles/game.dir/DependInfo.cmake"
   "CMakeFiles/dog-days.dir/DependInfo.cmake"
