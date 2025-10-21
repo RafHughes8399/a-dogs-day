@@ -5,13 +5,16 @@
  */
 #ifndef PLAYER_H
 #define PLAYER_H
+
+#include "config.h"
+#include "raylib.h"
+#include "sprite.h"
 namespace player{
+    // map from control input to function 
     class controls{
-
+        // TODO implement 
     };
-    class cursor{
 
-    };
     class viewport{
 
     };
@@ -24,13 +27,26 @@ namespace player{
     // also include at some point hud and inventory
     class player{
         public:
-        private:
+            ~player() = default;
+            player(controls controls)
+                : control_scheme_(controls) {};
+            player(const player& other) = default;
+            player(player&& other) = default;
+        
+            player& operator=(const player& other) = default;
+            player& operator=(player&& other) = default;
 
+            void update(float delta);
+            void render();
+
+        private:
             controls control_scheme_;
-            cursor cursor_;
-            hud hud_;
-            inventory inventory_;
-            viewport frame_;
+            //viewport frame_; // what can be seen by the player, essentially a rectangle, maybe better for the world ?
+            /** 
+             * 
+             hud hud_;
+             inventory inventory_;
+             */
     };
 
 } // namespace player

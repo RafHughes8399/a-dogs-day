@@ -19,8 +19,8 @@
 #define NODE_LIFETIME 30
 #define CHILDREN 4
 
-#define WORLD_MIN Vector3Scale(Vector2{config::world_x, config::world_y}, -0.5)
-#define WORLD_MAX Vector3Scale(Vector2{WORLD_X, WORLD_Y}, 0.5)
+#define WORLD_MIN Vector2Zero()
+#define WORLD_MAX Vector2 {config::world_x, config::world_y}
 #define WORLD_BOX raglib::bounding_box_2{WORLD_MIN, WORLD_MAX}
 
 namespace tree{

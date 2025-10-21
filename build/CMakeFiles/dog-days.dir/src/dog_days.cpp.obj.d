@@ -174,4 +174,44 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:/Strawberry/c/include/c++/13.2.0/tr1/riemann_zeta.tcc \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\config.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\game.h \
- C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\level.h
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\level.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\quadtree.h \
+ C:/Strawberry/c/include/c++/13.2.0/vector \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_uninitialized.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_vector.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_bvector.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/vector.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/memory \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_tempbuf.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_raw_storage_iter.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/align.h \
+ C:/Strawberry/c/lib/gcc/x86_64-w64-mingw32/13.2.0/include/stdint.h \
+ C:/Strawberry/c/x86_64-w64-mingw32/include/stdint.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/unique_ptr.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/shared_ptr.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/shared_ptr_base.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/allocated_ptr.h \
+ C:/Strawberry/c/include/c++/13.2.0/ext/aligned_buffer.h \
+ C:/Strawberry/c/include/c++/13.2.0/ext/concurrence.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/shared_ptr_atomic.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/atomic_base.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/atomic_lockfree_defines.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/atomic_wait.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/std_mutex.h \
+ C:/Strawberry/c/include/c++/13.2.0/backward/auto_ptr.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/ranges_uninitialized.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/ranges_algobase.h \
+ C:/Strawberry/c/include/c++/13.2.0/pstl/glue_memory_defs.h \
+ C:/Strawberry/c/include/c++/13.2.0/pstl/execution_defs.h \
+ C:/Strawberry/c/include/c++/13.2.0/algorithm \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_algo.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/algorithmfwd.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_heap.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/uniform_int_dist.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/ranges_algo.h \
+ C:/Strawberry/c/include/c++/13.2.0/pstl/glue_algorithm_defs.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\raglib.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\entities.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\sprite.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\animation.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\player.h

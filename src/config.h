@@ -12,7 +12,7 @@ namespace config{
     inline const char* background_path = "../sprites/background.png" ;
 
     // world dimensions
-    inline int world_x = 4096;
-    inline int world_y = 4096;
+    inline float world_x = 4096.0f;
+    inline float world_y = 4096.0f;
 }
 #endif

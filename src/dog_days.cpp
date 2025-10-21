@@ -8,7 +8,7 @@ int main(){
     auto width = GetScreenWidth();
     auto height = GetScreenHeight();
     InitWindow(width, height, "dog");
-    auto game = game::game();
+/*     auto game = game::game();
     while(! WindowShouldClose()){
         float delta = GetFrameTime();
         game.update(delta);
@@ -16,7 +16,7 @@ int main(){
             game.render(delta);
             game.debug(delta);
         EndDrawing();
-    }
+    } */
     /**
      * 
      auto background = LoadTexture(config::background_path);

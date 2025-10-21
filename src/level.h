@@ -10,20 +10,26 @@
  */
 #ifndef LEVEL_H
 #define LEVEL_H
-namespace leve{
+#include "quadtree.h"
+namespace level{
     class level{
         public:
             ~level() = default;
-            level() = default;
+            level()
+                : level_entities_(tree::quadree(raglib::bounding_box_2{Vector2Zero(), Vector2 {config::world_x, config::world_y}})){};
             level(const level& other) = default;
             level(level&& other) = default;
             
             level& operator=(const level& other) = default;
             level& operator=(level&& other) = default;
+
+            void update(float delta);
+            void render();
         private:
             // quadtree entities
             // level dimensions
             // etc.
+            tree::quadree level_entities_;
     };
 }
 
