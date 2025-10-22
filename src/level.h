@@ -14,16 +14,15 @@
 #include "quadtree.h"
 #include "textures.h"
 namespace level{
+
     class level{
-        public:
+        public :
             ~level() = default;
-            level()
-                : background_(sprite::sprite(LoadTexture(config::background_path), config::background_attributes[config::attributes::frame_width], config::background_attributes[config::attributes::frame_height],
-                config::background_attributes[config::attributes::frames], config::background_attributes[config::attributes::animations])), 
-                
-                level_entities_(tree::quadree(raglib::bounding_box_2{Vector2Zero(), Vector2{config::world_x, config::world_y}})),
-                view_frame_(Rectangle{0.0f, 0.0f, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())}),
-                dimensions_(Vector2{config::world_x, config::world_y}){};
+            level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
+            : background_(sprite), view_frame_(frame), dimensions_(dimensions), 
+            level_entities_(tree::quadree(raglib::bounding_box_2{Vector2Zero(), dimensions})){
+
+            };
             level(const level& other) = default;
             level(level&& other) = default;
             
@@ -32,11 +31,25 @@ namespace level{
 
             void update(float delta);
             void render();
-        private:
+        private :
             sprite::sprite background_;
             tree::quadree level_entities_;
             Rectangle view_frame_;
             Vector2 dimensions_;
+    };
+        // self explanatory, a class to construct leveks, outline functions that build levels generating enetities, specifying background,
+    // maybe the level map graph, and the tileset too
+    class level_builder {
+        public :
+            ~level_builder()  = default;
+            level_builder() = default;
+            level_builder(const level_builder& other) = default;
+            level_builder(level_builder&& other) = default;
+
+            level_builder& operator=(const level_builder& other) = default;
+            level_builder& operator=(level_builder&& other) = default;
+
+            level build_main_level();
     };
 }
 

@@ -5,15 +5,14 @@
 #include "config.h"
 #include "game.h"
 int main(){
-    auto width = GetScreenWidth();
-    auto height = GetScreenHeight();
-    std::cout << "screen dimensions"<< std::endl;
-    InitWindow(width, height, "dog");
-    std::cout << "init window"<< std::endl;
-    auto level = level::level();
+    InitWindow(GetScreenWidth(), GetScreenHeight(), "dog day");
+    auto level_builder = level::level_builder();
     auto player = player::player();
+    auto level = level_builder.build_main_level();
+    std::cout << "game constructing" << std::endl;
     auto game = game::game(level, player);
     std::cout << "created game "<< std::endl;
+    
     while(! WindowShouldClose()){
         float delta = GetFrameTime();
         game.update(delta);
@@ -56,6 +55,6 @@ int main(){
         }
     */
     CloseWindow();
-    std::cout << " HELLO WORLD " << std::endl;
+    std::cout << " HELLO WORLD " << std::endl; // 20 / 10 / 25
     return 0;
 }

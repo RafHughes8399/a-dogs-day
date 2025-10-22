@@ -14,7 +14,10 @@ namespace entities{
     class entity {
         public:
             virtual ~entity() = default;
-            entity() = default;
+            entity(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
+            : bounds_(bounds), sprite_(sprite), position_(position), id_(id){
+
+            };
             entity(const entity& other) = default;
             entity(entity&& other) = default;
 
@@ -31,14 +34,14 @@ namespace entities{
             void render();
             virtual void interact(entity& other) = 0;
 
-        private:
+        protected:
             const int id_;
             
             raglib::bounding_box_2 bounds_;
             sprite::sprite sprite_;
             Vector2 position_;
     };
-        // the cursor for the player 
+    // the cursor for the player 
     /**
      * shaped as a paw, changes based on interactable behaviour, like a regular cursor, 
      * if you consider it, a cursor is an entity, because it will interact with other entities
@@ -46,7 +49,10 @@ namespace entities{
     class cursor : public entity{
         public:
             ~cursor() = default;
-            cursor() = default;
+            cursor(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
+                : entity(sprite, bounds, position, id){
+
+            };
             cursor(const cursor& other) = default;
             cursor(cursor&& other) = default;
 

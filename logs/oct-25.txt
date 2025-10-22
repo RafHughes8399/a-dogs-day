@@ -61,3 +61,10 @@ moving the screen around, just a quick experiment for now
 -> where does it go, it is the player camera
 -> but it is used mostly by the level if anything
 -> i think the player is better for managing the hud and inventory, and controls 
+
+
+22 / 10
+-> cursor setup
+-> player controls
+-> cursor controls and associated events for dragging and interacting
+-> singleton texture loading

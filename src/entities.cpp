@@ -18,7 +18,10 @@ void entities::entity::render(){
 // --------------------------- cursor --------------------------- // 
 
 int entities::cursor::update(float delta){
+    // simple for now 
     (void) delta;
+    auto new_position = GetMousePosition();
+    position_ = new_position;
     return status_codes::nothing;
 }
 
