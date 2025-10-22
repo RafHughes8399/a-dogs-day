@@ -7,8 +7,13 @@
 int main(){
     auto width = GetScreenWidth();
     auto height = GetScreenHeight();
+    std::cout << "screen dimensions"<< std::endl;
     InitWindow(width, height, "dog");
-/*     auto game = game::game();
+    std::cout << "init window"<< std::endl;
+    auto level = level::level();
+    auto player = player::player();
+    auto game = game::game(level, player);
+    std::cout << "created game "<< std::endl;
     while(! WindowShouldClose()){
         float delta = GetFrameTime();
         game.update(delta);
@@ -16,7 +21,7 @@ int main(){
             game.render(delta);
             game.debug(delta);
         EndDrawing();
-    } */
+    }
     /**
      * 
      auto background = LoadTexture(config::background_path);

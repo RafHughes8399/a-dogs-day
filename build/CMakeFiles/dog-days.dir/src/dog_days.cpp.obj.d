@@ -214,4 +214,5 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\entities.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\sprite.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\animation.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\textures.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\player.h

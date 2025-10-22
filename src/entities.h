@@ -27,9 +27,9 @@ namespace entities{
             Vector2 get_position();
             int get_id();
 
-            int update(float delta);
+            virtual int update(float delta) = 0;
             void render();
-            void interact(entity& other);
+            virtual void interact(entity& other) = 0;
 
         private:
             const int id_;
@@ -53,8 +53,8 @@ namespace entities{
             cursor& operator=(const cursor& other) = default;
             cursor& operator=(cursor&& other) = default;
 
-            void update(float delta);
-            void render(); // draw at the mouse position
+            int update(float delta) override;
+            void interact(entity& other) override;
 
         private:
     };

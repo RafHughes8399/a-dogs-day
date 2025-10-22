@@ -43,9 +43,21 @@ moving the screen around, just a quick experiment for now
 
 
 
--> bring over sprite and animation
+-> bring over sprite and animation x 
 -> fill out entities 
 -> outline basic entity hierarchy
 -> setup player controller
 -> and hud 
 
+-> let us consider how things will be drawn
+-> there is a view frame for the game, kind of like the 2d version of the frustrum
+-> instead of a frustrum it is just a rectangle
+-> the cursor control changes this view frame
+-> entities that fit in the frame are drawn
+-> the background is drawn based on the view frame
+-> the view frame is essentially a camera
+-> there is a distinction between the background and the entities
+
+-> where does it go, it is the player camera
+-> but it is used mostly by the level if anything
+-> i think the player is better for managing the hud and inventory, and controls 

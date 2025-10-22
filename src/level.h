@@ -10,13 +10,20 @@
  */
 #ifndef LEVEL_H
 #define LEVEL_H
+#include "config.h"
 #include "quadtree.h"
+#include "textures.h"
 namespace level{
     class level{
         public:
             ~level() = default;
             level()
-                : level_entities_(tree::quadree(raglib::bounding_box_2{Vector2Zero(), Vector2 {config::world_x, config::world_y}})){};
+                : background_(sprite::sprite(LoadTexture(config::background_path), config::background_attributes[config::attributes::frame_width], config::background_attributes[config::attributes::frame_height],
+                config::background_attributes[config::attributes::frames], config::background_attributes[config::attributes::animations])), 
+                
+                level_entities_(tree::quadree(raglib::bounding_box_2{Vector2Zero(), Vector2{config::world_x, config::world_y}})),
+                view_frame_(Rectangle{0.0f, 0.0f, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())}),
+                dimensions_(Vector2{config::world_x, config::world_y}){};
             level(const level& other) = default;
             level(level&& other) = default;
             
@@ -26,10 +33,10 @@ namespace level{
             void update(float delta);
             void render();
         private:
-            // quadtree entities
-            // level dimensions
-            // etc.
+            sprite::sprite background_;
             tree::quadree level_entities_;
+            Rectangle view_frame_;
+            Vector2 dimensions_;
     };
 }
 

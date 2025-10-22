@@ -65,6 +65,7 @@ link_libraries(sprite)
 
 add_library(player src/player.cpp)
 link_libraries(player)
+
 add_library(entities src/entities.cpp)
 link_libraries(entities)
 

@@ -216,7 +216,8 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: C:/Users/raffa/OneDrive/Documents/
   C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/player.h \
   C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/quadtree.h \
   C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/raglib.h \
-  C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/sprite.h
+  C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/sprite.h \
+  C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/textures.h
 
 
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/player.h:
@@ -508,6 +509,8 @@ C:/Strawberry/c/x86_64-w64-mingw32/include/stdint.h:
 C:/Strawberry/c/include/c++/13.2.0/bits/exception_ptr.h:
 
 C:/Strawberry/c/include/c++/13.2.0/bits/iterator_concepts.h:
+
+C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/textures.h:
 
 C:/Strawberry/c/include/c++/13.2.0/exception:
 

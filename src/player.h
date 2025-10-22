@@ -15,9 +15,6 @@ namespace player{
         // TODO implement 
     };
 
-    class viewport{
-
-    };
     class hud{
 
     };
@@ -28,8 +25,7 @@ namespace player{
     class player{
         public:
             ~player() = default;
-            player(controls controls)
-                : control_scheme_(controls) {};
+            player() {};
             player(const player& other) = default;
             player(player&& other) = default;
         
@@ -40,7 +36,7 @@ namespace player{
             void render();
 
         private:
-            controls control_scheme_;
+            //controls control_scheme_;
             //viewport frame_; // what can be seen by the player, essentially a rectangle, maybe better for the world ?
             /** 
              * 
