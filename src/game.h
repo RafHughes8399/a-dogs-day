@@ -8,6 +8,7 @@
 
 #include "level.h"
 #include "player.h"
+#include <iostream>
 namespace game{
     class game {
         public:

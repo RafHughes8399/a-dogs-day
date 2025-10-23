@@ -10,9 +10,12 @@
  */
 #ifndef LEVEL_H
 #define LEVEL_H
+
 #include "config.h"
 #include "quadtree.h"
+#include "raglib.h"
 #include "textures.h"
+
 namespace level{
 
     class level{
@@ -31,6 +34,10 @@ namespace level{
 
             void update(float delta);
             void render();
+
+            void add_entity(std::unique_ptr<entities::entity> entity);
+            int entity_id();
+            int num_entities();
         private :
             sprite::sprite background_;
             tree::quadree level_entities_;

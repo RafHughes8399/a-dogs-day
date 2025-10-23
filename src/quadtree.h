@@ -8,6 +8,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <iostream>
 // raylib includes 
 #include "raylib.h"
 #include "raymath.h"
@@ -112,7 +113,6 @@ namespace tree{
         std::unique_ptr<node>* find_new_parent(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity>& entity);
         template<typename UnaryPred>
         void render(std::unique_ptr<node>& tree, UnaryPred p){
-        
             if(not tree){
                 return;
             }
@@ -198,7 +198,7 @@ namespace tree{
         }
         
         // update and render
-        void update(double delta){
+        void update(float delta){
             update(root_, delta);
             auto parent_objects = std::vector<entities::entity*>{};
             identify_collisions(root_, parent_objects); // start with an empty list

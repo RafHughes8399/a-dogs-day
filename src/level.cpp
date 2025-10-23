@@ -2,7 +2,7 @@
 #include <iostream>
 // --------------------- level ----------------------------------------- //
 void level::level::update(float delta){
-    (void) delta;
+    level_entities_.update(delta);
     return;
 }
 void level::level::render(){
@@ -18,6 +18,17 @@ void level::level::render(){
     level_entities_.render(render_precdicate);
     return;
 }
+
+void level::level::add_entity(std::unique_ptr<entities::entity> entity){
+    level_entities_.insert(entity);
+}
+
+int level::level::entity_id(){
+    return level_entities_.get_next_id();
+}
+int level::level::num_entities(){
+    return level_entities_.size();
+}
 // --------------------- level builder ----------------------------------------- //
 level::level level::level_builder::build_main_level(){
     auto background = sprite::sprite(LoadTexture(config::background_path), 
@@ -30,6 +41,19 @@ level::level level::level_builder::build_main_level(){
     auto dimensions = Vector2{config::world_x, config::world_y};
 
     auto l = level(background, view_frame, dimensions);
-    std::cout << "built level "<< std::endl;
+
+    // append the cursor
+    std::unique_ptr<entities::entity> cursor = std::make_unique<entities::cursor>(
+        sprite::sprite(LoadTexture(config::cursor_path), 
+        config::cursor_attributes[config::attributes::frame_width],
+        config::cursor_attributes[config::attributes::frame_height],
+        config::cursor_attributes[config::attributes::frames],
+        config::cursor_attributes[config::attributes::animations]),
+        raglib::bounding_box_2{Vector2Zero(), Vector2Zero()},
+        GetMousePosition(),
+        l.entity_id());
+    l.add_entity(std::move(cursor));
+    
+    
     return l;
 }

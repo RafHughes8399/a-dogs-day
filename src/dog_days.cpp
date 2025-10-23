@@ -9,10 +9,8 @@ int main(){
     auto level_builder = level::level_builder();
     auto player = player::player();
     auto level = level_builder.build_main_level();
-    std::cout << "game constructing" << std::endl;
     auto game = game::game(level, player);
-    std::cout << "created game "<< std::endl;
-    
+    HideCursor();
     while(! WindowShouldClose()){
         float delta = GetFrameTime();
         game.update(delta);

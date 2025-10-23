@@ -1,4 +1,5 @@
 #include "entities.h"
+#include <iostream>
 // --------------------------- entity --------------------------- // 
 raglib::bounding_box_2& entities::entity::get_bounds(){
     return bounds_;
