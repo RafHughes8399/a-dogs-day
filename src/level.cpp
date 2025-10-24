@@ -29,6 +29,28 @@ int level::level::entity_id(){
 int level::level::num_entities(){
     return level_entities_.size();
 }
+
+void level::level::on_left_mouse_event(const events::left_mouse_down& event){
+    // cast the event
+    // do what you need to do
+    auto delta = event.get_mouse_delta();
+    auto frame_delta = Vector2Scale(delta, -1);
+
+
+
+}
+void level::level::on_right_mouse_event(const events::right_mouse_click& event){
+    // cast the event
+    // do what you need to do
+    auto click_position = event.get_mouse_position();
+    // create an entity at that position
+   // std::unique_ptr<entities::entity> = std::make_unique<>();
+   auto paw = entities::e_builder.build_paw_mark(click_position, level_entities_.get_next_id());
+   // start playing the paw
+   add_entity(std::move(paw));
+
+}
+
 // --------------------- level builder ----------------------------------------- //
 level::level level::level_builder::build_main_level(){
     auto background = sprite::sprite(LoadTexture(config::background_path), 
@@ -43,17 +65,7 @@ level::level level::level_builder::build_main_level(){
     auto l = level(background, view_frame, dimensions);
 
     // append the cursor
-    std::unique_ptr<entities::entity> cursor = std::make_unique<entities::cursor>(
-        sprite::sprite(LoadTexture(config::cursor_path), 
-        config::cursor_attributes[config::attributes::frame_width],
-        config::cursor_attributes[config::attributes::frame_height],
-        config::cursor_attributes[config::attributes::frames],
-        config::cursor_attributes[config::attributes::animations]),
-        raglib::bounding_box_2{Vector2Zero(), Vector2Zero()},
-        GetMousePosition(),
-        l.entity_id());
+    auto cursor = entities::e_builder.build_cursor(GetMousePosition(), l.entity_id());
     l.add_entity(std::move(cursor));
-    
-    
     return l;
 }

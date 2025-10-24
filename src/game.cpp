@@ -5,6 +5,9 @@ void game::game::update(float delta){
     level_.update(delta);
     // then the player
     player_.update(delta);
+
+    // deal with the event queue
+    events::global_dispatcher_.process_events(delta);
     return;
 }
 

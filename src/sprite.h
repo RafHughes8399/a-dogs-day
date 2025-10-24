@@ -19,13 +19,14 @@ namespace sprite{
             sprite& operator=(const sprite& other) = default;
             sprite& operator=(sprite&& other) = default;
 
+            animation::animation& get_animation();
             Texture2D& get_texture();
-            void render(Vector2& position);
+            void render(Vector2 position);
         private:
             // has the texture 
+            animation::animation sprite_animation_;
             Texture2D sprite_texture_; 
             // and the animation
-            animation::animation sprite_animation_;
     };
     // potential use for displaying things like shop items
     // i.e all the hats exist on one sprite sheet, then the shop displays them, idk more thought needded

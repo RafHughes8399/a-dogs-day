@@ -386,6 +386,8 @@ void tree::quadree::update(std::unique_ptr<node>& tree, float delta){
                 // my thoughts is here to do somthing along the lines of 
                 //check_collisions(object)
                 break;
+            case entities::status_codes::dead:
+                erase(tree, object->get_id());
             default:
                 break;
         }

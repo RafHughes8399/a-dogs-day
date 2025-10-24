@@ -13,6 +13,7 @@
 
 #ifndef EVENTS_H
 #define EVENTS_H
+
 // std includes 
 #include <functional>
 #include <string>
@@ -21,14 +22,17 @@
 #include <algorithm>
 #include <queue>
 #include <ctime>
-// project includes
 
+// project includes
+#include "raylib.h"
 
 namespace events{
 	// an enum ID for event types
-	enum event_types{
+	enum ids{
 		test = 0,
-		size = 1
+		left_mouse = 1,
+		right_mouse = 2,
+		size = 3
 	};
 	class event{
 	protected:
@@ -57,14 +61,13 @@ namespace events{
 	};
 
 	class test_event : public  event{
-	protected:
 	public:
 		~test_event() = default;
 		test_event(float delay=0.0f)
-		: event(event_types::test, delay), time_(std::time(nullptr)){};
+		: event(ids::test, delay), time_(std::time(nullptr)){};
 
 		static const int get_static_type(){
-			return event_types::test;
+			return ids::test;
 		}
 		char* get_event_time() const{
 			return std::asctime(std::localtime(&time_));
@@ -73,7 +76,45 @@ namespace events{
 		std::time_t time_;
 
 	};
-	
+	// ------------------------- mouse events  ------------------------- //
+	class left_mouse_down : public event{
+		public:
+			~left_mouse_down() = default;
+			left_mouse_down(Vector2 delta)
+			: event(ids::left_mouse), mouse_delta_(delta){};
+
+			static const int get_static_type(){
+				return ids::left_mouse;
+			}
+			Vector2 get_mouse_delta() const{
+				return mouse_delta_;
+			}
+		private:
+			Vector2 mouse_delta_;
+	};
+	class right_mouse_click : public event{
+		public:
+			~right_mouse_click() = default;
+			right_mouse_click(Vector2 position)
+			: event(ids::right_mouse), mouse_position_(position){};
+
+			static const int get_static_type(){
+				return ids::right_mouse;
+			}
+			Vector2 get_mouse_position() const{
+				return mouse_position_;
+			}
+		private:
+			Vector2 mouse_position_;
+	};
+
+	// ------------------------- entity events  ------------------------- //
+	// ! right now for removing the paw when it fades ! 
+	// does it need to be an event though, because the tree can handle entity removing, 
+	// just pass it through an update status
+	class remove_entity : public event{
+
+	};
 	class event_handler_interface{
 		public:
 		virtual ~event_handler_interface() = default;

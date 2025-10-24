@@ -17,14 +17,20 @@
 #include "textures.h"
 
 namespace level{
-
     class level{
         public :
-            ~level() = default;
+            ~level(){
+                event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
+                event_interface::unsubscribe<events::right_mouse_click>(right_mouse_handler_);
+            }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
             : background_(sprite), view_frame_(frame), dimensions_(dimensions), 
-            level_entities_(tree::quadree(raglib::bounding_box_2{Vector2Zero(), dimensions})){
-
+            level_entities_(tree::quadree(raglib::bounding_box_2{Vector2Zero(), dimensions})),
+            left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}),
+            right_mouse_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);})
+            {
+                event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
+                event_interface::subscribe<events::right_mouse_click>(right_mouse_handler_);
             };
             level(const level& other) = default;
             level(level&& other) = default;
@@ -38,11 +44,19 @@ namespace level{
             void add_entity(std::unique_ptr<entities::entity> entity);
             int entity_id();
             int num_entities();
+
+            void on_left_mouse_event(const events::left_mouse_down& event);
+            void on_right_mouse_event(const events::right_mouse_click& event);
         private :
             sprite::sprite background_;
             tree::quadree level_entities_;
             Rectangle view_frame_;
             Vector2 dimensions_;
+
+
+            // event handlers
+            events::event_handler<events::left_mouse_down> left_mouse_handler_;
+            events::event_handler<events::right_mouse_click> right_mouse_handler_;
     };
         // self explanatory, a class to construct leveks, outline functions that build levels generating enetities, specifying background,
     // maybe the level map graph, and the tileset too

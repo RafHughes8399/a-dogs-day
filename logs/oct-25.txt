@@ -72,3 +72,16 @@ moving the screen around, just a quick experiment for now
 
 -> debug cursor drawing, it is in the tree isseus could be 
     -> view frame calculations, render implementations 
+
+
+ok ok ok
+-> player control, register mouse clicking and dragging
+->  
+-> visual indication of action (grab while dragging, lave mark when right click)
+-> cursor entity is lowkey only aesthetic since the player controls handles the events for left and right click
+
+
+-> so make the cursor a sprite for the player, no no no it needs to be an entity to interact with other entities
+-> then draw and animate the paw
+-> test right click 
+-> test left click dragging

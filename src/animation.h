@@ -21,18 +21,20 @@ namespace animation{
                 
             animation& operator=(const animation& other) = default;
             animation& operator=(animation&& other) = default;
+
             const Rectangle& get_frame() const;
+            bool playing();
             int get_current_frame(); 
             int get_current_animation();
-            bool playing();
-            void next_frame(bool wrap = true);
+            
             void next_animation();
+            void next_frame(bool wrap = true);
 
-            void goto_frame(const int frame);
             void goto_animation(const int animation);
+            void goto_frame(const int frame);
 
-            void play();
             void pause();
+            void play();
 
             const int num_frames();
             const int num_animations();

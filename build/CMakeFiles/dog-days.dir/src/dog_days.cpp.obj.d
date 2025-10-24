@@ -173,14 +173,14 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:/Strawberry/c/include/c++/13.2.0/tr1/poly_laguerre.tcc \
  C:/Strawberry/c/include/c++/13.2.0/tr1/riemann_zeta.tcc \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\config.h \
- C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\game.h \
- C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\level.h \
- C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\quadtree.h \
  C:/Strawberry/c/include/c++/13.2.0/vector \
  C:/Strawberry/c/include/c++/13.2.0/bits/stl_uninitialized.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/stl_vector.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/stl_bvector.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/vector.tcc \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\game.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\level.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\quadtree.h \
  C:/Strawberry/c/include/c++/13.2.0/memory \
  C:/Strawberry/c/include/c++/13.2.0/bits/stl_tempbuf.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/stl_raw_storage_iter.h \
@@ -212,6 +212,24 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:/Strawberry/c/include/c++/13.2.0/pstl/glue_algorithm_defs.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\raglib.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\entities.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\events.h \
+ C:/Strawberry/c/include/c++/13.2.0/functional \
+ C:/Strawberry/c/include/c++/13.2.0/bits/std_function.h \
+ C:/Strawberry/c/include/c++/13.2.0/unordered_map \
+ C:/Strawberry/c/include/c++/13.2.0/bits/unordered_map.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/hashtable.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/hashtable_policy.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/enable_special_members.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/node_handle.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/erase_if.h \
+ C:/Strawberry/c/include/c++/13.2.0/array \
+ C:/Strawberry/c/include/c++/13.2.0/queue \
+ C:/Strawberry/c/include/c++/13.2.0/deque \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_deque.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/deque.tcc \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_queue.h \
+ C:/Strawberry/c/include/c++/13.2.0/ctime \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\events_interface.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\sprite.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\animation.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\textures.h \
