@@ -21,16 +21,10 @@ void animation::animation::next_frame(bool wrap){
         current_frame_++;
         frame_.x += frame_.width;
     }
-    else{
-        if(wrap){
-                current_frame_ = 0;
-                frame_.x = 0.0;
-        }
-        else{
-            pause();
-        }
+    else if(wrap){
+            current_frame_ = 0;
+            frame_.x = 0.0;
     }
-
 }
 void animation::animation::next_animation(){
     // check bounds, increment, adjust rectangle

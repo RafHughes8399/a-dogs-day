@@ -22,8 +22,8 @@ namespace config{
         size = 4
     };
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
-    inline const float cursor_attributes[attributes::size] = {10.0f, 10.0f, 1.0f, 1.0f}; // TODO make bigger
-    inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 30.0, 1.0f};
+    inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 1.0f}; 
+    inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 70.0f, 1.0f};
     // world dimensions
     inline float world_x = 4096.0f;
     inline float world_y = 4096.0f;

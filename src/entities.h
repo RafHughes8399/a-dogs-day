@@ -137,7 +137,7 @@ namespace entities{
             }
 
             raglib::bounding_box_2& get_bounds();
-            sprite::sprite get_sprite();
+            sprite::sprite&  get_sprite();
             Vector2 get_position();
             int get_id();
 

@@ -11,6 +11,7 @@ int main(){
     auto level = level_builder.build_main_level();
     auto game = game::game(level, player);
     HideCursor();
+    SetTargetFPS(60);
     while(! WindowShouldClose()){
         float delta = GetFrameTime();
         game.update(delta);

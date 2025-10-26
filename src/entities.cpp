@@ -8,7 +8,7 @@ raglib::bounding_box_2& entities::entity::get_bounds(){
     return bounds_;
 }
 
-sprite::sprite entities::entity::get_sprite(){
+sprite::sprite& entities::entity::get_sprite(){
     return sprite_;
 }
 
@@ -34,11 +34,15 @@ int entities::entity::cursor_update::update(entity& entity, float delta){
     return status_codes::nothing;
 }
 int entities::entity::paw_update::update(entity& entity, float delta){
-    auto animation = entity.get_sprite().get_animation();
-    if(animation.playing()){
-        animation.next_frame(false); // will pause the animation if the end frame is reached 
-    }
-    return animation.playing() ? status_codes::nothing : status_codes::dead;
+    // set animation to play
+    // play until the end
+    auto sprite = entity.get_sprite();
+    auto animation = sprite.get_animation();
+    std::cout << "current frame: " << animation.get_current_frame() << std::endl;
+    animation.next_frame(false);
+    auto new_frame = animation.get_current_frame();
+    std::cout << "new frame: " << animation.get_current_frame() << std::endl;
+    return status_codes::nothing;
 }
 // --------------------------- interact strategies --------------------------- //
 void entities::entity::default_interaction::interact(entities::entity& interactor, entities::entity& interactee){

@@ -15,7 +15,7 @@ void level::level::render(){
     auto render_precdicate = [bounds](auto & entity) -> bool {
         return bounds.contains(entity->get_bounds());
     };
-    level_entities_.render(render_precdicate);
+    level_entities_.render();
     return;
 }
 

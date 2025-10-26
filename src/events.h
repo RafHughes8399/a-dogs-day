@@ -160,9 +160,6 @@ namespace events{
 		std::function<void(const E& e)> handler_;
 		const int handler_type_;
 	};
-
-	
-	// 
 	// the event
 	// the event handler - tempalted for any event, based on an interface
 	// the dispatcher manages all the listeners for that 
@@ -181,9 +178,7 @@ namespace events{
 		// pairs an event id with instances of event handlers listening for the event
 		std::unordered_map<int, std::vector<std::unique_ptr<event_handler_interface>>> subscriber_map_;
 	};
-
 	extern event_dispatcher global_dispatcher_;
-
 }
 
 #endif
