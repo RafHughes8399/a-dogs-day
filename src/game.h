@@ -13,7 +13,7 @@ namespace game{
     class game {
         public:
             ~game() = default;
-            game(level::level level, player::player player)
+            game(level::level& level, player::player& player)
                 : level_(level), player_(player){};
             game(const game& other) = default;
             game(game&& other) = default;
@@ -27,8 +27,8 @@ namespace game{
         private:
             // the world
             // the player controller
-            player::player player_;
-            level::level level_;
+            player::player& player_;
+            level::level& level_;
     };
 }
 #endif

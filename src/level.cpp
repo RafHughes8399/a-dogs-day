@@ -36,13 +36,11 @@ void level::level::on_left_mouse_event(const events::left_mouse_down& event){
     
     auto delta = event.get_mouse_delta();
     auto frame_delta = Vector2Scale(delta, -1); 
-    std::cout << "left mouse event " << std::endl;
     // TODO update frame values and clamp them 
     
 }
 void level::level::on_right_mouse_event(const events::right_mouse_click& event){
     // cast the event
-    std::cout << "right mouse event " << std::endl;
     // do what you need to do
     auto click_position = event.get_mouse_position();
     // create an entity at that position
