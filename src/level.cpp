@@ -15,7 +15,7 @@ void level::level::render(){
     auto render_precdicate = [bounds](auto & entity) -> bool {
         return bounds.contains(entity->get_bounds());
     };
-    level_entities_.render();
+    level_entities_.render(render_precdicate);
     return;
 }
 
@@ -31,17 +31,16 @@ int level::level::num_entities(){
 }
 
 void level::level::on_left_mouse_event(const events::left_mouse_down& event){
-    // cast the event
-    // do what you need to do
-    
     auto delta = event.get_mouse_delta();
     auto frame_delta = Vector2Scale(delta, -1); 
     // TODO update frame values and clamp them 
-    
+    view_frame_.x = Clamp(view_frame_.x + frame_delta.x, 0.0, config::world_x);
+    view_frame_.y = Clamp(view_frame_.y + frame_delta.y, 0.0, config::world_y);
 }
 void level::level::on_right_mouse_event(const events::right_mouse_click& event){
     // cast the event
     // do what you need to do
+    std::cout << "make paw " << std::endl;
     auto click_position = event.get_mouse_position();
     // create an entity at that position
    // std::unique_ptr<entities::entity> = std::make_unique<>();

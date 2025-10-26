@@ -36,12 +36,11 @@ int entities::entity::cursor_update::update(entity& entity, float delta){
 int entities::entity::paw_update::update(entity& entity, float delta){
     // set animation to play
     // play until the end
-    auto sprite = entity.get_sprite();
-    auto animation = sprite.get_animation();
-    std::cout << "current frame: " << animation.get_current_frame() << std::endl;
+    std::cout << "update paw " << std::endl;
+    auto& sprite = entity.get_sprite();
+    auto& animation = sprite.get_animation();
     animation.next_frame(false);
     auto new_frame = animation.get_current_frame();
-    std::cout << "new frame: " << animation.get_current_frame() << std::endl;
     return status_codes::nothing;
 }
 // --------------------------- interact strategies --------------------------- //
@@ -77,8 +76,8 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vecto
     std::unique_ptr<entity::update_strategy> update = std::make_unique<entity::paw_update>();
     return std::make_unique<entities::entity>(
         sprite::sprite(LoadTexture(config::paw_mark_path),
-        config::paw_mark_attributes[config::attributes::frame_height],
         config::paw_mark_attributes[config::attributes::frame_width],
+        config::paw_mark_attributes[config::attributes::frame_height],
         config::paw_mark_attributes[config::attributes::frames],
         config::paw_mark_attributes[config::attributes::animations]),
         

@@ -458,7 +458,6 @@ void tree::quadree::render(std::unique_ptr<node>& tree){
     }
     // if tree in bounds, render objects 
     for(auto & object : tree->objects_){
-            std::cout << "render entity: " << object->get_id() << std::endl;
             object->render();
     }
     // then iterate through children, only render those in bounds

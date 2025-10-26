@@ -23,10 +23,10 @@ namespace config{
     };
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 1.0f}; 
-    inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 70.0f, 1.0f};
+    inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
     // world dimensions
-    inline float world_x = 4096.0f;
-    inline float world_y = 4096.0f;
+    inline float world_x = 3840.0f;
+    inline float world_y = 2160.0f;
 
     // controls 
     inline std::vector<int> mouse_controls = std::vector<int>{MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT};
