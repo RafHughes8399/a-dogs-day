@@ -1,5 +1,5 @@
 #include "player.h"
-
+#include <iostream>
 
 // ----------------------- player ----------------------- //
 void player::player::update(float delta){
@@ -9,11 +9,13 @@ void player::player::update(float delta){
         // do event for dragging
         std::unique_ptr<events::event> left_mouse_down_event = std::make_unique<events::left_mouse_down>(GetMouseDelta());
         event_interface::queue_event(left_mouse_down_event);
+        std::cout << "queue left mouse " << std::endl;
     }
-    else if(IsMouseButtonPressed(mouse_controls_[mouse::right_mouse])){
+    if(IsMouseButtonPressed(mouse_controls_[mouse::right_mouse])){
         // do event for creating visual thing
         std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(GetMousePosition());
         event_interface::queue_event(right_mouse_click_event);
+        std::cout << "queue right mouse " << std::endl;
         
     }
     return;

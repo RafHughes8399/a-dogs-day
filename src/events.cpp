@@ -1,6 +1,6 @@
 /** implementation file for events namespace */
 #include "events.h"
-
+#include <iostream>
 // defining the dispatcher
 events::event_dispatcher events::global_dispatcher_;
 
@@ -64,6 +64,7 @@ void events::event_dispatcher::process_events(float delta){
     while(! event_queue_.empty()){
         auto&  event = event_queue_.front();
         if(! event->is_handled()){
+            std::cout << "execute event " << event->get_type() << std::endl; 
             execute_event(*event.get());
         }
         event_queue_.pop();
