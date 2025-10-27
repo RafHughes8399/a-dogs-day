@@ -14,7 +14,7 @@
 #include "config.h"
 #include "quadtree.h"
 #include "raglib.h"
-#include "textures.h"
+#include "texture.h"
 
 namespace level{
     class level{

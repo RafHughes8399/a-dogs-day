@@ -87,3 +87,16 @@ ok ok ok
 -> test left click dragging
 
 
+
+ok next steps:
+-> texture singleton
+-> cursor interactions and animations
+-> commands 
+-> the level grid 
+-> a better background, cursor and paw 
+-> controlling the dogs 
+
+
+textrure singleton would :
+-> ensure the texture is loaded only one time and used as much as needed
+->

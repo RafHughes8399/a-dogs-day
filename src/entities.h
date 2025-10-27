@@ -9,6 +9,7 @@
 #include "events_interface.h"
 #include "raglib.h"
 #include "sprite.h"
+#include "texture.h"
 namespace entities{
     enum status_codes{
         nothing = 0,
