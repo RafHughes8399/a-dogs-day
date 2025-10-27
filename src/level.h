@@ -11,17 +11,57 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
+#include <map>
+#include <utility>
+#include <vector>
+
 #include "config.h"
 #include "quadtree.h"
 #include "raglib.h"
 #include "texture.h"
 
+
 namespace level{
+    class level_graph{
+        private:
+            struct node{
+                // grid position
+                const Vector2 position_;
+                const int row_;
+                const int col_;
+                std::vector<int> entity_ids_; // maybe pointers instead, on va voir (27.10)
+            };
+            struct edge{
+                const node& src_;
+                const node& dst_;
+                const float weight_;
+            };
+            
+            std::map<node, std::vector<edge>> node_edge_map;
+        public:
+            ~level_graph() = default;
+            level_graph() {};
+            level_graph(const level_graph& other) = default;
+            level_graph(level_graph&& other) = default;
+            
+            
+            level_graph& operator=(const level_graph& other) = default;
+            level_graph& operator=(level_graph&& other) = default;
+    
+            node& find_entity(int entity_id);
+            void insert_entity(Vector2 position, raglib::bounding_box_2 bounds, int entity_id);
+            
+            void insert_node(Vector2 position, int row, int col);
+            void insert_edge(node & source, node & destination);
+    
+            void path_to_entity(int entity_id); // unsure what the return type would be exactly
+
+    };
     class level{
         public :
-            ~level(){
-                event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
-                event_interface::unsubscribe<events::right_mouse_click>(right_mouse_handler_);
+        ~level(){
+            event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
+            event_interface::unsubscribe<events::right_mouse_click>(right_mouse_handler_);
             }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
             : background_(sprite), view_frame_(frame), dimensions_(dimensions), 

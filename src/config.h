@@ -24,9 +24,17 @@ namespace config{
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 1.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
+    
+    
     // world dimensions
     inline float world_x = 3840.0f;
     inline float world_y = 2160.0f;
+    
+    // for the main level graph
+    inline const float node_width = 50.0f; // placeholder
+    inline const float node_height = 50.0f; // placeholder
+
+    inline const float edge_weight = 25.0f; // placeholder
 
     // controls 
     inline std::vector<int> mouse_controls = std::vector<int>{MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT};

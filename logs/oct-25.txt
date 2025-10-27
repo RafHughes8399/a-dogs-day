@@ -100,3 +100,8 @@ ok next steps:
 textrure singleton would :
 -> ensure the texture is loaded only one time and used as much as needed
 ->
+
+
+the level grid 
+-> used for organising the placement of decorative items 
+how is it distinguished from the quad tree ? that is the big question

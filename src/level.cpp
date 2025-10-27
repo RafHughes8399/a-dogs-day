@@ -1,6 +1,34 @@
 #include "level.h"
 #include <iostream>
-// --------------------- level ----------------------------------------- //
+
+// ----------------------------------------- level graph ----------------------------------------- //
+level::level_graph::node& level::level_graph::find_entity(int entity_id){
+    (void) entity_id;
+    return node{};
+}
+
+void level::level_graph::insert_entity(Vector2 position, raglib::bounding_box_2 bounds, int entity_id){
+    (void) position;
+    (void) bounds;
+    (void) entity_id;
+    return;
+}
+void level::level_graph::insert_node(Vector2 position, int row, int col){
+    (void) position;
+    (void) row;
+    (void) col;
+    return;
+}
+void level::level_graph::insert_edge(node & source, node & destination){
+    (void) source;
+    (void) destination;
+    return;
+}
+void level::level_graph::path_to_entity(int entity_id){
+    (void) entity_id;
+    return;
+} // unsure what the return type would be exactly
+// ----------------------------------------- level ----------------------------------------- //
 void level::level::update(float delta){
     level_entities_.update(delta);
     return;
