@@ -34,19 +34,15 @@ void level::level::on_left_mouse_event(const events::left_mouse_down& event){
     auto delta = event.get_mouse_delta();
     auto frame_delta = Vector2Scale(delta, -1); 
     // TODO update frame values and clamp them 
-    view_frame_.x = Clamp(view_frame_.x + frame_delta.x, 0.0, config::world_x);
-    view_frame_.y = Clamp(view_frame_.y + frame_delta.y, 0.0, config::world_y);
+    // ahh because you're changing the position of the frame, so it should be 
+    view_frame_.x = Clamp(view_frame_.x + frame_delta.x, 0.0, config::world_x - GetScreenWidth());
+    view_frame_.y = Clamp(view_frame_.y + frame_delta.y, 0.0, config::world_y - GetScreenHeight());
 }
 void level::level::on_right_mouse_event(const events::right_mouse_click& event){
-    // cast the event
-    // do what you need to do
-    std::cout << "make paw " << std::endl;
+
     auto click_position = event.get_mouse_position();
-    // create an entity at that position
-   // std::unique_ptr<entities::entity> = std::make_unique<>();
-   auto paw = entities::e_builder.build_paw_mark(click_position, level_entities_.get_next_id());
-   // start playing the paw
-   add_entity(std::move(paw));
+    auto paw = entities::e_builder.build_paw_mark(click_position, level_entities_.get_next_id());
+    add_entity(std::move(paw));
 }
 
 // --------------------- level builder ----------------------------------------- //

@@ -36,7 +36,6 @@ int entities::entity::cursor_update::update(entity& entity, float delta){
 int entities::entity::paw_update::update(entity& entity, float delta){
     // set animation to play
     // play until the end
-    std::cout << "update paw " << std::endl;
     auto& sprite = entity.get_sprite();
     auto& animation = sprite.get_animation();
     animation.next_frame(false);
@@ -57,9 +56,11 @@ entities::entity_builder entities::e_builder;
 std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2 position, int id){
     std::unique_ptr<entity::interaction_strategy> interact = std::make_unique<entity::default_interaction>();
     std::unique_ptr<entity::update_strategy> update = std::make_unique<entity::paw_update>();
-
+    
+    auto cursor_texture = textures::textures_.get_texture(textures::cursor, config::cursor_path);
+    // otherwise load it 
     return std::make_unique<entities::cursor>(
-        sprite::sprite(LoadTexture(config::cursor_path), 
+        sprite::sprite(cursor_texture, 
         config::cursor_attributes[config::attributes::frame_width],
         config::cursor_attributes[config::attributes::frame_height],
         config::cursor_attributes[config::attributes::frames],
@@ -74,8 +75,10 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2
 std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vector2 position, int id){
     std::unique_ptr<entity::interaction_strategy> interact = std::make_unique<entity::default_interaction>();
     std::unique_ptr<entity::update_strategy> update = std::make_unique<entity::paw_update>();
+    
+    auto paw_texture = textures::textures_.get_texture(textures::paw_mark, config::paw_mark_path); 
     return std::make_unique<entities::entity>(
-        sprite::sprite(LoadTexture(config::paw_mark_path),
+        sprite::sprite(paw_texture,
         config::paw_mark_attributes[config::attributes::frame_width],
         config::paw_mark_attributes[config::attributes::frame_height],
         config::paw_mark_attributes[config::attributes::frames],

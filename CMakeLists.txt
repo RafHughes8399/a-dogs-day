@@ -49,13 +49,18 @@ endif()
 
 # Our Project
 link_libraries(raylib)
+
 # add_library(lib_name src/lib_name.cpp)
 # link_libraries(lib_name)
+
 add_library(raglib src/raglib.cpp)
 link_libraries(raglib)
 
 add_library(events src/events.cpp)
 link_libraries(events)
+
+add_library(texture src/texture.cpp)
+link_libraries(texture)
 
 add_library(animation src/animation.cpp)
 link_libraries(animation)
