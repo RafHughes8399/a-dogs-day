@@ -118,7 +118,6 @@ namespace tree{
             }
             for(auto & entity : tree->objects_){
                 if(p(entity)){
-                    std::cout << "render entity " << entity->get_id() << std::endl;
                     entity->render();
                 }
             }

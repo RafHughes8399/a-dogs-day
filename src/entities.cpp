@@ -36,7 +36,6 @@ int entities::entity::cursor_update::update(entity& entity, float delta){
 int entities::entity::paw_update::update(entity& entity, float delta){
     // set animation to play
     // play until the end
-    std::cout << "update paw " << std::endl;
     auto& sprite = entity.get_sprite();
     auto& animation = sprite.get_animation();
     animation.next_frame(false);
