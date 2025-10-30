@@ -57,14 +57,14 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2
     std::unique_ptr<entity::interaction_strategy> interact = std::make_unique<entity::default_interaction>();
     std::unique_ptr<entity::update_strategy> update = std::make_unique<entity::paw_update>();
     
-    auto cursor_texture = textures::textures_.get_texture(textures::cursor, config::cursor_path);
+    auto cursor_texture = textures::textures_.get_texture(textures::cursor, assets_config::cursor_path);
     // otherwise load it 
     return std::make_unique<entities::cursor>(
         sprite::sprite(cursor_texture, 
-        config::cursor_attributes[config::attributes::frame_width],
-        config::cursor_attributes[config::attributes::frame_height],
-        config::cursor_attributes[config::attributes::frames],
-        config::cursor_attributes[config::attributes::animations]),
+        assets_config::cursor_attributes[assets_config::attributes::frame_width],
+        assets_config::cursor_attributes[assets_config::attributes::frame_height],
+        assets_config::cursor_attributes[assets_config::attributes::frames],
+        assets_config::cursor_attributes[assets_config::attributes::animations]),
         raglib::bounding_box_2{Vector2Zero(), Vector2Zero()},
         GetMousePosition(),
         id,
@@ -76,13 +76,13 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vecto
     std::unique_ptr<entity::interaction_strategy> interact = std::make_unique<entity::default_interaction>();
     std::unique_ptr<entity::update_strategy> update = std::make_unique<entity::paw_update>();
     
-    auto paw_texture = textures::textures_.get_texture(textures::paw_mark, config::paw_mark_path); 
+    auto paw_texture = textures::textures_.get_texture(textures::paw_mark, assets_config::paw_mark_path); 
     return std::make_unique<entities::entity>(
         sprite::sprite(paw_texture,
-        config::paw_mark_attributes[config::attributes::frame_width],
-        config::paw_mark_attributes[config::attributes::frame_height],
-        config::paw_mark_attributes[config::attributes::frames],
-        config::paw_mark_attributes[config::attributes::animations]),
+        assets_config::paw_mark_attributes[assets_config::attributes::frame_width],
+        assets_config::paw_mark_attributes[assets_config::attributes::frame_height],
+        assets_config::paw_mark_attributes[assets_config::attributes::frames],
+        assets_config::paw_mark_attributes[assets_config::attributes::animations]),
         
         raglib::bounding_box_2{Vector2Zero(), Vector2Zero()}, // TODO change
         position,

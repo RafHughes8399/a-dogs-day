@@ -12,6 +12,7 @@
 #define LEVEL_H
 
 #include <map>
+#include <memory>
 #include <utility>
 #include <vector>
 
@@ -25,22 +26,38 @@ namespace level{
     class level_graph{
         private:
             struct node{
-                // grid position
-                const Vector2 position_;
-                const int row_;
-                const int col_;
-                std::vector<int> entity_ids_; // maybe pointers instead, on va voir (27.10)
+                Vector2 position_;
+                bool operator==(const node& other){
+                    return Vector2Equals(position_, other.position_);
+                }
+                bool operator<(const node& other){
+
+                };
             };
             struct edge{
-                const node& src_;
-                const node& dst_;
-                const float weight_;
+                std::shared_ptr<node> destination_;
+                int weight_;
+
+                bool operator==(const edge& other){
+                    return destination_ == other.destination_ && weight_ == other.weight_;
+                }
             };
             
-            std::map<node, std::vector<edge>> node_edge_map;
+            std::vector<std::pair<node, std::vector<edge>>> graph_;
         public:
             ~level_graph() = default;
-            level_graph() {};
+            level_graph(int level_x, int level_y)
+            : graph_({}){
+                
+                for(int y = 0; y <= level_y; y += dimensions_config::edge_weight){
+                    for(int x = 0; x <= level_x; x += dimensions_config::edge_weight){
+                        Vector2 node_position = Vector2 {static_cast<float>(x),static_cast<float>(y)};
+                        insert_node(node_position);
+                        // for each node insert the appropraite edges
+                        // start with just the nodes, test them first 
+                    }
+                }
+            }
             level_graph(const level_graph& other) = default;
             level_graph(level_graph&& other) = default;
             
@@ -48,13 +65,22 @@ namespace level{
             level_graph& operator=(const level_graph& other) = default;
             level_graph& operator=(level_graph&& other) = default;
     
-            node& find_entity(int entity_id);
-            void insert_entity(Vector2 position, raglib::bounding_box_2 bounds, int entity_id);
+
+            bool find_path(Vector2 start, Vector2 end);
             
-            void insert_node(Vector2 position, int row, int col);
-            void insert_edge(node & source, node & destination);
-    
-            void path_to_entity(int entity_id); // unsure what the return type would be exactly
+            int num_nodes();
+            int num_edges();
+            int num_edges_from(node & node);
+
+            node& position_to_node(Vector2 position);
+
+            std::vector<edge> edges();
+            std::vector<edge> edges_from_node(node& node);
+            std::vector<node> nodes();
+
+            void insert_node(Vector2 position);
+            void insert_edge(int source_num, node& destination, int weight);
+            void render(Rectangle frame);
 
     };
     class level{
@@ -64,7 +90,7 @@ namespace level{
             event_interface::unsubscribe<events::right_mouse_click>(right_mouse_handler_);
             }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
-            : background_(sprite), view_frame_(frame), dimensions_(dimensions), 
+            : background_(sprite), view_frame_(frame), dimensions_(dimensions), graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
             level_entities_(tree::quadree(raglib::bounding_box_2{Vector2Zero(), dimensions})),
             left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}),
             right_mouse_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);})
@@ -88,6 +114,7 @@ namespace level{
             void on_left_mouse_event(const events::left_mouse_down& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
         private :
+            level_graph graph_;
             sprite::sprite background_;
             tree::quadree level_entities_;
             Rectangle view_frame_;

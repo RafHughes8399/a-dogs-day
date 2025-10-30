@@ -28,9 +28,9 @@ namespace player{
         public:
             ~player() = default;
             player()
-            : cursor_(sprite::sprite(LoadTexture(config::cursor_path), config::cursor_attributes[config::attributes::frame_width], config::cursor_attributes[config::attributes::frame_height],
-            config::cursor_attributes[config::attributes::frames], config::cursor_attributes[config::attributes::animations])),
-            mouse_controls_(config::mouse_controls), key_controls_(){};
+            : cursor_(sprite::sprite(LoadTexture(assets_config::cursor_path), assets_config::cursor_attributes[assets_config::attributes::frame_width], assets_config::cursor_attributes[assets_config::attributes::frame_height],
+            assets_config::cursor_attributes[assets_config::attributes::frames], assets_config::cursor_attributes[assets_config::attributes::animations])),
+            mouse_controls_(controls_config::mouse_controls), key_controls_(){};
             player(const player& other) = default;
             player(player&& other) = default;
         

@@ -105,3 +105,9 @@ textrure singleton would :
 the level grid 
 -> used for organising the placement of decorative items 
 how is it distinguished from the quad tree ? that is the big question
+
+
+-> then dog movement and controls
+    -> moving a dog to a position
+    -> changing between dogs
+    -> the foundation of cursor controls and interactionss

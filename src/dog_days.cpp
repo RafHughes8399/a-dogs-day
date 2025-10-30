@@ -54,6 +54,7 @@ int main(){
         }
     */
     CloseWindow();
+    std::cout << "int size : " << sizeof(float) << std::endl;
     std::cout << " HELLO WORLD " << std::endl; // 20 / 10 / 25
     return 0;
 }
