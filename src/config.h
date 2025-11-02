@@ -28,8 +28,8 @@ namespace assets_config{
 }
 namespace dimensions_config{
     // world dimensions
-    inline float world_x = 3840.0f;
-    inline float world_y = 2160.0f;
+    inline float world_x = 4096.0f;
+    inline float world_y = 4096.0f;
     
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder

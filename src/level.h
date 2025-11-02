@@ -11,6 +11,8 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
+#include <algorithm>
+#include <cmath>
 #include <map>
 #include <memory>
 #include <utility>
@@ -25,6 +27,11 @@
 namespace level{
     class level_graph{
         private:
+            enum nodes{
+                corner = 1,
+                perimeter = 2,
+                interior = 3
+            };
             struct node{
                 Vector2 position_;
                 bool operator==(const node& other){
@@ -35,28 +42,33 @@ namespace level{
                 };
             };
             struct edge{
-                std::shared_ptr<node> destination_;
-                int weight_;
+                node* destination_;
+                float weight_;
 
                 bool operator==(const edge& other){
                     return destination_ == other.destination_ && weight_ == other.weight_;
                 }
             };
+
+            std::vector<edge> build_corner_edges(int row, int column);
+            std::vector<edge> build_interior_edges(int row, int column);
+            std::vector<edge> build_perimeter_edges(int row, int column);
+            void build_nodes(int level_x, int level_y);
+            void build_edges();
+            int categorise_node(int row, int column);
             
+            int num_rows_;
+            int row_length_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
         public:
             ~level_graph() = default;
             level_graph(int level_x, int level_y)
-            : graph_({}){
-                
-                for(int y = 0; y <= level_y; y += dimensions_config::edge_weight){
-                    for(int x = 0; x <= level_x; x += dimensions_config::edge_weight){
-                        Vector2 node_position = Vector2 {static_cast<float>(x),static_cast<float>(y)};
-                        insert_node(node_position);
-                        // for each node insert the appropraite edges
-                        // start with just the nodes, test them first 
-                    }
-                }
+            : graph_({}), num_rows_(level_y / dimensions_config::edge_weight), row_length_(level_x / dimensions_config::edge_weight){
+                build_nodes(level_x, level_y);
+                build_edges();
+                std::cout << "num row: " << num_rows_ << std::endl;
+                std::cout << "row_length: " << row_length_<< std::endl;
+                    // columns is x, rows is y
             }
             level_graph(const level_graph& other) = default;
             level_graph(level_graph&& other) = default;
@@ -79,7 +91,7 @@ namespace level{
             std::vector<node> nodes();
 
             void insert_node(Vector2 position);
-            void insert_edge(int source_num, node& destination, int weight);
+            void insert_edge(int source_num, node& destination, float weight);
             void render(Rectangle frame);
 
     };

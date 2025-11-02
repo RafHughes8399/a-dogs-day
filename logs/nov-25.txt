@@ -1,0 +1,2 @@
+-> index calculation of the final perimeter node index is off, 
+the final node in each row

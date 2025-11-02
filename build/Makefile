@@ -207,6 +207,19 @@ events/fast:
 .PHONY : events/fast
 
 #=============================================================================
+# Target rules for targets named texture
+
+# Build rule for target.
+texture: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 texture
+.PHONY : texture
+
+# fast build rule for target.
+texture/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\texture.dir\build.make CMakeFiles/texture.dir/build
+.PHONY : texture/fast
+
+#=============================================================================
 # Target rules for targets named animation
 
 # Build rule for target.
@@ -602,6 +615,30 @@ src/sprite.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\sprite.dir\build.make CMakeFiles/sprite.dir/src/sprite.cpp.s
 .PHONY : src/sprite.cpp.s
 
+src/texture.obj: src/texture.cpp.obj
+.PHONY : src/texture.obj
+
+# target to build an object file
+src/texture.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\texture.dir\build.make CMakeFiles/texture.dir/src/texture.cpp.obj
+.PHONY : src/texture.cpp.obj
+
+src/texture.i: src/texture.cpp.i
+.PHONY : src/texture.i
+
+# target to preprocess a source file
+src/texture.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\texture.dir\build.make CMakeFiles/texture.dir/src/texture.cpp.i
+.PHONY : src/texture.cpp.i
+
+src/texture.s: src/texture.cpp.s
+.PHONY : src/texture.s
+
+# target to generate assembly for a file
+src/texture.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\texture.dir\build.make CMakeFiles/texture.dir/src/texture.cpp.s
+.PHONY : src/texture.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -630,6 +667,7 @@ help:
 	@echo ... raglib
 	@echo ... raylib
 	@echo ... sprite
+	@echo ... texture
 	@echo ... src/animation.obj
 	@echo ... src/animation.i
 	@echo ... src/animation.s
@@ -660,6 +698,9 @@ help:
 	@echo ... src/sprite.obj
 	@echo ... src/sprite.i
 	@echo ... src/sprite.s
+	@echo ... src/texture.obj
+	@echo ... src/texture.i
+	@echo ... src/texture.s
 .PHONY : help
 
 

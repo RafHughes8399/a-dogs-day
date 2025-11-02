@@ -95,6 +95,7 @@ dog-days.exe: CMakeFiles/dog-days.dir/build.make
 dog-days.exe: _deps/raylib-build/raylib/libraylib.a
 dog-days.exe: libraglib.a
 dog-days.exe: libevents.a
+dog-days.exe: libtexture.a
 dog-days.exe: libanimation.a
 dog-days.exe: libsprite.a
 dog-days.exe: libplayer.a
@@ -109,6 +110,7 @@ dog-days.exe: libentities.a
 dog-days.exe: libplayer.a
 dog-days.exe: libsprite.a
 dog-days.exe: libanimation.a
+dog-days.exe: libtexture.a
 dog-days.exe: libevents.a
 dog-days.exe: libraglib.a
 dog-days.exe: _deps/raylib-build/raylib/libraylib.a

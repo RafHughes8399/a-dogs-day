@@ -83,10 +83,14 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: C:/Users/raffa/OneDrive/Documents/
   C:/Strawberry/c/include/c++/13.2.0/bits/stl_iterator.h \
   C:/Strawberry/c/include/c++/13.2.0/bits/stl_iterator_base_funcs.h \
   C:/Strawberry/c/include/c++/13.2.0/bits/stl_iterator_base_types.h \
+  C:/Strawberry/c/include/c++/13.2.0/bits/stl_map.h \
+  C:/Strawberry/c/include/c++/13.2.0/bits/stl_multimap.h \
   C:/Strawberry/c/include/c++/13.2.0/bits/stl_pair.h \
   C:/Strawberry/c/include/c++/13.2.0/bits/stl_queue.h \
   C:/Strawberry/c/include/c++/13.2.0/bits/stl_raw_storage_iter.h \
+  C:/Strawberry/c/include/c++/13.2.0/bits/stl_relops.h \
   C:/Strawberry/c/include/c++/13.2.0/bits/stl_tempbuf.h \
+  C:/Strawberry/c/include/c++/13.2.0/bits/stl_tree.h \
   C:/Strawberry/c/include/c++/13.2.0/bits/stl_uninitialized.h \
   C:/Strawberry/c/include/c++/13.2.0/bits/stl_vector.h \
   C:/Strawberry/c/include/c++/13.2.0/bits/streambuf.tcc \
@@ -130,6 +134,7 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: C:/Users/raffa/OneDrive/Documents/
   C:/Strawberry/c/include/c++/13.2.0/iostream \
   C:/Strawberry/c/include/c++/13.2.0/istream \
   C:/Strawberry/c/include/c++/13.2.0/limits \
+  C:/Strawberry/c/include/c++/13.2.0/map \
   C:/Strawberry/c/include/c++/13.2.0/math.h \
   C:/Strawberry/c/include/c++/13.2.0/memory \
   C:/Strawberry/c/include/c++/13.2.0/new \
@@ -162,6 +167,7 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: C:/Users/raffa/OneDrive/Documents/
   C:/Strawberry/c/include/c++/13.2.0/type_traits \
   C:/Strawberry/c/include/c++/13.2.0/typeinfo \
   C:/Strawberry/c/include/c++/13.2.0/unordered_map \
+  C:/Strawberry/c/include/c++/13.2.0/utility \
   C:/Strawberry/c/include/c++/13.2.0/vector \
   C:/Strawberry/c/include/c++/13.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/Strawberry/c/include/c++/13.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
@@ -235,7 +241,7 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: C:/Users/raffa/OneDrive/Documents/
   C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/quadtree.h \
   C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/raglib.h \
   C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/sprite.h \
-  C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/textures.h
+  C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/texture.h
 
 
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/player.h:
@@ -284,8 +290,6 @@ C:/Strawberry/c/x86_64-w64-mingw32/include/_timeval.h:
 
 C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw_stdarg.h:
 
-C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw_stat64.h:
-
 C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw_off_t.h:
 
 C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw.h:
@@ -324,6 +328,8 @@ C:/Strawberry/c/include/c++/13.2.0/typeinfo:
 
 C:/Strawberry/c/include/c++/13.2.0/type_traits:
 
+C:/Strawberry/c/include/c++/13.2.0/utility:
+
 C:/Strawberry/c/include/c++/13.2.0/tuple:
 
 C:/Strawberry/c/include/c++/13.2.0/tr1/poly_laguerre.tcc:
@@ -352,11 +358,27 @@ C:/Strawberry/c/include/c++/13.2.0/pstl/execution_defs.h:
 
 C:/Strawberry/c/include/c++/13.2.0/ostream:
 
+C:/Strawberry/c/include/c++/13.2.0/map:
+
 C:/Strawberry/c/include/c++/13.2.0/istream:
+
+C:/Strawberry/c/include/c++/13.2.0/memory:
+
+C:/Strawberry/c/include/c++/13.2.0/ios:
+
+C:/Strawberry/c/include/c++/13.2.0/initializer_list:
 
 C:/Strawberry/c/include/c++/13.2.0/tr1/beta_function.tcc:
 
 C:/Strawberry/c/include/c++/13.2.0/bits/ranges_algo.h:
+
+C:/Strawberry/c/include/c++/13.2.0/x86_64-w64-mingw32/bits/gthr.h:
+
+C:/Strawberry/c/include/c++/13.2.0/x86_64-w64-mingw32/bits/ctype_base.h:
+
+C:/Strawberry/c/include/c++/13.2.0/iosfwd:
+
+C:/Strawberry/c/include/c++/13.2.0/bits/predefined_ops.h:
 
 C:/Strawberry/c/x86_64-w64-mingw32/include/time.h:
 
@@ -380,11 +402,7 @@ C:/Strawberry/c/include/c++/13.2.0/bits/ios_base.h:
 
 C:/Strawberry/c/include/c++/13.2.0/ctime:
 
-C:/Strawberry/c/include/c++/13.2.0/initializer_list:
-
 C:/Strawberry/c/include/c++/13.2.0/bits/iterator_concepts.h:
-
-C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/textures.h:
 
 C:/Strawberry/c/include/c++/13.2.0/exception:
 
@@ -394,6 +412,14 @@ C:/Strawberry/c/x86_64-w64-mingw32/include/stdint.h:
 
 C:/Strawberry/c/include/c++/13.2.0/bits/exception_ptr.h:
 
+C:/Strawberry/c/x86_64-w64-mingw32/include/wchar.h:
+
+C:/Strawberry/c/x86_64-w64-mingw32/include/process.h:
+
+C:/Strawberry/c/include/c++/13.2.0/iostream:
+
+C:/Strawberry/c/include/c++/13.2.0/bits/shared_ptr_base.h:
+
 C:/Strawberry/c/include/c++/13.2.0/x86_64-w64-mingw32/bits/c++allocator.h:
 
 C:/Strawberry/c/include/c++/13.2.0/bits/allocator.h:
@@ -401,6 +427,8 @@ C:/Strawberry/c/include/c++/13.2.0/bits/allocator.h:
 C:/Strawberry/c/include/c++/13.2.0/bits/locale_classes.tcc:
 
 C:/Strawberry/c/include/c++/13.2.0/bits/erase_if.h:
+
+C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/texture.h:
 
 C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw_secapi.h:
 
@@ -566,10 +594,6 @@ C:/Strawberry/c/include/c++/13.2.0/bits/stl_algo.h:
 
 C:/Strawberry/c/include/c++/13.2.0/bits/shared_ptr.h:
 
-C:/Strawberry/c/include/c++/13.2.0/memory:
-
-C:/Strawberry/c/include/c++/13.2.0/ios:
-
 C:/Strawberry/c/include/c++/13.2.0/bits/shared_ptr_atomic.h:
 
 C:/Strawberry/c/include/c++/13.2.0/stdlib.h:
@@ -610,11 +634,17 @@ C:/Strawberry/c/include/c++/13.2.0/bits/stl_function.h:
 
 C:/Strawberry/c/include/c++/13.2.0/bits/stl_heap.h:
 
+C:/Strawberry/c/include/c++/13.2.0/bits/stl_map.h:
+
 C:/Strawberry/c/include/c++/13.2.0/bits/stl_queue.h:
 
 C:/Strawberry/c/include/c++/13.2.0/bits/postypes.h:
 
+C:/Strawberry/c/include/c++/13.2.0/bits/stl_multimap.h:
+
 C:/Strawberry/c/include/c++/13.2.0/bits/stl_raw_storage_iter.h:
+
+C:/Strawberry/c/include/c++/13.2.0/bits/stl_relops.h:
 
 C:/Users/raffa/OneDrive/Documents/GitHub/a-dogs-day/src/config.h:
 
@@ -623,6 +653,10 @@ C:/Strawberry/c/include/c++/13.2.0/x86_64-w64-mingw32/bits/c++config.h:
 C:/Strawberry/c/include/c++/13.2.0/bits/stl_tempbuf.h:
 
 C:/Strawberry/c/include/c++/13.2.0/cwctype:
+
+C:/Strawberry/c/x86_64-w64-mingw32/include/_mingw_stat64.h:
+
+C:/Strawberry/c/include/c++/13.2.0/bits/stl_tree.h:
 
 C:/Strawberry/c/x86_64-w64-mingw32/include/sys/timeb.h:
 
@@ -682,14 +716,6 @@ C:/Strawberry/c/x86_64-w64-mingw32/include/math.h:
 
 C:/Strawberry/c/include/c++/13.2.0/ext/numeric_traits.h:
 
-C:/Strawberry/c/x86_64-w64-mingw32/include/wchar.h:
-
-C:/Strawberry/c/x86_64-w64-mingw32/include/process.h:
-
-C:/Strawberry/c/include/c++/13.2.0/bits/shared_ptr_base.h:
-
-C:/Strawberry/c/include/c++/13.2.0/iostream:
-
 C:/Strawberry/c/include/c++/13.2.0/ext/string_conversions.h:
 
 C:/Strawberry/c/include/c++/13.2.0/ext/type_traits.h:
@@ -699,11 +725,3 @@ C:/Strawberry/c/x86_64-w64-mingw32/include/stdlib.h:
 C:/Strawberry/c/include/c++/13.2.0/tr1/special_function_util.h:
 
 C:/Strawberry/c/include/c++/13.2.0/functional:
-
-C:/Strawberry/c/include/c++/13.2.0/x86_64-w64-mingw32/bits/gthr.h:
-
-C:/Strawberry/c/include/c++/13.2.0/x86_64-w64-mingw32/bits/ctype_base.h:
-
-C:/Strawberry/c/include/c++/13.2.0/bits/predefined_ops.h:
-
-C:/Strawberry/c/include/c++/13.2.0/iosfwd:
