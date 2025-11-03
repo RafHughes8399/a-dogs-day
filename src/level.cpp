@@ -377,6 +377,7 @@ void level::level::on_left_mouse_event(const events::left_mouse_down& event){
 
     view_frame_.x = Clamp(view_frame_.x + frame_delta.x, 0.0, dimensions_config::world_x - GetScreenWidth());
     view_frame_.y = Clamp(view_frame_.y + frame_delta.y, 0.0, dimensions_config::world_y - GetScreenHeight());
+    std::cout << "level left click event " << std::endl;
 }
 void level::level::on_right_mouse_event(const events::right_mouse_click& event){
 

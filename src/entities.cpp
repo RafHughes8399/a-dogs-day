@@ -16,14 +16,6 @@ Vector2 entities::entity::get_position(){
     return position_;
 }
 
-void entities::entity::set_position(Vector2 new_position){
-    // position difference, how much the new position has changed 
-    Vector2 delta = Vector2 {new_position.x - position_.x, new_position.y - position_.y};
-    std::cout << "update bounds " <<  delta.x << ", " << delta.y << std::endl;
-    update_bounds(delta);
-    std::cout << "updated bounds " << std::endl;
-    position_ = new_position;
-}
 
 void entities::entity::update_bounds(Vector2 delta){
     bounds_.min = Vector2Add(bounds_.min, delta);
@@ -33,26 +25,45 @@ void entities::entity::render(){
     sprite_.render(position_);
 }
 
-// --------------------------- update strategies --------------------------- //
-int entities::entity::cursor_update::update(entity& entity, float delta){
-    // update the position AND THE BOUNDS
-    auto old_position = entity.get_position();
-    entity.set_position(GetMousePosition());
-    return status_codes::moved;
+// -------------------------------- cursor --------------------------------//
+
+int entities::cursor::update(float delta){
+    auto old_position = position_;
+    position_ = GetMousePosition();
+
+    if(! Vector2Equals(old_position, position_)) {
+        Vector2 position_delta = Vector2Subtract(position_, old_position);
+        bounds_.min = Vector2Add(bounds_.min, position_delta);
+        bounds_.max = Vector2Add(bounds_.max, position_delta);
+        return status_codes::moved;
+    }
+    return status_codes::nothing;
 }
-int entities::entity::paw_update::update(entity& entity, float delta){
-    // set animation to play
-    // play until the end
-    auto& sprite = entity.get_sprite();
-    auto& animation = sprite.get_animation();
+
+void entities::cursor::interact(entities::entity& other){
+    (void) other;
+    return;
+}
+void entities::cursor::on_left_mouse_event(const events::left_mouse_down& event){
+    std::cout << "cursor left click event " << std::endl;
+    auto mouse_delta = event.get_mouse_delta();
+    auto new_position = Vector2Add(position_, mouse_delta);
+    position_ = new_position;
+    // create a moved entities event or something and debug 
+    std::cout << "make moved event " << std::endl;
+    std::unique_ptr<events::event> moved_event = std::make_unique<events::move_entity>(id_);
+    event_interface::queue_event(moved_event);
+}
+
+// -------------------------------- paw mark --------------------------------//
+int entities::paw_mark::update(float delta){
+    auto& animation = sprite_.get_animation();
     animation.next_frame(false);
     auto new_frame = animation.get_current_frame();
     return status_codes::nothing;
 }
-// --------------------------- interact strategies --------------------------- //
-void entities::entity::default_interaction::interact(entities::entity& interactor, entities::entity& interactee){
-    (void) interactor; 
-    (void) interactee;
+void entities::paw_mark::interact(entities::entity& other){
+    (void) other;
     return;
 }
 // --------------------------- builder --------------------------- //
@@ -61,9 +72,6 @@ void entities::entity::default_interaction::interact(entities::entity& interacto
 entities::entity_builder entities::e_builder;
 
 std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2 position, int id){
-    std::unique_ptr<entity::interaction_strategy> interact = std::make_unique<entity::default_interaction>();
-    std::unique_ptr<entity::update_strategy> update = std::make_unique<entity::cursor_update>();
-    
     auto cursor_texture = textures::textures_.get_texture(textures::cursor, assets_config::cursor_path);
     // otherwise load it 
     return std::make_unique<entities::cursor>(
@@ -72,17 +80,13 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2
         assets_config::cursor_attributes[assets_config::attributes::frame_height],
         assets_config::cursor_attributes[assets_config::attributes::frames],
         assets_config::cursor_attributes[assets_config::attributes::animations]),
-        raglib::bounding_box_2{Vector2Zero(), Vector2Zero()},
+        raglib::bounding_box_2{GetMousePosition(), Vector2Add(GetMousePosition(), 
+        Vector2 {assets_config::cursor_attributes[assets_config::attributes::frame_width], assets_config::cursor_attributes[assets_config::attributes::frame_height]})},
         GetMousePosition(),
-        id,
-        std::move(interact),
-        std::move(update)
+        id
     );
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vector2 position, int id){
-    std::unique_ptr<entity::interaction_strategy> interact = std::make_unique<entity::default_interaction>();
-    std::unique_ptr<entity::update_strategy> update = std::make_unique<entity::paw_update>();
-    
     auto paw_texture = textures::textures_.get_texture(textures::paw_mark, assets_config::paw_mark_path); 
     return std::make_unique<entities::entity>(
         sprite::sprite(paw_texture,
@@ -91,10 +95,9 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vecto
         assets_config::paw_mark_attributes[assets_config::attributes::frames],
         assets_config::paw_mark_attributes[assets_config::attributes::animations]),
         
-        raglib::bounding_box_2{Vector2Zero(), Vector2Zero()}, // TODO change
+        raglib::bounding_box_2{position, Vector2Add(position, 
+        Vector2{assets_config::paw_mark_attributes[assets_config::attributes::frame_width], assets_config::paw_mark_attributes[assets_config::attributes::frame_height]} )}, // TODO change
         position,
-        id,
-        std::move(interact),
-        std::move(update)
+        id
     );
 }

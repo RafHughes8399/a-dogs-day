@@ -32,7 +32,9 @@ namespace events{
 		test = 0,
 		left_mouse = 1,
 		right_mouse = 2,
-		size = 3
+		move = 3,
+		remove = 4,
+		size = 5
 	};
 	class event{
 	protected:
@@ -112,7 +114,37 @@ namespace events{
 	// ! right now for removing the paw when it fades ! 
 	// does it need to be an event though, because the tree can handle entity removing, 
 	// just pass it through an update status
+	
+	class move_entity : public event{
+		public:
+			~move_entity() = default;
+			move_entity(size_t id)
+			: event(ids::move), id_(id){};
+
+		static const int get_static_type(){
+				return ids::move;
+		}
+		size_t get_id() const{
+			return id_;
+		}
+		private:
+			size_t id_;
+
+	};
 	class remove_entity : public event{
+		public:
+			~remove_entity() = default;
+			remove_entity(size_t id)
+			: event(ids::remove), id_(id){};
+
+		static const int get_static_type(){
+				return ids::remove;
+		}
+		size_t get_id() const{
+			return id_;
+		}
+		private:
+			size_t id_;
 
 	};
 	class event_handler_interface{

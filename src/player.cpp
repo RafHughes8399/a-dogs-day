@@ -5,6 +5,7 @@
 void player::player::update(float delta){
     (void) delta;
     // check controls that have been pressed and create the approproiate events
+    
     if(IsMouseButtonDown(mouse_controls_[mouse::left_mouse])){
         // do event for dragging
         std::unique_ptr<events::event> left_mouse_down_event = std::make_unique<events::left_mouse_down>(GetMouseDelta());
