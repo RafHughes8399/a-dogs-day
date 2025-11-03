@@ -4,6 +4,8 @@ bool raglib::bounding_box_2::operator==(const bounding_box_2& other){
 }
 
 bool raglib::bounding_box_2::contains(const bounding_box_2& other) const{
-    return  min.x <= other.min.x &&  min.y <= other.min.y &&
-    other.max.x <= max.x  && other.max.y <= max.y;
+    // other is contained in this
+    bool contained_x = other.min.x >= min.x && max.x >= other.max.x; // greater than min less than max
+    bool contained_y = other.min.y >= min.y && max.y >= other.max.y;
+    return contained_x && contained_y;
 }

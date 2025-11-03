@@ -7,12 +7,9 @@ namespace raglib{
         Vector2 min;
         Vector2 max;
 
-        
         bool operator==(const bounding_box_2& other);
-        
         // framed as this.contains(other), is other inside this ?
         bool contains(const bounding_box_2& other) const;
-        
     };
     
 }

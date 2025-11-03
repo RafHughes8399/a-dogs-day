@@ -37,9 +37,6 @@ namespace level{
                 bool operator==(const node& other){
                     return Vector2Equals(position_, other.position_);
                 }
-                bool operator<(const node& other){
-
-                };
             };
             struct edge{
                 node* destination_;
@@ -66,8 +63,6 @@ namespace level{
             : graph_({}), num_rows_(level_y / dimensions_config::edge_weight), row_length_(level_x / dimensions_config::edge_weight){
                 build_nodes(level_x, level_y);
                 build_edges();
-                std::cout << "num row: " << num_rows_ << std::endl;
-                std::cout << "row_length: " << row_length_<< std::endl;
                     // columns is x, rows is y
             }
             level_graph(const level_graph& other) = default;
@@ -84,7 +79,7 @@ namespace level{
             int num_edges();
             int num_edges_from(node & node);
 
-            node& position_to_node(Vector2 position);
+            node position_to_node(Vector2 position);
 
             std::vector<edge> edges();
             std::vector<edge> edges_from_node(node& node);

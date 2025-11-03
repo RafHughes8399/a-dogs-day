@@ -143,7 +143,7 @@ namespace entities{
             int get_id();
 
             void set_position(Vector2 position);
-
+            void update_bounds(Vector2 delta);
             int update(float delta){
                 return update_->update(*this, delta);
             }

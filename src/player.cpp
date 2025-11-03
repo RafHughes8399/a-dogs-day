@@ -19,6 +19,5 @@ void player::player::update(float delta){
     return;
 }
 void player::player::render(){
-    cursor_.render(GetMousePosition());
     return;
 }

@@ -38,7 +38,7 @@ int level::level_graph::num_edges_from(node & node){
     return 0;
 }
 
-level::level_graph::node& level::level_graph::position_to_node(Vector2 position){
+level::level_graph::node level::level_graph::position_to_node(Vector2 position){
     (void) position;
     // use the calculation from your notes
     auto n = node {}; //  ! care on the returning a referecne to a local variable, it will go out of scope 
@@ -307,7 +307,6 @@ void level::level_graph::build_nodes(int level_x, int level_y){
             insert_node(node_position);
         }
     }
-    std::cout << "num nodes: " << num_nodes << std::endl;
 }
 void level::level_graph::insert_node(Vector2 position){
     // node is built with a number and at position 
@@ -318,7 +317,6 @@ void level::level_graph::insert_edge(int source_num, node& destination, float we
     return;
 }
 void level::level_graph::render(Rectangle frame){
-    auto num_rendered = 0;
     for(auto x = frame.x; x <= frame.x + frame.width; x += dimensions_config::edge_weight){
         for(auto y = frame.y; y <= frame.y + frame.height; y += dimensions_config::edge_weight){
             // (row * row_length) + col
@@ -326,7 +324,6 @@ void level::level_graph::render(Rectangle frame){
             int row_length = dimensions_config::world_x / dimensions_config::edge_weight;
             int col = x / dimensions_config::edge_weight;
             int index = (row * row_length) + col;
-            num_rendered++;
             auto position = graph_[index].first.position_;
             DrawCircle(position.x, position.y, 15, DARKGREEN);
             DrawText(TextFormat("%d", index), position.x, position.y, 12, WHITE);
@@ -349,11 +346,15 @@ void level::level::render(){
     // draw the background 
     DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
     // draw the entities, based on the view frame
-    graph_.render(view_frame_);
     auto bounds = raglib::bounding_box_2{Vector2{view_frame_.x, view_frame_.y}, 
-    Vector2{view_frame_.x + view_frame_.width, view_frame_.y +view_frame_.height}};
-    auto render_precdicate = [bounds](auto & entity) -> bool {
-        return bounds.contains(entity->get_bounds());
+    Vector2{view_frame_.x + view_frame_.width, view_frame_.y + view_frame_.height}};
+    std::cout << "frame: " << view_frame_.x << ", " << view_frame_.y << ", " << view_frame_.x + view_frame_.width <<
+    ", " << view_frame_.y + view_frame_.height << std::endl;
+    auto render_precdicate = [bounds](auto & entity) -> bool { // auto is std::unique_ptr<entity>
+        std::cout << "check bounds " << std::endl;
+        bool b =  bounds.contains(entity->get_bounds());
+        std::cout << "checked bounds " << std::endl;
+        return b;
     };
     level_entities_.render(render_precdicate);
     return;
@@ -373,8 +374,7 @@ int level::level::num_entities(){
 void level::level::on_left_mouse_event(const events::left_mouse_down& event){
     auto delta = event.get_mouse_delta();
     auto frame_delta = Vector2Scale(delta, -1); 
-    // TODO update frame values and clamp them 
-    // ahh because you're changing the position of the frame, so it should be 
+
     view_frame_.x = Clamp(view_frame_.x + frame_delta.x, 0.0, dimensions_config::world_x - GetScreenWidth());
     view_frame_.y = Clamp(view_frame_.y + frame_delta.y, 0.0, dimensions_config::world_y - GetScreenHeight());
 }
