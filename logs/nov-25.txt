@@ -1,2 +1,24 @@
 -> index calculation of the final perimeter node index is off, 
 the final node in each row
+
+
+-> fix the cursor bug 
+-> then implement the dogs
+-> then implement cursor interaction and collision
+-> then implement the controls for the dogs (path selection, dog selection)
+
+-> double trouble with the cursors yo, one is the player and one is the entity i think ?
+
+remove it from player
+WHEN THINGS GET COPY CONSTRUCTED THEY LOSE THEIR SUBSCRIPTION TO THE EVENT 
+THYE NO LONGER LISTEN
+
+
+the cursor needs to listen to the left mouse down events so the numbers can change properly
+-> copy over the event handlers 
+-> and add debug statements
+
+
+the events thing is working well
+still unsure as to why things are freezing, it definitely is a moving entities in the tree thing, need to test more
+i think some adjustments should be made to the tree, how it is handled, how it manages entities, how children are created, etc.

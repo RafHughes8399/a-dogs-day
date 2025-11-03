@@ -14,15 +14,7 @@ void events::event_dispatcher::subscribe(int event_key, std::unique_ptr<event_ha
     }
     // otherwise insert handler, provided there are no duplicates
     else{
-        bool exists = false;
-        for(auto& handler : event->second){
-            if(handler->get_type() == handler_value->get_type()){
-                exists = true;
-            }
-        }
-        if(! exists){
-            event->second.push_back(std::move(handler_value));
-        }
+        event->second.push_back(std::move(handler_value));
     }
     return;
 }
@@ -40,6 +32,7 @@ void events::event_dispatcher::unsubscribe(int event_key, const int handler_valu
 void events::event_dispatcher::execute_event(const event& event){
     //for all handlers of the event, execute the event
     auto key = event.get_type();
+    std::cout <<  "listeners " << subscriber_map_[key].size() << std::endl;
     for(auto& handler : subscriber_map_.at(key)){
         handler->execute(event);
     }
