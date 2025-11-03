@@ -89,10 +89,10 @@ void tree::quadree::build_child(std::unique_ptr<node>& tree, int child_to_build)
 
 // insertion
 void tree::quadree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity>& object){
-	auto object_bounds = object->get_bounds();
+	auto & object_bounds = object->get_bounds();
     // check if the node contains the object, if not then immediately return
+    std::cout << " node: " << tree->bounds_ << "entity : " << object_bounds << std::endl;
 	if(! node_contains_object(tree->bounds_, object_bounds)){ return; }
-	
     else{
         // if at the max depth then insert, no further children can be constructed
         if(tree->depth_ == max_depth_){
@@ -180,7 +180,10 @@ std::unique_ptr<entities::entity> tree::quadree::extract(std::unique_ptr<node>& 
     // otherwise not in this node - keep looking 
     else{
         for(auto& child : tree->children_){
-            extract(child, object_id);
+            auto extracted_object = extract(child, object_id);
+            if(extracted_object){
+                return extracted_object;
+            }
         }
     }
 }
@@ -371,8 +374,6 @@ void tree::quadree::traverse_tree(std::unique_ptr<node>& tree){
 		return;
 }
 
-
-
 void tree::quadree::update(std::unique_ptr<node>& tree, float delta){
     if(! tree) {return;}
     for(auto& object : tree->objects_){
@@ -382,9 +383,11 @@ void tree::quadree::update(std::unique_ptr<node>& tree, float delta){
             case entities::status_codes::moved:
                 // if moved then append to moved objects
                 // check if moved out of the current node
+                std::cout << " move entity: " << object->get_id();
+                std::cout << "size : " << size(tree);
                 move_entity(tree, object); // moves the entity 
-                // my thoughts is here to do somthing along the lines of 
-                //check_collisions(object)
+                std::cout << " moved entity: " << object->get_id();
+                std::cout << "size : " << size(tree);
                 break;
             case entities::status_codes::dead:
                 erase(tree, object->get_id());
@@ -468,20 +471,28 @@ void tree::quadree::render(std::unique_ptr<node>& tree){
 
 void tree::quadree::move_entity(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity>& entity){
     // check the bounding box
-
     // if not still
+    std::cout << "node : " << tree->bounds_ << "entity " <<  entity->get_bounds() << std::endl;
     if(! node_contains_object(tree->bounds_, entity->get_bounds())){
         // extract 
+        std::cout << "extract " << std::endl;
         auto extracted_entity = extract(tree, entity->get_id());
+        std::cout << "extracted " <<  extracted_entity->get_id() << std::endl;
         // find the appropraite parent
+        std::cout << "find new parent " << std::endl;
         auto new_parent = find_new_parent(tree, extracted_entity);
+        std::cout << "found new parent " << (*new_parent)->bounds_ << std::endl;
         // and reinsert at the parent
+        std::cout << "insert " << std::endl;
         insert(*new_parent, extracted_entity);
+        std::cout << "inserted " << std::endl;
+        return;
     }
     else{
+        std::cout << "still in node " << std::endl;
+        return;
         // do nothing, it does not need to move node 
     }
-    return;
 }
 
 std::unique_ptr<tree::quadree::node>* tree::quadree::find_new_parent(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity>& entity){

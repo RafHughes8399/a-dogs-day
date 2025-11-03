@@ -20,7 +20,7 @@ void entities::entity::set_position(Vector2 new_position){
     // position difference, how much the new position has changed 
     Vector2 delta = Vector2 {new_position.x - position_.x, new_position.y - position_.y};
     std::cout << "update bounds " <<  delta.x << ", " << delta.y << std::endl;
-    //update_bounds(delta);
+    update_bounds(delta);
     std::cout << "updated bounds " << std::endl;
     position_ = new_position;
 }

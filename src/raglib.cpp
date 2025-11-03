@@ -2,6 +2,10 @@
 bool raglib::bounding_box_2::operator==(const bounding_box_2& other){
     return Vector2Equals(min, other.min) && Vector2Equals(max, other.max);
 }
+std::ostream& raglib::operator<<(std::ostream& stream, raglib::bounding_box_2& box){
+    stream << box.min.x << ", " << box.min.y << " | " << box.max.x << ", " << box.max.y;
+    return stream;
+}
 
 bool raglib::bounding_box_2::contains(const bounding_box_2& other) const{
     // other is contained in this
