@@ -52,67 +52,64 @@ bool tree::quadree::is_child_built(std::unique_ptr<node>& tree, std::unique_ptr<
     return false;
 }
 
-void tree::quadree::build_child(std::unique_ptr<node>& tree, int child_to_build){
+void tree::quadree::build_children(std::unique_ptr<node>& tree){
     auto centre = Vector2Add(tree->bounds_.max, tree->bounds_.min);
     centre = Vector2Scale(centre, 0.5f);
 
     // create the child
-    auto child = std::make_unique<node>();
-    child->depth_ = tree->depth_ + 1;
-    child->life_ = 0;
-    child->parent_ = &tree;
+    auto top_right = std::make_unique<node>();
+    top_right->depth_ = tree->depth_ + 1;
+    top_right->life_ = 0;
+    top_right->bounds_ =  raglib::bounding_box_2{centre, tree->bounds_.max};
+    tree->children_.push_back(std::move(top_right));
+    
+    auto top_left = std::make_unique<node>();
+    top_left->depth_ = tree->depth_ + 1;
+    top_left->life_ = 0;
+    top_left->bounds_ = raglib::bounding_box_2{Vector2{tree->bounds_.min.x, centre.y},  Vector2{centre.x, tree->bounds_.max.y}};
 
-    // based on the "index" order used ni the method above to select the appropraite bounding box for the child
-    switch (child_to_build)
-    {
-    case positions::top_right:
-        child->bounds_ =  raglib::bounding_box_2{centre, tree->bounds_.max};
-        break;
-    case positions::top_left:
-        child->bounds_ = raglib::bounding_box_2{Vector2{tree->bounds_.min.x, centre.y},  Vector2{centre.x, tree->bounds_.max.y}};
-        break;
-    case positions::bottom_left:
-        child->bounds_ = raglib::bounding_box_2{tree->bounds_.min, centre};
-        break;
-    case positions::bottom_right:
-       child->bounds_ = raglib::bounding_box_2{Vector2{centre.x, tree->bounds_.min.y},  Vector2{tree->bounds_.max.x, centre.y}};
-        break;
-    default:
-        break;
-    }
-
-    // if the child has not been built, build it
-    if(! is_child_built(tree, child)){
-        tree->children_.push_back(std::move(child));
-    }
+    tree->children_.push_back(std::move(top_left));
+    auto bottom_left = std::make_unique<node>();
+    bottom_left->depth_ = tree->depth_ + 1;
+    bottom_left->life_ = 0;
+    bottom_left->bounds_ = raglib::bounding_box_2{tree->bounds_.min, centre};
+    tree->children_.push_back(std::move(bottom_left));
+    
+    auto bottom_right = std::make_unique<node>();
+    bottom_right->depth_ = tree->depth_ + 1;
+    bottom_right->life_ = 0;
+    bottom_right->bounds_ = raglib::bounding_box_2{Vector2{centre.x, tree->bounds_.min.y},  Vector2{tree->bounds_.max.x, centre.y}};
+    tree->children_.push_back(std::move(bottom_right));
 }
 
 // insertion
-void tree::quadree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity>& object){
+void tree::quadree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object){
 	auto & object_bounds = object->get_bounds();
     // check if the node contains the object, if not then immediately return
 	if(! node_contains_object(tree->bounds_, object_bounds)){ 
-        return; }
+        std::cout << " entity " << object_bounds << " does not fit in " << tree->bounds_ << std::endl;
+        return; 
+    }
     else{
         // if at the max depth then insert, no further children can be constructed
         if(tree->depth_ == max_depth_){
+            std::cout << "node: " << tree->bounds_ << "is max depth, insert here " << std::endl;
             tree->objects_.push_back(std::move(object));
             return;
 		}
+        else if(is_leaf(tree)){
+            std::cout << "node: " << tree->bounds_ << "is a leaf but not max depth " << std::endl;
+            build_children(tree);
+        }
         // if not all children for the tree have been built
-		else if(tree->children_.size() < CHILDREN){
-			// check which child needs to be built, and build that child
-            auto child_to_build = object_contained_by_child(tree->bounds_, object_bounds);
-            if(child_to_build != -1){
-                build_child(tree, child_to_build);
-            }
-		}
         // recursively iterate through the children
+        
+        std::cout << "node: " << tree->bounds_ << "has "  << tree->children_.size() << "children " << std::endl;
 	    for (auto& child : tree->children_) {
             // if does fit in a child, recursively insert
             if (node_contains_object(child->bounds_, object_bounds)) {
-                std::cout << object_bounds  << "fits in " << child->bounds_ << std::endl;
-                insert(child, object);
+                std::cout << "node : " << child->bounds_ << " can hold " << object_bounds << std::endl;
+                insert(child, std::move(object));
                 return;
             }
 		}
@@ -171,6 +168,7 @@ std::unique_ptr<entities::entity> tree::quadree::extract(std::unique_ptr<node>& 
             }
         }
     }
+    return nullptr;
 }
 void tree::quadree::clear(std::unique_ptr<node>& tree){
     tree->objects_.clear();
@@ -178,7 +176,6 @@ void tree::quadree::clear(std::unique_ptr<node>& tree){
         clear(child);
     }
 }
-
 int tree::quadree::height(std::unique_ptr<node>& tree) {
     if (!tree) {
         return -1;
@@ -286,7 +283,6 @@ std::unique_ptr<tree::quadree::node> tree::quadree::copy_tree(node* tree, std::u
     copy->bounds_ = tree->bounds_;
     copy->depth_ = tree->depth_;
     copy->life_ = tree->life_;
-    copy->parent_ = parent;
     // and then the objects, deep copy 
     for(auto & obj : tree->objects_){
         copy->objects_.push_back(std::move(obj));
@@ -315,12 +311,20 @@ void tree::quadree::update(std::unique_ptr<node>& tree, float delta){
     if(! tree) {return;}
     for(auto it = tree->objects_.begin(); it != tree->objects_.end();){
         int update_result = (*it)->update(delta);
+        std::cout << "update entity " << (*it)->get_id() <<  " with result " << update_result <<  std::endl;
         switch(update_result){
             case entities::status_codes::moved:
+                std::cout << "move entity " << std::endl;
                 if(! node_contains_object(tree->bounds_, (*it)->get_bounds())){
-                    it = tree->objects_.erase(it);
-                    insert(root_, *it);
-                    // reinsert
+                        std::cout << "move entity into new node " << std::endl;
+                        auto entity = std::move(*it);
+                        it = tree->objects_.erase(it);
+                        std::cout << "reinsert" <<  std::endl;
+                        insert(root_, std::move(entity));
+                        // reinsert
+                }
+                else{
+                    ++it;
                 }
                 break;
             case entities::status_codes::dead:

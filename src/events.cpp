@@ -32,7 +32,6 @@ void events::event_dispatcher::unsubscribe(int event_key, const int handler_valu
 void events::event_dispatcher::execute_event(const event& event){
     //for all handlers of the event, execute the event
     auto key = event.get_type();
-    std::cout <<  "listeners " << subscriber_map_[key].size() << std::endl;
     for(auto& handler : subscriber_map_.at(key)){
         handler->execute(event);
     }

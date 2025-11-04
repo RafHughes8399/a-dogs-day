@@ -34,7 +34,6 @@ namespace tree{
             raglib::bounding_box_2 bounds_;
             int depth_;
             short life_; // how long a node has lived without any objects
-            std::unique_ptr<node>* parent_;
         
             friend bool operator==(const node& a, const node& b) {
                 return Vector2Equals(a.bounds_.min, b.bounds_.min) && 
@@ -64,11 +63,11 @@ namespace tree{
         std::unique_ptr<entities::entity> extract(std::unique_ptr<node>& tree, size_t object_id);
         std::unique_ptr<node> copy_tree(node* tree, std::unique_ptr<node>* parent);
         
-        void build_child(std::unique_ptr<node>& tree, int child_to_build);
+        void build_children(std::unique_ptr<node>& tree);
         void clear(std::unique_ptr<node>& tree);
         void erase(std::unique_ptr<node>& tree, size_t object_id);
         void identify_collisions(std::unique_ptr<node>& tree, std::vector<entities::entity*> parent_entities);
-        void insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity>& object);
+        void insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object);
         void prune_leaves(std::unique_ptr<node>& tree, double delta);
         void render(std::unique_ptr<node>& tree);
         void traverse_tree(std::unique_ptr<node>& tree);
@@ -101,7 +100,6 @@ namespace tree{
             root_->bounds_ = root_bounds;
             root_->life_ = 0;
             root_->depth_ = 0;
-            root_->parent_ = nullptr;
             // build lazily
 
             // sub 
@@ -113,7 +111,7 @@ namespace tree{
         quadree(raglib::bounding_box_2 root_bounds, InputIt first, InputIt last)
         : quadree(root_bounds) { // initialise the root node
             for (auto i = first; i != last; ++i) {
-                insert(*i);
+                insert(std::move(*i));
             }
         }
         
@@ -184,8 +182,8 @@ namespace tree{
         void erase(size_t id){
             erase(root_, id);
         }
-        void insert(std::unique_ptr<entities::entity>& obj) {
-            insert(root_, obj);
+        void insert(std::unique_ptr<entities::entity> obj) {
+            insert(root_, std::move(obj));
             next_id_ += 1;
         }
 
@@ -193,7 +191,7 @@ namespace tree{
             size_t id = event.get_id();
             // remove and reinsert
             auto entity = extract(root_, id);
-            insert(root_, entity);
+            insert(root_, std::move(entity));
         }
         void on_remove_event(const events::remove_entity& event){
             // TODO implement

@@ -293,7 +293,6 @@ void level::level_graph::build_edges(){
             edges.push_back(e);
         }
     }
-    std::cout << "edges created: " << num_edges << std::endl;
     return;
 }
 void level::level_graph::build_nodes(int level_x, int level_y){
@@ -349,12 +348,8 @@ void level::level::render(){
     // draw the entities, based on the view frame
     auto bounds = raglib::bounding_box_2{Vector2{view_frame_.x, view_frame_.y}, 
     Vector2{view_frame_.x + view_frame_.width, view_frame_.y + view_frame_.height}};
-    std::cout << "frame: " << view_frame_.x << ", " << view_frame_.y << ", " << view_frame_.x + view_frame_.width <<
-    ", " << view_frame_.y + view_frame_.height << std::endl;
     auto render_precdicate = [bounds](auto & entity) -> bool { // auto is std::unique_ptr<entity>
-        std::cout << "check bounds " << std::endl;
         bool b =  bounds.contains(entity->get_bounds());
-        std::cout << "checked bounds " << std::endl;
         return b;
     };
     level_entities_.render(render_precdicate);
@@ -362,7 +357,7 @@ void level::level::render(){
 }
 
 void level::level::add_entity(std::unique_ptr<entities::entity> entity){
-    level_entities_.insert(entity);
+    level_entities_.insert(std::move(entity));
 }
 
 int level::level::entity_id(){
