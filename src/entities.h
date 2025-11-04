@@ -4,6 +4,8 @@
 #ifndef ENTITIES_H
 #define ENTITIES_h
 
+
+#include <iostream>
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
@@ -19,118 +21,14 @@ namespace entities{
     // ------------------------- entities ------------------------- // 
     class entity {
         public:
-        // ------------------ interaction and update strategies ------------------ // 
-            class interaction_strategy{
-                public:
-                    virtual ~interaction_strategy() = default;
-                    interaction_strategy() = default;
-                    interaction_strategy(const interaction_strategy& other) = default;
-                    interaction_strategy(interaction_strategy&& other) = default;
-        
-                    interaction_strategy& operator=(const interaction_strategy& other) = default;
-                    interaction_strategy& operator=(interaction_strategy&& other) = default;
-        
-                    virtual void interact(entities::entity& interactor, entities::entity& interactee) = 0;
-        
-            };
-             class default_interaction : public interaction_strategy{
-                public:
-                ~default_interaction() = default;
-                default_interaction()
-                :interaction_strategy(){};
-                
-                default_interaction(const default_interaction& other) = default;
-                default_interaction(default_interaction&& other) = default;
-                
-                default_interaction& operator=(const default_interaction& other) = default;
-                default_interaction& operator=(default_interaction&& other) = default;
-                
-                void interact(entities::entity& interactor, entities::entity& interactee) override;
-                
-            };
-            class cursor_interaction : public interaction_strategy{
-                public:
-                    ~cursor_interaction() = default;
-                    cursor_interaction()
-                    :interaction_strategy(){};
-        
-                    cursor_interaction(const cursor_interaction& other) = default;
-                    cursor_interaction(cursor_interaction&& other) = default;
-        
-                    cursor_interaction& operator=(const cursor_interaction& other) = default;
-                    cursor_interaction& operator=(cursor_interaction&& other) = default;
-        
-                    void interact(entities::entity& interactor, entities::entity& interactee) override;
-            };
-            class update_strategy{
-                public:
-                    virtual ~update_strategy() = default;
-                    update_strategy() = default;
-                    update_strategy(const update_strategy& other) = default;
-                    update_strategy(update_strategy&& other) = default;
-        
-                    update_strategy& operator=(const update_strategy& other) = default;
-                    update_strategy& operator=(update_strategy&& other) = default;
-        
-                    virtual int update(entities::entity& entity, float delta) = 0;
-        
-            };
-            /** 
-             * 
-             class default_update : public update_strategy{
-                public:
-                ~default_update() = default;
-                default_update()
-                :update_strategy(){};
-                
-                default_update(const default_update& other) = default;
-                default_update(default_update&& other) = default;
-                
-                default_update& operator=(const default_update& other) = default;
-                default_update& operator=(default_update&& other) = default;
-                
-                int update(entities::entity& entity, float delta) override;
-                
-            };
-            */
-            class cursor_update : public update_strategy{
-                public:
-                    ~cursor_update() = default;
-                    cursor_update()
-                    :update_strategy(){};
-        
-                    cursor_update(const cursor_update& other) = default;
-                    cursor_update(cursor_update&& other) = default;
-        
-                    cursor_update& operator=(const cursor_update& other) = default;
-                    cursor_update& operator=(cursor_update&& other) = default;
-        
-                    int update(entities::entity& entity, float delta) override;
-            };
-            class paw_update : public update_strategy{
-                public:
-                    ~paw_update() = default;
-                    paw_update()
-                    :update_strategy(){};
-        
-                    paw_update(const paw_update& other) = default;
-                    paw_update(paw_update&& other) = default;
-        
-                    paw_update& operator=(const paw_update& other) = default;
-                    paw_update& operator=(paw_update&& other) = default;
-        
-                    int update(entity& entity, float delta) override;
-            };
             virtual ~entity() = default;
-            entity(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id,
-            std::unique_ptr<interaction_strategy> interact, std::unique_ptr<update_strategy> update)
-            : bounds_(bounds), sprite_(sprite), position_(position), id_(id), interact_(std::move(interact)),
-            update_(std::move(update)){
+            entity(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
+            : bounds_(bounds), sprite_(sprite), position_(position), id_(id){
 
             };
             entity(const entity& other) = default;
-            entity(entity&& other) = default;
 
+            entity(entity&& other) = default;
             entity& operator=(const entity& other) = default;
             entity& operator=(entity&& other) = default;
             bool operator==(entity& other){
@@ -142,14 +40,16 @@ namespace entities{
             Vector2 get_position();
             int get_id();
 
-            void set_position(Vector2 position);
-
-            int update(float delta){
-                return update_->update(*this, delta);
-            }
+            void update_bounds(Vector2 delta);
             void render();
-            void interact(entity& other){
-                interact_->interact(*this, other);
+
+            virtual int update(float delta){
+                (void) delta;
+                return status_codes::nothing;
+            }
+            virtual void interact(entity& other){
+                (void) other;
+                return;
             }
 
         protected:
@@ -159,8 +59,6 @@ namespace entities{
             sprite::sprite sprite_;
             Vector2 position_;
 
-            std::unique_ptr<interaction_strategy> interact_;
-            std::unique_ptr<update_strategy> update_;
     };
     // the cursor for the player 
     /**
@@ -174,17 +72,56 @@ namespace entities{
      */
     class cursor : public entity{
         public:
-            ~cursor() = default;
-            cursor(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id, std::unique_ptr<interaction_strategy> interact, std::unique_ptr<update_strategy> update)
-            : entity(sprite, bounds, position, id, std::move(interact), std::move(update)){};
-            cursor(const cursor& other) = default;
-            cursor(cursor&& other) = default;
+            ~cursor() {
+                std::cout << "cursor unsubscribe " << std::endl;
+                 event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
 
+            }
+            cursor(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
+            : entity(sprite, bounds, position, id), left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}){
+                std::cout << "create cursor " << std::endl;
+                std::cout << "cursor subscribe " << std::endl;
+                event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
+                
+            };
+            cursor(const cursor& other)
+            : entity(other), left_mouse_handler_(other.left_mouse_handler_){
+                std::cout << "cursor subscribe " << std::endl;
+                event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
+            }
+            cursor(cursor&& other)
+            : entity(other), left_mouse_handler_(std::move(other.left_mouse_handler_)){
+                event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
+                std::cout << "cursor subscribe " << std::endl;
+                std::cout << "move construct cursor" << std::endl;
+            }
+            
             cursor& operator=(const cursor& other) = default;
-            cursor& operator=(cursor&& other) = default;
-        private:
-            // the handler_
+            cursor& operator=(cursor&& other)  = default;
+            int update(float delta) override;
+            void interact(entity& other) override;
+            
+            void on_left_mouse_event(const events::left_mouse_down& event);
+            
 
+        private:
+            events::event_handler<events::left_mouse_down> left_mouse_handler_;
+    };
+    class paw_mark : public entity{
+        public:
+            ~paw_mark() = default;
+            paw_mark(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
+            : entity(sprite, bounds, position, id){};
+            paw_mark(const paw_mark& other) = default;
+            paw_mark(paw_mark&& other) = default;
+
+            paw_mark& operator=(const paw_mark& other) = default;
+            paw_mark& operator=(paw_mark&& other) = default;
+
+            int update(float delta) override;
+            void interact(entity& other) override;
+
+        private:
     };
 
     // ------------------ entity builder ------------------ //

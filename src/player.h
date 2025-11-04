@@ -28,9 +28,7 @@ namespace player{
         public:
             ~player() = default;
             player()
-            : cursor_(sprite::sprite(LoadTexture(config::cursor_path), config::cursor_attributes[config::attributes::frame_width], config::cursor_attributes[config::attributes::frame_height],
-            config::cursor_attributes[config::attributes::frames], config::cursor_attributes[config::attributes::animations])),
-            mouse_controls_(config::mouse_controls), key_controls_(){};
+            : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_controls_(){};
             player(const player& other) = default;
             player(player&& other) = default;
         
@@ -48,7 +46,7 @@ namespace player{
              hud hud_;
              inventory inventory_;
              */
-            sprite::sprite cursor_;
+            Vector2 mouse_position_;
             std::vector<int> mouse_controls_; 
             std::vector<int> key_controls_; 
             

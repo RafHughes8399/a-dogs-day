@@ -1,5 +1,7 @@
 #ifndef RAGLIB_H
 #define RAGLIB_H
+
+#include <ostream>
 #include "raylib.h"
 #include "raymath.h"
 namespace raglib{
@@ -7,13 +9,11 @@ namespace raglib{
         Vector2 min;
         Vector2 max;
 
-        
         bool operator==(const bounding_box_2& other);
-        
         // framed as this.contains(other), is other inside this ?
         bool contains(const bounding_box_2& other) const;
-        
     };
+    std::ostream& operator<<(std::ostream& stream, bounding_box_2& box);
     
 }
 #endif

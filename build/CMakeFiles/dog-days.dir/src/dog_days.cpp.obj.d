@@ -180,9 +180,24 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:/Strawberry/c/include/c++/13.2.0/bits/vector.tcc \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\game.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\level.h \
- C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\quadtree.h \
- C:/Strawberry/c/include/c++/13.2.0/memory \
+ C:/Strawberry/c/include/c++/13.2.0/algorithm \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_algo.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/algorithmfwd.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_heap.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/uniform_int_dist.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/stl_tempbuf.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/ranges_algo.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/ranges_algobase.h \
+ C:/Strawberry/c/include/c++/13.2.0/pstl/glue_algorithm_defs.h \
+ C:/Strawberry/c/include/c++/13.2.0/pstl/execution_defs.h \
+ C:/Strawberry/c/include/c++/13.2.0/map \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_tree.h \
+ C:/Strawberry/c/include/c++/13.2.0/ext/aligned_buffer.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/node_handle.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_map.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_multimap.h \
+ C:/Strawberry/c/include/c++/13.2.0/bits/erase_if.h \
+ C:/Strawberry/c/include/c++/13.2.0/memory \
  C:/Strawberry/c/include/c++/13.2.0/bits/stl_raw_storage_iter.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/align.h \
  C:/Strawberry/c/lib/gcc/x86_64-w64-mingw32/13.2.0/include/stdint.h \
@@ -191,7 +206,6 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:/Strawberry/c/include/c++/13.2.0/bits/shared_ptr.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/shared_ptr_base.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/allocated_ptr.h \
- C:/Strawberry/c/include/c++/13.2.0/ext/aligned_buffer.h \
  C:/Strawberry/c/include/c++/13.2.0/ext/concurrence.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/shared_ptr_atomic.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/atomic_base.h \
@@ -200,16 +214,10 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:/Strawberry/c/include/c++/13.2.0/bits/std_mutex.h \
  C:/Strawberry/c/include/c++/13.2.0/backward/auto_ptr.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/ranges_uninitialized.h \
- C:/Strawberry/c/include/c++/13.2.0/bits/ranges_algobase.h \
  C:/Strawberry/c/include/c++/13.2.0/pstl/glue_memory_defs.h \
- C:/Strawberry/c/include/c++/13.2.0/pstl/execution_defs.h \
- C:/Strawberry/c/include/c++/13.2.0/algorithm \
- C:/Strawberry/c/include/c++/13.2.0/bits/stl_algo.h \
- C:/Strawberry/c/include/c++/13.2.0/bits/algorithmfwd.h \
- C:/Strawberry/c/include/c++/13.2.0/bits/stl_heap.h \
- C:/Strawberry/c/include/c++/13.2.0/bits/uniform_int_dist.h \
- C:/Strawberry/c/include/c++/13.2.0/bits/ranges_algo.h \
- C:/Strawberry/c/include/c++/13.2.0/pstl/glue_algorithm_defs.h \
+ C:/Strawberry/c/include/c++/13.2.0/utility \
+ C:/Strawberry/c/include/c++/13.2.0/bits/stl_relops.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\quadtree.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\raglib.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\entities.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\events.h \
@@ -220,8 +228,6 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:/Strawberry/c/include/c++/13.2.0/bits/hashtable.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/hashtable_policy.h \
  C:/Strawberry/c/include/c++/13.2.0/bits/enable_special_members.h \
- C:/Strawberry/c/include/c++/13.2.0/bits/node_handle.h \
- C:/Strawberry/c/include/c++/13.2.0/bits/erase_if.h \
  C:/Strawberry/c/include/c++/13.2.0/array \
  C:/Strawberry/c/include/c++/13.2.0/queue \
  C:/Strawberry/c/include/c++/13.2.0/deque \
@@ -232,5 +238,5 @@ CMakeFiles/dog-days.dir/src/dog_days.cpp.obj: \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\events_interface.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\sprite.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\animation.h \
- C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\textures.h \
+ C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\texture.h \
  C:\Users\raffa\OneDrive\Documents\GitHub\a-dogs-day\src\player.h

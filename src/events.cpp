@@ -14,15 +14,7 @@ void events::event_dispatcher::subscribe(int event_key, std::unique_ptr<event_ha
     }
     // otherwise insert handler, provided there are no duplicates
     else{
-        bool exists = false;
-        for(auto& handler : event->second){
-            if(handler->get_type() == handler_value->get_type()){
-                exists = true;
-            }
-        }
-        if(! exists){
-            event->second.push_back(std::move(handler_value));
-        }
+        event->second.push_back(std::move(handler_value));
     }
     return;
 }

@@ -34,7 +34,6 @@ namespace tree{
             raglib::bounding_box_2 bounds_;
             int depth_;
             short life_; // how long a node has lived without any objects
-            std::unique_ptr<node>* parent_;
         
             friend bool operator==(const node& a, const node& b) {
                 return Vector2Equals(a.bounds_.min, b.bounds_.min) && 
@@ -43,74 +42,37 @@ namespace tree{
         };
     private:
         // members 
-        std::unique_ptr<node> root_;
+        events::event_handler<events::move_entity> moved_entity_handler_;
+        events::event_handler<events::remove_entity> removed_entity_handler_;
         int max_depth_;
         size_t next_id_;
-        // methods
-        // containment checks
-        bool node_contains_object(raglib::bounding_box_2& node, raglib::bounding_box_2& object);
-        int object_contained_by_child(raglib::bounding_box_2& node, raglib::bounding_box_2& object);
-        // child node construction
+        std::unique_ptr<node> root_;
+
         bool is_child_built(std::unique_ptr<node>& tree, std::unique_ptr<node>& child);
-        void build_child(std::unique_ptr<node>& tree, int child_to_build);
-        // object insert and erase
-        void insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity>& object);
-        void insert(std::unique_ptr<node>& tree, std::vector<std::unique_ptr<entities::entity>>& objects);
-        void erase(std::unique_ptr<node>& tree, size_t object_id);
-        std::unique_ptr<entities::entity> extract(std::unique_ptr<node>& tree, size_t object_id);
-        
-        void clear(std::unique_ptr<node>& tree);
-        // object lookup
-        node* find_object_node(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity>& object);
-        entities::entity* find_object(std::unique_ptr<node>& tree, int id);
-        
-        // TODO change from reference wrapper
-        std::vector<std::reference_wrapper<std::unique_ptr<entities::entity>>> get_objects(std::unique_ptr<node>& tree);
-        
-        template<typename UnaryPred>
-        std::vector<std::reference_wrapper<std::unique_ptr<entities::entity>>> get_objects(std::unique_ptr<node>& tree, UnaryPred p){
-            // pass the object to the predicate
-            
-            auto predicate_objects = std::vector<std::reference_wrapper<std::unique_ptr<entities::entity>>>{};
-            if(not tree){
-                return predicate_objects;
-            }
-            for(auto& obj : tree->objects_){
-                if(p(obj)){
-                    predicate_objects.push_back(obj);
-                }
-            }
-            for(auto& child : tree->children_){
-                auto child_objects = get_objects(child, p);
-                for(auto child_object : child_objects){
-                    predicate_objects.push_back(child_object.get());
-                }
-            }
-            return predicate_objects;
-        }
-            
-        // height, size,  traversal and copying
-        int height(std::unique_ptr<node>& tree);
-        size_t size(std::unique_ptr<node>& tree);
-        size_t num_nodes(std::unique_ptr<node>& tree);
-        void traverse_tree(std::unique_ptr<node>& tree);
-        std::unique_ptr<node> copy_tree(node* tree, std::unique_ptr<node>* parent);
-        // tree characteristics
         bool is_root(std::unique_ptr<node>& tree);
         bool is_empty(std::unique_ptr<node>& tree);
         bool is_leaf(std::unique_ptr<node>& tree);
+        bool node_contains_object(raglib::bounding_box_2& node, raglib::bounding_box_2& object);
         
+        int height(std::unique_ptr<node>& tree);
+        int object_contained_by_child(raglib::bounding_box_2& node, raglib::bounding_box_2& object);
         
-        void prune_leaves(std::unique_ptr<node>& tree, double delta);
+        size_t num_nodes(std::unique_ptr<node>& tree);
+        size_t size(std::unique_ptr<node>& tree);
         
-        // update and render
-        void update(std::unique_ptr<node>& tree, float delta);
+        std::unique_ptr<entities::entity> extract(std::unique_ptr<node>& tree, size_t object_id);
+        std::unique_ptr<node> copy_tree(node* tree, std::unique_ptr<node>* parent);
+        
+        void build_children(std::unique_ptr<node>& tree);
+        void clear(std::unique_ptr<node>& tree);
+        void erase(std::unique_ptr<node>& tree, size_t object_id);
         void identify_collisions(std::unique_ptr<node>& tree, std::vector<entities::entity*> parent_entities);
+        void insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object);
+        void prune_leaves(std::unique_ptr<node>& tree, double delta);
         void render(std::unique_ptr<node>& tree);
+        void traverse_tree(std::unique_ptr<node>& tree);
+        void update(std::unique_ptr<node>& tree, float delta);
 
-
-        void move_entity(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity>& entity);
-        std::unique_ptr<node>* find_new_parent(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity>& entity);
         template<typename UnaryPred>
         void render(std::unique_ptr<node>& tree, UnaryPred p){
             if(not tree){
@@ -127,22 +89,29 @@ namespace tree{
         }
         public:
         // CONSTRUCTORS
-        ~quadree() = default;
+        ~quadree() {
+            event_interface::unsubscribe<events::move_entity>(moved_entity_handler_);
+            event_interface::unsubscribe<events::remove_entity>(removed_entity_handler_);
+        }
         // creates an empty quadree with a root node
         quadree(raglib::bounding_box_2 root_bounds, int depth=MAX_DEPTH)
-        : root_(std::make_unique<node>()), max_depth_(depth), next_id_(0) {
+        : root_(std::make_unique<node>()), max_depth_(depth), next_id_(0),
+        moved_entity_handler_([this](const events::move_entity& event) -> void {on_move_event(event);}), removed_entity_handler_([this](const events::remove_entity& event) -> void {on_remove_event(event);}) {
             root_->bounds_ = root_bounds;
             root_->life_ = 0;
             root_->depth_ = 0;
-            root_->parent_ = nullptr;
             // build lazily
+
+            // sub 
+            event_interface::subscribe<events::move_entity>(moved_entity_handler_);
+            event_interface::subscribe<events::remove_entity>(removed_entity_handler_);
         }
         // creates an empty quadree, then populates it with the list of objects
         template<typename InputIt>
         quadree(raglib::bounding_box_2 root_bounds, InputIt first, InputIt last)
         : quadree(root_bounds) { // initialise the root node
             for (auto i = first; i != last; ++i) {
-                insert(*i);
+                insert(std::move(*i));
             }
         }
         
@@ -152,8 +121,12 @@ namespace tree{
         
         // copy and move overloads, root, depth and next id
         quadree(const quadree& other)
-        :  max_depth_(other.max_depth_), next_id_(other.next_id_){
+        :  max_depth_(other.max_depth_), next_id_(other.next_id_), moved_entity_handler_(other.moved_entity_handler_), removed_entity_handler_(other.removed_entity_handler_){
             root_ = copy_tree(other.root_.get(), nullptr);
+            event_interface::subscribe<events::move_entity>(moved_entity_handler_);
+            event_interface::subscribe<events::remove_entity>(removed_entity_handler_);
+
+            // and resub
         };
 
         quadree(quadree&& other);
@@ -161,57 +134,38 @@ namespace tree{
         quadree& operator= (const quadree& other);
         quadree& operator=(quadree&& other);
         
-        // insert and erase 
-        void insert(std::vector<std::unique_ptr<entities::entity>>& objs){
-            insert(root_, objs);
-            
-        }
-        void insert(std::unique_ptr<entities::entity>& obj) {
-            insert(root_, obj);
-            next_id_ += 1;
-        }
-        void erase(size_t id){
-            erase(root_, id);
-        }
         std::unique_ptr<entities::entity> extract(size_t id){
             return extract(root_, id);
         }
-        void clear(){
-            clear(root_);
+        // tree properties
+        bool is_empty() {
+            return is_empty(root_);
         }
-        // object lookup
-        node* find_object_node(std::unique_ptr<entities::entity>& obj) {
-            return find_object_node(root_, obj);
+        bool is_leaf() {
+            return is_leaf(root_);
         }
-        
-        entities::entity* find_object(int id) {
-            return find_object(root_, id);
+        bool is_root(){
+            return is_root(root_);
         }
-        // TODO change from ref wrapper to raw pointersf
-        template<typename UnaryPred>
-        std::vector<std::reference_wrapper<std::unique_ptr<entities::entity>>> get_objects(UnaryPred p){
-            return get_objects(root_, p);
+        // for testing purposes 
+        bool object_in_node(raglib::bounding_box_2& node, raglib::bounding_box_2& obj) {
+            return node_contains_object(node, obj);
         }
-        //TODO change from ref wrapper to raw pointers
-        std::vector<std::reference_wrapper<std::unique_ptr<entities::entity>>> get_objects(){
-            return get_objects(root_);
+        int height() {
+            return height(root_);
         }
-        
-        // update and render
-        void update(float delta){
-            update(root_, delta);
-            auto parent_objects = std::vector<entities::entity*>{};
-            identify_collisions(root_, parent_objects); // start with an empty list
+        int max_depth(){
+            return max_depth_;
         }
-
-        // render the tree within a certain bounding box, default is the whole tree
-        void render(){
-            render(root_);
+        // height and size
+        size_t get_next_id(){
+            return next_id_;
+        }    
+        size_t num_nodes(){
+            return num_nodes(root_);
         }
-        
-        template<typename UnaryPred>
-        void render(UnaryPred p){
-            render(root_, p);
+        size_t size() {
+            return size(root_);
         }
         std::unique_ptr<node>& get_root() {
             return root_;
@@ -220,47 +174,49 @@ namespace tree{
         std::vector<std::unique_ptr<node>>& get_children() {
             return root_->children_;
         }
-        size_t get_next_id(){
-            return next_id_;
-        }
-        
-        int max_depth(){
-            return max_depth_;
-        }
-        // height and size
-        int height() {
-            return height(root_);
-        }
-        size_t size() {
-            return size(root_);
-        }
-        size_t num_nodes(){
-            return num_nodes(root_);
-        }
-        
-        // tree properties
-        bool is_leaf() {
-            return is_leaf(root_);
-        }
-        bool is_root(){
-            return is_root(root_);
-        }
-        bool is_empty() {
-            return is_empty(root_);
-        }
-        
         // checks leaves for their life, prunes if need be
+        // insert and erase 
+        void clear(){
+            clear(root_);
+        }
+        void erase(size_t id){
+            erase(root_, id);
+        }
+        void insert(std::unique_ptr<entities::entity> obj) {
+            insert(root_, std::move(obj));
+            next_id_ += 1;
+        }
+
+        void on_move_event(const events::move_entity& event){
+            size_t id = event.get_id();
+            // remove and reinsert
+            auto entity = extract(root_, id);
+            insert(root_, std::move(entity));
+        }
+        void on_remove_event(const events::remove_entity& event){
+            // TODO implement
+            size_t id = event.get_id();
+            erase(root_, id);
+        }
         void prune_leaves(double delta) {
             prune_leaves(root_, delta);
         }
-        
-        // for testing purposes 
-        bool object_in_node(raglib::bounding_box_2& node, raglib::bounding_box_2& obj) {
-            return node_contains_object(node, obj);
-        }
-        
         void traverse_tree(){
             traverse_tree(root_);
+        }
+        // update and render
+        // render the tree within a certain bounding box, default is the whole tree
+        void render(){
+            render(root_);
+        }
+        template<typename UnaryPred>
+        void render(UnaryPred p){
+            render(root_, p);
+        }
+        void update(float delta){
+            update(root_, delta);
+            auto parent_objects = std::vector<entities::entity*>{};
+            identify_collisions(root_, parent_objects); // start with an empty list
         }
     };
 }
