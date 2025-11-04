@@ -29,7 +29,7 @@ void entities::entity::render(){
 
 int entities::cursor::update(float delta){
     auto old_position = position_;
-    position_ = GetMousePosition();
+    position_ =  GetMousePosition();
 
     if(! Vector2Equals(old_position, position_)) {
         Vector2 position_delta = Vector2Subtract(position_, old_position);

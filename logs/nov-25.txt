@@ -30,3 +30,5 @@ both remove the entity, move reinserts it
 
 might be better ? 
 collisions are checked every frame still though
+
+-> slight out of bounds issue with the cursor, it can go beyond, so clamp it ? 
