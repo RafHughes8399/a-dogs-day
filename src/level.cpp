@@ -12,6 +12,7 @@ bool level::level_graph::find_path(Vector2 start, Vector2 end){
      * 
      * then run a *
      */
+    return true;
 } 
 
 int level::level_graph::categorise_node(int row, int column){
@@ -24,8 +25,8 @@ int level::level_graph::categorise_node(int row, int column){
     bool corner = ((top_row || bottom_row) && first_column) || ((top_row || bottom_row) && last_column);
     bool perimeter = (top_row || bottom_row) || (first_column || last_column);
     if(corner){return nodes::corner;}
-    if(perimeter) {return nodes::perimeter;}
-    if(! corner && ! perimeter) {return nodes::interior;}
+    else if(perimeter) {return nodes::perimeter;}
+    else {return nodes::interior;}
 }
 int level::level_graph::num_nodes(){
     return graph_.size();
