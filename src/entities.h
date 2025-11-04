@@ -60,16 +60,7 @@ namespace entities{
             Vector2 position_;
 
     };
-    // the cursor for the player 
-    /**
-     * shaped as a paw, changes based on interactable behaviour, like a regular cursor, 
-     * if you consider it, a cursor is an entity, because it will interact with other entities
-     * 
-     * they would differ by their interactions ? 
-     *  instead of making a class you could do entity, entity builder and then interact strategy and assign it that one ? 
-     * i like this idea 
-     * 
-     */
+
     class cursor : public entity{
         public:
             ~cursor() {
@@ -107,6 +98,7 @@ namespace entities{
         private:
             events::event_handler<events::left_mouse_down> left_mouse_handler_;
     };
+
     class paw_mark : public entity{
         public:
             ~paw_mark() = default;
@@ -124,12 +116,56 @@ namespace entities{
         private:
     };
 
+    /**
+     * there would be multiple kinds of dogs
+     * -> the player dog (K and M )
+     *      -> the player dog moves around, responding to cursor events 
+     *      -> also has cosmetics (hat, shirt, paw clothes)
+     *      
+     * -> hepler dogs (waiters, cooks, etc)
+     * -> customer dogs 
+     */
+    class player_dog : public entity{
+        public:
+            ~player_dog(){
+                event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
+            }
+            player_dog(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id, Vector2 move_speed)
+            : entity(sprite, bounds, position, id), move_speed_(move_speed), is_selected_(false), cosmetics_({}),
+            right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}){
+                    event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
+
+            };
+            player_dog(const player_dog& other) = default;
+            player_dog(player_dog&& other) = default;
+
+            player_dog& operator=(const player_dog& other) = default;
+            player_dog& operator=(player_dog&& other) = default;
+
+            int update(float delta) override;
+            void interact(entity& other) override;
+
+            void on_right_click_event(const events::right_mouse_click& event);
+
+            // something for cosmetics
+
+        private:
+            const Vector2 move_speed_;
+
+            bool is_selected_;
+            events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
+            std::vector<sprite::sprite> cosmetics_;
+
+            std::vector<Vector2> move_path_;
+
+    };
     // ------------------ entity builder ------------------ //
     class entity_builder{
         public:
             std::unique_ptr<entity> build_cursor(Vector2 position, int id);
+            std::unique_ptr<entity> build_mack(Vector2 position, int id);
+            std::unique_ptr<entity> build_khiri(Vector2 position, int id);
             std::unique_ptr<entity> build_paw_mark(Vector2 position, int id);
-
             ~entity_builder() = default;
             entity_builder() {};
             entity_builder(const entity_builder& other) = default;

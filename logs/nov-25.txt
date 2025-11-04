@@ -32,3 +32,13 @@ might be better ?
 collisions are checked every frame still though
 
 -> slight out of bounds issue with the cursor, it can go beyond, so clamp it ? 
+
+-> dogs and entitiy interaction 
+    -> dogs class
+    -> dog builders 
+    -> dog art
+    -> dog cursor controls
+        -> dog selection (and highlighting the selected one )
+        -> move to point
+    -> cursor interactions 
+     
