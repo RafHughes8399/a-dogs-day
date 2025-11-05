@@ -19,7 +19,9 @@ namespace textures{
     enum texture_keys{
         cursor = 0,
         paw_mark = 1,
-        size = 2
+        khiri = 2,
+        mack = 3, 
+        size = 4
         // and so on
     };
     class texture{

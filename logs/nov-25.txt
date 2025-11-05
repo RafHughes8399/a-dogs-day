@@ -40,5 +40,11 @@ collisions are checked every frame still though
     -> dog cursor controls
         -> dog selection (and highlighting the selected one )
         -> move to point
-    -> cursor interactions 
+    -> cursor interactions
+
+let's break it down 
+first, build the dogs
+second, be able to select the dogs, comprised of cursor interactions and prompts
+
+ok let's do that 
      

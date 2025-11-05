@@ -5,7 +5,8 @@ int entities::player_dog::update(float delta){
     (void) delta;
     /**
      * the dog should store its move path
-     * if the dog path is empty, then the dog is not moving
+     * if the dog path is empty, then the dog is not moving,
+     * for now do nothing 
      */
     return status_codes::nothing;
 }
@@ -21,13 +22,33 @@ void on_right_click_event(const events::right_mouse_click& event){
 }
 
 // ------------------------------- builder ------------------------------- //
-std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 position, int id){
-    (void) position;
-    (void) id;
-    return nullptr;
-}
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){
-    (void) position;
-    (void) id;
-    return nullptr;
+    auto khiri_texture = textures::textures_.get_texture(textures::khiri, assets_config::khiri_path);
+    return std::make_unique<entities::entity>(
+        sprite::sprite(khiri_texture,
+        assets_config::khiri_attributes[assets_config::attributes::frame_width],
+        assets_config::khiri_attributes[assets_config::attributes::frame_height],
+        assets_config::khiri_attributes[assets_config::attributes::frames],
+        assets_config::khiri_attributes[assets_config::attributes::animations]),
+
+        raglib::bounding_box_2{position, Vector2Add(position, 
+        Vector2{assets_config::khiri_attributes[assets_config::attributes::frame_width], assets_config::khiri_attributes[assets_config::attributes::frame_height]} )}, // TODO change
+        position,
+        id,
+        Vector2Zero());
+}
+std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 position, int id){
+    auto mack_texture = textures::textures_.get_texture(textures::mack, assets_config::mack_path);
+    return std::make_unique<entities::entity>(
+        sprite::sprite(mack_texture,
+        assets_config::mack_attributes[assets_config::attributes::frame_width],
+        assets_config::mack_attributes[assets_config::attributes::frame_height],
+        assets_config::mack_attributes[assets_config::attributes::frames],
+        assets_config::mack_attributes[assets_config::attributes::animations]),
+
+        raglib::bounding_box_2{position, Vector2Add(position, 
+        Vector2{assets_config::mack_attributes[assets_config::attributes::frame_width], assets_config::mack_attributes[assets_config::attributes::frame_height]} )}, // TODO change
+        position,
+        id,
+        Vector2Zero());
 }
