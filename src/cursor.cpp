@@ -16,7 +16,11 @@ int entities::cursor::update(float delta){
 }
 
 void entities::cursor::interact(entities::entity& other){
-    (void) other;
+    // down cast to a dog because that's all we have at the moment will, figure something 
+    // else out 
+    
+    player_dog& dog_cast = dynamic_cast<player_dog&>(other);
+    
     return;
 }
 void entities::cursor::on_left_mouse_event(const events::left_mouse_down& event){
@@ -38,7 +42,6 @@ int entities::paw_mark::update(float delta){
     return status_codes::nothing;
 }
 void entities::paw_mark::interact(entities::entity& other){
-    (void) other;
     return;
 }
 

@@ -311,15 +311,11 @@ void tree::quadree::update(std::unique_ptr<node>& tree, float delta){
     if(! tree) {return;}
     for(auto it = tree->objects_.begin(); it != tree->objects_.end();){
         int update_result = (*it)->update(delta);
-        std::cout << "update entity " << (*it)->get_id() <<  " with result " << update_result <<  std::endl;
         switch(update_result){
             case entities::status_codes::moved:
-                std::cout << "move entity " << std::endl;
                 if(! node_contains_object(tree->bounds_, (*it)->get_bounds())){
-                        std::cout << "move entity into new node " << std::endl;
                         auto entity = std::move(*it);
                         it = tree->objects_.erase(it);
-                        std::cout << "reinsert" <<  std::endl;
                         insert(root_, std::move(entity));
                         // reinsert
                 }
@@ -381,7 +377,6 @@ void tree::quadree::identify_collisions(std::unique_ptr<node>& tree , std::vecto
                 j_bounds.max.x - j_bounds.min.x, j_bounds.max.y - j_bounds.min.y};
 
                 if(CheckCollisionRecs(i_rectangle, j_rectangle)){
-                    // interact
                     tree->objects_[i]->interact(*tree->objects_[j]);
                 }            
             }

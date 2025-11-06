@@ -48,3 +48,22 @@ second, be able to select the dogs, comprised of cursor interactions and prompts
 
 ok let's do that 
      
+
+
+regarding interaction, start with a simple 
+if else dynamic cast thing for now, will work on a 
+more elegant solution later on
+
+consider a way for it to be turned off, i.e while interacting do this, while not do that
+
+and a way to select items
+
+ok kind of crazy idea, but dont query interactions every frame, rather interpret interactions as an event
+that could be created when an entity moves, because interactions can only occur when an entity moves into another
+
+
+-> implement queries
+-> adjust handler comparisons for events and queries
+-> setup cursor queries
+
+-> if I can template the handler over a query type, can i tempalte it over the return type too ? 
