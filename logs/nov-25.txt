@@ -66,4 +66,19 @@ that could be created when an entity moves, because interactions can only occur 
 -> adjust handler comparisons for events and queries
 -> setup cursor queries
 
--> if I can template the handler over a query type, can i tempalte it over the return type too ? 
+-> if I can template the handler over a query type,
+
+
+i do need a better way of setting handler ids for both events and entities 
+
+-> i think in the way that you have mov eevents nad upadtes you do for interactoin 
+=> the consideration is avoiding double ups ?
+-> well no because they enable both types of collision
+    -> is this entity colliding / no longer colliding with anything - like a state 
+    -> the exact entity it is colliding with, to then do something
+
+hold on you're doing something wrong
+-> the cursor creates a query, passing in the information 
+-> it is the tree that listens for the query, uses the bounds 
+and then returns the bool 
+

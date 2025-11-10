@@ -10,7 +10,7 @@
 #include "raglib.h"
 namespace queries{
     enum ids{
-        collision = 0,
+        is_colliding = 0,
         size = 1
     };
     
@@ -30,17 +30,17 @@ namespace queries{
             }
     };
 
-    class collision_query : public query{
+    class is_colliding_query : public query{
         public:
-            ~collision_query() = default;
-            collision_query(raglib::bounding_box_2 bounds)
-            : query(ids::collision), bounds_(bounds){};
+            ~is_colliding_query() = default;
+            is_colliding_query(raglib::bounding_box_2 bounds)
+            : query(ids::is_colliding), bounds_(bounds){};
 
             static const int get_static_type(){
-                return ids::collision;
+                return ids::is_colliding;
             }
 
-            raglib::bounding_box_2 get_bounds(){
+            raglib::bounding_box_2 get_bounds() const{
                 return bounds_;
             }
 
@@ -51,12 +51,11 @@ namespace queries{
     class query_handler_interface{
         public:
             virtual ~query_handler_interface() = default;
-            void execute(const query& q){
-                call_query(q);
+            bool execute(const query& q){
+                return call_query(q);
             }
-            virtual const int get_type() const = 0;
         protected:
-            virtual void call_query(const query& q) = 0;
+            virtual bool call_query(const query& q) = 0;
     };
 
     template<typename Q> // Q for query
@@ -64,7 +63,7 @@ namespace queries{
         public:
             ~query_handler() = default;
             query_handler(std::function<bool(const Q& q)> handle)
-            : handler_type_(handler_type), handler_(handle){};
+            : handler_(handle){};
 	        
             query_handler(const query_handler& other) = default;
 		    query_handler(query_handler&& other) = default;
@@ -72,29 +71,21 @@ namespace queries{
 		    query_handler& operator=(const query_handler& other) = default;
 		    query_handler& operator=(query_handler&& other) = default;
 
-            void call_query(cosnt query& q) override{
-                if(q.get_type() == Q::get_static_type()){
-                        handler_(static_cast<const Q&>(q));
-                }
-            }
-            const int get_type() const override{
-                return handler_type_;
-            }
-            bool operator==(const query_handler& other){
-                return handler_type_ == other.handler_type_;
+            bool call_query(const query& q) override{
+                return handler_(static_cast<const Q&>(q));
             }
         private:
             std::function<bool(const Q& q)> handler_;
-            const int handler_type_;
     };
 
     class query_executor{
         public:
             void subscribe(int query_key, std::unique_ptr<query_handler_interface> handler);
-            void unsubscribe(int query_key, const int handler);
-            void execute_query(const query& query);
+            void unsubscribe(int query_key);
+            bool execute_query(const query& query);
         private:
-            std::unordered_map<int, std::vector<std::unique_ptr<query_handler_interface>>> subscriber_map_;
+            std::unordered_map<int, std::unique_ptr<query_handler_interface>> subscriber_map_;
     };
+    extern query_executor global_executor_;
 }
 #endif

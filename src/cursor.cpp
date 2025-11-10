@@ -10,6 +10,22 @@ int entities::cursor::update(float delta){
         Vector2 position_delta = Vector2Subtract(position_, old_position);
         bounds_.min = Vector2Add(bounds_.min, position_delta);
         bounds_.max = Vector2Add(bounds_.max, position_delta);
+
+        // create the query and execute it
+        std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(bounds_);
+        // the listener (singular) does something with the query and returns the information
+        bool is_colliding = query_interface::execute_query(*colliding_query);
+
+        if(is_colliding){
+            // switch to colliding 
+            std::cout << "is colliding" << std::endl;
+        }
+        else{
+            // switch to default anim
+            std::cout << "is not colliding" << std::endl;
+        }
+
+
         return status_codes::moved;
     }
     return status_codes::nothing;
@@ -63,7 +79,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vector2 position, int id){
     auto paw_texture = textures::textures_.get_texture(textures::paw_mark, assets_config::paw_mark_path); 
-    return std::make_unique<entities::entity>(
+    return std::make_unique<entities::paw_mark>(
         sprite::sprite(paw_texture,
         assets_config::paw_mark_attributes[assets_config::attributes::frame_width],
         assets_config::paw_mark_attributes[assets_config::attributes::frame_height],

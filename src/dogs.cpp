@@ -24,7 +24,7 @@ void on_right_click_event(const events::right_mouse_click& event){
 // ------------------------------- builder ------------------------------- //
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){
     auto khiri_texture = textures::textures_.get_texture(textures::khiri, assets_config::khiri_path);
-    return std::make_unique<entities::entity>(
+    return std::make_unique<entities::player_dog>(
         sprite::sprite(khiri_texture,
         assets_config::khiri_attributes[assets_config::attributes::frame_width],
         assets_config::khiri_attributes[assets_config::attributes::frame_height],
@@ -39,7 +39,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 position, int id){
     auto mack_texture = textures::textures_.get_texture(textures::mack, assets_config::mack_path);
-    return std::make_unique<entities::entity>(
+    return std::make_unique<entities::player_dog>(
         sprite::sprite(mack_texture,
         assets_config::mack_attributes[assets_config::attributes::frame_width],
         assets_config::mack_attributes[assets_config::attributes::frame_height],

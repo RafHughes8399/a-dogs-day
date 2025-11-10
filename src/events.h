@@ -190,7 +190,7 @@ namespace events{
 		}
 	private:
 		std::function<void(const E& e)> handler_;
-		const int handler_type_;
+		const int handler_type_; // this should be an id i think 
 	};
 	// the event
 	// the event handler - tempalted for any event, based on an interface

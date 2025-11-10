@@ -6,13 +6,13 @@ enum positions{
     bottom_right = 3
 };
 // containment checks
-bool tree::quadree::node_contains_object(raglib::bounding_box_2& node, raglib::bounding_box_2& object){
+bool tree::quadtree::node_contains_object(raglib::bounding_box_2& node, raglib::bounding_box_2& object){
     // compare the bounding box of the node and the object
     return (object.min.x >= node.min.x && object.min.y >= node.min.y)
     && (object.max.x <= node.max.x && object.max.y <= node.max.y);
 }
 // return the child "index" that the object can fit into, if -1 then no child can fit the object
-int tree::quadree::object_contained_by_child(raglib::bounding_box_2& node, raglib::bounding_box_2& object){
+int tree::quadtree::object_contained_by_child(raglib::bounding_box_2& node, raglib::bounding_box_2& object){
     // check if the object will fit into potential children of the node 
     auto centre = Vector2Add(node.max, node.min);
     centre = Vector2Scale(centre, 0.5f);
@@ -45,14 +45,14 @@ int tree::quadree::object_contained_by_child(raglib::bounding_box_2& node, ragli
     return -1;
 }
 // child construction 
-bool tree::quadree::is_child_built(std::unique_ptr<node>& tree, std::unique_ptr<node>& child){
+bool tree::quadtree::is_child_built(std::unique_ptr<node>& tree, std::unique_ptr<node>& child){
     for(auto& c : tree->children_){
         if(*c == *child){return true;}
     }
     return false;
 }
 
-void tree::quadree::build_children(std::unique_ptr<node>& tree){
+void tree::quadtree::build_children(std::unique_ptr<node>& tree){
     auto centre = Vector2Add(tree->bounds_.max, tree->bounds_.min);
     centre = Vector2Scale(centre, 0.5f);
 
@@ -83,7 +83,7 @@ void tree::quadree::build_children(std::unique_ptr<node>& tree){
 }
 
 // insertion
-void tree::quadree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object){
+void tree::quadtree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object){
 	auto & object_bounds = object->get_bounds();
     // check if the node contains the object, if not then immediately return
 	if(! node_contains_object(tree->bounds_, object_bounds)){ 
@@ -118,7 +118,7 @@ void tree::quadree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entities
 	}
 }
 
-void tree::quadree::erase(std::unique_ptr<node>& tree, size_t object_id){
+void tree::quadtree::erase(std::unique_ptr<node>& tree, size_t object_id){
     if(! tree){
         return;
     } 
@@ -143,7 +143,7 @@ void tree::quadree::erase(std::unique_ptr<node>& tree, size_t object_id){
     }
 }
 
-std::unique_ptr<entities::entity> tree::quadree::extract(std::unique_ptr<node>& tree, size_t object_id){
+std::unique_ptr<entities::entity> tree::quadtree::extract(std::unique_ptr<node>& tree, size_t object_id){
     if(!tree){return nullptr;}
     // find them remove
     auto entity = std::find_if(tree->objects_.begin(), tree->objects_.end(),
@@ -170,13 +170,13 @@ std::unique_ptr<entities::entity> tree::quadree::extract(std::unique_ptr<node>& 
     }
     return nullptr;
 }
-void tree::quadree::clear(std::unique_ptr<node>& tree){
+void tree::quadtree::clear(std::unique_ptr<node>& tree){
     tree->objects_.clear();
     for(auto& child : tree->children_){
         clear(child);
     }
 }
-int tree::quadree::height(std::unique_ptr<node>& tree) {
+int tree::quadtree::height(std::unique_ptr<node>& tree) {
     if (!tree) {
         return -1;
     }
@@ -192,7 +192,7 @@ int tree::quadree::height(std::unique_ptr<node>& tree) {
         return 1 + max_child_height;
     }
 }
-size_t tree::quadree::size(std::unique_ptr<node>& tree) {
+size_t tree::quadtree::size(std::unique_ptr<node>& tree) {
     auto empty = is_empty(tree);
     if (empty) { return 0; }
     if(! tree){
@@ -208,7 +208,7 @@ size_t tree::quadree::size(std::unique_ptr<node>& tree) {
     return 0;
 }
 
-size_t tree::quadree::num_nodes(std::unique_ptr<node>& tree){
+size_t tree::quadtree::num_nodes(std::unique_ptr<node>& tree){
     if(tree){
         size_t size = 1;
         for(auto& child : tree->children_){
@@ -221,7 +221,7 @@ size_t tree::quadree::num_nodes(std::unique_ptr<node>& tree){
     }
 }
 
-bool tree::quadree::is_empty(std::unique_ptr<node>& tree) {
+bool tree::quadtree::is_empty(std::unique_ptr<node>& tree) {
     // check the current list 
     auto empty = tree->objects_.size() == 0 ? true : false;
     // check the children
@@ -233,10 +233,16 @@ bool tree::quadree::is_empty(std::unique_ptr<node>& tree) {
     }
     return true;
 }
-bool tree::quadree::is_root(std::unique_ptr<node>& tree){
+bool tree::quadtree::is_root(std::unique_ptr<node>& tree){
     return tree->depth_ == 0  ? true : false;
 }
-bool tree::quadree::is_leaf(std::unique_ptr<node>& tree) {
+bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, raglib::bounding_box_2& bounds){
+    (void) tree;
+    (void) bounds;
+    return true;
+}
+
+bool tree::quadtree::is_leaf(std::unique_ptr<node>& tree) {
 
     return tree->children_.size() == 0 ? true : false;
 }
@@ -246,7 +252,7 @@ bool tree::quadree::is_leaf(std::unique_ptr<node>& tree) {
 // but then the parent is now holding onto a null pointer
 
 // i need to remove it from the parent's children list
-void tree::quadree::prune_leaves(std::unique_ptr<node>& tree, double delta) {
+void tree::quadtree::prune_leaves(std::unique_ptr<node>& tree, double delta) {
     // you're thinking about it wrong i think 
         if (is_leaf(tree) && ! is_root(tree) 
             && is_empty(tree)) {
@@ -273,7 +279,7 @@ void tree::quadree::prune_leaves(std::unique_ptr<node>& tree, double delta) {
     return;
 } 
 
-std::unique_ptr<tree::quadree::node> tree::quadree::copy_tree(node* tree, std::unique_ptr<node>* parent){
+std::unique_ptr<tree::quadtree::node> tree::quadtree::copy_tree(node* tree, std::unique_ptr<node>* parent){
     if(! tree){
         return nullptr;
     }
@@ -293,7 +299,7 @@ std::unique_ptr<tree::quadree::node> tree::quadree::copy_tree(node* tree, std::u
     }
     return copy;
 }
-void tree::quadree::traverse_tree(std::unique_ptr<node>& tree){
+void tree::quadtree::traverse_tree(std::unique_ptr<node>& tree){
 		// print the box of the node 
 		if(!tree){
 			return;
@@ -307,7 +313,7 @@ void tree::quadree::traverse_tree(std::unique_ptr<node>& tree){
 		return;
 }
 
-void tree::quadree::update(std::unique_ptr<node>& tree, float delta){
+void tree::quadtree::update(std::unique_ptr<node>& tree, float delta){
     if(! tree) {return;}
     for(auto it = tree->objects_.begin(); it != tree->objects_.end();){
         int update_result = (*it)->update(delta);
@@ -341,7 +347,7 @@ void tree::quadree::update(std::unique_ptr<node>& tree, float delta){
     }
     return;
 }
-void tree::quadree::identify_collisions(std::unique_ptr<node>& tree , std::vector<entities::entity*> parent_entities){
+void tree::quadtree::identify_collisions(std::unique_ptr<node>& tree , std::vector<entities::entity*> parent_entities){
     if(! tree) {return;}
     // check for collisions with objects from parent nodes
     // basic debugging for tests
@@ -394,7 +400,7 @@ void tree::quadree::identify_collisions(std::unique_ptr<node>& tree , std::vecto
         identify_collisions(child, parent_entities);
     });
 }
-void tree::quadree::render(std::unique_ptr<node>& tree){
+void tree::quadtree::render(std::unique_ptr<node>& tree){
     // if null tree skip 
     if(! tree){
         return; 

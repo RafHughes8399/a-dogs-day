@@ -98,7 +98,7 @@ namespace level{
             }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
             : background_(sprite), view_frame_(frame), dimensions_(dimensions), graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
-            level_entities_(tree::quadree(raglib::bounding_box_2{Vector2Zero(), dimensions})),
+            level_entities_(tree::quadtree(raglib::bounding_box_2{Vector2Zero(), dimensions})),
             left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}),
             right_mouse_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);})
             {
@@ -128,7 +128,7 @@ namespace level{
         private :
             level_graph graph_;
             sprite::sprite background_;
-            tree::quadree level_entities_;
+            tree::quadtree level_entities_;
             Rectangle view_frame_;
             Vector2 dimensions_;
 

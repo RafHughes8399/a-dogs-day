@@ -2,13 +2,15 @@
  * header file that defines entitiy class hierarchy
  */
 #ifndef ENTITIES_H
-#define ENTITIES_h
+#define ENTITIES_H
 
 
 #include <iostream>
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
+#include "queries.h"
+#include "query_interface.h"
 #include "raglib.h"
 #include "sprite.h"
 #include "texture.h"
@@ -64,34 +66,23 @@ namespace entities{
     class cursor : public entity{
         public:
             ~cursor() {
-                std::cout << "cursor unsubscribe " << std::endl;
-                 event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
-
+                event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
             }
             cursor(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
-            : entity(sprite, bounds, position, id), left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}){
-                std::cout << "create cursor " << std::endl;
-                std::cout << "cursor subscribe " << std::endl;
+            : entity(sprite, bounds, position, id), 
+            left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}){
                 event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
-                
             };
-            cursor(const cursor& other)
-            : entity(other), left_mouse_handler_(other.left_mouse_handler_){
-                std::cout << "cursor subscribe " << std::endl;
-                event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
-            }
-            cursor(cursor&& other)
-            : entity(other), left_mouse_handler_(std::move(other.left_mouse_handler_)){
-                event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
-                std::cout << "cursor subscribe " << std::endl;
-                std::cout << "move construct cursor" << std::endl;
-            }
+            cursor(const cursor& other) = default;
+            cursor(cursor&& other) = default;
             
             cursor& operator=(const cursor& other) = default;
             cursor& operator=(cursor&& other)  = default;
-            int update(float delta) override;
-            void interact(entity& other) override;
+
             
+            int update(float delta) override;
+            
+            void interact(entity& other) override;            
             void on_left_mouse_event(const events::left_mouse_down& event);
             
 

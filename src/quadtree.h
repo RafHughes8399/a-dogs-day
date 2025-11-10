@@ -4,18 +4,17 @@
  */
 #ifndef QUADTREE_H
 #define QUADTREE_H
-// std includes
 #include <vector>
 #include <memory>
 #include <algorithm>
 #include <iostream>
-// raylib includes 
+
+#include "config.h"
+#include "entities.h"
 #include "raylib.h"
 #include "raymath.h"
 #include "raglib.h"
-// project includes
-#include "entities.h"
-#include "config.h"
+
 #define MAX_DEPTH 4
 #define NODE_LIFETIME 30
 #define CHILDREN 4
@@ -25,7 +24,7 @@
 #define WORLD_BOX raglib::bounding_box_2{WORLD_MIN, WORLD_MAX}
 
 namespace tree{
-    class quadree {
+    class quadtree {
     protected:
         // node definition
         struct node {
@@ -44,6 +43,8 @@ namespace tree{
         // members 
         events::event_handler<events::move_entity> moved_entity_handler_;
         events::event_handler<events::remove_entity> removed_entity_handler_;
+        queries::query_handler<queries::is_colliding_query> is_colliding_handler_;
+
         int max_depth_;
         size_t next_id_;
         std::unique_ptr<node> root_;
@@ -52,6 +53,7 @@ namespace tree{
         bool is_root(std::unique_ptr<node>& tree);
         bool is_empty(std::unique_ptr<node>& tree);
         bool is_leaf(std::unique_ptr<node>& tree);
+        bool is_there_collision(std::unique_ptr<node>& tree, raglib::bounding_box_2& bounds);
         bool node_contains_object(raglib::bounding_box_2& node, raglib::bounding_box_2& object);
         
         int height(std::unique_ptr<node>& tree);
@@ -89,50 +91,57 @@ namespace tree{
         }
         public:
         // CONSTRUCTORS
-        ~quadree() {
+        ~quadtree() {
             event_interface::unsubscribe<events::move_entity>(moved_entity_handler_);
             event_interface::unsubscribe<events::remove_entity>(removed_entity_handler_);
+            query_interface::unsubscribe<queries::is_colliding_query>(is_colliding_handler_);
         }
-        // creates an empty quadree with a root node
-        quadree(raglib::bounding_box_2 root_bounds, int depth=MAX_DEPTH)
+        // creates an empty quadtree with a root node
+        quadtree(raglib::bounding_box_2 root_bounds, int depth=MAX_DEPTH)
         : root_(std::make_unique<node>()), max_depth_(depth), next_id_(0),
-        moved_entity_handler_([this](const events::move_entity& event) -> void {on_move_event(event);}), removed_entity_handler_([this](const events::remove_entity& event) -> void {on_remove_event(event);}) {
+        moved_entity_handler_([this](const events::move_entity& event) -> void {on_move_event(event);}), 
+        removed_entity_handler_([this](const events::remove_entity& event) -> void {on_remove_event(event);}),
+        is_colliding_handler_([this](const queries::is_colliding_query& query) -> bool {return on_is_colliding_query(query);}) {
             root_->bounds_ = root_bounds;
             root_->life_ = 0;
             root_->depth_ = 0;
-            // build lazily
-
+            
             // sub 
             event_interface::subscribe<events::move_entity>(moved_entity_handler_);
             event_interface::subscribe<events::remove_entity>(removed_entity_handler_);
+            query_interface::subscribe<queries::is_colliding_query>(is_colliding_handler_);
         }
-        // creates an empty quadree, then populates it with the list of objects
+        // creates an empty quadtree, then populates it with the list of objects
         template<typename InputIt>
-        quadree(raglib::bounding_box_2 root_bounds, InputIt first, InputIt last)
-        : quadree(root_bounds) { // initialise the root node
+        quadtree(raglib::bounding_box_2 root_bounds, InputIt first, InputIt last)
+        : quadtree(root_bounds) { // initialise the root node
             for (auto i = first; i != last; ++i) {
                 insert(std::move(*i));
             }
         }
         
-        quadree(raglib::bounding_box_2 root_bounds, std::vector<std::unique_ptr<entities::entity>>& objects)
-        : quadree(root_bounds, objects.begin(), objects.end()) {
+        quadtree(raglib::bounding_box_2 root_bounds, std::vector<std::unique_ptr<entities::entity>>& objects)
+        : quadtree(root_bounds, objects.begin(), objects.end()) {
         }
         
         // copy and move overloads, root, depth and next id
-        quadree(const quadree& other)
-        :  max_depth_(other.max_depth_), next_id_(other.next_id_), moved_entity_handler_(other.moved_entity_handler_), removed_entity_handler_(other.removed_entity_handler_){
+        quadtree(const quadtree& other)
+        :  max_depth_(other.max_depth_), next_id_(other.next_id_), 
+        moved_entity_handler_(other.moved_entity_handler_), 
+        removed_entity_handler_(other.removed_entity_handler_),
+        is_colliding_handler_(other.is_colliding_handler_){
             root_ = copy_tree(other.root_.get(), nullptr);
             event_interface::subscribe<events::move_entity>(moved_entity_handler_);
             event_interface::subscribe<events::remove_entity>(removed_entity_handler_);
+            query_interface::subscribe<queries::is_colliding_query>(is_colliding_handler_);
 
             // and resub
         };
 
-        quadree(quadree&& other);
+        quadtree(quadtree&& other);
         
-        quadree& operator= (const quadree& other);
-        quadree& operator=(quadree&& other);
+        quadtree& operator= (const quadtree& other);
+        quadtree& operator=(quadtree&& other);
         
         std::unique_ptr<entities::entity> extract(size_t id){
             return extract(root_, id);
@@ -194,9 +203,13 @@ namespace tree{
             insert(root_, std::move(entity));
         }
         void on_remove_event(const events::remove_entity& event){
-            // TODO implement
             size_t id = event.get_id();
             erase(root_, id);
+        }
+
+        bool on_is_colliding_query(const queries::is_colliding_query& query){
+            auto bounds = query.get_bounds();
+            return is_there_collision(root_, bounds);
         }
         void prune_leaves(double delta) {
             prune_leaves(root_, delta);
