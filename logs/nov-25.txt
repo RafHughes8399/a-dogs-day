@@ -82,3 +82,9 @@ hold on you're doing something wrong
 -> it is the tree that listens for the query, uses the bounds 
 and then returns the bool 
 
+
+-> basic rectangles for the dogs to test 
+-> draw cursor grabbing 
+-> test cursor interaction query and animation changing
+-> then dog selection highlight
+-> then dog pathfinding (a* and an event for getting the destination )

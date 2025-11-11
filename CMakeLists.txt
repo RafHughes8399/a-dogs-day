@@ -59,6 +59,10 @@ link_libraries(raglib)
 add_library(events src/events.cpp)
 link_libraries(events)
 
+add_library(queries src/queries.cpp)
+link_libraries(queries)
+
+
 add_library(texture src/texture.cpp)
 link_libraries(texture)
 
@@ -73,6 +77,12 @@ link_libraries(player)
 
 add_library(entities src/entities.cpp)
 link_libraries(entities)
+
+add_library(cursor src/cursor.cpp)
+link_libraries(cursor)
+
+add_library(dogs src/dogs.cpp)
+link_libraries(dogs)
 
 add_library(quadtree src/quadtree.cpp)
 link_libraries(quadtree)

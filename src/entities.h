@@ -64,6 +64,10 @@ namespace entities{
     };
 
     class cursor : public entity{
+        enum animation_tags{
+            default = 0,
+            hover = 1
+        };
         public:
             ~cursor() {
                 event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
