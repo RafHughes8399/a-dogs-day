@@ -33,19 +33,22 @@ namespace queries{
     class is_colliding_query : public query{
         public:
             ~is_colliding_query() = default;
-            is_colliding_query(raglib::bounding_box_2 bounds)
-            : query(ids::is_colliding), bounds_(bounds){};
+            is_colliding_query(raglib::bounding_box_2 bounds, int id)
+            : query(ids::is_colliding), bounds_(bounds), id_(id){};
 
             static const int get_static_type(){
                 return ids::is_colliding;
             }
 
+            int get_id() const{
+                return id_;
+            }
             raglib::bounding_box_2 get_bounds() const{
                 return bounds_;
             }
-
         private:
             raglib::bounding_box_2 bounds_;
+            int id_;
     };
 
     class query_handler_interface{

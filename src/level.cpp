@@ -352,7 +352,9 @@ void level::level::render(){
         bool b =  bounds.contains(entity->get_bounds());
         return b;
     };
-    level_entities_.render(render_precdicate);
+    // ! there is a bug with the rendering predicate, will test and reincorporate at a later date
+    // TODO fix that bug (12.11)
+    level_entities_.render();
     return;
 }
 
@@ -373,7 +375,8 @@ void level::level::on_left_mouse_event(const events::left_mouse_down& event){
 
     view_frame_.x = Clamp(view_frame_.x + frame_delta.x, 0.0, dimensions_config::world_x - GetScreenWidth());
     view_frame_.y = Clamp(view_frame_.y + frame_delta.y, 0.0, dimensions_config::world_y - GetScreenHeight());
-    std::cout << "level left click event " << std::endl;
+
+    
 }
 void level::level::on_right_mouse_event(const events::right_mouse_click& event){
 
@@ -398,5 +401,14 @@ level::level level::level_builder::build_main_level(){
     // append the cursor
     auto cursor = entities::e_builder.build_cursor(GetMousePosition(), l.entity_id());
     l.add_entity(std::move(cursor));
+    
+    // and the dogs
+    std::cout << "id for khiri : " << l.entity_id() << std::endl;
+    auto khiri = entities::e_builder.build_khiri(Vector2 {500, 500}, l.entity_id());
+    l.add_entity(std::move(khiri));
+    
+    std::cout << "id for mack: " << l.entity_id() << std::endl;
+    auto mack = entities::e_builder.build_mack(Vector2 {700, 700}, l.entity_id());
+    l.add_entity(std::move(mack));
     return l;
 }

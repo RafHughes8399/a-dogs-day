@@ -6,9 +6,11 @@
 
 
 #include <iostream>
+
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
+#include "hitbox.h"
 #include "queries.h"
 #include "query_interface.h"
 #include "raglib.h"
@@ -64,17 +66,13 @@ namespace entities{
     };
 
     class cursor : public entity{
-        enum animation_tags{
-            default = 0,
-            hover = 1
-        };
         public:
-            ~cursor() {
-                event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
-            }
-            cursor(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
-            : entity(sprite, bounds, position, id), 
-            left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}){
+        ~cursor() {
+            event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
+        }
+        cursor(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
+        : entity(sprite, bounds, position, id), 
+        left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}){
                 event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
             };
             cursor(const cursor& other) = default;
@@ -82,23 +80,27 @@ namespace entities{
             
             cursor& operator=(const cursor& other) = default;
             cursor& operator=(cursor&& other)  = default;
-
+            
             
             int update(float delta) override;
             
             void interact(entity& other) override;            
             void on_left_mouse_event(const events::left_mouse_down& event);
             
-
-        private:
+            
+            private:
+            enum animation_tags{
+                    base = 0,
+                    hover = 1
+            };
             events::event_handler<events::left_mouse_down> left_mouse_handler_;
-    };
-
-    class paw_mark : public entity{
+        };
+        
+        class paw_mark : public entity{
         public:
-            ~paw_mark() = default;
-            paw_mark(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
-            : entity(sprite, bounds, position, id){};
+        ~paw_mark() = default;
+        paw_mark(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
+        : entity(sprite, bounds, position, id){};
             paw_mark(const paw_mark& other) = default;
             paw_mark(paw_mark&& other) = default;
 

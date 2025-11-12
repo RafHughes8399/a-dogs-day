@@ -87,28 +87,23 @@ void tree::quadtree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entitie
 	auto & object_bounds = object->get_bounds();
     // check if the node contains the object, if not then immediately return
 	if(! node_contains_object(tree->bounds_, object_bounds)){ 
-        std::cout << " entity " << object_bounds << " does not fit in " << tree->bounds_ << std::endl;
         return; 
     }
     else{
         // if at the max depth then insert, no further children can be constructed
         if(tree->depth_ == max_depth_){
-            std::cout << "node: " << tree->bounds_ << "is max depth, insert here " << std::endl;
             tree->objects_.push_back(std::move(object));
             return;
 		}
         else if(is_leaf(tree)){
-            std::cout << "node: " << tree->bounds_ << "is a leaf but not max depth " << std::endl;
             build_children(tree);
         }
         // if not all children for the tree have been built
         // recursively iterate through the children
         
-        std::cout << "node: " << tree->bounds_ << "has "  << tree->children_.size() << "children " << std::endl;
 	    for (auto& child : tree->children_) {
             // if does fit in a child, recursively insert
             if (node_contains_object(child->bounds_, object_bounds)) {
-                std::cout << "node : " << child->bounds_ << " can hold " << object_bounds << std::endl;
                 insert(child, std::move(object));
                 return;
             }
@@ -236,10 +231,33 @@ bool tree::quadtree::is_empty(std::unique_ptr<node>& tree) {
 bool tree::quadtree::is_root(std::unique_ptr<node>& tree){
     return tree->depth_ == 0  ? true : false;
 }
-bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, raglib::bounding_box_2& bounds){
-    (void) tree;
-    (void) bounds;
-    return true;
+bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, raglib::bounding_box_2& bounds, int id){
+    std::cout << "actually check collision, recursively and such " << std::endl;
+    // starts with the whole if node case
+    if(! tree) {
+        return false;
+    }
+    // then check the objects
+    auto entity_rec = Rectangle{bounds.min.x, bounds.min.y, (bounds.max.x - bounds.min.x), (bounds.max.y - bounds.min.y)}; // x, y, width, height
+    for(auto & obj : tree->objects_){
+        auto obj_bounds = obj->get_bounds();
+        auto obj_rec = Rectangle{obj_bounds.min.x, obj_bounds.min.y, (obj_bounds.max.x - obj_bounds.min.x), (obj_bounds.max.y - obj_bounds.min.y)};;
+        // it is checking collision with itself, make sure that is not the case
+        if(id != obj->get_id() && CheckCollisionRecs(entity_rec, obj_rec)){
+            std::cout << "collision with " << obj->get_id() << std::endl;
+            return true;
+        }
+    }
+    // if not colliding with something in the current node, then check the children, but only those that 
+    // could contain the entity
+    for(auto & child : tree->children_){
+        if(node_contains_object(child->bounds_, bounds)){
+            if(is_there_collision(child, bounds, id)){
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 bool tree::quadtree::is_leaf(std::unique_ptr<node>& tree) {
@@ -285,7 +303,7 @@ std::unique_ptr<tree::quadtree::node> tree::quadtree::copy_tree(node* tree, std:
     }
     auto copy = std::make_unique<node>();
     
-    // copy the bounds, life, depth
+    // copy the obj_bounds, life, depth
     copy->bounds_ = tree->bounds_;
     copy->depth_ = tree->depth_;
     copy->life_ = tree->life_;

@@ -53,7 +53,7 @@ namespace tree{
         bool is_root(std::unique_ptr<node>& tree);
         bool is_empty(std::unique_ptr<node>& tree);
         bool is_leaf(std::unique_ptr<node>& tree);
-        bool is_there_collision(std::unique_ptr<node>& tree, raglib::bounding_box_2& bounds);
+        bool is_there_collision(std::unique_ptr<node>& tree, raglib::bounding_box_2& bounds, int id);
         bool node_contains_object(raglib::bounding_box_2& node, raglib::bounding_box_2& object);
         
         int height(std::unique_ptr<node>& tree);
@@ -208,8 +208,11 @@ namespace tree{
         }
 
         bool on_is_colliding_query(const queries::is_colliding_query& query){
+            std::cout << "get query info" << std::endl;
             auto bounds = query.get_bounds();
-            return is_there_collision(root_, bounds);
+            auto id = query.get_id();
+            std::cout << "use bounds, check collision" << std::endl;
+            return is_there_collision(root_, bounds, id);
         }
         void prune_leaves(double delta) {
             prune_leaves(root_, delta);

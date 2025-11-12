@@ -88,3 +88,8 @@ and then returns the bool
 -> test cursor interaction query and animation changing
 -> then dog selection highlight
 -> then dog pathfinding (a* and an event for getting the destination )
+
+-> i think i need to switch from bounds to rectangle for hitboxes, it just makes more sense 
+-> yeah i think there's some funky business there, just switch to rectangles bro
+-> can do hitboxes while you're at it too ig, may as well
+-> and draw the hitboxes while you're at it for debugging

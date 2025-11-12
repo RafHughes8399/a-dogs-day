@@ -12,17 +12,20 @@ int entities::cursor::update(float delta){
         bounds_.max = Vector2Add(bounds_.max, position_delta);
 
         // create the query and execute it
-        std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(bounds_);
+        std::cout << "create is_colliding query " << std::endl;
+        std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(bounds_, id_);
         // the listener (singular) does something with the query and returns the information
+        
+        std::cout << "execute is_colliding query " << std::endl;
         bool is_colliding = query_interface::execute_query(*colliding_query);
-
+        std::cout << "is colliding ?  " << is_colliding << std::endl;
         if(is_colliding){
             // switch to colliding 
-            std::cout << "is colliding" << std::endl;
+            sprite_.get_animation().goto_animation(animation_tags::hover);
         }
         else{
+            sprite_.get_animation().goto_animation(animation_tags::base);
             // switch to default anim
-            std::cout << "is not colliding" << std::endl;
         }
 
 

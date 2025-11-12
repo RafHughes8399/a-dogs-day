@@ -14,7 +14,7 @@ void entities::player_dog::interact(entity& other){
     (void) other;
     return;
 }
-void on_right_click_event(const events::right_mouse_click& event){
+void entities::player_dog::on_right_click_event(const events::right_mouse_click& event){
     auto destination = event.get_mouse_position();
     // update the dog's movement path, query the level graph
     (void) destination;
@@ -32,7 +32,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
         assets_config::khiri_attributes[assets_config::attributes::animations]),
 
         raglib::bounding_box_2{position, Vector2Add(position, 
-        Vector2{assets_config::khiri_attributes[assets_config::attributes::frame_width], assets_config::khiri_attributes[assets_config::attributes::frame_height]} )}, // TODO change
+        Vector2Add(position, Vector2{assets_config::khiri_attributes[assets_config::attributes::frame_width], assets_config::khiri_attributes[assets_config::attributes::frame_height]}))}, // TODO change
         position,
         id,
         Vector2Zero());
@@ -47,7 +47,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
         assets_config::mack_attributes[assets_config::attributes::animations]),
 
         raglib::bounding_box_2{position, Vector2Add(position, 
-        Vector2{assets_config::mack_attributes[assets_config::attributes::frame_width], assets_config::mack_attributes[assets_config::attributes::frame_height]} )}, // TODO change
+        Vector2Add(position, Vector2{assets_config::mack_attributes[assets_config::attributes::frame_width], assets_config::mack_attributes[assets_config::attributes::frame_height]} ))}, // TODO change
         position,
         id,
         Vector2Zero());
