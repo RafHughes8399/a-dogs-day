@@ -21,8 +21,10 @@
 
 #define WORLD_MIN Vector2Zero()
 #define WORLD_MAX Vector2 {config::world_x, config::world_y}
-#define WORLD_BOX raglib::bounding_box_2{WORLD_MIN, WORLD_MAX}
+#define WORLD_BOX raglib::bounding_box_2(WORLD_MIN, WORLD_MAX)
 
+
+// nodes have a bounding box, entities have a rectangle
 namespace tree{
     class quadtree {
     protected:
@@ -53,11 +55,11 @@ namespace tree{
         bool is_root(std::unique_ptr<node>& tree);
         bool is_empty(std::unique_ptr<node>& tree);
         bool is_leaf(std::unique_ptr<node>& tree);
-        bool is_there_collision(std::unique_ptr<node>& tree, raglib::bounding_box_2& bounds, int id);
-        bool node_contains_object(raglib::bounding_box_2& node, raglib::bounding_box_2& object);
+        bool is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, int id);
+        bool node_contains_object(raglib::bounding_box_2& node, Rectangle& object);
         
         int height(std::unique_ptr<node>& tree);
-        int object_contained_by_child(raglib::bounding_box_2& node, raglib::bounding_box_2& object);
+        int object_contained_by_child(raglib::bounding_box_2& node, Rectangle& object);
         
         size_t num_nodes(std::unique_ptr<node>& tree);
         size_t size(std::unique_ptr<node>& tree);
@@ -157,7 +159,7 @@ namespace tree{
             return is_root(root_);
         }
         // for testing purposes 
-        bool object_in_node(raglib::bounding_box_2& node, raglib::bounding_box_2& obj) {
+        bool object_in_node(raglib::bounding_box_2& node, Rectangle& obj) {
             return node_contains_object(node, obj);
         }
         int height() {

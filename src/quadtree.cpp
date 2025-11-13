@@ -6,20 +6,21 @@ enum positions{
     bottom_right = 3
 };
 // containment checks
-bool tree::quadtree::node_contains_object(raglib::bounding_box_2& node, raglib::bounding_box_2& object){
+bool tree::quadtree::node_contains_object(raglib::bounding_box_2& node, Rectangle& object){
     // compare the bounding box of the node and the object
-    return (object.min.x >= node.min.x && object.min.y >= node.min.y)
-    && (object.max.x <= node.max.x && object.max.y <= node.max.y);
+    return node.contains(object);
 }
 // return the child "index" that the object can fit into, if -1 then no child can fit the object
-int tree::quadtree::object_contained_by_child(raglib::bounding_box_2& node, raglib::bounding_box_2& object){
+int tree::quadtree::object_contained_by_child(raglib::bounding_box_2& node, Rectangle& object){
     // check if the object will fit into potential children of the node 
     auto centre = Vector2Add(node.max, node.min);
     centre = Vector2Scale(centre, 0.5f);
 
+    Vector2 object_min = Vector2{object.x, object.y};
+    Vector2 object_max = Vector2{object.x + object.width, object.y + object.height};
     // first check if the object crosses the centre of any axis, if it does then no child will fit it
-    bool crosses_centre = (object.min.x < centre.x && centre.x < object.max.x) 
-    || (object.min.y < centre.y && centre.y < object.max.y);
+    bool crosses_centre = (object_min.x < centre.x && centre.x < object_max.x) 
+    || (object_min.y < centre.y && centre.y < object_max.y);
     
     if(crosses_centre) {return -1;}
 
@@ -84,9 +85,9 @@ void tree::quadtree::build_children(std::unique_ptr<node>& tree){
 
 // insertion
 void tree::quadtree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object){
-	auto & object_bounds = object->get_bounds();
+	auto & object_bounds = object->get_hitbox();
     // check if the node contains the object, if not then immediately return
-	if(! node_contains_object(tree->bounds_, object_bounds)){ 
+	if(! node_contains_object(tree->bounds_, object_bounds.get_box())){ 
         return; 
     }
     else{
@@ -103,7 +104,7 @@ void tree::quadtree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entitie
         
 	    for (auto& child : tree->children_) {
             // if does fit in a child, recursively insert
-            if (node_contains_object(child->bounds_, object_bounds)) {
+            if (node_contains_object(child->bounds_, object_bounds.get_box())) {
                 insert(child, std::move(object));
                 return;
             }
@@ -231,19 +232,16 @@ bool tree::quadtree::is_empty(std::unique_ptr<node>& tree) {
 bool tree::quadtree::is_root(std::unique_ptr<node>& tree){
     return tree->depth_ == 0  ? true : false;
 }
-bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, raglib::bounding_box_2& bounds, int id){
+bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, int id){
     std::cout << "actually check collision, recursively and such " << std::endl;
     // starts with the whole if node case
     if(! tree) {
         return false;
     }
     // then check the objects
-    auto entity_rec = Rectangle{bounds.min.x, bounds.min.y, (bounds.max.x - bounds.min.x), (bounds.max.y - bounds.min.y)}; // x, y, width, height
     for(auto & obj : tree->objects_){
-        auto obj_bounds = obj->get_bounds();
-        auto obj_rec = Rectangle{obj_bounds.min.x, obj_bounds.min.y, (obj_bounds.max.x - obj_bounds.min.x), (obj_bounds.max.y - obj_bounds.min.y)};;
         // it is checking collision with itself, make sure that is not the case
-        if(id != obj->get_id() && CheckCollisionRecs(entity_rec, obj_rec)){
+        if(id != obj->get_id() && bounds.check_collision(obj->get_hitbox())){
             std::cout << "collision with " << obj->get_id() << std::endl;
             return true;
         }
@@ -251,7 +249,7 @@ bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, raglib::bou
     // if not colliding with something in the current node, then check the children, but only those that 
     // could contain the entity
     for(auto & child : tree->children_){
-        if(node_contains_object(child->bounds_, bounds)){
+        if(node_contains_object(child->bounds_, bounds.get_box())){
             if(is_there_collision(child, bounds, id)){
                 return true;
             }
@@ -337,7 +335,7 @@ void tree::quadtree::update(std::unique_ptr<node>& tree, float delta){
         int update_result = (*it)->update(delta);
         switch(update_result){
             case entities::status_codes::moved:
-                if(! node_contains_object(tree->bounds_, (*it)->get_bounds())){
+                if(! node_contains_object(tree->bounds_, (*it)->get_hitbox().get_box())){
                         auto entity = std::move(*it);
                         it = tree->objects_.erase(it);
                         insert(root_, std::move(entity));
@@ -372,14 +370,9 @@ void tree::quadtree::identify_collisions(std::unique_ptr<node>& tree , std::vect
     for(auto& parent_entity : parent_entities){
         for(auto& entity : tree->objects_){
             // check for collisions between parent entity and entity
-            auto parent_bounds = parent_entity->get_bounds();
-            auto parent_rectangle = Rectangle{parent_entity->get_position().x, parent_entity->get_position().y, 
-            parent_bounds.max.x - parent_bounds.min.x, parent_bounds.max.y - parent_bounds.min.y};
+            auto parent_rectangle = parent_entity->get_hitbox().get_box();
 
-            auto entity_bounds = entity->get_bounds();
-            auto entity_rectangle = Rectangle{entity->get_position().x, entity->get_position().y, 
-            entity_bounds.max.x - entity_bounds.min.x, entity_bounds.max.y - entity_bounds.min.y};
-            
+            auto entity_rectangle = entity->get_hitbox().get_box();
             if(CheckCollisionRecs(parent_rectangle, entity_rectangle)){
                 // interact
                 parent_entity->interact(*entity);             
@@ -392,13 +385,9 @@ void tree::quadtree::identify_collisions(std::unique_ptr<node>& tree , std::vect
     if(tree->objects_.size() > 1 ){
         for(auto i = 0; i < tree->objects_.size() - 1; ++i){
             for(auto j = i + 1; j < tree->objects_.size(); ++j){
-                auto i_bounds = tree->objects_[i]->get_bounds();
-                auto i_rectangle = Rectangle{tree->objects_[i]->get_position().x, tree->objects_[i]->get_position().y, 
-                i_bounds.max.x - i_bounds.min.x, i_bounds.max.y - i_bounds.min.y};
+                auto i_rectangle = tree->objects_[i]->get_hitbox().get_box();
 
-                auto j_bounds = tree->objects_[j]->get_bounds();
-                auto j_rectangle = Rectangle{tree->objects_[j]->get_position().x, tree->objects_[j]->get_position().y, 
-                j_bounds.max.x - j_bounds.min.x, j_bounds.max.y - j_bounds.min.y};
+                auto j_rectangle = tree->objects_[j]->get_hitbox().get_box();
 
                 if(CheckCollisionRecs(i_rectangle, j_rectangle)){
                     tree->objects_[i]->interact(*tree->objects_[j]);

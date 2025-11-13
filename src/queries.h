@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+#include "hitbox.h"
 #include "raglib.h"
 namespace queries{
     enum ids{
@@ -33,8 +34,8 @@ namespace queries{
     class is_colliding_query : public query{
         public:
             ~is_colliding_query() = default;
-            is_colliding_query(raglib::bounding_box_2 bounds, int id)
-            : query(ids::is_colliding), bounds_(bounds), id_(id){};
+            is_colliding_query(hitbox::hitbox box, int id)
+            : query(ids::is_colliding), box_(box), id_(id){};
 
             static const int get_static_type(){
                 return ids::is_colliding;
@@ -43,11 +44,11 @@ namespace queries{
             int get_id() const{
                 return id_;
             }
-            raglib::bounding_box_2 get_bounds() const{
-                return bounds_;
+            hitbox::hitbox get_bounds() const{
+                return box_;
             }
         private:
-            raglib::bounding_box_2 bounds_;
+            hitbox::hitbox box_;
             int id_;
     };
 

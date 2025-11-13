@@ -26,8 +26,8 @@ namespace assets_config{
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
-    inline const float khiri_attributes[attributes::size] =  {150.0f, 100.0f, 81.0f, 1.0f}; // TODO update values (4/11)
-    inline const float mack_attributes[attributes::size] =  {150.0f, 100.0f, 81.0f, 1.0f}; // TODO update values (4/11)
+    inline const float khiri_attributes[attributes::size] =  {150.0f, 100.0f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float mack_attributes[attributes::size] =  {150.0f, 100.0f, 1.0f, 1.0f}; // TODO update values (4/11)
 
     inline const Vector2 dog_move_speed = {2.5f , 2.5f};
     

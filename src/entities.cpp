@@ -4,8 +4,8 @@
 int entities::entity::get_id(){
     return id_;
 }
-raglib::bounding_box_2& entities::entity::get_bounds(){
-    return bounds_;
+hitbox::hitbox& entities::entity::get_hitbox(){
+    return hitbox_;
 }
 
 sprite::sprite& entities::entity::get_sprite(){
@@ -16,13 +16,10 @@ Vector2 entities::entity::get_position(){
     return position_;
 }
 
-
-void entities::entity::update_bounds(Vector2 delta){
-    bounds_.min = Vector2Add(bounds_.min, delta);
-    bounds_.max = Vector2Add(bounds_.max, delta);
-}
 void entities::entity::render(){
     sprite_.render(position_);
+    auto box = hitbox_.get_box();
+    DrawRectangleLines(box.x, box.y, box.width, box.height, GREEN);
 }
 
 

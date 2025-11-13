@@ -24,30 +24,28 @@ void entities::player_dog::on_right_click_event(const events::right_mouse_click&
 // ------------------------------- builder ------------------------------- //
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){
     auto khiri_texture = textures::textures_.get_texture(textures::khiri, assets_config::khiri_path);
+    auto hitbox = hitbox::h_builder_.build_player_dog_hitbox(position);
     return std::make_unique<entities::player_dog>(
         sprite::sprite(khiri_texture,
         assets_config::khiri_attributes[assets_config::attributes::frame_width],
         assets_config::khiri_attributes[assets_config::attributes::frame_height],
         assets_config::khiri_attributes[assets_config::attributes::frames],
         assets_config::khiri_attributes[assets_config::attributes::animations]),
-
-        raglib::bounding_box_2{position, Vector2Add(position, 
-        Vector2Add(position, Vector2{assets_config::khiri_attributes[assets_config::attributes::frame_width], assets_config::khiri_attributes[assets_config::attributes::frame_height]}))}, // TODO change
+        hitbox,
         position,
         id,
         Vector2Zero());
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 position, int id){
     auto mack_texture = textures::textures_.get_texture(textures::mack, assets_config::mack_path);
+    auto hitbox = hitbox::h_builder_.build_player_dog_hitbox(position);
     return std::make_unique<entities::player_dog>(
         sprite::sprite(mack_texture,
         assets_config::mack_attributes[assets_config::attributes::frame_width],
         assets_config::mack_attributes[assets_config::attributes::frame_height],
         assets_config::mack_attributes[assets_config::attributes::frames],
         assets_config::mack_attributes[assets_config::attributes::animations]),
-
-        raglib::bounding_box_2{position, Vector2Add(position, 
-        Vector2Add(position, Vector2{assets_config::mack_attributes[assets_config::attributes::frame_width], assets_config::mack_attributes[assets_config::attributes::frame_height]} ))}, // TODO change
+        hitbox,
         position,
         id,
         Vector2Zero());

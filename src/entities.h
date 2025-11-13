@@ -26,8 +26,8 @@ namespace entities{
     class entity {
         public:
             virtual ~entity() = default;
-            entity(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
-            : bounds_(bounds), sprite_(sprite), position_(position), id_(id){
+            entity(sprite::sprite sprite, hitbox::hitbox hitbox, Vector2 position, int id)
+            : hitbox_(hitbox), sprite_(sprite), position_(position), id_(id){
 
             };
             entity(const entity& other) = default;
@@ -39,12 +39,11 @@ namespace entities{
                 return id_ == other.id_;
             }
 
-            raglib::bounding_box_2& get_bounds();
+            hitbox::hitbox& get_hitbox();
             sprite::sprite&  get_sprite();
             Vector2 get_position();
             int get_id();
 
-            void update_bounds(Vector2 delta);
             void render();
 
             virtual int update(float delta){
@@ -59,7 +58,7 @@ namespace entities{
         protected:
             const int id_;
             
-            raglib::bounding_box_2 bounds_;
+            hitbox::hitbox hitbox_;
             sprite::sprite sprite_;
             Vector2 position_;
 
@@ -70,8 +69,8 @@ namespace entities{
         ~cursor() {
             event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
         }
-        cursor(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
-        : entity(sprite, bounds, position, id), 
+        cursor(sprite::sprite sprite, hitbox::hitbox hitbox, Vector2 position, int id)
+        : entity(sprite, hitbox, position, id), 
         left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}){
                 event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
             };
@@ -99,8 +98,8 @@ namespace entities{
         class paw_mark : public entity{
         public:
         ~paw_mark() = default;
-        paw_mark(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id)
-        : entity(sprite, bounds, position, id){};
+        paw_mark(sprite::sprite sprite, hitbox::hitbox hitbox, Vector2 position, int id)
+        : entity(sprite, hitbox, position, id){};
             paw_mark(const paw_mark& other) = default;
             paw_mark(paw_mark&& other) = default;
 
@@ -127,8 +126,8 @@ namespace entities{
             ~player_dog(){
                 event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
             }
-            player_dog(sprite::sprite sprite, raglib::bounding_box_2 bounds, Vector2 position, int id, Vector2 move_speed)
-            : entity(sprite, bounds, position, id), move_speed_(move_speed), is_selected_(false), cosmetics_({}),
+            player_dog(sprite::sprite sprite, hitbox::hitbox hitbox, Vector2 position, int id, Vector2 move_speed)
+            : entity(sprite, hitbox, position, id), move_speed_(move_speed), is_selected_(false), cosmetics_({}),
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}){
                     event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
 

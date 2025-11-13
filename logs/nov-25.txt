@@ -93,3 +93,7 @@ and then returns the bool
 -> yeah i think there's some funky business there, just switch to rectangles bro
 -> can do hitboxes while you're at it too ig, may as well
 -> and draw the hitboxes while you're at it for debugging
+
+-> fix hit box when dragging
+-> get these dog dimensions on lock 
+-> fix crash when collide 
