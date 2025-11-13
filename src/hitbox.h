@@ -2,6 +2,7 @@
 #define HITBOX_H
 
 #include <algorithm>
+#include <iostream>
 #include <vector>
 #include "config.h"
 
@@ -27,6 +28,9 @@ namespace hitbox{
             Rectangle get_sub_box(size_t index);
             void update(Vector2 delta);    
         private:
+
+            bool check_collision_box_sub_boxes(const Rectangle& box, const std::vector<Rectangle>& other_boxes);
+            bool check_collision_sub_boxes(const std::vector<Rectangle>& boxes, const std::vector<Rectangle> other_boxes);
             Rectangle box_;
             std::vector<Rectangle> sub_boxes_;
     };

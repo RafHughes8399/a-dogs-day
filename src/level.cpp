@@ -403,11 +403,9 @@ level::level level::level_builder::build_main_level(){
     l.add_entity(std::move(cursor));
     
     // and the dogs
-    std::cout << "id for khiri : " << l.entity_id() << std::endl;
     auto khiri = entities::e_builder.build_khiri(Vector2 {500, 500}, l.entity_id());
     l.add_entity(std::move(khiri));
     
-    std::cout << "id for mack: " << l.entity_id() << std::endl;
     auto mack = entities::e_builder.build_mack(Vector2 {700, 700}, l.entity_id());
     l.add_entity(std::move(mack));
     return l;

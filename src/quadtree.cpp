@@ -233,7 +233,6 @@ bool tree::quadtree::is_root(std::unique_ptr<node>& tree){
     return tree->depth_ == 0  ? true : false;
 }
 bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, int id){
-    std::cout << "actually check collision, recursively and such " << std::endl;
     // starts with the whole if node case
     if(! tree) {
         return false;
@@ -242,7 +241,6 @@ bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, hitbox::hit
     for(auto & obj : tree->objects_){
         // it is checking collision with itself, make sure that is not the case
         if(id != obj->get_id() && bounds.check_collision(obj->get_hitbox())){
-            std::cout << "collision with " << obj->get_id() << std::endl;
             return true;
         }
     }

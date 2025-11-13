@@ -210,10 +210,8 @@ namespace tree{
         }
 
         bool on_is_colliding_query(const queries::is_colliding_query& query){
-            std::cout << "get query info" << std::endl;
             auto bounds = query.get_bounds();
             auto id = query.get_id();
-            std::cout << "use bounds, check collision" << std::endl;
             return is_there_collision(root_, bounds, id);
         }
         void prune_leaves(double delta) {

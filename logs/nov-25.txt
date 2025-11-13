@@ -94,6 +94,8 @@ and then returns the bool
 -> can do hitboxes while you're at it too ig, may as well
 -> and draw the hitboxes while you're at it for debugging
 
--> fix hit box when dragging
+-> fix hit box when dragging x
 -> get these dog dimensions on lock 
 -> fix crash when collide 
+    -> i suspect the issue is in the hitbox method
+-> add render layers, like background, then deco, then stations, then dogs, then hud, then cursor 
