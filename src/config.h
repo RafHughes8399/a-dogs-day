@@ -32,13 +32,24 @@ namespace assets_config{
     inline const Vector2 dog_move_speed = {2.5f , 2.5f};
     
 }
-namespace dimensions_config{
+namespace level_config{
     // world dimensions
     inline float world_x = 4096.0f;
     inline float world_y = 4096.0f;
     
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder
+
+    enum draw_layers{
+        background = 0,
+        decoration = 1,
+        stations = 2,
+        dogs = 3,
+        hud = 4,
+        cursor = 5,
+        size = 6
+    };
+    
 }
 namespace controls_config{
     // controls 

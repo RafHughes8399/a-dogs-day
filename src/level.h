@@ -21,6 +21,7 @@
 #include "config.h"
 #include "quadtree.h"
 #include "raglib.h"
+#include "render_layer.h"
 #include "texture.h"
 
 
@@ -60,7 +61,7 @@ namespace level{
         public:
             ~level_graph() = default;
             level_graph(int level_x, int level_y)
-            : graph_({}), num_rows_(level_y / dimensions_config::edge_weight), row_length_(level_x / dimensions_config::edge_weight){
+            : graph_({}), num_rows_(level_y / level_config::edge_weight), row_length_(level_x / level_config::edge_weight){
                 build_nodes(level_x, level_y);
                 build_edges();
                     // columns is x, rows is y
@@ -119,23 +120,26 @@ namespace level{
             void update(float delta);
             void render();
 
-            void add_entity(std::unique_ptr<entities::entity> entity);
+            void add_entity(std::unique_ptr<entities::entity> entity, size_t layer);
             int entity_id();
             int num_entities();
 
             void on_left_mouse_event(const events::left_mouse_down& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
         private :
-            level_graph graph_;
-            sprite::sprite background_;
-            tree::quadtree level_entities_;
-            Rectangle view_frame_;
-            Vector2 dimensions_;
-
-
             // event handlers
             events::event_handler<events::left_mouse_down> left_mouse_handler_;
             events::event_handler<events::right_mouse_click> right_mouse_handler_;
+
+            level_graph graph_;
+            
+            Rectangle view_frame_;
+            sprite::sprite background_;
+            render_layer::layer render_layers_[level_config::size];
+            tree::quadtree level_entities_;
+            Vector2 dimensions_;
+
+
     };
         // self explanatory, a class to construct leveks, outline functions that build levels generating enetities, specifying background,
     // maybe the level map graph, and the tileset too

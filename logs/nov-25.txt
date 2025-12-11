@@ -98,4 +98,16 @@ and then returns the bool
 -> get these dog dimensions on lock 
 -> fix crash when collide 
     -> i suspect the issue is in the hitbox method
--> add render layers, like background, then deco, then stations, then dogs, then hud, then cursor 
+-> add render layers ? , like background, then deco, then stations, then dogs, then hud, then cursor 
+
+-> so currently rendering occurs in o(n) time, it iterates 
+-> the save in computation comes from the predicate that checks whether it should be rendered or not 
+-> the level should have a list of layers
+-> each layer has a raw pointer to an entity, the unique pointer still remains in the quadtree
+
+-> draw layers from background to foreground , still pass the predicate 
+
+
+
+-> impacts by mental health (i.e attentional disorders, memory disorders)
+-> and imapcts on mental health (i.e prolonged heightend cortiosl, reported less wellbeing)
