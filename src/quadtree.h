@@ -75,7 +75,7 @@ namespace tree{
         void prune_leaves(std::unique_ptr<node>& tree, double delta);
         void render(std::unique_ptr<node>& tree);
         void traverse_tree(std::unique_ptr<node>& tree);
-        void update(std::unique_ptr<node>& tree, float delta);
+        std::vector<int> update(std::unique_ptr<node>& tree, float delta);
 
         template<typename UnaryPred>
         void render(std::unique_ptr<node>& tree, UnaryPred p){
@@ -229,10 +229,11 @@ namespace tree{
         void render(UnaryPred p){
             render(root_, p);
         }
-        void update(float delta){
-            update(root_, delta);
+        std::vector<int> update(float delta){
+            auto to_remove = update(root_, delta);
             auto parent_objects = std::vector<entities::entity*>{};
             identify_collisions(root_, parent_objects); // start with an empty list
+            return to_remove;
         }
     };
 }

@@ -327,8 +327,9 @@ void tree::quadtree::traverse_tree(std::unique_ptr<node>& tree){
 		return;
 }
 
-void tree::quadtree::update(std::unique_ptr<node>& tree, float delta){
-    if(! tree) {return;}
+std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta){
+    if(! tree) {return {};}
+    std::vector<int> to_remove = {};
     for(auto it = tree->objects_.begin(); it != tree->objects_.end();){
         int update_result = (*it)->update(delta);
         switch(update_result){
@@ -345,6 +346,7 @@ void tree::quadtree::update(std::unique_ptr<node>& tree, float delta){
                 break;
             case entities::status_codes::dead:
                 // remove
+                to_remove.push_back((*it)->get_id());
                 it = tree->objects_.erase(it);
                 break;
             case entities::status_codes::nothing:
@@ -357,9 +359,10 @@ void tree::quadtree::update(std::unique_ptr<node>& tree, float delta){
     }
     // Recursively update children
     for(auto & child : tree->children_){
-        update(child, delta);
+        auto sub_remove = update(child, delta);
+        to_remove.insert(to_remove.end(), sub_remove.begin(), sub_remove.end());
     }
-    return;
+    return to_remove;
 }
 void tree::quadtree::identify_collisions(std::unique_ptr<node>& tree , std::vector<entities::entity*> parent_entities){
     if(! tree) {return;}

@@ -33,8 +33,8 @@ void entities::cursor::interact(entities::entity& other){
     // down cast to a dog because that's all we have at the moment will, figure something 
     // else out 
     
-    player_dog& dog_cast = dynamic_cast<player_dog&>(other);
-    
+    /* lol that's not how you cast safely */
+    //player_dog& dog_cast = dynamic_cast<player_dog&>(other);
     return;
 }
 void entities::cursor::on_left_mouse_event(const events::left_mouse_down& event){
@@ -51,7 +51,13 @@ int entities::paw_mark::update(float delta){
     auto& animation = sprite_.get_animation();
     animation.next_frame(false);
     auto new_frame = animation.get_current_frame();
-    return status_codes::nothing;
+
+    if(new_frame == animation.num_frames() - 1){
+        return status_codes::dead;
+    }
+    else{
+        return status_codes::nothing;
+    }
 }
 void entities::paw_mark::interact(entities::entity& other){
     return;

@@ -11,3 +11,5 @@ draw layers is up still right ?
 
 -> learn a *
 
+-> bad cast on right click
+-> maybe an interaction thing ?, yes from the interactions

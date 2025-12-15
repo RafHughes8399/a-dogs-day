@@ -23,6 +23,7 @@ namespace render_layer{
 
             void add_entity(entities::entity* entity);
             void remove_entity(entities::entity* entity);
+            void remove_entities(std::vector<int> entity_ids);
 
             void draw();
 

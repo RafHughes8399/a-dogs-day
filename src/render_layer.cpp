@@ -15,3 +15,20 @@ void render_layer::layer::remove_entity(entities::entity* entity){
     });
     entities_.erase(new_end, entities_.end());
 }
+
+void render_layer::layer::remove_entities(std::vector<int> entity_ids){
+    for(auto it = entities_.begin(); it != entities_.end();){
+        size_t current_id = (*it)->get_id();
+        bool removed = false;
+        for(auto & remove_id : entity_ids){
+            if(remove_id == current_id){
+                removed = true;
+                it = entities_.erase(it);
+            
+            }
+        }
+        if(! removed){
+            ++it;
+            }
+    }
+}

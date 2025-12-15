@@ -339,7 +339,15 @@ void level::level_graph::render(Rectangle frame){
 
 // ----------------------------------------- level ----------------------------------------- //
 void level::level::update(float delta){
-    level_entities_.update(delta);
+    auto to_remove = level_entities_.update(delta); // could return a list of entiteis to remove ? 
+
+    // only if there are entities to remove
+    if(! to_remove.empty()){
+
+        for(auto & layer : render_layers_){
+            layer.remove_entities(to_remove);
+        }
+    }
     return;
 }
 void level::level::render(){
