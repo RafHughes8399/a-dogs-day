@@ -12,7 +12,8 @@
 namespace queries{
     enum ids{
         is_colliding = 0,
-        size = 1
+        collision = 1,
+        size = 2
     };
     
     class query{
@@ -51,6 +52,26 @@ namespace queries{
             hitbox::hitbox box_;
             int id_;
     };
+    class collision_query : public query{
+        public:
+            ~collision_query() = default;
+            collision_query(hitbox::hitbox box, int id)
+            : query(ids::collision), box_(box), id_(id){};
+
+            static const int get_static_type(){
+                return ids::collision;
+            }
+
+            int get_id() const{
+                return id_;
+            }
+            hitbox::hitbox get_bounds() const{
+                return box_;
+            }
+        private:
+            hitbox::hitbox box_;
+            int id_;
+    };
 
     class query_handler_interface{
         public:
@@ -62,7 +83,7 @@ namespace queries{
             virtual bool call_query(const query& q) = 0;
     };
 
-    template<typename Q> // Q for query
+    template<typename Q> // Q for query, T for type 
     class query_handler : public query_handler_interface{
         public:
             ~query_handler() = default;
@@ -79,7 +100,7 @@ namespace queries{
                 return handler_(static_cast<const Q&>(q));
             }
         private:
-            std::function<bool(const Q& q)> handler_;
+            std::function<T(const Q& q)> handler_;
     };
 
     class query_executor{
@@ -90,6 +111,6 @@ namespace queries{
         private:
             std::unordered_map<int, std::unique_ptr<query_handler_interface>> subscriber_map_;
     };
-    extern query_executor global_executor_;
+    extern query_executor global_executor_; // bool executor, entities::entity* executor
 }
 #endif

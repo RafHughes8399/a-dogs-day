@@ -35,15 +35,34 @@ void entities::cursor::interact(entities::entity& other){
     
     /* lol that's not how you cast safely */
     //player_dog& dog_cast = dynamic_cast<player_dog&>(other);
+
+    
     return;
 }
-void entities::cursor::on_left_mouse_event(const events::left_mouse_down& event){
+void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click& event){
+    auto position = event.get_mouse_position();
+    auto hitbox = event.get_hitbox();
+
+    // find the entity being collided with 
+
+}
+void entities::cursor::on_left_mouse_down_event(const events::left_mouse_down& event){
+    // handles dragging
+    // two cases, dragging occurs only if the mouse is moving after 
+    // ! slow your roll cowboy, you're looking in the wrong spot, this is already handleed 
+
+    // look, its left mouse down 
     auto mouse_delta = event.get_mouse_delta();
     auto new_position = Vector2Add(position_, mouse_delta);
     position_ = new_position;
     // create a moved entities event or something and debug 
     std::unique_ptr<events::event> moved_event = std::make_unique<events::move_entity>(id_);
-    event_interface::queue_event(moved_event);
+
+    // current thought is that, the move in the tre does not happen until next frame, 
+    // ? that could cause issues ? maybe ? 
+    event_interface::queue_event(moved_event); 
+
+    // check for collisions 
 }
 
 // -------------------------------- paw mark --------------------------------//

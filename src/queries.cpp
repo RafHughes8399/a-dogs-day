@@ -13,7 +13,7 @@ void queries::query_executor::unsubscribe(int query_key){
     subscriber_map_.erase(query_key);
     return;
 }
-
+// this cannot be bool,. this has to be something else 
 bool queries::query_executor::execute_query(const query& query){
     return subscriber_map_[query.get_type()]->execute(query);
 }

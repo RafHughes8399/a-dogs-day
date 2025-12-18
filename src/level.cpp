@@ -387,7 +387,27 @@ int level::level::num_entities(){
     return level_entities_.size();
 }
 
-void level::level::on_left_mouse_event(const events::left_mouse_down& event){
+void level::level::on_left_mouse_click_event(const events::left_mouse_click& event){
+    (void) event;
+    // it should be managed by the level
+
+    // check the colliding entity 
+
+    // send back the id for the player 
+
+    // find and entity based on an id 
+
+    // currently it is O(n), but it could be log n or 1
+
+
+    // or better yet, change queries to return ints, and then you can manage entity ids, and status codes 
+    // but that could be confusing
+
+    // or because the dogs are unique and will never be removed, you can treat their ids as 0 and 1 ? or 1 and 2 
+    
+    return;
+}
+void level::level::on_left_mouse_down_event(const events::left_mouse_down& event){
     auto delta = event.get_mouse_delta();
     auto frame_delta = Vector2Scale(delta, -1); 
 

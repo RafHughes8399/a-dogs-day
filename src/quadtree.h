@@ -58,6 +58,8 @@ namespace tree{
         bool is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, int id);
         bool node_contains_object(raglib::bounding_box_2& node, Rectangle& object);
         
+
+        entities::entity* get_colliding_entity(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, int id);
         int height(std::unique_ptr<node>& tree);
         int object_contained_by_child(raglib::bounding_box_2& node, Rectangle& object);
         
@@ -168,6 +170,17 @@ namespace tree{
         int max_depth(){
             return max_depth_;
         }
+        bool on_is_colliding_query(const queries::is_colliding_query& query){
+            auto bounds = query.get_bounds();
+            auto id = query.get_id();
+            return is_there_collision(root_, bounds, id);
+        }
+
+        entities::entity* on_collision_query(const queries::collision_query& query){
+            auto bounds = query.get_bounds();
+            auto id = query.get_id();
+            return get_colliding_entity(root_, bounds, id);
+        }
         // height and size
         size_t get_next_id(){
             return next_id_;
@@ -209,11 +222,6 @@ namespace tree{
             erase(root_, id);
         }
 
-        bool on_is_colliding_query(const queries::is_colliding_query& query){
-            auto bounds = query.get_bounds();
-            auto id = query.get_id();
-            return is_there_collision(root_, bounds, id);
-        }
         void prune_leaves(double delta) {
             prune_leaves(root_, delta);
         }

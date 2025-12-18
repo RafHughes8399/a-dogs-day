@@ -67,12 +67,15 @@ namespace entities{
     class cursor : public entity{
         public:
         ~cursor() {
-            event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
+            event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
+            event_interface::unsubscribe<events::left_mouse_down>(left_mouse_down_handler_);
         }
         cursor(sprite::sprite sprite, hitbox::hitbox hitbox, Vector2 position, int id)
         : entity(sprite, hitbox, position, id), 
-        left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}){
-                event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
+        left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
+        left_mouse_down_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_down_event(event);}){
+                event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
+                event_interface::subscribe<events::left_mouse_down>(left_mouse_down_handler_);
             };
             cursor(const cursor& other) = default;
             cursor(cursor&& other) = default;
@@ -84,7 +87,8 @@ namespace entities{
             int update(float delta) override;
             
             void interact(entity& other) override;            
-            void on_left_mouse_event(const events::left_mouse_down& event);
+            void on_left_mouse_click_event(const events::left_mouse_click& event);
+            void on_left_mouse_down_event(const events::left_mouse_down& event);
             
             
             private:
@@ -92,7 +96,8 @@ namespace entities{
                     base = 0,
                     hover = 1
             };
-            events::event_handler<events::left_mouse_down> left_mouse_handler_;
+            events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
+            events::event_handler<events::left_mouse_down> left_mouse_down_handler_;
         };
         
         class paw_mark : public entity{

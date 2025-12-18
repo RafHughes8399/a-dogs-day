@@ -30,11 +30,12 @@ namespace events{
 	// an enum ID for event types
 	enum ids{
 		test = 0,
-		left_mouse = 1,
+		left_mouse_d = 1,
 		right_mouse = 2,
-		move = 3,
-		remove = 4,
-		size = 5
+		left_mouse = 3,
+		move = 4,
+		remove = 5,
+		size = 6
 	};
 	class event{
 	protected:
@@ -83,16 +84,37 @@ namespace events{
 		public:
 			~left_mouse_down() = default;
 			left_mouse_down(Vector2 delta)
-			: event(ids::left_mouse), mouse_delta_(delta){};
+			: event(ids::left_mouse_d), mouse_delta_(delta){};
 
 			static const int get_static_type(){
-				return ids::left_mouse;
+				return ids::left_mouse_d;
 			}
 			Vector2 get_mouse_delta() const{
 				return mouse_delta_;
 			}
 		private:
 			Vector2 mouse_delta_;
+	};
+	class left_mouse_click : public event{
+		public:
+			~left_mouse_click() = default;
+			left_mouse_click(Vector2 position, float box_width, float box_length)
+			:	event(ids::left_mouse), mouse_position_(position), collision_box_(Rectangle{position.x, position.y, box_width, box_length}){ // TODO fill in (16/12)
+
+			};
+			static const int get_static_type(){
+				return ids::left_mouse;
+			}
+			Vector2 get_mouse_position() const{
+				return mouse_position_;
+			}
+			Rectangle get_hitbox() const{
+				return collision_box_;
+			}
+			
+		private:
+			Vector2 mouse_position_;
+			Rectangle collision_box_;
 	};
 	class right_mouse_click : public event{
 		public:

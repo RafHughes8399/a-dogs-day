@@ -13,3 +13,84 @@ draw layers is up still right ?
 
 -> bad cast on right click
 -> maybe an interaction thing ?, yes from the interactions
+
+consider the following 
+
+-> dog pathfinding
+-> selecting a dog (manage subscription based on left click interactions with player dogs, not on dog construction and destruction)
+-> giving the dog its destination
+
+
+first, dog selection,
+simple enough:
+    -> when a left click occurs:
+        -> do a collision check
+            -> if colliding: 
+                -> interact based on the entity type
+                    -> player dog is selected
+
+-> what does that mean; selected ? 
+-> player has a field like selected_dog_ which stores the id of the selected dog, which determines 
+
+
+
+player recognises the mouse click 
+creates an event for the level to find what the cursor is colliding with 
+the level finds what the cursor is colliding with 
+the level then notifies the player with the appropriate player dog id
+
+maybe instead of query returning a bool 
+the query can return a block of information
+
+those contents could be either
+
+
+there are two routes and you need to pick one of them instead of flipping between the two, its wasting time 
+
+one is the level way, two is the cursor query way
+
+the cursor query way does not necessarily work because of the information that the query can or cannot return
+so how can i change how the query information return works
+
+currently it only returns bool information, but what if I have it return an information class
+that is templated over some type 
+
+otherwise is there a way to make it so that a query can be tempalted over a return type ? 
+i.e
+
+template <typename T>
+class query information {
+
+    public :
+        // necessaru constructors 
+    T get_information
+    private:
+        T information
+}
+
+
+
+
+
+on the mouse left click, check if the cursor interacts with any of the dogs
+if it does, update the dog selected by the player 
+on mouse click -> query colliding entity -> update selected dog
+
+have your bool queries, your int queries, your entity* queries
+i guess you need sepearte handlers and executors
+
+just make those templated too and then define as you need ? 
+
+i need to extend the query system such that it can return multiple types 
+so temapltes 
+
+template the executor, handler interface and handler ? 
+just make a new set of queries aaaaaaaaaaa
+near future tasks 
+-> player dog selection
+-> player dog pathfinding 
+-> player dog directing
+-> player dog art 
+
+-> basic hud outline 
+-> player inventory and 
