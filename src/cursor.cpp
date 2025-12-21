@@ -1,5 +1,17 @@
 #include "entities.h"
 
+// -------------------------------- interaction states --------------------------------//
+void entities::cursor::left_click_state::interact(cursor& cursor, entity& other){
+    std::cout << "left click interaction " << std::endl;
+}
+void entities::cursor::right_click_state::interact(cursor& cursor, entity& other){
+    std::cout << "right click interaction " << std::endl;
+    
+}
+void entities::cursor::default_state::interact(cursor& cursor, entity& other){
+    std::cout << "default click interaction " << std::endl;
+    
+}
 // -------------------------------- cursor --------------------------------//
 
 int entities::cursor::update(float delta){
@@ -36,7 +48,7 @@ void entities::cursor::interact(entities::entity& other){
     /* lol that's not how you cast safely */
     //player_dog& dog_cast = dynamic_cast<player_dog&>(other);
 
-    
+    interaction_state_->interact(*this, other);
     return;
 }
 void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click& event){
@@ -45,6 +57,20 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
 
     // find the entity being collided with 
 
+    
+    std::cout << "clicked left mouse " << std::endl;
+    // query the quadtree
+
+
+    // ! consider what happens if colliding with multiple, how do you prioritise  ? 
+    std::unique_ptr<queries::query> entity_collision = std::make_unique<queries::collision_query>(hitbox_, id_);
+    int colliding_entity_id = query_interface::execute_query(queries::int_executor_, *entity_collision);
+
+    // because at some point the interact function must be called, that is how interaction behaviour occurs, that
+    // occcurs through the quadtree, the quad tree is how you access the actual entity rather than just the id
+
+
+    
 }
 void entities::cursor::on_left_mouse_down_event(const events::left_mouse_down& event){
     // handles dragging
@@ -65,6 +91,9 @@ void entities::cursor::on_left_mouse_down_event(const events::left_mouse_down& e
     // check for collisions 
 }
 
+void entities::cursor::on_right_mouse_click_event(const events::right_mouse_click& event){
+    // for now just change the interact state
+}
 // -------------------------------- paw mark --------------------------------//
 int entities::paw_mark::update(float delta){
     auto& animation = sprite_.get_animation();

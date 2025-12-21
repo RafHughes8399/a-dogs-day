@@ -98,6 +98,86 @@ and so that there are no duplicates
 just make a new set of queries aaaaaaaaaaa
 near future tasks 
 -> player dog selection
+
+ok lets move onto dog selection 
+the player, for the sake of the hud ? stores the dog id that is selected,
+sure lets say for the sake of the hud, but the sake of other things to, namely which 
+dog to move
+
+starts off as no dog being selected,
+
+when you click a dog it changes
+
+left clikc -> left click event -> cursor listens -> create interaction event -> quad tree listens, 
+takes the hitbox and id
+
+-> performs an interaction check with that id and hitbox
+-> checks the node the hitbox is in, and the id of the entity
+
+-> i think you have two conflicting systems ? 
+-> maybe conflicting is the wrong word 
+-> competing ? complementary systems, one is a system that allows for quick frame-update-based, and another that operates
+on event based interaction and update requests
+-> because if you had a map that mapped id to the entity pointer things would be so easy
+
+-> if the level managed an entity map, id -> entity*, it would make this process easier ig ?
+-> game this out what are your two ways 
+
+one is: 
+
+left click event creates an interaction event that the quad tree listens for. 
+the interaction event looks for an entities that interact with the entity and calls interact
+the interact function defines how the cursor would interact
+
+
+but the interaction behaviour depends on the type of interaction, is it a right click interaction, left click interaction or hover interaction
+
+another idea, the cursor has an interaction strategy that depends on its state, the state of the cursor is changed by control input
+left click -> left click state
+right click -> right click state (selecting entities to walk to and interact with other than a specific position)
+default -> hover state
+clcking changes the state for the frame, which then determines the interaction behaviour
+for the frame
+
+so the left click would:
+    -> update the cursor state,
+    -> create an interaction event that uses the quad tree to perform the interaction with whatever it is interacting 
+    with
+    -> the interaction (for left click), checks if interacting with dog, if so, then it creates an event to update the player selected dog, 
+    -> which is then used for when right clicks occur 
+    -> the right click creates an "pathfind" event, which gives the selected dog its required destination
+
+
+
+the level has an entity map that maps id to entity *, that could help with easily accessing entities
+
+
+so the interaction state for the cursor, 
+and the level map
+the cursor queries whatever it may be interacting with
+
+
+i definitely need the interaction state thing,
+lets do that now 
+
+
+you're losing grip i think on what you're actually trying to do holy nut dick balls 
+you query the dog id, but you need to check if it is a dog
+
+things are spinning my goodness, lay off the weed, your brain isn't working proper
+
+
+
+ok short list todo:
+level id-entity* map
+interaction state behaviour cursor
+the player dog has a field for interacting_with (id of entity it is interacting with)
+
+curently quadtree does not check for interactions every frame , it is only done based as per request
+
+
+YOU ARE DOING A REQUEST BASED INTERACTION SYSTEM, WHERE ONCE AN ENTITY MOVES IT QUERIES ANY POTENTIAL INTERACTIONS
+for now we know that khiri is 1, mack is 2
 -> player dog pathfinding 
 -> player dog directing
 -> player dog art 

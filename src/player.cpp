@@ -16,6 +16,9 @@ void player::player::update(float delta){
         std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(GetMousePosition(), 
         assets_config::cursor_attributes[assets_config::attributes::frame_width], assets_config::cursor_attributes[assets_config::attributes::frame_height]);
         event_interface::queue_event(left_mouse_click_event);
+
+
+        // the left mouse click checks if the cursor interacts with anything
     }
     else if(IsMouseButtonDown(mouse_controls_[mouse::left_mouse])){
         // do event for dragging

@@ -66,38 +66,98 @@ namespace entities{
 
     class cursor : public entity{
         public:
-        ~cursor() {
-            event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
-            event_interface::unsubscribe<events::left_mouse_down>(left_mouse_down_handler_);
-        }
-        cursor(sprite::sprite sprite, hitbox::hitbox hitbox, Vector2 position, int id)
-        : entity(sprite, hitbox, position, id), 
-        left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
-        left_mouse_down_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_down_event(event);}){
-                event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
-                event_interface::subscribe<events::left_mouse_down>(left_mouse_down_handler_);
+            class interaction_state{
+                public:
+                    virtual ~interaction_state() = default;
+                    interaction_state(){};
+                    interaction_state(const interaction_state& other) = default;
+                    interaction_state(interaction_state&& other) = default;
+                    
+                    interaction_state& operator=(const interaction_state& other) = default;
+                    interaction_state& operator=(interaction_state&& other) = default;
+
+                    virtual void interact(cursor& cursor, entity& other) = 0;
+                private:
             };
-            cursor(const cursor& other) = default;
-            cursor(cursor&& other) = default;
-            
-            cursor& operator=(const cursor& other) = default;
-            cursor& operator=(cursor&& other)  = default;
-            
-            
-            int update(float delta) override;
-            
-            void interact(entity& other) override;            
-            void on_left_mouse_click_event(const events::left_mouse_click& event);
-            void on_left_mouse_down_event(const events::left_mouse_down& event);
-            
-            
+            class left_click_state : public interaction_state{
+                public:
+                    left_click_state()
+                    : interaction_state() {};
+                    left_click_state(const left_click_state& other) = default;
+                    left_click_state(left_click_state&& other) = default;
+                    
+                    left_click_state& operator=(const left_click_state& other) = default;
+                    left_click_state& operator=(left_click_state&& other) = default;
+                    
+                    void interact(cursor& cursor, entity& other) override;
+                    
+                    private:
+                };
+                
+                class right_click_state : public interaction_state{
+                    public:
+                    right_click_state()
+                    : interaction_state() {};
+                    right_click_state(const right_click_state& other) = default;
+                    right_click_state(right_click_state&& other) = default;
+                    
+                    right_click_state& operator=(const right_click_state& other) = default;
+                    right_click_state& operator=(right_click_state&& other) = default;
+
+                    void interact(cursor& cursor, entity& other) override;
+                    private:
+                };
+
+            class default_state : public interaction_state{
+                public:
+                    default_state()
+                    : interaction_state() {};
+                    default_state(const default_state& other) = default;
+                    default_state(default_state&& other) = default;
+                        
+                    default_state& operator=(const default_state& other) = default;
+                    default_state& operator=(default_state&& other) = default;
+                    void interact(cursor& cursor, entity& other) override;
+                private:
+            };
+                ~cursor() {
+                    event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
+                    event_interface::unsubscribe<events::left_mouse_down>(left_mouse_down_handler_);
+                    event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
+                }
+                cursor(sprite::sprite sprite, hitbox::hitbox hitbox, Vector2 position, int id)
+                : entity(sprite, hitbox, position, id), 
+                left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
+                left_mouse_down_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_down_event(event);}),
+                right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_click_event(event);}),
+                interaction_state_(std::make_unique<default_state>()){
+                    event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
+                    event_interface::subscribe<events::left_mouse_down>(left_mouse_down_handler_);
+                    event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
+                };
+                cursor(const cursor& other) = default;
+                cursor(cursor&& other) = default;
+                    
+                cursor& operator=(const cursor& other) = default;
+                cursor& operator=(cursor&& other)  = default;
+                
+                
+                int update(float delta) override;
+                
+                void interact(entity& other) override;            
+                void on_left_mouse_click_event(const events::left_mouse_click& event);
+                void on_left_mouse_down_event(const events::left_mouse_down& event);
+                void on_right_mouse_click_event(const events::right_mouse_click& event);                
             private:
-            enum animation_tags{
-                    base = 0,
-                    hover = 1
-            };
-            events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
-            events::event_handler<events::left_mouse_down> left_mouse_down_handler_;
+                enum animation_tags{
+                        base = 0,
+                        hover = 1
+                };
+                events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
+                events::event_handler<events::left_mouse_down> left_mouse_down_handler_;
+                events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
+
+                std::unique_ptr<interaction_state> interaction_state_;
         };
         
         class paw_mark : public entity{

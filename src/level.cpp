@@ -377,7 +377,7 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
     level_entities_.insert(std::move(entity));
     // insert into the draw layer ?
     render_layers_[layer].add_entity(entity_raw);
-
+    id_entity_map_[entity_raw->get_id()] = entity_raw;
 }
 
 int level::level::entity_id(){
@@ -389,22 +389,7 @@ int level::level::num_entities(){
 
 void level::level::on_left_mouse_click_event(const events::left_mouse_click& event){
     (void) event;
-    // it should be managed by the level
 
-    // check the colliding entity 
-
-    // send back the id for the player 
-
-    // find and entity based on an id 
-
-    // currently it is O(n), but it could be log n or 1
-
-
-    // or better yet, change queries to return ints, and then you can manage entity ids, and status codes 
-    // but that could be confusing
-
-    // or because the dogs are unique and will never be removed, you can treat their ids as 0 and 1 ? or 1 and 2 
-    
     return;
 }
 void level::level::on_left_mouse_down_event(const events::left_mouse_down& event){

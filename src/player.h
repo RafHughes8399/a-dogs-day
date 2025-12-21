@@ -28,7 +28,8 @@ namespace player{
         public:
             ~player() = default;
             player()
-            : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_controls_(){};
+            : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_controls_(),
+            selected_dog_(-1){};
             player(const player& other) = default;
             player(player&& other) = default;
         
@@ -45,10 +46,14 @@ namespace player{
              * 
              hud hud_;
              inventory inventory_;
-             */
-            Vector2 mouse_position_;
+            */
+            
+            int selected_dog_;
+            
             std::vector<int> mouse_controls_; 
             std::vector<int> key_controls_; 
+            
+            Vector2 mouse_position_;
             
     };
 
