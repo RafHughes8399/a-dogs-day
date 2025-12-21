@@ -72,19 +72,19 @@ namespace queries{
             hitbox::hitbox box_;
             int id_;
     };
-
+    template <typename T>
     class query_handler_interface{
         public:
             virtual ~query_handler_interface() = default;
-            bool execute(const query& q){
+            T execute(const query& q){
                 return call_query(q);
             }
         protected:
-            virtual bool call_query(const query& q) = 0;
+            virtual T call_query(const query& q) = 0;
     };
 
-    template<typename Q> // Q for query, T for type 
-    class query_handler : public query_handler_interface{
+    template<typename Q, typename T> // Q for query, T for type 
+    class query_handler : public query_handler_interface<T>{
         public:
             ~query_handler() = default;
             query_handler(std::function<bool(const Q& q)> handle)
@@ -96,21 +96,35 @@ namespace queries{
 		    query_handler& operator=(const query_handler& other) = default;
 		    query_handler& operator=(query_handler&& other) = default;
 
-            bool call_query(const query& q) override{
+            T call_query(const query& q) override{
                 return handler_(static_cast<const Q&>(q));
             }
         private:
-            std::function<T(const Q& q)> handler_;
+            std::function<T (const Q& q)> handler_;
     };
-
+    template <typename T> // T for type 
     class query_executor{
         public:
-            void subscribe(int query_key, std::unique_ptr<query_handler_interface> handler);
-            void unsubscribe(int query_key);
-            bool execute_query(const query& query);
+            // ? i need to template these too ?, yes
+            void subscribe(int query_key, std::unique_ptr<query_handler_interface<T>> handler){
+                // find the id key
+                subscriber_map_[query_key] = (std::move(handler));
+                return;
+            }
+            void unsubscribe(int query_key){
+                // find the query key
+                // erase the handler
+                subscriber_map_.erase(query_key);
+                return;
+            }
+            // this cannot be bool,. this has to be something else 
+            T execute_query(const query& query){
+                return subscriber_map_[query.get_type()]->execute(query);
+            }
         private:
-            std::unordered_map<int, std::unique_ptr<query_handler_interface>> subscriber_map_;
+            std::unordered_map<int, std::unique_ptr<query_handler_interface<T>>> subscriber_map_;
     };
-    extern query_executor global_executor_; // bool executor, entities::entity* executor
+    extern query_executor<bool> bool_executor_; // bool executor, entities::entity* executor
+    extern query_executor<int> int_executor_;
 }
 #endif

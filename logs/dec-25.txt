@@ -85,6 +85,16 @@ i need to extend the query system such that it can return multiple types
 so temapltes 
 
 template the executor, handler interface and handler ? 
+
+
+temaplte everything 
+make an int query executor and handler
+query the id of the 
+
+change how ids work so that you always know what khiri and mack's id are
+and so that there are no duplicates
+
+
 just make a new set of queries aaaaaaaaaaa
 near future tasks 
 -> player dog selection

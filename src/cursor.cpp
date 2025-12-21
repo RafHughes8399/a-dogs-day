@@ -12,8 +12,8 @@ int entities::cursor::update(float delta){
         // create the query and execute it
         std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(hitbox_, id_);
         // the listener (singular) does something with the query and returns the information
-        
-        bool is_colliding = query_interface::execute_query(*colliding_query);
+        bool is_colliding = queries::bool_executor_.execute_query(*colliding_query);
+        //bool is_colliding = query_interface::execute_query(*colliding_query);
         if(is_colliding){
             // switch to colliding 
             sprite_.get_animation().goto_animation(animation_tags::hover);

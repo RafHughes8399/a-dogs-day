@@ -45,7 +45,7 @@ namespace tree{
         // members 
         events::event_handler<events::move_entity> moved_entity_handler_;
         events::event_handler<events::remove_entity> removed_entity_handler_;
-        queries::query_handler<queries::is_colliding_query> is_colliding_handler_;
+        queries::query_handler<queries::is_colliding_query, bool> is_colliding_handler_;
 
         int max_depth_;
         size_t next_id_;
@@ -98,7 +98,7 @@ namespace tree{
         ~quadtree() {
             event_interface::unsubscribe<events::move_entity>(moved_entity_handler_);
             event_interface::unsubscribe<events::remove_entity>(removed_entity_handler_);
-            query_interface::unsubscribe<queries::is_colliding_query>(is_colliding_handler_);
+            query_interface::unsubscribe<queries::is_colliding_query, bool>(queries::bool_executor_, is_colliding_handler_);
         }
         // creates an empty quadtree with a root node
         quadtree(raglib::bounding_box_2 root_bounds, int depth=MAX_DEPTH)
@@ -113,7 +113,7 @@ namespace tree{
             // sub 
             event_interface::subscribe<events::move_entity>(moved_entity_handler_);
             event_interface::subscribe<events::remove_entity>(removed_entity_handler_);
-            query_interface::subscribe<queries::is_colliding_query>(is_colliding_handler_);
+            query_interface::subscribe<queries::is_colliding_query, bool>(queries::bool_executor_, is_colliding_handler_);
         }
         // creates an empty quadtree, then populates it with the list of objects
         template<typename InputIt>
@@ -137,7 +137,7 @@ namespace tree{
             root_ = copy_tree(other.root_.get(), nullptr);
             event_interface::subscribe<events::move_entity>(moved_entity_handler_);
             event_interface::subscribe<events::remove_entity>(removed_entity_handler_);
-            query_interface::subscribe<queries::is_colliding_query>(is_colliding_handler_);
+            query_interface::subscribe<queries::is_colliding_query, bool>(queries::bool_executor_, is_colliding_handler_);
 
             // and resub
         };
