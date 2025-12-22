@@ -44,7 +44,7 @@ bool hitbox::hitbox::check_collision(const hitbox& other){
     }
     // then compare subboxes
 }
-Rectangle& hitbox::hitbox::get_box(){
+const Rectangle& hitbox::hitbox::get_box() const{
     return box_;
 }
 

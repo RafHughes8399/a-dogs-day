@@ -6,7 +6,7 @@ enum positions{
     bottom_right = 3
 };
 // containment checks
-bool tree::quadtree::node_contains_object(raglib::bounding_box_2& node, Rectangle& object){
+bool tree::quadtree::node_contains_object(raglib::bounding_box_2& node, const Rectangle& object){
     // compare the bounding box of the node and the object
     return node.contains(object);
 }
@@ -257,8 +257,49 @@ bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, hitbox::hit
 }
 
 bool tree::quadtree::is_leaf(std::unique_ptr<node>& tree) {
-
     return tree->children_.size() == 0 ? true : false;
+}
+entities::entity* tree::quadtree::get_entity(std::unique_ptr<node>& tree, size_t id){
+    if(! tree) {return nullptr;}
+    for(auto & entity : tree->objects_){
+        if(entity->get_id() == id){
+            std::cout << "found entity " << std::endl;
+            return entity.get();
+        }
+    }
+    for(auto & child : tree->children_){
+        return get_entity(child, id);
+    }
+    return nullptr;
+}
+
+void tree::quadtree::perform_interactions(std::unique_ptr<node>& tree, entities::entity* entity){
+
+    // iterate until node containing object is found
+    std::cout << "check for interactions " << std::endl;
+    // in the correct node, checck collisions using hitboxes 
+
+    // perform any identified collisions
+    if(! tree) {
+        return;
+    }
+    auto hitbox_rec = entity->get_hitbox().get_box();
+    if(object_in_node(tree->bounds_, hitbox_rec)){
+        // check the objects
+        for(auto & other_entity : tree->objects_){
+            if(entity->check_collision(other_entity->get_hitbox())){
+                entity->interact(*other_entity);
+            }
+        }
+        return;
+    }
+    else{
+    }
+    for(auto & child : tree->children_){
+        perform_interactions(child, entity);
+    }
+    // check the children
+
 }
 
 

@@ -39,6 +39,7 @@ namespace entities{
                 return id_ == other.id_;
             }
 
+            bool check_collision(const hitbox::hitbox other);
             hitbox::hitbox& get_hitbox();
             sprite::sprite&  get_sprite();
             Vector2 get_position();
@@ -66,57 +67,57 @@ namespace entities{
 
     class cursor : public entity{
         public:
-            class interaction_state{
+            class interaction_strategy{
                 public:
-                    virtual ~interaction_state() = default;
-                    interaction_state(){};
-                    interaction_state(const interaction_state& other) = default;
-                    interaction_state(interaction_state&& other) = default;
+                    virtual ~interaction_strategy() = default;
+                    interaction_strategy(){};
+                    interaction_strategy(const interaction_strategy& other) = default;
+                    interaction_strategy(interaction_strategy&& other) = default;
                     
-                    interaction_state& operator=(const interaction_state& other) = default;
-                    interaction_state& operator=(interaction_state&& other) = default;
+                    interaction_strategy& operator=(const interaction_strategy& other) = default;
+                    interaction_strategy& operator=(interaction_strategy&& other) = default;
 
                     virtual void interact(cursor& cursor, entity& other) = 0;
                 private:
             };
-            class left_click_state : public interaction_state{
+            class left_click_strategy : public interaction_strategy{
                 public:
-                    left_click_state()
-                    : interaction_state() {};
-                    left_click_state(const left_click_state& other) = default;
-                    left_click_state(left_click_state&& other) = default;
+                    left_click_strategy()
+                    : interaction_strategy() {};
+                    left_click_strategy(const left_click_strategy& other) = default;
+                    left_click_strategy(left_click_strategy&& other) = default;
                     
-                    left_click_state& operator=(const left_click_state& other) = default;
-                    left_click_state& operator=(left_click_state&& other) = default;
+                    left_click_strategy& operator=(const left_click_strategy& other) = default;
+                    left_click_strategy& operator=(left_click_strategy&& other) = default;
                     
                     void interact(cursor& cursor, entity& other) override;
                     
                     private:
                 };
                 
-                class right_click_state : public interaction_state{
+                class right_click_strategy : public interaction_strategy{
                     public:
-                    right_click_state()
-                    : interaction_state() {};
-                    right_click_state(const right_click_state& other) = default;
-                    right_click_state(right_click_state&& other) = default;
+                    right_click_strategy()
+                    : interaction_strategy() {};
+                    right_click_strategy(const right_click_strategy& other) = default;
+                    right_click_strategy(right_click_strategy&& other) = default;
                     
-                    right_click_state& operator=(const right_click_state& other) = default;
-                    right_click_state& operator=(right_click_state&& other) = default;
+                    right_click_strategy& operator=(const right_click_strategy& other) = default;
+                    right_click_strategy& operator=(right_click_strategy&& other) = default;
 
                     void interact(cursor& cursor, entity& other) override;
                     private:
                 };
 
-            class default_state : public interaction_state{
+            class default_strategy : public interaction_strategy{
                 public:
-                    default_state()
-                    : interaction_state() {};
-                    default_state(const default_state& other) = default;
-                    default_state(default_state&& other) = default;
+                    default_strategy()
+                    : interaction_strategy() {};
+                    default_strategy(const default_strategy& other) = default;
+                    default_strategy(default_strategy&& other) = default;
                         
-                    default_state& operator=(const default_state& other) = default;
-                    default_state& operator=(default_state&& other) = default;
+                    default_strategy& operator=(const default_strategy& other) = default;
+                    default_strategy& operator=(default_strategy&& other) = default;
                     void interact(cursor& cursor, entity& other) override;
                 private:
             };
@@ -130,7 +131,7 @@ namespace entities{
                 left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
                 left_mouse_down_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_down_event(event);}),
                 right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_click_event(event);}),
-                interaction_state_(std::make_unique<default_state>()){
+                interaction_strategy_(std::make_unique<default_strategy>()){
                     event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
                     event_interface::subscribe<events::left_mouse_down>(left_mouse_down_handler_);
                     event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
@@ -157,7 +158,7 @@ namespace entities{
                 events::event_handler<events::left_mouse_down> left_mouse_down_handler_;
                 events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
 
-                std::unique_ptr<interaction_state> interaction_state_;
+                std::unique_ptr<interaction_strategy> interaction_strategy_;
         };
         
         class paw_mark : public entity{

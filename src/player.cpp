@@ -26,11 +26,14 @@ void player::player::update(float delta){
         event_interface::queue_event(left_mouse_down_event);
     }
     
-    if(IsMouseButtonPressed(mouse_controls_[mouse::right_mouse])){
+    else if(IsMouseButtonPressed(mouse_controls_[mouse::right_mouse])){
         // do event for creating visual thing
         std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(GetMousePosition());
         event_interface::queue_event(right_mouse_click_event);
         
+    }
+    else {
+        // set default state
     }
     return;
 }

@@ -1,14 +1,14 @@
 #include "entities.h"
 
 // -------------------------------- interaction states --------------------------------//
-void entities::cursor::left_click_state::interact(cursor& cursor, entity& other){
+void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){
     std::cout << "left click interaction " << std::endl;
 }
-void entities::cursor::right_click_state::interact(cursor& cursor, entity& other){
+void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
     std::cout << "right click interaction " << std::endl;
     
 }
-void entities::cursor::default_state::interact(cursor& cursor, entity& other){
+void entities::cursor::default_strategy::interact(cursor& cursor, entity& other){
     std::cout << "default click interaction " << std::endl;
     
 }
@@ -42,57 +42,50 @@ int entities::cursor::update(float delta){
 }
 
 void entities::cursor::interact(entities::entity& other){
-    // down cast to a dog because that's all we have at the moment will, figure something 
-    // else out 
-    
-    /* lol that's not how you cast safely */
-    //player_dog& dog_cast = dynamic_cast<player_dog&>(other);
-
-    interaction_state_->interact(*this, other);
-    return;
+    interaction_strategy_->interact(*this, other);
 }
 void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click& event){
     auto position = event.get_mouse_position();
     auto hitbox = event.get_hitbox();
-
-    // find the entity being collided with 
-
+    std::cout << "cursor handle left click" << std::endl;
+    // check interactions within the quadtree, use the correct interaction stategy (the left click one)
+    interaction_strategy_ = std::make_unique<left_click_strategy>();
     
-    std::cout << "clicked left mouse " << std::endl;
-    // query the quadtree
-
-
-    // ! consider what happens if colliding with multiple, how do you prioritise  ? 
-    std::unique_ptr<queries::query> entity_collision = std::make_unique<queries::collision_query>(hitbox_, id_);
-    int colliding_entity_id = query_interface::execute_query(queries::int_executor_, *entity_collision);
-
-    // because at some point the interact function must be called, that is how interaction behaviour occurs, that
-    // occcurs through the quadtree, the quad tree is how you access the actual entity rather than just the id
-
-
     
+    // ! note that the interaction strategy changes back on the current frame, but the interaction 
+    // ! event would not be executed until the next frame, so that could be an issue, if it is, just 
+    // ! execute it directly
+    
+    // create the interaction event
+    std::cout << "cursor create interaction event " << std::endl;
+    std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, hitbox_);
+    event_interface::queue_event(interaction_event);
+    // then return to default interaciton
+    interaction_strategy_ = std::make_unique<default_strategy>();
+
 }
 void entities::cursor::on_left_mouse_down_event(const events::left_mouse_down& event){
-    // handles dragging
-    // two cases, dragging occurs only if the mouse is moving after 
-    // ! slow your roll cowboy, you're looking in the wrong spot, this is already handleed 
+
 
     // look, its left mouse down 
     auto mouse_delta = event.get_mouse_delta();
     auto new_position = Vector2Add(position_, mouse_delta);
     position_ = new_position;
-    // create a moved entities event or something and debug 
+    interaction_strategy_ = std::make_unique<left_click_strategy>();
     std::unique_ptr<events::event> moved_event = std::make_unique<events::move_entity>(id_);
 
-    // current thought is that, the move in the tre does not happen until next frame, 
-    // ? that could cause issues ? maybe ? 
     event_interface::queue_event(moved_event); 
 
-    // check for collisions 
+
+    // return to default interaction, for now
+    interaction_strategy_ = std::make_unique<default_strategy>();
 }
 
 void entities::cursor::on_right_mouse_click_event(const events::right_mouse_click& event){
     // for now just change the interact state
+    interaction_strategy_ = std::make_unique<right_click_strategy>();
+    // do something, then go back
+    interaction_strategy_ = std::make_unique<default_strategy>();
 }
 // -------------------------------- paw mark --------------------------------//
 int entities::paw_mark::update(float delta){

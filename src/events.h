@@ -24,8 +24,8 @@
 #include <ctime>
 
 // project includes
+#include "hitbox.h"
 #include "raylib.h"
-
 namespace events{
 	// an enum ID for event types
 	enum ids{
@@ -35,7 +35,8 @@ namespace events{
 		left_mouse = 3,
 		move = 4,
 		remove = 5,
-		size = 6
+		interact = 6,
+		size = 7
 	};
 	class event{
 	protected:
@@ -159,15 +160,35 @@ namespace events{
 			remove_entity(size_t id)
 			: event(ids::remove), id_(id){};
 
-		static const int get_static_type(){
+			static const int get_static_type(){
 				return ids::remove;
-		}
-		size_t get_id() const{
-			return id_;
-		}
+			}
+			size_t get_id() const{
+				return id_;
+			}
 		private:
 			size_t id_;
 
+	};
+
+	class interact_entity : public event{
+		public:
+			~interact_entity() = default;
+			interact_entity(size_t id, hitbox::hitbox hitbox)
+			:event(ids::interact), id_(id), hitbox_(hitbox){};
+
+			static const int get_static_type(){
+				return ids::interact;
+			}
+			size_t get_id() const {
+				return id_;
+			}
+			const hitbox::hitbox& get_hitbox() const{
+				return hitbox_;
+			}
+		private:
+			size_t id_;
+			hitbox::hitbox hitbox_; 
 	};
 	class event_handler_interface{
 		public:

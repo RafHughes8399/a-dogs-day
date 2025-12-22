@@ -1,6 +1,9 @@
 #include "entities.h"
 #include <iostream>
 // --------------------------- entity --------------------------- // 
+bool entities::entity::check_collision(const hitbox::hitbox other){
+    return hitbox_.check_collision(other);
+}
 int entities::entity::get_id(){
     return id_;
 }

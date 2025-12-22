@@ -178,6 +178,10 @@ curently quadtree does not check for interactions every frame , it is only done 
 
 YOU ARE DOING A REQUEST BASED INTERACTION SYSTEM, WHERE ONCE AN ENTITY MOVES IT QUERIES ANY POTENTIAL INTERACTIONS
 for now we know that khiri is 1, mack is 2
+
+check that state based interaction works 
+establish the interaction event
+other way around actually
 -> player dog pathfinding 
 -> player dog directing
 -> player dog art 

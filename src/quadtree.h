@@ -42,9 +42,11 @@ namespace tree{
             }
         };
     private:
-        // members 
+        // event and query handlers 
         events::event_handler<events::move_entity> moved_entity_handler_;
         events::event_handler<events::remove_entity> removed_entity_handler_;
+        events::event_handler<events::interact_entity> interact_entity_handler_;
+        
         queries::query_handler<queries::is_colliding_query, bool> is_colliding_handler_;
 
         int max_depth_;
@@ -56,10 +58,11 @@ namespace tree{
         bool is_empty(std::unique_ptr<node>& tree);
         bool is_leaf(std::unique_ptr<node>& tree);
         bool is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, int id);
-        bool node_contains_object(raglib::bounding_box_2& node, Rectangle& object);
+        bool node_contains_object(raglib::bounding_box_2& node, const Rectangle& object);
         
 
         entities::entity* get_colliding_entity(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, int id);
+        entities::entity* get_entity(std::unique_ptr<node>& tree, size_t id);
         int height(std::unique_ptr<node>& tree);
         int object_contained_by_child(raglib::bounding_box_2& node, Rectangle& object);
         
@@ -74,6 +77,7 @@ namespace tree{
         void erase(std::unique_ptr<node>& tree, size_t object_id);
         void identify_collisions(std::unique_ptr<node>& tree, std::vector<entities::entity*> parent_entities);
         void insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object);
+        void perform_interactions(std::unique_ptr<node>& tree, entities::entity* entity);
         void prune_leaves(std::unique_ptr<node>& tree, double delta);
         void render(std::unique_ptr<node>& tree);
         void traverse_tree(std::unique_ptr<node>& tree);
@@ -96,6 +100,7 @@ namespace tree{
         public:
         // CONSTRUCTORS
         ~quadtree() {
+            event_interface::unsubscribe<events::interact_entity>(interact_entity_handler_);
             event_interface::unsubscribe<events::move_entity>(moved_entity_handler_);
             event_interface::unsubscribe<events::remove_entity>(removed_entity_handler_);
             query_interface::unsubscribe<queries::is_colliding_query, bool>(queries::bool_executor_, is_colliding_handler_);
@@ -103,6 +108,7 @@ namespace tree{
         // creates an empty quadtree with a root node
         quadtree(raglib::bounding_box_2 root_bounds, int depth=MAX_DEPTH)
         : root_(std::make_unique<node>()), max_depth_(depth), next_id_(0),
+        interact_entity_handler_([this](const events::interact_entity& event) -> void {on_interact_event(event);}), 
         moved_entity_handler_([this](const events::move_entity& event) -> void {on_move_event(event);}), 
         removed_entity_handler_([this](const events::remove_entity& event) -> void {on_remove_event(event);}),
         is_colliding_handler_([this](const queries::is_colliding_query& query) -> bool {return on_is_colliding_query(query);}) {
@@ -111,6 +117,7 @@ namespace tree{
             root_->depth_ = 0;
             
             // sub 
+            event_interface::subscribe<events::interact_entity>(interact_entity_handler_);
             event_interface::subscribe<events::move_entity>(moved_entity_handler_);
             event_interface::subscribe<events::remove_entity>(removed_entity_handler_);
             query_interface::subscribe<queries::is_colliding_query, bool>(queries::bool_executor_, is_colliding_handler_);
@@ -131,10 +138,12 @@ namespace tree{
         // copy and move overloads, root, depth and next id
         quadtree(const quadtree& other)
         :  max_depth_(other.max_depth_), next_id_(other.next_id_), 
+        interact_entity_handler_(other.interact_entity_handler_), 
         moved_entity_handler_(other.moved_entity_handler_), 
         removed_entity_handler_(other.removed_entity_handler_),
         is_colliding_handler_(other.is_colliding_handler_){
             root_ = copy_tree(other.root_.get(), nullptr);
+            event_interface::subscribe<events::interact_entity>(interact_entity_handler_);
             event_interface::subscribe<events::move_entity>(moved_entity_handler_);
             event_interface::subscribe<events::remove_entity>(removed_entity_handler_);
             query_interface::subscribe<queries::is_colliding_query, bool>(queries::bool_executor_, is_colliding_handler_);
@@ -211,6 +220,19 @@ namespace tree{
             next_id_ += 1;
         }
 
+        void on_interact_event(const events::interact_entity& event){
+            // TODO do (22.12);
+            std::cout << "quadtree handle interaction event " << std::endl;
+
+            size_t id = event.get_id();
+            std::cout << " entity id is  " << id << std::endl;
+            auto entity = get_entity(root_, id);
+            std::cout << " found entity " << entity << std::endl;
+            const hitbox::hitbox& hb = event.get_hitbox();
+            perform_interactions(root_, entity);
+            return;
+        }
+
         void on_move_event(const events::move_entity& event){
             size_t id = event.get_id();
             // remove and reinsert
@@ -221,6 +243,7 @@ namespace tree{
             size_t id = event.get_id();
             erase(root_, id);
         }
+
 
         void prune_leaves(double delta) {
             prune_leaves(root_, delta);
