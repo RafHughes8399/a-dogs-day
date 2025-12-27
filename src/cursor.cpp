@@ -22,6 +22,8 @@ int entities::cursor::update(float delta){
         hitbox_.update(position_);
 
         // create the query and execute it
+
+        // TODO change how this works to test your interaction theory  !
         std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(hitbox_, id_);
         // the listener (singular) does something with the query and returns the information
         bool is_colliding = queries::bool_executor_.execute_query(*colliding_query);
@@ -34,7 +36,7 @@ int entities::cursor::update(float delta){
             sprite_.get_animation().goto_animation(animation_tags::base);
             // switch to default anim
         }
-
+        
 
         return status_codes::moved;
     }
@@ -56,10 +58,13 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
     // ! event would not be executed until the next frame, so that could be an issue, if it is, just 
     // ! execute it directly
     
+
+    // ! lets test this theory
+    // ! your theory was correct yay, i think, do one more test 
     // create the interaction event
     std::cout << "cursor create interaction event " << std::endl;
     std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, hitbox_);
-    event_interface::queue_event(interaction_event);
+    event_interface::execute_event(*interaction_event);
     // then return to default interaciton
     interaction_strategy_ = std::make_unique<default_strategy>();
 

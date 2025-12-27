@@ -14,7 +14,7 @@ namespace game{
         public:
             ~game() = default;
             game(level::level& level, player::player& player)
-                : level_(level), player_(player){};
+                : level_(level), player_(player), frame_count_(0){};
             game(const game& other) = default;
             game(game&& other) = default;
 
@@ -27,8 +27,9 @@ namespace game{
         private:
             // the world
             // the player controller
-            player::player& player_;
+            int frame_count_;
             level::level& level_;
+            player::player& player_;
     };
 }
 #endif

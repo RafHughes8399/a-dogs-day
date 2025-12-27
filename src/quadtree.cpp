@@ -268,8 +268,12 @@ entities::entity* tree::quadtree::get_entity(std::unique_ptr<node>& tree, size_t
         }
     }
     for(auto & child : tree->children_){
-        return get_entity(child, id);
+        auto result = get_entity(child, id);  // Store the result
+        if(result) {
+            return result;  // Only return if found
+        }
     }
+    
     return nullptr;
 }
 
@@ -284,14 +288,20 @@ void tree::quadtree::perform_interactions(std::unique_ptr<node>& tree, entities:
         return;
     }
     auto hitbox_rec = entity->get_hitbox().get_box();
-    if(object_in_node(tree->bounds_, hitbox_rec)){
+    std::cout << "tree bounds : " << tree->bounds_ << std::endl;
+    std::cout << "hitbox : " << hitbox_rec.x << ", " <<hitbox_rec.y  << ", " <<
+            hitbox_rec.x + hitbox_rec.width << ", " << hitbox_rec.y + hitbox_rec.height << std::endl;
+
+    if(node_contains_object(tree->bounds_, hitbox_rec)){
+
         // check the objects
+        std::cout << "contained " << std::endl;
         for(auto & other_entity : tree->objects_){
-            if(entity->check_collision(other_entity->get_hitbox())){
+            if(entity->check_collision(other_entity->get_hitbox()) && entity != other_entity.get()){
+                std::cout << "process interaction with " << other_entity->get_id() << std::endl;
                 entity->interact(*other_entity);
             }
         }
-        return;
     }
     else{
     }

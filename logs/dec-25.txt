@@ -181,6 +181,12 @@ for now we know that khiri is 1, mack is 2
 
 check that state based interaction works 
 establish the interaction event
+
+
+-> ok the print statements work
+-> so lets make the logic work with selecting a dog
+
+
 other way around actually
 -> player dog pathfinding 
 -> player dog directing
