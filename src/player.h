@@ -26,16 +26,22 @@ namespace player{
     // also include at some point hud and inventory
     class player{
         public:
-            ~player() = default;
+            ~player(){
+                event_interface::unsubscribe<events::selected_dog>(select_dog_handler_);
+            }
             player()
             : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_controls_(),
-            selected_dog_(-1){};
+            selected_dog_(-1),
+            select_dog_handler_([this](const events::selected_dog& event) -> void{on_selected_dog(event);}){
+                event_interface::subscribe(select_dog_handler_);
+            };
             player(const player& other) = default;
             player(player&& other) = default;
         
             player& operator=(const player& other) = default;
             player& operator=(player&& other) = default;
 
+            void on_selected_dog(const events::selected_dog& event);
             void update(float delta);
             void render();
 
@@ -47,12 +53,11 @@ namespace player{
              hud hud_;
              inventory inventory_;
             */
-            
+            events::event_handler<events::selected_dog> select_dog_handler_;            
             int selected_dog_;
             
             std::vector<int> mouse_controls_; 
             std::vector<int> key_controls_; 
-            
             Vector2 mouse_position_;
             
     };

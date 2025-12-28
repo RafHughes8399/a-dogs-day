@@ -263,7 +263,6 @@ entities::entity* tree::quadtree::get_entity(std::unique_ptr<node>& tree, size_t
     if(! tree) {return nullptr;}
     for(auto & entity : tree->objects_){
         if(entity->get_id() == id){
-            std::cout << "found entity " << std::endl;
             return entity.get();
         }
     }
@@ -288,9 +287,6 @@ void tree::quadtree::perform_interactions(std::unique_ptr<node>& tree, entities:
         return;
     }
     auto hitbox_rec = entity->get_hitbox().get_box();
-    std::cout << "tree bounds : " << tree->bounds_ << std::endl;
-    std::cout << "hitbox : " << hitbox_rec.x << ", " <<hitbox_rec.y  << ", " <<
-            hitbox_rec.x + hitbox_rec.width << ", " << hitbox_rec.y + hitbox_rec.height << std::endl;
 
     if(node_contains_object(tree->bounds_, hitbox_rec)){
 

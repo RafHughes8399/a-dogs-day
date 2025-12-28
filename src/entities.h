@@ -6,7 +6,6 @@
 
 
 #include <iostream>
-
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"

@@ -3,6 +3,20 @@
 // -------------------------------- interaction states --------------------------------//
 void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){
     std::cout << "left click interaction " << std::endl;
+
+    // cast to a player dog 
+    // a bit if elsey but not sure otherwise
+    if(entities::player_dog* dog_cast = dynamic_cast<entities::player_dog*>(&other)){
+        std::cout << "interact with dog " << std::endl;
+        // I need the dog id, and need to update the player's selected dog id
+        auto dog_id = dog_cast->get_id();
+
+        // TODO create select dog event 
+        std::unique_ptr<events::event> selected_dog = std::make_unique<events::selected_dog>(dog_id);
+        event_interface::execute_event(*selected_dog);
+
+    }
+    
 }
 void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
     std::cout << "right click interaction " << std::endl;
