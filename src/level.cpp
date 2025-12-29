@@ -1,10 +1,13 @@
 #include "level.h"
 
 // ----------------------------------------- level graph ----------------------------------------- //
-bool level::level_graph::find_path(Vector2 start, Vector2 end){
-    (void) start;
-    (void) end;
+float level::level_graph::manhattan_distance_heurisitic(Vector2 a, Vector2 b){
+    // abs a.x - b.x,  + abs a.y - b,y
+    return std::abs(a.x - b.x) + std::abs(a.y - b.y);
+}
 
+std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end){
+    // TODO Implement !
     // ? something along the lines of, 
     /**
      * node start = position_to_node(start)
@@ -12,7 +15,10 @@ bool level::level_graph::find_path(Vector2 start, Vector2 end){
      * 
      * then run a *
      */
-    return true;
+    std::cout << "find path " << std::endl;
+    // ! should return something different
+
+    return {};
 } 
 
 int level::level_graph::categorise_node(int row, int column){
@@ -68,7 +74,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
         
         destination_index = source_index + row_length_ + 1;
         auto x_plus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_plus_y_plus);
+        // edges.push_back(x_plus_y_plus);
     } 
     else if(top_row && ! left_column){ // top right corner
         destination_index = source_index + row_length_;
@@ -81,7 +87,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
         
         destination_index = source_index - row_length_ - 1;
         auto x_minus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_minus_y_plus);
+        // edges.push_back(x_minus_y_plus);
     }
     else if(! top_row && left_column){ // bottom left corner
         destination_index = source_index - row_length_;
@@ -94,7 +100,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
         
         destination_index = source_index - row_length_ + 1;
         auto x_plus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};      
-        edges.push_back(x_plus_y_minus);  
+        // edges.push_back(x_plus_y_minus);  
     } 
     else if(! top_row && ! left_column){
         destination_index = source_index - row_length_;
@@ -107,7 +113,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
 
         destination_index = source_index - row_length_ - 1;
         auto x_minus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_minus_y_minus);
+        // edges.push_back(x_minus_y_minus);
     } // bottom right corner
     return edges;
 }
@@ -137,19 +143,19 @@ std::vector<level::level_graph::edge> level::level_graph::build_interior_edges(i
     
     destination_index = source_index - row_length_ - 1;
     auto x_minus_y_minus =  edge{&graph_[destination_index].first, hypotenuse_weight};
-    edges.push_back(x_minus_y_minus);
+    // edges.push_back(x_minus_y_minus);
     
     destination_index = source_index - row_length_ +  1;
     auto x_plus_y_minus =  edge{&graph_[destination_index].first, hypotenuse_weight};
-    edges.push_back(x_plus_y_minus);
+    // edges.push_back(x_plus_y_minus);
     
     destination_index = source_index + row_length_ - 1;
     auto x_minus_y_plus =  edge{&graph_[destination_index].first, hypotenuse_weight};
-    edges.push_back(x_minus_y_plus);
+    // edges.push_back(x_minus_y_plus);
     
     destination_index = source_index + row_length_ + 1;
     auto x_plus_y_plus =  edge{&graph_[destination_index].first, hypotenuse_weight};
-    edges.push_back(x_plus_y_plus);
+    // edges.push_back(x_plus_y_plus);
 
     return edges;   
 }
@@ -179,11 +185,11 @@ std::vector<level::level_graph::edge> level::level_graph::build_perimeter_edges(
         
         destination_index = source_index + row_length_ - 1;
         auto x_minus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_minus_y_plus);
+        // edges.push_back(x_minus_y_plus);
         
         destination_index = source_index + row_length_ + 1;
         auto x_plus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_plus_y_plus);
+        // edges.push_back(x_plus_y_plus);
     }
     else if(bottom_row){
         destination_index = source_index - 1;
@@ -200,11 +206,11 @@ std::vector<level::level_graph::edge> level::level_graph::build_perimeter_edges(
         
         destination_index = source_index - row_length_ - 1;
         auto x_minus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_minus_y_minus);
+        // edges.push_back(x_minus_y_minus);
         
         destination_index = source_index - row_length_ + 1;
         auto x_plus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_plus_y_minus);
+        // edges.push_back(x_plus_y_minus);
     }
     else if(left_column){
         destination_index = source_index - row_length_;
@@ -220,11 +226,11 @@ std::vector<level::level_graph::edge> level::level_graph::build_perimeter_edges(
         
         destination_index = source_index - row_length_ + 1;
         auto x_plus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_plus_y_minus);
+        // edges.push_back(x_plus_y_minus);
 
         destination_index = source_index + row_length_ + 1;
         auto x_plus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_plus_y_plus);
+        // edges.push_back(x_plus_y_plus);
     }
     else if(right_column){
         destination_index = source_index - row_length_;
@@ -240,11 +246,11 @@ std::vector<level::level_graph::edge> level::level_graph::build_perimeter_edges(
         
         destination_index = source_index - row_length_ - 1;
         auto x_minus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_minus_y_minus);
+        // edges.push_back(x_minus_y_minus);
 
         destination_index = source_index + row_length_ - 1;
         auto x_minus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
-        edges.push_back(x_minus_y_plus);
+        // edges.push_back(x_minus_y_plus);
     }
     return edges;
 }
@@ -353,6 +359,7 @@ void level::level::update(float delta){
 void level::level::render(){
     // draw the background 
     DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
+    graph_.render(view_frame_);
     // draw the entities, based on the view frame
     auto bounds = raglib::bounding_box_2{Vector2{view_frame_.x, view_frame_.y}, 
     Vector2{view_frame_.x + view_frame_.width, view_frame_.y + view_frame_.height}};
@@ -363,7 +370,6 @@ void level::level::render(){
     // ! there is a bug with the rendering predicate, will test and reincorporate at a later date
     // TODO fix that bug (12.11)
 
-    //TODO switch to drawuing layers
     for(size_t i = 0; i < level_config::draw_layers::size; ++i){
         render_layers_[i].draw();
     }
@@ -406,6 +412,15 @@ void level::level::on_right_mouse_event(const events::right_mouse_click& event){
     auto click_position = event.get_mouse_position();
     auto paw = entities::e_builder.build_paw_mark(click_position, level_entities_.get_next_id());
     add_entity(std::move(paw), level_config::draw_layers::hud);
+
+    auto dog_id = event.get_selected_dog();
+    if(dog_id != -1){
+        auto dog = id_entity_map_[dog_id];
+        auto dog_path = graph_.find_path(dog->get_position(), click_position);
+        // cast and set the path
+        auto dog_cast = static_cast<entities::player_dog*>(dog);
+        dog_cast->set_path(dog_path);
+    }
 }
 
 // --------------------- level builder ----------------------------------------- //

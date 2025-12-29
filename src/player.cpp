@@ -35,8 +35,10 @@ void player::player::update(float delta){
     
     else if(IsMouseButtonPressed(mouse_controls_[mouse::right_mouse])){
         // do event for creating visual thing
-        std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(GetMousePosition());
+        std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(GetMousePosition(), selected_dog_);
         event_interface::queue_event(right_mouse_click_event);
+
+        // pass in the dog id
         
     }
     else {

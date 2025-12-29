@@ -8,6 +8,39 @@
 
 #include <vector>
 #include "raylib.h"
+namespace level_config{
+    // world dimensions
+    inline float world_x = 4096.0f;
+    inline float world_y = 4096.0f;
+    
+    // for the main level graph
+    inline const float edge_weight = 64.0f; // placeholder
+
+    enum draw_layers{
+        background = 0,
+        decoration = 1,
+        stations = 2,
+        dogs = 3,
+        hud = 4,
+        cursor = 5,
+        size = 6
+    };
+
+    enum directions{
+        up = 0,
+        down = 1,
+        left = 2,
+        right = 3,
+        directions_size = 4
+    };
+    inline const Vector2 direction_scalars[directions::directions_size] = {
+        Vector2{0, -1}, // up 
+        Vector2{0, 1},  // down
+        Vector2{-1, 0}, // left
+        Vector2{0, 1} // right
+    };
+    
+}
 namespace assets_config{
     // file paths
     inline const char* background_path = "../sprites/background.png" ;
@@ -26,29 +59,10 @@ namespace assets_config{
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
-    inline const float khiri_attributes[attributes::size] =  {150.0f, 100.0f, 1.0f, 1.0f}; // TODO update values (4/11)
-    inline const float mack_attributes[attributes::size] =  {150.0f, 100.0f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float khiri_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 0.75, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float mack_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 0.75, 1.0f, 1.0f}; // TODO update values (4/11)
 
     inline const Vector2 dog_move_speed = {2.5f , 2.5f};
-    
-}
-namespace level_config{
-    // world dimensions
-    inline float world_x = 4096.0f;
-    inline float world_y = 4096.0f;
-    
-    // for the main level graph
-    inline const float edge_weight = 64.0f; // placeholder
-
-    enum draw_layers{
-        background = 0,
-        decoration = 1,
-        stations = 2,
-        dogs = 3,
-        hud = 4,
-        cursor = 5,
-        size = 6
-    };
     
 }
 namespace controls_config{

@@ -121,8 +121,8 @@ namespace events{
 	class right_mouse_click : public event{
 		public:
 			~right_mouse_click() = default;
-			right_mouse_click(Vector2 position)
-			: event(ids::right_mouse), mouse_position_(position){};
+			right_mouse_click(Vector2 position, int selected_dog)
+			: event(ids::right_mouse), mouse_position_(position), selected_dog_(selected_dog){};
 
 			static const int get_static_type(){
 				return ids::right_mouse;
@@ -130,8 +130,12 @@ namespace events{
 			Vector2 get_mouse_position() const{
 				return mouse_position_;
 			}
+			int get_selected_dog() const {
+				return selected_dog_;
+			}
 		private:
 			Vector2 mouse_position_;
+			int selected_dog_;
 	};
 
 	// ------------------------- entity events  ------------------------- //

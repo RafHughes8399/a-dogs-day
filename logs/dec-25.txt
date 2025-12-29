@@ -193,4 +193,36 @@ other way around actually
 -> player dog art 
 
 -> basic hud outline 
--> player inventory and 
+
+
+player dog pathfinding 
+
+-> player right clicks, has a dog selected
+-> queries the level graph to determine the path that the dog can take
+-> gets the path calculated from the graph
+-> gives it to the dog, the dog them moves according to the path and the speed, 
+-> if the path is empty it does not move, simple
+
+
+-> A* heuristic, prefer points to destination that are closer
+
+
+a star either based manhattan (up, down, left, right direction) or 
+diagonal, i think i ruled out diagonals because of the sheer art workload
+
+
+setup A*
+remove from map as well when entity is removed  
+-> make dogs and other things multiples of edge weights x 
+-> remove diagonal edges x 
+-> use manhattan distance formula for the heuristic x 
+-> implement A*
+    -> setup the event infrastrucutre and return architecture
+    -> essentually how other parts of the code will handle it before you actually implemtn the algo
+        -> what does that consist of ?
+-> for now no dog is selected on 
+
+-> i mean assuming that positions and move speeds are calcualted in terms of edge weight then at some point it will be equal ?
+
+-> fix dog rendering
+-> remove entity from level id entity map

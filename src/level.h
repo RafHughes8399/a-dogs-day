@@ -51,9 +51,12 @@ namespace level{
             std::vector<edge> build_corner_edges(int row, int column);
             std::vector<edge> build_interior_edges(int row, int column);
             std::vector<edge> build_perimeter_edges(int row, int column);
+
+            float manhattan_distance_heurisitic(Vector2 a, Vector2 b);
+            int categorise_node(int row, int column);
+
             void build_nodes(int level_x, int level_y);
             void build_edges();
-            int categorise_node(int row, int column);
             
             int num_rows_;
             int row_length_;
@@ -74,22 +77,22 @@ namespace level{
             level_graph& operator=(level_graph&& other) = default;
     
 
-            bool find_path(Vector2 start, Vector2 end);
             
             int num_nodes();
             int num_edges();
             int num_edges_from(node & node);
-
+            
             node position_to_node(Vector2 position);
-
+            
             std::vector<edge> edges();
             std::vector<edge> edges_from_node(node& node);
             std::vector<node> nodes();
-
+            
+            std::vector<Vector2> find_path(Vector2 start, Vector2 end);
+            
             void insert_node(Vector2 position);
             void insert_edge(int source_num, node& destination, float weight);
             void render(Rectangle frame);
-
     };
     class level{
         public :
