@@ -15,6 +15,7 @@
 #include <cmath>
 #include <map>
 #include <memory>
+#include <queue>
 #include <utility>
 #include <vector>
 
@@ -34,9 +35,13 @@ namespace level{
                 interior = 3
             };
             struct node{
+                int id_;
                 Vector2 position_;
-                bool operator==(const node& other){
-                    return Vector2Equals(position_, other.position_);
+                bool operator==(const node& other) const {
+                    return id_ == other.id_;
+                }
+                bool operator<(const node& other) const {
+                    return id_ < other.id_;
                 }
             };
             struct edge{
@@ -52,12 +57,16 @@ namespace level{
             std::vector<edge> build_interior_edges(int row, int column);
             std::vector<edge> build_perimeter_edges(int row, int column);
 
+            node* lowest_f_score(std::vector<node*>& nodes, std::map<int, float>& f_scores);
             float manhattan_distance_heurisitic(Vector2 a, Vector2 b);
+            
             int categorise_node(int row, int column);
-
+            
             void build_nodes(int level_x, int level_y);
             void build_edges();
             
+            std::vector<int> bfs(int start_id, int end_id);
+            std::vector<Vector2> make_position_path(std::vector<int>& visited, int start_id, int end_id);
             int num_rows_;
             int row_length_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
@@ -82,7 +91,7 @@ namespace level{
             int num_edges();
             int num_edges_from(node & node);
             
-            node position_to_node(Vector2 position);
+            int position_to_node(Vector2 position);
             
             std::vector<edge> edges();
             std::vector<edge> edges_from_node(node& node);
@@ -90,7 +99,7 @@ namespace level{
             
             std::vector<Vector2> find_path(Vector2 start, Vector2 end);
             
-            void insert_node(Vector2 position);
+            void insert_node(int id, Vector2 position);
             void insert_edge(int source_num, node& destination, float weight);
             void render(Rectangle frame);
     };

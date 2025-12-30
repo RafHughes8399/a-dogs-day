@@ -6,6 +6,45 @@ float level::level_graph::manhattan_distance_heurisitic(Vector2 a, Vector2 b){
     return std::abs(a.x - b.x) + std::abs(a.y - b.y);
 }
 
+std::vector<int> level::level_graph::bfs(int start_id, int end_id){
+    size_t visited_size = graph_.size();
+    auto visited = std::vector<int>(visited_size, -1);
+    // init all with -1 
+    bool found = false;
+    
+    visited[start_id] = start_id;
+    
+    auto nodes = std::queue<int>();
+    nodes.push(start_id);
+    while(! nodes.empty() && ! found){
+        auto current = nodes.front();
+        nodes.pop();
+        if(current == end_id){
+            found = true;
+        }
+        else{
+            // for each outgoing edge from current 
+            for(auto & edge : graph_[current].second){
+                if(visited[edge.destination_->id_] == -1){
+                    visited[edge.destination_->id_] = current;
+                    nodes.push(edge.destination_->id_);
+                }
+            }
+        }
+    }
+    return visited;
+}
+std::vector<Vector2> level::level_graph::make_position_path(std::vector<int>& visited, int start_id, int end_id){
+    auto path = std::vector<Vector2>{};
+    int current_id = end_id;
+    while(current_id != start_id){
+        path.push_back(graph_[current_id].first.position_);
+        current_id = visited[current_id];
+    }
+    path.push_back(graph_[start_id].first.position_);
+    std::reverse(path.begin(), path.end());
+    return path;
+}
 std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end){
     // TODO Implement !
     // ? something along the lines of, 
@@ -16,11 +55,20 @@ std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end){
      * then run a *
      */
     std::cout << "find path " << std::endl;
-    // ! should return something different
+    /** this should be pointers */
+    int start_node = position_to_node(start);
+    int end_node = position_to_node(end);
+    
+    auto node_path = bfs(start_node, end_node);
 
-    return {};
+    // convert node path to position path
+    // append the start and end positions if the nodes do not equal them 
+    return make_position_path(node_path, start_node, end_node);
+
 } 
-
+level::level_graph::node* level::level_graph::lowest_f_score(std::vector<level_graph::node*>& nodes, std::map<int, float>& f_scores){
+    return nullptr;
+}
 int level::level_graph::categorise_node(int row, int column){
     bool top_row = row == 0; // || row == max_row;
     bool bottom_row = row == num_rows_ - 1;
@@ -45,12 +93,20 @@ int level::level_graph::num_edges_from(node & node){
     return 0;
 }
 
-level::level_graph::node level::level_graph::position_to_node(Vector2 position){
-    (void) position;
-    // use the calculation from your notes
-    auto n = node {}; //  ! care on the returning a referecne to a local variable, it will go out of scope 
-                        // ! this is just placeholder so you should be fine  
-    return n;
+int level::level_graph::position_to_node(Vector2 position){
+    // use the calculation from your notes, what calculation lol, the id caclulation i think, that's what
+    // you're referring to 
+
+    // the index is (row * row_length_ ) + column
+    // convert a position to an index 
+    // it will need some rounding i think 
+
+
+    // returns the id of the node 
+
+    // for now only assumes 
+    size_t id = 0;
+    return 0;
 }
 
 std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int row, int column){
@@ -309,14 +365,14 @@ void level::level_graph::build_nodes(int level_x, int level_y){
     for(int y = 0; y < level_y; y += level_config::edge_weight){
         for(int x = 0; x < level_x; x += level_config::edge_weight){
             Vector2 node_position = Vector2 {static_cast<float>(x),static_cast<float>(y)};
+            insert_node(num_nodes, node_position);
             num_nodes++;
-            insert_node(node_position);
         }
     }
 }
-void level::level_graph::insert_node(Vector2 position){
+void level::level_graph::insert_node(int id, Vector2 position){
     // node is built with a number and at position 
-    graph_.push_back(std::make_pair(node{position}, std::vector<edge>{}));
+    graph_.push_back(std::make_pair(node{id, position}, std::vector<edge>{}));
     return;
 }
 void level::level_graph::insert_edge(int source_num, node& destination, float weight){
@@ -332,7 +388,7 @@ void level::level_graph::render(Rectangle frame){
             int index = (row * row_length) + col;
             auto position = graph_[index].first.position_;
             DrawCircle(position.x, position.y, 15, DARKGREEN);
-            DrawText(TextFormat("%d", index), position.x, position.y, 12, WHITE);
+            DrawText(TextFormat("%d", graph_[index].first.id_), position.x, position.y, 12, WHITE);
             
             auto edges = graph_[index].second;
             for(auto & e : edges){

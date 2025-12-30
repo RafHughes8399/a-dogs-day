@@ -223,6 +223,15 @@ remove from map as well when entity is removed
 -> for now no dog is selected on 
 
 -> i mean assuming that positions and move speeds are calcualted in terms of edge weight then at some point it will be equal ?
+'
 
+-> implement basic djikstra for testing purposes,
+    -> then A*
+    -> Then A* with a priority queue
 -> fix dog rendering
 -> remove entity from level id entity map
+
+
+
+-> check that id assignment works correctly, it is key to pathfinding
+-> id assignment works
