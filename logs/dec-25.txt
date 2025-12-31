@@ -235,3 +235,22 @@ remove from map as well when entity is removed
 
 -> check that id assignment works correctly, it is key to pathfinding
 -> id assignment works
+
+
+-> debug statements and test pathfind
+-> test pathfind 
+
+-> remove the start and end from the path
+-> find a way to highlight the path
+
+-> an extension when incorporating other static entites (decorations, statitions, etc)
+    -> each will have a position and an interaction position
+    -> if they are right clicked on, then the end of the path becomes the interaction position
+
+    -> nodes should have an occupied field to determine if they can be traversed through
+
+    -> i dont actually need the true start poistion in the path
+
+-> draw the path
+-> actually have the dog move, i think the dog path needs to be set ? 
+-> 

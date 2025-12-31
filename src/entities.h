@@ -191,8 +191,8 @@ namespace entities{
             ~player_dog(){
                 event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
             }
-            player_dog(sprite::sprite sprite, hitbox::hitbox hitbox, Vector2 position, int id, Vector2 move_speed)
-            : entity(sprite, hitbox, position, id), move_speed_(move_speed), cosmetics_({}), 
+            player_dog(sprite::sprite sprite, hitbox::hitbox hitbox, Vector2 position, int id)
+            : entity(sprite, hitbox, position, id), cosmetics_({}), 
             direction_scalar_(level_config::direction_scalars[level_config::directions::right]),
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}){
                     event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
@@ -210,9 +210,9 @@ namespace entities{
             void on_right_click_event(const events::right_mouse_click& event);
             void set_path(std::vector<Vector2>& path);
             // something for cosmetics
-
-        private:
-
+            
+            private:
+            
             /**
              * setup a direction map to a scalar vector
              * so up = {0, -1}
@@ -222,12 +222,13 @@ namespace entities{
              */
             bool reached_position(Vector2 new_position, Vector2 target);
             void determine_direction(Vector2 target);
+            void draw_path();
 
             events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
             std::vector<sprite::sprite> cosmetics_;
             std::vector<Vector2> move_path_; // the prev array from the path algorithm
             
-            const Vector2 move_speed_; // TODO: specify move speed, in config file (28 . 12), in terms of a factor of edge weight (one tenth ? )
+            const Vector2 move_speed_ = assets_config::dog_move_speed; // TODO: specify move speed, in config file (28 . 12), in terms of a factor of edge weight (one tenth ? )
             Vector2 direction_scalar_;
 
 

@@ -66,7 +66,7 @@ namespace level{
             void build_edges();
             
             std::vector<int> bfs(int start_id, int end_id);
-            std::vector<Vector2> make_position_path(std::vector<int>& visited, int start_id, int end_id);
+            std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, int start_id, int end_id);
             int num_rows_;
             int row_length_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
@@ -91,7 +91,7 @@ namespace level{
             int num_edges();
             int num_edges_from(node & node);
             
-            int position_to_node(Vector2 position);
+            int position_to_node(Vector2 position, bool snap_before);
             
             std::vector<edge> edges();
             std::vector<edge> edges_from_node(node& node);

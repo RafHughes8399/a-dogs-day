@@ -21,6 +21,7 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
         nodes.pop();
         if(current == end_id){
             found = true;
+            return visited;
         }
         else{
             // for each outgoing edge from current 
@@ -34,7 +35,7 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
     }
     return visited;
 }
-std::vector<Vector2> level::level_graph::make_position_path(std::vector<int>& visited, int start_id, int end_id){
+std::vector<Vector2> level::level_graph::make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, int start_id, int end_id){
     auto path = std::vector<Vector2>{};
     int current_id = end_id;
     while(current_id != start_id){
@@ -43,6 +44,10 @@ std::vector<Vector2> level::level_graph::make_position_path(std::vector<int>& vi
     }
     path.push_back(graph_[start_id].first.position_);
     std::reverse(path.begin(), path.end());
+    for(auto & position : path){
+        position_path.push_back(position);
+    }
+
     return path;
 }
 std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end){
@@ -54,16 +59,25 @@ std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end){
      * 
      * then run a *
      */
-    std::cout << "find path " << std::endl;
+    std::cout << "find path from " << start.x << ", " << start.y << " to " << end.x << ", " << end.y <<  std::endl;
     /** this should be pointers */
-    int start_node = position_to_node(start);
-    int end_node = position_to_node(end);
+    int start_node = position_to_node(start, false);
+    std::cout << "start at " << start_node << std::endl;
+    int end_node = position_to_node(end, true);
+    std::cout << "end at " << end_node << std::endl;
     
     auto node_path = bfs(start_node, end_node);
-
     // convert node path to position path
-    // append the start and end positions if the nodes do not equal them 
-    return make_position_path(node_path, start_node, end_node);
+    
+    auto position_path = std::vector<Vector2>();
+    std::cout << "path has " << position_path.size() << " nodes " << std::endl;
+
+    make_position_path(position_path, node_path, start_node, end_node);
+    
+    for(auto position : position_path){
+        std::cout << "visit : " << position.x << ", " << position.y << std::endl;
+    }
+    return position_path;
 
 } 
 level::level_graph::node* level::level_graph::lowest_f_score(std::vector<level_graph::node*>& nodes, std::map<int, float>& f_scores){
@@ -93,20 +107,27 @@ int level::level_graph::num_edges_from(node & node){
     return 0;
 }
 
-int level::level_graph::position_to_node(Vector2 position){
-    // use the calculation from your notes, what calculation lol, the id caclulation i think, that's what
-    // you're referring to 
+int level::level_graph::position_to_node(Vector2 position, bool snap_before){
+    float row = position.y / level_config::edge_weight;
+    float column = position.x / level_config::edge_weight;
 
-    // the index is (row * row_length_ ) + column
-    // convert a position to an index 
-    // it will need some rounding i think 
+    int row_length  = level_config::world_x  / level_config::edge_weight;
 
+    
+    float index = (row * row_length) + column;
+    std::cout << " rough index is " << index << std::endl;
+    int index_i = 0; 
+    if(snap_before){
+        index_i = std::floor(index);
+        std::cout << " snapped before index is " << index_i << std::endl;
+    }
+    else{
+        index_i = std::ceil(index);
+        std::cout << " snapped after index is " << index_i << std::endl;
+    }
 
-    // returns the id of the node 
-
-    // for now only assumes 
-    size_t id = 0;
-    return 0;
+    // this should be changed
+    return index_i;
 }
 
 std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int row, int column){

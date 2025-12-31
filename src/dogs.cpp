@@ -11,9 +11,11 @@ int entities::player_dog::update(float delta){
     // process the head of the move path if it exists,
 
     // need an iniital setting of the direction
+    std::cout << " move path size " << move_path_.size() << std::endl;
+    draw_path();
     if(! move_path_.empty()){
         auto next_position = move_path_.front();
-        auto new_position = Vector2Add(position_, Vector2Multiply(move_speed_, direction_scalar_));
+        auto new_position = Vector2Scale(Vector2Add(position_, Vector2Multiply(move_speed_, direction_scalar_)), delta);
         if(reached_position(new_position, next_position)){
             move_path_.erase(move_path_.begin()); // the direction of movement should be the same until a new position in the path is reached
             if(! move_path_.empty()){
@@ -36,12 +38,22 @@ void entities::player_dog::on_right_click_event(const events::right_mouse_click&
 }
 
 void entities::player_dog::set_path(std::vector<Vector2>& path){
+    std::cout << " set dog path " << std::endl;
     move_path_ = path;
     // when the path is set, also pick a direction 
     // compare the position with the next position in the path
     determine_direction(move_path_.front());
 }
-
+void entities::player_dog::draw_path(){
+    for(auto position : move_path_){
+        int row = position.y / level_config::edge_weight;
+        int row_length = level_config::world_x / level_config::edge_weight;
+        int col = position.x / level_config::edge_weight;
+        int index = (row * row_length) + col;
+        DrawCircle(position.x, position.y, 15, YELLOW);
+        DrawText(TextFormat("%d", index), position.x, position.y, 12, WHITE);
+    }
+}
 bool entities::player_dog::reached_position(Vector2 new_position, Vector2 target){
     // reached is either equal or exceeded position
     // maybe more complicated, comapre distances
@@ -89,8 +101,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
         assets_config::khiri_attributes[assets_config::attributes::animations]),
         hitbox,
         position,
-        id,
-        Vector2Zero());
+        id);
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 position, int id){
     auto mack_texture = textures::textures_.get_texture(textures::mack, assets_config::mack_path);
@@ -103,6 +114,5 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
         assets_config::mack_attributes[assets_config::attributes::animations]),
         hitbox,
         position,
-        id,
-        Vector2Zero());
+        id); // becayse tge move speed is zero
 }
