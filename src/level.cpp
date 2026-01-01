@@ -59,24 +59,17 @@ std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end, V
      * 
      * then run a *
      */
-    std::cout << "find path from " << start.x << ", " << start.y << " to " << end.x << ", " << end.y <<  std::endl;
     /** this should be pointers */
     int start_node = position_to_node(start, direction);
-    std::cout << "start at " << start_node << std::endl;
     int end_node = position_to_node(end, direction);
-    std::cout << "end at " << end_node << std::endl;
     
     auto node_path = bfs(start_node, end_node);
     // convert node path to position path
     
     auto position_path = std::vector<Vector2>();
-    std::cout << "path has " << position_path.size() << " nodes " << std::endl;
 
     make_position_path(position_path, node_path, start_node, end_node);
-    
-    for(auto position : position_path){
-        std::cout << "visit : " << position.x << ", " << position.y << std::endl;
-    }
+
     return position_path;
 
 } 
@@ -109,7 +102,6 @@ int level::level_graph::num_edges_from(node & node){
 
 // ok the problems are here 
 int level::level_graph::position_to_node(Vector2 position, Vector2 direction){
-   std::cout << "position " << position.x << ", " << position.y << std::endl;
     
     float row_f = position.y / level_config::edge_weight;
     float column_f = position.x / level_config::edge_weight; 
@@ -133,15 +125,12 @@ int level::level_graph::position_to_node(Vector2 position, Vector2 direction){
         row = static_cast<int>(std::floor(row_f));
     } 
     
-    // Clamp to bounds
+    // clamp
     column = std::max(0, std::min(column, row_length_ - 1));
     row = std::max(0, std::min(row, num_rows_ - 1));
     
     int index = (row * row_length_) + column;
-    std::cout << "calculated index  " << index << std::endl;
-    std::cout << "node at index:  " << graph_[index].first.position_.x <<  ", " <<
-     graph_[index].first.position_.y << std::endl; 
-    
+
     return index;
 }
 
@@ -451,7 +440,6 @@ void level::level::update(float delta){
 void level::level::render(){
     // draw the background 
     DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
-    graph_.render(view_frame_);
     // draw the entities, based on the view frame
     auto bounds = raglib::bounding_box_2{Vector2{view_frame_.x, view_frame_.y}, 
     Vector2{view_frame_.x + view_frame_.width, view_frame_.y + view_frame_.height}};

@@ -2,7 +2,6 @@
 
 void game::game::update(float delta){
     // update the level
-    //std::cout << "frame: " << frame_count_ << std::endl; 
     events::global_dispatcher_.process_events(delta);
     level_.update(delta);
     // then the player

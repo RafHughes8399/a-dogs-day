@@ -221,13 +221,8 @@ namespace tree{
         }
 
         void on_interact_event(const events::interact_entity& event){
-            // TODO do (22.12);
-            std::cout << "quadtree handle interaction event " << std::endl;
-
             size_t id = event.get_id();
-            std::cout << " entity id is  " << id << std::endl;
             auto entity = get_entity(root_, id);
-            std::cout << " found entity " << entity << std::endl;
             const hitbox::hitbox& hb = event.get_hitbox();
             perform_interactions(root_, entity);
             return;

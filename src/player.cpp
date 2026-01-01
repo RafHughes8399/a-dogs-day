@@ -7,7 +7,6 @@ void player::player::on_selected_dog(const events::selected_dog& event){
     auto id = event.get_id();
     selected_dog_ = id;
 
-    std::cout << "player selected dog " << selected_dog_ << std::endl;
 }
 void player::player::update(float delta){
     (void) delta;

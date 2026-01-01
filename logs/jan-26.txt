@@ -13,7 +13,10 @@
     -> ok that kind of worked
     -> i think reached position is now the issue,
     -> and direction selection 
-    
+
+-> remove couts
+-> don't draw the grid 
+-> fix the dog art, proper sketches
 -> dog art fix 
 -> basic decorations and stations outline
     -> placing decorations and stations
@@ -21,3 +24,7 @@
     -> cursor interactiosn with decorations 
     -> nodes being "occupied" or blocked from moving through 
 -> basic hud outline 
+
+
+
+-> some issue with the position to node 

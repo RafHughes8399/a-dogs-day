@@ -12,7 +12,7 @@ namespace sprite{
         public:
             ~sprite() = default;
             sprite(Texture2D texture, float frame_width, float frame_height, int frames, int animations)
-                : sprite_texture_(texture), sprite_animation_(animation::animation(frame_height, frame_width, frames, animations)){};
+                : sprite_texture_(texture), sprite_animation_(animation::animation(frame_width, frame_height, frames, animations)){};
             sprite(const sprite& other) = default;
             sprite(sprite&& other) = default;
             

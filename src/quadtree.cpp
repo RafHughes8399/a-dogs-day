@@ -279,7 +279,6 @@ entities::entity* tree::quadtree::get_entity(std::unique_ptr<node>& tree, size_t
 void tree::quadtree::perform_interactions(std::unique_ptr<node>& tree, entities::entity* entity){
 
     // iterate until node containing object is found
-    std::cout << "check for interactions " << std::endl;
     // in the correct node, checck collisions using hitboxes 
 
     // perform any identified collisions
@@ -291,10 +290,8 @@ void tree::quadtree::perform_interactions(std::unique_ptr<node>& tree, entities:
     if(node_contains_object(tree->bounds_, hitbox_rec)){
 
         // check the objects
-        std::cout << "contained " << std::endl;
         for(auto & other_entity : tree->objects_){
             if(entity->check_collision(other_entity->get_hitbox()) && entity != other_entity.get()){
-                std::cout << "process interaction with " << other_entity->get_id() << std::endl;
                 entity->interact(*other_entity);
             }
         }

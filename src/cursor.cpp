@@ -7,7 +7,6 @@ void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& oth
     // cast to a player dog 
     // a bit if elsey but not sure otherwise
     if(entities::player_dog* dog_cast = dynamic_cast<entities::player_dog*>(&other)){
-        std::cout << "interact with dog " << std::endl;
         // I need the dog id, and need to update the player's selected dog id
         auto dog_id = dog_cast->get_id();
 
@@ -63,7 +62,6 @@ void entities::cursor::interact(entities::entity& other){
 void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click& event){
     auto position = event.get_mouse_position();
     auto hitbox = event.get_hitbox();
-    std::cout << "cursor handle left click" << std::endl;
     // check interactions within the quadtree, use the correct interaction stategy (the left click one)
     interaction_strategy_ = std::make_unique<left_click_strategy>();
     
@@ -76,7 +74,6 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
     // ! lets test this theory
     // ! your theory was correct yay, i think, do one more test 
     // create the interaction event
-    std::cout << "cursor create interaction event " << std::endl;
     std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, hitbox_);
     event_interface::execute_event(*interaction_event);
     // then return to default interaciton
