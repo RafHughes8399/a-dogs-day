@@ -1,0 +1,23 @@
+-> pathfinding 
+    -> reached position is incorrect
+    -> need diagonal edges and direction movement
+    -> otherwise I have to put in positions in the path
+        for example in the 700, 700 -> 704, 704
+    -> or is hte issue because the dogs are not on placed on multiples of edge weights 
+    -> i think you have to be strict about placement and movement, they have to move 
+    along multiples of edge weights
+
+    -> lets try this one first i think
+    -> then reintroduce  diagonals if that doesn't work
+    
+    -> ok that kind of worked
+    -> i think reached position is now the issue,
+    -> and direction selection 
+    
+-> dog art fix 
+-> basic decorations and stations outline
+    -> placing decorations and stations
+    -> cursor and dog interacting with stations 
+    -> cursor interactiosn with decorations 
+    -> nodes being "occupied" or blocked from moving through 
+-> basic hud outline 

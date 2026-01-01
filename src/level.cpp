@@ -50,7 +50,7 @@ std::vector<Vector2> level::level_graph::make_position_path(std::vector<Vector2>
 
     return path;
 }
-std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end){
+std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end, Vector2 direction){
     // TODO Implement !
     // ? something along the lines of, 
     /**
@@ -61,9 +61,9 @@ std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end){
      */
     std::cout << "find path from " << start.x << ", " << start.y << " to " << end.x << ", " << end.y <<  std::endl;
     /** this should be pointers */
-    int start_node = position_to_node(start, false);
+    int start_node = position_to_node(start, direction);
     std::cout << "start at " << start_node << std::endl;
-    int end_node = position_to_node(end, true);
+    int end_node = position_to_node(end, direction);
     std::cout << "end at " << end_node << std::endl;
     
     auto node_path = bfs(start_node, end_node);
@@ -107,27 +107,42 @@ int level::level_graph::num_edges_from(node & node){
     return 0;
 }
 
-int level::level_graph::position_to_node(Vector2 position, bool snap_before){
-    float row = position.y / level_config::edge_weight;
-    float column = position.x / level_config::edge_weight;
-
-    int row_length  = level_config::world_x  / level_config::edge_weight;
-
+// ok the problems are here 
+int level::level_graph::position_to_node(Vector2 position, Vector2 direction){
+   std::cout << "position " << position.x << ", " << position.y << std::endl;
     
-    float index = (row * row_length) + column;
-    std::cout << " rough index is " << index << std::endl;
-    int index_i = 0; 
-    if(snap_before){
-        index_i = std::floor(index);
-        std::cout << " snapped before index is " << index_i << std::endl;
+    float row_f = position.y / level_config::edge_weight;
+    float column_f = position.x / level_config::edge_weight; 
+    int row, column;
+    
+    // Always snap forward in direction of travel
+    if(direction.x >= 0) {
+        column = static_cast<int>(std::ceil(column_f));
     }
+        
     else{
-        index_i = std::ceil(index);
-        std::cout << " snapped after index is " << index_i << std::endl;
-    }
-
-    // this should be changed
-    return index_i;
+        column = static_cast<int>(std::floor(column_f));
+    } 
+        
+    
+    if(direction.y >= 0) {
+      row = static_cast<int>(std::ceil(row_f));
+    } 
+    
+    else{
+        row = static_cast<int>(std::floor(row_f));
+    } 
+    
+    // Clamp to bounds
+    column = std::max(0, std::min(column, row_length_ - 1));
+    row = std::max(0, std::min(row, num_rows_ - 1));
+    
+    int index = (row * row_length_) + column;
+    std::cout << "calculated index  " << index << std::endl;
+    std::cout << "node at index:  " << graph_[index].first.position_.x <<  ", " <<
+     graph_[index].first.position_.y << std::endl; 
+    
+    return index;
 }
 
 std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int row, int column){
@@ -493,9 +508,11 @@ void level::level::on_right_mouse_event(const events::right_mouse_click& event){
     auto dog_id = event.get_selected_dog();
     if(dog_id != -1){
         auto dog = id_entity_map_[dog_id];
-        auto dog_path = graph_.find_path(dog->get_position(), click_position);
+        // add the direction too
         // cast and set the path
         auto dog_cast = static_cast<entities::player_dog*>(dog);
+        auto direction = dog_cast->get_direction_scalar();
+        auto dog_path = graph_.find_path(dog->get_position(), click_position, direction);
         dog_cast->set_path(dog_path);
     }
 }
@@ -518,10 +535,12 @@ level::level level::level_builder::build_main_level(){
     l.add_entity(std::move(cursor), level_config::draw_layers::cursor);
     
     // and the dogs
-    auto khiri = entities::e_builder.build_khiri(Vector2 {500, 500}, l.entity_id());
+    // TODO change the positions
+
+    auto khiri = entities::e_builder.build_khiri(Vector2 {level_config::edge_weight * 4, static_cast<float>(level_config::edge_weight * 3.5)}, l.entity_id());
     l.add_entity(std::move(khiri), level_config::draw_layers::dogs);
     
-    auto mack = entities::e_builder.build_mack(Vector2 {700, 700}, l.entity_id());
+    auto mack = entities::e_builder.build_mack(Vector2 {level_config::edge_weight * 7, level_config::edge_weight * 4}, l.entity_id());
     l.add_entity(std::move(mack), level_config::draw_layers::dogs);
     return l;
 }

@@ -205,8 +205,9 @@ namespace entities{
             player_dog& operator=(player_dog&& other) = default;
 
             int update(float delta) override;
+            Vector2 get_direction_scalar();
+
             void interact(entity& other) override;
-            
             void on_right_click_event(const events::right_mouse_click& event);
             void set_path(std::vector<Vector2>& path);
             // something for cosmetics
@@ -220,7 +221,7 @@ namespace entities{
              * 
              * so left = {-1, 0}
              */
-            bool reached_position(Vector2 new_position, Vector2 target);
+            bool reached_position(Vector2 target);
             void determine_direction(Vector2 target);
             void draw_path();
 

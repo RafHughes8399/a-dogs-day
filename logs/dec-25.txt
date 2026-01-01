@@ -243,14 +243,36 @@ remove from map as well when entity is removed
 -> remove the start and end from the path
 -> find a way to highlight the path
 
--> an extension when incorporating other static entites (decorations, statitions, etc)
-    -> each will have a position and an interaction position
-    -> if they are right clicked on, then the end of the path becomes the interaction position
 
-    -> nodes should have an occupied field to determine if they can be traversed through
 
     -> i dont actually need the true start poistion in the path
 
 -> draw the path
 -> actually have the dog move, i think the dog path needs to be set ? 
 -> 
+
+
+-> an extension when incorporating other static entites (decorations, statitions, etc)
+    -> each will have a position and an interaction position
+    -> if they are right clicked on, then the end of the path becomes the interaction position
+    -> nodes should have an occupied field to determine if they can be traversed through
+    -> for now will allow dogs to pass through each other
+
+-> dog pathfinding
+    -> issues with hitbox and direction ?
+    -> issues are with the position to node and recognising when a position has been reached
+            -> look into the mod operator ? 
+            -> position reached i need to rework, the logic is just not there 
+            -> might need to bring back diagonal movement
+
+-> pathfinding 
+    -> reached position is incorrect
+    -> need diagonal edges and directino movement
+    
+-> dog art fix 
+-> basic decorations and stations outline
+    -> placing decorations and stations
+    -> cursor and dog interacting with stations 
+    -> cursor interactiosn with decorations 
+    -> nodes being "occupied" or blocked from moving through 
+-> basic hud outline 

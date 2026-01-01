@@ -35,9 +35,13 @@ namespace level_config{
     };
     inline const Vector2 direction_scalars[directions::directions_size] = {
         Vector2{0, -1}, // up 
+        // up-left
+        // up-right
         Vector2{0, 1},  // down
+        // down-left
+        // down-right
         Vector2{-1, 0}, // left
-        Vector2{0, 1} // right
+        Vector2{1, 0} // right
     };
     
 }
@@ -62,7 +66,7 @@ namespace assets_config{
     inline const float khiri_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 0.75, 1.0f, 1.0f}; // TODO update values (4/11)
     inline const float mack_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 0.75, 1.0f, 1.0f}; // TODO update values (4/11)
 
-    inline const Vector2 dog_move_speed = {2.5f , 2.5f};
+    inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     
 }
 namespace controls_config{

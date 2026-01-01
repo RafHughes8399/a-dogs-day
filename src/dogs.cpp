@@ -14,17 +14,28 @@ int entities::player_dog::update(float delta){
     std::cout << " move path size " << move_path_.size() << std::endl;
     draw_path();
     if(! move_path_.empty()){
+        std::cout << "not empty, get next position " << std::endl;
         auto next_position = move_path_.front();
-        auto new_position = Vector2Scale(Vector2Add(position_, Vector2Multiply(move_speed_, direction_scalar_)), delta);
-        if(reached_position(new_position, next_position)){
+        std::cout << "position :  " << position_.x << ", " << position_.y << std::endl;
+        if(reached_position(next_position)){
+            std::cout << "reached point on path " << std::endl;
             move_path_.erase(move_path_.begin()); // the direction of movement should be the same until a new position in the path is reached
             if(! move_path_.empty()){
+                next_position = move_path_.front();
                 determine_direction(next_position);
             }
         }
+        auto new_position = Vector2Add(position_, Vector2Scale(Vector2Multiply(move_speed_, direction_scalar_), delta));
+        std::cout << "new_position :  " << new_position.x << ", " << new_position.y << std::endl;
         position_ = new_position;
+        // update the hitbox too 
+        hitbox_.update(position_);
     }
     return status_codes::nothing;
+}
+
+Vector2 entities::player_dog::get_direction_scalar(){
+    return direction_scalar_;
 }
 void entities::player_dog::interact(entity& other){
     (void) other;
@@ -54,39 +65,49 @@ void entities::player_dog::draw_path(){
         DrawText(TextFormat("%d", index), position.x, position.y, 12, WHITE);
     }
 }
-bool entities::player_dog::reached_position(Vector2 new_position, Vector2 target){
-    // reached is either equal or exceeded position
-    // maybe more complicated, comapre distances
-    
-    // ? compare the distances 
-    // ? the distance between position and new_position ?
-    // ? and the distance between position and target ?
+bool entities::player_dog::reached_position(Vector2 target){
 
-    // ? if the same, then the target is reached, if "less" then new position is not yet at the target
-    // ? if greater, then the new position is beyond the target and it has been reached
-    float position_to_new = std::abs(Vector2Distance(position_, new_position));
-    float position_to_target = std::abs(Vector2Distance(position_, target));
-    return position_to_new >= position_to_target;
+    std::cout << " new : " << position_.x << ", " << position_.y << std::endl;
+    std::cout << " target : " << target.x << ", " << target.y << std::endl;
+    float position_to_target = Vector2Distance(position_, target);
+    std::cout << "distance between position and target: " << position_to_target << std::endl; 
+    // which is 3.2
+    if(position_to_target <= level_config::edge_weight * 0.05){
+        position_ = target;
+        return true;
+    } 
+    return false;
 }
 
 void entities::player_dog::determine_direction(Vector2 target){
     // it is either up down left or right
     // x is left right, y is up down 
+    std::cout << "determine direction " << std::endl;
+    std::cout << "position is " << position_.x << ", " << position_.y << std::endl;
+    std::cout << "target is " << target.x << ", " << target.y << std::endl;
     if(position_.x < target.x){
         // moving right
+        std::cout << " pos x < target x " << std::endl;
         direction_scalar_ = level_config::direction_scalars[level_config::directions::right];
+        return;
     }
     else if(position_.x > target.x){
+        std::cout << " pos x > target x " << std::endl;
         // moving left
         direction_scalar_ = level_config::direction_scalars[level_config::directions::left];
+        return;
     }
     else if(position_.y < target.y){
+        std::cout << " pos y < target y " << std::endl;
         // moving down 
         direction_scalar_ = level_config::direction_scalars[level_config::directions::down];
+        return;
     }
     else if(position_.y > target.y){
         // moving up
+        std::cout << " pos y > target y " << std::endl;
         direction_scalar_ = level_config::direction_scalars[level_config::directions::up];
+        return;
     }
 }
 // ------------------------------- builder ------------------------------- //

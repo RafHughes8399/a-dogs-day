@@ -26,7 +26,7 @@ namespace hitbox{
             std::vector<Rectangle> get_sub_boxes();
             const Rectangle& get_box() const;
             Rectangle get_sub_box(size_t index);
-            void update(Vector2 delta);    
+            void update(Vector2 new_position);    
         private:
 
             bool check_collision_box_sub_boxes(const Rectangle& box, const std::vector<Rectangle>& other_boxes);

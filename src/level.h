@@ -91,13 +91,13 @@ namespace level{
             int num_edges();
             int num_edges_from(node & node);
             
-            int position_to_node(Vector2 position, bool snap_before);
+            int position_to_node(Vector2 position, Vector2 direction);
             
             std::vector<edge> edges();
             std::vector<edge> edges_from_node(node& node);
             std::vector<node> nodes();
             
-            std::vector<Vector2> find_path(Vector2 start, Vector2 end);
+            std::vector<Vector2> find_path(Vector2 start, Vector2 end, Vector2 direction);
             
             void insert_node(int id, Vector2 position);
             void insert_edge(int source_num, node& destination, float weight);
