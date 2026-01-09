@@ -6,7 +6,7 @@ void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& oth
 
     // cast to a player dog 
     // a bit if elsey but not sure otherwise
-    if(entities::player_dog* dog_cast = dynamic_cast<entities::player_dog*>(&other)){
+     if(entities::player_dog* dog_cast = dynamic_cast<entities::player_dog*>(&other)){
         // I need the dog id, and need to update the player's selected dog id
         auto dog_id = dog_cast->get_id();
 
@@ -14,7 +14,7 @@ void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& oth
         std::unique_ptr<events::event> selected_dog = std::make_unique<events::selected_dog>(dog_id);
         event_interface::execute_event(*selected_dog);
 
-    }
+    } 
     
 }
 void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
@@ -32,21 +32,21 @@ int entities::cursor::update(float delta){
     position_ =  GetMousePosition();
 
     if(! Vector2Equals(old_position, position_)) {
-        hitbox_.update(position_);
+        hitboxes_[sprite_index_].update(position_);
 
         // create the query and execute it
 
         // TODO change how this works to test your interaction theory  !
-        std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(hitbox_, id_);
+        std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(hitboxes_[sprite_index_], id_);
         // the listener (singular) does something with the query and returns the information
         bool is_colliding = queries::bool_executor_.execute_query(*colliding_query);
         //bool is_colliding = query_interface::execute_query(*colliding_query);
         if(is_colliding){
             // switch to colliding 
-            sprite_.get_animation().goto_animation(animation_tags::hover);
+            sprites_[sprite_index_].get_animation().goto_animation(animation_tags::hover);
         }
         else{
-            sprite_.get_animation().goto_animation(animation_tags::base);
+            sprites_[sprite_index_].get_animation().goto_animation(animation_tags::base);
             // switch to default anim
         }
         
@@ -74,7 +74,7 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
     // ! lets test this theory
     // ! your theory was correct yay, i think, do one more test 
     // create the interaction event
-    std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, hitbox_);
+    std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, hitboxes_[sprite_index_]);
     event_interface::execute_event(*interaction_event);
     // then return to default interaciton
     interaction_strategy_ = std::make_unique<default_strategy>();
@@ -105,7 +105,7 @@ void entities::cursor::on_right_mouse_click_event(const events::right_mouse_clic
 }
 // -------------------------------- paw mark --------------------------------//
 int entities::paw_mark::update(float delta){
-    auto& animation = sprite_.get_animation();
+    auto& animation = sprites_[sprite_index_].get_animation();
     animation.next_frame(false);
     auto new_frame = animation.get_current_frame();
 
@@ -125,13 +125,16 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2
     auto cursor_texture = textures::textures_.get_texture(textures::cursor, assets_config::cursor_path);
     auto cursor_hitbox = hitbox::h_builder_.build_cursor_hitbox(position);
     // otherwise load it 
-    return std::make_unique<entities::cursor>(
-        sprite::sprite(cursor_texture, 
+    auto cursor_sprite = sprite::sprite(cursor_texture, 
         assets_config::cursor_attributes[assets_config::attributes::frame_width],
         assets_config::cursor_attributes[assets_config::attributes::frame_height],
         assets_config::cursor_attributes[assets_config::attributes::frames],
-        assets_config::cursor_attributes[assets_config::attributes::animations]),
-        cursor_hitbox, 
+        assets_config::cursor_attributes[assets_config::attributes::animations]);
+    auto sprites = std::vector<sprite::sprite>{cursor_sprite};
+    auto hitboxes = std::vector<hitbox::hitbox>{cursor_hitbox};
+    return std::make_unique<entities::cursor>(
+        sprites,
+        hitboxes,
         GetMousePosition(),
         id
     );
@@ -139,13 +142,18 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2
 std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vector2 position, int id){
     auto paw_texture = textures::textures_.get_texture(textures::paw_mark, assets_config::paw_mark_path); 
     auto paw_hitbox = hitbox::h_builder_.build_paw_mark_hitbox(position);
-    return std::make_unique<entities::paw_mark>(
-        sprite::sprite(paw_texture,
+    auto paw_sprite =         sprite::sprite(paw_texture,
         assets_config::paw_mark_attributes[assets_config::attributes::frame_width],
         assets_config::paw_mark_attributes[assets_config::attributes::frame_height],
         assets_config::paw_mark_attributes[assets_config::attributes::frames],
-        assets_config::paw_mark_attributes[assets_config::attributes::animations]),
-        paw_hitbox,
+        assets_config::paw_mark_attributes[assets_config::attributes::animations]);
+
+
+    auto sprites = std::vector<sprite::sprite>{paw_sprite};
+    auto hitboxes = std::vector<hitbox::hitbox>{paw_hitbox};
+    return std::make_unique<entities::paw_mark>(
+        sprites, 
+        hitboxes,
         position,
         id
     );

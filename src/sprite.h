@@ -28,6 +28,8 @@ namespace sprite{
             Texture2D sprite_texture_; 
             // and the animation
     };
+
+    // a sprite should have multiple textures, up to 4 (up down left right)
     // potential use for displaying things like shop items
     // i.e all the hats exist on one sprite sheet, then the shop displays them, idk more thought needded
     class spritesheet{

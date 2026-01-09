@@ -11,6 +11,9 @@
 #include "events_interface.h"
 #include "raylib.h"
 #include "sprite.h"
+
+#include <map>
+#include <functional>
 namespace player{
     enum mouse{
         left_mouse = 0,
@@ -30,10 +33,11 @@ namespace player{
                 event_interface::unsubscribe<events::selected_dog>(select_dog_handler_);
             }
             player()
-            : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_controls_(),
-            selected_dog_(-1),
+            : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_controls_({}),
+            selected_dog_(level_config::mack_id),
             select_dog_handler_([this](const events::selected_dog& event) -> void{on_selected_dog(event);}){
                 event_interface::subscribe(select_dog_handler_);
+                
             };
             player(const player& other) = default;
             player(player&& other) = default;
@@ -57,7 +61,7 @@ namespace player{
             int selected_dog_;
             
             std::vector<int> mouse_controls_; 
-            std::vector<int> key_controls_; 
+            std::map<int, std::function<void()>> key_controls_; 
             Vector2 mouse_position_;
             
     };

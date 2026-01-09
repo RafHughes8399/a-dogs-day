@@ -43,6 +43,14 @@ void player::player::update(float delta){
     else {
         // set default state
     }
+    // check if any keys are pressed
+    for(auto & key : key_controls_){
+        if(IsKeyPressed(key.first)){
+            // do key thing
+            auto key_function = key.second;
+            key_function();
+        }
+    }
     return;
 }
 void player::player::render(){

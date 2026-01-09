@@ -2,17 +2,17 @@
 #include <iostream>
 // --------------------------- entity --------------------------- // 
 bool entities::entity::check_collision(const hitbox::hitbox other){
-    return hitbox_.check_collision(other);
+    return hitboxes_[sprite_index_].check_collision(other);
 }
 int entities::entity::get_id(){
     return id_;
 }
 hitbox::hitbox& entities::entity::get_hitbox(){
-    return hitbox_;
+    return hitboxes_[sprite_index_];
 }
 
-sprite::sprite& entities::entity::get_sprite(){
-    return sprite_;
+std::vector<sprite::sprite>& entities::entity::get_sprites(){
+    return sprites_;
 }
 
 Vector2 entities::entity::get_position(){
@@ -20,8 +20,8 @@ Vector2 entities::entity::get_position(){
 }
 
 void entities::entity::render(){
-    sprite_.render(position_);
-    auto box = hitbox_.get_box();
+    sprites_[sprite_index_].render(position_);
+    auto box = hitboxes_[sprite_index_].get_box();
     DrawRectangleLines(box.x, box.y, box.width, box.height, GREEN);
 }
 
