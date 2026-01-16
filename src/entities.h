@@ -125,17 +125,17 @@ namespace entities{
             };
                 ~cursor() {
                     event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
-                    event_interface::unsubscribe<events::left_mouse_down>(left_mouse_down_handler_);
+                    event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 }
                 cursor(std::vector<sprite::sprite>& sprites, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
                 : entity(sprites, hitboxes, position, id), 
                 left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
-                left_mouse_down_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_down_event(event);}),
+                move_view_frame_handler_([this](const events::move_view_frame& event) -> void{on_move_view_frame_event(event);}),
                 right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_click_event(event);}),
                 interaction_strategy_(std::make_unique<default_strategy>()){
                     event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
-                    event_interface::subscribe<events::left_mouse_down>(left_mouse_down_handler_);
+                    event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 };
                 cursor(const cursor& other) = default;
@@ -149,7 +149,7 @@ namespace entities{
                 
                 void interact(entity& other) override;            
                 void on_left_mouse_click_event(const events::left_mouse_click& event);
-                void on_left_mouse_down_event(const events::left_mouse_down& event);
+                void on_move_view_frame_event(const events::move_view_frame& event);
                 void on_right_mouse_click_event(const events::right_mouse_click& event);                
             private:
                 enum animation_tags{
@@ -157,7 +157,7 @@ namespace entities{
                         hover = 1
                 };
                 events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
-                events::event_handler<events::left_mouse_down> left_mouse_down_handler_;
+                events::event_handler<events::move_view_frame> move_view_frame_handler_;
                 events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
 
                 std::unique_ptr<interaction_strategy> interaction_strategy_;
@@ -193,12 +193,53 @@ namespace entities{
      */
     class player_dog : public entity{
         public:
+            class state{
+                public:
+                    virtual ~state() = default;
+                    state() {};
+                    state(const state& other) = default;
+                    state(state&& other) = default;
+
+                    state& operator=(const state& other) = default;
+                    state& operator=(state&& other) = default;
+
+                    virtual void render(player_dog& dog) = 0;
+
+            };
+            class selected : public state {
+                public:
+                
+                    virtual ~selected() = default;
+                    selected() {};
+                    selected(const selected& other) = default;
+                    selected(selected&& other) = default;
+
+                    selected& operator=(const selected& other) = default;
+                    selected& operator=(selected&& other) = default;
+
+                    void render(player_dog& dog) override;
+
+            }; 
+            class unselected : public state{
+                public:
+                    virtual ~unselected() = default;
+                    unselected() {};
+                    unselected(const unselected& other) = default;
+                    unselected(unselected&& other) = default;
+
+                    unselected& operator=(const unselected& other) = default;
+                    unselected& operator=(unselected&& other) = default;
+
+                    void render(player_dog& dog) override;
+            };
+            
             ~player_dog(){
                 event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
             }
-            player_dog(std::vector<sprite::sprite>& sprites, std::vector<sprite::sprite> outlines, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
+            player_dog(std::vector<sprite::sprite>& sprites, std::vector<sprite::sprite> outlines, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id,
+            Vector2 direction = level_config::direction_scalars[level_config::directions::right], std::unique_ptr<player_dog::state> state = std::make_unique<unselected>())
             : entity(sprites, hitboxes, position, id), outlines_(outlines), cosmetics_({}), 
-            direction_scalar_(level_config::direction_scalars[level_config::directions::right]),
+            direction_scalar_(direction), selected_state_(std::move(state)),
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}){
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 sprite_index_ = level_config::directions::right;
@@ -213,13 +254,14 @@ namespace entities{
             Vector2 get_direction_scalar();
 
             void interact(entity& other) override;
+            void select();
+            void unselect();
             void render() override;
             void on_right_click_event(const events::right_mouse_click& event);
             void set_path(std::vector<Vector2>& path);
             // something for cosmetics
             
-            private:
-            
+        private:
             /**
              * setup a direction map to a scalar vector
              * so up = {0, -1}
@@ -233,11 +275,10 @@ namespace entities{
 
             events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
             
-
+            std::unique_ptr<state> selected_state_;
             std::vector<sprite::sprite> outlines_;
             std::vector<sprite::sprite> cosmetics_;
             std::vector<Vector2> move_path_; // the prev array from the path algorithm
-            
             const Vector2 move_speed_ = assets_config::dog_move_speed; // TODO: specify move speed, in config file (28 . 12), in terms of a factor of edge weight (one tenth ? )
             Vector2 direction_scalar_;
 

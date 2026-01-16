@@ -8,6 +8,9 @@
 
 #include <vector>
 #include "raylib.h"
+namespace game_config {
+    inline const int twenty_seconds = 1200;
+}
 namespace level_config{
     // world dimensions
     inline float world_x = 4096.0f;
@@ -15,8 +18,12 @@ namespace level_config{
     
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder
+
     inline const size_t mack_id = 2;
     inline const size_t khiri_id = 1;
+
+    inline const Vector2 frame_move = Vector2{375, 375};
+
     enum draw_layers{
         background = 0,
         decoration = 1,
@@ -105,7 +112,11 @@ namespace controls_config{
     };
     inline std::vector<int> key_controls = std::vector<int>{KEY_F};
     enum key_hold_actions{
-        edit_mode = KEY_E
+        edit_mode = KEY_E,
+        move_down = KEY_DOWN,
+        move_up  = KEY_UP,
+        move_left = KEY_LEFT,
+        move_right = KEY_RIGHT
     };
     // ? antiicpating the need for multiple control schemes, one for the home level, and one for the 
     // ? resource collecting levels 

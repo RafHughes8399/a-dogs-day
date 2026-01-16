@@ -31,8 +31,25 @@ int entities::player_dog::update(float delta){
     return status_codes::nothing;
 }
 
+
+void entities::player_dog::select(){
+    selected_state_ = std::make_unique<selected>();
+}
+void entities::player_dog::unselect(){
+    selected_state_ = std::make_unique<unselected>();
+}
+void entities::player_dog::selected::render(player_dog& dog){
+    // draw the outlines
+    dog.outlines_[dog.sprite_index_].render(dog.position_);
+}
+void entities::player_dog::unselected::render(player_dog& dog){
+    // do nothing, already handled
+    (void) dog;
+    return;
+}
 void entities::player_dog::render(){
     entity::render();
+    selected_state_->render(*this);
 }
 
 Vector2 entities::player_dog::get_direction_scalar(){

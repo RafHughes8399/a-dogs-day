@@ -80,11 +80,11 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
     interaction_strategy_ = std::make_unique<default_strategy>();
 
 }
-void entities::cursor::on_left_mouse_down_event(const events::left_mouse_down& event){
+void entities::cursor::on_move_view_frame_event(const events::move_view_frame& event){
 
 
     // look, its left mouse down 
-    auto mouse_delta = event.get_mouse_delta();
+    auto mouse_delta = event.get_delta();
     auto new_position = Vector2Add(position_, mouse_delta);
     position_ = new_position;
     interaction_strategy_ = std::make_unique<left_click_strategy>();

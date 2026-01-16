@@ -107,18 +107,18 @@ namespace level{
         public :
         ~level(){
             event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
-            event_interface::unsubscribe<events::left_mouse_down>(left_mouse_down_handler_);
+            event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
             event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
             }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
             : background_(sprite), view_frame_(frame), dimensions_(dimensions), graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
             level_entities_(tree::quadtree(raglib::bounding_box_2{Vector2Zero(), dimensions})), id_entity_map_({}),
             left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
-            left_mouse_down_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_down_event(event);}),
+            move_view_frame_handler_([this](const events::move_view_frame& event) -> void{on_move_view_frame_event(event);}),
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);})
             {
                 event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
-                event_interface::subscribe<events::left_mouse_down>(left_mouse_down_handler_);
+                event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
             };
             level(const level& other) = default;
@@ -135,12 +135,12 @@ namespace level{
             int num_entities();
 
             void on_left_mouse_click_event(const events::left_mouse_click& event);
-            void on_left_mouse_down_event(const events::left_mouse_down& event);
+            void on_move_view_frame_event(const events::move_view_frame& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
         private :
             // event handlers
             events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
-            events::event_handler<events::left_mouse_down> left_mouse_down_handler_;
+            events::event_handler<events::move_view_frame> move_view_frame_handler_;
             events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
 
             level_graph graph_;

@@ -30,7 +30,7 @@ namespace events{
 	// an enum ID for event types
 	enum ids{
 		test = 0,
-		left_mouse_d = 1,
+		move_frame = 1,
 		right_mouse = 2,
 		left_mouse = 3,
 		move = 4,
@@ -82,20 +82,20 @@ namespace events{
 
 	};
 	// ------------------------- mouse events  ------------------------- //
-	class left_mouse_down : public event{
+	class move_view_frame : public event{
 		public:
-			~left_mouse_down() = default;
-			left_mouse_down(Vector2 delta)
-			: event(ids::left_mouse_d), mouse_delta_(delta){};
+			~move_view_frame() = default;
+			move_view_frame(Vector2 delta)
+			: event(ids::move_frame), delta_(delta){};
 
 			static const int get_static_type(){
-				return ids::left_mouse_d;
+				return ids::move_frame;
 			}
-			Vector2 get_mouse_delta() const{
-				return mouse_delta_;
+			Vector2 get_delta() const{
+				return delta_;
 			}
 		private:
-			Vector2 mouse_delta_;
+			Vector2 delta_;
 	};
 	class left_mouse_click : public event{
 		public:

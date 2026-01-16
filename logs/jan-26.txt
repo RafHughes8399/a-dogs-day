@@ -61,3 +61,21 @@ steps :
 the parameter with a default value )
 -> drawing the outline of the selected dog 
 -> key input and controls
+
+
+
+state patterns for 
+    -> dog selection
+    -> cursor animation 
+    -> animations in general 
+
+game frame counts, and animtation play speeds
+
+switch player controls from mouse dragging to arrows
+
+TODO select a dog for the player upon building
+
+need to rethink how dogs are selected, 
+first requires key inputs 
+
+the id queue thing for the tree

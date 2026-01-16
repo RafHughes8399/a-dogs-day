@@ -478,12 +478,11 @@ void level::level::on_left_mouse_click_event(const events::left_mouse_click& eve
 
     return;
 }
-void level::level::on_left_mouse_down_event(const events::left_mouse_down& event){
-    auto delta = event.get_mouse_delta();
-    auto frame_delta = Vector2Scale(delta, -1); 
+void level::level::on_move_view_frame_event(const events::move_view_frame& event){
+    auto delta = event.get_delta();
 
-    view_frame_.x = Clamp(view_frame_.x + frame_delta.x, 0.0, level_config::world_x - GetScreenWidth());
-    view_frame_.y = Clamp(view_frame_.y + frame_delta.y, 0.0, level_config::world_y - GetScreenHeight());
+    view_frame_.x = Clamp(view_frame_.x + delta.x, 0.0, level_config::world_x - GetScreenWidth());
+    view_frame_.y = Clamp(view_frame_.y + delta .y, 0.0, level_config::world_y - GetScreenHeight());
 
     
 }
