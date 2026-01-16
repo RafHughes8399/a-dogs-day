@@ -40,29 +40,29 @@ namespace events{
 		size = 8
 	};
 	class event{
-	protected:
-		bool handled_ = false;
-		const int type_;
-		float delay_; // potential execution delay for the event, i.e an event 
-		// can take palce 10s after another,
-	public:
-		virtual ~event() = default;	
-		event(int id, float delay=0.0f)
-		: type_(id), handled_(false), delay_(delay){};
-		
-		event(event&& other) = default;
-		event& operator=(event&& other) = default;
-		
-		bool is_handled(){
-			return handled_;
-		}
-		const int get_type() const{
-				return type_;
-		}
-		bool update_delay(float delta){
-			delay_ = std::max(0.0f, delay_ - delta);
-			return delay_ == 0;
-		}
+		protected:
+			bool handled_ = false;
+			const int type_;
+			float delay_; // potential execution delay for the event, i.e an event 
+			// can take palce 10s after another,
+		public:
+			virtual ~event() = default;	
+			event(int id, float delay=0.0f)
+			: type_(id), handled_(false), delay_(delay){};
+			
+			event(event&& other) = default;
+			event& operator=(event&& other) = default;
+			
+			bool is_handled(){
+				return handled_;
+			}
+			const int get_type() const{
+					return type_;
+			}
+			bool update_delay(float delta){
+				delay_ = std::max(0.0f, delay_ - delta);
+				return delay_ == 0;
+			}
 	};
 
 	class test_event : public  event{
@@ -81,22 +81,22 @@ namespace events{
 		std::time_t time_;
 
 	};
-	// ------------------------- mouse events  ------------------------- //
 	class move_view_frame : public event{
 		public:
-			~move_view_frame() = default;
-			move_view_frame(Vector2 delta)
-			: event(ids::move_frame), delta_(delta){};
-
-			static const int get_static_type(){
-				return ids::move_frame;
-			}
-			Vector2 get_delta() const{
-				return delta_;
-			}
+		~move_view_frame() = default;
+		move_view_frame(Vector2 delta)
+		: event(ids::move_frame), delta_(delta){};
+		
+		static const int get_static_type(){
+			return ids::move_frame;
+		}
+		Vector2 get_delta() const{
+			return delta_;
+		}
 		private:
-			Vector2 delta_;
+		Vector2 delta_;
 	};
+	// ------------------------- mouse events  ------------------------- //
 	class left_mouse_click : public event{
 		public:
 			~left_mouse_click() = default;

@@ -48,13 +48,13 @@ namespace player{
             ~player(){
                 event_interface::unsubscribe<events::selected_dog>(select_dog_handler_);
             }
-            player()
+            player(int selected_dog = level_config::mack_id)
             : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_press_controls_({}),
-            key_hold_controls_({}), selected_dog_(level_config::mack_id),
+            key_hold_controls_({}), selected_dog_(selected_dog),
             select_dog_handler_([this](const events::selected_dog& event) -> void{on_selected_dog(event);}){
                 event_interface::subscribe(select_dog_handler_);
-                // select_dog(mack_id)
                 setup_control_maps();
+                select_dog();
 
             };
             player(const player& other) = default;
@@ -69,6 +69,8 @@ namespace player{
             void open_menu();
             void open_quests();
             void open_shop();
+            
+            void select_dog();
             void switch_dog();
 
             void on_selected_dog(const events::selected_dog& event);

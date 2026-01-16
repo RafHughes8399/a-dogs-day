@@ -59,6 +59,16 @@ void entities::player_dog::interact(entity& other){
     (void) other;
     return;
 }
+
+void entities::player_dog::on_dog_select_event(const events::selected_dog& event){
+    auto dog_id = event.get_id();
+    if(dog_id == id_){
+        select();
+    }
+    else{
+        unselect();
+    }
+}
 void entities::player_dog::on_right_click_event(const events::right_mouse_click& event){
     auto destination = event.get_mouse_position();
     // update the dog's movement path, query the level graph

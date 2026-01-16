@@ -19,7 +19,7 @@ namespace level_config{
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder
 
-    inline const size_t mack_id = 2;
+    inline const size_t mack_id = 0;
     inline const size_t khiri_id = 1;
 
     inline const Vector2 frame_move = Vector2{375, 375};

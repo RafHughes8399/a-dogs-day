@@ -1,8 +1,9 @@
 #include "game.h"
 
 void game::game::update(float delta){
-    // update the level
+    // deal with queued events 
     events::global_dispatcher_.process_events(delta);
+    // update the level
     level_.update(delta);
     // then the player
     player_.update(delta);
@@ -14,7 +15,6 @@ void game::game::update(float delta){
         frame_count_ = 0;
     }
 
-    // deal with the event queue
     return;
 }
 

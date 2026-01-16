@@ -78,4 +78,13 @@ TODO select a dog for the player upon building
 need to rethink how dogs are selected, 
 first requires key inputs 
 
-the id queue thing for the tree
+
+-> the id queue thing for the tree
+-> dog selection with keys
+    -> start off with a default dog selected
+    -> upon dog selection, the state is changed on both 
+
+-> reintroduce the render predicate too
+-> fix the path finding
+-> id queue for the tree 
+-> animation play speeds

@@ -235,14 +235,17 @@ namespace entities{
             
             ~player_dog(){
                 event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
+                event_interface::unsubscribe<events::selected_dog>(selected_dog_handler_);
             }
             player_dog(std::vector<sprite::sprite>& sprites, std::vector<sprite::sprite> outlines, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id,
-            Vector2 direction = level_config::direction_scalars[level_config::directions::right], std::unique_ptr<player_dog::state> state = std::make_unique<unselected>())
+            int direction = level_config::directions::right, std::unique_ptr<player_dog::state> state = std::make_unique<unselected>())
             : entity(sprites, hitboxes, position, id), outlines_(outlines), cosmetics_({}), 
-            direction_scalar_(direction), selected_state_(std::move(state)),
-            right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}){
+            direction_scalar_(level_config::direction_scalars[direction]), selected_state_(std::move(state)),
+            right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}),
+            selected_dog_handler_([this](const events::selected_dog& event)->void {on_dog_select_event(event);}){
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
-                sprite_index_ = level_config::directions::right;
+                event_interface::subscribe<events::selected_dog>(selected_dog_handler_);
+                sprite_index_ = direction;
             };
             player_dog(const player_dog& other) = default;
             player_dog(player_dog&& other) = default;
@@ -257,9 +260,10 @@ namespace entities{
             void select();
             void unselect();
             void render() override;
+            void on_dog_select_event(const events::selected_dog& event);
             void on_right_click_event(const events::right_mouse_click& event);
             void set_path(std::vector<Vector2>& path);
-            // something for cosmetics
+
             
         private:
             /**
@@ -274,7 +278,8 @@ namespace entities{
             void draw_path();
 
             events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
-            
+            events::event_handler<events::selected_dog> selected_dog_handler_;
+
             std::unique_ptr<state> selected_state_;
             std::vector<sprite::sprite> outlines_;
             std::vector<sprite::sprite> cosmetics_;

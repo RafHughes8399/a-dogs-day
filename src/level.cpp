@@ -516,18 +516,24 @@ level::level level::level_builder::build_main_level(){
     auto dimensions = Vector2{level_config::world_x, level_config::world_y};
 
     auto l = level(background, view_frame, dimensions);
+    
 
-    // append the cursor
+    // 0 
+    auto mack = entities::e_builder.build_mack(Vector2 {level_config::edge_weight * 7, level_config::edge_weight * 4}, l.entity_id());
+    l.add_entity(std::move(mack), level_config::draw_layers::dogs);
+
+
+    // 1
+    auto khiri = entities::e_builder.build_khiri(Vector2 {level_config::edge_weight * 4, static_cast<float>(level_config::edge_weight * 3.5)}, l.entity_id());
+    l.add_entity(std::move(khiri), level_config::draw_layers::dogs);
+
+    // 2
+    //  append the cursor
     auto cursor = entities::e_builder.build_cursor(GetMousePosition(), l.entity_id());
     l.add_entity(std::move(cursor), level_config::draw_layers::cursor);
     
     // and the dogs
     // TODO change the positions
 
-    auto khiri = entities::e_builder.build_khiri(Vector2 {level_config::edge_weight * 4, static_cast<float>(level_config::edge_weight * 3.5)}, l.entity_id());
-    l.add_entity(std::move(khiri), level_config::draw_layers::dogs);
-    
-    auto mack = entities::e_builder.build_mack(Vector2 {level_config::edge_weight * 7, level_config::edge_weight * 4}, l.entity_id());
-    l.add_entity(std::move(mack), level_config::draw_layers::dogs);
     return l;
 }

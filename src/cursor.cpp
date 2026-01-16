@@ -2,7 +2,6 @@
 
 // -------------------------------- interaction states --------------------------------//
 void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){
-    std::cout << "left click interaction " << std::endl;
 
     // cast to a player dog 
     // a bit if elsey but not sure otherwise
@@ -10,7 +9,6 @@ void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& oth
         // I need the dog id, and need to update the player's selected dog id
         auto dog_id = dog_cast->get_id();
 
-        // TODO create select dog event 
         std::unique_ptr<events::event> selected_dog = std::make_unique<events::selected_dog>(dog_id);
         event_interface::execute_event(*selected_dog);
 
@@ -18,11 +16,9 @@ void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& oth
     
 }
 void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
-    std::cout << "right click interaction " << std::endl;
     
 }
 void entities::cursor::default_strategy::interact(cursor& cursor, entity& other){
-    std::cout << "default click interaction " << std::endl;
     
 }
 // -------------------------------- cursor --------------------------------//

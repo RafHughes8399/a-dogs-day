@@ -23,7 +23,6 @@ void player::player::setup_control_maps(){
 void player::player::on_selected_dog(const events::selected_dog& event){
     auto id = event.get_id();
     selected_dog_ = id;
-
 }
 
 void player::player::move(Vector2 direction_scalar, float delta){
@@ -36,22 +35,34 @@ void player::player::move(Vector2 direction_scalar, float delta){
 }
 
 // TODO implement all 
+void player::player::select_dog(){
+    std::unique_ptr<events::event> select_dog_event = std::make_unique<events::selected_dog>(selected_dog_);
+    event_interface::queue_event(select_dog_event);
+}
 void player::player::switch_dog(){
+    std::cout << "switch dog " << std::endl;
+    selected_dog_ ^= 1; // flip the dog id 
+    select_dog();
     return;
 }
 void player::player::open_inventory(){
+    std::cout << "open inventory" << std::endl;
     return;
 }
 void player::player::open_map(){
+    std::cout << "open map" << std::endl;
     return;
 }
 void player::player::open_menu(){
+    std::cout << "open menu" << std::endl;
     return;
 }
 void player::player::open_quests(){
+    std::cout << "open quest" << std::endl;
     return;
 }
 void player::player::open_shop(){
+    std::cout << "open shop" << std::endl;
     return;
 }
 
