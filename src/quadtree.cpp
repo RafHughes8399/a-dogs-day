@@ -452,17 +452,3 @@ void tree::quadtree::identify_collisions(std::unique_ptr<node>& tree , std::vect
         identify_collisions(child, parent_entities);
     });
 }
-void tree::quadtree::render(std::unique_ptr<node>& tree){
-    // if null tree skip 
-    if(! tree){
-        return; 
-    }
-    // if tree in bounds, render objects 
-    for(auto & object : tree->objects_){
-            object->render();
-    }
-    // then iterate through children, only render those in bounds
-    for(auto & child : tree->children_){
-        render(child);
-    }
-}

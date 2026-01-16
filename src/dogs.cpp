@@ -38,18 +38,19 @@ void entities::player_dog::select(){
 void entities::player_dog::unselect(){
     selected_state_ = std::make_unique<unselected>();
 }
-void entities::player_dog::selected::render(player_dog& dog){
+void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position){
     // draw the outlines
-    dog.outlines_[dog.sprite_index_].render(dog.position_);
+    dog.outlines_[dog.sprite_index_].render(draw_position);
 }
-void entities::player_dog::unselected::render(player_dog& dog){
+void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_position){
     // do nothing, already handled
     (void) dog;
+    (void) draw_position;
     return;
 }
-void entities::player_dog::render(){
-    entity::render();
-    selected_state_->render(*this);
+void entities::player_dog::render(Vector2 draw_position){
+    entity::render(draw_position);
+    selected_state_->render(*this, draw_position);
 }
 
 Vector2 entities::player_dog::get_direction_scalar(){

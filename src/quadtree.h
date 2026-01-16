@@ -79,24 +79,9 @@ namespace tree{
         void insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object);
         void perform_interactions(std::unique_ptr<node>& tree, entities::entity* entity);
         void prune_leaves(std::unique_ptr<node>& tree, double delta);
-        void render(std::unique_ptr<node>& tree);
         void traverse_tree(std::unique_ptr<node>& tree);
         std::vector<int> update(std::unique_ptr<node>& tree, float delta);
 
-        template<typename UnaryPred>
-        void render(std::unique_ptr<node>& tree, UnaryPred p){
-            if(not tree){
-                return;
-            }
-            for(auto & entity : tree->objects_){
-                if(p(entity)){
-                    entity->render();
-                }
-            }
-            for(auto & child : tree->children_){
-                render(child, p);
-            }
-        }
         public:
         // CONSTRUCTORS
         ~quadtree() {
@@ -246,15 +231,7 @@ namespace tree{
         void traverse_tree(){
             traverse_tree(root_);
         }
-        // update and render
-        // render the tree within a certain bounding box, default is the whole tree
-        void render(){
-            render(root_);
-        }
-        template<typename UnaryPred>
-        void render(UnaryPred p){
-            render(root_, p);
-        }
+
         std::vector<int> update(float delta){
             auto to_remove = update(root_, delta);
             auto parent_objects = std::vector<entities::entity*>{};

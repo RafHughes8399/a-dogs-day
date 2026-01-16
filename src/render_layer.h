@@ -26,11 +26,14 @@ namespace render_layer{
             void remove_entities(std::vector<int> entity_ids);
 
             template<typename UnaryPred>
-            void draw(UnaryPred p){
+            void draw(UnaryPred p, Vector2 frame_position){
                 for(auto & entity : entities_){
                     if(p(entity)){
-                        std::cout << "fits " << std::endl;
-                        entity->render(); 
+
+                        auto position = entity->get_position();
+                        auto draw_position = Vector2Subtract(entity->get_position(), frame_position);
+
+                        entity->render(draw_position); 
                     }
                 }
             }

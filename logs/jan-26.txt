@@ -87,5 +87,6 @@ first requires key inputs
 -> reintroduce the render predicate too
     -> debug
 -> fix the path finding
+    -> don't explore edges that go in the wrong direction
 -> id queue for the tree 
 -> animation play speeds

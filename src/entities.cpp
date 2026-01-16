@@ -19,10 +19,10 @@ Vector2 entities::entity::get_position(){
     return position_;
 }
 
-void entities::entity::render(){
-    sprites_[sprite_index_].render(position_);
+void entities::entity::render(Vector2 draw_position ){
+    sprites_[sprite_index_].render(draw_position);
     auto box = hitboxes_[sprite_index_].get_box();
-    DrawRectangleLines(box.x, box.y, box.width, box.height, GREEN);
+    DrawRectangleLines(draw_position.x, draw_position.y, box.width, box.height, GREEN);
 }
 
 

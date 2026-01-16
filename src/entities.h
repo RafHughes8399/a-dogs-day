@@ -45,7 +45,7 @@ namespace entities{
             Vector2 get_position();
             int get_id();
 
-            virtual void render();
+            virtual void render(Vector2 draw_position);
 
             virtual int update(float delta){
                 (void) delta;
@@ -203,7 +203,7 @@ namespace entities{
                     state& operator=(const state& other) = default;
                     state& operator=(state&& other) = default;
 
-                    virtual void render(player_dog& dog) = 0;
+                    virtual void render(player_dog& dog, Vector2 draw_position) = 0;
 
             };
             class selected : public state {
@@ -217,7 +217,7 @@ namespace entities{
                     selected& operator=(const selected& other) = default;
                     selected& operator=(selected&& other) = default;
 
-                    void render(player_dog& dog) override;
+                    void render(player_dog& dog, Vector2 draw_position) override;
 
             }; 
             class unselected : public state{
@@ -230,7 +230,7 @@ namespace entities{
                     unselected& operator=(const unselected& other) = default;
                     unselected& operator=(unselected&& other) = default;
 
-                    void render(player_dog& dog) override;
+                    void render(player_dog& dog, Vector2 draw_position) override;
             };
             
             ~player_dog(){
@@ -259,7 +259,7 @@ namespace entities{
             void interact(entity& other) override;
             void select();
             void unselect();
-            void render() override;
+            void render(Vector2 draw_position) override;
             void on_dog_select_event(const events::selected_dog& event);
             void on_right_click_event(const events::right_mouse_click& event);
             void set_path(std::vector<Vector2>& path);
