@@ -1,9 +1,4 @@
 #include "render_layer.h"
-void render_layer::layer::draw(){
-    for(auto & entity : entities_){
-        entity->render();
-    }
-}
 
 void render_layer::layer::add_entity(entities::entity* entity){
     entities_.push_back(entity);

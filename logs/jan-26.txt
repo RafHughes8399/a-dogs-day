@@ -85,6 +85,7 @@ first requires key inputs
     -> upon dog selection, the state is changed on both 
 
 -> reintroduce the render predicate too
+    -> debug
 -> fix the path finding
 -> id queue for the tree 
 -> animation play speeds

@@ -25,8 +25,15 @@ namespace render_layer{
             void remove_entity(entities::entity* entity);
             void remove_entities(std::vector<int> entity_ids);
 
-            void draw();
-
+            template<typename UnaryPred>
+            void draw(UnaryPred p){
+                for(auto & entity : entities_){
+                    if(p(entity)){
+                        std::cout << "fits " << std::endl;
+                        entity->render(); 
+                    }
+                }
+            }
         private:
             std::vector<entities::entity*> entities_;
 

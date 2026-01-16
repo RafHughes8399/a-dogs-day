@@ -441,18 +441,27 @@ void level::level::render(){
     // draw the background 
     DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
     // draw the entities, based on the view frame
-    auto bounds = raglib::bounding_box_2{Vector2{view_frame_.x, view_frame_.y}, 
-    Vector2{view_frame_.x + view_frame_.width, view_frame_.y + view_frame_.height}};
-    auto render_precdicate = [bounds](auto & entity) -> bool { // auto is std::unique_ptr<entity>
-        bool b =  bounds.contains(entity->get_bounds());
-        return b;
+    
+    std::cout << "view frame : " << view_frame_.x << ", " << view_frame_.y << ", " << view_frame_.x + view_frame_.width << " , " << view_frame_.y + view_frame_.height << std :: endl;
+    
+    auto render_precdicate = [this](entities::entity*& entity) -> bool { // auto is std::unique_ptr<entity>
+        const Rectangle& entity_box = entity->get_hitbox().get_box();
+        auto position = entity->get_position();
+
+        std::cout << "entity : " << entity->get_id() << std::endl;
+        std::cout << "entity box : " << entity_box.x << ", " << entity_box.y << ", " << entity_box.x + entity_box.width << " , " << entity_box.y + entity_box.height << std :: endl;
+        return view_frame_.x <= entity_box.x && view_frame_.y <= entity_box.y 
+        && (view_frame_.x + view_frame_.width) >= (entity_box.x + entity_box.width) 
+        && (view_frame_.y + view_frame_.height) >= (entity_box.y + entity_box.height);
+
     };
     // ! there is a bug with the rendering predicate, will test and reincorporate at a later date
     // TODO fix that bug (12.11)
 
     for(size_t i = 0; i < level_config::draw_layers::size; ++i){
-        render_layers_[i].draw();
+        render_layers_[i].draw(render_precdicate);
     }
+
     return;
 }
 
