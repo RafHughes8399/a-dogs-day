@@ -1,11 +1,27 @@
 #include "level.h"
 
 // ----------------------------------------- level graph ----------------------------------------- //
+bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id){
+    Vector2 current_position = id_to_node(current_id)->position_;
+    Vector2 next_position = id_to_node(next_id)->position_;
+    Vector2 end_position = id_to_node(end_id)->position_;
+
+    auto current_end_distance = Vector2Distance(current_position, end_position);
+    auto next_end_distance = Vector2Distance(next_position, end_position);
+    return next_end_distance <= current_end_distance;
+
+}
+
 float level::level_graph::manhattan_distance_heurisitic(Vector2 a, Vector2 b){
     // abs a.x - b.x,  + abs a.y - b,y
     return std::abs(a.x - b.x) + std::abs(a.y - b.y);
 }
 
+
+level::level_graph::node* level::level_graph::id_to_node(int id){
+    // is it just as simple as 
+    return &graph_[id].first;
+}
 std::vector<int> level::level_graph::bfs(int start_id, int end_id){
     size_t visited_size = graph_.size();
     auto visited = std::vector<int>(visited_size, -1);
@@ -26,7 +42,10 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
         else{
             // for each outgoing edge from current 
             for(auto & edge : graph_[current].second){
-                if(visited[edge.destination_->id_] == -1){
+                // if not visited, and closer to the end 
+                // TODO and not "occupied", like not blocked by a decoration
+                // then explore
+                if(visited[edge.destination_->id_] == -1 && is_node_closer(current, edge.destination_->id_, end_id)){
                     visited[edge.destination_->id_] = current;
                     nodes.push(edge.destination_->id_);
                 }
@@ -89,6 +108,9 @@ int level::level_graph::categorise_node(int row, int column){
     else if(perimeter) {return nodes::perimeter;}
     else {return nodes::interior;}
 }
+
+
+
 int level::level_graph::num_nodes(){
     return graph_.size();
 }
@@ -100,7 +122,7 @@ int level::level_graph::num_edges_from(node & node){
     return 0;
 }
 
-// ok the problems are here 
+
 int level::level_graph::position_to_node(Vector2 position, Vector2 direction){
     
     float row_f = position.y / level_config::edge_weight;
@@ -383,7 +405,6 @@ void level::level_graph::build_edges(){
     return;
 }
 void level::level_graph::build_nodes(int level_x, int level_y){
-
     // goes across the row, and then down the column so you. a node can be found by
     // ! (row * row_length) + column
     int num_nodes = 0;
@@ -452,26 +473,15 @@ void level::level::render(){
         && (view_frame_.y + view_frame_.height) >= (entity_box.y + entity_box.height);
 
     };
-    // ! there is a bug with the rendering predicate, will test and reincorporate at a later date
-    // TODO fix that bug (12.11)
-    // TODO adjust the draw position of the entity 
-    // because the screen is 1920 * 1080 or whatever
-    // if the view frame goes beyond to be at position 2000, 1200,
-    // and you try to draw an entity at 2100, 1300, it wont work 
-    // instead you would have to draw it at 100, 100
-    // it is the difference between the enitty pos and the view_frame pos 
-    // but the actual entity pos remains the same
 
     for(size_t i = 0; i < level_config::draw_layers::size; ++i){
         render_layers_[i].draw(render_precdicate, Vector2{view_frame_.x, view_frame_.y});
     }
-
     return;
 }
 
 void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t layer){
     // make raw pointer and insert ot 
-    // TODO insert into the correct layer
     auto entity_raw = entity.get();
     level_entities_.insert(std::move(entity));
     // insert into the draw layer ?

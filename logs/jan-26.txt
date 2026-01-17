@@ -90,3 +90,18 @@ first requires key inputs
     -> don't explore edges that go in the wrong direction
 -> id queue for the tree 
 -> animation play speeds
+
+-> then decorations
+    -> placing 
+    -> rotating 
+    -> pathfinding around 
+
+    -> player deco inventory and stash
+    
+-> edit mode and moving
+
+
+
+for when decorations are implemented,
+often they are the thing that will be right clicked on,
+so pick a point on it to be the "interaction point" and the end of the path

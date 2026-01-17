@@ -43,11 +43,7 @@ namespace level_config{
     };
     inline const Vector2 direction_scalars[directions::directions_size] = {
         Vector2{0, -1}, // up 
-        // up-left
-        // up-right
         Vector2{0, 1},  // down
-        // down-left
-        // down-right
         Vector2{-1, 0}, // left
         Vector2{1, 0} // right
     };

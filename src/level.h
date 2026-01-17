@@ -52,7 +52,7 @@ namespace level{
                     return destination_ == other.destination_ && weight_ == other.weight_;
                 }
             };
-
+            bool is_node_closer(int current_id, int next_id, int end_id);
             std::vector<edge> build_corner_edges(int row, int column);
             std::vector<edge> build_interior_edges(int row, int column);
             std::vector<edge> build_perimeter_edges(int row, int column);
@@ -93,6 +93,8 @@ namespace level{
             
             int position_to_node(Vector2 position, Vector2 direction);
             
+            node* id_to_node(int id);
+
             std::vector<edge> edges();
             std::vector<edge> edges_from_node(node& node);
             std::vector<node> nodes();

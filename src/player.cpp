@@ -40,7 +40,6 @@ void player::player::select_dog(){
     event_interface::queue_event(select_dog_event);
 }
 void player::player::switch_dog(){
-    std::cout << "switch dog " << std::endl;
     selected_dog_ ^= 1; // flip the dog id 
     select_dog();
     return;
