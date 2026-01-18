@@ -24,7 +24,11 @@ namespace player{
 
     };
     class inventory{
-
+        public:
+        private:
+            // active 
+            // stashed
+            // decorations and hats
     };
     // also include at some point hud and inventory
     class player{
@@ -83,9 +87,9 @@ namespace player{
             /** 
              * 
              hud hud_;
-             inventory inventory_;
-            */
-
+             */
+            
+            inventory inventory_;
             void setup_control_maps();
             events::event_handler<events::selected_dog> select_dog_handler_;            
             int selected_dog_;

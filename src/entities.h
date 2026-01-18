@@ -289,6 +289,11 @@ namespace entities{
 
 
     };
+
+    class decoration : public entity {
+        public:
+        private:
+    };
     // ------------------ entity builder ------------------ //
     class entity_builder{
         public:
