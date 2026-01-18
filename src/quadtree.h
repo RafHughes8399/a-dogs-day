@@ -50,6 +50,7 @@ namespace tree{
         queries::query_handler<queries::is_colliding_query, bool> is_colliding_handler_;
 
         int max_depth_;
+        std::queue<size_t> next_ids_;
         size_t next_id_;
         std::unique_ptr<node> root_;
 
@@ -92,7 +93,7 @@ namespace tree{
         }
         // creates an empty quadtree with a root node
         quadtree(raglib::bounding_box_2 root_bounds, int depth=MAX_DEPTH)
-        : root_(std::make_unique<node>()), max_depth_(depth), next_id_(0),
+        : root_(std::make_unique<node>()), max_depth_(depth), next_id_(0), next_ids_(),
         interact_entity_handler_([this](const events::interact_entity& event) -> void {on_interact_event(event);}), 
         moved_entity_handler_([this](const events::move_entity& event) -> void {on_move_event(event);}), 
         removed_entity_handler_([this](const events::remove_entity& event) -> void {on_remove_event(event);}),
@@ -122,7 +123,7 @@ namespace tree{
         
         // copy and move overloads, root, depth and next id
         quadtree(const quadtree& other)
-        :  max_depth_(other.max_depth_), next_id_(other.next_id_), 
+        :  max_depth_(other.max_depth_), next_id_(other.next_id_), next_ids_(other.next_ids_),
         interact_entity_handler_(other.interact_entity_handler_), 
         moved_entity_handler_(other.moved_entity_handler_), 
         removed_entity_handler_(other.removed_entity_handler_),
@@ -177,7 +178,15 @@ namespace tree{
         }
         // height and size
         size_t get_next_id(){
-            return next_id_;
+            if(next_ids_.empty()){
+                return next_id_;
+            }
+            else{
+                size_t id = next_ids_.front();
+                next_ids_.pop();
+                return id;
+                // get the front of the queu 
+            }
         }    
         size_t num_nodes(){
             return num_nodes(root_);
@@ -199,10 +208,14 @@ namespace tree{
         }
         void erase(size_t id){
             erase(root_, id);
+            // add the id to the queue
+            next_ids_.push(id);
         }
         void insert(std::unique_ptr<entities::entity> obj) {
             insert(root_, std::move(obj));
-            next_id_ += 1;
+            if(next_ids_.empty()){
+                next_id_ += 1;
+            }
         }
 
         void on_interact_event(const events::interact_entity& event){
@@ -221,7 +234,7 @@ namespace tree{
         }
         void on_remove_event(const events::remove_entity& event){
             size_t id = event.get_id();
-            erase(root_, id);
+            erase(id);
         }
 
 

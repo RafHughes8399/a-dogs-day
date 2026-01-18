@@ -89,8 +89,10 @@ first requires key inputs
 -> fix the path finding
     -> don't explore edges that go in the wrong direction
 -> id queue for the tree 
+    -> and removing from the entity map
+    -> need to handle enqueuing the ids after they are "used"
 -> animation play speeds
-
+    -> pending animations though (not required just yet)
 -> then decorations
     -> placing 
     -> rotating 

@@ -391,7 +391,9 @@ std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta
             case entities::status_codes::dead:
                 // remove
                 to_remove.push_back((*it)->get_id());
+                next_ids_.push((*it)->get_id());
                 it = tree->objects_.erase(it);
+
                 break;
             case entities::status_codes::nothing:
                 ++it;
