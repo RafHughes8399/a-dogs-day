@@ -32,3 +32,82 @@ might be better ?
 collisions are checked every frame still though
 
 -> slight out of bounds issue with the cursor, it can go beyond, so clamp it ? 
+
+-> dogs and entitiy interaction 
+    -> dogs class
+    -> dog builders 
+    -> dog art
+    -> dog cursor controls
+        -> dog selection (and highlighting the selected one )
+        -> move to point
+    -> cursor interactions
+
+let's break it down 
+first, build the dogs
+second, be able to select the dogs, comprised of cursor interactions and prompts
+
+ok let's do that 
+     
+
+
+regarding interaction, start with a simple 
+if else dynamic cast thing for now, will work on a 
+more elegant solution later on
+
+consider a way for it to be turned off, i.e while interacting do this, while not do that
+
+and a way to select items
+
+ok kind of crazy idea, but dont query interactions every frame, rather interpret interactions as an event
+that could be created when an entity moves, because interactions can only occur when an entity moves into another
+
+
+-> implement queries
+-> adjust handler comparisons for events and queries
+-> setup cursor queries
+
+-> if I can template the handler over a query type,
+
+
+i do need a better way of setting handler ids for both events and entities 
+
+-> i think in the way that you have mov eevents nad upadtes you do for interactoin 
+=> the consideration is avoiding double ups ?
+-> well no because they enable both types of collision
+    -> is this entity colliding / no longer colliding with anything - like a state 
+    -> the exact entity it is colliding with, to then do something
+
+hold on you're doing something wrong
+-> the cursor creates a query, passing in the information 
+-> it is the tree that listens for the query, uses the bounds 
+and then returns the bool 
+
+
+-> basic rectangles for the dogs to test 
+-> draw cursor grabbing 
+-> test cursor interaction query and animation changing
+-> then dog selection highlight
+-> then dog pathfinding (a* and an event for getting the destination )
+
+-> i think i need to switch from bounds to rectangle for hitboxes, it just makes more sense 
+-> yeah i think there's some funky business there, just switch to rectangles bro
+-> can do hitboxes while you're at it too ig, may as well
+-> and draw the hitboxes while you're at it for debugging
+
+-> fix hit box when dragging x
+-> get these dog dimensions on lock 
+-> fix crash when collide 
+    -> i suspect the issue is in the hitbox method
+-> add render layers ? , like background, then deco, then stations, then dogs, then hud, then cursor 
+
+-> so currently rendering occurs in o(n) time, it iterates 
+-> the save in computation comes from the predicate that checks whether it should be rendered or not 
+-> the level should have a list of layers
+-> each layer has a raw pointer to an entity, the unique pointer still remains in the quadtree
+
+-> draw layers from background to foreground , still pass the predicate 
+
+
+
+-> impacts by mental health (i.e attentional disorders, memory disorders)
+-> and imapcts on mental health (i.e prolonged heightend cortiosl, reported less wellbeing)

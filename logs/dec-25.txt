@@ -1,0 +1,278 @@
+
+
+took a bit of a haitus but we're back yay 
+
+draw layers is up still right ?
+
+
+
+-> known draw issue with the dogs
+-> path finding
+
+-> learn a *
+
+-> bad cast on right click
+-> maybe an interaction thing ?, yes from the interactions
+
+consider the following 
+
+-> dog pathfinding
+-> selecting a dog (manage subscription based on left click interactions with player dogs, not on dog construction and destruction)
+-> giving the dog its destination
+
+
+first, dog selection,
+simple enough:
+    -> when a left click occurs:
+        -> do a collision check
+            -> if colliding: 
+                -> interact based on the entity type
+                    -> player dog is selected
+
+-> what does that mean; selected ? 
+-> player has a field like selected_dog_ which stores the id of the selected dog, which determines 
+
+
+
+player recognises the mouse click 
+creates an event for the level to find what the cursor is colliding with 
+the level finds what the cursor is colliding with 
+the level then notifies the player with the appropriate player dog id
+
+maybe instead of query returning a bool 
+the query can return a block of information
+
+those contents could be either
+
+
+there are two routes and you need to pick one of them instead of flipping between the two, its wasting time 
+
+one is the level way, two is the cursor query way
+
+the cursor query way does not necessarily work because of the information that the query can or cannot return
+so how can i change how the query information return works
+
+currently it only returns bool information, but what if I have it return an information class
+that is templated over some type 
+
+otherwise is there a way to make it so that a query can be tempalted over a return type ? 
+i.e
+
+template <typename T>
+class query information {
+
+    public :
+        // necessaru constructors 
+    T get_information
+    private:
+        T information
+}
+
+
+
+
+
+on the mouse left click, check if the cursor interacts with any of the dogs
+if it does, update the dog selected by the player 
+on mouse click -> query colliding entity -> update selected dog
+
+have your bool queries, your int queries, your entity* queries
+i guess you need sepearte handlers and executors
+
+just make those templated too and then define as you need ? 
+
+i need to extend the query system such that it can return multiple types 
+so temapltes 
+
+template the executor, handler interface and handler ? 
+
+
+temaplte everything 
+make an int query executor and handler
+query the id of the 
+
+change how ids work so that you always know what khiri and mack's id are
+and so that there are no duplicates
+
+
+just make a new set of queries aaaaaaaaaaa
+near future tasks 
+-> player dog selection
+
+ok lets move onto dog selection 
+the player, for the sake of the hud ? stores the dog id that is selected,
+sure lets say for the sake of the hud, but the sake of other things to, namely which 
+dog to move
+
+starts off as no dog being selected,
+
+when you click a dog it changes
+
+left clikc -> left click event -> cursor listens -> create interaction event -> quad tree listens, 
+takes the hitbox and id
+
+-> performs an interaction check with that id and hitbox
+-> checks the node the hitbox is in, and the id of the entity
+
+-> i think you have two conflicting systems ? 
+-> maybe conflicting is the wrong word 
+-> competing ? complementary systems, one is a system that allows for quick frame-update-based, and another that operates
+on event based interaction and update requests
+-> because if you had a map that mapped id to the entity pointer things would be so easy
+
+-> if the level managed an entity map, id -> entity*, it would make this process easier ig ?
+-> game this out what are your two ways 
+
+one is: 
+
+left click event creates an interaction event that the quad tree listens for. 
+the interaction event looks for an entities that interact with the entity and calls interact
+the interact function defines how the cursor would interact
+
+
+but the interaction behaviour depends on the type of interaction, is it a right click interaction, left click interaction or hover interaction
+
+another idea, the cursor has an interaction strategy that depends on its state, the state of the cursor is changed by control input
+left click -> left click state
+right click -> right click state (selecting entities to walk to and interact with other than a specific position)
+default -> hover state
+clcking changes the state for the frame, which then determines the interaction behaviour
+for the frame
+
+so the left click would:
+    -> update the cursor state,
+    -> create an interaction event that uses the quad tree to perform the interaction with whatever it is interacting 
+    with
+    -> the interaction (for left click), checks if interacting with dog, if so, then it creates an event to update the player selected dog, 
+    -> which is then used for when right clicks occur 
+    -> the right click creates an "pathfind" event, which gives the selected dog its required destination
+
+
+
+the level has an entity map that maps id to entity *, that could help with easily accessing entities
+
+
+so the interaction state for the cursor, 
+and the level map
+the cursor queries whatever it may be interacting with
+
+
+i definitely need the interaction state thing,
+lets do that now 
+
+
+you're losing grip i think on what you're actually trying to do holy nut dick balls 
+you query the dog id, but you need to check if it is a dog
+
+things are spinning my goodness, lay off the weed, your brain isn't working proper
+
+
+
+ok short list todo:
+level id-entity* map
+interaction state behaviour cursor
+the player dog has a field for interacting_with (id of entity it is interacting with)
+
+curently quadtree does not check for interactions every frame , it is only done based as per request
+
+
+YOU ARE DOING A REQUEST BASED INTERACTION SYSTEM, WHERE ONCE AN ENTITY MOVES IT QUERIES ANY POTENTIAL INTERACTIONS
+for now we know that khiri is 1, mack is 2
+
+check that state based interaction works 
+establish the interaction event
+
+
+-> ok the print statements work
+-> so lets make the logic work with selecting a dog
+
+
+other way around actually
+-> player dog pathfinding 
+-> player dog directing
+-> player dog art 
+
+-> basic hud outline 
+
+
+player dog pathfinding 
+
+-> player right clicks, has a dog selected
+-> queries the level graph to determine the path that the dog can take
+-> gets the path calculated from the graph
+-> gives it to the dog, the dog them moves according to the path and the speed, 
+-> if the path is empty it does not move, simple
+
+
+-> A* heuristic, prefer points to destination that are closer
+
+
+a star either based manhattan (up, down, left, right direction) or 
+diagonal, i think i ruled out diagonals because of the sheer art workload
+
+
+setup A*
+remove from map as well when entity is removed  
+-> make dogs and other things multiples of edge weights x 
+-> remove diagonal edges x 
+-> use manhattan distance formula for the heuristic x 
+-> implement A*
+    -> setup the event infrastrucutre and return architecture
+    -> essentually how other parts of the code will handle it before you actually implemtn the algo
+        -> what does that consist of ?
+-> for now no dog is selected on 
+
+-> i mean assuming that positions and move speeds are calcualted in terms of edge weight then at some point it will be equal ?
+'
+
+-> implement basic djikstra for testing purposes,
+    -> then A*
+    -> Then A* with a priority queue
+-> fix dog rendering
+-> remove entity from level id entity map
+
+
+
+-> check that id assignment works correctly, it is key to pathfinding
+-> id assignment works
+
+
+-> debug statements and test pathfind
+-> test pathfind 
+
+-> remove the start and end from the path
+-> find a way to highlight the path
+
+
+
+    -> i dont actually need the true start poistion in the path
+
+-> draw the path
+-> actually have the dog move, i think the dog path needs to be set ? 
+-> 
+
+
+-> an extension when incorporating other static entites (decorations, statitions, etc)
+    -> each will have a position and an interaction position
+    -> if they are right clicked on, then the end of the path becomes the interaction position
+    -> nodes should have an occupied field to determine if they can be traversed through
+    -> for now will allow dogs to pass through each other
+
+-> dog pathfinding
+    -> issues with hitbox and direction ?
+    -> issues are with the position to node and recognising when a position has been reached
+            -> look into the mod operator ? 
+            -> position reached i need to rework, the logic is just not there 
+            -> might need to bring back diagonal movement
+
+-> pathfinding 
+    -> reached position is incorrect
+    -> need diagonal edges and directino movement
+    
+-> dog art fix 
+-> basic decorations and stations outline
+    -> placing decorations and stations
+    -> cursor and dog interacting with stations 
+    -> cursor interactiosn with decorations 
+    -> nodes being "occupied" or blocked from moving through 
+-> basic hud outline 

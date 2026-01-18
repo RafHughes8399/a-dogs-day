@@ -1,0 +1,109 @@
+-> pathfinding 
+    -> reached position is incorrect
+    -> need diagonal edges and direction movement
+    -> otherwise I have to put in positions in the path
+        for example in the 700, 700 -> 704, 704
+    -> or is hte issue because the dogs are not on placed on multiples of edge weights 
+    -> i think you have to be strict about placement and movement, they have to move 
+    along multiples of edge weights
+
+    -> lets try this one first i think
+    -> then reintroduce  diagonals if that doesn't work
+    
+    -> ok that kind of worked
+    -> i think reached position is now the issue,
+    -> and direction selection 
+
+-> remove couts
+-> don't draw the grid 
+-> fix the dog art, proper sketches
+-> dog art fix 
+-> basic decorations and stations outline
+    -> placing decorations and stations
+    -> cursor and dog interacting with stations 
+    -> cursor interactiosn with decorations 
+    -> nodes being "occupied" or blocked from moving through 
+-> basic hud outline 
+
+
+
+-> some issue with the position to node 
+
+-> get the dog art in place
+-> get the oulines too
+-> change to a key input (like f)
+
+
+steps : 
+    -> change khiri and mack ids to be constants, have the quadtree recognise that
+        -> in the config file, in the quadtree insert, allow for an id to be passed in, 
+        -> if not the default value, set the next id to be the one after it
+    -> setup player key controls
+        -> the usual int function map
+            -> F -> switch dog id
+                -> creates an event to turn the dog with the selected id outline on
+                -> right click still functions the same
+                -> left click with then be used for hud interactions
+
+    -> setup the dog art 
+        -> update sprite to hold a list of textures (either 1 or 4)
+        -> update entity builders
+
+-> entity list of sprites 
+-> dogs also have a list of outlines (parallel to sprite)
+-> key input map key to function, check key pressed
+-> config define actions and map to keys (like swtich dog = KEY F)
+-> like an enum 
+
+
+-> abstract sprites and sprite index to a new class 
+-> define a player dog constructor where you can set the direction (or just make 
+the parameter with a default value )
+-> drawing the outline of the selected dog 
+-> key input and controls
+
+
+
+state patterns for 
+    -> dog selection
+    -> cursor animation 
+    -> animations in general 
+
+game frame counts, and animtation play speeds
+
+switch player controls from mouse dragging to arrows
+
+TODO select a dog for the player upon building
+
+need to rethink how dogs are selected, 
+first requires key inputs 
+
+
+-> the id queue thing for the tree
+-> dog selection with keys
+    -> start off with a default dog selected
+    -> upon dog selection, the state is changed on both 
+
+-> reintroduce the render predicate too
+    -> debug
+-> fix the path finding
+    -> don't explore edges that go in the wrong direction
+-> id queue for the tree 
+    -> and removing from the entity map
+    -> need to handle enqueuing the ids after they are "used"
+-> animation play speeds
+    -> pending animations though (not required just yet)
+-> then decorations
+    -> placing 
+    -> rotating 
+    -> pathfinding around 
+
+    -> player deco inventory and stash
+    
+-> edit mode and moving
+
+
+
+for when decorations are implemented,
+often they are the thing that will be right clicked on,
+so pick a point on it to be the "interaction point" and the end of the path

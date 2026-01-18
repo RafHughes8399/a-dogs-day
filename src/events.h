@@ -24,42 +24,45 @@
 #include <ctime>
 
 // project includes
+#include "hitbox.h"
 #include "raylib.h"
-
 namespace events{
 	// an enum ID for event types
 	enum ids{
 		test = 0,
-		left_mouse = 1,
+		move_frame = 1,
 		right_mouse = 2,
-		move = 3,
-		remove = 4,
-		size = 5
+		left_mouse = 3,
+		move = 4,
+		remove = 5,
+		interact = 6,
+		select_dog = 7,
+		size = 8
 	};
 	class event{
-	protected:
-		bool handled_ = false;
-		const int type_;
-		float delay_; // potential execution delay for the event, i.e an event 
-		// can take palce 10s after another,
-	public:
-		virtual ~event() = default;	
-		event(int id, float delay=0.0f)
-		: type_(id), handled_(false), delay_(delay){};
-		
-		event(event&& other) = default;
-		event& operator=(event&& other) = default;
-		
-		bool is_handled(){
-			return handled_;
-		}
-		const int get_type() const{
-				return type_;
-		}
-		bool update_delay(float delta){
-			delay_ = std::max(0.0f, delay_ - delta);
-			return delay_ == 0;
-		}
+		protected:
+			bool handled_ = false;
+			const int type_;
+			float delay_; // potential execution delay for the event, i.e an event 
+			// can take palce 10s after another,
+		public:
+			virtual ~event() = default;	
+			event(int id, float delay=0.0f)
+			: type_(id), handled_(false), delay_(delay){};
+			
+			event(event&& other) = default;
+			event& operator=(event&& other) = default;
+			
+			bool is_handled(){
+				return handled_;
+			}
+			const int get_type() const{
+					return type_;
+			}
+			bool update_delay(float delta){
+				delay_ = std::max(0.0f, delay_ - delta);
+				return delay_ == 0;
+			}
 	};
 
 	class test_event : public  event{
@@ -78,27 +81,48 @@ namespace events{
 		std::time_t time_;
 
 	};
-	// ------------------------- mouse events  ------------------------- //
-	class left_mouse_down : public event{
+	class move_view_frame : public event{
 		public:
-			~left_mouse_down() = default;
-			left_mouse_down(Vector2 delta)
-			: event(ids::left_mouse), mouse_delta_(delta){};
+		~move_view_frame() = default;
+		move_view_frame(Vector2 delta)
+		: event(ids::move_frame), delta_(delta){};
+		
+		static const int get_static_type(){
+			return ids::move_frame;
+		}
+		Vector2 get_delta() const{
+			return delta_;
+		}
+		private:
+		Vector2 delta_;
+	};
+	// ------------------------- mouse events  ------------------------- //
+	class left_mouse_click : public event{
+		public:
+			~left_mouse_click() = default;
+			left_mouse_click(Vector2 position, float box_width, float box_length)
+			:	event(ids::left_mouse), mouse_position_(position), collision_box_(Rectangle{position.x, position.y, box_width, box_length}){ // TODO fill in (16/12)
 
+			};
 			static const int get_static_type(){
 				return ids::left_mouse;
 			}
-			Vector2 get_mouse_delta() const{
-				return mouse_delta_;
+			Vector2 get_mouse_position() const{
+				return mouse_position_;
 			}
+			Rectangle get_hitbox() const{
+				return collision_box_;
+			}
+			
 		private:
-			Vector2 mouse_delta_;
+			Vector2 mouse_position_;
+			Rectangle collision_box_;
 	};
 	class right_mouse_click : public event{
 		public:
 			~right_mouse_click() = default;
-			right_mouse_click(Vector2 position)
-			: event(ids::right_mouse), mouse_position_(position){};
+			right_mouse_click(Vector2 position, int selected_dog)
+			: event(ids::right_mouse), mouse_position_(position), selected_dog_(selected_dog){};
 
 			static const int get_static_type(){
 				return ids::right_mouse;
@@ -106,8 +130,12 @@ namespace events{
 			Vector2 get_mouse_position() const{
 				return mouse_position_;
 			}
+			int get_selected_dog() const {
+				return selected_dog_;
+			}
 		private:
 			Vector2 mouse_position_;
+			int selected_dog_;
 	};
 
 	// ------------------------- entity events  ------------------------- //
@@ -137,15 +165,50 @@ namespace events{
 			remove_entity(size_t id)
 			: event(ids::remove), id_(id){};
 
-		static const int get_static_type(){
+			static const int get_static_type(){
 				return ids::remove;
-		}
-		size_t get_id() const{
-			return id_;
-		}
+			}
+			size_t get_id() const{
+				return id_;
+			}
 		private:
 			size_t id_;
 
+	};
+
+	class interact_entity : public event{
+		public:
+			~interact_entity() = default;
+			interact_entity(size_t id, hitbox::hitbox hitbox)
+			:event(ids::interact), id_(id), hitbox_(hitbox){};
+
+			static const int get_static_type(){
+				return ids::interact;
+			}
+			size_t get_id() const {
+				return id_;
+			}
+			const hitbox::hitbox& get_hitbox() const{
+				return hitbox_;
+			}
+		private:
+			size_t id_;
+			hitbox::hitbox hitbox_; 
+	};
+	class selected_dog : public event{
+		public:
+			~selected_dog() = default;
+			selected_dog(size_t id)
+			:event(ids::select_dog), id_(id){};
+
+			static const int get_static_type(){
+				return ids::select_dog;
+			}
+			size_t get_id() const {
+				return id_;
+			}
+		private:
+			size_t id_;
 	};
 	class event_handler_interface{
 		public:
@@ -190,7 +253,7 @@ namespace events{
 		}
 	private:
 		std::function<void(const E& e)> handler_;
-		const int handler_type_;
+		const int handler_type_; // this should be an id i think 
 	};
 	// the event
 	// the event handler - tempalted for any event, based on an interface

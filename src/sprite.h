@@ -12,7 +12,7 @@ namespace sprite{
         public:
             ~sprite() = default;
             sprite(Texture2D texture, float frame_width, float frame_height, int frames, int animations)
-                : sprite_texture_(texture), sprite_animation_(animation::animation(frame_height, frame_width, frames, animations)){};
+                : sprite_texture_(texture), sprite_animation_(animation::animation(frame_width, frame_height, frames, animations)){};
             sprite(const sprite& other) = default;
             sprite(sprite&& other) = default;
             
@@ -28,6 +28,8 @@ namespace sprite{
             Texture2D sprite_texture_; 
             // and the animation
     };
+
+    // a sprite should have multiple textures, up to 4 (up down left right)
     // potential use for displaying things like shop items
     // i.e all the hats exist on one sprite sheet, then the shop displays them, idk more thought needded
     class spritesheet{

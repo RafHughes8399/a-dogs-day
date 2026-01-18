@@ -19,7 +19,23 @@ namespace textures{
     enum texture_keys{
         cursor = 0,
         paw_mark = 1,
-        size = 2
+        khiri_left = 2,
+        khiri_right = 3,
+        khiri_up = 4,
+        khiri_down = 5,
+        khiri_left_out = 6,
+        khiri_right_out = 7,
+        khiri_up_out = 8,
+        khiri_down_out = 9,
+        mack_left = 10,
+        mack_right = 11,
+        mack_up = 12,
+        mack_down = 13,
+        mack_left_out = 14,
+        mack_right_out = 15,
+        mack_up_out = 16,
+        mack_down_out = 17,
+        size = 18
         // and so on
     };
     class texture{

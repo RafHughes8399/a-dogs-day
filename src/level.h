@@ -15,12 +15,14 @@
 #include <cmath>
 #include <map>
 #include <memory>
+#include <queue>
 #include <utility>
 #include <vector>
 
 #include "config.h"
 #include "quadtree.h"
 #include "raglib.h"
+#include "render_layer.h"
 #include "texture.h"
 
 
@@ -33,9 +35,13 @@ namespace level{
                 interior = 3
             };
             struct node{
+                int id_;
                 Vector2 position_;
-                bool operator==(const node& other){
-                    return Vector2Equals(position_, other.position_);
+                bool operator==(const node& other) const {
+                    return id_ == other.id_;
+                }
+                bool operator<(const node& other) const {
+                    return id_ < other.id_;
                 }
             };
             struct edge{
@@ -46,21 +52,28 @@ namespace level{
                     return destination_ == other.destination_ && weight_ == other.weight_;
                 }
             };
-
+            bool is_node_closer(int current_id, int next_id, int end_id);
             std::vector<edge> build_corner_edges(int row, int column);
             std::vector<edge> build_interior_edges(int row, int column);
             std::vector<edge> build_perimeter_edges(int row, int column);
-            void build_nodes(int level_x, int level_y);
-            void build_edges();
+
+            node* lowest_f_score(std::vector<node*>& nodes, std::map<int, float>& f_scores);
+            float manhattan_distance_heurisitic(Vector2 a, Vector2 b);
+            
             int categorise_node(int row, int column);
             
+            void build_nodes(int level_x, int level_y);
+            void build_edges();
+            
+            std::vector<int> bfs(int start_id, int end_id);
+            std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, int start_id, int end_id);
             int num_rows_;
             int row_length_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
         public:
             ~level_graph() = default;
             level_graph(int level_x, int level_y)
-            : graph_({}), num_rows_(level_y / dimensions_config::edge_weight), row_length_(level_x / dimensions_config::edge_weight){
+            : graph_({}), num_rows_(level_y / level_config::edge_weight), row_length_(level_x / level_config::edge_weight){
                 build_nodes(level_x, level_y);
                 build_edges();
                     // columns is x, rows is y
@@ -73,44 +86,44 @@ namespace level{
             level_graph& operator=(level_graph&& other) = default;
     
 
-            bool find_path(Vector2 start, Vector2 end);
             
             int num_nodes();
             int num_edges();
             int num_edges_from(node & node);
-
-            node position_to_node(Vector2 position);
+            
+            int position_to_node(Vector2 position, Vector2 direction);
+            
+            node* id_to_node(int id);
 
             std::vector<edge> edges();
             std::vector<edge> edges_from_node(node& node);
             std::vector<node> nodes();
-
-            void insert_node(Vector2 position);
+            
+            std::vector<Vector2> find_path(Vector2 start, Vector2 end, Vector2 direction);
+            
+            void insert_node(int id, Vector2 position);
             void insert_edge(int source_num, node& destination, float weight);
             void render(Rectangle frame);
-
     };
     class level{
         public :
         ~level(){
-            event_interface::unsubscribe<events::left_mouse_down>(left_mouse_handler_);
-            event_interface::unsubscribe<events::right_mouse_click>(right_mouse_handler_);
+            event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
+            event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
+            event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
             }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
             : background_(sprite), view_frame_(frame), dimensions_(dimensions), graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
-            level_entities_(tree::quadree(raglib::bounding_box_2{Vector2Zero(), dimensions})),
-            left_mouse_handler_([this](const events::left_mouse_down& event) -> void{on_left_mouse_event(event);}),
-            right_mouse_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);})
+            level_entities_(tree::quadtree(raglib::bounding_box_2{Vector2Zero(), dimensions})), id_entity_map_({}),
+            left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
+            move_view_frame_handler_([this](const events::move_view_frame& event) -> void{on_move_view_frame_event(event);}),
+            right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);})
             {
-                event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
-                event_interface::subscribe<events::right_mouse_click>(right_mouse_handler_);
+                event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
+                event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
+                event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
             };
-            level(const level& other) 
-            : background_(other.background_), view_frame_(other.view_frame_), dimensions_(other.dimensions_), graph_(other.graph_), level_entities_(other.level_entities_),
-            left_mouse_handler_(other.left_mouse_handler_), right_mouse_handler_(other.right_mouse_handler_){
-                event_interface::subscribe<events::left_mouse_down>(left_mouse_handler_);
-                event_interface::subscribe<events::right_mouse_click>(right_mouse_handler_);
-            }
+            level(const level& other) = default;
             level(level&& other) = default;
             
             level& operator=(const level& other) = default;
@@ -119,23 +132,29 @@ namespace level{
             void update(float delta);
             void render();
 
-            void add_entity(std::unique_ptr<entities::entity> entity);
+            void add_entity(std::unique_ptr<entities::entity> entity, size_t layer);
             int entity_id();
             int num_entities();
 
-            void on_left_mouse_event(const events::left_mouse_down& event);
+            void on_left_mouse_click_event(const events::left_mouse_click& event);
+            void on_move_view_frame_event(const events::move_view_frame& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
         private :
+            // event handlers
+            events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
+            events::event_handler<events::move_view_frame> move_view_frame_handler_;
+            events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
+
             level_graph graph_;
-            sprite::sprite background_;
-            tree::quadree level_entities_;
+            
             Rectangle view_frame_;
+            sprite::sprite background_;
+            std::map<int, entities::entity*> id_entity_map_;
+            render_layer::layer render_layers_[level_config::size];
+            tree::quadtree level_entities_;
             Vector2 dimensions_;
 
 
-            // event handlers
-            events::event_handler<events::left_mouse_down> left_mouse_handler_;
-            events::event_handler<events::right_mouse_click> right_mouse_handler_;
     };
         // self explanatory, a class to construct leveks, outline functions that build levels generating enetities, specifying background,
     // maybe the level map graph, and the tileset too
