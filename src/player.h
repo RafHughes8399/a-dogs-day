@@ -20,9 +20,6 @@ namespace player{
         right_mouse = 1
     };
 
-    class hud{
-
-    };
     class inventory{
         public:
         private:

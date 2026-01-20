@@ -107,3 +107,10 @@ first requires key inputs
 for when decorations are implemented,
 often they are the thing that will be right clicked on,
 so pick a point on it to be the "interaction point" and the end of the path
+
+
+-> menu class infrastructure 
+-> button class infrastructure
+-> menu " graph " infrastructure
+-> item infrastructure 
+-> decoration entity infrastructure
