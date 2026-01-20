@@ -37,7 +37,8 @@ namespace events{
 		remove = 5,
 		interact = 6,
 		select_dog = 7,
-		size = 8
+		press_key = 8,
+		size = 9
 	};
 	class event{
 		protected:
@@ -195,6 +196,7 @@ namespace events{
 			size_t id_;
 			hitbox::hitbox hitbox_; 
 	};
+
 	class selected_dog : public event{
 		public:
 			~selected_dog() = default;
@@ -209,6 +211,21 @@ namespace events{
 			}
 		private:
 			size_t id_;
+	};
+	class key_press: public event{
+		public:	
+			~key_press() = default;
+			key_press(int key)
+			:event(ids::press_key), key_(key){};
+
+			static const int get_static_type(){
+				return ids::press_key;
+			}
+			int get_key() const {
+				return key_;
+			}
+		private:
+			int key_;
 	};
 	class event_handler_interface{
 		public:

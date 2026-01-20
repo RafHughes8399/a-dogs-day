@@ -46,22 +46,32 @@ void player::player::switch_dog(){
 }
 void player::player::open_inventory(){
     std::cout << "open inventory" << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key_press_actions::inventory_open);
+    event_interface::queue_event(key_press);
+
     return;
 }
 void player::player::open_map(){
     std::cout << "open map" << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key_press_actions::map_open);
+    event_interface::queue_event(key_press);
     return;
 }
 void player::player::open_menu(){
     std::cout << "open menu" << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key_press_actions::menu_open);
+    event_interface::queue_event(key_press);
     return;
 }
 void player::player::open_quests(){
     std::cout << "open quest" << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key_press_actions::quests_open);
+    event_interface::queue_event(key_press);
     return;
 }
 void player::player::open_shop(){
     std::cout << "open shop" << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key_press_actions::shop_open);
     return;
 }
 

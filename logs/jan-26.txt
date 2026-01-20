@@ -114,3 +114,10 @@ so pick a point on it to be the "interaction point" and the end of the path
 -> menu " graph " infrastructure
 -> item infrastructure 
 -> decoration entity infrastructure
+
+
+
+-> key press create key press events 
+-> menu classes and build
+-> build the menu graph
+-> very basic art for now
