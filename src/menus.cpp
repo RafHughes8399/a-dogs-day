@@ -13,19 +13,38 @@ void menus::menu::render(){
 
 
 // ------------------------------ graph --------------------------------------- // 
-menus::menu_graph::edge menus::menu_graph::build_edge(node& src, node& dst, int key){
-    (void) src;
-    (void) dst;
-    (void) key;
-    return edge{};
+menus::menu_graph::edge menus::menu_graph::build_edge(node* dst, int key){
+    return edge {key, dst};
 }
-menus::menu_graph::node menus::menu_graph::build_node(std::unique_ptr<menu> & menu, size_t id){
-    (void) menu;
-    (void) id;
-    return node {};
+menus::menu_graph::node menus::menu_graph::build_node(std::unique_ptr<menu> menu, size_t id){
+    return node {std::move(menu), id};
 }
 void menus::menu_graph::build_graph(){
-    return;
+ graph_.push_back(std::make_pair(build_node(m_builder_.build_blank_menu(), menu_ids::blank), std::vector<edge>{}));
+    graph_.push_back(std::make_pair(build_node(m_builder_.build_pause_menu(), menu_ids::pause), std::vector<edge>{}));
+    graph_.push_back(std::make_pair(build_node(m_builder_.build_tab_menu(), menu_ids::tab), std::vector<edge>{}));
+    graph_.push_back(std::make_pair(build_node(m_builder_.build_shop_menu(), menu_ids::shop), std::vector<edge>{}));
+    graph_.push_back(std::make_pair(build_node(m_builder_.build_quest_menu(), menu_ids::quest), std::vector<edge>{}));
+    graph_.push_back(std::make_pair(build_node(m_builder_.build_inventory_menu(), menu_ids::inventory), std::vector<edge>{}));
+    graph_.push_back(std::make_pair(build_node(m_builder_.build_map_menu(), menu_ids::map), std::vector<edge>{}));
+
+    // Now add edges using pointers to nodes in the graph
+    // Blank menu edges
+    graph_[menu_ids::blank].second = {
+        build_edge(&graph_[menu_ids::tab].first, controls_config::key_press_actions::menu_open),
+        build_edge(&graph_[menu_ids::shop].first, controls_config::key_press_actions::shop_open),
+        build_edge(&graph_[menu_ids::quest].first, controls_config::key_press_actions::quests_open),
+        build_edge(&graph_[menu_ids::inventory].first, controls_config::key_press_actions::inventory_open),
+        build_edge(&graph_[menu_ids::map].first, controls_config::key_press_actions::map_open),
+    };
+
+    // Other menus all go back to blank
+    graph_[menu_ids::pause].second = { build_edge(&graph_[menu_ids::blank].first, controls_config::key_press_actions::back) };
+    graph_[menu_ids::tab].second = { build_edge(&graph_[menu_ids::blank].first, controls_config::key_press_actions::back) };
+    graph_[menu_ids::shop].second = { build_edge(&graph_[menu_ids::blank].first, controls_config::key_press_actions::back) };
+    graph_[menu_ids::quest].second = { build_edge(&graph_[menu_ids::blank].first, controls_config::key_press_actions::back) };
+    graph_[menu_ids::inventory].second = { build_edge(&graph_[menu_ids::blank].first, controls_config::key_press_actions::back) };
+    graph_[menu_ids::map].second = { build_edge(&graph_[menu_ids::blank].first, controls_config::key_press_actions::back) };
 }
 
 int menus::menu_graph::update(float delta){

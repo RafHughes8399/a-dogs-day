@@ -7,24 +7,30 @@
 
 void player::player::setup_control_maps(){
     // ! figure out how to assign 
-    key_press_controls_[key_press_actions::dog_switch] = [this]() -> void {switch_dog();};
-    key_press_controls_[key_press_actions::shop_open] = [this]() -> void{open_shop();};
-    key_press_controls_[key_press_actions::inventory_open] = [this]() -> void {open_inventory();};
-    key_press_controls_[key_press_actions::menu_open] = [this]() -> void {open_menu();};
-    key_press_controls_[key_press_actions::quests_open] = [this]() -> void {open_quests();};
-    key_press_controls_[key_press_actions::map_open] = [this]() -> void {open_map();};
+    key_press_controls_[controls_config::key_press_actions::dog_switch] = [this]() -> void {switch_dog();};
+    key_press_controls_[controls_config::key_press_actions::shop_open] = [this]() -> void{open_shop();};
+    key_press_controls_[controls_config::key_press_actions::inventory_open] = [this]() -> void {open_inventory();};
+    key_press_controls_[controls_config::key_press_actions::menu_open] = [this]() -> void {open_menu();};
+    key_press_controls_[controls_config::key_press_actions::quests_open] = [this]() -> void {open_quests();};
+    key_press_controls_[controls_config::key_press_actions::map_open] = [this]() -> void {open_map();};
+    key_press_controls_[controls_config::key_press_actions::back] = [this]() -> void {back();};
 
-
-    key_hold_controls_[key_hold_actions::move_up] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::up], delta);};
-    key_hold_controls_[key_hold_actions::move_down] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::down], delta);};
-    key_hold_controls_[key_hold_actions::move_left] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::left], delta);};
-    key_hold_controls_[key_hold_actions::move_right] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::right], delta);};
+    key_hold_controls_[controls_config::key_hold_actions::move_up] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::up], delta);};
+    key_hold_controls_[controls_config::key_hold_actions::move_down] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::down], delta);};
+    key_hold_controls_[controls_config::key_hold_actions::move_left] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::left], delta);};
+    key_hold_controls_[controls_config::key_hold_actions::move_right] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::right], delta);};
 }
 void player::player::on_selected_dog(const events::selected_dog& event){
     auto id = event.get_id();
     selected_dog_ = id;
 }
 
+void player::player::back(){
+    std::cout << "back " << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::back);
+    event_interface::queue_event(key_press);
+
+}
 void player::player::move(Vector2 direction_scalar, float delta){
     
     auto move_vector = Vector2Scale(Vector2Multiply(level_config::frame_move, direction_scalar), delta);
@@ -46,32 +52,32 @@ void player::player::switch_dog(){
 }
 void player::player::open_inventory(){
     std::cout << "open inventory" << std::endl;
-    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key_press_actions::inventory_open);
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::inventory_open);
     event_interface::queue_event(key_press);
 
     return;
 }
 void player::player::open_map(){
     std::cout << "open map" << std::endl;
-    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key_press_actions::map_open);
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::map_open);
     event_interface::queue_event(key_press);
     return;
 }
 void player::player::open_menu(){
     std::cout << "open menu" << std::endl;
-    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key_press_actions::menu_open);
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::menu_open);
     event_interface::queue_event(key_press);
     return;
 }
 void player::player::open_quests(){
     std::cout << "open quest" << std::endl;
-    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key_press_actions::quests_open);
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::quests_open);
     event_interface::queue_event(key_press);
     return;
 }
 void player::player::open_shop(){
     std::cout << "open shop" << std::endl;
-    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key_press_actions::shop_open);
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::shop_open);
     return;
 }
 

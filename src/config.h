@@ -98,17 +98,16 @@ namespace controls_config{
     // controls 
     inline std::vector<int> mouse_controls = std::vector<int>{MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT};
     enum key_press_actions{
-        switch_dog = KEY_F,
-        open_shop = KEY_S,
-        open_inventory = KEY_I,
-        open_menu = KEY_TAB,
-        open_quests = KEY_Q,
-        open_map = KEY_M,
-
+        dog_switch = KEY_F,
+        shop_open = KEY_S,
+        inventory_open = KEY_I,
+        menu_open = KEY_TAB,
+        quests_open = KEY_Q,
+        map_open = KEY_M,
+        back = KEY_ESCAPE
     };
-    inline std::vector<int> key_controls = std::vector<int>{KEY_F};
     enum key_hold_actions{
-        edit_mode = KEY_E,
+        //edit_mode = KEY_E,
         move_down = KEY_DOWN,
         move_up  = KEY_UP,
         move_left = KEY_LEFT,

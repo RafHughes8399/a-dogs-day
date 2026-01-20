@@ -43,7 +43,7 @@ namespace menus{
     };
     class menu_graph{
         enum menu_ids{
-            empty = 0,
+            blank = 0,
             pause = 1,
             tab = 2,
             inventory = 3,
@@ -70,8 +70,8 @@ namespace menus{
                 node* destination_menu_;
             };
 
-            edge build_edge(node& src, node& dst, int key);
-            node build_node(std::unique_ptr<menu>& menu, size_t id);
+            edge build_edge(node* dst, int key);
+            node build_node(std::unique_ptr<menu> menu, size_t id);
             void build_graph();
         public:
             ~menu_graph() = default;

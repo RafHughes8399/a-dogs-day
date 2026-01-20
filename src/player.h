@@ -30,22 +30,7 @@ namespace player{
     // also include at some point hud and inventory
     class player{
         public:
-        enum key_press_actions{
-            dog_switch = KEY_F,
-            shop_open = KEY_S,
-            inventory_open = KEY_I,
-            menu_open = KEY_TAB,
-            quests_open = KEY_Q,
-            map_open = KEY_M,
 
-        };
-        enum key_hold_actions{
-            //edit_mode = KEY_E,
-            move_down = KEY_DOWN,
-            move_up  = KEY_UP,
-            move_left = KEY_LEFT,
-            move_right = KEY_RIGHT
-        };
             ~player(){
                 event_interface::unsubscribe<events::selected_dog>(select_dog_handler_);
             }
@@ -64,6 +49,7 @@ namespace player{
             player& operator=(const player& other) = default;
             player& operator=(player&& other) = default;
 
+            void back();
             void move(Vector2 direction_scalar, float delta);            
             void open_inventory();
             void open_map();
