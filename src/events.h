@@ -83,22 +83,62 @@ namespace events{
 		std::time_t time_;
 
 	};
-	class move_view_frame : public event{
+	// for when an entity potentailly interacts with another, main listener is the quad tree to check collisionss
+	class interact_entity : public event{
 		public:
-		~move_view_frame() = default;
-		move_view_frame(Vector2 delta)
-		: event(ids::move_frame), delta_(delta){};
-		
-		static const int get_static_type(){
-			return ids::move_frame;
-		}
-		Vector2 get_delta() const{
-			return delta_;
-		}
-		private:
-		Vector2 delta_;
-	};
-	// ------------------------- mouse events  ------------------------- //
+			~interact_entity() = default;
+			interact_entity(size_t id, hitbox::hitbox hitbox)
+			:event(ids::interact), id_(id), hitbox_(hitbox){};
+
+			static const int get_static_type(){
+				return ids::interact;
+			}
+			size_t get_id() const {
+				return id_;
+			}
+			const hitbox::hitbox& get_hitbox() const{
+				return hitbox_;
+			}
+			private:
+			size_t id_;
+			hitbox::hitbox hitbox_; 
+		};
+		// when a key is pressed by the player, main listeners are the menus for menu navigation
+
+		class key_press: public event{
+			public:	
+				~key_press() = default;
+				key_press(int key)
+				:event(ids::press_key), key_(key){};
+	
+				static const int get_static_type(){
+					return ids::press_key;
+				}
+				int get_key() const {
+					return key_;
+				}
+			private:
+				int key_;
+		};
+		// when the player levels up, main listeners are shop items to check if the level requirement 
+		// is met to purhcase 
+		// and in future to play level up hud animations
+		class level_up: public event{
+			public:	
+				~level_up() = default;
+				level_up(int new_level)
+				:event(ids::lvl_up), new_level_(new_level){};
+	
+				static const int get_static_type(){
+					return ids::lvl_up;
+				}
+				int get_new_level() const {
+					return new_level_;
+				}
+			private:
+				int new_level_;
+		};
+	// when the cursor left click occurs, main listener is the quad tree to check collisions
 	class left_mouse_click : public event{
 		public:
 			~left_mouse_click() = default;
@@ -119,7 +159,42 @@ namespace events{
 		private:
 			Vector2 mouse_position_;
 			Rectangle collision_box_;
+		};
+	
+	// when an entity moves, main listener is the quad tree to move entities into the correct node
+	class move_entity : public event{
+		public:
+		~move_entity() = default;
+		move_entity(size_t id)
+			: event(ids::move), id_(id){};
+			static const int get_static_type(){
+				return ids::move;
+			}
+		size_t get_id() const{
+			return id_;
+		}
+		private:
+		size_t id_;
 	};
+	
+	// when an view_Frame moves, main listener is the level to adjust the view_frame when the player
+	// moves it
+	class move_view_frame : public event{
+		public:
+		~move_view_frame() = default;
+		move_view_frame(Vector2 delta)
+		: event(ids::move_frame), delta_(delta){};
+		
+		static const int get_static_type(){
+			return ids::move_frame;
+		}
+		Vector2 get_delta() const{
+			return delta_;
+		}
+		private:
+		Vector2 delta_;
+	};
+	// when a right click occurs, main listener is the level to create a paw mark
 	class right_mouse_click : public event{
 		public:
 			~right_mouse_click() = default;
@@ -139,28 +214,7 @@ namespace events{
 			Vector2 mouse_position_;
 			int selected_dog_;
 	};
-
-	// ------------------------- entity events  ------------------------- //
-	// ! right now for removing the paw when it fades ! 
-	// does it need to be an event though, because the tree can handle entity removing, 
-	// just pass it through an update status
-	
-	class move_entity : public event{
-		public:
-			~move_entity() = default;
-			move_entity(size_t id)
-			: event(ids::move), id_(id){};
-
-		static const int get_static_type(){
-				return ids::move;
-		}
-		size_t get_id() const{
-			return id_;
-		}
-		private:
-			size_t id_;
-
-	};
+	// for when an entity need be removed from the level, main listener is the quad tree
 	class remove_entity : public event{
 		public:
 			~remove_entity() = default;
@@ -178,26 +232,7 @@ namespace events{
 
 	};
 
-	class interact_entity : public event{
-		public:
-			~interact_entity() = default;
-			interact_entity(size_t id, hitbox::hitbox hitbox)
-			:event(ids::interact), id_(id), hitbox_(hitbox){};
-
-			static const int get_static_type(){
-				return ids::interact;
-			}
-			size_t get_id() const {
-				return id_;
-			}
-			const hitbox::hitbox& get_hitbox() const{
-				return hitbox_;
-			}
-		private:
-			size_t id_;
-			hitbox::hitbox hitbox_; 
-	};
-
+	// for when a dog is selected, main listener is the player to update the id
 	class selected_dog : public event{
 		public:
 			~selected_dog() = default;
@@ -212,36 +247,6 @@ namespace events{
 			}
 		private:
 			size_t id_;
-	};
-	class key_press: public event{
-		public:	
-			~key_press() = default;
-			key_press(int key)
-			:event(ids::press_key), key_(key){};
-
-			static const int get_static_type(){
-				return ids::press_key;
-			}
-			int get_key() const {
-				return key_;
-			}
-		private:
-			int key_;
-	};
-	class level_up: public event{
-		public:	
-			~level_up() = default;
-			level_up(int new_level)
-			:event(ids::lvl_up), new_level_(new_level){};
-
-			static const int get_static_type(){
-				return ids::lvl_up;
-			}
-			int get_new_level() const {
-				return new_level_;
-			}
-		private:
-			int new_level_;
 	};
 	class event_handler_interface{
 		public:

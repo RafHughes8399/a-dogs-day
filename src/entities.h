@@ -34,23 +34,25 @@ namespace entities{
             entity(entity&& other) = default;
             entity& operator=(const entity& other) = default;
             entity& operator=(entity&& other) = default;
+
             bool operator==(entity& other){
                 return id_ == other.id_;
             }
 
             bool check_collision(const hitbox::hitbox other);
+            int get_id();
             hitbox::hitbox& get_hitbox();
             sprite::sprite& get_sprite();
             std::vector<sprite::sprite>& get_sprites();
             Vector2 get_position();
-            int get_id();
-
-            virtual void render(Vector2 draw_position);
-
+            
             virtual int update(float delta){
                 (void) delta;
                 return status_codes::nothing;
             }
+
+            virtual void render(Vector2 draw_position);
+
             virtual void interact(entity& other){
                 (void) other;
                 return;
@@ -58,12 +60,12 @@ namespace entities{
 
         protected:
             const int id_;
-            
-            
             size_t sprite_index_ = 0;
+
             // TODO combine these into a class 
             std::vector<hitbox::hitbox> hitboxes_;
             std::vector<sprite::sprite> sprites_;
+            
             Vector2 position_;
 
     };
@@ -81,6 +83,18 @@ namespace entities{
                     interaction_strategy& operator=(interaction_strategy&& other) = default;
 
                     virtual void interact(cursor& cursor, entity& other) = 0;
+                private:
+            };
+            class default_strategy : public interaction_strategy{
+                public:
+                    default_strategy()
+                    : interaction_strategy() {};
+                    default_strategy(const default_strategy& other) = default;
+                    default_strategy(default_strategy&& other) = default;
+                        
+                    default_strategy& operator=(const default_strategy& other) = default;
+                    default_strategy& operator=(default_strategy&& other) = default;
+                    void interact(cursor& cursor, entity& other) override;
                 private:
             };
             class left_click_strategy : public interaction_strategy{
@@ -112,18 +126,6 @@ namespace entities{
                     private:
                 };
 
-            class default_strategy : public interaction_strategy{
-                public:
-                    default_strategy()
-                    : interaction_strategy() {};
-                    default_strategy(const default_strategy& other) = default;
-                    default_strategy(default_strategy&& other) = default;
-                        
-                    default_strategy& operator=(const default_strategy& other) = default;
-                    default_strategy& operator=(default_strategy&& other) = default;
-                    void interact(cursor& cursor, entity& other) override;
-                private:
-            };
                 ~cursor() {
                     event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
                     event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
@@ -160,7 +162,7 @@ namespace entities{
                 events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
                 events::event_handler<events::move_view_frame> move_view_frame_handler_;
                 events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
-
+                
                 std::unique_ptr<interaction_strategy> interaction_strategy_;
         };
         
@@ -285,6 +287,7 @@ namespace entities{
             std::vector<sprite::sprite> outlines_;
             std::vector<sprite::sprite> cosmetics_;
             std::vector<Vector2> move_path_; // the prev array from the path algorithm
+            
             const Vector2 move_speed_ = assets_config::dog_move_speed; // TODO: specify move speed, in config file (28 . 12), in terms of a factor of edge weight (one tenth ? )
             Vector2 direction_scalar_;
 

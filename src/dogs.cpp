@@ -1,6 +1,35 @@
 #include "entities.h"
 
+// ------------------------------- render states ------------------------------- //
+void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position){
+    // draw the outlines
+    dog.outlines_[dog.sprite_index_].render(draw_position);
+}
+
+void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_position){
+    // do nothing, already handled
+    (void) dog;
+    (void) draw_position;
+    return;
+}
+void entities::player_dog::select(){
+    selected_state_ = std::make_unique<selected>();
+}
+void entities::player_dog::unselect(){
+    selected_state_ = std::make_unique<unselected>();
+}
 // ------------------------------- player dogs ------------------------------- //
+bool entities::player_dog::reached_position(Vector2 target){
+
+    float position_to_target = Vector2Distance(position_, target);
+    // which is 3.2
+    if(position_to_target <= level_config::edge_weight * 0.05){
+        position_ = target;
+        return true;
+    } 
+    return false;
+}
+
 int entities::player_dog::update(float delta){
     (void) delta;
     /**
@@ -9,7 +38,7 @@ int entities::player_dog::update(float delta){
      * for now do nothing 
      */
     // process the head of the move path if it exists,
-
+    
     // need an iniital setting of the direction
     draw_path();
     if(! move_path_.empty()){
@@ -31,79 +60,9 @@ int entities::player_dog::update(float delta){
     return status_codes::nothing;
 }
 
-
-void entities::player_dog::select(){
-    selected_state_ = std::make_unique<selected>();
-}
-void entities::player_dog::unselect(){
-    selected_state_ = std::make_unique<unselected>();
-}
-void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position){
-    // draw the outlines
-    dog.outlines_[dog.sprite_index_].render(draw_position);
-}
-void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_position){
-    // do nothing, already handled
-    (void) dog;
-    (void) draw_position;
-    return;
-}
-void entities::player_dog::render(Vector2 draw_position){
-    entity::render(draw_position);
-    selected_state_->render(*this, draw_position);
-}
-
 Vector2 entities::player_dog::get_direction_scalar(){
     return direction_scalar_;
 }
-void entities::player_dog::interact(entity& other){
-    (void) other;
-    return;
-}
-
-void entities::player_dog::on_dog_select_event(const events::selected_dog& event){
-    auto dog_id = event.get_id();
-    if(dog_id == id_){
-        select();
-    }
-    else{
-        unselect();
-    }
-}
-void entities::player_dog::on_right_click_event(const events::right_mouse_click& event){
-    auto destination = event.get_mouse_position();
-    // update the dog's movement path, query the level graph
-    (void) destination;
-    return;
-}
-
-void entities::player_dog::set_path(std::vector<Vector2>& path){
-    move_path_ = path;
-    // when the path is set, also pick a direction 
-    // compare the position with the next position in the path
-    determine_direction(move_path_.front());
-}
-void entities::player_dog::draw_path(){
-    for(auto position : move_path_){
-        int row = position.y / level_config::edge_weight;
-        int row_length = level_config::world_x / level_config::edge_weight;
-        int col = position.x / level_config::edge_weight;
-        int index = (row * row_length) + col;
-        DrawCircle(position.x, position.y, 15, YELLOW);
-        DrawText(TextFormat("%d", index), position.x, position.y, 12, WHITE);
-    }
-}
-bool entities::player_dog::reached_position(Vector2 target){
-
-    float position_to_target = Vector2Distance(position_, target);
-    // which is 3.2
-    if(position_to_target <= level_config::edge_weight * 0.05){
-        position_ = target;
-        return true;
-    } 
-    return false;
-}
-
 void entities::player_dog::determine_direction(Vector2 target){
     // it is either up down left or right
     // x is left right, y is up down 
@@ -132,6 +91,50 @@ void entities::player_dog::determine_direction(Vector2 target){
         return;
     }
 }
+
+void entities::player_dog::draw_path(){
+    for(auto position : move_path_){
+        int row = position.y / level_config::edge_weight;
+        int row_length = level_config::world_x / level_config::edge_weight;
+        int col = position.x / level_config::edge_weight;
+        int index = (row * row_length) + col;
+        DrawCircle(position.x, position.y, 15, YELLOW);
+        DrawText(TextFormat("%d", index), position.x, position.y, 12, WHITE);
+    }
+}
+void entities::player_dog::interact(entity& other){
+    (void) other;
+    return;
+}
+void entities::player_dog::on_dog_select_event(const events::selected_dog& event){
+    auto dog_id = event.get_id();
+    if(dog_id == id_){
+        select();
+    }
+    else{
+        unselect();
+    }
+}
+void entities::player_dog::on_right_click_event(const events::right_mouse_click& event){
+    auto destination = event.get_mouse_position();
+    // update the dog's movement path, query the level graph
+    (void) destination;
+    return;
+}
+void entities::player_dog::render(Vector2 draw_position){
+    entity::render(draw_position);
+    selected_state_->render(*this, draw_position);
+}
+
+void entities::player_dog::set_path(std::vector<Vector2>& path){
+    move_path_ = path;
+    // when the path is set, also pick a direction 
+    // compare the position with the next position in the path
+    determine_direction(move_path_.front());
+}
+
+
+
 // ------------------------------- builder ------------------------------- //
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){
     auto khiri_left_texture = textures::textures_.get_texture(textures::khiri_left, assets_config::khiri_left_path);

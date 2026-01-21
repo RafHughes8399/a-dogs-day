@@ -14,7 +14,7 @@ namespace menus{
     class menu{
         public:
             virtual ~menu() = default;
-            menu();
+            menu() {};
             menu(const menu& other) = default;
             menu(menu&& other) = default;
             menu& operator=(const menu& other) = default;
@@ -23,9 +23,9 @@ namespace menus{
             void render();
         
         protected:
-            Vector2 position_; // anchor position where 
-            Rectangle box_;
-            hud::hud components_; // holds the hud elements and buttons
+            //Vector2 position_; // anchor position where 
+            //Rectangle box_;
+            //hud::hud components_; // holds the hud elements and buttons
     };  
     class item_menu : public menu{
         public:

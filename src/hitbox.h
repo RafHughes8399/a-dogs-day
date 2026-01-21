@@ -23,11 +23,14 @@ namespace hitbox{
             hitbox& operator=(hitbox&& other) = default;
 
             bool check_collision(const hitbox& other);
-            std::vector<Rectangle> get_sub_boxes();
+        
             const Rectangle& get_box() const;
             Rectangle get_sub_box(size_t index);
+        
+            std::vector<Rectangle> get_sub_boxes();
             void update(Vector2 new_position);    
-        private:
+        
+            private:
 
             bool check_collision_box_sub_boxes(const Rectangle& box, const std::vector<Rectangle>& other_boxes);
             bool check_collision_sub_boxes(const std::vector<Rectangle>& boxes, const std::vector<Rectangle> other_boxes);

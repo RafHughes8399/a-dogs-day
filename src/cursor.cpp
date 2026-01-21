@@ -1,6 +1,9 @@
 #include "entities.h"
 
-// -------------------------------- interaction states --------------------------------//
+// -------------------------------- interaction strategies --------------------------------//
+void entities::cursor::default_strategy::interact(cursor& cursor, entity& other){
+    
+}
 void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){
 
     // cast to a player dog 
@@ -16,9 +19,6 @@ void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& oth
     
 }
 void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
-    
-}
-void entities::cursor::default_strategy::interact(cursor& cursor, entity& other){
     
 }
 // -------------------------------- cursor --------------------------------//
@@ -55,6 +55,7 @@ int entities::cursor::update(float delta){
 void entities::cursor::interact(entities::entity& other){
     interaction_strategy_->interact(*this, other);
 }
+
 void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click& event){
     auto position = event.get_mouse_position();
     auto hitbox = event.get_hitbox();
@@ -112,6 +113,7 @@ int entities::paw_mark::update(float delta){
         return status_codes::nothing;
     }
 }
+
 void entities::paw_mark::interact(entities::entity& other){
     return;
 }

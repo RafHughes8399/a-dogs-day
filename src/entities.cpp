@@ -4,11 +4,11 @@
 bool entities::entity::check_collision(const hitbox::hitbox other){
     return hitboxes_[sprite_index_].check_collision(other);
 }
-int entities::entity::get_id(){
-    return id_;
-}
 hitbox::hitbox& entities::entity::get_hitbox(){
     return hitboxes_[sprite_index_];
+}
+int entities::entity::get_id(){
+    return id_;
 }
 
 std::vector<sprite::sprite>& entities::entity::get_sprites(){
