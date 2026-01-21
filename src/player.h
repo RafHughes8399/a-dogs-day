@@ -41,7 +41,8 @@ namespace player{
                 event_interface::subscribe(select_dog_handler_);
                 setup_control_maps();
                 select_dog();
-
+                std::unique_ptr<events::event> level_up_event = std::make_unique<events::level_up>(level_);
+                event_interface::queue_event(level_up_event);
             };
             player(const player& other) = default;
             player(player&& other) = default;
@@ -72,14 +73,18 @@ namespace player{
              hud hud_;
              */
             
-            inventory inventory_;
             void setup_control_maps();
+
             events::event_handler<events::selected_dog> select_dog_handler_;            
+            inventory inventory_;
+            int bones_ = player_config::max_bones;
+            int level_ = player_config::max_level;
             int selected_dog_;
             
             std::vector<int> mouse_controls_; 
             std::map<int, std::function<void(float)>> key_hold_controls_;
             std::map<int, std::function<void()>> key_press_controls_; 
+            
             Vector2 mouse_position_;
             
     };

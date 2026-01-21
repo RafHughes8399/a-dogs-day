@@ -61,6 +61,7 @@ namespace entities{
             
             
             size_t sprite_index_ = 0;
+            // TODO combine these into a class 
             std::vector<hitbox::hitbox> hitboxes_;
             std::vector<sprite::sprite> sprites_;
             Vector2 position_;

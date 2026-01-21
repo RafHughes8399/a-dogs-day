@@ -22,6 +22,7 @@ void game::game::render(float delta){
     (void) delta;
     level_.render();
     player_.render();
+    menus_.render();
     return;
 }
 

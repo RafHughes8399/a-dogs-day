@@ -108,6 +108,7 @@ namespace menus{
             std::unique_ptr<menu> build_map_menu();
             std::unique_ptr<menu> build_quest_menu();
             std::unique_ptr<menu> build_inventory_menu();
+            menu_graph build_menus();
         private:
     };
 

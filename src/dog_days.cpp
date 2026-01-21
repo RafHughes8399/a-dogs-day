@@ -7,9 +7,10 @@
 int main(){
     InitWindow(GetScreenWidth(), GetScreenHeight(), "dog day");
     auto level_builder = level::level_builder();
-    auto player = player::player();
     auto level = level_builder.build_main_level();
-    auto game = game::game(level, player);
+    auto menus = menus::m_builder_.build_menus();
+    auto player = player::player();
+    auto game = game::game(level, player, menus);
     HideCursor();
     SetTargetFPS(60);
     while(! WindowShouldClose()){

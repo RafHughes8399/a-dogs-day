@@ -10,8 +10,33 @@ void menus::menu::render(){
     return;
 }
 // ------------------------------ builder ---------------------------------- // 
-
-
+std::unique_ptr<menus::menu> menus::menu_builder::build_blank_menu() {
+    return std::make_unique<menus::menu>();
+}
+std::unique_ptr<menus::menu> menus::menu_builder::build_pause_menu(){
+    return std::make_unique<menus::menu>();
+}
+std::unique_ptr<menus::menu> menus::menu_builder::build_tab_menu(){
+    return std::make_unique<menus::menu>();
+    
+}
+std::unique_ptr<menus::menu> menus::menu_builder::build_shop_menu(){
+    return std::make_unique<menus::menu>();
+}
+std::unique_ptr<menus::menu> menus::menu_builder::build_map_menu(){
+    return std::make_unique<menus::menu>();
+}
+std::unique_ptr<menus::menu> menus::menu_builder::build_quest_menu(){
+    
+    return std::make_unique<menus::menu>();
+}
+std::unique_ptr<menus::menu> menus::menu_builder::build_inventory_menu(){
+    
+    return std::make_unique<menus::menu>();
+}
+menus::menu_graph menus::menu_builder::build_menus(){
+    return menu_graph();
+}
 // ------------------------------ graph --------------------------------------- // 
 menus::menu_graph::edge menus::menu_graph::build_edge(node* dst, int key){
     return edge {key, dst};
@@ -20,13 +45,13 @@ menus::menu_graph::node menus::menu_graph::build_node(std::unique_ptr<menu> menu
     return node {std::move(menu), id};
 }
 void menus::menu_graph::build_graph(){
- graph_.push_back(std::make_pair(build_node(m_builder_.build_blank_menu(), menu_ids::blank), std::vector<edge>{}));
+    graph_.push_back(std::make_pair(build_node(m_builder_.build_blank_menu(), menu_ids::blank), std::vector<edge>{}));
     graph_.push_back(std::make_pair(build_node(m_builder_.build_pause_menu(), menu_ids::pause), std::vector<edge>{}));
     graph_.push_back(std::make_pair(build_node(m_builder_.build_tab_menu(), menu_ids::tab), std::vector<edge>{}));
-    graph_.push_back(std::make_pair(build_node(m_builder_.build_shop_menu(), menu_ids::shop), std::vector<edge>{}));
-    graph_.push_back(std::make_pair(build_node(m_builder_.build_quest_menu(), menu_ids::quest), std::vector<edge>{}));
     graph_.push_back(std::make_pair(build_node(m_builder_.build_inventory_menu(), menu_ids::inventory), std::vector<edge>{}));
     graph_.push_back(std::make_pair(build_node(m_builder_.build_map_menu(), menu_ids::map), std::vector<edge>{}));
+    graph_.push_back(std::make_pair(build_node(m_builder_.build_shop_menu(), menu_ids::shop), std::vector<edge>{}));
+    graph_.push_back(std::make_pair(build_node(m_builder_.build_quest_menu(), menu_ids::quest), std::vector<edge>{}));
 
     // Now add edges using pointers to nodes in the graph
     // Blank menu edges

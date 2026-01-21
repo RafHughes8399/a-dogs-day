@@ -121,3 +121,15 @@ so pick a point on it to be the "interaction point" and the end of the path
 -> menu classes and build
 -> build the menu graph
 -> very basic art for now
+
+
+-> incorporate menu graph into game
+->  build very basic menus, i'm talking rectangles and text, to show the navigation 
+works 
+
+-> player currency
+-> decorations as items and entities
+
+-> spring cleaning 
+    -> add file descriptions
+    -> make everything alphabetical

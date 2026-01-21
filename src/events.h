@@ -38,7 +38,8 @@ namespace events{
 		interact = 6,
 		select_dog = 7,
 		press_key = 8,
-		size = 9
+		lvl_up = 9,
+		size = 10
 	};
 	class event{
 		protected:
@@ -226,6 +227,21 @@ namespace events{
 			}
 		private:
 			int key_;
+	};
+	class level_up: public event{
+		public:	
+			~level_up() = default;
+			level_up(int new_level)
+			:event(ids::lvl_up), new_level_(new_level){};
+
+			static const int get_static_type(){
+				return ids::lvl_up;
+			}
+			int get_new_level() const {
+				return new_level_;
+			}
+		private:
+			int new_level_;
 	};
 	class event_handler_interface{
 		public:

@@ -11,6 +11,10 @@
 namespace game_config {
     inline const int twenty_seconds = 1200;
 }
+namespace player_config{
+    inline const int max_bones = 999999;
+    inline const int max_level = 50;
+}
 namespace level_config{
     // world dimensions
     inline float world_x = 4096.0f;
