@@ -23,6 +23,7 @@ void game::game::render(float delta){
     level_.render();
     player_.render();
     menus_.render();
+    DrawFPS(25, 25);
     return;
 }
 

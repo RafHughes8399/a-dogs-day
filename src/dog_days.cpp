@@ -13,6 +13,7 @@ int main(){
     auto game = game::game(level, player, menus);
     HideCursor();
     SetTargetFPS(60);
+
     while(! WindowShouldClose()){
         float delta = GetFrameTime();
         game.update(delta);
