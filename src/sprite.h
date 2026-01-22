@@ -7,6 +7,8 @@
 #define SPRITE_H
 
 #include "animation.h"
+#include <vector>
+
 namespace sprite{
     class sprite{
         public:
@@ -24,11 +26,35 @@ namespace sprite{
             void render(Vector2 position);
         private:
             // has the texture 
+            // and the animation
             animation::animation sprite_animation_;
             Texture2D sprite_texture_; 
-            // and the animation
     };
+    class spriteset{
+        public:
+            ~spriteset() = default;
+            spriteset(std::vector<sprite>& sprites, size_t index = 0)
+            : sprites_(sprites), current_(index){}
+            spriteset(const spriteset& other) = default;
+            spriteset(spriteset&& other) = default;
 
+            spriteset& operator=(const spriteset& other) = default;
+            spriteset& operator=(spriteset&& other) = default;
+
+            sprite& operator[](size_t index){
+                return sprites_[index];
+            }
+            
+            size_t index();
+            sprite& get_sprite();
+            std::vector<sprite>& get_sprites();
+            
+            void set_index(size_t index);
+            void render(Vector2 position);
+        private:
+            size_t current_;
+            std::vector<sprite> sprites_;
+    };
     // a sprite should have multiple textures, up to 4 (up down left right)
     // potential use for displaying things like shop items
     // i.e all the hats exist on one sprite sheet, then the shop displays them, idk more thought needded

@@ -42,7 +42,7 @@ namespace player{
                 setup_control_maps();
                 select_dog();
                 std::unique_ptr<events::event> level_up_event = std::make_unique<events::level_up>(level_);
-                event_interface::queue_event(level_up_event);
+                //event_interface::queue_event(level_up_event);
             };
             player(const player& other) = default;
             player(player&& other) = default;

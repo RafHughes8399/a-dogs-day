@@ -28,21 +28,21 @@ int entities::cursor::update(float delta){
     position_ =  GetMousePosition();
 
     if(! Vector2Equals(old_position, position_)) {
-        hitboxes_[sprite_index_].update(position_);
+        hitboxes_[sprites_.index()].update(position_);
 
         // create the query and execute it
 
         // TODO change how this works to test your interaction theory  !
-        std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(hitboxes_[sprite_index_], id_);
+        std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(hitboxes_[sprites_.index()], id_);
         // the listener (singular) does something with the query and returns the information
         bool is_colliding = queries::bool_executor_.execute_query(*colliding_query);
         //bool is_colliding = query_interface::execute_query(*colliding_query);
         if(is_colliding){
             // switch to colliding 
-            sprites_[sprite_index_].get_animation().goto_animation(animation_tags::hover);
+            sprites_[sprites_.index()].get_animation().goto_animation(animation_tags::hover);
         }
         else{
-            sprites_[sprite_index_].get_animation().goto_animation(animation_tags::base);
+            sprites_[sprites_.index()].get_animation().goto_animation(animation_tags::base);
             // switch to default anim
         }
         
@@ -71,7 +71,7 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
     // ! lets test this theory
     // ! your theory was correct yay, i think, do one more test 
     // create the interaction event
-    std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, hitboxes_[sprite_index_]);
+    std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, hitboxes_[sprites_.index()]);
     event_interface::execute_event(*interaction_event);
     // then return to default interaciton
     interaction_strategy_ = std::make_unique<default_strategy>();
@@ -102,7 +102,7 @@ void entities::cursor::on_right_mouse_click_event(const events::right_mouse_clic
 }
 // -------------------------------- paw mark --------------------------------//
 int entities::paw_mark::update(float delta){
-    auto& animation = sprites_[sprite_index_].get_animation();
+    auto& animation = sprites_[sprites_.index()].get_animation();
     animation.next_frame(false);
     auto new_frame = animation.get_current_frame();
 

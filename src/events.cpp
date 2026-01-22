@@ -60,7 +60,6 @@ void events::event_dispatcher::process_events(float delta){
         }
         event_queue_.pop();
     }
-
     // then check delayed events
     for(auto it = delayed_events_.begin(); it != delayed_events_.end();){
         // true if there is no longer a delay

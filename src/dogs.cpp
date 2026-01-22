@@ -3,7 +3,8 @@
 // ------------------------------- render states ------------------------------- //
 void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position){
     // draw the outlines
-    dog.outlines_[dog.sprite_index_].render(draw_position);
+    size_t render_index = dog.get_spriteset().index();
+    dog.outlines_[render_index].render(draw_position);
 }
 
 void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_position){
@@ -69,25 +70,25 @@ void entities::player_dog::determine_direction(Vector2 target){
     if(position_.x < target.x){
         // moving right
         direction_scalar_ = level_config::direction_scalars[level_config::directions::right];
-        sprite_index_ = level_config::directions::right;
+        sprites_.set_index(level_config::directions::right);
         return;
     }
     else if(position_.x > target.x){
         // moving left
         direction_scalar_ = level_config::direction_scalars[level_config::directions::left];
-        sprite_index_ = level_config::directions::left;
+        sprites_.set_index(level_config::directions::left);
         return;
     }
     else if(position_.y < target.y){
         // moving down 
         direction_scalar_ = level_config::direction_scalars[level_config::directions::down];
-        sprite_index_ = level_config::directions::down;
+        sprites_.set_index(level_config::directions::down);
         return;
     }
     else if(position_.y > target.y){
         // moving up
         direction_scalar_ = level_config::direction_scalars[level_config::directions::up];
-        sprite_index_ = level_config::directions::up;
+        sprites_.set_index(level_config::directions::up);
         return;
     }
 }

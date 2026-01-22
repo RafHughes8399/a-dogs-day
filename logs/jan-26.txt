@@ -133,3 +133,6 @@ works
 -> spring cleaning 
     -> add file descriptions
     -> make everything alphabetical
+
+-> very basic menu builds, to test navigation
+-> spriteset, has the up to four spots and the index

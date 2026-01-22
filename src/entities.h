@@ -43,7 +43,7 @@ namespace entities{
             int get_id();
             hitbox::hitbox& get_hitbox();
             sprite::sprite& get_sprite();
-            std::vector<sprite::sprite>& get_sprites();
+            sprite::spriteset& get_spriteset();
             Vector2 get_position();
             
             virtual int update(float delta){
@@ -60,12 +60,10 @@ namespace entities{
 
         protected:
             const int id_;
-            size_t sprite_index_ = 0;
 
             // TODO combine these into a class 
             std::vector<hitbox::hitbox> hitboxes_;
-            std::vector<sprite::sprite> sprites_;
-            
+            sprite::spriteset sprites_;            
             Vector2 position_;
 
     };
@@ -248,7 +246,7 @@ namespace entities{
             selected_dog_handler_([this](const events::selected_dog& event)->void {on_dog_select_event(event);}){
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 event_interface::subscribe<events::selected_dog>(selected_dog_handler_);
-                sprite_index_ = direction;
+                sprites_.set_index(direction);
             };
             player_dog(const player_dog& other) = default;
             player_dog(player_dog&& other) = default;

@@ -62,7 +62,7 @@ void menus::menu_graph::build_graph(){
         build_edge(&graph_[menu_ids::inventory].first, controls_config::key_press_actions::inventory_open),
         build_edge(&graph_[menu_ids::map].first, controls_config::key_press_actions::map_open),
     };
-
+    
     // Other menus all go back to blank
     graph_[menu_ids::pause].second = { build_edge(&graph_[menu_ids::blank].first, controls_config::key_press_actions::back) };
     graph_[menu_ids::tab].second = { build_edge(&graph_[menu_ids::blank].first, controls_config::key_press_actions::back) };
