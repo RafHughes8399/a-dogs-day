@@ -136,3 +136,12 @@ works
 
 -> very basic menu builds, to test navigation
 -> spriteset, has the up to four spots and the index
+
+
+-> basic menu art (like boxes and text)
+-> start building deco items and populating the shop
+    -> all have an level req of 0 and price of 0 to start
+-> design the shop layout and logic 
+-> test shop functionality 
+-> remove up and down sprites, just left and right, yk 
+-> only switch the sprite index when left or right changes

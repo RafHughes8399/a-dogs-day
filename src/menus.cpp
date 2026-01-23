@@ -7,32 +7,49 @@ menus::menu_builder menus::m_builder_;
 // ------------------------------- menu --------------------------------------- //
 void menus::menu::render(){
     // TODO
+    DrawRectangle(box_.x, box_.y, box_.width, box_.height, YELLOW);
+    DrawText(text_.c_str(), box_.x + 32, box_.y + 32, 32, BLACK);
     return;
+}
+
+void menus::item_menu::render(){
+    return ;
 }
 // ------------------------------ builder ---------------------------------- // 
 std::unique_ptr<menus::menu> menus::menu_builder::build_blank_menu() {
-    return std::make_unique<menus::menu>();
+    
+    return std::make_unique<menus::menu>(Rectangle{-1, -1, 0, 0});
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_pause_menu(){
-    return std::make_unique<menus::menu>();
+    std::string text = "pause";
+    Rectangle box = { 400, 400,  200, 200};
+    return std::make_unique<menus::menu>(box, text);
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_tab_menu(){
-    return std::make_unique<menus::menu>();
+    std::string text = "tab";
+    Rectangle box = { 400 , 400 ,  200, 200};
+    return std::make_unique<menus::menu>(box, text);
     
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_shop_menu(){
-    return std::make_unique<menus::menu>();
+    std::string text = "shop";
+    Rectangle box = { 400 , 400 ,  200, 200};
+    return std::make_unique<menus::menu>(box, text);
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_map_menu(){
-    return std::make_unique<menus::menu>();
+    std::string text = "map";
+    Rectangle box = { 400 , 400 ,  200, 200};
+    return std::make_unique<menus::menu>(box, text);
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_quest_menu(){
-    
-    return std::make_unique<menus::menu>();
+    std::string text = "quest";
+    Rectangle box = { 400 , 400 ,  200, 200};
+    return std::make_unique<menus::menu>(box, text);
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_inventory_menu(){
-    
-    return std::make_unique<menus::menu>();
+    std::string text = "inventory";
+    Rectangle box = { 400 , 400 ,  200, 200};
+    return std::make_unique<menus::menu>(box, text);    
 }
 menus::menu_graph menus::menu_builder::build_menus(){
     return menu_graph();
@@ -56,6 +73,7 @@ void menus::menu_graph::build_graph(){
     // Now add edges using pointers to nodes in the graph
     // Blank menu edges
     graph_[menu_ids::blank].second = {
+        build_edge(&graph_[menu_ids::pause].first, controls_config::key_press_actions::back),
         build_edge(&graph_[menu_ids::tab].first, controls_config::key_press_actions::menu_open),
         build_edge(&graph_[menu_ids::shop].first, controls_config::key_press_actions::shop_open),
         build_edge(&graph_[menu_ids::quest].first, controls_config::key_press_actions::quests_open),
@@ -79,11 +97,11 @@ int menus::menu_graph::update(float delta){
 
 void menus::menu_graph::on_key_press_event(const events::key_press& event){
     size_t key = event.get_key();
-
     // check the edges of current, if there is a key match, "move" 
+
     for(auto & edge : graph_[current_].second){
         if(edge.key_ == key){
-            auto dst = edge.destination_menu_;
+            node* dst = edge.destination_menu_;
             current_ = dst->id_;
         }
     }

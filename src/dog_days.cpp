@@ -13,14 +13,15 @@ int main(){
     auto game = game::game(level, player, menus);
     HideCursor();
     SetTargetFPS(60);
-
-    while(! WindowShouldClose()){
+    bool loop = true;
+    while(loop){
         float delta = GetFrameTime();
         game.update(delta);
         BeginDrawing();
             game.render(delta);
             game.debug(delta);
         EndDrawing();
+        if(IsKeyPressed(KEY_PERIOD)){loop = false;}
     }
     /**
      * 

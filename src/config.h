@@ -17,6 +17,8 @@ namespace player_config{
 }
 namespace level_config{
     // world dimensions
+    inline float screen_width = GetScreenWidth();
+    inline float screen_height = GetScreenHeight();
     inline float world_x = 4096.0f;
     inline float world_y = 4096.0f;
     

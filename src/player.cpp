@@ -78,6 +78,7 @@ void player::player::open_quests(){
 void player::player::open_shop(){
     std::cout << "open shop" << std::endl;
     std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::shop_open);
+    event_interface::queue_event(key_press);
     return;
 }
 

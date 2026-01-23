@@ -14,17 +14,21 @@ namespace menus{
     class menu{
         public:
             virtual ~menu() = default;
-            menu() {};
+            // ! baasic implementation, currently (23.01), for testing menu navigation
+            // ! proper implementation will follow 
+            menu(Rectangle box, std::string text = "")
+            : text_(text), box_(box) {};
             menu(const menu& other) = default;
             menu(menu&& other) = default;
             menu& operator=(const menu& other) = default;
             menu& operator=(menu&& other) = default;
 
-            void render();
+            virtual void render();
         
         protected:
-            //Vector2 position_; // anchor position where 
-            //Rectangle box_;
+        //Vector2 position_; // anchor position where 
+            Rectangle box_;
+            std::string text_;
             //hud::hud components_; // holds the hud elements and buttons
     };  
     class item_menu : public menu{
@@ -35,7 +39,7 @@ namespace menus{
             item_menu& operator=(const item_menu& other) = default;
             item_menu& operator=(item_menu&& other) = default;
 
-            void render();
+            void render() override;
         private:
             std::vector<std::unique_ptr<items::item>> items_;
             
@@ -74,10 +78,14 @@ namespace menus{
             node build_node(std::unique_ptr<menu> menu, size_t id);
             void build_graph();
         public:
-            ~menu_graph() = default;
+        // need to sub and unsub
+            ~menu_graph(){
+                event_interface::unsubscribe<events::key_press>(key_event_handler_);
+            }
             menu_graph()
             : current_(0), graph_(), key_event_handler_([this](const events::key_press& event) -> void {on_key_press_event(event);}){
                 build_graph();
+                event_interface::subscribe<events::key_press>(key_event_handler_);
             }
             menu_graph(const menu_graph& other) = default;
             menu_graph(menu_graph&& other) = default;
