@@ -83,16 +83,6 @@ void player::player::open_shop(){
 }
 
 void player::player::update(float delta){
-    
-
-    // ! working on new control scheme
-    /**
-     *   ! click and drag is gone, now move screen through arrow keys
-     *  ! right click for path selection stays 
-     * ! click to select dog is gone, but left click interactions should still stay 
-     *
-     *   
-    */ 
 
     // check pressed keys 
     for(auto & key : key_press_controls_){
