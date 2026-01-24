@@ -16,20 +16,20 @@ namespace menus{
             virtual ~menu() = default;
             // ! baasic implementation, currently (23.01), for testing menu navigation
             // ! proper implementation will follow 
-            menu(Rectangle box, std::string text = "")
-            : text_(text), box_(box) {};
-            menu(const menu& other) = default;
+            menu(Rectangle box, hud::hud components)
+            :box_(box), components_(std::move(components)) {};
+            menu(const menu& other) = delete;
             menu(menu&& other) = default;
-            menu& operator=(const menu& other) = default;
+            menu& operator=(const menu& other) = delete;
             menu& operator=(menu&& other) = default;
 
             virtual void render();
+            void subscribe_hud();
+            void unsubscribe_hud();
         
         protected:
-        //Vector2 position_; // anchor position where 
+            hud::hud components_; // holds the hud elements and buttons
             Rectangle box_;
-            std::string text_;
-            //hud::hud components_; // holds the hud elements and buttons
     };  
     class item_menu : public menu{
         public:
@@ -80,11 +80,14 @@ namespace menus{
         public:
         // need to sub and unsub
             ~menu_graph(){
+                event_interface::unsubscribe<events::interact_menu>(menu_interact_handler_);
                 event_interface::unsubscribe<events::key_press>(key_event_handler_);
             }
             menu_graph()
-            : current_(0), graph_(), key_event_handler_([this](const events::key_press& event) -> void {on_key_press_event(event);}){
+            : current_(0), graph_(), key_event_handler_([this](const events::key_press& event) -> void {on_key_press_event(event);}),
+            menu_interact_handler_([this](const events::interact_menu& event) -> void {on_menu_interact_event(event);}){
                 build_graph();
+                event_interface::subscribe<events::interact_menu>(menu_interact_handler_);
                 event_interface::subscribe<events::key_press>(key_event_handler_);
             }
             menu_graph(const menu_graph& other) = default;
@@ -99,12 +102,14 @@ namespace menus{
             int update(float delta);
 
             void on_key_press_event(const events::key_press& event);
+            void on_menu_interact_event(const events::interact_menu& event);
             void render();
 
 
+            events::event_handler<events::key_press> key_event_handler_;
+            events::event_handler<events::interact_menu> menu_interact_handler_;
             size_t current_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
-            events::event_handler<events::key_press> key_event_handler_;
     };
 
     class menu_builder{

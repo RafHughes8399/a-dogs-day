@@ -183,7 +183,7 @@ namespace items{
                 // kitchen equipment
                 std::unique_ptr<shop_item> build_pots();
                 std::unique_ptr<shop_item> build_pans();
-
+                std::unique_ptr<shop_item> build_moka();
                 // cooking stations 
                 std::unique_ptr<shop_item> build_oven();
                 std::unique_ptr<shop_item> build_stove();

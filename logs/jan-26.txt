@@ -135,7 +135,9 @@ works
     -> make everything alphabetical
 
 -> very basic menu builds, to test navigation
--> spriteset, has the up to four spots and the index
+-> spriteset, has the up to four sp
+
+ots and the index
 
 
 -> basic menu art (like boxes and text)
@@ -146,3 +148,8 @@ works
 -> and pause menu functionality
 -> remove up and down sprites, just left and right, yk 
 -> only switch the sprite index when left or right changes
+
+
+INSTEAD OF DIRECTIONS, DECORATIONS HAVE VARIANTS THEY HAVE THE UP DOWN LEFT RIGHT VARIANTS, AND YOU CAN ROTATE BETWEEN THEM
+
+buy the stove -> buy the moka wrapper for the stove to cook coffee

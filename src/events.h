@@ -36,10 +36,11 @@ namespace events{
 		move = 4,
 		remove = 5,
 		interact = 6,
-		select_dog = 7,
-		press_key = 8,
-		lvl_up = 9,
-		size = 10
+		menu_interact = 7,
+		select_dog = 8,
+		press_key = 9,
+		lvl_up = 10,
+		size = 11
 	};
 	class event{
 		protected:
@@ -102,6 +103,23 @@ namespace events{
 			private:
 			size_t id_;
 			hitbox::hitbox hitbox_; 
+		};
+		// for when the cursor potentially interacts with a button on a menu, main listener is the meny graph that checks the buttons
+		// on the current menu 
+		class interact_menu : public event {
+			public:
+				~interact_menu() = default;
+				interact_menu(hitbox::hitbox hitbox)
+				:event(ids::menu_interact), hitbox_(hitbox){};
+
+				static const int get_static_type(){
+					return ids::menu_interact;
+				}
+				const hitbox::hitbox& get_hitbox() const{
+					return hitbox_;
+				}
+				private:
+					hitbox::hitbox hitbox_; 
 		};
 		// when a key is pressed by the player, main listeners are the menus for menu navigation
 
