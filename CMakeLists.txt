@@ -48,16 +48,14 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
 endif()
 
 # Our Project
-link_libraries(raylib)
 
 # add_library(lib_name src/lib_name.cpp)
 # link_libraries(lib_name)
 
+link_libraries(raylib)
+
 add_library(raglib src/raglib.cpp)
 link_libraries(raglib)
-
-add_library(hitbox src/hitbox.cpp)
-link_libraries(hitbox)
 
 add_library(events src/events.cpp)
 link_libraries(events)
@@ -65,14 +63,27 @@ link_libraries(events)
 add_library(queries src/queries.cpp)
 link_libraries(queries)
 
-add_library(texture src/texture.cpp)
-link_libraries(texture)
-
 add_library(animation src/animation.cpp)
 link_libraries(animation)
 
 add_library(sprite src/sprite.cpp)
 link_libraries(sprite)
+
+add_library(item src/items.cpp)
+link_libraries(item)
+
+add_library(menu src/menus.cpp)
+link_libraries(menu)
+
+add_library(hud src/hud.cpp)
+link_libraries(hud)
+
+add_library(hitbox src/hitbox.cpp)
+link_libraries(hitbox)
+
+
+add_library(texture src/texture.cpp)
+link_libraries(texture)
 
 add_library(player src/player.cpp)
 link_libraries(player)

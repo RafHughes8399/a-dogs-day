@@ -11,7 +11,7 @@ namespace items{
     class item {
         public:
             virtual ~item() = default;
-            item(size_t id, sprite::sprite icon, sprite::sprite sprite, std::string name)
+            item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name)
             : id_(id), icon_(icon), sprite_(sprite), name_(name){}
             item(const item& other) = default;
             item(item&& other) = default;
@@ -23,7 +23,7 @@ namespace items{
             protected:
             size_t id_;
             sprite::sprite icon_; // the store / inventory icon
-            sprite::sprite sprite_; // the actual sprite with all four directions,  
+            sprite::spriteset sprite_; // the actual sprite with all four directions,  
             std::string name_;
         };
     class inventory_item : public item{
@@ -59,7 +59,7 @@ namespace items{
             ~shop_item() {
                 event_interface::unsubscribe<events::level_up>(level_up_handler_);
             }
-            shop_item(size_t id, sprite::sprite icon, sprite::sprite sprite, std::string name, int price, int level_req)
+            shop_item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name, int price, int level_req)
             : item(id, icon, sprite, name), price_(price), level_requirement_(level_req), locked_state_(std::make_unique<locked>()),
             level_up_handler_([this](const events::level_up& event)->void {on_level_up_event(event);}){
                 event_interface::subscribe<events::level_up>(level_up_handler_);
@@ -82,9 +82,27 @@ namespace items{
             std::unique_ptr<access_state> locked_state_;
     };
 
-
+    /**
+     * how can i pair the icon with the spriteset
+     * 
+     * to turn an item into an entity
+     * 
+     * 
+     * maybe somewhere there exists an id to spriteset map
+     * when you assign the item an id, you pull the spriteset from that map ?
+     * or maybe, a sprite icon (new sprite class) has a field for the spriteset
+     * then you assign when the icon is built
+     * 
+     * use pavlov as an example
+     * 
+     * 
+     * 
+     */
     class item_builder{
-
+        public:
+            std::unique_ptr<item> build_item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name);
+            std::unique_ptr<shop_item> build_shop_item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name, int price, int level_req);
+            
     };
     extern item_builder i_builder_;
 }

@@ -143,5 +143,6 @@ works
     -> all have an level req of 0 and price of 0 to start
 -> design the shop layout and logic 
 -> test shop functionality 
+-> and pause menu functionality
 -> remove up and down sprites, just left and right, yk 
 -> only switch the sprite index when left or right changes
