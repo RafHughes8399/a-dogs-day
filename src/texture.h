@@ -35,7 +35,8 @@ namespace textures{
         mack_right_out = 15,
         mack_up_out = 16,
         mack_down_out = 17,
-        size = 18
+        test_decoration = 18,
+        size = 19
         // and so on
     };
     class texture{

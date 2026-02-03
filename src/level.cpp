@@ -555,8 +555,7 @@ level::level level::level_builder::build_main_level(){
     auto cursor = entities::e_builder.build_cursor(GetMousePosition(), l.entity_id());
     l.add_entity(std::move(cursor), level_config::draw_layers::cursor);
     
-    // and the dogs
-    // TODO change the positions
-
+    auto test_decoration = entities::e_builder.build_test_decoration(Vector2 {level_config::edge_weight * 6, level_config::edge_weight * 6}, l.entity_id());
+    l.add_entity(std::move(test_decoration), level_config::draw_layers::decoration);
     return l;
 }

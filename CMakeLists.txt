@@ -97,6 +97,9 @@ link_libraries(cursor)
 add_library(dogs src/dogs.cpp)
 link_libraries(dogs)
 
+add_library(decorations src/decorations.cpp)
+link_libraries(decorations)
+
 add_library(render_layer src/render_layer.cpp)
 link_libraries(render_layer)
 

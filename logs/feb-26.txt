@@ -1,0 +1,28 @@
+
+INSTEAD OF DIRECTIONS, DECORATIONS HAVE VARIANTS THEY HAVE THE UP DOWN LEFT RIGHT VARIANTS, AND YOU CAN ROTATE BETWEEN THEM
+
+buy the stove -> buy the moka wrapper for the stove to cook coffee
+
+-> test button clicking
+requires:
+    -> cursor menu and level mode (to change how interaction and update works )
+    -> cursor states (hover, grab, click)
+    -> button building
+    -> 
+
+
+-> remove up and down sprites
+-> only switch the sprite index when left or right changes
+-> change dog sprites, base sprite has body, extra sprite for the head
+
+
+
+-> decoration functionality 
+    -> placing them in the world as an entity 
+    -> clicking on them (selected / unselected state, like the dogs )
+    -> clik and hold to drag them around
+or the dog class has an extra sprite set for the head
+and the base sprite is just the body
+
+that’s cleaner
+

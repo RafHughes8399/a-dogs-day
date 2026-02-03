@@ -81,6 +81,8 @@ namespace assets_config{
     inline const char* mack_right_outline_path = "../sprites/mack_right_outline.png";
     inline const char* mack_up_outline_path = "../sprites/mack_up_outline.png";
     inline const char* mack_down_outline_path = "../sprites/mack_down_outline.png";
+
+    inline const char* test_decoration_path ="../sprites/test_decoration.png";
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
     enum attributes{
         frame_width = 0,
@@ -96,6 +98,7 @@ namespace assets_config{
     inline const float khiri_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75, level_config::edge_weight * 2, 1.0f, 1.0f}; // TODO update values (4/11)
     inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 0.75, 1.0f, 1.0f}; // TODO update values (4/11)
     inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75, level_config::edge_weight * 2, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 2, 1.0f, 1.0f}; // TODO update values (3/02)
 
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     

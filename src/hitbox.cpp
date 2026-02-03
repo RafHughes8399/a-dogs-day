@@ -77,3 +77,6 @@ hitbox::hitbox hitbox::hitbox_builder::build_player_dog_across_hitbox(Vector2 po
 hitbox::hitbox hitbox::hitbox_builder::build_player_dog_down_hitbox(Vector2 position){
     return hitbox(Rectangle{position.x, position.y, assets_config::khiri_down_attributes[assets_config::attributes::frame_width], assets_config::khiri_down_attributes[assets_config::attributes::frame_height]});
 }
+hitbox::hitbox hitbox::hitbox_builder::build_test_decoration_hitbox(Vector2 position){
+    return hitbox(Rectangle{position.x, position.y, assets_config::test_decoration_attributes[assets_config::attributes::frame_width], assets_config::test_decoration_attributes[assets_config::attributes::frame_height]});
+}

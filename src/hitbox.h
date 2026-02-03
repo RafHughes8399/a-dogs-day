@@ -52,6 +52,7 @@ namespace hitbox{
             hitbox build_paw_mark_hitbox(Vector2 position);
             hitbox build_player_dog_across_hitbox(Vector2 position);
             hitbox build_player_dog_down_hitbox(Vector2 position);
+            hitbox build_test_decoration_hitbox(Vector2 position);
     }
     extern h_builder_;
 } // namespace hitbox

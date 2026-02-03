@@ -60,8 +60,6 @@ namespace entities{
 
         protected:
             const int id_;
-
-            // TODO combine these into a class 
             std::vector<hitbox::hitbox> hitboxes_;
             sprite::spriteset sprites_;            
             Vector2 position_;
@@ -294,7 +292,19 @@ namespace entities{
 
     class decoration : public entity {
         public:
+            ~decoration() = default;
+            decoration(std::vector<sprite::sprite>& sprite, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
+            : entity(sprite, hitboxes, position, id){
+                
+            }
+            decoration(const decoration& other) = default;
+            decoration(decoration&& other);
+
+            decoration& operator=(const decoration& other) = default;
+            decoration& operator=(decoration&& other) = default;
+            
         private:
+
     };
     // ------------------ entity builder ------------------ //
     class entity_builder{
@@ -303,6 +313,8 @@ namespace entities{
             std::unique_ptr<entity> build_mack(Vector2 position, int id);
             std::unique_ptr<entity> build_khiri(Vector2 position, int id);
             std::unique_ptr<entity> build_paw_mark(Vector2 position, int id);
+
+            std::unique_ptr<entity> build_test_decoration(Vector2 position, int id);
             ~entity_builder() = default;
             entity_builder() {};
             entity_builder(const entity_builder& other) = default;
