@@ -149,24 +149,32 @@ namespace entities{
                 cursor& operator=(const cursor& other) = default;
                 cursor& operator=(cursor&& other)  = default;
                 
-                
+                float get_hold_meter();
+
                 int update(float delta) override;
                 
+                void increment_meter(int amount = 1);                
                 void interact(entity& other) override;     
                 void on_edit_mode_switch_event(const events::edit_mode_switch& event);       
                 void on_left_mouse_click_event(const events::left_mouse_click& event);
                 void on_move_view_frame_event(const events::move_view_frame& event);
                 void on_right_mouse_click_event(const events::right_mouse_click& event);                
+            
+                void reset_meter();
             private:
+                
                 enum animation_tags{
                         base = 0,
                         hover = 1
                 };
+
                 events::event_handler<events::edit_mode_switch> edit_mode_handler_;
                 events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
                 events::event_handler<events::move_view_frame> move_view_frame_handler_;
                 events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
                 
+                int click_and_hold_meter_ = 0;
+
                 std::unique_ptr<interaction_strategy> interaction_strategy_;
         };
         

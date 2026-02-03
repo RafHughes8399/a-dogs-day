@@ -2,9 +2,6 @@
 #include <iostream>
 
 // ----------------------- player ----------------------- //
-
-
-
 void player::player::setup_control_maps(){
     // ! figure out how to assign 
     key_press_controls_[controls_config::key_press_actions::dog_switch] = [this]() -> void {switch_dog();};
@@ -21,6 +18,27 @@ void player::player::setup_control_maps(){
     key_hold_controls_[controls_config::key_hold_actions::move_left] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::left], delta);};
     key_hold_controls_[controls_config::key_hold_actions::move_right] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::right], delta);};
 }
+
+// ----------------------------- player states ----------------------------- // 
+
+void player::player::state::left_click(player& player){
+    std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(GetMousePosition(), 
+    assets_config::cursor_attributes[assets_config::attributes::frame_width], assets_config::cursor_attributes[assets_config::attributes::frame_height]);
+    event_interface::queue_event(left_mouse_click_event);
+}
+void player::player::state::right_click(player& player){
+    std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(GetMousePosition(), player.selected_dog_);
+    event_interface::queue_event(right_mouse_click_event);
+}
+
+void player::player::editing::left_click(player& player){
+
+}
+
+void player::player::carrying_decoration::left_click(player& player){
+
+}
+
 void player::player::on_selected_dog(const events::selected_dog& event){
     auto id = event.get_id();
     selected_dog_ = id;
@@ -34,18 +52,15 @@ void player::player::back(){
 }
 
 void player::player::edit(float delta){
-    // ! needs to be bidirectional - i.e hold to go into edit and then hold again to go out of edit
-    if(edit_meter_ < game_config::edit_mode_hold){
-        edit_meter_ += (1 * delta);
+     // ! needs to be bidirectional - i.e hold to go into edit and then hold again to go out of edit
+    if(edit_meter_ < game_config::hold_duration){
+        edit_meter_ += 1;
         std::cout << "edit progress: " << edit_meter_ << std::endl;
     }
     
-    if(edit_meter_ >= game_config::edit_mode_hold){
-        // change the mode of the cursor
-        edit_mode_ ^= 1;
-        // create event
-        std::unique_ptr<events::event> edit_switch_event = std::make_unique<events::edit_mode_switch>(edit_mode_);
-        event_interface::queue_event(edit_switch_event);
+    if(edit_meter_ >= game_config::hold_duration){
+        // change the player state
+        state_ = std::make_unique<editing>();
         edit_meter_ = 0; // then reset the meter
     }
     else{
@@ -105,6 +120,13 @@ void player::player::open_shop(){
     return;
 }
 
+
+void player::player::left_click(){
+    state_->left_click(*this);
+}
+void player::player::right_click(){
+    state_->right_click(*this);
+}
 void player::player::update(float delta){
 
     // check pressed keys 
@@ -124,28 +146,13 @@ void player::player::update(float delta){
     }
 
 
-    // mouse inputs depend on the state of the player
     // check mouse inputs
     if(IsMouseButtonPressed(mouse_controls_[mouse::left_mouse])){
-        // do event for check selct interaciotn
-
-        std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(GetMousePosition(), 
-        assets_config::cursor_attributes[assets_config::attributes::frame_width], assets_config::cursor_attributes[assets_config::attributes::frame_height]);
-        event_interface::queue_event(left_mouse_click_event);
-
-
-        // the left mouse click checks if the cursor interacts with anything
+        left_click();
     }    
     else if(IsMouseButtonPressed(mouse_controls_[mouse::right_mouse])){
         // do event for creating visual thing
-        std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(GetMousePosition(), selected_dog_);
-        event_interface::queue_event(right_mouse_click_event);
-
-        // pass in the dog id
-        
-    }
-    else {
-        // set default state
+        right_click();
     }
     return;
 }

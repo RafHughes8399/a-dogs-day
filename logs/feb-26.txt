@@ -53,5 +53,45 @@ things to implement
 
 
 
+slight rethink ok 
+e to go into edit mode (x)
+    -> changes the player control state
+        -> lmb changes (can only interact with decorations, )
+        -> clicking on a decoration "picks it up", clicking again "puts it down"
+        -> the deocration is moved physically and in the level_graph for pathfinding
+
+    
+    player control states 
+        -> default 
+        -> edit
+        -> carrying-decoration
+            -> lmb now only checks decorations
+                -> changes the player state to carrying
+                -> and the decoration now listesn for cursor movement 
+                    -> while carrying only lmb works
+                        -> lmb then can place the decoration down 
+                            -> the decoration stops listening to cursor movement
+                            -> and the graph representation fo the cursor is updated
+
+    -> upon clicking the
+-> how do you get out of edit state ?
+-> incorporate it into the player states
+
+
+ok so: 
+    the player can switch between editing and not editing
+    upon entering edit mode:
+        -> the cursor left click interactions must change so I think
+            -> the cursor has the same states as the player for editing, carrying
+            -> and changes in accordance to the player 
+            -> these states override the left click interaction behaviour
+            -> which is how you acheive what you want to 
+
+editing left click:
+    -> makes a 
+
+editing right click 
+
+
 the level graph stores a
 

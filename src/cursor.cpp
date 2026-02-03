@@ -6,29 +6,40 @@ void entities::cursor::default_strategy::interact(cursor& cursor, entity& other)
 }
 void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){
 
-    // cast to a player dog 
-    // a bit if elsey but not sure otherwise
-     if(entities::player_dog* dog_cast = dynamic_cast<entities::player_dog*>(&other)){
-        // I need the dog id, and need to update the player's selected dog id
+    if(entities::player_dog* dog_cast = dynamic_cast<entities::player_dog*>(&other)){
         auto dog_id = dog_cast->get_id();
-
         std::unique_ptr<events::event> selected_dog = std::make_unique<events::selected_dog>(dog_id);
         event_interface::execute_event(*selected_dog);
-
     }
-    
-    if(entities::decoration* decoration_cast = dynamic_cast<entities::decoration*>(&other)){
-        //if(is_editing){
-            // make the decoration subscribe to cursor move events 
-            // change the state of the player to moving decoration
-        //}
-    }  
+    /**
+     * 
+     if(entities::decoration* decoration_cast = dynamic_cast<entities::decoration*>(&other)){
+        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
+            if(cursor.get_hold_meter() < game_config::cursor_hold_duration){
+                cursor.increment_meter();
+                std::cout << "hold progress: " << cursor.get_hold_meter() << std::endl;
+            }
+            
+            if(cursor.get_hold_meter() >= game_config::cursor_hold_duration){
+                std::cout << "hold complete " << std::endl;
+                cursor.reset_meter();
+            }
+        }
+        else {
+            // Mouse button is not held, reset
+            std::cout << "reset meter " << std::endl;
+            cursor.reset_meter();
+        }
+    }
+    */
 }
 void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
     
 }
 // -------------------------------- cursor --------------------------------//
-
+float entities::cursor::get_hold_meter(){
+    return click_and_hold_meter_;
+}
 int entities::cursor::update(float delta){
     auto old_position = position_;
     position_ =  GetMousePosition();
@@ -42,25 +53,30 @@ int entities::cursor::update(float delta){
         std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(hitboxes_[sprites_.index()], id_);
         // the listener (singular) does something with the query and returns the information
         bool is_colliding = queries::bool_executor_.execute_query(*colliding_query);
-        //bool is_colliding = query_interface::execute_query(*colliding_query);
+
         if(is_colliding){
             // switch to colliding 
             sprites_[sprites_.index()].get_animation().goto_animation(animation_tags::hover);
+
         }
         else{
             sprites_[sprites_.index()].get_animation().goto_animation(animation_tags::base);
             // switch to default anim
         }
-        
-
+    
         return status_codes::moved;
     }
     return status_codes::nothing;
 }
 
+void entities::cursor::increment_meter(int delta){
+    click_and_hold_meter_ += delta;
+}
+
 void entities::cursor::interact(entities::entity& other){
     interaction_strategy_->interact(*this, other);
 }
+
 void entities::cursor::on_edit_mode_switch_event(const events::edit_mode_switch& event){
     // change the state of the cursor
     (void) event;
@@ -73,15 +89,6 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
     // check interactions within the quadtree, use the correct interaction stategy (the left click one)
     interaction_strategy_ = std::make_unique<left_click_strategy>();
     
-    
-    // ! note that the interaction strategy changes back on the current frame, but the interaction 
-    // ! event would not be executed until the next frame, so that could be an issue, if it is, just 
-    // ! execute it directly
-    
-
-    // ! lets test this theory
-    // ! your theory was correct yay, i think, do one more test 
-    // create the interaction event
     std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, hitboxes_[sprites_.index()]);
     event_interface::execute_event(*interaction_event);
     // then return to default interaciton
@@ -89,8 +96,6 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
 
 }
 void entities::cursor::on_move_view_frame_event(const events::move_view_frame& event){
-
-
     // look, its left mouse down 
     auto mouse_delta = event.get_delta();
     auto new_position = Vector2Add(position_, mouse_delta);
@@ -111,6 +116,11 @@ void entities::cursor::on_right_mouse_click_event(const events::right_mouse_clic
     // do something, then go back
     interaction_strategy_ = std::make_unique<default_strategy>();
 }
+
+void entities::cursor::reset_meter(){
+    click_and_hold_meter_ = 0;
+}
+
 // -------------------------------- paw mark --------------------------------//
 int entities::paw_mark::update(float delta){
     auto& animation = sprites_[sprites_.index()].get_animation();

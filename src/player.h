@@ -31,27 +31,50 @@ namespace player{
     class player{
         public:
             class state {
-                virtual ~state() = default;
-                state(){};
-                state(const state& other) = default;
-                state(state&& other) = default;
-                
-                state& operator=(const state& other) = default;
-                state& operator=(state&& other) = default;
-        
-                // has the "default " control behaviour
+                public:
+                    virtual ~state() = default;
+                    state(){};
+                    state(const state& other) = default;
+                    state(state&& other) = default;
+                    
+                    state& operator=(const state& other) = default;
+                    state& operator=(state&& other) = default;
+                    
+                    // has the "default " control behaviour
+                    virtual void left_click(player& player);
+                    virtual void right_click(player& player);
+            };
+            class editing : public state{
+                public:
+                    virtual ~editing() = default;
+                    editing()
+                    : state(){};
+                    editing(const editing& other) = default;
+                    editing(editing&& other) = default;
+                    
+                    editing& operator=(const editing& other) = default;
+                    editing& operator=(editing&& other) = default;
+                    
+                    void left_click(player& player) override;
+                    //void right_click(player& player) override;
+            };
+            class carrying_decoration : public editing {
+                public:
+                    ~carrying_decoration() = default;
+                    carrying_decoration()
+                    : editing(){};
+                    carrying_decoration(const carrying_decoration& other) = default;
+                    carrying_decoration(carrying_decoration&& other) = default;
+                    
+                    carrying_decoration& operator=(const carrying_decoration& other) = default;
+                    carrying_decoration& operator=(carrying_decoration&& other) = default;
+                    
+                    // has the "default " control behaviour
+                    void left_click(player& player) override;
+                    //void right_click(player& player) override;
+            };
+
             
-            };
-            class moving_decoration : public state {
-                // changes how left clikc works, instead of "picking up" a decoration, it places it
-                // when the decoration is placed, it unsubscirbes from the cursor events
-            };
-            class default : public state {
-
-            };
-
-            // add more states, they change how controls operator
-
             ~player(){
                 event_interface::unsubscribe<events::selected_dog>(select_dog_handler_);
             }
@@ -80,6 +103,8 @@ namespace player{
             void open_quests();
             void open_shop();
             
+            void left_click(); 
+            void right_click();
             void select_dog();
             void switch_dog();
 
@@ -99,10 +124,9 @@ namespace player{
 
             events::event_handler<events::selected_dog> select_dog_handler_;            
             inventory inventory_;
-            float edit_meter_ = 0.0f;
+            int edit_meter_ = 0;
 
             int bones_ = player_config::max_bones;
-            int edit_mode_ = 0; // 0 for not editing, 1 for editing
             int level_ = player_config::max_level;
             int selected_dog_;
             
@@ -110,6 +134,7 @@ namespace player{
             std::map<int, std::function<void(float)>> key_hold_controls_;
             std::map<int, std::function<void()>> key_press_controls_; 
             
+            std::unique_ptr<state> state_;
             Vector2 mouse_position_;
             
     };

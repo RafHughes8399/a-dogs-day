@@ -9,8 +9,9 @@
 #include <vector>
 #include "raylib.h"
 namespace game_config {
-    inline const int twenty_seconds = 1200; // seconds in frames
-    inline const float edit_mode_hold = 3.2; // seconds
+    inline const int frames = 60;
+    inline const int twenty_seconds = frames * 60; // 20 seconds in frames
+    inline const float hold_duration = frames * 1.5; // 3 seconds in frames
 }
 namespace player_config{
     inline const int max_bones = 999999;
