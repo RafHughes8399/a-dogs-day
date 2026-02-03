@@ -9,7 +9,8 @@
 #include <vector>
 #include "raylib.h"
 namespace game_config {
-    inline const int twenty_seconds = 1200;
+    inline const int twenty_seconds = 1200; // seconds in frames
+    inline const float edit_mode_hold = 3.2; // seconds
 }
 namespace player_config{
     inline const int max_bones = 999999;
@@ -116,7 +117,7 @@ namespace controls_config{
         back = KEY_ESCAPE
     };
     enum key_hold_actions{
-        //edit_mode = KEY_E,
+        edit_mode = KEY_E,
         move_down = KEY_DOWN,
         move_up  = KEY_UP,
         move_left = KEY_LEFT,

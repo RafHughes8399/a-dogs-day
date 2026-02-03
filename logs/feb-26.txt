@@ -26,3 +26,32 @@ and the base sprite is just the body
 
 that’s cleaner
 
+-> placed decoration in the world 
+-> click and hold to drag them around
+-> deco hold click meter ? 
+
+
+-> press and hold e to go into edit mode
+-> then click on a decoration 
+    ->  it then follows the mouse around until clicked again 
+    -> there it snaps to the nearest point on the level_graph
+
+things to implement
+    -> e to go into edit mode
+    -> cursor states (interacting, moving decoration, hovering, etc)
+    -> decoration states (default, and then being moved)
+    -> the left click interaction does what:
+        -> changes the state of the cursor to moving decoration
+            -> which makes the cursor create "moving cursor" events every frame
+            -> the decoration being clicked on then subscribes to those events and follows the cursor
+            ->
+    -> upon another click
+        -> the moving state ends
+            -> sending a "place decoration" event with a position to the listening decoration
+            -> the decoration is placed at that point and snaps to the grid
+            -> sends a move decoration from position_a to position_b
+
+
+
+the level graph stores a
+

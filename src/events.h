@@ -40,7 +40,8 @@ namespace events{
 		select_dog = 8,
 		press_key = 9,
 		lvl_up = 10,
-		size = 11
+		edit_switch = 11,
+		size = 12
 	};
 	class event{
 		protected:
@@ -84,6 +85,23 @@ namespace events{
 		std::time_t time_;
 
 	};
+	// for when the player finishes holding down the edit button to switch between edit and non-edit mode, the cursor
+	// listens to change its state
+	class edit_mode_switch : public event{
+		public:
+			~edit_mode_switch() = default;
+			edit_mode_switch(int mode)
+			:event(ids::edit_switch), mode_(mode){};
+
+			static const int get_static_type(){
+				return ids::edit_switch;
+			}
+			int get_mode() const {
+				return mode_;
+			}
+			private:
+				int mode_;
+		};
 	// for when an entity potentailly interacts with another, main listener is the quad tree to check collisionss
 	class interact_entity : public event{
 		public:

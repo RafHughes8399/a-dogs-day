@@ -15,8 +15,14 @@ void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& oth
         std::unique_ptr<events::event> selected_dog = std::make_unique<events::selected_dog>(dog_id);
         event_interface::execute_event(*selected_dog);
 
-    } 
+    }
     
+    if(entities::decoration* decoration_cast = dynamic_cast<entities::decoration*>(&other)){
+        //if(is_editing){
+            // make the decoration subscribe to cursor move events 
+            // change the state of the player to moving decoration
+        //}
+    }  
 }
 void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
     
@@ -55,7 +61,12 @@ int entities::cursor::update(float delta){
 void entities::cursor::interact(entities::entity& other){
     interaction_strategy_->interact(*this, other);
 }
-
+void entities::cursor::on_edit_mode_switch_event(const events::edit_mode_switch& event){
+    // change the state of the cursor
+    (void) event;
+    std::cout << "swtich cursor state " << std::endl;
+    return;
+}
 void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click& event){
     auto position = event.get_mouse_position();
     auto hitbox = event.get_hitbox();

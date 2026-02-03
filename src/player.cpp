@@ -15,6 +15,7 @@ void player::player::setup_control_maps(){
     key_press_controls_[controls_config::key_press_actions::map_open] = [this]() -> void {open_map();};
     key_press_controls_[controls_config::key_press_actions::back] = [this]() -> void {back();};
 
+    key_hold_controls_[controls_config::key_hold_actions::edit_mode] = [this](float delta) -> void {edit(delta);};
     key_hold_controls_[controls_config::key_hold_actions::move_up] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::up], delta);};
     key_hold_controls_[controls_config::key_hold_actions::move_down] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::down], delta);};
     key_hold_controls_[controls_config::key_hold_actions::move_left] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::left], delta);};
@@ -30,6 +31,28 @@ void player::player::back(){
     std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::back);
     event_interface::queue_event(key_press);
 
+}
+
+void player::player::edit(float delta){
+    // ! needs to be bidirectional - i.e hold to go into edit and then hold again to go out of edit
+    if(edit_meter_ < game_config::edit_mode_hold){
+        edit_meter_ += (1 * delta);
+        std::cout << "edit progress: " << edit_meter_ << std::endl;
+    }
+    
+    if(edit_meter_ >= game_config::edit_mode_hold){
+        // change the mode of the cursor
+        edit_mode_ ^= 1;
+        // create event
+        std::unique_ptr<events::event> edit_switch_event = std::make_unique<events::edit_mode_switch>(edit_mode_);
+        event_interface::queue_event(edit_switch_event);
+        edit_meter_ = 0; // then reset the meter
+    }
+    else{
+        if(! IsKeyDown(controls_config::key_hold_actions::edit_mode)){
+            edit_meter_ = 0;
+        }
+    }
 }
 void player::player::move(Vector2 direction_scalar, float delta){
     
@@ -100,33 +123,19 @@ void player::player::update(float delta){
         }
     }
 
-    // check mouse inputs
 
-    // check controls that have been pressed and create the approproiate events
+    // mouse inputs depend on the state of the player
+    // check mouse inputs
     if(IsMouseButtonPressed(mouse_controls_[mouse::left_mouse])){
         // do event for check selct interaciotn
 
-        // what would a click event need  ?
-        // the position of the click
-        // what information would the level need
-            // the position of the cursor for sure
-            // and its hitbox, do i have that information ? , i think so 
         std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(GetMousePosition(), 
         assets_config::cursor_attributes[assets_config::attributes::frame_width], assets_config::cursor_attributes[assets_config::attributes::frame_height]);
         event_interface::queue_event(left_mouse_click_event);
 
 
         // the left mouse click checks if the cursor interacts with anything
-    }
-
-    /*     
-    else if(IsMouseButtonDown(mouse_controls_[mouse::left_mouse])){
-        // do event for dragging
-        std::unique_ptr<events::event> move_view_frame_event = std::make_unique<events::move_view_frame>(GetMouseDelta());
-        event_interface::queue_event(move_view_frame_event);
-    } 
-    */
-    
+    }    
     else if(IsMouseButtonPressed(mouse_controls_[mouse::right_mouse])){
         // do event for creating visual thing
         std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(GetMousePosition(), selected_dog_);

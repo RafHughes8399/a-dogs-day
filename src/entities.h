@@ -68,6 +68,7 @@ namespace entities{
 
     class cursor : public entity{
         public:
+            // more of a combination of state and strategy ig
             class interaction_strategy{
                 public:
                     virtual ~interaction_strategy() = default;
@@ -92,6 +93,7 @@ namespace entities{
                     default_strategy& operator=(default_strategy&& other) = default;
                     void interact(cursor& cursor, entity& other) override;
                 private:
+                    
             };
             class left_click_strategy : public interaction_strategy{
                 public:
@@ -106,6 +108,7 @@ namespace entities{
                     void interact(cursor& cursor, entity& other) override;
                     
                     private:
+                        int hold_meter_ = 0;
                 };
                 
                 class right_click_strategy : public interaction_strategy{
@@ -123,16 +126,19 @@ namespace entities{
                 };
 
                 ~cursor() {
+                    event_interface::unsubscribe<events::edit_mode_switch>(edit_mode_handler_);
                     event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
                     event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 }
                 cursor(std::vector<sprite::sprite>& sprites, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
                 : entity(sprites, hitboxes, position, id), 
+                edit_mode_handler_([this](const events::edit_mode_switch& event) -> void{on_edit_mode_switch_event(event);}),
                 left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
                 move_view_frame_handler_([this](const events::move_view_frame& event) -> void{on_move_view_frame_event(event);}),
                 right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_click_event(event);}),
                 interaction_strategy_(std::make_unique<default_strategy>()){
+                    event_interface::subscribe<events::edit_mode_switch>(edit_mode_handler_);
                     event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
                     event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
@@ -146,7 +152,8 @@ namespace entities{
                 
                 int update(float delta) override;
                 
-                void interact(entity& other) override;            
+                void interact(entity& other) override;     
+                void on_edit_mode_switch_event(const events::edit_mode_switch& event);       
                 void on_left_mouse_click_event(const events::left_mouse_click& event);
                 void on_move_view_frame_event(const events::move_view_frame& event);
                 void on_right_mouse_click_event(const events::right_mouse_click& event);                
@@ -155,6 +162,7 @@ namespace entities{
                         base = 0,
                         hover = 1
                 };
+                events::event_handler<events::edit_mode_switch> edit_mode_handler_;
                 events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
                 events::event_handler<events::move_view_frame> move_view_frame_handler_;
                 events::event_handler<events::right_mouse_click> right_mouse_click_handler_;

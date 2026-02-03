@@ -30,6 +30,27 @@ namespace player{
     // also include at some point hud and inventory
     class player{
         public:
+            class state {
+                virtual ~state() = default;
+                state(){};
+                state(const state& other) = default;
+                state(state&& other) = default;
+                
+                state& operator=(const state& other) = default;
+                state& operator=(state&& other) = default;
+        
+                // has the "default " control behaviour
+            
+            };
+            class moving_decoration : public state {
+                // changes how left clikc works, instead of "picking up" a decoration, it places it
+                // when the decoration is placed, it unsubscirbes from the cursor events
+            };
+            class default : public state {
+
+            };
+
+            // add more states, they change how controls operator
 
             ~player(){
                 event_interface::unsubscribe<events::selected_dog>(select_dog_handler_);
@@ -51,6 +72,7 @@ namespace player{
             player& operator=(player&& other) = default;
 
             void back();
+            void edit(float delta);
             void move(Vector2 direction_scalar, float delta);            
             void open_inventory();
             void open_map();
@@ -77,7 +99,10 @@ namespace player{
 
             events::event_handler<events::selected_dog> select_dog_handler_;            
             inventory inventory_;
+            float edit_meter_ = 0.0f;
+
             int bones_ = player_config::max_bones;
+            int edit_mode_ = 0; // 0 for not editing, 1 for editing
             int level_ = player_config::max_level;
             int selected_dog_;
             
