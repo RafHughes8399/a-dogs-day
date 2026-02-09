@@ -22,7 +22,9 @@ Vector2 entities::entity::get_position(){
 void entities::entity::render(Vector2 draw_position ){
     sprites_.render(draw_position);
     auto box = hitboxes_[sprites_.index()].get_box();
-    DrawRectangleLines(draw_position.x, draw_position.y, box.width, box.height, GREEN);
+    // draw the hitbox at its actual place 
+
+    DrawRectangleLines(box.x, box.y, box.width, box.height, GREEN);
 }
 
 

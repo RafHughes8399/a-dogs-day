@@ -3,6 +3,20 @@
 // ------------------------ decorations -----------------------------------// 
 
 
+void entities::decoration::on_moved_cursor(const events::moved_cursor& event){
+    std::cout << "update decoration position " << std::endl;
+    position_ = event.get_position();
+    std::for_each(hitboxes_.begin(), hitboxes_.end(), [this](hitbox::hitbox& h)-> void {h.update(position_);});
+}
+ void entities::decoration::subscribe_to_cursor(){
+    std::cout << "subscribe to cursor moves" << std::endl;
+    event_interface::subscribe<events::moved_cursor>(moved_cursor_handler);
+}
+void entities::decoration::unsubscribe_from_cursor(){
+    std::cout << "unsubscribe from cursor moves " << std::endl;
+    event_interface::unsubscribe<events::moved_cursor>(moved_cursor_handler);
+}
+
 // ------------------------------ builds -------------------------------- //
 
 std::unique_ptr<entities::entity> entities::entity_builder::build_test_decoration(Vector2 position, int id){

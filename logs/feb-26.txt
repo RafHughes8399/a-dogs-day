@@ -87,6 +87,21 @@ ok so:
             -> these states override the left click interaction behaviour
             -> which is how you acheive what you want to 
 
+            -> lets think about it, 
+            -> the player left click remains the same (it still creates a left click event)
+            -> it is the cursor behaviour that is changing
+            -> it is the cursor that should have the state, not the player
+            
+
+            the interaction is governed by the state of the cursor and the mouse button that was pressed (or not pressed)
+            
+            make the cursor change state
+
+            
+
+
+how do you get out of edit, come to that later
+
 editing left click:
     -> makes a 
 

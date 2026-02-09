@@ -41,7 +41,8 @@ namespace events{
 		press_key = 9,
 		lvl_up = 10,
 		edit_switch = 11,
-		size = 12
+		cursor_move = 12,
+		size = 13
 	};
 	class event{
 		protected:
@@ -87,21 +88,17 @@ namespace events{
 	};
 	// for when the player finishes holding down the edit button to switch between edit and non-edit mode, the cursor
 	// listens to change its state
-	class edit_mode_switch : public event{
+	class edit_mode : public event{
 		public:
-			~edit_mode_switch() = default;
-			edit_mode_switch(int mode)
-			:event(ids::edit_switch), mode_(mode){};
+			~edit_mode() = default;
+			edit_mode()
+			:event(ids::edit_switch){};
 
 			static const int get_static_type(){
 				return ids::edit_switch;
 			}
-			int get_mode() const {
-				return mode_;
-			}
-			private:
-				int mode_;
-		};
+		private:
+	};
 	// for when an entity potentailly interacts with another, main listener is the quad tree to check collisionss
 	class interact_entity : public event{
 		public:
@@ -122,58 +119,59 @@ namespace events{
 			size_t id_;
 			hitbox::hitbox hitbox_; 
 		};
+
 		// for when the cursor potentially interacts with a button on a menu, main listener is the meny graph that checks the buttons
 		// on the current menu 
-		class interact_menu : public event {
-			public:
-				~interact_menu() = default;
-				interact_menu(hitbox::hitbox hitbox)
-				:event(ids::menu_interact), hitbox_(hitbox){};
+	class interact_menu : public event {
+		public:
+			~interact_menu() = default;
+			interact_menu(hitbox::hitbox hitbox)
+			:event(ids::menu_interact), hitbox_(hitbox){};
 
-				static const int get_static_type(){
-					return ids::menu_interact;
-				}
-				const hitbox::hitbox& get_hitbox() const{
-					return hitbox_;
-				}
-				private:
-					hitbox::hitbox hitbox_; 
-		};
+			static const int get_static_type(){
+				return ids::menu_interact;
+			}
+			const hitbox::hitbox& get_hitbox() const{
+				return hitbox_;
+			}
+		private:
+			hitbox::hitbox hitbox_; 
+	};
 		// when a key is pressed by the player, main listeners are the menus for menu navigation
 
-		class key_press: public event{
-			public:	
-				~key_press() = default;
-				key_press(int key)
-				:event(ids::press_key), key_(key){};
-	
-				static const int get_static_type(){
-					return ids::press_key;
-				}
-				int get_key() const {
-					return key_;
-				}
-			private:
-				int key_;
-		};
-		// when the player levels up, main listeners are shop items to check if the level requirement 
-		// is met to purhcase 
-		// and in future to play level up hud animations
-		class level_up: public event{
-			public:	
-				~level_up() = default;
-				level_up(int new_level)
-				:event(ids::lvl_up), new_level_(new_level){};
-	
-				static const int get_static_type(){
-					return ids::lvl_up;
-				}
-				int get_new_level() const {
-					return new_level_;
-				}
-			private:
-				int new_level_;
-		};
+	class key_press: public event{
+		public:	
+			~key_press() = default;
+			key_press(int key)
+			:event(ids::press_key), key_(key){};
+
+			static const int get_static_type(){
+				return ids::press_key;
+			}
+			int get_key() const {
+				return key_;
+			}
+		private:
+			int key_;
+	};
+	// when the player levels up, main listeners are shop items to check if the level requirement 
+	// is met to purhcase 
+	// and in future to play level up hud animations
+	class level_up: public event{
+		public:	
+			~level_up() = default;
+			level_up(int new_level)
+			:event(ids::lvl_up), new_level_(new_level){};
+
+			static const int get_static_type(){
+				return ids::lvl_up;
+			}
+			int get_new_level() const {
+				return new_level_;
+			}
+		private:
+			int new_level_;
+	};
 	// when the cursor left click occurs, main listener is the quad tree to check collisions
 	class left_mouse_click : public event{
 		public:
@@ -195,22 +193,39 @@ namespace events{
 		private:
 			Vector2 mouse_position_;
 			Rectangle collision_box_;
-		};
-	
+	};
+
 	// when an entity moves, main listener is the quad tree to move entities into the correct node
 	class move_entity : public event{
 		public:
 		~move_entity() = default;
 		move_entity(size_t id)
 			: event(ids::move), id_(id){};
-			static const int get_static_type(){
-				return ids::move;
-			}
+		static const int get_static_type(){
+			return ids::move;
+		}
 		size_t get_id() const{
 			return id_;
 		}
 		private:
 		size_t id_;
+	};
+
+	class moved_cursor : public event{
+		public:
+			~moved_cursor() = default;
+			moved_cursor(Vector2 position)
+			: event(ids::cursor_move), new_position_(position){};
+
+			static const int get_static_type(){
+				return ids::cursor_move;
+			}
+			
+			Vector2 get_position() const{
+				return new_position_;
+			}
+		private:
+			Vector2 new_position_;
 	};
 	
 	// when an view_Frame moves, main listener is the level to adjust the view_frame when the player

@@ -32,7 +32,8 @@ void player::player::state::right_click(player& player){
 }
 
 void player::player::editing::left_click(player& player){
-
+    
+    std::cout << "edit left click " << std::endl;
 }
 
 void player::player::carrying_decoration::left_click(player& player){
@@ -55,12 +56,16 @@ void player::player::edit(float delta){
      // ! needs to be bidirectional - i.e hold to go into edit and then hold again to go out of edit
     if(edit_meter_ < game_config::hold_duration){
         edit_meter_ += 1;
-        std::cout << "edit progress: " << edit_meter_ << std::endl;
+        // ! temporary pending UI implementation
+        auto text = std::string("edit meter at " + std::to_string(edit_meter_));
+        DrawText(text.c_str(), 50, 50, 32, YELLOW);
     }
     
     if(edit_meter_ >= game_config::hold_duration){
         // change the player state
-        state_ = std::make_unique<editing>();
+        std::cout << "edit meter filled " << std::endl;
+        std::unique_ptr<events::event> cursor_edit_state = std::make_unique<events::edit_mode>();
+        event_interface::queue_event(cursor_edit_state);
         edit_meter_ = 0; // then reset the meter
     }
     else{
@@ -122,6 +127,7 @@ void player::player::open_shop(){
 
 
 void player::player::left_click(){
+    std::cout << "left mouse clicked " << std::endl;
     state_->left_click(*this);
 }
 void player::player::right_click(){

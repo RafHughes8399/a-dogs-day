@@ -16,8 +16,8 @@ int main(){
     bool loop = true;
     while(loop){
         float delta = GetFrameTime();
-        game.update(delta);
         BeginDrawing();
+            game.update(delta);
             game.render(delta);
             game.debug(delta);
         EndDrawing();

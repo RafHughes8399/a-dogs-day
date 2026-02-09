@@ -80,7 +80,7 @@ namespace player{
             }
             player(int selected_dog = level_config::mack_id)
             : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_press_controls_({}),
-            key_hold_controls_({}), selected_dog_(selected_dog),
+            key_hold_controls_({}), selected_dog_(selected_dog), state_(std::make_unique<state>()),
             select_dog_handler_([this](const events::selected_dog& event) -> void{on_selected_dog(event);}){
                 event_interface::subscribe(select_dog_handler_);
                 setup_control_maps();

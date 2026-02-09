@@ -2,50 +2,83 @@
 
 // -------------------------------- interaction strategies --------------------------------//
 void entities::cursor::default_strategy::interact(cursor& cursor, entity& other){
-    
+    (void) cursor;
+    return;
 }
-void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){
-
-    if(entities::player_dog* dog_cast = dynamic_cast<entities::player_dog*>(&other)){
-        auto dog_id = dog_cast->get_id();
-        std::unique_ptr<events::event> selected_dog = std::make_unique<events::selected_dog>(dog_id);
-        event_interface::execute_event(*selected_dog);
-    }
-    /**
-     * 
-     if(entities::decoration* decoration_cast = dynamic_cast<entities::decoration*>(&other)){
-        if(IsMouseButtonDown(MOUSE_BUTTON_LEFT)){
-            if(cursor.get_hold_meter() < game_config::cursor_hold_duration){
-                cursor.increment_meter();
-                std::cout << "hold progress: " << cursor.get_hold_meter() << std::endl;
-            }
-            
-            if(cursor.get_hold_meter() >= game_config::cursor_hold_duration){
-                std::cout << "hold complete " << std::endl;
-                cursor.reset_meter();
-            }
-        }
-        else {
-            // Mouse button is not held, reset
-            std::cout << "reset meter " << std::endl;
-            cursor.reset_meter();
-        }
-    }
-    */
+void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){\
+    std::cout << "perform left click interaction" << std::endl;
+    cursor.state_->left_click(cursor, other);
 }
 void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
+    cursor.state_->right_click(cursor, other); 
+}
+
+// ------------------------------- cursor states ---------------------------- //
+
+void entities::cursor::state::create_move_event(cursor& cursor){
+    // don't make an event
+}
+void entities::cursor::state::left_click(cursor& cursor, entity& other){
+    // for "selecting a dog" and bringing up the hud
+    (void) cursor;
+    (void) other;
+}
+void entities::cursor::state::right_click(cursor& cursor, entity& other){
+    // for creating a paw mark, telling a dog where to go or what to start interacting with
+    (void) cursor;
+    (void) other;
+    return;
+}
+
+
+void entities::cursor::carrying_decoration::create_move_event(cursor& cursor){
+    // do make a move event
+    std::cout << "create moved event " << std::endl;
+    std::unique_ptr<events::event> cursor_moved_event = std::make_unique<events::moved_cursor>(cursor.position_);
+    event_interface::queue_event(cursor_moved_event);
+}
+
+void entities::cursor::editing::left_click(cursor& cursor, entity& other){
+    // makes other subscribe to cursor move events
+    std::cout << "edit left click " << std::endl;
+    if(decoration* decoration_cast = dynamic_cast<decoration*>(&other)){
+        
+        decoration_cast->subscribe_to_cursor();
+
+        std::cout << " and switch to carrying " << std::endl;
+        cursor.state_ = std::make_unique<carrying_decoration>();
+    }
     
+    return;
 }
+void entities::cursor::editing::right_click(cursor& cursor, entity& other){
+    // override, do nothing
+
+}
+
+void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& other){
+    // places the decoration back down
+    // makes the move call in the level graph
+    std::cout << "carrying left click" << std::endl;
+    if(decoration* decoration_cast  = dynamic_cast<decoration*>(&other)){
+        decoration_cast->unsubscribe_from_cursor();
+
+        std::cout << "and switch back to edtiing "<< std::endl; 
+        cursor.state_ = std::make_unique<editing>();
+    }
+
+
+}
+
 // -------------------------------- cursor --------------------------------//
-float entities::cursor::get_hold_meter(){
-    return click_and_hold_meter_;
-}
+
 int entities::cursor::update(float delta){
     auto old_position = position_;
     position_ =  GetMousePosition();
 
     if(! Vector2Equals(old_position, position_)) {
         hitboxes_[sprites_.index()].update(position_);
+        create_move_event();
 
         // create the query and execute it
 
@@ -69,31 +102,36 @@ int entities::cursor::update(float delta){
     return status_codes::nothing;
 }
 
-void entities::cursor::increment_meter(int delta){
-    click_and_hold_meter_ += delta;
+void entities::cursor::create_move_event(){
+    state_->create_move_event(*this);
 }
-
 void entities::cursor::interact(entities::entity& other){
     interaction_strategy_->interact(*this, other);
 }
 
-void entities::cursor::on_edit_mode_switch_event(const events::edit_mode_switch& event){
+
+void entities::cursor::on_edit_mode_event(const events::edit_mode& event){
     // change the state of the cursor
-    (void) event;
-    std::cout << "swtich cursor state " << std::endl;
+    std::cout << "swtich cursor state to editing " << std::endl;
+    state_ = std::make_unique<editing>();
     return;
 }
 void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click& event){
     auto position = event.get_mouse_position();
     auto hitbox = event.get_hitbox();
     // check interactions within the quadtree, use the correct interaction stategy (the left click one)
+    std::cout << "left click event process " << std::endl;
     interaction_strategy_ = std::make_unique<left_click_strategy>();
     
+    // ?  can I pass the event the function I want called ? no
+    // ? the state overrides the
+    
+    // strategy is just state->left_click();
     std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, hitboxes_[sprites_.index()]);
     event_interface::execute_event(*interaction_event);
+    std::cout << "execute interaction check " << std::endl;
     // then return to default interaciton
     interaction_strategy_ = std::make_unique<default_strategy>();
-
 }
 void entities::cursor::on_move_view_frame_event(const events::move_view_frame& event){
     // look, its left mouse down 
@@ -115,10 +153,6 @@ void entities::cursor::on_right_mouse_click_event(const events::right_mouse_clic
     interaction_strategy_ = std::make_unique<right_click_strategy>();
     // do something, then go back
     interaction_strategy_ = std::make_unique<default_strategy>();
-}
-
-void entities::cursor::reset_meter(){
-    click_and_hold_meter_ = 0;
 }
 
 // -------------------------------- paw mark --------------------------------//

@@ -68,7 +68,55 @@ namespace entities{
 
     class cursor : public entity{
         public:
-            // more of a combination of state and strategy ig
+            class state {
+                public:
+                    virtual ~state() = default;
+                    state(){};
+                    state(const state& other) = default;
+                    state(state&& other) = default;
+                    
+                    state& operator=(const state& other) = default;
+                    state& operator=(state&& other) = default;
+                    
+                    virtual void create_move_event(cursor& cursor);
+                    virtual void left_click(cursor& cursor, entity& other);
+                    virtual void right_click(cursor& cursor, entity& other);
+            };
+            class in_menus : public state{
+                // to be implemented
+                ~in_menus() = default;
+                in_menus()
+                : state() {};
+            };
+            class editing : public state{
+                public:
+                    virtual ~editing() = default;
+                    editing()
+                    : state(){};
+                    editing(const editing& other) = default;
+                    editing(editing&& other) = default;
+                    
+                    editing& operator=(const editing& other) = default;
+                    editing& operator=(editing&& other) = default;
+                    
+                    void left_click(cursor& cursor, entity& other) override;
+                    void right_click(cursor& cursor, entity& other) override;
+                    
+                };
+                class carrying_decoration : public editing {
+                    public:
+                    ~carrying_decoration() = default;
+                    carrying_decoration()
+                    : editing(){};
+                    carrying_decoration(const carrying_decoration& other) = default;
+                    carrying_decoration(carrying_decoration&& other) = default;
+                    
+                    carrying_decoration& operator=(const carrying_decoration& other) = default;
+                    carrying_decoration& operator=(carrying_decoration&& other) = default;
+                    
+                    void left_click(cursor& cursor, entity& other) override;
+                    void create_move_event(cursor& cursor) override;
+            };
             class interaction_strategy{
                 public:
                     virtual ~interaction_strategy() = default;
@@ -108,7 +156,6 @@ namespace entities{
                     void interact(cursor& cursor, entity& other) override;
                     
                     private:
-                        int hold_meter_ = 0;
                 };
                 
                 class right_click_strategy : public interaction_strategy{
@@ -126,41 +173,41 @@ namespace entities{
                 };
 
                 ~cursor() {
-                    event_interface::unsubscribe<events::edit_mode_switch>(edit_mode_handler_);
+                    event_interface::unsubscribe<events::edit_mode>(edit_mode_handler_);
                     event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
                     event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 }
                 cursor(std::vector<sprite::sprite>& sprites, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
                 : entity(sprites, hitboxes, position, id), 
-                edit_mode_handler_([this](const events::edit_mode_switch& event) -> void{on_edit_mode_switch_event(event);}),
+                edit_mode_handler_([this](const events::edit_mode& event) -> void{on_edit_mode_event(event);}),
                 left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
                 move_view_frame_handler_([this](const events::move_view_frame& event) -> void{on_move_view_frame_event(event);}),
                 right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_click_event(event);}),
-                interaction_strategy_(std::make_unique<default_strategy>()){
-                    event_interface::subscribe<events::edit_mode_switch>(edit_mode_handler_);
+                interaction_strategy_(std::make_unique<default_strategy>()),
+                state_(std::make_unique<state>()){
+                    event_interface::subscribe<events::edit_mode>(edit_mode_handler_);
                     event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
                     event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 };
+
                 cursor(const cursor& other) = default;
                 cursor(cursor&& other) = default;
                     
                 cursor& operator=(const cursor& other) = default;
                 cursor& operator=(cursor&& other)  = default;
                 
-                float get_hold_meter();
 
                 int update(float delta) override;
-                
-                void increment_meter(int amount = 1);                
-                void interact(entity& other) override;     
-                void on_edit_mode_switch_event(const events::edit_mode_switch& event);       
+                void create_move_event();
+                void interact(entity& other) override;   
+
+                void on_edit_mode_event(const events::edit_mode& event);       
                 void on_left_mouse_click_event(const events::left_mouse_click& event);
                 void on_move_view_frame_event(const events::move_view_frame& event);
                 void on_right_mouse_click_event(const events::right_mouse_click& event);                
             
-                void reset_meter();
             private:
                 
                 enum animation_tags{
@@ -168,14 +215,13 @@ namespace entities{
                         hover = 1
                 };
 
-                events::event_handler<events::edit_mode_switch> edit_mode_handler_;
+                events::event_handler<events::edit_mode> edit_mode_handler_;
                 events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
                 events::event_handler<events::move_view_frame> move_view_frame_handler_;
                 events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
                 
-                int click_and_hold_meter_ = 0;
-
                 std::unique_ptr<interaction_strategy> interaction_strategy_;
+                std::unique_ptr<state> state_;
         };
         
         class paw_mark : public entity{
@@ -310,7 +356,7 @@ namespace entities{
         public:
             ~decoration() = default;
             decoration(std::vector<sprite::sprite>& sprite, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
-            : entity(sprite, hitboxes, position, id){
+            : entity(sprite, hitboxes, position, id), moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ){
                 
             }
             decoration(const decoration& other) = default;
@@ -319,7 +365,13 @@ namespace entities{
             decoration& operator=(const decoration& other) = default;
             decoration& operator=(decoration&& other) = default;
             
+
+            void on_moved_cursor(const events::moved_cursor& event);
+            void subscribe_to_cursor();
+            void unsubscribe_from_cursor();
+
         private:
+            events::event_handler<events::moved_cursor> moved_cursor_handler;
 
     };
     // ------------------ entity builder ------------------ //
