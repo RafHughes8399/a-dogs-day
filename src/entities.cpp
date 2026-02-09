@@ -26,7 +26,16 @@ void entities::entity::render(Vector2 draw_position ){
 
     DrawRectangleLines(box.x, box.y, box.width, box.height, GREEN);
 }
+void entities::entity::move(Vector2 new_position){
+    // update hte position
+    position_ = new_position;
 
+    // update the hitboxes
+    std::for_each(hitboxes_.begin(), hitboxes_.end(), [this](hitbox::hitbox& h) -> void {h.update(position_);});
+    // move in the quadtree
+    std::unique_ptr<events::event> move_event = std::make_unique<events::move_entity>(id_);
+    event_interface::queue_event(move_event);
+}
 
 // --------------------------- builder --------------------------- //
 

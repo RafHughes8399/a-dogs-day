@@ -110,3 +110,7 @@ editing right click
 
 the level graph stores a
 
+
+
+-> next is exiting edit state
+-> 

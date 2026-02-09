@@ -45,6 +45,7 @@ namespace entities{
             sprite::sprite& get_sprite();
             sprite::spriteset& get_spriteset();
             Vector2 get_position();
+            void move(Vector2 new_postion);
             
             virtual int update(float delta){
                 (void) delta;

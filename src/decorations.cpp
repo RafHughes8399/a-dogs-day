@@ -4,9 +4,7 @@
 
 
 void entities::decoration::on_moved_cursor(const events::moved_cursor& event){
-    std::cout << "update decoration position " << std::endl;
-    position_ = event.get_position();
-    std::for_each(hitboxes_.begin(), hitboxes_.end(), [this](hitbox::hitbox& h)-> void {h.update(position_);});
+    move(event.get_position());
 }
  void entities::decoration::subscribe_to_cursor(){
     std::cout << "subscribe to cursor moves" << std::endl;
