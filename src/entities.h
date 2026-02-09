@@ -357,7 +357,8 @@ namespace entities{
         public:
             ~decoration() = default;
             decoration(std::vector<sprite::sprite>& sprite, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
-            : entity(sprite, hitboxes, position, id), moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ){
+            : entity(sprite, hitboxes, position, id), pre_move_position_(position_),
+            moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ){
                 
             }
             decoration(const decoration& other) = default;
@@ -367,12 +368,14 @@ namespace entities{
             decoration& operator=(decoration&& other) = default;
             
 
+            
             void on_moved_cursor(const events::moved_cursor& event);
             void subscribe_to_cursor();
             void unsubscribe_from_cursor();
 
         private:
             events::event_handler<events::moved_cursor> moved_cursor_handler;
+            Vector2 pre_move_position_;
 
     };
     // ------------------ entity builder ------------------ //

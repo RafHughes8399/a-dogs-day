@@ -113,4 +113,5 @@ the level graph stores a
 
 
 -> next is exiting edit state
--> 
+-> and then updating in the graph
+-> for decorations only

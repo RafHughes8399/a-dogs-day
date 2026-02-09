@@ -6,13 +6,27 @@
 void entities::decoration::on_moved_cursor(const events::moved_cursor& event){
     move(event.get_position());
 }
+
  void entities::decoration::subscribe_to_cursor(){
     std::cout << "subscribe to cursor moves" << std::endl;
+    // store the "start position"
+    pre_move_position_ = position_;
     event_interface::subscribe<events::moved_cursor>(moved_cursor_handler);
 }
 void entities::decoration::unsubscribe_from_cursor(){
     std::cout << "unsubscribe from cursor moves " << std::endl;
     event_interface::unsubscribe<events::moved_cursor>(moved_cursor_handler);
+    // this is the "end position"
+    auto post_move_position = position_;
+    auto width = hitboxes_[sprites_.index()].get_box().width;
+    auto height = hitboxes_[sprites_.index()].get_box().height;
+
+    auto pre_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
+    auto post_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
+    std::unique_ptr<events::event> move_decoration = std::make_unique<events::moved_decoration>(pre_move_rectangle, post_move_rectangle, id_);
+    // create a move_in_graph_event
+
+    // pass in the two rectangles 
 }
 
 // ------------------------------ builds -------------------------------- //

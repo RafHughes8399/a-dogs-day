@@ -57,8 +57,6 @@ void player::player::edit(float delta){
     if(edit_meter_ < game_config::hold_duration){
         edit_meter_ += 1;
         // ! temporary pending UI implementation
-        auto text = std::string("edit meter at " + std::to_string(edit_meter_));
-        DrawText(text.c_str(), 50, 50, 32, YELLOW);
     }
     
     if(edit_meter_ >= game_config::hold_duration){

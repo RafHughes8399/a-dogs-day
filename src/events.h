@@ -42,7 +42,8 @@ namespace events{
 		lvl_up = 10,
 		edit_switch = 11,
 		cursor_move = 12,
-		size = 13
+		decoration_move = 13,
+		size = 14
 	};
 	class event{
 		protected:
@@ -227,7 +228,29 @@ namespace events{
 		private:
 			Vector2 new_position_;
 	};
-	
+	class moved_decoration : public event{
+		public:
+			~moved_decoration() = default;
+			moved_decoration(Rectangle pre, Rectangle post, size_t id)
+			: event(ids::decoration_move), pre_move_(pre), post_move_(post), id_(id){}
+
+			static const int get_static_type(){
+				return ids::decoration_move;
+			}
+			Rectangle get_pre_move() const{
+				return pre_move_;
+			}
+			Rectangle get_post_move() const {
+				return post_move_;
+			} 
+			size_t get_id() const {
+				return id_;
+			}
+		private:
+			Rectangle pre_move_;
+			Rectangle post_move_;
+			size_t id_;
+	};
 	// when an view_Frame moves, main listener is the level to adjust the view_frame when the player
 	// moves it
 	class move_view_frame : public event{
