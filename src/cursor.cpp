@@ -6,7 +6,6 @@ void entities::cursor::default_strategy::interact(cursor& cursor, entity& other)
     return;
 }
 void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){\
-    std::cout << "perform left click interaction" << std::endl;
     cursor.state_->left_click(cursor, other);
 }
 void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
@@ -34,19 +33,16 @@ void entities::cursor::state::right_click(cursor& cursor, entity& other){
 
 void entities::cursor::carrying_decoration::create_move_event(cursor& cursor){
     // do make a move event
-    std::cout << "create moved event " << std::endl;
     std::unique_ptr<events::event> cursor_moved_event = std::make_unique<events::moved_cursor>(cursor.position_);
     event_interface::queue_event(cursor_moved_event);
 }
 
 void entities::cursor::editing::left_click(cursor& cursor, entity& other){
     // makes other subscribe to cursor move events
-    std::cout << "edit left click " << std::endl;
     if(decoration* decoration_cast = dynamic_cast<decoration*>(&other)){
         
         decoration_cast->subscribe_to_cursor();
 
-        std::cout << " and switch to carrying " << std::endl;
         cursor.state_ = std::make_unique<carrying_decoration>();
     }
     
@@ -60,11 +56,9 @@ void entities::cursor::editing::right_click(cursor& cursor, entity& other){
 void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& other){
     // places the decoration back down
     // makes the move call in the level graph
-    std::cout << "carrying left click" << std::endl;
     if(decoration* decoration_cast  = dynamic_cast<decoration*>(&other)){
         decoration_cast->unsubscribe_from_cursor();
 
-        std::cout << "and switch back to edtiing "<< std::endl; 
         cursor.state_ = std::make_unique<editing>();
     }
 
@@ -113,13 +107,11 @@ void entities::cursor::interact(entities::entity& other){
 
 void entities::cursor::on_enter_edit_mode_event(const events::enter_edit_mode& event){
     // change the state of the cursor
-    std::cout << "swtich cursor state to editing " << std::endl;
     state_ = std::make_unique<editing>();
     return;
 }
 void entities::cursor::on_exit_edit_mode_event(const events::exit_edit_mode& event){
     // change the state of the cursor
-    std::cout << "swtich cursor state to editing " << std::endl;
     state_ = std::make_unique<state>();
     return;
 }
@@ -128,7 +120,6 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
     auto position = event.get_mouse_position();
     auto hitbox = event.get_hitbox();
     // check interactions within the quadtree, use the correct interaction stategy (the left click one)
-    std::cout << "left click event process " << std::endl;
     interaction_strategy_ = std::make_unique<left_click_strategy>();
     
     // ?  can I pass the event the function I want called ? no
@@ -137,7 +128,6 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
     // strategy is just state->left_click();
     std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, hitboxes_[sprites_.index()]);
     event_interface::execute_event(*interaction_event);
-    std::cout << "execute interaction check " << std::endl;
     // then return to default interaciton
     interaction_strategy_ = std::make_unique<default_strategy>();
 }

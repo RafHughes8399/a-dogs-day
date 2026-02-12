@@ -81,7 +81,7 @@ void player::player::exit_edit(){
     // make an event for the cursor
     // change the control state 
     std::unique_ptr<events::event> exit_edit = std::make_unique<events::exit_edit_mode>();
-    
+    event_interface::queue_event(exit_edit);
 }
 void player::player::move(Vector2 direction_scalar, float delta){
     

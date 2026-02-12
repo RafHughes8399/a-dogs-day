@@ -8,13 +8,11 @@ void entities::decoration::on_moved_cursor(const events::moved_cursor& event){
 }
 
  void entities::decoration::subscribe_to_cursor(){
-    std::cout << "subscribe to cursor moves" << std::endl;
     // store the "start position"
     pre_move_position_ = position_;
     event_interface::subscribe<events::moved_cursor>(moved_cursor_handler);
 }
 void entities::decoration::unsubscribe_from_cursor(){
-    std::cout << "unsubscribe from cursor moves " << std::endl;
     event_interface::unsubscribe<events::moved_cursor>(moved_cursor_handler);
     // this is the "end position"
     auto post_move_position = position_;

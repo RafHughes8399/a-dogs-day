@@ -65,7 +65,6 @@ void player::controls::build_editing_controls_state(){
 // -------------------------------- controls ------------------------------
 void player::controls::check(float delta){
     // check the controls for 
-
     for(auto & key : key_press_controls_[current_scheme_]){
         if(IsKeyPressed(key.first)) {
             auto action = key.second;
