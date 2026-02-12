@@ -4,19 +4,22 @@
 // ----------------------- player ----------------------- //
 void player::player::setup_control_maps(){
     // ! figure out how to assign 
-    key_press_controls_[controls_config::key_press_actions::dog_switch] = [this]() -> void {switch_dog();};
-    key_press_controls_[controls_config::key_press_actions::shop_open] = [this]() -> void{open_shop();};
-    key_press_controls_[controls_config::key_press_actions::inventory_open] = [this]() -> void {open_inventory();};
-    key_press_controls_[controls_config::key_press_actions::menu_open] = [this]() -> void {open_menu();};
-    key_press_controls_[controls_config::key_press_actions::quests_open] = [this]() -> void {open_quests();};
-    key_press_controls_[controls_config::key_press_actions::map_open] = [this]() -> void {open_map();};
-    key_press_controls_[controls_config::key_press_actions::back] = [this]() -> void {back();};
-
-    key_hold_controls_[controls_config::key_hold_actions::edit_mode] = [this](float delta) -> void {edit(delta);};
-    key_hold_controls_[controls_config::key_hold_actions::move_up] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::up], delta);};
-    key_hold_controls_[controls_config::key_hold_actions::move_down] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::down], delta);};
-    key_hold_controls_[controls_config::key_hold_actions::move_left] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::left], delta);};
-    key_hold_controls_[controls_config::key_hold_actions::move_right] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::right], delta);};
+    /**
+     * 
+     key_press_controls_[controls_config::key_press_actions::dog_switch] = [this]() -> void {switch_dog();};
+     key_press_controls_[controls_config::key_press_actions::shop_open] = [this]() -> void{open_shop();};
+     key_press_controls_[controls_config::key_press_actions::inventory_open] = [this]() -> void {open_inventory();};
+     key_press_controls_[controls_config::key_press_actions::menu_open] = [this]() -> void {open_menu();};
+     key_press_controls_[controls_config::key_press_actions::quests_open] = [this]() -> void {open_quests();};
+     key_press_controls_[controls_config::key_press_actions::map_open] = [this]() -> void {open_map();};
+     key_press_controls_[controls_config::key_press_actions::back] = [this]() -> void {back();};
+     
+     key_hold_controls_[controls_config::key_hold_actions::edit_mode] = [this](float delta) -> void {edit(delta);};
+     key_hold_controls_[controls_config::key_hold_actions::move_up] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::up], delta);};
+     key_hold_controls_[controls_config::key_hold_actions::move_down] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::down], delta);};
+     key_hold_controls_[controls_config::key_hold_actions::move_left] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::left], delta);};
+     key_hold_controls_[controls_config::key_hold_actions::move_right] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::right], delta);};
+     */
 }
 
 // ----------------------------- player states ----------------------------- // 
@@ -62,8 +65,9 @@ void player::player::edit(float delta){
     if(edit_meter_ >= game_config::hold_duration){
         // change the player state
         std::cout << "edit meter filled " << std::endl;
-        std::unique_ptr<events::event> cursor_edit_state = std::make_unique<events::edit_mode>();
-        event_interface::queue_event(cursor_edit_state);
+        std::unique_ptr<events::event> enter_edit = std::make_unique<events::enter_edit_mode>();
+        event_interface::queue_event(enter_edit);
+        
         edit_meter_ = 0; // then reset the meter
     }
     else{
@@ -71,6 +75,13 @@ void player::player::edit(float delta){
             edit_meter_ = 0;
         }
     }
+}
+
+void player::player::exit_edit(){
+    // make an event for the cursor
+    // change the control state 
+    std::unique_ptr<events::event> exit_edit = std::make_unique<events::exit_edit_mode>();
+    
 }
 void player::player::move(Vector2 direction_scalar, float delta){
     
@@ -134,7 +145,9 @@ void player::player::right_click(){
 void player::player::update(float delta){
 
     // check pressed keys 
-    for(auto & key : key_press_controls_){
+    /**
+     * 
+     for(auto & key : key_press_controls_){
         if(IsKeyPressed(key.first)) {
             auto action = key.second;
             action();
@@ -159,6 +172,7 @@ void player::player::update(float delta){
         right_click();
     }
     return;
+    */
 }
 void player::player::render(){
     return;

@@ -20,6 +20,7 @@ void entities::cursor::state::create_move_event(cursor& cursor){
 }
 void entities::cursor::state::left_click(cursor& cursor, entity& other){
     // for "selecting a dog" and bringing up the hud
+    // pending implementation 
     (void) cursor;
     (void) other;
 }
@@ -110,12 +111,19 @@ void entities::cursor::interact(entities::entity& other){
 }
 
 
-void entities::cursor::on_edit_mode_event(const events::edit_mode& event){
+void entities::cursor::on_enter_edit_mode_event(const events::enter_edit_mode& event){
     // change the state of the cursor
     std::cout << "swtich cursor state to editing " << std::endl;
     state_ = std::make_unique<editing>();
     return;
 }
+void entities::cursor::on_exit_edit_mode_event(const events::exit_edit_mode& event){
+    // change the state of the cursor
+    std::cout << "swtich cursor state to editing " << std::endl;
+    state_ = std::make_unique<state>();
+    return;
+}
+
 void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click& event){
     auto position = event.get_mouse_position();
     auto hitbox = event.get_hitbox();

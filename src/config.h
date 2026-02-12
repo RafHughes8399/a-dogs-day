@@ -115,7 +115,8 @@ namespace controls_config{
         menu_open = KEY_TAB,
         quests_open = KEY_Q,
         map_open = KEY_M,
-        back = KEY_ESCAPE
+        back = KEY_ESCAPE,
+        exit_edit = KEY_E
     };
     enum key_hold_actions{
         edit_mode = KEY_E,

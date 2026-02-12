@@ -40,10 +40,11 @@ namespace events{
 		select_dog = 8,
 		press_key = 9,
 		lvl_up = 10,
-		edit_switch = 11,
-		cursor_move = 12,
-		decoration_move = 13,
-		size = 14
+		enter_edit = 11,
+		exit_edit = 12,
+		cursor_move = 13,
+		decoration_move = 14,
+		size = 15
 	};
 	class event{
 		protected:
@@ -89,14 +90,25 @@ namespace events{
 	};
 	// for when the player finishes holding down the edit button to switch between edit and non-edit mode, the cursor
 	// listens to change its state
-	class edit_mode : public event{
+	class enter_edit_mode : public event{
 		public:
-			~edit_mode() = default;
-			edit_mode()
-			:event(ids::edit_switch){};
+			~enter_edit_mode() = default;
+			enter_edit_mode()
+			:event(ids::enter_edit){};
 
 			static const int get_static_type(){
-				return ids::edit_switch;
+				return ids::enter_edit;
+			}
+		private:
+	};
+	class exit_edit_mode : public event{
+		public:
+			~exit_edit_mode() = default;
+			exit_edit_mode()
+			:event(ids::exit_edit){};
+
+			static const int get_static_type(){
+				return ids::exit_edit;
 			}
 		private:
 	};

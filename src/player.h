@@ -19,6 +19,11 @@ namespace player{
         left_mouse = 0,
         right_mouse = 1
     };
+    enum control_states{
+        regular = 0,
+        editing = 1
+        // menu = 2 maybe 
+    };
 
     class inventory{
         public:
@@ -96,6 +101,7 @@ namespace player{
 
             void back();
             void edit(float delta);
+            void exit_edit();
             void move(Vector2 direction_scalar, float delta);            
             void open_inventory();
             void open_map();
@@ -121,7 +127,6 @@ namespace player{
              */
             
             void setup_control_maps();
-
             events::event_handler<events::selected_dog> select_dog_handler_;            
             inventory inventory_;
             int edit_meter_ = 0;
@@ -138,7 +143,48 @@ namespace player{
             Vector2 mouse_position_;
             
     };
+    class controls {
+        public:
+            ~controls() {
+                event_interface::unsubscribe<events::enter_edit_mode>(enter_edit_mode_handler_);
+                event_interface::unsubscribe<events::exit_edit_mode>(exit_edit_mode_handler_);
+            }
+            controls(player* player, size_t index = control_states::regular)
+            :player_(player), current_scheme_(index),
+            enter_edit_mode_handler_([this](const events::enter_edit_mode& event) -> void {on_enter_edit_mode(event);}),
+            exit_edit_mode_handler_([this](const events::exit_edit_mode& event) -> void {on_exit_edit_mode(event);})
+            {
 
+                build_controls();
+                event_interface::subscribe<events::enter_edit_mode>(enter_edit_mode_handler_);
+                event_interface::subscribe<events::exit_edit_mode>(exit_edit_mode_handler_);
+            }
+            controls(const controls& other) = default;
+            controls(controls&& other) = default;
+
+            controls& operator=(const controls& other) = default;
+            controls& operator=(controls&& other) = default;
+
+            void check(float delta);
+            void on_enter_edit_mode(const events::enter_edit_mode& event);
+            void on_exit_edit_mode(const events::exit_edit_mode& event);
+        private:
+            // operate as two parralel arrays
+            void build_controls();
+            void build_default_controls_state();
+            void build_editing_controls_state();
+
+            size_t current_scheme_;
+            
+            events::event_handler<events::enter_edit_mode> enter_edit_mode_handler_;
+            events::event_handler<events::exit_edit_mode> exit_edit_mode_handler_;
+            std::vector<std::map<int, std::function<void()>>> mouse_controls_; 
+            std::vector<std::map<int, std::function<void(float)>>> key_hold_controls_;
+            std::vector<std::map<int, std::function<void()>>> key_press_controls_; 
+
+            player* player_;
+            // and listen to events         
+    };
 } // namespace player
 
 #endif

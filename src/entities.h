@@ -174,20 +174,23 @@ namespace entities{
                 };
 
                 ~cursor() {
-                    event_interface::unsubscribe<events::edit_mode>(edit_mode_handler_);
+                    event_interface::unsubscribe<events::enter_edit_mode>(enter_edit_mode_handler_);
+                    event_interface::unsubscribe<events::exit_edit_mode>(exit_edit_mode_handler_);
                     event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
                     event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 }
                 cursor(std::vector<sprite::sprite>& sprites, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
                 : entity(sprites, hitboxes, position, id), 
-                edit_mode_handler_([this](const events::edit_mode& event) -> void{on_edit_mode_event(event);}),
+                enter_edit_mode_handler_([this](const events::enter_edit_mode& event) -> void{on_enter_edit_mode_event(event);}),
+                exit_edit_mode_handler_([this](const events::exit_edit_mode& event) -> void{on_exit_edit_mode_event(event);}),
                 left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
                 move_view_frame_handler_([this](const events::move_view_frame& event) -> void{on_move_view_frame_event(event);}),
                 right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_click_event(event);}),
                 interaction_strategy_(std::make_unique<default_strategy>()),
                 state_(std::make_unique<state>()){
-                    event_interface::subscribe<events::edit_mode>(edit_mode_handler_);
+                    event_interface::subscribe<events::enter_edit_mode>(enter_edit_mode_handler_);
+                    event_interface::subscribe<events::exit_edit_mode>(exit_edit_mode_handler_);
                     event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
                     event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
@@ -204,7 +207,8 @@ namespace entities{
                 void create_move_event();
                 void interact(entity& other) override;   
 
-                void on_edit_mode_event(const events::edit_mode& event);       
+                void on_enter_edit_mode_event(const events::enter_edit_mode& event);       
+                void on_exit_edit_mode_event(const events::exit_edit_mode& event);       
                 void on_left_mouse_click_event(const events::left_mouse_click& event);
                 void on_move_view_frame_event(const events::move_view_frame& event);
                 void on_right_mouse_click_event(const events::right_mouse_click& event);                
@@ -216,7 +220,8 @@ namespace entities{
                         hover = 1
                 };
 
-                events::event_handler<events::edit_mode> edit_mode_handler_;
+                events::event_handler<events::enter_edit_mode> enter_edit_mode_handler_;
+                events::event_handler<events::exit_edit_mode> exit_edit_mode_handler_;
                 events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
                 events::event_handler<events::move_view_frame> move_view_frame_handler_;
                 events::event_handler<events::right_mouse_click> right_mouse_click_handler_;

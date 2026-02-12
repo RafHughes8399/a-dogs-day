@@ -10,7 +10,8 @@ int main(){
     auto level = level_builder.build_main_level();
     auto menus = menus::m_builder_.build_menus();
     auto player = player::player();
-    auto game = game::game(level, player, menus);
+    auto controls = player::controls(&player);
+    auto game = game::game(level, player, menus, controls);
     HideCursor();
     SetTargetFPS(60);
     bool loop = true;

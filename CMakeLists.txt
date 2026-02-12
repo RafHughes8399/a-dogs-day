@@ -88,6 +88,9 @@ link_libraries(texture)
 add_library(player src/player.cpp)
 link_libraries(player)
 
+add_library(controls src/controls.cpp)
+link_libraries(controls)
+
 add_library(entities src/entities.cpp)
 link_libraries(entities)
 

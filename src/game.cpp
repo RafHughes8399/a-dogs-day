@@ -6,6 +6,7 @@ void game::game::update(float delta){
     // update the level
     level_.update(delta);
     // then the player
+    controls_.check(delta);
     player_.update(delta);
     
     // resets at 20 second intervals 

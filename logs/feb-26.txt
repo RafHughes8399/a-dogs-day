@@ -111,7 +111,22 @@ editing right click
 the level graph stores a
 
 
+-> exiting the edit state 
+-> graph knowing where obstacles are and using that in pathfinding 
 
--> next is exiting edit state
--> and then updating in the graph
--> for decorations only
+
+exiting editing : 
+    -> player states manage the controls 
+    -> each hasa control scheme, like player currently does
+
+
+    -> or list of maps, and then switch based on how things work
+    -> implement edit exiting
+    -> have controls listen to the same events that make the cursor switch to editing mode
+
+
+-> contrls listen to edit events 
+-> then test to make sure controls works 
+
+-> then having the graph represent decorations (for pathfinding)
+-> then moving decorations in the level_graph (and avoiding collsisions)
