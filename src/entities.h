@@ -379,9 +379,10 @@ namespace entities{
             void unsubscribe_from_cursor();
 
         private:
+            void round_position();
             events::event_handler<events::moved_cursor> moved_cursor_handler;
             Vector2 pre_move_position_;
-
+        
     };
     // ------------------ entity builder ------------------ //
     class entity_builder{

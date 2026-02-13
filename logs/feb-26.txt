@@ -128,5 +128,9 @@ exiting editing :
 -> contrls listen to edit events 
 -> then test to make sure controls works 
 
+
+
 -> then having the graph represent decorations (for pathfinding)
+    -> upon a decoration being built or moved it updates the graph
+    -> need to snap the decoration to a node
 -> then moving decorations in the level_graph (and avoiding collsisions)

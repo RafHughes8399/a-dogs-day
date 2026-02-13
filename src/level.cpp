@@ -424,6 +424,12 @@ void level::level_graph::insert_node(int id, Vector2 position){
 void level::level_graph::insert_edge(int source_num, node& destination, float weight){
     return;
 }
+
+void level::level_graph::on_moved_decoration(const events::moved_decoration& event){
+    // TODO 13.02
+    (void) event;
+    std::cout << "move decoration in graph representation" << std::endl;
+}
 void level::level_graph::render(Rectangle frame){
     for(auto x = frame.x; x <= frame.x + frame.width; x += level_config::edge_weight){
         for(auto y = frame.y; y <= frame.y + frame.height; y += level_config::edge_weight){
