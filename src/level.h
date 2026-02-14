@@ -39,6 +39,7 @@ namespace level{
             struct node{
                 int id_;
                 Vector2 position_;
+                int decoration_; // indicates the presence of a decoration at the current node, -1 means there is no decoration
                 bool operator==(const node& other) const {
                     return id_ == other.id_;
                 }
@@ -68,12 +69,13 @@ namespace level{
             
             void build_nodes(int level_x, int level_y);
             void build_edges();
-            
+            void update_decoration(Rectangle rectangle, int id = -1);
             std::vector<int> bfs(int start_id, int end_id);
             std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, int start_id, int end_id);
             
             // fields
             events::event_handler<events::moved_decoration> moved_decoration_handler_;
+            events::event_handler<events::placed_decoration> placed_decoration_handler_;
             int num_rows_;
             int row_length_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
@@ -81,14 +83,17 @@ namespace level{
         public:
             ~level_graph(){
                 event_interface::unsubscribe<events::moved_decoration>(moved_decoration_handler_);
+                event_interface::unsubscribe<events::placed_decoration>(placed_decoration_handler_);
             }
             level_graph(int level_x, int level_y)
             : graph_({}), num_rows_(level_y / level_config::edge_weight), row_length_(level_x / level_config::edge_weight),
-            moved_decoration_handler_([this](const events::moved_decoration& event) -> void{on_moved_decoration(event);}){
+            moved_decoration_handler_([this](const events::moved_decoration& event) -> void{on_moved_decoration(event);}),
+            placed_decoration_handler_([this](const events::placed_decoration& event) -> void{on_placed_decoration(event);}){
                 // ! columns is x, rows is y
                 build_nodes(level_x, level_y);
                 build_edges();
                 event_interface::subscribe<events::moved_decoration>(moved_decoration_handler_);
+                event_interface::subscribe<events::placed_decoration>(placed_decoration_handler_);
             }
             level_graph(const level_graph& other) = default;
             level_graph(level_graph&& other) = default;
@@ -103,6 +108,7 @@ namespace level{
             int num_edges();
             int num_edges_from(node & node);
             
+            int position_to_node(Vector2 position);
             int position_to_node(Vector2 position, Vector2 direction);
             
             node* id_to_node(int id);
@@ -116,6 +122,7 @@ namespace level{
             void insert_node(int id, Vector2 position);
             void insert_edge(int source_num, node& destination, float weight);
             void on_moved_decoration(const events::moved_decoration& event);
+            void on_placed_decoration(const events::placed_decoration& event);
             void render(Rectangle frame);
     };
     class level{

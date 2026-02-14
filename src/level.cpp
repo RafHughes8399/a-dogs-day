@@ -123,6 +123,16 @@ int level::level_graph::num_edges_from(node & node){
 }
 
 
+// similar to the function below, but assumes that the position is 
+// a clean multiple of edge weight
+int level::level_graph::position_to_node(Vector2 position){
+    int row = position.y / level_config::edge_weight;
+    int col= position.x / level_config::edge_weight;
+
+    return (row * row_length_) + col;
+}
+// snaps to the nearest node based on the direction being travelled 
+// assumes that the position is not a clean multiple of level_config::edge_weight
 int level::level_graph::position_to_node(Vector2 position, Vector2 direction){
     
     float row_f = position.y / level_config::edge_weight;
@@ -370,7 +380,6 @@ std::vector<level::level_graph::node> level::level_graph::nodes(){
 
 void level::level_graph::build_edges(){
     // auto is a std::pair<node, std::vector<edge>>
-    int num_edges = 0;
     for(auto & node : graph_){
         auto & n = node.first;
         auto & edges = node.second;
@@ -382,20 +391,14 @@ void level::level_graph::build_edges(){
         auto node_edges = std::vector<edge>{};
         switch(node_type){
             case nodes::corner:
-                // TODO something
                 // ? exact outgoing edges depends on which corner (i.e top and bottom have different ones)
                 node_edges = build_corner_edges(node_row, node_column);
-                num_edges += 3;
                 break; 
                 case nodes::perimeter:
                 node_edges = build_perimeter_edges(node_row, node_column);
-                num_edges += 5;
-                // TODO something
                 break;
                 case nodes::interior:
-                // TODO something
                 node_edges = build_interior_edges(node_row, node_column);
-                num_edges += 8;
                 break;
         }
         for(edge & e : node_edges){
@@ -425,10 +428,28 @@ void level::level_graph::insert_edge(int source_num, node& destination, float we
     return;
 }
 
+void level::level_graph::update_decoration(Rectangle rectangle, int id){
+    // start at the position x,y and iterate in increments of edge weight until 
+    for(auto col = rectangle.x; col <= rectangle.x + rectangle.width; col += level_config::edge_weight){
+        for(auto row = rectangle.y; row <= rectangle.y + rectangle.height; row += level_config::edge_weight){
+            auto position = Vector2{col, row};
+            int node_index = position_to_node(position);
+
+            graph_[node_index].first.decoration_ = id;
+        }
+    }
+}
+// for these two functions the following assumptions are
+// the decoration is placed at positions that are multiples of edge weights
+// and so too are their dimensions (width and height)
 void level::level_graph::on_moved_decoration(const events::moved_decoration& event){
-    // TODO 13.02
-    (void) event;
     std::cout << "move decoration in graph representation" << std::endl;
+    update_decoration(event.get_pre_move());
+    update_decoration(event.get_post_move(), event.get_id());
+}
+void level::level_graph::on_placed_decoration(const events::placed_decoration& event){
+    std::cout << "place decoration in graph representation" << std::endl;
+    update_decoration(event.get_rectangle(), event.get_id());
 }
 void level::level_graph::render(Rectangle frame){
     for(auto x = frame.x; x <= frame.x + frame.width; x += level_config::edge_weight){
@@ -467,9 +488,11 @@ void level::level::update(float delta){
 void level::level::render(){
     // draw the background 
     DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
+    // for debugging purposes
+    //graph_.render(view_frame_);
+
+
     // draw the entities, based on the view frame
-    
-    
     auto render_precdicate = [this](entities::entity*& entity) -> bool { // auto is std::unique_ptr<entity>
         const Rectangle& entity_box = entity->get_hitbox().get_box();
         auto position = entity->get_position();

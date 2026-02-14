@@ -44,7 +44,8 @@ namespace events{
 		exit_edit = 12,
 		cursor_move = 13,
 		decoration_move = 14,
-		size = 15
+		decoration_place = 15,
+		size = 16
 	};
 	class event{
 		protected:
@@ -261,6 +262,26 @@ namespace events{
 		private:
 			Rectangle pre_move_;
 			Rectangle post_move_;
+			size_t id_;
+	};
+	class placed_decoration : public event{
+		public:
+			~placed_decoration() = default;
+			placed_decoration(Rectangle rec, size_t id)
+			: event(ids::decoration_move), rectangle_(rec), id_(id){}
+
+			static const int get_static_type(){
+				return ids::decoration_move;
+			}
+			Rectangle get_rectangle() const{
+				return rectangle_;
+			}
+
+			size_t get_id() const {
+				return id_;
+			}
+		private:
+			Rectangle rectangle_;
 			size_t id_;
 	};
 	// when an view_Frame moves, main listener is the level to adjust the view_frame when the player

@@ -132,5 +132,14 @@ exiting editing :
 
 -> then having the graph represent decorations (for pathfinding)
     -> upon a decoration being built or moved it updates the graph
-    -> need to snap the decoration to a node
+    -> need to snap the decoration to a node x 
+    -> user test w jonah
+
+
+
 -> then moving decorations in the level_graph (and avoiding collsisions)
+    -> that is the true test
+
+
+-> then placing decorations on top of each other
+    -> cant happen, need to check the "availability: of the place 

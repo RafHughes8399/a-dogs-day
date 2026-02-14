@@ -364,7 +364,10 @@ namespace entities{
             decoration(std::vector<sprite::sprite>& sprite, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
             : entity(sprite, hitboxes, position, id), pre_move_position_(position_),
             moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ){
-                
+                // upon creating a decoration, let the graph know where it was placed with the event
+                auto rectangle = hitboxes_[sprites_.index()].get_box();
+                std::unique_ptr<events::event> place_decoration = std::make_unique<events::placed_decoration>(rectangle, id_);
+                event_interface::queue_event(place_decoration);
             }
             decoration(const decoration& other) = default;
             decoration(decoration&& other);
