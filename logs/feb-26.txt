@@ -139,7 +139,7 @@ exiting editing :
 
 -> then moving decorations in the level_graph (and avoiding collsisions)
     -> that is the true test
-
+    -> add the node to the path if it is occupied, dont if not
 
 -> then placing decorations on top of each other
     -> cant happen, need to check the "availability: of the place 

@@ -58,6 +58,7 @@ namespace level{
             };
             // builder and pathfinding methods
             bool is_node_closer(int current_id, int next_id, int end_id);
+            bool is_node_occupied(int id);
             std::vector<edge> build_corner_edges(int row, int column);
             std::vector<edge> build_interior_edges(int row, int column);
             std::vector<edge> build_perimeter_edges(int row, int column);

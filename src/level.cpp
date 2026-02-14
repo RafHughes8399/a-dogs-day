@@ -11,6 +11,9 @@ bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id)
     return next_end_distance <= current_end_distance;
 
 }
+bool level::level_graph::is_node_occupied(int id){
+    return id_to_node(id)->decoration_ == -1;
+}
 
 float level::level_graph::manhattan_distance_heurisitic(Vector2 a, Vector2 b){
     // abs a.x - b.x,  + abs a.y - b,y
@@ -44,8 +47,15 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
             for(auto & edge : graph_[current].second){
                 // if not visited, and closer to the end 
                 // TODO and not "occupied", like not blocked by a decoration
+                /**
+                 * ? while i like the idea of not looking at nodes going in the wrong direction, i feel 
+                 * ? that it may cause errors down the line when many decorations are in the map and a direct, "always moving 
+                 * ? closer" path may not exist
+                 */
+                auto closer = is_node_closer(current, edge.destination_->id_, end_id);
+                auto occupied = is_node_occupied(edge.destination_->id_);
                 // then explore
-                if(visited[edge.destination_->id_] == -1 && is_node_closer(current, edge.destination_->id_, end_id)){
+                if(visited[edge.destination_->id_] == -1 && ! occupied){
                     visited[edge.destination_->id_] = current;
                     nodes.push(edge.destination_->id_);
                 }
