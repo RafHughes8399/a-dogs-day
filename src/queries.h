@@ -13,7 +13,8 @@ namespace queries{
     enum ids{
         is_colliding = 0,
         collision = 1,
-        size = 2
+        place_decoration = 2,
+        size = 3
     };
     
     class query{
@@ -71,6 +72,21 @@ namespace queries{
         private:
             hitbox::hitbox box_;
             int id_;
+    };
+    class can_place_decoration : public query{
+        public:
+            ~can_place_decoration() = default;
+            can_place_decoration(Rectangle rectangle)
+            : query(ids::place_decoration), decoration_rectanlge_(rectangle){};
+
+            static const int get_static_type(){
+                return ids::place_decoration;
+            }
+            Rectangle get_decoration_rectangle() const{
+                return decoration_rectanlge_;
+            }
+        private:
+            Rectangle decoration_rectanlge_;
     };
     template <typename T>
     class query_handler_interface{

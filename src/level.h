@@ -21,6 +21,8 @@
 
 #include "config.h"
 #include "quadtree.h"
+#include "queries.h"
+#include "query_interface.h"
 #include "raglib.h"
 #include "render_layer.h"
 #include "texture.h"
@@ -51,20 +53,19 @@ namespace level{
             struct edge{
                 node* destination_;
                 float weight_;
-                int decoration_ = -1; // -1 means empty, there is no decoration, any other number refers to the id of the decoration stored within
+                int decoration_ = level_config::empty_node; // -1 means empty, there is no decoration, any other number refers to the id of the decoration stored within
                 bool operator==(const edge& other){
                     return destination_ == other.destination_ && weight_ == other.weight_;
                 }
             };
-            // builder and pathfinding methods
+            // builder 
+            bool check_for_decoration(Rectangle rectanlge);
             bool is_node_closer(int current_id, int next_id, int end_id);
             bool is_node_occupied(int id);
             std::vector<edge> build_corner_edges(int row, int column);
             std::vector<edge> build_interior_edges(int row, int column);
             std::vector<edge> build_perimeter_edges(int row, int column);
-
-            node* lowest_f_score(std::vector<node*>& nodes, std::map<int, float>& f_scores);
-            float manhattan_distance_heurisitic(Vector2 a, Vector2 b);
+            
             
             int categorise_node(int row, int column);
             
@@ -79,22 +80,27 @@ namespace level{
             events::event_handler<events::placed_decoration> placed_decoration_handler_;
             int num_rows_;
             int row_length_;
+
+            queries::query_handler<queries::can_place_decoration, bool> can_place_decoration_handler_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
         
         public:
             ~level_graph(){
                 event_interface::unsubscribe<events::moved_decoration>(moved_decoration_handler_);
                 event_interface::unsubscribe<events::placed_decoration>(placed_decoration_handler_);
+                query_interface::unsubscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
             }
             level_graph(int level_x, int level_y)
             : graph_({}), num_rows_(level_y / level_config::edge_weight), row_length_(level_x / level_config::edge_weight),
             moved_decoration_handler_([this](const events::moved_decoration& event) -> void{on_moved_decoration(event);}),
-            placed_decoration_handler_([this](const events::placed_decoration& event) -> void{on_placed_decoration(event);}){
+            placed_decoration_handler_([this](const events::placed_decoration& event) -> void{on_placed_decoration(event);}),
+            can_place_decoration_handler_([this](const queries::can_place_decoration& query) -> bool {return can_place_decoration(query);}){
                 // ! columns is x, rows is y
                 build_nodes(level_x, level_y);
                 build_edges();
                 event_interface::subscribe<events::moved_decoration>(moved_decoration_handler_);
                 event_interface::subscribe<events::placed_decoration>(placed_decoration_handler_);
+                query_interface::subscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
             }
             level_graph(const level_graph& other) = default;
             level_graph(level_graph&& other) = default;
@@ -102,7 +108,8 @@ namespace level{
             
             level_graph& operator=(const level_graph& other) = default;
             level_graph& operator=(level_graph&& other) = default;
-    
+            
+            bool can_place_decoration(const queries::can_place_decoration& query);
 
             
             int num_nodes();
@@ -150,16 +157,15 @@ namespace level{
             level& operator=(const level& other) = default;
             level& operator=(level&& other) = default;
 
-            void update(float delta);
-            void render();
-
-            void add_entity(std::unique_ptr<entities::entity> entity, size_t layer);
             int entity_id();
             int num_entities();
-
+            void add_entity(std::unique_ptr<entities::entity> entity, size_t layer);
+            
             void on_left_mouse_click_event(const events::left_mouse_click& event);
             void on_move_view_frame_event(const events::move_view_frame& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
+            void render();
+            void update(float delta);
         private :
             // event handlers
             events::event_handler<events::left_mouse_click> left_mouse_click_handler_;

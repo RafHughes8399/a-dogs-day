@@ -352,7 +352,7 @@ namespace entities{
             std::vector<sprite::sprite> cosmetics_;
             std::vector<Vector2> move_path_; // the prev array from the path algorithm
             
-            const Vector2 move_speed_ = assets_config::dog_move_speed; // TODO: specify move speed, in config file (28 . 12), in terms of a factor of edge weight (one tenth ? )
+            const Vector2 move_speed_ = entity_config::dog_move_speed; // TODO: specify move speed, in config file (28 . 12), in terms of a factor of edge weight (one tenth ? )
             Vector2 direction_scalar_;
 
 
@@ -378,6 +378,8 @@ namespace entities{
 
             
             void on_moved_cursor(const events::moved_cursor& event);
+            void pick_up();
+            void place_down();
             void subscribe_to_cursor();
             void unsubscribe_from_cursor();
 

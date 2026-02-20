@@ -143,3 +143,19 @@ exiting editing :
 
 -> then placing decorations on top of each other
     -> cant happen, need to check the "availability: of the place 
+
+
+player has and manages the hud ? 
+or is it just managed separately by the game ?
+better for coupling i guess
+
+
+hud has a state that determines the exact elements to draw, 
+or i guess its like menus ish where the actual hud drawn changes based on what happens 
+you can define a list of huds
+
+setup hud draw strategies x 
+build the hud elements for decorations
+setup the hud in the game and switching huds based on player state 
+
+decoration place conflicts, query the grid

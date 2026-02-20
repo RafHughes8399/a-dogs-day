@@ -5,31 +5,45 @@
 
 void entities::decoration::on_moved_cursor(const events::moved_cursor& event){
     move(event.get_position());
+    // and let the hud_element know too
 }
 
  void entities::decoration::subscribe_to_cursor(){
     // store the "start position"
-    pre_move_position_ = position_;
     event_interface::subscribe<events::moved_cursor>(moved_cursor_handler);
+}
+
+void entities::decoration::pick_up(){
+    pre_move_position_ = position_;
+    subscribe_to_cursor();
+    // make the hud element subscribe 
+}
+void entities::decoration::place_down(){
+    auto post_move_position = position_;
+    // query the grid, can it be placed there
+    // TODO create the query and check the answer
+    std::unique_ptr<queries::query> can_place_decoration = std::make_unique<queries::can_place_decoration>(hitboxes_[sprites_.index()].get_box());
+    bool can_place = query_interface::execute_query(queries::bool_executor_, *can_place_decoration);
+    if(can_place){
+
+        unsubscribe_from_cursor();
+        round_position(); // so the decoration fits on a node
+        auto width = hitboxes_[sprites_.index()].get_box().width;
+        auto height = hitboxes_[sprites_.index()].get_box().height;
+        
+        auto pre_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
+        auto post_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
+        
+        // create a move_in_graph_event, pass in the two rectangles 
+        std::unique_ptr<events::event> move_decoration = std::make_unique<events::moved_decoration>(pre_move_rectangle, post_move_rectangle, id_);
+        event_interface::queue_event(move_decoration);
+    }
+    else{
+        // TODO visual indication for the player maybe ? 
+    }
 }
 void entities::decoration::unsubscribe_from_cursor(){
     event_interface::unsubscribe<events::moved_cursor>(moved_cursor_handler);
-    // this is the "end position"
-    // calculate the "rounded position"
-    
-    // ? maybe call this every time on cursor move occurs ?
-    // ? something to think about in user testing ? 
-    round_position(); // so the decoration fits on a node
-    auto post_move_position = position_;
-    auto width = hitboxes_[sprites_.index()].get_box().width;
-    auto height = hitboxes_[sprites_.index()].get_box().height;
-
-    auto pre_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
-    auto post_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
-    
-    // create a move_in_graph_event, pass in the two rectangles 
-    std::unique_ptr<events::event> move_decoration = std::make_unique<events::moved_decoration>(pre_move_rectangle, post_move_rectangle, id_);
-    event_interface::queue_event(move_decoration);
 
 }
 
@@ -46,11 +60,11 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_test_decoratio
     // load the sprite and the hitbox
 
     auto sprite = sprite::sprite(
-        textures::textures_.get_texture(textures::test_decoration, assets_config::test_decoration_path),
-        assets_config::test_decoration_attributes[assets_config::attributes::frame_width],
-        assets_config::test_decoration_attributes[assets_config::attributes::frame_height],
-        assets_config::test_decoration_attributes[assets_config::attributes::frames],
-        assets_config::test_decoration_attributes[assets_config::attributes::animations]
+        textures::textures_.get_texture(textures::test_decoration, entity_config::test_decoration_path),
+        entity_config::test_decoration_attributes[entity_config::attributes::frame_width],
+        entity_config::test_decoration_attributes[entity_config::attributes::frame_height],
+        entity_config::test_decoration_attributes[entity_config::attributes::frames],
+        entity_config::test_decoration_attributes[entity_config::attributes::animations]
     );
     auto hitbox = hitbox::h_builder_.build_test_decoration_hitbox(position);
     std::vector<sprite::sprite> sprites = {sprite};

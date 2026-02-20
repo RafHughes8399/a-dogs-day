@@ -1,6 +1,10 @@
 #include "level.h"
 
 // ----------------------------------------- level graph ----------------------------------------- //
+bool level::level_graph::can_place_decoration(const queries::can_place_decoration& query){
+    auto query_rectangle = query.get_decoration_rectangle();
+    return  ! check_for_decoration(query_rectangle);
+}
 bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id){
     Vector2 current_position = id_to_node(current_id)->position_;
     Vector2 next_position = id_to_node(next_id)->position_;
@@ -13,11 +17,6 @@ bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id)
 }
 bool level::level_graph::is_node_occupied(int id){
     return id_to_node(id)->decoration_ == -1;
-}
-
-float level::level_graph::manhattan_distance_heurisitic(Vector2 a, Vector2 b){
-    // abs a.x - b.x,  + abs a.y - b,y
-    return std::abs(a.x - b.x) + std::abs(a.y - b.y);
 }
 
 
@@ -102,9 +101,7 @@ std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end, V
     return position_path;
 
 } 
-level::level_graph::node* level::level_graph::lowest_f_score(std::vector<level_graph::node*>& nodes, std::map<int, float>& f_scores){
-    return nullptr;
-}
+
 int level::level_graph::categorise_node(int row, int column){
     bool top_row = row == 0; // || row == max_row;
     bool bottom_row = row == num_rows_ - 1;
@@ -437,7 +434,18 @@ void level::level_graph::insert_node(int id, Vector2 position){
 void level::level_graph::insert_edge(int source_num, node& destination, float weight){
     return;
 }
-
+bool level::level_graph::check_for_decoration(Rectangle rectangle){
+    for(auto col = rectangle.x; col <= rectangle.x + rectangle.width; col += level_config::edge_weight){
+        for(auto row = rectangle.y; row <= rectangle.y + rectangle.height; row += level_config::edge_weight){
+            auto position = Vector2{col, row};
+            int node_index = position_to_node(position);
+            if(is_node_occupied(node_index)){
+                return true;
+            }
+        }
+    }
+    return false;
+}
 void level::level_graph::update_decoration(Rectangle rectangle, int id){
     // start at the position x,y and iterate in increments of edge weight until 
     for(auto col = rectangle.x; col <= rectangle.x + rectangle.width; col += level_config::edge_weight){
@@ -568,11 +576,11 @@ void level::level::on_right_mouse_event(const events::right_mouse_click& event){
 
 // --------------------- level builder ----------------------------------------- //
 level::level level::level_builder::build_main_level(){
-    auto background = sprite::sprite(LoadTexture(assets_config::background_path), 
-        assets_config::background_attributes[assets_config::attributes::frame_width], 
-        assets_config::background_attributes[assets_config::attributes::frame_height],
-        assets_config::background_attributes[assets_config::attributes::frames],
-        assets_config::background_attributes[assets_config::attributes::animations]);
+    auto background = sprite::sprite(LoadTexture(entity_config::background_path), 
+        entity_config::background_attributes[entity_config::attributes::frame_width], 
+        entity_config::background_attributes[entity_config::attributes::frame_height],
+        entity_config::background_attributes[entity_config::attributes::frames],
+        entity_config::background_attributes[entity_config::attributes::animations]);
                 
     auto view_frame = Rectangle{0.0f, 0.0f, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
     auto dimensions = Vector2{level_config::world_x, level_config::world_y};

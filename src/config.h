@@ -27,6 +27,8 @@ namespace level_config{
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder
 
+
+    inline const int empty_node = -1;
     inline const size_t mack_id = 0;
     inline const size_t khiri_id = 1;
 
@@ -57,7 +59,7 @@ namespace level_config{
     };
     
 }
-namespace assets_config{
+namespace entity_config{
     // file paths
     inline const char* background_path = "../sprites/background.png" ;
     inline const char* cursor_path = "../sprites/cursor.png";
@@ -93,6 +95,7 @@ namespace assets_config{
         animations = 3,
         size = 4
     };
+    
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
@@ -127,5 +130,17 @@ namespace controls_config{
     };
     // ? antiicpating the need for multiple control schemes, one for the home level, and one for the 
     // ? resource collecting levels 
+}
+namespace hud_config{
+    // TODO change values pending test
+    inline unsigned char opacity = 120;
+    inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
+    inline Color red_decoration_highlight = Color {255, 255, 0, opacity};
+
+    // hud elements paths 
+    inline const char* cursor_edit_progres_wheel = "../sprites/edit_wheel.png";
+    inline const char* edit_grid = "../sprite/edit_grid.png";
+    
+
 }
 #endif

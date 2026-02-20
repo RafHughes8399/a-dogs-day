@@ -66,17 +66,17 @@ void hitbox::hitbox::update(Vector2 new_position){
 }
 // ----------------------- hitbox builder ----------------------- //
 hitbox::hitbox hitbox::hitbox_builder::build_cursor_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, assets_config::cursor_attributes[assets_config::attributes::frame_width], assets_config::cursor_attributes[assets_config::attributes::frame_height]});
+    return hitbox(Rectangle{position.x, position.y, entity_config::cursor_attributes[entity_config::attributes::frame_width], entity_config::cursor_attributes[entity_config::attributes::frame_height]});
 }
 hitbox::hitbox hitbox::hitbox_builder::build_paw_mark_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, assets_config::paw_mark_attributes[assets_config::attributes::frame_width], assets_config::paw_mark_attributes[assets_config::attributes::frame_height]});
+    return hitbox(Rectangle{position.x, position.y, entity_config::paw_mark_attributes[entity_config::attributes::frame_width], entity_config::paw_mark_attributes[entity_config::attributes::frame_height]});
 }
 hitbox::hitbox hitbox::hitbox_builder::build_player_dog_across_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, assets_config::khiri_across_attributes[assets_config::attributes::frame_width], assets_config::khiri_across_attributes[assets_config::attributes::frame_height]});
+    return hitbox(Rectangle{position.x, position.y, entity_config::khiri_across_attributes[entity_config::attributes::frame_width], entity_config::khiri_across_attributes[entity_config::attributes::frame_height]});
 }
 hitbox::hitbox hitbox::hitbox_builder::build_player_dog_down_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, assets_config::khiri_down_attributes[assets_config::attributes::frame_width], assets_config::khiri_down_attributes[assets_config::attributes::frame_height]});
+    return hitbox(Rectangle{position.x, position.y, entity_config::khiri_down_attributes[entity_config::attributes::frame_width], entity_config::khiri_down_attributes[entity_config::attributes::frame_height]});
 }
 hitbox::hitbox hitbox::hitbox_builder::build_test_decoration_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, assets_config::test_decoration_attributes[assets_config::attributes::frame_width], assets_config::test_decoration_attributes[assets_config::attributes::frame_height]});
+    return hitbox(Rectangle{position.x, position.y, entity_config::test_decoration_attributes[entity_config::attributes::frame_width], entity_config::test_decoration_attributes[entity_config::attributes::frame_height]});
 }

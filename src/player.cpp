@@ -26,7 +26,7 @@ void player::player::setup_control_maps(){
 
 void player::player::state::left_click(player& player){
     std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(GetMousePosition(), 
-    assets_config::cursor_attributes[assets_config::attributes::frame_width], assets_config::cursor_attributes[assets_config::attributes::frame_height]);
+    entity_config::cursor_attributes[entity_config::attributes::frame_width], entity_config::cursor_attributes[entity_config::attributes::frame_height]);
     event_interface::queue_event(left_mouse_click_event);
 }
 void player::player::state::right_click(player& player){

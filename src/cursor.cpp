@@ -40,9 +40,7 @@ void entities::cursor::carrying_decoration::create_move_event(cursor& cursor){
 void entities::cursor::editing::left_click(cursor& cursor, entity& other){
     // makes other subscribe to cursor move events
     if(decoration* decoration_cast = dynamic_cast<decoration*>(&other)){
-        
-        decoration_cast->subscribe_to_cursor();
-
+        decoration_cast->pick_up();
         cursor.state_ = std::make_unique<carrying_decoration>();
     }
     
@@ -57,8 +55,7 @@ void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& o
     // places the decoration back down
     // makes the move call in the level graph
     if(decoration* decoration_cast  = dynamic_cast<decoration*>(&other)){
-        decoration_cast->unsubscribe_from_cursor();
-
+        decoration_cast->place_down();
         cursor.state_ = std::make_unique<editing>();
     }
 
@@ -173,14 +170,14 @@ void entities::paw_mark::interact(entities::entity& other){
 
 // -------------------------------- builds -------------------------------- //
 std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2 position, int id){
-    auto cursor_texture = textures::textures_.get_texture(textures::cursor, assets_config::cursor_path);
+    auto cursor_texture = textures::textures_.get_texture(textures::cursor, entity_config::cursor_path);
     auto cursor_hitbox = hitbox::h_builder_.build_cursor_hitbox(position);
     // otherwise load it 
     auto cursor_sprite = sprite::sprite(cursor_texture, 
-        assets_config::cursor_attributes[assets_config::attributes::frame_width],
-        assets_config::cursor_attributes[assets_config::attributes::frame_height],
-        assets_config::cursor_attributes[assets_config::attributes::frames],
-        assets_config::cursor_attributes[assets_config::attributes::animations]);
+        entity_config::cursor_attributes[entity_config::attributes::frame_width],
+        entity_config::cursor_attributes[entity_config::attributes::frame_height],
+        entity_config::cursor_attributes[entity_config::attributes::frames],
+        entity_config::cursor_attributes[entity_config::attributes::animations]);
     auto sprites = std::vector<sprite::sprite>{cursor_sprite};
     auto hitboxes = std::vector<hitbox::hitbox>{cursor_hitbox};
     return std::make_unique<entities::cursor>(
@@ -191,13 +188,13 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2
     );
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vector2 position, int id){
-    auto paw_texture = textures::textures_.get_texture(textures::paw_mark, assets_config::paw_mark_path); 
+    auto paw_texture = textures::textures_.get_texture(textures::paw_mark, entity_config::paw_mark_path); 
     auto paw_hitbox = hitbox::h_builder_.build_paw_mark_hitbox(position);
     auto paw_sprite =         sprite::sprite(paw_texture,
-        assets_config::paw_mark_attributes[assets_config::attributes::frame_width],
-        assets_config::paw_mark_attributes[assets_config::attributes::frame_height],
-        assets_config::paw_mark_attributes[assets_config::attributes::frames],
-        assets_config::paw_mark_attributes[assets_config::attributes::animations]);
+        entity_config::paw_mark_attributes[entity_config::attributes::frame_width],
+        entity_config::paw_mark_attributes[entity_config::attributes::frame_height],
+        entity_config::paw_mark_attributes[entity_config::attributes::frames],
+        entity_config::paw_mark_attributes[entity_config::attributes::animations]);
 
 
     auto sprites = std::vector<sprite::sprite>{paw_sprite};

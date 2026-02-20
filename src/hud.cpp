@@ -7,6 +7,27 @@ hud::hud_builder hud::h_builder_;
 
 
 // ---------------------------------- hud element ----------------------------- //
+// ------------------------------- draw strategies ------------------------------- //
+void hud::hud_element::sprite_draw::draw(Vector2 position){
+    sprite_.render(position);
+}    
+void hud::hud_element::rectangle_draw::draw(Vector2 position){
+    DrawRectangle(rectangle_.x, rectangle_.y, rectangle_.width, rectangle_.height, colour_);
+}
+// position is assumed to be Vector2Zero(), the grid will cover the whole screen (for now)
+void hud::hud_element::grid_draw::draw(Vector2 position){
+    // x is column, y is row
+    for(int x = position.x; x <= level_config::screen_width; x += level_config::edge_weight){
+    }
+    for(int y = position.y; y <= level_config::screen_height; y += level_config::edge_weight){
+    }
+}
+// ------------------------------- draw strategies ------------------------------- //
+
+
+void hud::hud_element::draw(){
+    draw_strategy_->draw(position_);
+}   
 // ---------------------------------- button --------------------------------- //
 void hud::button::on_menu_interact(const events::interact_menu& event){
     const hitbox::hitbox& hitbox = event.get_hitbox();
