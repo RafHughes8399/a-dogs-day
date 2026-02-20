@@ -8,12 +8,12 @@ void entities::decoration::on_moved_cursor(const events::moved_cursor& event){
     // and let the hud_element know too
 }
 
- void entities::decoration::subscribe_to_cursor(){
-    // store the "start position"
+void entities::decoration::subscribe_to_cursor(){
     event_interface::subscribe<events::moved_cursor>(moved_cursor_handler);
 }
-
+    
 void entities::decoration::pick_up(){
+    // store the "start position"
     pre_move_position_ = position_;
     subscribe_to_cursor();
     // make the hud element subscribe 
@@ -21,12 +21,14 @@ void entities::decoration::pick_up(){
 void entities::decoration::place_down(){
     // query the grid, can it be placed there
     // TODO create the query and check the answer
+    round_position(); // so the decoration fits on a node
     std::unique_ptr<queries::query> can_place_decoration = std::make_unique<queries::can_place_decoration>(hitboxes_[sprites_.index()].get_box());
     bool can_place = query_interface::execute_query(queries::bool_executor_, *can_place_decoration);
     if(can_place){
         std::cout << "can place " << std::endl;
         unsubscribe_from_cursor();
-        round_position(); // so the decoration fits on a node
+        
+        // update the post move position after it has been rounded
         post_move_position_ = position_;
         auto width = hitboxes_[sprites_.index()].get_box().width;
         auto height = hitboxes_[sprites_.index()].get_box().height;
@@ -45,7 +47,6 @@ void entities::decoration::place_down(){
 }
 void entities::decoration::unsubscribe_from_cursor(){
     event_interface::unsubscribe<events::moved_cursor>(moved_cursor_handler);
-
 }
 
 void entities::decoration::round_position(){

@@ -109,6 +109,9 @@ link_libraries(render_layer)
 add_library(quadtree src/quadtree.cpp)
 link_libraries(quadtree)
 
+add_library(graph src/graph.cpp)
+link_libraries(graph)
+
 add_library(level src/level.cpp)
 link_libraries(level)
 

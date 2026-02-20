@@ -71,7 +71,7 @@ namespace level{
             
             void build_nodes(int level_x, int level_y);
             void build_edges();
-            void update_decoration(Rectangle rectangle, int id = -1);
+            void update_decoration(Rectangle rectangle, int id = level_config::empty_node);
             std::vector<int> bfs(int start_id, int end_id);
             std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, int start_id, int end_id);
             
@@ -116,10 +116,6 @@ namespace level{
             
             node* id_to_node(int id);
 
-            std::vector<edge> edges();
-            std::vector<edge> edges_from_node(node& node);
-            std::vector<node> nodes();
-            
             std::vector<Vector2> find_path(Vector2 start, Vector2 end, Vector2 direction);
             
             void insert_node(int id, Vector2 position);

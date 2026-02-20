@@ -244,7 +244,7 @@ namespace events{
 	class moved_decoration : public event{
 		public:
 			~moved_decoration() = default;
-			moved_decoration(Rectangle pre, Rectangle post, size_t id)
+			moved_decoration(Rectangle pre, Rectangle post, int id)
 			: event(ids::decoration_move), pre_move_(pre), post_move_(post), id_(id){}
 
 			static const int get_static_type(){
@@ -256,22 +256,22 @@ namespace events{
 			Rectangle get_post_move() const {
 				return post_move_;
 			} 
-			size_t get_id() const {
+			int get_id() const {
 				return id_;
 			}
 		private:
 			Rectangle pre_move_;
 			Rectangle post_move_;
-			size_t id_;
+			int id_;
 	};
 	class placed_decoration : public event{
 		public:
 			~placed_decoration() = default;
 			placed_decoration(Rectangle rec, size_t id)
-			: event(ids::decoration_move), rectangle_(rec), id_(id){}
+			: event(ids::decoration_place), rectangle_(rec), id_(id){}
 
 			static const int get_static_type(){
-				return ids::decoration_move;
+				return ids::decoration_place;
 			}
 			Rectangle get_rectangle() const{
 				return rectangle_;
