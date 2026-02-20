@@ -110,11 +110,6 @@ namespace level{
             level_graph& operator=(level_graph&& other) = default;
             
             bool can_place_decoration(const queries::can_place_decoration& query);
-
-            
-            int num_nodes();
-            int num_edges();
-            int num_edges_from(node & node);
             
             int position_to_node(Vector2 position);
             int position_to_node(Vector2 position, Vector2 direction);

@@ -16,7 +16,7 @@ bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id)
 
 }
 bool level::level_graph::is_node_occupied(int id){
-    return id_to_node(id)->decoration_ == -1;
+    return id_to_node(id)->decoration_ != -1; 
 }
 
 
@@ -115,20 +115,6 @@ int level::level_graph::categorise_node(int row, int column){
     else if(perimeter) {return nodes::perimeter;}
     else {return nodes::interior;}
 }
-
-
-
-int level::level_graph::num_nodes(){
-    return graph_.size();
-}
-int level::level_graph::num_edges(){
-    return 0;
-}
-int level::level_graph::num_edges_from(node & node){
-    (void) node;
-    return 0;
-}
-
 
 // similar to the function below, but assumes that the position is 
 // a clean multiple of edge weight
@@ -428,7 +414,7 @@ void level::level_graph::build_nodes(int level_x, int level_y){
 }
 void level::level_graph::insert_node(int id, Vector2 position){
     // node is built with a number and at position 
-    graph_.push_back(std::make_pair(node{id, position}, std::vector<edge>{}));
+    graph_.push_back(std::make_pair(node{id, position, level_config::empty_node}, std::vector<edge>{}));
     return;
 }
 void level::level_graph::insert_edge(int source_num, node& destination, float weight){
@@ -448,14 +434,17 @@ bool level::level_graph::check_for_decoration(Rectangle rectangle){
 }
 void level::level_graph::update_decoration(Rectangle rectangle, int id){
     // start at the position x,y and iterate in increments of edge weight until 
+    int nodes_affected = 0;
     for(auto col = rectangle.x; col <= rectangle.x + rectangle.width; col += level_config::edge_weight){
         for(auto row = rectangle.y; row <= rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
             int node_index = position_to_node(position);
 
             graph_[node_index].first.decoration_ = id;
+            nodes_affected++;
         }
     }
+    std::cout << "updated nodes : " << nodes_affected << std::endl;
 }
 // for these two functions the following assumptions are
 // the decoration is placed at positions that are multiples of edge weights
@@ -478,7 +467,12 @@ void level::level_graph::render(Rectangle frame){
             int col = x / level_config::edge_weight;
             int index = (row * row_length) + col;
             auto position = graph_[index].first.position_;
-            DrawCircle(position.x, position.y, 15, DARKGREEN);
+            if(graph_[index].first.decoration_ == level_config::empty_node){
+                DrawCircle(position.x, position.y, 15, DARKGREEN);
+            }
+            else{
+                DrawCircle(position.x, position.y, 15, RED);
+            }
             DrawText(TextFormat("%d", graph_[index].first.id_), position.x, position.y, 12, WHITE);
             
             auto edges = graph_[index].second;
@@ -507,7 +501,7 @@ void level::level::render(){
     // draw the background 
     DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
     // for debugging purposes
-    //graph_.render(view_frame_);
+    graph_.render(view_frame_);
 
 
     // draw the entities, based on the view frame
@@ -604,5 +598,8 @@ level::level level::level_builder::build_main_level(){
     
     auto test_decoration = entities::e_builder.build_test_decoration(Vector2 {level_config::edge_weight * 6, level_config::edge_weight * 6}, l.entity_id());
     l.add_entity(std::move(test_decoration), level_config::draw_layers::decoration);
+    
+    auto second_decoration = entities::e_builder.build_test_decoration(Vector2 {level_config::edge_weight * 12, level_config::edge_weight * 12}, l.entity_id());
+    l.add_entity(std::move(second_decoration), level_config::draw_layers::decoration);
     return l;
 }

@@ -19,26 +19,27 @@ void entities::decoration::pick_up(){
     // make the hud element subscribe 
 }
 void entities::decoration::place_down(){
-    auto post_move_position = position_;
     // query the grid, can it be placed there
     // TODO create the query and check the answer
     std::unique_ptr<queries::query> can_place_decoration = std::make_unique<queries::can_place_decoration>(hitboxes_[sprites_.index()].get_box());
     bool can_place = query_interface::execute_query(queries::bool_executor_, *can_place_decoration);
     if(can_place){
-
+        std::cout << "can place " << std::endl;
         unsubscribe_from_cursor();
         round_position(); // so the decoration fits on a node
+        post_move_position_ = position_;
         auto width = hitboxes_[sprites_.index()].get_box().width;
         auto height = hitboxes_[sprites_.index()].get_box().height;
         
         auto pre_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
-        auto post_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
+        auto post_move_rectangle = Rectangle{post_move_position_.x, post_move_position_.y, width, height};
         
         // create a move_in_graph_event, pass in the two rectangles 
         std::unique_ptr<events::event> move_decoration = std::make_unique<events::moved_decoration>(pre_move_rectangle, post_move_rectangle, id_);
         event_interface::queue_event(move_decoration);
     }
     else{
+        std::cout << "can't place " << std::endl;
         // TODO visual indication for the player maybe ? 
     }
 }

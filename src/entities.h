@@ -362,7 +362,7 @@ namespace entities{
         public:
             ~decoration() = default;
             decoration(std::vector<sprite::sprite>& sprite, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
-            : entity(sprite, hitboxes, position, id), pre_move_position_(position_),
+            : entity(sprite, hitboxes, position, id), pre_move_position_(position_), post_move_position_(position_),
             moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ){
                 // upon creating a decoration, let the graph know where it was placed with the event
                 auto rectangle = hitboxes_[sprites_.index()].get_box();
@@ -387,6 +387,7 @@ namespace entities{
             void round_position();
             events::event_handler<events::moved_cursor> moved_cursor_handler;
             Vector2 pre_move_position_;
+            Vector2 post_move_position_;
         
     };
     // ------------------ entity builder ------------------ //

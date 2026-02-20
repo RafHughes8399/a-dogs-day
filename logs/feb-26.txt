@@ -159,3 +159,14 @@ build the hud elements for decorations
 setup the hud in the game and switching huds based on player state 
 
 decoration place conflicts, query the grid
+
+-> definite issues, time to debugging
+-> enable the grid draw, and whip out the print statements
+-> check that move and place and working
+-> and that 
+
+-> and maybe to some more file work (like split level and level graph)
+-> ok yeah its munted lol 
+-> test moving and placing before you try overlap
+-> its probably something to do with the double place/move call
+// and the fact that post move uses pre post
