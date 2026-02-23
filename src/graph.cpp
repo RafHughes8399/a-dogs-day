@@ -3,7 +3,7 @@
 // ----------------------------------------- level graph ----------------------------------------- //
 bool level::level_graph::can_place_decoration(const queries::can_place_decoration& query){
     auto query_rectangle = query.get_decoration_rectangle();
-    return  ! check_for_decoration(query_rectangle);
+    return  ! check_for_decoration(query_rectangle, query.get_decoration_id()); // is there no decoration
 }
 bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id){
     Vector2 current_position = id_to_node(current_id)->position_;
@@ -15,8 +15,10 @@ bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id)
     return next_end_distance <= current_end_distance;
 
 }
-bool level::level_graph::is_node_occupied(int id){
-    return id_to_node(id)->decoration_ != -1; 
+// true if occupued, false if not
+bool level::level_graph::is_node_occupied(int node_id, int decoration_id){
+    auto node_decoration = id_to_node(id)->decoration_;
+    return node_decoration != level_config::empty_node && node_decoration != decoration_id;
 }
 
 level::level_graph::node* level::level_graph::id_to_node(int id){
@@ -386,12 +388,15 @@ void level::level_graph::insert_node(int id, Vector2 position){
 void level::level_graph::insert_edge(int source_num, node& destination, float weight){
     return;
 }
-bool level::level_graph::check_for_decoration(Rectangle rectangle){
+// returns true if there is a decoration there, that is not the id one
+// returns false otherwise, (to place down, this must be false)
+bool level::level_graph::check_for_decoration(Rectangle rectangle, int id){
     for(auto col = rectangle.x; col <= rectangle.x + rectangle.width; col += level_config::edge_weight){
         for(auto row = rectangle.y; row <= rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
             int node_index = position_to_node(position);
-            if(is_node_occupied(node_index)){
+            int occupied_node = is_node_occupied(node_index, id); // returns the deocration_ value of the node
+            if(occupied_node != id || occupied_node != level_config::empty_node ){
                 return true;
             }
         }

@@ -99,11 +99,11 @@ namespace entity_config{
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
-    inline const float khiri_across_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 0.75, 1.0f, 1.0f}; // TODO update values (4/11)
-    inline const float khiri_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75, level_config::edge_weight * 2, 1.0f, 1.0f}; // TODO update values (4/11)
-    inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 0.75, 1.0f, 1.0f}; // TODO update values (4/11)
-    inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75, level_config::edge_weight * 2, 1.0f, 1.0f}; // TODO update values (4/11)
-    inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 2, 1.0f, 1.0f}; // TODO update values (3/02)
+    inline const float khiri_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float khiri_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (3/02)
 
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     

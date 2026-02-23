@@ -22,7 +22,7 @@ void entities::decoration::place_down(){
     // query the grid, can it be placed there
     // TODO create the query and check the answer
     round_position(); // so the decoration fits on a node
-    std::unique_ptr<queries::query> can_place_decoration = std::make_unique<queries::can_place_decoration>(hitboxes_[sprites_.index()].get_box());
+    std::unique_ptr<queries::query> can_place_decoration = std::make_unique<queries::can_place_decoration>(hitboxes_[sprites_.index()].get_box(), id_);
     bool can_place = query_interface::execute_query(queries::bool_executor_, *can_place_decoration);
     if(can_place){
         std::cout << "can place " << std::endl;

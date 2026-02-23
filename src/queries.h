@@ -76,8 +76,8 @@ namespace queries{
     class can_place_decoration : public query{
         public:
             ~can_place_decoration() = default;
-            can_place_decoration(Rectangle rectangle)
-            : query(ids::place_decoration), decoration_rectanlge_(rectangle){};
+            can_place_decoration(Rectangle rectangle, int id)
+            : query(ids::place_decoration), decoration_rectanlge_(rectangle), decoration_id_(id){};
 
             static const int get_static_type(){
                 return ids::place_decoration;
@@ -85,8 +85,12 @@ namespace queries{
             Rectangle get_decoration_rectangle() const{
                 return decoration_rectanlge_;
             }
+            int get_decoration_id() const {
+                return decoration_id_;
+            }
         private:
             Rectangle decoration_rectanlge_;
+            int decoration_id_;
     };
     template <typename T>
     class query_handler_interface{
