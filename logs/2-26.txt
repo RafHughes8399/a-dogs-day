@@ -170,3 +170,6 @@ decoration place conflicts, query the grid
 -> test moving and placing before you try overlap
 -> its probably something to do with the double place/move call
 // and the fact that post move uses pre post
+
+-> cant place if occupied by itself, ahhhh 
+-> check for -1 or the id of the self

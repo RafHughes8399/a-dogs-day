@@ -395,8 +395,7 @@ bool level::level_graph::check_for_decoration(Rectangle rectangle, int id){
         for(auto row = rectangle.y; row <= rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
             int node_index = position_to_node(position);
-            int occupied_node = is_node_occupied(node_index, id); // returns the deocration_ value of the node
-            if(occupied_node != id || occupied_node != level_config::empty_node ){
+            if(is_node_occupied(node_index, id) ){
                 return true;
             }
         }
