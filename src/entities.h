@@ -365,12 +365,9 @@ namespace entities{
             : entity(sprite, hitboxes, position, id), pre_move_position_(position_), post_move_position_(position_),
             moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ){
                 // upon creating a decoration, let the graph know where it was placed with the event
-                std::cout << "construct decoration " << std::endl;
                 auto rectangle = hitboxes_[sprites_.index()].get_box();
                 
-                std::cout << "make place event " << std::endl;
                 std::unique_ptr<events::event> place_decoration = std::make_unique<events::placed_decoration>(rectangle, id_);
-                std::cout << "execute place event " << std::endl;
                 event_interface::execute_event(*place_decoration);
             }
             decoration(const decoration& other) = default;
@@ -382,8 +379,9 @@ namespace entities{
 
             
             void on_moved_cursor(const events::moved_cursor& event);
-            void pick_up();
+            bool can_place_down();
             void place_down();
+            void pick_up();
             void subscribe_to_cursor();
             void unsubscribe_from_cursor();
 

@@ -13,7 +13,6 @@ bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id)
     auto current_end_distance = Vector2Distance(current_position, end_position);
     auto next_end_distance = Vector2Distance(next_position, end_position);
     return next_end_distance <= current_end_distance;
-
 }
 
 bool level::level_graph::is_node_empty(int node_id){
@@ -24,7 +23,12 @@ bool level::level_graph::is_node_empty(int node_id){
 // empty is used for dog pathfinding, occupied is used for decoration placement
 bool level::level_graph::is_node_occupied(int node_id, int decoration_id){
     auto node_decoration = id_to_node(node_id)->decoration_;
-    return node_decoration != level_config::empty_node && node_decoration != decoration_id;
+    bool empty = node_decoration == level_config::empty_node;
+    std::cout << "empty ? : " << empty <<  std::endl;
+    bool self = node_decoration == decoration_id;
+    std::cout << "self ? : " << self << std::endl;
+    // is occupied if not empty and not the self 
+    return ! empty && ! self;
 }
 
 level::level_graph::node* level::level_graph::id_to_node(int id){
@@ -120,7 +124,7 @@ int level::level_graph::position_to_node(Vector2 position){
     int row = position.y / level_config::edge_weight;
     int col= position.x / level_config::edge_weight;
 
-    return (row * row_length_) + col;
+    return (row * row_length_ ) + col;
 }
 // snaps to the nearest node based on the direction being travelled 
 // assumes that the position is not a clean multiple of level_config::edge_weight
@@ -400,7 +404,9 @@ bool level::level_graph::check_for_decoration(Rectangle rectangle, int id){
     for(auto col = rectangle.x; col <= rectangle.x + rectangle.width; col += level_config::edge_weight){
         for(auto row = rectangle.y; row <= rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
+            std::cout << "check position " << position.x << ", " << position.y << std::endl;
             int node_index = position_to_node(position);
+            std::cout << "node:  " << node_index << " has decoration " << graph_[node_index].first.decoration_ << std::endl;
             if(is_node_occupied(node_index, id) ){
                 return true;
             }
@@ -410,18 +416,14 @@ bool level::level_graph::check_for_decoration(Rectangle rectangle, int id){
 }
 void level::level_graph::update_decoration(Rectangle rectangle, int id){
     // start at the position x,y and iterate in increments of edge weight until 
-    std::cout << " decoration id value : " << id << std::endl;
-    int nodes_affected = 0;
     for(auto col = rectangle.x; col <= rectangle.x + rectangle.width; col += level_config::edge_weight){
         for(auto row = rectangle.y; row <= rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
             int node_index = position_to_node(position);
 
             graph_[node_index].first.decoration_ = id;
-            nodes_affected++;
         }
     }
-    std::cout << "updated nodes : " << nodes_affected << std::endl;
 }
 // for these two functions the following assumptions are
 // the decoration is placed at positions that are multiples of edge weights

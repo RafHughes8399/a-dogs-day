@@ -18,42 +18,37 @@ void entities::decoration::pick_up(){
     subscribe_to_cursor();
     // make the hud element subscribe 
 }
-void entities::decoration::place_down(){
-    // query the grid, can it be placed there
-    // TODO create the query and check the answer
-    // currently round moves the decoration before it is placed
-
-    //  TODO update round, it should not edit the postiion and move the decoration, 
-    // rather it should offer the new potential position which is used to check if the decoration can be placed
-    // if it can be placed, update the deocration and move it in
+bool entities::decoration::can_place_down(){
     Vector2 rounded_position = round_position();
     Rectangle box = hitboxes_[sprites_.index()].get_box();
+    std::cout << "pre round box position " << box.x << ", " << box.y << std::endl;
+    
     Vector2 rounded_position_difference = Vector2Subtract(rounded_position, position_);
     box.x += rounded_position_difference.x;
-    box.y += rounded_position.y;
+    box.y += rounded_position_difference.y;
+    std::cout << "post round box position " << box.x << ", " << box.y << std::endl;
+
+    std::cout << "query with id " << id_ << std::endl;
     std::unique_ptr<queries::query> can_place_decoration = std::make_unique<queries::can_place_decoration>(box, id_);
-    bool can_place = query_interface::execute_query(queries::bool_executor_, *can_place_decoration);
-    if(can_place){
-        std::cout << "can place " << std::endl;
-        move(rounded_position);
-        unsubscribe_from_cursor();
+    return query_interface::execute_query(queries::bool_executor_, *can_place_decoration);
+}
+void entities::decoration::place_down(){
+    Vector2 rounded_position = round_position();
+    std::cout << "can place " << std::endl;
+    move(rounded_position);
+    unsubscribe_from_cursor();
         
-        // update the post move position after it has been rounded
-        post_move_position_ = position_;
-        auto width = hitboxes_[sprites_.index()].get_box().width;
-        auto height = hitboxes_[sprites_.index()].get_box().height;
+    // update the post move position after it has been rounded
+    post_move_position_ = position_;
+    auto width = hitboxes_[sprites_.index()].get_box().width;
+    auto height = hitboxes_[sprites_.index()].get_box().height;
         
-        auto pre_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
-        auto post_move_rectangle = Rectangle{post_move_position_.x, post_move_position_.y, width, height};
+    auto pre_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
+    auto post_move_rectangle = Rectangle{post_move_position_.x, post_move_position_.y, width, height};
         
-        // create a move_in_graph_event, pass in the two rectangles 
-        std::unique_ptr<events::event> move_decoration = std::make_unique<events::moved_decoration>(pre_move_rectangle, post_move_rectangle, id_);
-        event_interface::queue_event(move_decoration);
-    }
-    else{
-        std::cout << "can't place " << std::endl;
-        // TODO visual indication for the player maybe ? 
-    }
+    // create a move_in_graph_event, pass in the two rectangles 
+    std::unique_ptr<events::event> move_decoration = std::make_unique<events::moved_decoration>(pre_move_rectangle, post_move_rectangle, id_);
+    event_interface::queue_event(move_decoration);
 }
 void entities::decoration::unsubscribe_from_cursor(){
     event_interface::unsubscribe<events::moved_cursor>(moved_cursor_handler);
