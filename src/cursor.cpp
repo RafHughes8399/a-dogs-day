@@ -42,7 +42,7 @@ void entities::cursor::editing::left_click(cursor& cursor, entity& other){
     if(decoration* decoration_cast = dynamic_cast<decoration*>(&other)){
         std::cout << "pick up decoration" << decoration_cast->get_id() << std::endl;
         decoration_cast->pick_up();
-        cursor.state_ = std::make_unique<carrying_decoration>();
+        cursor.state_ = std::make_unique<carrying_decoration>(decoration_cast);
     }
     
     return;
@@ -53,13 +53,9 @@ void entities::cursor::editing::right_click(cursor& cursor, entity& other){
 }
 
 void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& other){
-    // places the decoration back down
-    if(decoration* decoration_cast  = dynamic_cast<decoration*>(&other)){
+    (void) other;
+    if(decoration* decoration_cast = dynamic_cast<decoration*>(carried_decoration_)){
         std::cout << "check place down for decoration " << decoration_cast->get_id() <<  std::endl;
-        /**
-         * i think this flow is correct ? 
-         * some small bugs perhaps 
-         */
         bool can_place = decoration_cast->can_place_down(); 
         if(can_place){
             std::cout << "place down decoration " << decoration_cast->get_id() << std::endl;
@@ -68,7 +64,6 @@ void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& o
             std::cout << "and switch back to editing "<< std::endl;
         }
         else{
-
             std::cout << "can't place down " << std::endl;
         }
     }

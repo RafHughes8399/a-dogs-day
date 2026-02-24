@@ -107,8 +107,8 @@ namespace entities{
                 class carrying_decoration : public editing {
                     public:
                     ~carrying_decoration() = default;
-                    carrying_decoration()
-                    : editing(){};
+                    carrying_decoration(entity* carried)
+                    : editing(), carried_decoration_(carried){};
                     carrying_decoration(const carrying_decoration& other) = default;
                     carrying_decoration(carrying_decoration&& other) = default;
                     
@@ -117,6 +117,8 @@ namespace entities{
                     
                     void left_click(cursor& cursor, entity& other) override;
                     void create_move_event(cursor& cursor) override;
+                    private:
+                    entity* carried_decoration_;
             };
             class interaction_strategy{
                 public:
