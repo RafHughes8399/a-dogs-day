@@ -173,3 +173,6 @@ decoration place conflicts, query the grid
 
 -> cant place if occupied by itself, ahhhh 
 -> check for -1 or the id of the self
+
+-> ovelrap works better now, still the case of when thy "share" that they border on
+-> so ask yourself the question, can two decorations "share" border nodes ? I learn toward no
