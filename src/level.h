@@ -61,6 +61,7 @@ namespace level{
             // builder 
             bool check_for_decoration(Rectangle rectanlge, int id);
             bool is_node_closer(int current_id, int next_id, int end_id);
+            bool is_node_empty(int node_id);
             bool is_node_occupied(int node_id, int decoration_id);
             std::vector<edge> build_corner_edges(int row, int column);
             std::vector<edge> build_interior_edges(int row, int column);

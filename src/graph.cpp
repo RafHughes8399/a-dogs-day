@@ -15,9 +15,15 @@ bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id)
     return next_end_distance <= current_end_distance;
 
 }
-// true if occupued, false if not
+
+bool level::level_graph::is_node_empty(int node_id){
+    auto node_decoration = id_to_node(node_id)->decoration_;
+    return node_decoration == level_config::empty_node;
+}
+// true if occupued, false if not, differs from empty by the use case 
+// empty is used for dog pathfinding, occupied is used for decoration placement
 bool level::level_graph::is_node_occupied(int node_id, int decoration_id){
-    auto node_decoration = id_to_node(id)->decoration_;
+    auto node_decoration = id_to_node(node_id)->decoration_;
     return node_decoration != level_config::empty_node && node_decoration != decoration_id;
 }
 
@@ -53,9 +59,9 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
                  * ? closer" path may not exist
                  */
                 auto closer = is_node_closer(current, edge.destination_->id_, end_id);
-                auto occupied = is_node_occupied(edge.destination_->id_);
-                // then explore
-                if(visited[edge.destination_->id_] == -1 && ! occupied){
+                auto empty = is_node_empty(edge.destination_->id_);
+                // then explore if not visited and if empty
+                if(visited[edge.destination_->id_] == -1 && empty){
                     visited[edge.destination_->id_] = current;
                     nodes.push(edge.destination_->id_);
                 }
