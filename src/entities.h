@@ -388,7 +388,7 @@ namespace entities{
             void unsubscribe_from_cursor();
 
         private:
-            void round_position();
+            Vector2 round_position();
             events::event_handler<events::moved_cursor> moved_cursor_handler;
             Vector2 pre_move_position_;
             Vector2 post_move_position_;

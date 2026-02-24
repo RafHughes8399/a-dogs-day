@@ -21,11 +21,21 @@ void entities::decoration::pick_up(){
 void entities::decoration::place_down(){
     // query the grid, can it be placed there
     // TODO create the query and check the answer
-    round_position(); // so the decoration fits on a node
-    std::unique_ptr<queries::query> can_place_decoration = std::make_unique<queries::can_place_decoration>(hitboxes_[sprites_.index()].get_box(), id_);
+    // currently round moves the decoration before it is placed
+
+    //  TODO update round, it should not edit the postiion and move the decoration, 
+    // rather it should offer the new potential position which is used to check if the decoration can be placed
+    // if it can be placed, update the deocration and move it in
+    Vector2 rounded_position = round_position();
+    Rectangle box = hitboxes_[sprites_.index()].get_box();
+    Vector2 rounded_position_difference = Vector2Subtract(rounded_position, position_);
+    box.x += rounded_position_difference.x;
+    box.y += rounded_position.y;
+    std::unique_ptr<queries::query> can_place_decoration = std::make_unique<queries::can_place_decoration>(box, id_);
     bool can_place = query_interface::execute_query(queries::bool_executor_, *can_place_decoration);
     if(can_place){
         std::cout << "can place " << std::endl;
+        move(rounded_position);
         unsubscribe_from_cursor();
         
         // update the post move position after it has been rounded
@@ -49,12 +59,13 @@ void entities::decoration::unsubscribe_from_cursor(){
     event_interface::unsubscribe<events::moved_cursor>(moved_cursor_handler);
 }
 
-void entities::decoration::round_position(){
+Vector2 entities::decoration::round_position(){
     auto rounded_position = Vector2 {
         std::round(position_.x / level_config::edge_weight) * level_config::edge_weight,
         std::round(position_.y / level_config::edge_weight) * level_config::edge_weight
     };
-    move(rounded_position);
+    //move(rounded_position);
+    return rounded_position;
 }
 // ------------------------------ builds -------------------------------- //
 
