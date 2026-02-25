@@ -176,3 +176,13 @@ decoration place conflicts, query the grid
 
 -> ovelrap works better now, still the case of when thy "share" that they border on
 -> so ask yourself the question, can two decorations "share" border nodes ? I learn toward no
+
+
+
+
+-> after this deco and hud stuff is done, do a bit of that QOL stuff you were talking about 
+    -> remove dog up and down
+    -> refactor sprite and hitbox into the same class (this hitbox[sprite.index()] thing is weird)
+    -> for dogs, separate the head from the body sprite to its own sprite, (to enable head animations)
+    -> setup animation play speedsa
+    -> also adjust the level size, 4096 is massive, probably too big

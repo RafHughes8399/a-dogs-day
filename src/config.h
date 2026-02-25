@@ -104,7 +104,7 @@ namespace entity_config{
     inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (4/11)
     inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (4/11)
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (3/02)
-
+    
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     
 }
@@ -136,11 +136,12 @@ namespace hud_config{
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
     inline Color red_decoration_highlight = Color {255, 255, 0, opacity};
-
+    
     // hud elements paths 
     inline const char* cursor_edit_progres_wheel = "../sprites/edit_wheel.png";
     inline const char* edit_grid = "../sprite/edit_grid.png";
     
+    inline const float edit_wheel_attributes[entity_config::attributes::size] = {35.0f, 35.0f, game_config::hold_duration,  2.0f}; // for now, pending animation play speed implementation , frames is 90
 
 }
 #endif
