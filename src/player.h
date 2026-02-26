@@ -9,6 +9,7 @@
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
+#include "hud.h"
 #include "raylib.h"
 #include "sprite.h"
 
@@ -85,7 +86,7 @@ namespace player{
             }
             player(int selected_dog = level_config::mack_id)
             : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_press_controls_({}),
-            key_hold_controls_({}), selected_dog_(selected_dog), state_(std::make_unique<state>()),
+            key_hold_controls_({}), selected_dog_(selected_dog), state_(std::make_unique<state>()), hud_(hud::h_builder_.build_player_hud()),
             select_dog_handler_([this](const events::selected_dog& event) -> void{on_selected_dog(event);}){
                 event_interface::subscribe(select_dog_handler_);
                 setup_control_maps();
@@ -123,11 +124,14 @@ namespace player{
             //viewport frame_; // what can be seen by the player, essentially a rectangle, maybe better for the world ?
             /** 
              * 
-             hud hud_;
+             hud hud_; // for now hud is just a list of elements, will change when it becomes more intricate
              */
             
             void setup_control_maps();
-            events::event_handler<events::selected_dog> select_dog_handler_;            
+
+            events::event_handler<events::selected_dog> select_dog_handler_;       
+            
+            hud::hud hud_;
             inventory inventory_;
             int edit_meter_ = 0;
 

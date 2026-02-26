@@ -5,8 +5,35 @@
 // ----------------------------------- builder ---------------------------- // 
 hud::hud_builder hud::h_builder_;
 
+hud::hud hud::hud_builder::build_player_hud(){
+    hud player_hud = hud();
+    player_hud.add_element(std::move(h_builder_.build_edit_wheel()));
+    return player_hud;
+}
+std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
+    // create the sprite 
+    auto texture = textures::textures_.get_texture(textures::texture_keys::hud_edit_wheel, hud_config::cursor_edit_progres_wheel);
+    auto sprite = sprite::sprite(
+        texture,
+        hud_config::edit_wheel_attributes[entity_config::attributes::frame_width],            
+        hud_config::edit_wheel_attributes[entity_config::attributes::frame_height],            
+        hud_config::edit_wheel_attributes[entity_config::attributes::frames],            
+        hud_config::edit_wheel_attributes[entity_config::attributes::animations]        
+    );
+    
+    // create the draw strategy 
+    std::unique_ptr<hud_element::draw_strategy> draw_strategy = std::make_unique<hud_element::sprite_draw>(sprite);
+
+    // and return the hud element 
+    // query the cursor position 
+    Vector2 cursor_position = GetMousePosition(); // TODO this may have to change
+    return std::make_unique<hud_element>(cursor_position, Rectangle{cursor_position.x, cursor_position.y, hud_config::edit_wheel_attributes[entity_config::attributes::frame_width],            
+        hud_config::edit_wheel_attributes[entity_config::attributes::frame_height]}, std::move(draw_strategy));       
+
+}
 
 // ---------------------------------- hud element ----------------------------- //
+
 // ------------------------------- draw strategies ------------------------------- //
 void hud::hud_element::sprite_draw::draw(Vector2 position){
     sprite_.render(position);
@@ -65,5 +92,15 @@ void hud::hud::buttons_unsubscribe(){
         if(button_cast){
             button_cast->unsubscribe();
         }
+    }
+}
+
+void hud::hud::add_element(std::unique_ptr<hud_element> element){
+    elements_.push_back(std::move(element));
+}
+
+void hud::hud::render(){
+    for(const std::unique_ptr<hud_element> & element : elements_){
+        element->draw();
     }
 }

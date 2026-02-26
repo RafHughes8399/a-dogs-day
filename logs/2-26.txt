@@ -186,3 +186,9 @@ decoration place conflicts, query the grid
     -> for dogs, separate the head from the body sprite to its own sprite, (to enable head animations)
     -> setup animation play speedsa
     -> also adjust the level size, 4096 is massive, probably too big
+    this is more cpp best practice though
+    -> const-correctness
+    -> references too
+    -> delete the copy constructors
+
+    -> just get it drawing tonight, then have it respond to shit later

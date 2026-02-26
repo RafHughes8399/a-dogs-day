@@ -36,6 +36,8 @@ namespace textures{
         mack_up_out = 16,
         mack_down_out = 17,
         test_decoration = 18,
+
+        hud_edit_wheel = 19,
         size = 19
         // and so on
     };

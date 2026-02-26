@@ -5,12 +5,18 @@
 #include "events.h"
 #include "items.h"
 #include "sprite.h"
+#include "texture.h"
 #include <memory>
 #include <vector>
 #include <string>
 
 namespace hud{
     // some habve a sprite, some are just a draw rectangle / draw line
+    // here's some thinking, a hud elemetn will need to respond to events
+
+    // previously I did a event strategy pattern, I dont mind that idea
+    // can have multiple strategies
+    // TODO event strategies
     class hud_element{
         public:
         class draw_strategy{
@@ -28,8 +34,13 @@ namespace hud{
         class sprite_draw : public draw_strategy{
             public:
             virtual ~sprite_draw() = default;
-            sprite_draw(sprite::sprite& sprite)
-            : draw_strategy(), sprite_(sprite){};
+            sprite_draw(sprite::sprite sprite)
+            : draw_strategy(), sprite_(sprite){
+                sprite.get_animation().goto_frame(sprite.get_animation().num_frames() - 1) ;
+                 // ! temp placeholder just to test that hud creation works 
+                // ! it will not behave like this 
+                // TODO change once at that point 
+            };
 
             sprite_draw(const sprite_draw& other) = default;
             sprite_draw(sprite_draw&& other) = default;
@@ -129,18 +140,22 @@ namespace hud{
 
             void buttons_subscribe();
             void buttons_unsubscribe();
-
+            
+            void add_element(std::unique_ptr<hud_element> element);
+            void render();
         private:
             std::vector<std::unique_ptr<hud_element>> elements_;
 
     };
 
     class hud_builder{
+    public:
         hud build_player_hud();
         hud build_pause_menu_hud();
         button build_button();
         // builder picks the strategy
-        std::unique_ptr<hud_element> build_item_hud_element(items::item&  item);
+        std::unique_ptr<hud_element> build_item_hud_element(items::item& item);
+        std::unique_ptr<hud_element> build_edit_wheel();
         // .....
     };
     extern hud_builder h_builder_;

@@ -175,5 +175,6 @@ void player::player::update(float delta){
     */
 }
 void player::player::render(){
+    hud_.render();
     return;
 }
