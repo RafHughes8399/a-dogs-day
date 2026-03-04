@@ -11,7 +11,6 @@ hud::hud hud::hud_builder::build_player_hud(){
     return player_hud;
 }
 std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
-    // create the sprite 
     auto texture = textures::textures_.get_texture(textures::texture_keys::hud_edit_wheel, hud_config::cursor_edit_progres_wheel);
     auto sprite = sprite::sprite(
         texture,
@@ -21,13 +20,14 @@ std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
         hud_config::edit_wheel_attributes[entity_config::attributes::animations]        
     );
     auto cursor_position = GetMousePosition();
-    // create the draw strategy 
-    std::unique_ptr<hud_element::draw_strategy> draw_strategy = std::make_unique<hud_element::sprite_draw>(sprite);
-    // and the event handle strategy
-    std::unique_ptr<hud_element::event_strategy> event_strategy = std::make_unique<hud_element::edit_wheel_strategy>(&sprite, &cursor_position);
+
+    auto draw_strat = std::make_unique<hud_element::sprite_draw>(sprite);
+    sprite::sprite* sprite_ptr = draw_strat->get_sprite();
+
+    std::unique_ptr<hud_element::event_strategy> event_strategy = std::make_unique<hud_element::edit_wheel_strategy>(sprite_ptr);
     std::cout << "build element " << std::endl;
     return std::make_unique<hud_element>(cursor_position, Rectangle{cursor_position.x, cursor_position.y, hud_config::edit_wheel_attributes[entity_config::attributes::frame_width],            
-        hud_config::edit_wheel_attributes[entity_config::attributes::frame_height]}, std::move(draw_strategy), std::move(event_strategy));       
+        hud_config::edit_wheel_attributes[entity_config::attributes::frame_height]}, std::move(draw_strat), std::move(event_strategy));       
 
 }
 

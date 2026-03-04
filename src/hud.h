@@ -37,29 +37,27 @@ namespace hud{
                 virtual void on_event(const events::event& event) = 0;
                 virtual void unsubscribe() = 0;
                 virtual void subscribe() = 0;
+                virtual void bind_position(Vector2* position){};
             protected:
                 std::unique_ptr<events::event_handler_interface> handler_;
         };
         class edit_wheel_strategy : public event_strategy{
             public:
                 ~edit_wheel_strategy(){
-                    // unsub
                     unsubscribe();
                 }
-                // for now moved cursor
-                edit_wheel_strategy(sprite::sprite* sprite, Vector2* position)
+                edit_wheel_strategy(sprite::sprite* sprite)
                 : event_strategy(std::make_unique<events::event_handler<events::edit_hold>>([this](const events::edit_hold& event) -> void {on_event(event);})), 
-                position_(position), sprite_(sprite){ // construct the handler here
+                position_(nullptr), sprite_(sprite){
                     subscribe();
                 }
                 void on_event(const events::event& event) override{
-                    // update the position of the element
                     const events::edit_hold& edit_event = static_cast<const events::edit_hold&>(event);
-                    position_->x = edit_event.get_position().x;
-                    position_->y = edit_event.get_position().y;
-                    // and the frame of the sprite
+                    if(position_){
+                        position_->x = edit_event.get_position().x;
+                        position_->y = edit_event.get_position().y;
+                    }
                     sprite_->get_animation().goto_frame(edit_event.get_edit_progress());
-
                 }
                 void unsubscribe() override{
                     auto* handler_cast = static_cast<events::event_handler<events::edit_hold>*>(handler_.get());
@@ -68,6 +66,9 @@ namespace hud{
                 void subscribe() override{
                     auto* handler_cast = static_cast<events::event_handler<events::edit_hold>*>(handler_.get());
                     event_interface::subscribe<events::edit_hold>(*handler_cast);
+                }
+                void bind_position(Vector2* position) override{
+                    position_ = position;
                 }
                 
             private:
@@ -109,6 +110,7 @@ namespace hud{
             sprite_draw& operator=(sprite_draw&& other) = default;
 
             void draw(Vector2 position) override;
+            sprite::sprite* get_sprite() { return &sprite_; }
             private:
             sprite::sprite sprite_;
         };
@@ -148,7 +150,11 @@ namespace hud{
         // ----------------------------- hud element --------------------------------------------- //
             virtual ~hud_element() = default;
             hud_element(Vector2 position, Rectangle outline, std::unique_ptr<draw_strategy> draw_strat, std::unique_ptr<event_strategy> event_strat)
-            : outline_(outline), position_(position), draw_strategy_(std::move(draw_strat)), event_handler_strategy_(std::move(event_strat)) {};
+            : outline_(outline), position_(position), draw_strategy_(std::move(draw_strat)), event_handler_strategy_(std::move(event_strat)) {
+                if(event_handler_strategy_){
+                    event_handler_strategy_->bind_position(&position_);
+                }
+            }
 
             hud_element(const hud_element& other) = default;
             hud_element(hud_element&& other) = default;

@@ -1,0 +1,4 @@
+for hud elements 
+-> should the draw strategy maintain the position too ?
+-> what am I using the rectangle for ? 
+-> is my pointer management and object lifetime usage correct ? 
