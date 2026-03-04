@@ -20,20 +20,24 @@ std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
         hud_config::edit_wheel_attributes[entity_config::attributes::frames],            
         hud_config::edit_wheel_attributes[entity_config::attributes::animations]        
     );
-    
+    auto cursor_position = GetMousePosition();
     // create the draw strategy 
     std::unique_ptr<hud_element::draw_strategy> draw_strategy = std::make_unique<hud_element::sprite_draw>(sprite);
-
-    // and return the hud element 
-    // query the cursor position 
-    Vector2 cursor_position = GetMousePosition(); // TODO this may have to change
+    // and the event handle strategy
+    std::unique_ptr<hud_element::event_strategy> event_strategy = std::make_unique<hud_element::edit_wheel_strategy>(&sprite, &cursor_position);
+    std::cout << "build element " << std::endl;
     return std::make_unique<hud_element>(cursor_position, Rectangle{cursor_position.x, cursor_position.y, hud_config::edit_wheel_attributes[entity_config::attributes::frame_width],            
-        hud_config::edit_wheel_attributes[entity_config::attributes::frame_height]}, std::move(draw_strategy));       
+        hud_config::edit_wheel_attributes[entity_config::attributes::frame_height]}, std::move(draw_strategy), std::move(event_strategy));       
 
 }
 
 // ---------------------------------- hud element ----------------------------- //
-
+Vector2 hud::hud_element::get_position(){
+    return position_;
+}
+void hud::hud_element::set_position(Vector2 position){
+    position_ = position;
+}
 // ------------------------------- draw strategies ------------------------------- //
 void hud::hud_element::sprite_draw::draw(Vector2 position){
     sprite_.render(position);
@@ -56,7 +60,7 @@ void hud::hud_element::draw(){
     draw_strategy_->draw(position_);
 }   
 // ---------------------------------- button --------------------------------- //
-void hud::button::on_menu_interact(const events::interact_menu& event){
+/* void hud::button::on_menu_interact(const events::interact_menu& event){
     const hitbox::hitbox& hitbox = event.get_hitbox();
     
     // does the current button interact with the event hitbox
@@ -64,15 +68,15 @@ void hud::button::on_menu_interact(const events::interact_menu& event){
         press_button();
     } 
 }
-
+ */
 void hud::button::press_button(){
     // placeholder pending actual button press functionality 
 }
 void hud::button::subscribe(){
-    event_interface::subscribe(menu_interact_handler_);
+   // event_interface::subscribe(menu_interact_handler_);
 }
 void hud::button::unsubscribe(){
-    event_interface::unsubscribe(menu_interact_handler_);
+    //event_interface::unsubscribe(menu_interact_handler_);
 
 }
 
@@ -101,6 +105,7 @@ void hud::hud::add_element(std::unique_ptr<hud_element> element){
 
 void hud::hud::render(){
     for(const std::unique_ptr<hud_element> & element : elements_){
+        std::cout << "element position : " << element->get_position().x << ", " << element->get_position().y << std::endl;
         element->draw();
     }
 }

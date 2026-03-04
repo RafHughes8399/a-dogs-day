@@ -56,7 +56,12 @@ void player::player::back(){
 }
 
 void player::player::edit(float delta){
-     // ! needs to be bidirectional - i.e hold to go into edit and then hold again to go out of edit
+    
+    // create the event here that the edit wheel will listen to
+    // how do i get the cursor positiom, you query it ?  just do get mouse position lol 
+    std::unique_ptr<events::event> edit_hold_event = std::make_unique<events::edit_hold>(GetMousePosition(), edit_meter_);
+    event_interface::queue_event(edit_hold_event);
+    
     if(edit_meter_ < game_config::hold_duration){
         edit_meter_ += 1;
         // ! temporary pending UI implementation

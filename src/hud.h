@@ -17,8 +17,65 @@ namespace hud{
     // previously I did a event strategy pattern, I dont mind that idea
     // can have multiple strategies
     // TODO event strategies
+    
     class hud_element{
         public:
+        // --------------------------- event handle strategies --------------------------------------//
+        // allows for a hud element to have its own event handlder (or multiple)
+        // parent handles construction, subscription and unsubscription, no it can;t because its tempalted
+        class event_strategy{
+            public:
+                virtual ~event_strategy() = default;
+                event_strategy(std::unique_ptr<events::event_handler_interface> handler)
+                : handler_(std::move(handler)){
+                }
+                event_strategy(const event_strategy& other) = default;
+                event_strategy(event_strategy&& other) = default;
+
+                event_strategy& operator=(const event_strategy& other) = default;
+                event_strategy& operator=(event_strategy&& other) = default;
+                virtual void on_event(const events::event& event) = 0;
+                virtual void unsubscribe() = 0;
+                virtual void subscribe() = 0;
+            protected:
+                std::unique_ptr<events::event_handler_interface> handler_;
+        };
+        class edit_wheel_strategy : public event_strategy{
+            public:
+                ~edit_wheel_strategy(){
+                    // unsub
+                    unsubscribe();
+                }
+                // for now moved cursor
+                edit_wheel_strategy(sprite::sprite* sprite, Vector2* position)
+                : event_strategy(std::make_unique<events::event_handler<events::edit_hold>>([this](const events::edit_hold& event) -> void {on_event(event);})), 
+                position_(position), sprite_(sprite){ // construct the handler here
+                    subscribe();
+                }
+                void on_event(const events::event& event) override{
+                    // update the position of the element
+                    const events::edit_hold& edit_event = static_cast<const events::edit_hold&>(event);
+                    position_->x = edit_event.get_position().x;
+                    position_->y = edit_event.get_position().y;
+                    // and the frame of the sprite
+                    sprite_->get_animation().goto_frame(edit_event.get_edit_progress());
+
+                }
+                void unsubscribe() override{
+                    auto* handler_cast = static_cast<events::event_handler<events::edit_hold>*>(handler_.get());
+                    event_interface::unsubscribe<events::edit_hold>(*handler_cast);
+                }
+                void subscribe() override{
+                    auto* handler_cast = static_cast<events::event_handler<events::edit_hold>*>(handler_.get());
+                    event_interface::subscribe<events::edit_hold>(*handler_cast);
+                }
+                
+            private:
+                sprite::sprite* sprite_;
+                Vector2* position_;
+        };
+        // ------------------------------- event hand strategies --------------------------------------//
+        // ------------------ draw strateiges --------------------------------------- //
         class draw_strategy{
             public:
             virtual ~draw_strategy() = default;
@@ -36,8 +93,11 @@ namespace hud{
             virtual ~sprite_draw() = default;
             sprite_draw(sprite::sprite sprite)
             : draw_strategy(), sprite_(sprite){
-                sprite.get_animation().goto_frame(sprite.get_animation().num_frames() - 1) ;
-                 // ! temp placeholder just to test that hud creation works 
+                int end_frame = sprite_.get_animation().num_frames();
+                std::cout << "num frames : " << end_frame << std::endl;
+                std::cout << "set frame "<< std::endl;
+                sprite_.get_animation().goto_frame(end_frame - 1);
+                // ! temp placeholder just to test that hud creation works 
                 // ! it will not behave like this 
                 // TODO change once at that point 
             };
@@ -83,11 +143,12 @@ namespace hud{
 
                 void draw(Vector2 position) override;
             private:
-
         };
+        // ------------------------ draw strategy --------------------------------------------------- // 
+        // ----------------------------- hud element --------------------------------------------- //
             virtual ~hud_element() = default;
-            hud_element(Vector2 position, Rectangle outline, std::unique_ptr<draw_strategy> draw_strat)
-            : outline_(outline), position_(position), draw_strategy_(std::move(draw_strat)) {};
+            hud_element(Vector2 position, Rectangle outline, std::unique_ptr<draw_strategy> draw_strat, std::unique_ptr<event_strategy> event_strat)
+            : outline_(outline), position_(position), draw_strategy_(std::move(draw_strat)), event_handler_strategy_(std::move(event_strat)) {};
 
             hud_element(const hud_element& other) = default;
             hud_element(hud_element&& other) = default;
@@ -95,22 +156,23 @@ namespace hud{
             hud_element& operator=(hud_element&& other) = default;
 
             Rectangle get_outline();
-            sprite::sprite& get_sprite();
             Vector2 get_position();
 
             void draw();
-
+            void set_position(Vector2 position);
         protected:
             Rectangle outline_;
             std::unique_ptr<draw_strategy> draw_strategy_;
+            std::unique_ptr<event_strategy> event_handler_strategy_; // make this the list if you to be able to handle multuple event
             Vector2 position_;
 
     };
     class button : hud_element {
         public:
             ~button() = default;
-            button(Vector2 position, Rectangle outline, std::unique_ptr<draw_strategy> sprite_draw)
-            : hud_element(position, outline, std::move(sprite_draw)), menu_interact_handler_([this](const events::interact_menu& event) -> void {on_menu_interact(event);}){};
+            // here specify what the draw strat type and event listener types are ? 
+            button(Vector2 position, Rectangle outline, std::unique_ptr<draw_strategy> sprite_draw, std::unique_ptr<event_strategy> event_handler)
+            : hud_element(position, outline, std::move(sprite_draw), std::move(event_handler)){};
 
             
             button(const button& other) = default;
@@ -120,11 +182,11 @@ namespace hud{
 
             void subscribe();
             void unsubscribe();
-            void on_menu_interact(const events::interact_menu& event);
+            //void on_menu_interact(const events::interact_menu& event);
 
             void press_button();
         private:
-            events::event_handler<events::interact_menu> menu_interact_handler_;
+            //events::event_handler<events::interact_menu> menu_interact_handler_;
     };
 
     class hud{

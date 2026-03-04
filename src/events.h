@@ -45,7 +45,8 @@ namespace events{
 		cursor_move = 13,
 		decoration_move = 14,
 		decoration_place = 15,
-		size = 16
+		hold_edit = 16,
+		size = 17
 	};
 	class event{
 		protected:
@@ -113,6 +114,28 @@ namespace events{
 			}
 		private:
 	};
+	// for when the player holds down the edit key, main listener is the edit wheel hud component
+	class edit_hold : public event{
+		public:
+			~edit_hold() = default;
+			edit_hold(Vector2 position, int frame)
+			:event(ids::hold_edit), position_(position), edit_progress_(frame){};
+
+			static const int get_static_type(){
+				return ids::hold_edit;
+			}
+			Vector2 get_position() const{
+				return position_;
+			}
+			int get_edit_progress() const{
+				return edit_progress_;
+			}
+		private:
+			Vector2 position_; // for where to draw the edit wheel
+			int edit_progress_; // for picking the fram/e
+
+	};
+
 	// for when an entity potentailly interacts with another, main listener is the quad tree to check collisionss
 	class interact_entity : public event{
 		public:

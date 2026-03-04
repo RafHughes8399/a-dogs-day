@@ -192,3 +192,19 @@ decoration place conflicts, query the grid
     -> delete the copy constructors
 
     -> just get it drawing tonight, then have it respond to shit later
+
+-> cursor move events are listend to by mutliple things (hud elements, decorations)
+-> the cursor should always make the event when it moves (or when it needs to), it is the listeners that should change their behaviour
+
+-> for example ,the deco only listens, 
+-> even through the event is always made
+-> that could result in  processing a lot of events
+-> really you only need to update the position of the hud element when e is pressed initally
+
+    -> query the cursor position
+    -> create the edit wheel event
+    
+    -> update the edit wheel position
+
+-> each player state has a hud ? 
+-> swap the hud based on the state
