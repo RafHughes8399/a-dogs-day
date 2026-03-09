@@ -21,43 +21,41 @@ std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
     );
     auto cursor_position = GetMousePosition();
 
-    auto draw_strat = std::make_unique<hud_element::sprite_draw>(sprite);
-    sprite::sprite* sprite_ptr = draw_strat->get_sprite();
+    auto draw_strat = std::make_unique<hud_element::sprite_draw>(sprite, cursor_position);
+    auto event_strat = std::make_unique<hud_element::edit_wheel_strategy>(draw_strat->get_sprite(), draw_strat->get_position_ptr());
 
-    std::unique_ptr<hud_element::event_strategy> event_strategy = std::make_unique<hud_element::edit_wheel_strategy>(sprite_ptr);
     std::cout << "build element " << std::endl;
-    return std::make_unique<hud_element>(cursor_position, Rectangle{cursor_position.x, cursor_position.y, hud_config::edit_wheel_attributes[entity_config::attributes::frame_width],            
-        hud_config::edit_wheel_attributes[entity_config::attributes::frame_height]}, std::move(draw_strat), std::move(event_strategy));       
+    return std::make_unique<hud_element>(Rectangle{cursor_position.x, cursor_position.y, hud_config::edit_wheel_attributes[entity_config::attributes::frame_width],            
+        hud_config::edit_wheel_attributes[entity_config::attributes::frame_height]}, std::move(draw_strat), std::move(event_strat));       
 
 }
 
 // ---------------------------------- hud element ----------------------------- //
 Vector2 hud::hud_element::get_position(){
-    return position_;
+    return draw_strategy_->get_position();
 }
 void hud::hud_element::set_position(Vector2 position){
-    position_ = position;
+    draw_strategy_->set_position(position);
 }
 // ------------------------------- draw strategies ------------------------------- //
-void hud::hud_element::sprite_draw::draw(Vector2 position){
-    sprite_.render(position);
+void hud::hud_element::sprite_draw::draw(){
+    sprite_.render(position_);
 }    
-void hud::hud_element::rectangle_draw::draw(Vector2 position){
-    DrawRectangle(rectangle_.x, rectangle_.y, rectangle_.width, rectangle_.height, colour_);
+void hud::hud_element::rectangle_draw::draw(){
+    DrawRectangle(position_.x, position_.y, rectangle_.width, rectangle_.height, colour_);
 }
 // position is assumed to be Vector2Zero(), the grid will cover the whole screen (for now)
-void hud::hud_element::grid_draw::draw(Vector2 position){
-    // x is column, y is row
-    for(int x = position.x; x <= level_config::screen_width; x += level_config::edge_weight){
+void hud::hud_element::grid_draw::draw(){
+    for(int x = position_.x; x <= level_config::screen_width; x += level_config::edge_weight){
     }
-    for(int y = position.y; y <= level_config::screen_height; y += level_config::edge_weight){
+    for(int y = position_.y; y <= level_config::screen_height; y += level_config::edge_weight){
     }
 }
 // ------------------------------- draw strategies ------------------------------- //
 
 
 void hud::hud_element::draw(){
-    draw_strategy_->draw(position_);
+    draw_strategy_->draw();
 }   
 // ---------------------------------- button --------------------------------- //
 /* void hud::button::on_menu_interact(const events::interact_menu& event){

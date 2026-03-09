@@ -122,6 +122,8 @@ namespace player{
         private:
             //controls control_scheme_;
             //viewport frame_; // what can be seen by the player, essentially a rectangle, maybe better for the world ?
+            void reset_meter();
+            void increment_meter();
             /** 
              * 
              hud hud_; // for now hud is just a list of elements, will change when it becomes more intricate

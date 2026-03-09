@@ -57,29 +57,22 @@ void player::player::back(){
 
 void player::player::edit(float delta){
     
-    // create the event here that the edit wheel will listen to
-    // how do i get the cursor positiom, you query it ?  just do get mouse position lol 
-    std::unique_ptr<events::event> edit_hold_event = std::make_unique<events::edit_hold>(GetMousePosition(), edit_meter_);
-    event_interface::queue_event(edit_hold_event);
-    
     if(edit_meter_ < game_config::hold_duration){
-        edit_meter_ += 1;
-        // ! temporary pending UI implementation
+        increment_meter();
     }
-    
     if(edit_meter_ >= game_config::hold_duration){
         // change the player state
         std::cout << "edit meter filled " << std::endl;
         std::unique_ptr<events::event> enter_edit = std::make_unique<events::enter_edit_mode>();
         event_interface::queue_event(enter_edit);
-        
-        edit_meter_ = 0; // then reset the meter
+        reset_meter();
     }
     else{
         if(! IsKeyDown(controls_config::key_hold_actions::edit_mode)){
-            edit_meter_ = 0;
+            reset_meter();
         }
     }
+
 }
 
 void player::player::exit_edit(){
@@ -182,4 +175,15 @@ void player::player::update(float delta){
 void player::player::render(){
     hud_.render();
     return;
+}
+
+void player::player::reset_meter(){
+    edit_meter_ = 0;
+    std::unique_ptr<events::event> edit_hold_event = std::make_unique<events::edit_hold>(GetMousePosition(), edit_meter_);
+    event_interface::queue_event(edit_hold_event);
+}
+void player::player::increment_meter(){
+    edit_meter_ += 1;
+    std::unique_ptr<events::event> edit_hold_event = std::make_unique<events::edit_hold>(GetMousePosition(), edit_meter_);
+    event_interface::queue_event(edit_hold_event);
 }

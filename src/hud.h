@@ -46,9 +46,9 @@ namespace hud{
                 ~edit_wheel_strategy(){
                     unsubscribe();
                 }
-                edit_wheel_strategy(sprite::sprite* sprite)
+                edit_wheel_strategy(sprite::sprite* sprite, Vector2* position)
                 : event_strategy(std::make_unique<events::event_handler<events::edit_hold>>([this](const events::edit_hold& event) -> void {on_event(event);})), 
-                position_(nullptr), sprite_(sprite){
+                position_(position), sprite_(sprite){
                     subscribe();
                 }
                 void on_event(const events::event& event) override{
@@ -67,10 +67,6 @@ namespace hud{
                     auto* handler_cast = static_cast<events::event_handler<events::edit_hold>*>(handler_.get());
                     event_interface::subscribe<events::edit_hold>(*handler_cast);
                 }
-                void bind_position(Vector2* position) override{
-                    position_ = position;
-                }
-                
             private:
                 sprite::sprite* sprite_;
                 Vector2* position_;
@@ -80,20 +76,25 @@ namespace hud{
         class draw_strategy{
             public:
             virtual ~draw_strategy() = default;
-            draw_strategy() = default;
+            draw_strategy(Vector2 position = {0, 0}) : position_(position) {};
             draw_strategy(const draw_strategy& other) = default;
             draw_strategy(draw_strategy&& other) = default;
 
             draw_strategy& operator=(const draw_strategy& other) = default;
             draw_strategy& operator=(draw_strategy&& other) = default;
 
-            virtual void draw(Vector2 position) = 0;
+            virtual void draw() = 0;
+            void set_position(Vector2 position) { position_ = position; }
+            Vector2 get_position() { return position_; }
+            Vector2* get_position_ptr() {return &position_;}
+            protected:
+            Vector2 position_;
         };
         class sprite_draw : public draw_strategy{
             public:
             virtual ~sprite_draw() = default;
-            sprite_draw(sprite::sprite sprite)
-            : draw_strategy(), sprite_(sprite){
+            sprite_draw(sprite::sprite sprite, Vector2 position = {0, 0})
+            : draw_strategy(position), sprite_(sprite){
                 int end_frame = sprite_.get_animation().num_frames();
                 std::cout << "num frames : " << end_frame << std::endl;
                 std::cout << "set frame "<< std::endl;
@@ -109,7 +110,7 @@ namespace hud{
             sprite_draw& operator=(const sprite_draw& other) = default;
             sprite_draw& operator=(sprite_draw&& other) = default;
 
-            void draw(Vector2 position) override;
+            void draw() override;
             sprite::sprite* get_sprite() { return &sprite_; }
             private:
             sprite::sprite sprite_;
@@ -119,14 +120,14 @@ namespace hud{
             public:
                 virtual ~rectangle_draw() = default;
                 rectangle_draw(Rectangle rectangle, Color colour)
-                : draw_strategy(), rectangle_(rectangle), colour_(colour){};
+                : draw_strategy({rectangle.x, rectangle.y}), rectangle_(rectangle), colour_(colour){};
 
                 rectangle_draw(const rectangle_draw& other) = default;
                 rectangle_draw(rectangle_draw&& other) = default;
 
                 rectangle_draw& operator=(const rectangle_draw& other) = default;
                 rectangle_draw& operator=(rectangle_draw&& other) = default;
-                void draw(Vector2 position) override;
+                void draw() override;
             private:
                 Rectangle rectangle_;
                 Color colour_; // damn american spelling
@@ -134,8 +135,8 @@ namespace hud{
         class grid_draw : public draw_strategy{
             public:
                 virtual ~grid_draw() = default;
-                grid_draw()
-                : draw_strategy(){};
+                grid_draw(Vector2 position = {0, 0})
+                : draw_strategy(position){};
 
                 grid_draw(const grid_draw& other) = default;
                 grid_draw(grid_draw&& other) = default;
@@ -143,16 +144,16 @@ namespace hud{
                 grid_draw& operator=(const grid_draw& other) = default;
                 grid_draw& operator=(grid_draw&& other) = default;
 
-                void draw(Vector2 position) override;
+                void draw() override;
             private:
         };
         // ------------------------ draw strategy --------------------------------------------------- // 
         // ----------------------------- hud element --------------------------------------------- //
             virtual ~hud_element() = default;
-            hud_element(Vector2 position, Rectangle outline, std::unique_ptr<draw_strategy> draw_strat, std::unique_ptr<event_strategy> event_strat)
-            : outline_(outline), position_(position), draw_strategy_(std::move(draw_strat)), event_handler_strategy_(std::move(event_strat)) {
-                if(event_handler_strategy_){
-                    event_handler_strategy_->bind_position(&position_);
+            hud_element(Rectangle outline, std::unique_ptr<draw_strategy> draw_strat, std::unique_ptr<event_strategy> event_strat)
+            : outline_(outline), draw_strategy_(std::move(draw_strat)), event_handler_strategy_(std::move(event_strat)) {
+                if(event_handler_strategy_ && draw_strategy_){
+                    event_handler_strategy_->bind_position(draw_strategy_->get_position_ptr());
                 }
             }
 
@@ -169,16 +170,15 @@ namespace hud{
         protected:
             Rectangle outline_;
             std::unique_ptr<draw_strategy> draw_strategy_;
-            std::unique_ptr<event_strategy> event_handler_strategy_; // make this the list if you to be able to handle multuple event
-            Vector2 position_;
+            std::unique_ptr<event_strategy> event_handler_strategy_;
 
     };
     class button : hud_element {
         public:
             ~button() = default;
             // here specify what the draw strat type and event listener types are ? 
-            button(Vector2 position, Rectangle outline, std::unique_ptr<draw_strategy> sprite_draw, std::unique_ptr<event_strategy> event_handler)
-            : hud_element(position, outline, std::move(sprite_draw), std::move(event_handler)){};
+            button(Rectangle outline, std::unique_ptr<draw_strategy> sprite_draw, std::unique_ptr<event_strategy> event_handler)
+            : hud_element(outline, std::move(sprite_draw), std::move(event_handler)){};
 
             
             button(const button& other) = default;
