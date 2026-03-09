@@ -40,7 +40,7 @@ void entities::cursor::carrying_decoration::create_move_event(cursor& cursor){
 void entities::cursor::editing::left_click(cursor& cursor, entity& other){
     // makes other subscribe to cursor move events
     if(decoration* decoration_cast = dynamic_cast<decoration*>(&other)){
-        std::cout << "pick up decoration" << decoration_cast->get_id() << std::endl;
+
         decoration_cast->pick_up();
         cursor.state_ = std::make_unique<carrying_decoration>(decoration_cast);
     }
@@ -55,16 +55,14 @@ void entities::cursor::editing::right_click(cursor& cursor, entity& other){
 void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& other){
     (void) other;
     if(decoration* decoration_cast = dynamic_cast<decoration*>(carried_decoration_)){
-        std::cout << "check place down for decoration " << decoration_cast->get_id() <<  std::endl;
+
         bool can_place = decoration_cast->can_place_down(); 
         if(can_place){
-            std::cout << "place down decoration " << decoration_cast->get_id() << std::endl;
+
             decoration_cast->place_down();
             cursor.state_ = std::make_unique<editing>();
-            std::cout << "and switch back to editing "<< std::endl;
         }
         else{
-            std::cout << "can't place down " << std::endl;
         }
     }
 }

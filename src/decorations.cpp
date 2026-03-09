@@ -21,20 +21,20 @@ void entities::decoration::pick_up(){
 bool entities::decoration::can_place_down(){
     Vector2 rounded_position = round_position();
     Rectangle box = hitboxes_[sprites_.index()].get_box();
-    std::cout << "pre round box position " << box.x << ", " << box.y << std::endl;
+
     
     Vector2 rounded_position_difference = Vector2Subtract(rounded_position, position_);
     box.x += rounded_position_difference.x;
     box.y += rounded_position_difference.y;
-    std::cout << "post round box position " << box.x << ", " << box.y << std::endl;
 
-    std::cout << "query with id " << id_ << std::endl;
+
+
     std::unique_ptr<queries::query> can_place_decoration = std::make_unique<queries::can_place_decoration>(box, id_);
     return query_interface::execute_query(queries::bool_executor_, *can_place_decoration);
 }
 void entities::decoration::place_down(){
     Vector2 rounded_position = round_position();
-    std::cout << "can place " << std::endl;
+
     move(rounded_position);
     unsubscribe_from_cursor();
         

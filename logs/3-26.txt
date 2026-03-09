@@ -7,3 +7,17 @@ for hud elements
 -> there is some position offset that must be coded in 
 -> reset frame after stop holding
 ->  
+
+basic quality of life todo 
+-> after this deco and hud stuff is done, do a bit of that QOL stuff you were talking about 
+    -> remove dog up and down
+    -> the rest of the hud for edit
+    -> refactor sprite and hitbox into the same class (this hitbox[sprite.index()] thing is weird)
+    -> for dogs, separate the head from the body sprite to its own sprite, (to enable head animations)
+    -> setup animation play speedsa
+    -> also adjust the level size, 4096 is massive, probably too big
+    -> the is a nasty seg fault happening when dog pathfinds 
+    this is more cpp best practice though
+    -> const-correctness
+    -> references too
+    -> delete the copy constructors

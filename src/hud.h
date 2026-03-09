@@ -95,13 +95,6 @@ namespace hud{
             virtual ~sprite_draw() = default;
             sprite_draw(sprite::sprite sprite, Vector2 position = {0, 0})
             : draw_strategy(position), sprite_(sprite){
-                int end_frame = sprite_.get_animation().num_frames();
-                std::cout << "num frames : " << end_frame << std::endl;
-                std::cout << "set frame "<< std::endl;
-                sprite_.get_animation().goto_frame(end_frame - 1);
-                // ! temp placeholder just to test that hud creation works 
-                // ! it will not behave like this 
-                // TODO change once at that point 
             };
 
             sprite_draw(const sprite_draw& other) = default;

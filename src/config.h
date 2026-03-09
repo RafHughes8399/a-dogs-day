@@ -45,10 +45,10 @@ namespace level_config{
     };
 
     enum directions{
-        up = 0,
-        down = 1,
-        left = 2,
-        right = 3,
+        left = 0,
+        right = 1,
+        up = 2,
+        down = 3,
         directions_size = 4
     };
     inline const Vector2 direction_scalars[directions::directions_size] = {

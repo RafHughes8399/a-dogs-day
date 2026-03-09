@@ -24,7 +24,7 @@ std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
     auto draw_strat = std::make_unique<hud_element::sprite_draw>(sprite, cursor_position);
     auto event_strat = std::make_unique<hud_element::edit_wheel_strategy>(draw_strat->get_sprite(), draw_strat->get_position_ptr());
 
-    std::cout << "build element " << std::endl;
+
     return std::make_unique<hud_element>(Rectangle{cursor_position.x, cursor_position.y, hud_config::edit_wheel_attributes[entity_config::attributes::frame_width],            
         hud_config::edit_wheel_attributes[entity_config::attributes::frame_height]}, std::move(draw_strat), std::move(event_strat));       
 
@@ -103,7 +103,7 @@ void hud::hud::add_element(std::unique_ptr<hud_element> element){
 
 void hud::hud::render(){
     for(const std::unique_ptr<hud_element> & element : elements_){
-        std::cout << "element position : " << element->get_position().x << ", " << element->get_position().y << std::endl;
+
         element->draw();
     }
 }
