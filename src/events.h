@@ -16,7 +16,6 @@
 
 // std includes 
 #include <functional>
-#include <string>
 #include <memory>
 #include <vector>
 #include <algorithm>
@@ -46,14 +45,11 @@ namespace events{
 		decoration_move = 14,
 		decoration_place = 15,
 		hold_edit = 16,
+		empty = 18,
 		size = 17
 	};
 	class event{
-		protected:
-			bool handled_ = false;
-			const int type_;
-			float delay_; // potential execution delay for the event, i.e an event 
-			// can take palce 10s after another,
+
 		public:
 			virtual ~event() = default;	
 			event(int id, float delay=0.0f)
@@ -72,6 +68,11 @@ namespace events{
 				delay_ = std::max(0.0f, delay_ - delta);
 				return delay_ == 0;
 			}
+			protected:
+			bool handled_ = false;
+			const int type_;
+			float delay_; // potential execution delay for the event, i.e an event 
+			// can take palce 10s after another,
 	};
 
 	class test_event : public  event{
@@ -87,7 +88,7 @@ namespace events{
 			return std::asctime(std::localtime(&time_));
 		}
 		private:
-		std::time_t time_;
+		const std::time_t time_;
 
 	};
 	// for when the player finishes holding down the edit button to switch between edit and non-edit mode, the cursor
@@ -131,11 +132,21 @@ namespace events{
 				return edit_progress_;
 			}
 		private:
-			Vector2 position_; // for where to draw the edit wheel
-			int edit_progress_; // for picking the fram/e
+			const Vector2 position_;
+			const int edit_progress_;
 
 	};
+	class empty_event : public event{
+		public:
+			~empty_event() = default;
+			empty_event()
+			:event(ids::empty){};
 
+			static const int get_static_type(){
+				return ids::empty;
+			}
+		private:
+	};
 	// for when an entity potentailly interacts with another, main listener is the quad tree to check collisionss
 	class interact_entity : public event{
 		public:
@@ -153,8 +164,8 @@ namespace events{
 				return hitbox_;
 			}
 			private:
-			size_t id_;
-			hitbox::hitbox hitbox_; 
+			const size_t id_;
+			const hitbox::hitbox hitbox_; 
 		};
 
 		// for when the cursor potentially interacts with a button on a menu, main listener is the meny graph that checks the buttons
@@ -172,7 +183,7 @@ namespace events{
 				return hitbox_;
 			}
 		private:
-			hitbox::hitbox hitbox_; 
+			const hitbox::hitbox hitbox_; 
 	};
 		// when a key is pressed by the player, main listeners are the menus for menu navigation
 
@@ -189,7 +200,7 @@ namespace events{
 				return key_;
 			}
 		private:
-			int key_;
+			const int key_;
 	};
 	// when the player levels up, main listeners are shop items to check if the level requirement 
 	// is met to purhcase 
@@ -207,7 +218,7 @@ namespace events{
 				return new_level_;
 			}
 		private:
-			int new_level_;
+			const int new_level_;
 	};
 	// when the cursor left click occurs, main listener is the quad tree to check collisions
 	class left_mouse_click : public event{
@@ -228,8 +239,8 @@ namespace events{
 			}
 			
 		private:
-			Vector2 mouse_position_;
-			Rectangle collision_box_;
+			const Vector2 mouse_position_;
+			const Rectangle collision_box_;
 	};
 
 	// when an entity moves, main listener is the quad tree to move entities into the correct node
@@ -245,7 +256,7 @@ namespace events{
 			return id_;
 		}
 		private:
-		size_t id_;
+		const size_t id_;
 	};
 
 	class moved_cursor : public event{
@@ -262,7 +273,7 @@ namespace events{
 				return new_position_;
 			}
 		private:
-			Vector2 new_position_;
+			const Vector2 new_position_;
 	};
 	class moved_decoration : public event{
 		public:
@@ -283,9 +294,9 @@ namespace events{
 				return id_;
 			}
 		private:
-			Rectangle pre_move_;
-			Rectangle post_move_;
-			int id_;
+			const Rectangle pre_move_;
+			const Rectangle post_move_;
+			const int id_;
 	};
 	class placed_decoration : public event{
 		public:
@@ -304,8 +315,8 @@ namespace events{
 				return id_;
 			}
 		private:
-			Rectangle rectangle_;
-			size_t id_;
+			const Rectangle rectangle_;
+			const size_t id_;
 	};
 	// when an view_Frame moves, main listener is the level to adjust the view_frame when the player
 	// moves it
@@ -322,7 +333,7 @@ namespace events{
 			return delta_;
 		}
 		private:
-		Vector2 delta_;
+		const Vector2 delta_;
 	};
 	// when a right click occurs, main listener is the level to create a paw mark
 	class right_mouse_click : public event{
@@ -341,8 +352,8 @@ namespace events{
 				return selected_dog_;
 			}
 		private:
-			Vector2 mouse_position_;
-			int selected_dog_;
+			const Vector2 mouse_position_;
+			const int selected_dog_;
 	};
 	// for when an entity need be removed from the level, main listener is the quad tree
 	class remove_entity : public event{
@@ -358,7 +369,7 @@ namespace events{
 				return id_;
 			}
 		private:
-			size_t id_;
+			const size_t id_;
 
 	};
 
@@ -376,7 +387,7 @@ namespace events{
 				return id_;
 			}
 		private:
-			size_t id_;
+			const size_t id_;
 	};
 	class event_handler_interface{
 		public:

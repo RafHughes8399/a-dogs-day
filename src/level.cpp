@@ -16,7 +16,7 @@ void level::level::render(){
     // draw the background 
     DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
     // for debugging purposes
-    graph_.render(view_frame_);
+    // graph_.render(view_frame_);
 
 
     // draw the entities, based on the view frame

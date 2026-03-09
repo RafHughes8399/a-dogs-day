@@ -136,7 +136,8 @@ namespace hud_config{
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
     inline Color red_decoration_highlight = Color {255, 255, 0, opacity};
-    
+    inline Color decoration_grid_highlight = Color{243, 252, 255, opacity};
+    inline const int decoration_grid_thickness = 3;
     // hud elements paths 
     inline const char* cursor_edit_progres_wheel = "../sprites/edit_wheel.png";
     inline const char* edit_grid = "../sprite/edit_grid.png";

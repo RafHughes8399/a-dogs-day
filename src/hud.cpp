@@ -1,4 +1,6 @@
 #include "hud.h"
+#include "config.h"
+#include "raylib.h"
 
 
 
@@ -8,6 +10,7 @@ hud::hud_builder hud::h_builder_;
 hud::hud hud::hud_builder::build_player_hud(){
     hud player_hud = hud();
     player_hud.add_element(std::move(h_builder_.build_edit_wheel()));
+    player_hud.add_element(std::move(h_builder_.build_decoration_grid()));
     return player_hud;
 }
 std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
@@ -30,6 +33,12 @@ std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
 
 }
 
+std::unique_ptr<hud::hud_element> hud::hud_builder::build_decoration_grid(){
+    auto draw_strategy = std::make_unique<hud_element::grid_draw>();
+    auto empty_handler_strategy = std::make_unique<hud_element::empty_handler_strategy>();
+    return std::make_unique<hud_element>(Rectangle {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())}, std::move(draw_strategy), std::move(empty_handler_strategy));
+}
+
 // ---------------------------------- hud element ----------------------------- //
 Vector2 hud::hud_element::get_position(){
     return draw_strategy_->get_position();
@@ -39,6 +48,7 @@ void hud::hud_element::set_position(Vector2 position){
 }
 // ------------------------------- draw strategies ------------------------------- //
 void hud::hud_element::sprite_draw::draw(){
+    std::cout << "draw hud spirte " << std::endl;
     sprite_.render(position_);
 }    
 void hud::hud_element::rectangle_draw::draw(){
@@ -46,9 +56,14 @@ void hud::hud_element::rectangle_draw::draw(){
 }
 // position is assumed to be Vector2Zero(), the grid will cover the whole screen (for now)
 void hud::hud_element::grid_draw::draw(){
-    for(int x = position_.x; x <= level_config::screen_width; x += level_config::edge_weight){
+    std::cout << "draw grid " << std::endl;
+    float screen_w = static_cast<float>(GetScreenWidth());
+    float screen_h = static_cast<float>(GetScreenHeight());
+    for(int x = position_.x; x <= screen_w; x += level_config::edge_weight){
+        DrawLineEx({(float)x, position_.y}, {(float)x, screen_h}, hud_config::decoration_grid_thickness, hud_config::decoration_grid_highlight);
     }
-    for(int y = position_.y; y <= level_config::screen_height; y += level_config::edge_weight){
+    for(int y = position_.y; y <= screen_h; y += level_config::edge_weight){
+        DrawLineEx({position_.x, (float)y}, {screen_w, (float)y}, hud_config::decoration_grid_thickness, hud_config::decoration_grid_highlight);
     }
 }
 // ------------------------------- draw strategies ------------------------------- //

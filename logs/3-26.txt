@@ -10,7 +10,7 @@ for hud elements
 
 basic quality of life todo 
 -> after this deco and hud stuff is done, do a bit of that QOL stuff you were talking about 
-    -> remove dog up and down
+    -> remove dog up and down x 
     -> the rest of the hud for edit
     -> refactor sprite and hitbox into the same class (this hitbox[sprite.index()] thing is weird)
     -> for dogs, separate the head from the body sprite to its own sprite, (to enable head animations)
@@ -21,3 +21,7 @@ basic quality of life todo
     -> const-correctness
     -> references too
     -> delete the copy constructors
+
+bugs to fix too :
+-> seg fault dog pathfingind
+-> arrow screen navigation directions are mucked up
