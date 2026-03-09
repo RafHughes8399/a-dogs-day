@@ -1,6 +1,6 @@
 /**
  *  file that handles animations from spritesheets
- *  - more info -
+ *  
  *  author: raffa October 25
  */
 #ifndef ANIMATION_H
@@ -22,16 +22,17 @@ namespace animation{
             animation& operator=(const animation& other) = default;
             animation& operator=(animation&& other) = default;
 
-            const Rectangle& get_frame() const;
             bool playing();
+            const Rectangle& get_frame() const;
             int get_current_frame(); 
             int get_current_animation();
             
+            void goto_animation(const int animation);
+            void goto_frame(const int frame);
+
             void next_animation();
             void next_frame(bool wrap = true);
 
-            void goto_animation(const int animation);
-            void goto_frame(const int frame);
 
             void pause();
             void play();

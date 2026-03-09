@@ -15,8 +15,8 @@
         executor.unsubscribe(Q::get_static_type());
     } 
     template<typename T>
-    inline T execute_query(queries::query_executor<T>& executor, const queries::query& event){
-        return executor.execute_query(event);
+    inline T execute_query(queries::query_executor<T>& executor, const queries::query& query){
+        return executor.execute_query(query);
     }
 }
 

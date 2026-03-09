@@ -1,6 +1,36 @@
 #include "entities.h"
 
+// ------------------------------- render states ------------------------------- //
+void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position){
+    // draw the outlines
+    size_t render_index = dog.get_spriteset().index();
+    dog.outlines_[render_index].render(draw_position);
+}
+
+void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_position){
+    // do nothing, already handled
+    (void) dog;
+    (void) draw_position;
+    return;
+}
+void entities::player_dog::select(){
+    selected_state_ = std::make_unique<selected>();
+}
+void entities::player_dog::unselect(){
+    selected_state_ = std::make_unique<unselected>();
+}
 // ------------------------------- player dogs ------------------------------- //
+bool entities::player_dog::reached_position(Vector2 target){
+
+    float position_to_target = Vector2Distance(position_, target);
+    // which is 3.2
+    if(position_to_target <= level_config::edge_weight * 0.05){
+        position_ = target;
+        return true;
+    } 
+    return false;
+}
+
 int entities::player_dog::update(float delta){
     (void) delta;
     /**
@@ -9,7 +39,7 @@ int entities::player_dog::update(float delta){
      * for now do nothing 
      */
     // process the head of the move path if it exists,
-
+    
     // need an iniital setting of the direction
     draw_path();
     if(! move_path_.empty()){
@@ -31,36 +61,52 @@ int entities::player_dog::update(float delta){
     return status_codes::nothing;
 }
 
-
-void entities::player_dog::select(){
-    selected_state_ = std::make_unique<selected>();
-}
-void entities::player_dog::unselect(){
-    selected_state_ = std::make_unique<unselected>();
-}
-void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position){
-    // draw the outlines
-    dog.outlines_[dog.sprite_index_].render(draw_position);
-}
-void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_position){
-    // do nothing, already handled
-    (void) dog;
-    (void) draw_position;
-    return;
-}
-void entities::player_dog::render(Vector2 draw_position){
-    entity::render(draw_position);
-    selected_state_->render(*this, draw_position);
-}
-
 Vector2 entities::player_dog::get_direction_scalar(){
     return direction_scalar_;
+}
+void entities::player_dog::determine_direction(Vector2 target){
+    // it is either up down left or right
+    // x is left right, y is up down 
+    if(position_.x < target.x){
+        // moving right
+        direction_scalar_ = level_config::direction_scalars[level_config::directions::right];
+        sprites_.set_index(level_config::directions::right);
+        return;
+    }
+    else if(position_.x > target.x){
+        // moving left
+        direction_scalar_ = level_config::direction_scalars[level_config::directions::left];
+        sprites_.set_index(level_config::directions::left);
+        return;
+    }
+    else if(position_.y < target.y){
+        // moving down 
+        direction_scalar_ = level_config::direction_scalars[level_config::directions::down];
+        sprites_.set_index(level_config::directions::down);
+        return;
+    }
+    else if(position_.y > target.y){
+        // moving up
+        direction_scalar_ = level_config::direction_scalars[level_config::directions::up];
+        sprites_.set_index(level_config::directions::up);
+        return;
+    }
+}
+
+void entities::player_dog::draw_path(){
+    for(auto position : move_path_){
+        int row = position.y / level_config::edge_weight;
+        int row_length = level_config::world_x / level_config::edge_weight;
+        int col = position.x / level_config::edge_weight;
+        int index = (row * row_length) + col;
+        DrawCircle(position.x, position.y, 15, YELLOW);
+        DrawText(TextFormat("%d", index), position.x, position.y, 12, WHITE);
+    }
 }
 void entities::player_dog::interact(entity& other){
     (void) other;
     return;
 }
-
 void entities::player_dog::on_dog_select_event(const events::selected_dog& event){
     auto dog_id = event.get_id();
     if(dog_id == id_){
@@ -76,6 +122,10 @@ void entities::player_dog::on_right_click_event(const events::right_mouse_click&
     (void) destination;
     return;
 }
+void entities::player_dog::render(Vector2 draw_position){
+    entity::render(draw_position);
+    selected_state_->render(*this, draw_position);
+}
 
 void entities::player_dog::set_path(std::vector<Vector2>& path){
     move_path_ = path;
@@ -83,114 +133,68 @@ void entities::player_dog::set_path(std::vector<Vector2>& path){
     // compare the position with the next position in the path
     determine_direction(move_path_.front());
 }
-void entities::player_dog::draw_path(){
-    for(auto position : move_path_){
-        int row = position.y / level_config::edge_weight;
-        int row_length = level_config::world_x / level_config::edge_weight;
-        int col = position.x / level_config::edge_weight;
-        int index = (row * row_length) + col;
-        DrawCircle(position.x, position.y, 15, YELLOW);
-        DrawText(TextFormat("%d", index), position.x, position.y, 12, WHITE);
-    }
-}
-bool entities::player_dog::reached_position(Vector2 target){
 
-    float position_to_target = Vector2Distance(position_, target);
-    // which is 3.2
-    if(position_to_target <= level_config::edge_weight * 0.05){
-        position_ = target;
-        return true;
-    } 
-    return false;
-}
 
-void entities::player_dog::determine_direction(Vector2 target){
-    // it is either up down left or right
-    // x is left right, y is up down 
-    if(position_.x < target.x){
-        // moving right
-        direction_scalar_ = level_config::direction_scalars[level_config::directions::right];
-        sprite_index_ = level_config::directions::right;
-        return;
-    }
-    else if(position_.x > target.x){
-        // moving left
-        direction_scalar_ = level_config::direction_scalars[level_config::directions::left];
-        sprite_index_ = level_config::directions::left;
-        return;
-    }
-    else if(position_.y < target.y){
-        // moving down 
-        direction_scalar_ = level_config::direction_scalars[level_config::directions::down];
-        sprite_index_ = level_config::directions::down;
-        return;
-    }
-    else if(position_.y > target.y){
-        // moving up
-        direction_scalar_ = level_config::direction_scalars[level_config::directions::up];
-        sprite_index_ = level_config::directions::up;
-        return;
-    }
-}
+
 // ------------------------------- builder ------------------------------- //
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){
-    auto khiri_left_texture = textures::textures_.get_texture(textures::khiri_left, assets_config::khiri_left_path);
-    auto khiri_right_texture = textures::textures_.get_texture(textures::khiri_right, assets_config::khiri_right_path);
-    auto khiri_up_texture = textures::textures_.get_texture(textures::khiri_up, assets_config::khiri_up_path);
-    auto khiri_down_texture = textures::textures_.get_texture(textures::khiri_down, assets_config::khiri_down_path);
+    auto khiri_left_texture = textures::textures_.get_texture(textures::khiri_left, entity_config::khiri_left_path);
+    auto khiri_right_texture = textures::textures_.get_texture(textures::khiri_right, entity_config::khiri_right_path);
+    auto khiri_up_texture = textures::textures_.get_texture(textures::khiri_up, entity_config::khiri_up_path);
+    auto khiri_down_texture = textures::textures_.get_texture(textures::khiri_down, entity_config::khiri_down_path);
 
-   auto khiri_left_outline_texture = textures::textures_.get_texture(textures::khiri_left_out, assets_config::khiri_left_outline_path);
-   auto khiri_right_outline_texture = textures::textures_.get_texture(textures::khiri_right_out, assets_config::khiri_right_outline_path);
-   auto khiri_up_outline_texture = textures::textures_.get_texture(textures::khiri_up_out, assets_config::khiri_up_outline_path);
-   auto khiri_down_outline_texture = textures::textures_.get_texture(textures::khiri_down_out, assets_config::khiri_down_outline_path);
+   auto khiri_left_outline_texture = textures::textures_.get_texture(textures::khiri_left_out, entity_config::khiri_left_outline_path);
+   auto khiri_right_outline_texture = textures::textures_.get_texture(textures::khiri_right_out, entity_config::khiri_right_outline_path);
+   auto khiri_up_outline_texture = textures::textures_.get_texture(textures::khiri_up_out, entity_config::khiri_up_outline_path);
+   auto khiri_down_outline_texture = textures::textures_.get_texture(textures::khiri_down_out, entity_config::khiri_down_outline_path);
 
     auto khiri_left_sprite = sprite::sprite(khiri_left_texture,
-        assets_config::khiri_across_attributes[assets_config::attributes::frame_width],
-        assets_config::khiri_across_attributes[assets_config::attributes::frame_height],
-        assets_config::khiri_across_attributes[assets_config::attributes::frames],
-        assets_config::khiri_across_attributes[assets_config::attributes::animations]);
+        entity_config::khiri_across_attributes[entity_config::attributes::frame_width],
+        entity_config::khiri_across_attributes[entity_config::attributes::frame_height],
+        entity_config::khiri_across_attributes[entity_config::attributes::frames],
+        entity_config::khiri_across_attributes[entity_config::attributes::animations]);
     
     auto khiri_right_sprite = sprite::sprite(khiri_right_texture,
-        assets_config::khiri_across_attributes[assets_config::attributes::frame_width],
-        assets_config::khiri_across_attributes[assets_config::attributes::frame_height],
-        assets_config::khiri_across_attributes[assets_config::attributes::frames],
-        assets_config::khiri_across_attributes[assets_config::attributes::animations]);
+        entity_config::khiri_across_attributes[entity_config::attributes::frame_width],
+        entity_config::khiri_across_attributes[entity_config::attributes::frame_height],
+        entity_config::khiri_across_attributes[entity_config::attributes::frames],
+        entity_config::khiri_across_attributes[entity_config::attributes::animations]);
 
     auto khiri_up_sprite = sprite::sprite(khiri_up_texture,
-        assets_config::khiri_down_attributes[assets_config::attributes::frame_width],
-        assets_config::khiri_down_attributes[assets_config::attributes::frame_height],
-        assets_config::khiri_down_attributes[assets_config::attributes::frames],
-        assets_config::khiri_down_attributes[assets_config::attributes::animations]);
+        entity_config::khiri_down_attributes[entity_config::attributes::frame_width],
+        entity_config::khiri_down_attributes[entity_config::attributes::frame_height],
+        entity_config::khiri_down_attributes[entity_config::attributes::frames],
+        entity_config::khiri_down_attributes[entity_config::attributes::animations]);
     
     auto khiri_down_sprite = sprite::sprite(khiri_down_texture,
-        assets_config::khiri_down_attributes[assets_config::attributes::frame_width],
-        assets_config::khiri_down_attributes[assets_config::attributes::frame_height],
-        assets_config::khiri_down_attributes[assets_config::attributes::frames],
-        assets_config::khiri_down_attributes[assets_config::attributes::animations]);
+        entity_config::khiri_down_attributes[entity_config::attributes::frame_width],
+        entity_config::khiri_down_attributes[entity_config::attributes::frame_height],
+        entity_config::khiri_down_attributes[entity_config::attributes::frames],
+        entity_config::khiri_down_attributes[entity_config::attributes::animations]);
 
     auto khiri_left_outline_sprite = sprite::sprite(khiri_left_outline_texture,
-        assets_config::khiri_across_attributes[assets_config::attributes::frame_width],
-        assets_config::khiri_across_attributes[assets_config::attributes::frame_height],
-        assets_config::khiri_across_attributes[assets_config::attributes::frames],
-        assets_config::khiri_across_attributes[assets_config::attributes::animations]);
+        entity_config::khiri_across_attributes[entity_config::attributes::frame_width],
+        entity_config::khiri_across_attributes[entity_config::attributes::frame_height],
+        entity_config::khiri_across_attributes[entity_config::attributes::frames],
+        entity_config::khiri_across_attributes[entity_config::attributes::animations]);
     
     auto khiri_right_outline_sprite = sprite::sprite(khiri_right_outline_texture,
-        assets_config::khiri_across_attributes[assets_config::attributes::frame_width],
-        assets_config::khiri_across_attributes[assets_config::attributes::frame_height],
-        assets_config::khiri_across_attributes[assets_config::attributes::frames],
-        assets_config::khiri_across_attributes[assets_config::attributes::animations]);
+        entity_config::khiri_across_attributes[entity_config::attributes::frame_width],
+        entity_config::khiri_across_attributes[entity_config::attributes::frame_height],
+        entity_config::khiri_across_attributes[entity_config::attributes::frames],
+        entity_config::khiri_across_attributes[entity_config::attributes::animations]);
 
     auto khiri_up_outline_sprite = sprite::sprite(khiri_up_outline_texture,
-        assets_config::khiri_down_attributes[assets_config::attributes::frame_width],
-        assets_config::khiri_down_attributes[assets_config::attributes::frame_height],
-        assets_config::khiri_down_attributes[assets_config::attributes::frames],
-        assets_config::khiri_down_attributes[assets_config::attributes::animations]);
+        entity_config::khiri_down_attributes[entity_config::attributes::frame_width],
+        entity_config::khiri_down_attributes[entity_config::attributes::frame_height],
+        entity_config::khiri_down_attributes[entity_config::attributes::frames],
+        entity_config::khiri_down_attributes[entity_config::attributes::animations]);
     
     auto khiri_down_outline_sprite = sprite::sprite(khiri_down_outline_texture,
-        assets_config::khiri_down_attributes[assets_config::attributes::frame_width],
-        assets_config::khiri_down_attributes[assets_config::attributes::frame_height],
-        assets_config::khiri_down_attributes[assets_config::attributes::frames],
-        assets_config::khiri_down_attributes[assets_config::attributes::animations]);
+        entity_config::khiri_down_attributes[entity_config::attributes::frame_width],
+        entity_config::khiri_down_attributes[entity_config::attributes::frame_height],
+        entity_config::khiri_down_attributes[entity_config::attributes::frames],
+        entity_config::khiri_down_attributes[entity_config::attributes::animations]);
        
 
     auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
@@ -209,63 +213,63 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
         id);
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 position, int id){
-    auto mack_left_texture = textures::textures_.get_texture(textures::mack_left, assets_config::mack_left_path);
-    auto mack_right_texture = textures::textures_.get_texture(textures::mack_right, assets_config::mack_right_path);
-    auto mack_up_texture = textures::textures_.get_texture(textures::mack_up, assets_config::mack_up_path);
-    auto mack_down_texture = textures::textures_.get_texture(textures::mack_down, assets_config::mack_down_path);
+    auto mack_left_texture = textures::textures_.get_texture(textures::mack_left, entity_config::mack_left_path);
+    auto mack_right_texture = textures::textures_.get_texture(textures::mack_right, entity_config::mack_right_path);
+    auto mack_up_texture = textures::textures_.get_texture(textures::mack_up, entity_config::mack_up_path);
+    auto mack_down_texture = textures::textures_.get_texture(textures::mack_down, entity_config::mack_down_path);
 
-   auto mack_left_outline_texture = textures::textures_.get_texture(textures::mack_left_out, assets_config::mack_left_outline_path);
-   auto mack_right_outline_texture = textures::textures_.get_texture(textures::mack_right_out, assets_config::mack_right_outline_path);
-   auto mack_up_outline_texture = textures::textures_.get_texture(textures::mack_up_out, assets_config::mack_up_outline_path);
-   auto mack_down_outline_texture = textures::textures_.get_texture(textures::mack_down_out, assets_config::mack_down_outline_path);
+   auto mack_left_outline_texture = textures::textures_.get_texture(textures::mack_left_out, entity_config::mack_left_outline_path);
+   auto mack_right_outline_texture = textures::textures_.get_texture(textures::mack_right_out, entity_config::mack_right_outline_path);
+   auto mack_up_outline_texture = textures::textures_.get_texture(textures::mack_up_out, entity_config::mack_up_outline_path);
+   auto mack_down_outline_texture = textures::textures_.get_texture(textures::mack_down_out, entity_config::mack_down_outline_path);
 
     auto mack_left_sprite = sprite::sprite(mack_left_texture,
-        assets_config::mack_across_attributes[assets_config::attributes::frame_width],
-        assets_config::mack_across_attributes[assets_config::attributes::frame_height],
-        assets_config::mack_across_attributes[assets_config::attributes::frames],
-        assets_config::mack_across_attributes[assets_config::attributes::animations]);
+        entity_config::mack_across_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_across_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_across_attributes[entity_config::attributes::frames],
+        entity_config::mack_across_attributes[entity_config::attributes::animations]);
     
     auto mack_right_sprite = sprite::sprite(mack_right_texture,
-        assets_config::mack_across_attributes[assets_config::attributes::frame_width],
-        assets_config::mack_across_attributes[assets_config::attributes::frame_height],
-        assets_config::mack_across_attributes[assets_config::attributes::frames],
-        assets_config::mack_across_attributes[assets_config::attributes::animations]);
+        entity_config::mack_across_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_across_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_across_attributes[entity_config::attributes::frames],
+        entity_config::mack_across_attributes[entity_config::attributes::animations]);
 
     auto mack_up_sprite = sprite::sprite(mack_up_texture,
-        assets_config::mack_down_attributes[assets_config::attributes::frame_width],
-        assets_config::mack_down_attributes[assets_config::attributes::frame_height],
-        assets_config::mack_down_attributes[assets_config::attributes::frames],
-        assets_config::mack_down_attributes[assets_config::attributes::animations]);
+        entity_config::mack_down_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_down_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_down_attributes[entity_config::attributes::frames],
+        entity_config::mack_down_attributes[entity_config::attributes::animations]);
     
     auto mack_down_sprite = sprite::sprite(mack_down_texture,
-        assets_config::mack_down_attributes[assets_config::attributes::frame_width],
-        assets_config::mack_down_attributes[assets_config::attributes::frame_height],
-        assets_config::mack_down_attributes[assets_config::attributes::frames],
-        assets_config::mack_down_attributes[assets_config::attributes::animations]);
+        entity_config::mack_down_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_down_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_down_attributes[entity_config::attributes::frames],
+        entity_config::mack_down_attributes[entity_config::attributes::animations]);
 
     auto mack_left_outline_sprite = sprite::sprite(mack_left_outline_texture,
-        assets_config::mack_across_attributes[assets_config::attributes::frame_width],
-        assets_config::mack_across_attributes[assets_config::attributes::frame_height],
-        assets_config::mack_across_attributes[assets_config::attributes::frames],
-        assets_config::mack_across_attributes[assets_config::attributes::animations]);
+        entity_config::mack_across_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_across_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_across_attributes[entity_config::attributes::frames],
+        entity_config::mack_across_attributes[entity_config::attributes::animations]);
     
     auto mack_right_outline_sprite = sprite::sprite(mack_right_outline_texture,
-        assets_config::mack_across_attributes[assets_config::attributes::frame_width],
-        assets_config::mack_across_attributes[assets_config::attributes::frame_height],
-        assets_config::mack_across_attributes[assets_config::attributes::frames],
-        assets_config::mack_across_attributes[assets_config::attributes::animations]);
+        entity_config::mack_across_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_across_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_across_attributes[entity_config::attributes::frames],
+        entity_config::mack_across_attributes[entity_config::attributes::animations]);
 
     auto mack_up_outline_sprite = sprite::sprite(mack_up_outline_texture,
-        assets_config::mack_down_attributes[assets_config::attributes::frame_width],
-        assets_config::mack_down_attributes[assets_config::attributes::frame_height],
-        assets_config::mack_down_attributes[assets_config::attributes::frames],
-        assets_config::mack_down_attributes[assets_config::attributes::animations]);
+        entity_config::mack_down_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_down_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_down_attributes[entity_config::attributes::frames],
+        entity_config::mack_down_attributes[entity_config::attributes::animations]);
     
     auto mack_down_outline_sprite = sprite::sprite(mack_down_outline_texture,
-        assets_config::mack_down_attributes[assets_config::attributes::frame_width],
-        assets_config::mack_down_attributes[assets_config::attributes::frame_height],
-        assets_config::mack_down_attributes[assets_config::attributes::frames],
-        assets_config::mack_down_attributes[assets_config::attributes::animations]);
+        entity_config::mack_down_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_down_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_down_attributes[entity_config::attributes::frames],
+        entity_config::mack_down_attributes[entity_config::attributes::animations]);
        
     auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
     auto down_hitbox = hitbox::h_builder_.build_player_dog_down_hitbox(position);

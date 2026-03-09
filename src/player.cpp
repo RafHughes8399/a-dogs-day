@@ -2,29 +2,85 @@
 #include <iostream>
 
 // ----------------------- player ----------------------- //
-
-
-
 void player::player::setup_control_maps(){
     // ! figure out how to assign 
-    key_press_controls_[key_press_actions::dog_switch] = [this]() -> void {switch_dog();};
-    key_press_controls_[key_press_actions::shop_open] = [this]() -> void{open_shop();};
-    key_press_controls_[key_press_actions::inventory_open] = [this]() -> void {open_inventory();};
-    key_press_controls_[key_press_actions::menu_open] = [this]() -> void {open_menu();};
-    key_press_controls_[key_press_actions::quests_open] = [this]() -> void {open_quests();};
-    key_press_controls_[key_press_actions::map_open] = [this]() -> void {open_map();};
-
-
-    key_hold_controls_[key_hold_actions::move_up] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::up], delta);};
-    key_hold_controls_[key_hold_actions::move_down] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::down], delta);};
-    key_hold_controls_[key_hold_actions::move_left] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::left], delta);};
-    key_hold_controls_[key_hold_actions::move_right] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::right], delta);};
+    /**
+     * 
+     key_press_controls_[controls_config::key_press_actions::dog_switch] = [this]() -> void {switch_dog();};
+     key_press_controls_[controls_config::key_press_actions::shop_open] = [this]() -> void{open_shop();};
+     key_press_controls_[controls_config::key_press_actions::inventory_open] = [this]() -> void {open_inventory();};
+     key_press_controls_[controls_config::key_press_actions::menu_open] = [this]() -> void {open_menu();};
+     key_press_controls_[controls_config::key_press_actions::quests_open] = [this]() -> void {open_quests();};
+     key_press_controls_[controls_config::key_press_actions::map_open] = [this]() -> void {open_map();};
+     key_press_controls_[controls_config::key_press_actions::back] = [this]() -> void {back();};
+     
+     key_hold_controls_[controls_config::key_hold_actions::edit_mode] = [this](float delta) -> void {edit(delta);};
+     key_hold_controls_[controls_config::key_hold_actions::move_up] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::up], delta);};
+     key_hold_controls_[controls_config::key_hold_actions::move_down] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::down], delta);};
+     key_hold_controls_[controls_config::key_hold_actions::move_left] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::left], delta);};
+     key_hold_controls_[controls_config::key_hold_actions::move_right] = [this](float delta) -> void {move(level_config::direction_scalars[level_config::directions::right], delta);};
+     */
 }
+
+// ----------------------------- player states ----------------------------- // 
+
+void player::player::state::left_click(player& player){
+    std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(GetMousePosition(), 
+    entity_config::cursor_attributes[entity_config::attributes::frame_width], entity_config::cursor_attributes[entity_config::attributes::frame_height]);
+    event_interface::queue_event(left_mouse_click_event);
+}
+void player::player::state::right_click(player& player){
+    std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(GetMousePosition(), player.selected_dog_);
+    event_interface::queue_event(right_mouse_click_event);
+}
+
+void player::player::editing::left_click(player& player){
+    
+    std::cout << "edit left click " << std::endl;
+}
+
+void player::player::carrying_decoration::left_click(player& player){
+
+}
+
 void player::player::on_selected_dog(const events::selected_dog& event){
     auto id = event.get_id();
     selected_dog_ = id;
 }
 
+void player::player::back(){
+    std::cout << "back " << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::back);
+    event_interface::queue_event(key_press);
+
+}
+
+void player::player::edit(float delta){
+    
+    if(edit_meter_ < game_config::hold_duration){
+        increment_meter();
+    }
+    if(edit_meter_ >= game_config::hold_duration){
+        // change the player state
+        std::cout << "edit meter filled " << std::endl;
+        std::unique_ptr<events::event> enter_edit = std::make_unique<events::enter_edit_mode>();
+        event_interface::queue_event(enter_edit);
+        reset_meter();
+    }
+    else{
+        if(! IsKeyDown(controls_config::key_hold_actions::edit_mode)){
+            reset_meter();
+        }
+    }
+
+}
+
+void player::player::exit_edit(){
+    // make an event for the cursor
+    // change the control state 
+    std::unique_ptr<events::event> exit_edit = std::make_unique<events::exit_edit_mode>();
+    event_interface::queue_event(exit_edit);
+}
 void player::player::move(Vector2 direction_scalar, float delta){
     
     auto move_vector = Vector2Scale(Vector2Multiply(level_config::frame_move, direction_scalar), delta);
@@ -46,39 +102,50 @@ void player::player::switch_dog(){
 }
 void player::player::open_inventory(){
     std::cout << "open inventory" << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::inventory_open);
+    event_interface::queue_event(key_press);
+
     return;
 }
 void player::player::open_map(){
     std::cout << "open map" << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::map_open);
+    event_interface::queue_event(key_press);
     return;
 }
 void player::player::open_menu(){
     std::cout << "open menu" << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::menu_open);
+    event_interface::queue_event(key_press);
     return;
 }
 void player::player::open_quests(){
     std::cout << "open quest" << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::quests_open);
+    event_interface::queue_event(key_press);
     return;
 }
 void player::player::open_shop(){
     std::cout << "open shop" << std::endl;
+    std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(controls_config::key_press_actions::shop_open);
+    event_interface::queue_event(key_press);
     return;
 }
 
-void player::player::update(float delta){
-    
 
-    // ! working on new control scheme
-    /**
-     *   ! click and drag is gone, now move screen through arrow keys
-     *  ! right click for path selection stays 
-     * ! click to select dog is gone, but left click interactions should still stay 
-     *
-     *   
-    */ 
+void player::player::left_click(){
+    std::cout << "left mouse clicked " << std::endl;
+    state_->left_click(*this);
+}
+void player::player::right_click(){
+    state_->right_click(*this);
+}
+void player::player::update(float delta){
 
     // check pressed keys 
-    for(auto & key : key_press_controls_){
+    /**
+     * 
+     for(auto & key : key_press_controls_){
         if(IsKeyPressed(key.first)) {
             auto action = key.second;
             action();
@@ -93,46 +160,30 @@ void player::player::update(float delta){
         }
     }
 
+
     // check mouse inputs
-
-    // check controls that have been pressed and create the approproiate events
     if(IsMouseButtonPressed(mouse_controls_[mouse::left_mouse])){
-        // do event for check selct interaciotn
-
-        // what would a click event need  ?
-        // the position of the click
-        // what information would the level need
-            // the position of the cursor for sure
-            // and its hitbox, do i have that information ? , i think so 
-        std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(GetMousePosition(), 
-        assets_config::cursor_attributes[assets_config::attributes::frame_width], assets_config::cursor_attributes[assets_config::attributes::frame_height]);
-        event_interface::queue_event(left_mouse_click_event);
-
-
-        // the left mouse click checks if the cursor interacts with anything
-    }
-
-    /*     
-    else if(IsMouseButtonDown(mouse_controls_[mouse::left_mouse])){
-        // do event for dragging
-        std::unique_ptr<events::event> move_view_frame_event = std::make_unique<events::move_view_frame>(GetMouseDelta());
-        event_interface::queue_event(move_view_frame_event);
-    } 
-    */
-    
+        left_click();
+    }    
     else if(IsMouseButtonPressed(mouse_controls_[mouse::right_mouse])){
         // do event for creating visual thing
-        std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(GetMousePosition(), selected_dog_);
-        event_interface::queue_event(right_mouse_click_event);
-
-        // pass in the dog id
-        
-    }
-    else {
-        // set default state
+        right_click();
     }
     return;
+    */
 }
 void player::player::render(){
+    hud_.render();
     return;
+}
+
+void player::player::reset_meter(){
+    edit_meter_ = 0;
+    std::unique_ptr<events::event> edit_hold_event = std::make_unique<events::edit_hold>(GetMousePosition(), edit_meter_);
+    event_interface::queue_event(edit_hold_event);
+}
+void player::player::increment_meter(){
+    edit_meter_ += 1;
+    std::unique_ptr<events::event> edit_hold_event = std::make_unique<events::edit_hold>(GetMousePosition(), edit_meter_);
+    event_interface::queue_event(edit_hold_event);
 }

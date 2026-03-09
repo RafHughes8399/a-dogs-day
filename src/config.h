@@ -9,16 +9,26 @@
 #include <vector>
 #include "raylib.h"
 namespace game_config {
-    inline const int twenty_seconds = 1200;
+    inline const int frames = 60;
+    inline const int twenty_seconds = frames * 60; // 20 seconds in frames
+    inline const float hold_duration = frames * 1.2; // 1.2 seconds in frames
+}
+namespace player_config{
+    inline const int max_bones = 999999;
+    inline const int max_level = 50;
 }
 namespace level_config{
     // world dimensions
+    inline float screen_width = GetScreenWidth();
+    inline float screen_height = GetScreenHeight();
     inline float world_x = 4096.0f;
     inline float world_y = 4096.0f;
     
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder
 
+
+    inline const int empty_node = -1;
     inline const size_t mack_id = 0;
     inline const size_t khiri_id = 1;
 
@@ -49,7 +59,7 @@ namespace level_config{
     };
     
 }
-namespace assets_config{
+namespace entity_config{
     // file paths
     inline const char* background_path = "../sprites/background.png" ;
     inline const char* cursor_path = "../sprites/cursor.png";
@@ -75,6 +85,8 @@ namespace assets_config{
     inline const char* mack_right_outline_path = "../sprites/mack_right_outline.png";
     inline const char* mack_up_outline_path = "../sprites/mack_up_outline.png";
     inline const char* mack_down_outline_path = "../sprites/mack_down_outline.png";
+
+    inline const char* test_decoration_path ="../sprites/test_decoration.png";
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
     enum attributes{
         frame_width = 0,
@@ -83,14 +95,16 @@ namespace assets_config{
         animations = 3,
         size = 4
     };
+    
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
-    inline const float khiri_across_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 0.75, 1.0f, 1.0f}; // TODO update values (4/11)
-    inline const float khiri_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75, level_config::edge_weight * 2, 1.0f, 1.0f}; // TODO update values (4/11)
-    inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2, level_config::edge_weight * 0.75, 1.0f, 1.0f}; // TODO update values (4/11)
-    inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75, level_config::edge_weight * 2, 1.0f, 1.0f}; // TODO update values (4/11)
-
+    inline const float khiri_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float khiri_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (3/02)
+    
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     
 }
@@ -98,15 +112,15 @@ namespace controls_config{
     // controls 
     inline std::vector<int> mouse_controls = std::vector<int>{MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT};
     enum key_press_actions{
-        switch_dog = KEY_F,
-        open_shop = KEY_S,
-        open_inventory = KEY_I,
-        open_menu = KEY_TAB,
-        open_quests = KEY_Q,
-        open_map = KEY_M,
-
+        dog_switch = KEY_F,
+        shop_open = KEY_S,
+        inventory_open = KEY_I,
+        menu_open = KEY_TAB,
+        quests_open = KEY_Q,
+        map_open = KEY_M,
+        back = KEY_ESCAPE,
+        exit_edit = KEY_E
     };
-    inline std::vector<int> key_controls = std::vector<int>{KEY_F};
     enum key_hold_actions{
         edit_mode = KEY_E,
         move_down = KEY_DOWN,
@@ -116,5 +130,18 @@ namespace controls_config{
     };
     // ? antiicpating the need for multiple control schemes, one for the home level, and one for the 
     // ? resource collecting levels 
+}
+namespace hud_config{
+    // TODO change values pending test
+    inline unsigned char opacity = 120;
+    inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
+    inline Color red_decoration_highlight = Color {255, 255, 0, opacity};
+    
+    // hud elements paths 
+    inline const char* cursor_edit_progres_wheel = "../sprites/edit_wheel.png";
+    inline const char* edit_grid = "../sprite/edit_grid.png";
+    
+    inline const float edit_wheel_attributes[entity_config::attributes::size] = {35.0f, 35.0f, game_config::hold_duration,  1.0f}; // for now, pending animation play speed implementation , frames is 90
+
 }
 #endif

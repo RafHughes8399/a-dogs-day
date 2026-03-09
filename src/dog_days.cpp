@@ -7,18 +7,22 @@
 int main(){
     InitWindow(GetScreenWidth(), GetScreenHeight(), "dog day");
     auto level_builder = level::level_builder();
-    auto player = player::player();
     auto level = level_builder.build_main_level();
-    auto game = game::game(level, player);
+    auto menus = menus::m_builder_.build_menus();
+    auto player = player::player();
+    auto controls = player::controls(&player);
+    auto game = game::game(level, player, menus, controls);
     HideCursor();
     SetTargetFPS(60);
-    while(! WindowShouldClose()){
+    bool loop = true;
+    while(loop){
         float delta = GetFrameTime();
-        game.update(delta);
         BeginDrawing();
+            game.update(delta);
             game.render(delta);
             game.debug(delta);
         EndDrawing();
+        if(IsKeyPressed(KEY_PERIOD)){loop = false;}
     }
     /**
      * 

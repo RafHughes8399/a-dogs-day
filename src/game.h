@@ -6,6 +6,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include  "menus.h"
 #include "level.h"
 #include "player.h"
 #include <iostream>
@@ -13,8 +14,8 @@ namespace game{
     class game {
         public:
             ~game() = default;
-            game(level::level& level, player::player& player)
-                : level_(level), player_(player), frame_count_(0){};
+            game(level::level& level, player::player& player, menus::menu_graph& menu, player::controls& controls)
+                : level_(level), player_(player), frame_count_(0), menus_(menu), controls_(controls){};
             game(const game& other) = default;
             game(game&& other) = default;
 
@@ -25,10 +26,12 @@ namespace game{
             void render(float delta_time);
             void debug(float delta_time);
         private:
-            // the world
-            // the player controller
+            
             int frame_count_;
+            
             level::level& level_;
+            menus::menu_graph& menus_;
+            player::controls& controls_;
             player::player& player_;
     };
 }

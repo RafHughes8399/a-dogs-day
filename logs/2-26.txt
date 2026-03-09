@@ -1,0 +1,210 @@
+
+INSTEAD OF DIRECTIONS, DECORATIONS HAVE VARIANTS THEY HAVE THE UP DOWN LEFT RIGHT VARIANTS, AND YOU CAN ROTATE BETWEEN THEM
+
+buy the stove -> buy the moka wrapper for the stove to cook coffee
+
+-> test button clicking
+requires:
+    -> cursor menu and level mode (to change how interaction and update works )
+    -> cursor states (hover, grab, click)
+    -> button building
+    -> 
+
+
+-> remove up and down sprites
+-> only switch the sprite index when left or right changes
+-> change dog sprites, base sprite has body, extra sprite for the head
+
+
+
+-> decoration functionality 
+    -> placing them in the world as an entity 
+    -> clicking on them (selected / unselected state, like the dogs )
+    -> clik and hold to drag them around
+or the dog class has an extra sprite set for the head
+and the base sprite is just the body
+
+that’s cleaner
+
+-> placed decoration in the world 
+-> click and hold to drag them around
+-> deco hold click meter ? 
+
+
+-> press and hold e to go into edit mode
+-> then click on a decoration 
+    ->  it then follows the mouse around until clicked again 
+    -> there it snaps to the nearest point on the level_graph
+
+things to implement
+    -> e to go into edit mode
+    -> cursor states (interacting, moving decoration, hovering, etc)
+    -> decoration states (default, and then being moved)
+    -> the left click interaction does what:
+        -> changes the state of the cursor to moving decoration
+            -> which makes the cursor create "moving cursor" events every frame
+            -> the decoration being clicked on then subscribes to those events and follows the cursor
+            ->
+    -> upon another click
+        -> the moving state ends
+            -> sending a "place decoration" event with a position to the listening decoration
+            -> the decoration is placed at that point and snaps to the grid
+            -> sends a move decoration from position_a to position_b
+
+
+
+slight rethink ok 
+e to go into edit mode (x)
+    -> changes the player control state
+        -> lmb changes (can only interact with decorations, )
+        -> clicking on a decoration "picks it up", clicking again "puts it down"
+        -> the deocration is moved physically and in the level_graph for pathfinding
+
+    
+    player control states 
+        -> default 
+        -> edit
+        -> carrying-decoration
+            -> lmb now only checks decorations
+                -> changes the player state to carrying
+                -> and the decoration now listesn for cursor movement 
+                    -> while carrying only lmb works
+                        -> lmb then can place the decoration down 
+                            -> the decoration stops listening to cursor movement
+                            -> and the graph representation fo the cursor is updated
+
+    -> upon clicking the
+-> how do you get out of edit state ?
+-> incorporate it into the player states
+
+
+ok so: 
+    the player can switch between editing and not editing
+    upon entering edit mode:
+        -> the cursor left click interactions must change so I think
+            -> the cursor has the same states as the player for editing, carrying
+            -> and changes in accordance to the player 
+            -> these states override the left click interaction behaviour
+            -> which is how you acheive what you want to 
+
+            -> lets think about it, 
+            -> the player left click remains the same (it still creates a left click event)
+            -> it is the cursor behaviour that is changing
+            -> it is the cursor that should have the state, not the player
+            
+
+            the interaction is governed by the state of the cursor and the mouse button that was pressed (or not pressed)
+            
+            make the cursor change state
+
+            
+
+
+how do you get out of edit, come to that later
+
+editing left click:
+    -> makes a 
+
+editing right click 
+
+
+the level graph stores a
+
+
+-> exiting the edit state 
+-> graph knowing where obstacles are and using that in pathfinding 
+
+
+exiting editing : 
+    -> player states manage the controls 
+    -> each hasa control scheme, like player currently does
+
+
+    -> or list of maps, and then switch based on how things work
+    -> implement edit exiting
+    -> have controls listen to the same events that make the cursor switch to editing mode
+
+
+-> contrls listen to edit events 
+-> then test to make sure controls works 
+
+
+
+-> then having the graph represent decorations (for pathfinding)
+    -> upon a decoration being built or moved it updates the graph
+    -> need to snap the decoration to a node x 
+    -> user test w jonah
+
+
+
+-> then moving decorations in the level_graph (and avoiding collsisions)
+    -> that is the true test
+    -> add the node to the path if it is occupied, dont if not
+
+-> then placing decorations on top of each other
+    -> cant happen, need to check the "availability: of the place 
+
+
+player has and manages the hud ? 
+or is it just managed separately by the game ?
+better for coupling i guess
+
+
+hud has a state that determines the exact elements to draw, 
+or i guess its like menus ish where the actual hud drawn changes based on what happens 
+you can define a list of huds
+
+setup hud draw strategies x 
+build the hud elements for decorations
+setup the hud in the game and switching huds based on player state 
+
+decoration place conflicts, query the grid
+
+-> definite issues, time to debugging
+-> enable the grid draw, and whip out the print statements
+-> check that move and place and working
+-> and that 
+
+-> and maybe to some more file work (like split level and level graph)
+-> ok yeah its munted lol 
+-> test moving and placing before you try overlap
+-> its probably something to do with the double place/move call
+// and the fact that post move uses pre post
+
+-> cant place if occupied by itself, ahhhh 
+-> check for -1 or the id of the self
+
+-> ovelrap works better now, still the case of when thy "share" that they border on
+-> so ask yourself the question, can two decorations "share" border nodes ? I learn toward no
+
+
+
+
+-> after this deco and hud stuff is done, do a bit of that QOL stuff you were talking about 
+    -> remove dog up and down
+    -> refactor sprite and hitbox into the same class (this hitbox[sprite.index()] thing is weird)
+    -> for dogs, separate the head from the body sprite to its own sprite, (to enable head animations)
+    -> setup animation play speedsa
+    -> also adjust the level size, 4096 is massive, probably too big
+    this is more cpp best practice though
+    -> const-correctness
+    -> references too
+    -> delete the copy constructors
+
+    -> just get it drawing tonight, then have it respond to shit later
+
+-> cursor move events are listend to by mutliple things (hud elements, decorations)
+-> the cursor should always make the event when it moves (or when it needs to), it is the listeners that should change their behaviour
+
+-> for example ,the deco only listens, 
+-> even through the event is always made
+-> that could result in  processing a lot of events
+-> really you only need to update the position of the hud element when e is pressed initally
+
+    -> query the cursor position
+    -> create the edit wheel event
+    
+    -> update the edit wheel position
+
+-> each player state has a hud ? 
+-> swap the hud based on the state
