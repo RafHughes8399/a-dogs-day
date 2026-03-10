@@ -1,9 +1,9 @@
 #include "entities.h"
-
+#include "texture.h"
 // ------------------------------- render states ------------------------------- //
 void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position){
     // draw the outlines
-    size_t render_index = dog.get_spriteset().index();
+    size_t render_index = dog.get_body().get_index();
     dog.outlines_[render_index].render(draw_position);
 }
 
@@ -54,9 +54,7 @@ int entities::player_dog::update(float delta){
         auto new_position = Vector2Add(position_, Vector2Scale(Vector2Multiply(move_speed_, direction_scalar_), delta));
         position_ = new_position;
         // update the hitbox too 
-        std::for_each(hitboxes_.begin(), hitboxes_.end(), [this](hitbox::hitbox& h) -> void {
-            h.update(position_);
-        });
+        body_.update_hitboxes(position_);
     }
     return status_codes::nothing;
 }
@@ -70,13 +68,13 @@ void entities::player_dog::determine_direction(Vector2 target){
     if(position_.x < target.x){
         // moving right
         direction_scalar_ = level_config::direction_scalars[level_config::directions::right];
-        sprites_.set_index(level_config::directions::right);
+        body_.set_index(level_config::directions::right);
         return;
     }
     else if(position_.x > target.x){
         // moving left
         direction_scalar_ = level_config::direction_scalars[level_config::directions::left];
-        sprites_.set_index(level_config::directions::left);
+        body_.set_index(level_config::directions::left);
         return;
     }
     else if(position_.y < target.y){
@@ -140,7 +138,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
     auto khiri_right_texture = textures::textures_.get_texture(textures::khiri_right, entity_config::khiri_right_path);
 
     auto khiri_left_outline_texture = textures::textures_.get_texture(textures::khiri_left_out, entity_config::khiri_left_outline_path);
-     auto khiri_right_outline_texture = textures::textures_.get_texture(textures::khiri_right_out, entity_config::khiri_right_outline_path);
+    auto khiri_right_outline_texture = textures::textures_.get_texture(textures::khiri_right_out, entity_config::khiri_right_outline_path);
 
     auto khiri_left_sprite = sprite::sprite(khiri_left_texture,
         entity_config::khiri_across_attributes[entity_config::attributes::frame_width],
@@ -173,11 +171,10 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
     auto khiri_sprites = std::vector<sprite::sprite>{khiri_left_sprite, khiri_right_sprite};
     auto khiri_outlines = std::vector<sprite::sprite>{khiri_left_outline_sprite, khiri_right_outline_sprite};
     auto khiri_hitboxes = std::vector<hitbox::hitbox>{across_hitbox, across_hitbox};
-
+    auto body = body::body(khiri_hitboxes, khiri_sprites);
     return std::make_unique<entities::player_dog>(
-        khiri_sprites,
+        body,
         khiri_outlines,
-        khiri_hitboxes,
         position,
         id);
 }
@@ -220,11 +217,10 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
     auto mack_outlines = std::vector<sprite::sprite>{mack_left_outline_sprite, mack_right_outline_sprite};
     auto mack_hitboxes = std::vector<hitbox::hitbox>{across_hitbox, across_hitbox};
 
-
+    auto body = body::body(mack_hitboxes, mack_sprites);
     return std::make_unique<entities::player_dog>(
-        mack_sprites,
+        body,
         mack_outlines,
-        mack_hitboxes,
         position,
         id);
 }

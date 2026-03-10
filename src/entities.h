@@ -5,16 +5,14 @@
 #define ENTITIES_H
 
 
-#include <iostream>
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
 #include "hitbox.h"
-#include "queries.h"
-#include "query_interface.h"
-#include "raglib.h"
 #include "sprite.h"
-#include "texture.h"
+#include "raylib.h"
+#include "body.h"
+
 namespace entities{
     enum status_codes{
         nothing = 0,
@@ -25,25 +23,26 @@ namespace entities{
     class entity {
         public:
             virtual ~entity() = default;
-            entity(std::vector<sprite::sprite>& sprite, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
-            : hitboxes_(hitboxes), sprites_(sprite), position_(position), id_(id){
+            entity(body::body body, Vector2 position, int id)
+            : body_(body), position_(position), id_(id){
 
             };
             entity(const entity& other) = default;
-
             entity(entity&& other) = default;
-            entity& operator=(const entity& other) = default;
-            entity& operator=(entity&& other) = default;
+
+            entity& operator=(const entity& other) = delete;
+            entity& operator=(entity&& other) = delete;
 
             bool operator==(entity& other){
                 return id_ == other.id_;
             }
 
             bool check_collision(const hitbox::hitbox other);
+            body::body& get_body();
             int get_id();
             hitbox::hitbox& get_hitbox();
             sprite::sprite& get_sprite();
-            sprite::spriteset& get_spriteset();
+
             Vector2 get_position();
             void move(Vector2 new_postion);
             
@@ -60,9 +59,8 @@ namespace entities{
             }
 
         protected:
-            const int id_;
-            std::vector<hitbox::hitbox> hitboxes_;
-            sprite::spriteset sprites_;            
+            const int id_;    
+            body::body body_;  
             Vector2 position_;
 
     };
@@ -182,8 +180,8 @@ namespace entities{
                     event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 }
-                cursor(std::vector<sprite::sprite>& sprites, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
-                : entity(sprites, hitboxes, position, id), 
+                cursor(body::body body, Vector2 position, int id)
+                : entity(body, position, id), 
                 enter_edit_mode_handler_([this](const events::enter_edit_mode& event) -> void{on_enter_edit_mode_event(event);}),
                 exit_edit_mode_handler_([this](const events::exit_edit_mode& event) -> void{on_exit_edit_mode_event(event);}),
                 left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
@@ -198,10 +196,10 @@ namespace entities{
                     event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 };
 
-                cursor(const cursor& other) = default;
+                cursor(const cursor& other) = delete;
                 cursor(cursor&& other) = default;
                     
-                cursor& operator=(const cursor& other) = default;
+                cursor& operator=(const cursor& other) = delete;
                 cursor& operator=(cursor&& other)  = default;
                 
 
@@ -235,13 +233,13 @@ namespace entities{
         class paw_mark : public entity{
         public:
         ~paw_mark() = default;
-        paw_mark(std::vector<sprite::sprite>& sprites, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
-        : entity(sprites, hitboxes, position, id){};
+        paw_mark(body::body body, Vector2 position, int id)
+        : entity(body, position, id){};
             paw_mark(const paw_mark& other) = default;
             paw_mark(paw_mark&& other) = default;
 
-            paw_mark& operator=(const paw_mark& other) = default;
-            paw_mark& operator=(paw_mark&& other) = default;
+            paw_mark& operator=(const paw_mark& other) = delete;
+            paw_mark& operator=(paw_mark&& other) = delete;
 
             int update(float delta) override;
             void interact(entity& other) override;
@@ -306,21 +304,21 @@ namespace entities{
                 event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 event_interface::unsubscribe<events::selected_dog>(selected_dog_handler_);
             }
-            player_dog(std::vector<sprite::sprite>& sprites, std::vector<sprite::sprite> outlines, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id,
+            player_dog(body::body body,  std::vector<sprite::sprite> outlines, Vector2 position, int id,
             int direction = level_config::directions::right, std::unique_ptr<player_dog::state> state = std::make_unique<unselected>())
-            : entity(sprites, hitboxes, position, id), outlines_(outlines), cosmetics_({}), 
+            : entity(body, position, id), outlines_(outlines), cosmetics_({}), 
             direction_scalar_(level_config::direction_scalars[direction]), selected_state_(std::move(state)),
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}),
             selected_dog_handler_([this](const events::selected_dog& event)->void {on_dog_select_event(event);}){
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 event_interface::subscribe<events::selected_dog>(selected_dog_handler_);
-                sprites_.set_index(direction);
+                body_.set_index(direction);
             };
-            player_dog(const player_dog& other) = default;
+            player_dog(const player_dog& other) = delete;
             player_dog(player_dog&& other) = default;
 
-            player_dog& operator=(const player_dog& other) = default;
-            player_dog& operator=(player_dog&& other) = default;
+            player_dog& operator=(const player_dog& other) = delete;
+            player_dog& operator=(player_dog&& other) = delete;
 
             int update(float delta) override;
             Vector2 get_direction_scalar();
@@ -352,6 +350,7 @@ namespace entities{
             std::unique_ptr<state> selected_state_;
             std::vector<sprite::sprite> outlines_;
             std::vector<sprite::sprite> cosmetics_;
+            // body::body head_;
             std::vector<Vector2> move_path_; // the prev array from the path algorithm
             
             const Vector2 move_speed_ = entity_config::dog_move_speed; // TODO: specify move speed, in config file (28 . 12), in terms of a factor of edge weight (one tenth ? )
@@ -359,26 +358,23 @@ namespace entities{
 
 
     };
-
+    // body behaves slightly differently for decorations, it will have the variants for the decoration (probably should be called deocraiotn)
     class decoration : public entity {
         public:
             ~decoration() = default;
-            decoration(std::vector<sprite::sprite>& sprite, std::vector<hitbox::hitbox>& hitboxes, Vector2 position, int id)
-            : entity(sprite, hitboxes, position, id), pre_move_position_(position_), post_move_position_(position_),
+            decoration(body::body body, Vector2 position, int id)
+            : entity(body, position, id), pre_move_position_(position_), post_move_position_(position_),
             moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ){
                 // upon creating a decoration, let the graph know where it was placed with the event
-                auto rectangle = hitboxes_[sprites_.index()].get_box();
-                
+                auto rectangle = body_.get_hitbox().get_box();
                 std::unique_ptr<events::event> place_decoration = std::make_unique<events::placed_decoration>(rectangle, id_);
                 event_interface::execute_event(*place_decoration);
             }
             decoration(const decoration& other) = default;
-            decoration(decoration&& other);
+            decoration(decoration&& other) = default;
 
-            decoration& operator=(const decoration& other) = default;
+            decoration& operator=(const decoration& other) = delete;
             decoration& operator=(decoration&& other) = default;
-            
-
             
             void on_moved_cursor(const events::moved_cursor& event);
             bool can_place_down();

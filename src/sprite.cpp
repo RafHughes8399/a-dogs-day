@@ -4,7 +4,7 @@
 animation::animation& sprite::sprite::get_animation(){
     return sprite_animation_;
 }
-Texture2D& sprite::sprite::get_texture(){
+const Texture2D& sprite::sprite::get_texture(){
     return sprite_texture_;
 }
 

@@ -21,7 +21,11 @@ basic quality of life todo
     -> const-correctness
     -> references too
     -> delete the copy constructors
-
+    
 bugs to fix too :
 -> seg fault dog pathfingind
 -> arrow screen navigation directions are mucked up
+
+hitbox and sprite combined
+the entity has a 
+

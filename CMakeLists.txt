@@ -81,6 +81,8 @@ link_libraries(hud)
 add_library(hitbox src/hitbox.cpp)
 link_libraries(hitbox)
 
+add_library(body src/body.cpp)
+link_libraries(body)
 
 add_library(texture src/texture.cpp)
 link_libraries(texture)
