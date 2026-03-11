@@ -250,7 +250,7 @@ namespace entities{
     /**
      * there would be multiple kinds of dogs
      * 
-     
+    
      * -> the player dog (K and M )
      *      -> the player dog moves around, responding to cursor events 
      *      -> also has cosmetics (hat, shirt, paw clothes)
@@ -263,7 +263,7 @@ namespace entities{
             class state{
                 public:
                     virtual ~state() = default;
-                    state() {};
+                    state() {}
                     state(const state& other) = default;
                     state(state&& other) = default;
 
@@ -276,8 +276,7 @@ namespace entities{
             class selected : public state {
                 public:
                 
-                    virtual ~selected() = default;
-                    selected() {};
+                    selected() {}
                     selected(const selected& other) = default;
                     selected(selected&& other) = default;
 
@@ -289,8 +288,7 @@ namespace entities{
             }; 
             class unselected : public state{
                 public:
-                    virtual ~unselected() = default;
-                    unselected() {};
+                    unselected() {}
                     unselected(const unselected& other) = default;
                     unselected(unselected&& other) = default;
 
@@ -300,20 +298,20 @@ namespace entities{
                     void render(player_dog& dog, Vector2 draw_position) override;
             };
             
-            ~player_dog(){
+            ~player_dog() override{
                 event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 event_interface::unsubscribe<events::selected_dog>(selected_dog_handler_);
             }
-            player_dog(body::body body,  std::vector<sprite::sprite> outlines, Vector2 position, int id,
+            player_dog(body::body body, body::body head, std::vector<sprite::sprite> outlines, Vector2 position, int id,
             int direction = level_config::directions::right, std::unique_ptr<player_dog::state> state = std::make_unique<unselected>())
-            : entity(body, position, id), outlines_(outlines), cosmetics_({}), 
+            : entity(body, position, id), head_(head), outlines_(outlines), cosmetics_(), 
             direction_scalar_(level_config::direction_scalars[direction]), selected_state_(std::move(state)),
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}),
             selected_dog_handler_([this](const events::selected_dog& event)->void {on_dog_select_event(event);}){
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 event_interface::subscribe<events::selected_dog>(selected_dog_handler_);
-                body_.set_index(direction);
-            };
+                body_.set_index(static_cast<size_t>(direction));
+            }
             player_dog(const player_dog& other) = delete;
             player_dog(player_dog&& other) = default;
 
@@ -343,25 +341,25 @@ namespace entities{
             bool reached_position(Vector2 target);
             void determine_direction(Vector2 target);
             void draw_path();
-
-            events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
-            events::event_handler<events::selected_dog> selected_dog_handler_;
+            
+            body::body head_;
+            
+            const Vector2 move_speed_ = entity_config::dog_move_speed;
+            Vector2 direction_scalar_;
 
             std::unique_ptr<state> selected_state_;
             std::vector<sprite::sprite> outlines_;
             std::vector<sprite::sprite> cosmetics_;
-            // body::body head_;
             std::vector<Vector2> move_path_; // the prev array from the path algorithm
             
-            const Vector2 move_speed_ = entity_config::dog_move_speed; // TODO: specify move speed, in config file (28 . 12), in terms of a factor of edge weight (one tenth ? )
-            Vector2 direction_scalar_;
 
+            events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
+            events::event_handler<events::selected_dog> selected_dog_handler_;
 
     };
     // body behaves slightly differently for decorations, it will have the variants for the decoration (probably should be called deocraiotn)
     class decoration : public entity {
         public:
-            ~decoration() = default;
             decoration(body::body body, Vector2 position, int id)
             : entity(body, position, id), pre_move_position_(position_), post_move_position_(position_),
             moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ){
@@ -374,7 +372,7 @@ namespace entities{
             decoration(decoration&& other) = default;
 
             decoration& operator=(const decoration& other) = delete;
-            decoration& operator=(decoration&& other) = default;
+            decoration& operator=(decoration&& other) = delete;
             
             void on_moved_cursor(const events::moved_cursor& event);
             bool can_place_down();

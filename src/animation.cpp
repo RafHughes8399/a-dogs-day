@@ -16,11 +16,11 @@ int animation::animation::get_current_animation(){
     return current_animation_;
 }
 
-const int animation::animation::num_animations(){
+int animation::animation::num_animations(){
     return animations_;
 }
 
-const int animation::animation::num_frames(){
+int animation::animation::num_frames(){
     return frames_;
 }
 void animation::animation::goto_animation(const int animation){

@@ -21,31 +21,24 @@ namespace textures{
         paw_mark = 1,
         khiri_left = 2,
         khiri_right = 3,
-        khiri_up = 4,
-        khiri_down = 5,
-        khiri_left_out = 6,
-        khiri_right_out = 7,
-        khiri_up_out = 8,
-        khiri_down_out = 9,
-        mack_left = 10,
-        mack_right = 11,
-        mack_up = 12,
-        mack_down = 13,
-        mack_left_out = 14,
-        mack_right_out = 15,
-        mack_up_out = 16,
-        mack_down_out = 17,
-        test_decoration = 18,
-
-        hud_edit_wheel = 19,
-        size = 19
+        khiri_left_out = 4,
+        khiri_right_out = 5,
+        mack_left = 6,
+        mack_right = 7,
+        mack_up = 8,
+        mack_down = 9,
+        mack_left_out = 10,
+        mack_right_out = 11,
+        test_decoration = 12,
+        hud_edit_wheel = 13,
+        size = 14
         // and so on
     };
     class texture{
         public:
             ~texture() = default;
             texture(Texture2D texture)
-            : texture_(texture), is_loaded_(true) {};
+            : is_loaded_(true), texture_(texture) {}
             texture(const texture& other) = default;
             texture(texture&& other) = default;
 
@@ -67,7 +60,7 @@ namespace textures{
                 for(int i = 0; i < texture_keys::size; ++i){
                     loaded_textures_.insert({i, nullptr});
                 }
-            };
+            }
             textures_map(const textures_map& other) = default;
             textures_map(textures_map&& other) = default;
 

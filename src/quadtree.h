@@ -10,6 +10,8 @@
 #include <iostream>
 
 #include "config.h"
+#include "queries.h"
+#include "query_interface.h"
 #include "entities.h"
 #include "raylib.h"
 #include "raymath.h"

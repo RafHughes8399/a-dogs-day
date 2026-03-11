@@ -12,10 +12,14 @@ basic quality of life todo
 -> after this deco and hud stuff is done, do a bit of that QOL stuff you were talking about 
     -> remove dog up and down x 
     -> the rest of the hud for edit
-    -> refactor sprite and hitbox into the same class (this hitbox[sprite.index()] thing is weird)
-    -> for dogs, separate the head from the body sprite to its own sprite, (to enable head animations)
-    -> setup animation play speedsa
-    -> also adjust the level size, 4096 is massive, probably too big
+    -> refactor sprite and hitbox into the same class (this hitbox[sprite.index()] thing is weird) x
+    -> for dogs, separate the head from the body sprite to its own sprite, (to enable head animations) 
+        -> done in code, need to do in art
+
+    -> setup animation play speeds
+        -> instead of playing every frame, the animation plays every n frames
+    -> also adjust the level size and edge weights, 4096 is massive, probably too big
+
     -> the is a nasty seg fault happening when dog pathfinds 
     this is more cpp best practice though
     -> const-correctness
@@ -26,6 +30,4 @@ bugs to fix too :
 -> seg fault dog pathfingind
 -> arrow screen navigation directions are mucked up
 
-hitbox and sprite combined
-the entity has a 
 

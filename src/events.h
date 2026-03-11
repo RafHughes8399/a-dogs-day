@@ -56,7 +56,7 @@ namespace events{
 			: type_(id), handled_(false), delay_(delay){};
 			
 			event(event&& other) = default;
-			event& operator=(event&& other) = default;
+			event& operator=(event&& other) = delete;
 			
 			bool is_handled(){
 				return handled_;
@@ -406,13 +406,13 @@ namespace events{
 	public:
 		~event_handler() override = default;
 		event_handler(std::function<void(const E& e)> handle)
-			: handler_type_(E::get_static_type()), handler_(handle){
+			: handler_(handle), handler_type_(E::get_static_type()){
 			};
 		
 		event_handler(const event_handler& other) = default;
 		event_handler(event_handler&& other) = default;
 		
-		event_handler& operator=(const event_handler& other) = default;
+		event_handler& operator=(const event_handler& other) = delete;
 		event_handler& operator=(event_handler&& other) = default;
 		
 		void call_event(const event& e) override{

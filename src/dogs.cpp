@@ -118,8 +118,12 @@ void entities::player_dog::on_right_click_event(const events::right_mouse_click&
     (void) destination;
     return;
 }
+
 void entities::player_dog::render(Vector2 draw_position){
+    // design choice, the inherited body is rendered at the position, so the head has the offset
     entity::render(draw_position);
+    auto draw_position_offset = draw_position;
+    //head_.render(draw_position); // head is empty atm 
     selected_state_->render(*this, draw_position);
 }
 
@@ -168,13 +172,24 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
     auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
 
     // ! up down left right
-    auto khiri_sprites = std::vector<sprite::sprite>{khiri_left_sprite, khiri_right_sprite};
-    auto khiri_outlines = std::vector<sprite::sprite>{khiri_left_outline_sprite, khiri_right_outline_sprite};
-    auto khiri_hitboxes = std::vector<hitbox::hitbox>{across_hitbox, across_hitbox};
+    std::vector<sprite::sprite> khiri_sprites;
+    khiri_sprites.push_back(std::move(khiri_left_sprite));
+    khiri_sprites.push_back(std::move(khiri_right_sprite));
+
+    std::vector<sprite::sprite> khiri_outlines;
+    khiri_outlines.push_back(std::move(khiri_left_outline_sprite));
+    khiri_outlines.push_back(std::move(khiri_right_outline_sprite));
+
+    std::vector<hitbox::hitbox> khiri_hitboxes;
+    khiri_hitboxes.push_back(across_hitbox);
+    khiri_hitboxes.push_back(across_hitbox);
+
     auto body = body::body(khiri_hitboxes, khiri_sprites);
+    auto head = body::body(); // TODO fill !
     return std::make_unique<entities::player_dog>(
-        body,
-        khiri_outlines,
+        std::move(body),
+        std::move(head),
+        std::move(khiri_outlines),
         position,
         id);
 }
@@ -207,20 +222,32 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
     auto mack_right_outline_sprite = sprite::sprite(mack_right_outline_texture,
         entity_config::mack_across_attributes[entity_config::attributes::frame_width],
         entity_config::mack_across_attributes[entity_config::attributes::frame_height],
-        entity_config::mack_across_attributes[entity_config::attributes::frames],
-        entity_config::mack_across_attributes[entity_config::attributes::animations]);
+        static_cast<int>(entity_config::mack_across_attributes[entity_config::attributes::frames]),
+        static_cast<int>(entity_config::mack_across_attributes[entity_config::attributes::animations]));
 
     auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
 
     // ! up down left right
-    auto mack_sprites = std::vector<sprite::sprite>{mack_left_sprite, mack_right_sprite};
-    auto mack_outlines = std::vector<sprite::sprite>{mack_left_outline_sprite, mack_right_outline_sprite};
-    auto mack_hitboxes = std::vector<hitbox::hitbox>{across_hitbox, across_hitbox};
+    std::vector<sprite::sprite> mack_sprites;
+    mack_sprites.push_back(std::move(mack_left_sprite));
+    mack_sprites.push_back(std::move(mack_right_sprite));
+
+    std::vector<sprite::sprite> mack_outlines;
+    mack_outlines.push_back(std::move(mack_left_outline_sprite));
+    mack_outlines.push_back(std::move(mack_right_outline_sprite));
+
+    std::vector<hitbox::hitbox> mack_hitboxes;
+    mack_hitboxes.push_back(across_hitbox);
+    mack_hitboxes.push_back(across_hitbox);
 
     auto body = body::body(mack_hitboxes, mack_sprites);
+    auto head = body::body(); // TODO fill ! and build the head sprites and hitboxes
+
+    // and build the head, pending
     return std::make_unique<entities::player_dog>(
-        body,
-        mack_outlines,
+        std::move(body),
+        std::move(head),
+        std::move(mack_outlines),
         position,
         id);
 }

@@ -26,7 +26,7 @@
 #include "raglib.h"
 #include "render_layer.h"
 #include "texture.h"
-
+#include "raylib.h"
 
 namespace level{
     class level_graph{
@@ -107,8 +107,8 @@ namespace level{
             level_graph(level_graph&& other) = default;
             
             
-            level_graph& operator=(const level_graph& other) = default;
-            level_graph& operator=(level_graph&& other) = default;
+            level_graph& operator=(const level_graph& other) = delete;
+            level_graph& operator=(level_graph&& other) = delete;
             
             bool can_place_decoration(const queries::can_place_decoration& query);
             
@@ -146,8 +146,8 @@ namespace level{
             level(const level& other) = default;
             level(level&& other) = default;
             
-            level& operator=(const level& other) = default;
-            level& operator=(level&& other) = default;
+            level& operator=(const level& other) = delete;
+            level& operator=(level&& other) = delete;
 
             int entity_id();
             int num_entities();

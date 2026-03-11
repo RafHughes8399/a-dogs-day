@@ -19,7 +19,7 @@ namespace sprite{
             sprite(sprite&& other) = default;
             
             sprite& operator=(const sprite& other) = default;
-            sprite& operator=(sprite&& other) = default;
+            sprite& operator=(sprite&& other) = delete;
 
             animation::animation& get_animation();
             const Texture2D& get_texture();

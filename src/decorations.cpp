@@ -1,4 +1,7 @@
 #include "entities.h"
+#include "texture.h"
+#include "queries.h"
+#include "query_interface.h"
 
 // ------------------------ decorations -----------------------------------// 
 
@@ -20,7 +23,7 @@ void entities::decoration::pick_up(){
 }
 bool entities::decoration::can_place_down(){
     Vector2 rounded_position = round_position();
-    Rectangle box = hitboxes_[sprites_.index()].get_box();
+    Rectangle box = body_.get_hitbox().get_box();
 
     
     Vector2 rounded_position_difference = Vector2Subtract(rounded_position, position_);
@@ -40,8 +43,8 @@ void entities::decoration::place_down(){
         
     // update the post move position after it has been rounded
     post_move_position_ = position_;
-    auto width = hitboxes_[sprites_.index()].get_box().width;
-    auto height = hitboxes_[sprites_.index()].get_box().height;
+    auto width = body_.get_hitbox().get_box().width;
+    auto height = body_.get_hitbox().get_box().height;
         
     auto pre_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
     auto post_move_rectangle = Rectangle{post_move_position_.x, post_move_position_.y, width, height};
@@ -77,6 +80,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_test_decoratio
     auto hitbox = hitbox::h_builder_.build_test_decoration_hitbox(position);
     std::vector<sprite::sprite> sprites = {sprite};
     std::vector<hitbox::hitbox> hitboxes = {hitbox};
+    auto body = body::body(hitboxes, sprites);
 
-    return std::make_unique<entities::decoration>(sprites, hitboxes, position, id);
+    return std::make_unique<entities::decoration>(body, position, id);
 }

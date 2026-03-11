@@ -94,11 +94,11 @@ namespace player{
                 std::unique_ptr<events::event> level_up_event = std::make_unique<events::level_up>(level_);
                 //event_interface::queue_event(level_up_event);
             };
-            player(const player& other) = default;
+            player(const player& other) = delete;
             player(player&& other) = default;
         
-            player& operator=(const player& other) = default;
-            player& operator=(player&& other) = default;
+            player& operator=(const player& other) = delete;
+            player& operator=(player&& other) = delete;
 
             void back();
             void edit(float delta);
@@ -168,8 +168,8 @@ namespace player{
             controls(const controls& other) = default;
             controls(controls&& other) = default;
 
-            controls& operator=(const controls& other) = default;
-            controls& operator=(controls&& other) = default;
+            controls& operator=(const controls& other) = delete;
+            controls& operator=(controls&& other) = delete;
 
             void check(float delta);
             void on_enter_edit_mode(const events::enter_edit_mode& event);

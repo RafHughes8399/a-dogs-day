@@ -6,9 +6,11 @@ namespace body{
     class body{
         public:
             ~body() = default;
+            body(size_t index = 0)
+            : hitboxes_({}), sprites_({}), index_(index){}
             body(std::vector<hitbox::hitbox>& hitboxes, std::vector<sprite::sprite>& sprites, size_t index = 0)
-            : hitboxes_(hitboxes), sprites_(sprites), index_(index){};
-
+            : hitboxes_(hitboxes), sprites_(sprites), index_(index){}
+            
             body(const body& other) = default;
             body(body&& other) = default;
 
