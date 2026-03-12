@@ -18,8 +18,9 @@ std::vector<sprite::sprite> body::body::get_sprites(){
     return sprites_;
 }
 
-void body::body::render(Vector2 position){
-    sprites_[index_].render(position);
+void body::body::render(Vector2 position, int frame){
+    if(index_ >= sprites_.size() || index_ >= hitboxes_.size()) return;
+    sprites_[index_].render(position, frame);
 
     // temp for debug purposes
     auto box = hitboxes_[index_].get_box();

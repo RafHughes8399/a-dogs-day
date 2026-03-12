@@ -26,7 +26,7 @@ namespace body{
             std::vector<hitbox::hitbox> get_hitboxes();
             std::vector<sprite::sprite> get_sprites();
 
-            void render(Vector2 position);
+            void render(Vector2 position, int frame);
             void update_hitboxes(Vector2 new_position);
 
         private:

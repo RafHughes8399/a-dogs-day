@@ -17,8 +17,8 @@ Vector2 entities::entity::get_position(){
     return position_;
 }
 
-void entities::entity::render(Vector2 draw_position ){
-    body_.render(draw_position);
+void entities::entity::render(Vector2 draw_position, int frame){
+    body_.render(draw_position, frame);
 
 }
 void entities::entity::move(Vector2 new_position){

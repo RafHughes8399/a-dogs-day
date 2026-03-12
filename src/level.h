@@ -156,8 +156,8 @@ namespace level{
             void on_left_mouse_click_event(const events::left_mouse_click& event);
             void on_move_view_frame_event(const events::move_view_frame& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
-            void render();
-            void update(float delta);
+            void render(int frame);
+            void update(float delta, int frame);
         private :
             // event handlers
             events::event_handler<events::left_mouse_click> left_mouse_click_handler_;

@@ -23,7 +23,7 @@ namespace sprite{
 
             animation::animation& get_animation();
             const Texture2D& get_texture();
-            void render(Vector2 position);
+            void render(Vector2 position, int frame);
         private:
             // has the texture 
             // and the animation
@@ -50,7 +50,7 @@ namespace sprite{
             std::vector<sprite>& get_sprites();
             
             void set_index(size_t index);
-            void render(Vector2 position);
+            void render(Vector2 position, int frame);
         private:
             size_t current_;
             std::vector<sprite> sprites_;

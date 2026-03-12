@@ -83,7 +83,7 @@ namespace tree{
         void perform_interactions(std::unique_ptr<node>& tree, entities::entity* entity);
         void prune_leaves(std::unique_ptr<node>& tree, double delta);
         void traverse_tree(std::unique_ptr<node>& tree);
-        std::vector<int> update(std::unique_ptr<node>& tree, float delta);
+        std::vector<int> update(std::unique_ptr<node>& tree, float delta, int frame);
 
         public:
         // CONSTRUCTORS
@@ -247,8 +247,8 @@ namespace tree{
             traverse_tree(root_);
         }
 
-        std::vector<int> update(float delta){
-            auto to_remove = update(root_, delta);
+        std::vector<int> update(float delta, int frame){
+            auto to_remove = update(root_, delta, frame);
             auto parent_objects = std::vector<entities::entity*>{};
             identify_collisions(root_, parent_objects); // start with an empty list
             return to_remove;

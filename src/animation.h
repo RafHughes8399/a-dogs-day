@@ -33,6 +33,7 @@ namespace animation{
             void next_animation();
             void next_frame(bool wrap = true);
 
+            void advance(int frame);
             void pause();
             void play();
 

@@ -72,7 +72,8 @@ void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& o
 
 // -------------------------------- cursor --------------------------------//
 
-int entities::cursor::update(float delta){
+int entities::cursor::update(float delta, int frame){
+    (void) frame;
     auto old_position = position_;
     position_ =  GetMousePosition();
 
@@ -159,7 +160,8 @@ void entities::cursor::on_right_mouse_click_event(const events::right_mouse_clic
 }
 
 // -------------------------------- paw mark --------------------------------//
-int entities::paw_mark::update(float delta){
+int entities::paw_mark::update(float delta, int frame){
+    (void) frame;
     auto& animation = body_.get_sprite().get_animation();
     animation.next_frame(false);
     auto new_frame = animation.get_current_frame();

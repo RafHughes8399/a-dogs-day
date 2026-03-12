@@ -371,11 +371,11 @@ void tree::quadtree::traverse_tree(std::unique_ptr<node>& tree){
 		return;
 }
 
-std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta){
+std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta, int frame){
     if(! tree) {return {};}
     std::vector<int> to_remove = {};
     for(auto it = tree->objects_.begin(); it != tree->objects_.end();){
-        int update_result = (*it)->update(delta);
+        int update_result = (*it)->update(delta, frame);
         switch(update_result){
             case entities::status_codes::moved:
                 if(! node_contains_object(tree->bounds_, (*it)->get_hitbox().get_box())){
@@ -405,7 +405,7 @@ std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta
     }
     // Recursively update children
     for(auto & child : tree->children_){
-        auto sub_remove = update(child, delta);
+        auto sub_remove = update(child, delta, frame);
         to_remove.insert(to_remove.end(), sub_remove.begin(), sub_remove.end());
     }
     return to_remove;

@@ -1,16 +1,15 @@
 #include "entities.h"
 #include "texture.h"
 // ------------------------------- render states ------------------------------- //
-void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position){
-    // draw the outlines
+void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position, int frame){
     size_t render_index = dog.get_body().get_index();
-    dog.outlines_[render_index].render(draw_position);
+    dog.outlines_[render_index].render(draw_position, frame);
 }
 
-void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_position){
-    // do nothing, already handled
+void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_position, int frame){
     (void) dog;
     (void) draw_position;
+    (void) frame;
     return;
 }
 void entities::player_dog::select(){
@@ -31,8 +30,9 @@ bool entities::player_dog::reached_position(Vector2 target){
     return false;
 }
 
-int entities::player_dog::update(float delta){
+int entities::player_dog::update(float delta, int frame){
     (void) delta;
+    (void) frame;
     /**
      * the dog should store its move path
      * if the dog path is empty, then the dog is not moving,
@@ -119,12 +119,11 @@ void entities::player_dog::on_right_click_event(const events::right_mouse_click&
     return;
 }
 
-void entities::player_dog::render(Vector2 draw_position){
-    // design choice, the inherited body is rendered at the position, so the head has the offset
-    entity::render(draw_position);
+void entities::player_dog::render(Vector2 draw_position, int frame){
+    entity::render(draw_position, frame);
     auto draw_position_offset = draw_position;
-    //head_.render(draw_position); // head is empty atm 
-    selected_state_->render(*this, draw_position);
+    head_.render(draw_position, frame);
+    selected_state_->render(*this, draw_position, frame);
 }
 
 void entities::player_dog::set_path(std::vector<Vector2>& path){

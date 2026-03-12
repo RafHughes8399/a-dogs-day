@@ -49,7 +49,7 @@ void hud::hud_element::set_position(Vector2 position){
 // ------------------------------- draw strategies ------------------------------- //
 void hud::hud_element::sprite_draw::draw(){
     std::cout << "draw hud spirte " << std::endl;
-    sprite_.render(position_);
+    sprite_.render(position_, 0);
 }    
 void hud::hud_element::rectangle_draw::draw(){
     DrawRectangle(position_.x, position_.y, rectangle_.width, rectangle_.height, colour_);

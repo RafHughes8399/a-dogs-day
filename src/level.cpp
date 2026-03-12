@@ -1,7 +1,7 @@
 #include "level.h"
 // ----------------------------------------- level ----------------------------------------- //
-void level::level::update(float delta){
-    auto to_remove = level_entities_.update(delta); // could return a list of entiteis to remove ? 
+void level::level::update(float delta, int frame){
+    auto to_remove = level_entities_.update(delta, frame); 
 
     // only if there are entities to remove
     if(! to_remove.empty()){
@@ -12,7 +12,7 @@ void level::level::update(float delta){
     }
     return;
 }
-void level::level::render(){
+void level::level::render(int frame){
     // draw the background 
     DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
     // for debugging purposes
@@ -31,7 +31,7 @@ void level::level::render(){
     };
 
     for(size_t i = 0; i < level_config::draw_layers::size; ++i){
-        render_layers_[i].draw(render_precdicate, Vector2{view_frame_.x, view_frame_.y});
+        render_layers_[i].draw(render_precdicate, Vector2{view_frame_.x, view_frame_.y}, frame);
     }
     return;
 }
