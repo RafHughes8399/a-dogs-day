@@ -1,16 +1,16 @@
 #include "level.h"
+#include <iostream>
 // ----------------------------------------- level ----------------------------------------- //
 void level::level::update(float delta, int frame){
-    auto to_remove = level_entities_.update(delta, frame); 
+    std::vector<std::unique_ptr<entities::entity>> graveyard;
+    auto to_remove = level_entities_.update(delta, frame, graveyard);
 
-    // only if there are entities to remove
     if(! to_remove.empty()){
-
         for(auto & layer : render_layers_){
             layer.remove_entities(to_remove);
         }
     }
-    return;
+    // graveyard destroyed here -- dead entities stay alive until render layers are cleaned up
 }
 void level::level::render(int frame){
     // draw the background 
@@ -64,18 +64,22 @@ void level::level::on_move_view_frame_event(const events::move_view_frame& event
 }
 void level::level::on_right_mouse_event(const events::right_mouse_click& event){
     auto click_position = event.get_mouse_position();
+    std::cout << "[on_right_mouse] click_position: (" << click_position.x << ", " << click_position.y << ")" << std::endl;
     auto paw = entities::e_builder.build_paw_mark(click_position, level_entities_.get_next_id());
     add_entity(std::move(paw), level_config::draw_layers::hud);
 
     auto dog_id = event.get_selected_dog();
+    std::cout << "[on_right_mouse] dog_id: " << dog_id << std::endl;
     if(dog_id != -1){
         auto dog = id_entity_map_[dog_id];
-        // add the direction too
-        // cast and set the path
+        std::cout << "[on_right_mouse] dog ptr: " << dog << " dog_position: (" << dog->get_position().x << ", " << dog->get_position().y << ")" << std::endl;
         auto dog_cast = static_cast<entities::player_dog*>(dog);
         auto direction = dog_cast->get_direction_scalar();
+        std::cout << "[on_right_mouse] direction_scalar: (" << direction.x << ", " << direction.y << ")" << std::endl;
         auto dog_path = graph_.find_path(dog->get_position(), click_position, direction);
+        std::cout << "[on_right_mouse] path returned, size: " << dog_path.size() << std::endl;
         dog_cast->set_path(dog_path);
+        std::cout << "[on_right_mouse] set_path complete" << std::endl;
     }
 }
 

@@ -74,7 +74,7 @@ namespace level{
             void build_edges();
             void update_decoration(Rectangle rectangle, int id = level_config::empty_node);
             std::vector<int> bfs(int start_id, int end_id);
-            std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, int start_id, int end_id);
+            std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id);
             
             // fields
             events::event_handler<events::moved_decoration> moved_decoration_handler_;

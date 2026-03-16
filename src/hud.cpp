@@ -48,7 +48,7 @@ void hud::hud_element::set_position(Vector2 position){
 }
 // ------------------------------- draw strategies ------------------------------- //
 void hud::hud_element::sprite_draw::draw(){
-    std::cout << "draw hud spirte " << std::endl;
+
     sprite_.render(position_, 0);
 }    
 void hud::hud_element::rectangle_draw::draw(){
@@ -56,7 +56,7 @@ void hud::hud_element::rectangle_draw::draw(){
 }
 // position is assumed to be Vector2Zero(), the grid will cover the whole screen (for now)
 void hud::hud_element::grid_draw::draw(){
-    std::cout << "draw grid " << std::endl;
+
     float screen_w = static_cast<float>(GetScreenWidth());
     float screen_h = static_cast<float>(GetScreenHeight());
     for(int x = position_.x; x <= screen_w; x += level_config::edge_weight){

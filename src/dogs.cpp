@@ -1,5 +1,6 @@
 #include "entities.h"
 #include "texture.h"
+#include <iostream>
 // ------------------------------- render states ------------------------------- //
 void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position, int frame){
     size_t render_index = dog.get_body().get_index();
@@ -20,10 +21,9 @@ void entities::player_dog::unselect(){
 }
 // ------------------------------- player dogs ------------------------------- //
 bool entities::player_dog::reached_position(Vector2 target){
-
     float position_to_target = Vector2Distance(position_, target);
-    // which is 3.2
     if(position_to_target <= level_config::edge_weight * 0.05){
+        std::cout << "[reached_position] id: " << id_ << " reached (" << target.x << ", " << target.y << ") dist: " << position_to_target << " remaining path: " << move_path_.size() << std::endl;
         position_ = target;
         return true;
     } 
@@ -31,29 +31,21 @@ bool entities::player_dog::reached_position(Vector2 target){
 }
 
 int entities::player_dog::update(float delta, int frame){
-    (void) delta;
     (void) frame;
-    /**
-     * the dog should store its move path
-     * if the dog path is empty, then the dog is not moving,
-     * for now do nothing 
-     */
-    // process the head of the move path if it exists,
-    
-    // need an iniital setting of the direction
-    draw_path();
     if(! move_path_.empty()){
         auto next_position = move_path_.front();
         if(reached_position(next_position)){
-            move_path_.erase(move_path_.begin()); // the direction of movement should be the same until a new position in the path is reached
+            move_path_.erase(move_path_.begin());
             if(! move_path_.empty()){
                 next_position = move_path_.front();
+                std::cout << "[update] id: " << id_ << " moving to next waypoint: (" << next_position.x << ", " << next_position.y << ") path remaining: " << move_path_.size() << std::endl;
                 determine_direction(next_position);
+            } else {
+                std::cout << "[update] id: " << id_ << " path exhausted" << std::endl;
             }
         }
         auto new_position = Vector2Add(position_, Vector2Scale(Vector2Multiply(move_speed_, direction_scalar_), delta));
         position_ = new_position;
-        // update the hitbox too 
         body_.update_hitboxes(position_);
     }
     return status_codes::nothing;
@@ -63,42 +55,34 @@ Vector2 entities::player_dog::get_direction_scalar(){
     return direction_scalar_;
 }
 void entities::player_dog::determine_direction(Vector2 target){
-    // it is either up down left or right
-    // x is left right, y is up down 
+    std::cout << "[determine_direction] id: " << id_ << " pos: (" << position_.x << ", " << position_.y << ") target: (" << target.x << ", " << target.y << ")" << std::endl;
+    std::cout << "[determine_direction] body sprites: " << body_.get_sprites().size() << " body hitboxes: " << body_.get_hitboxes().size() << " current index: " << body_.get_index() << std::endl;
+    std::cout << "[determine_direction] outlines size: " << outlines_.size() << std::endl;
     if(position_.x < target.x){
-        // moving right
         direction_scalar_ = level_config::direction_scalars[level_config::directions::right];
+        std::cout << "[determine_direction] -> RIGHT set_index(" << level_config::directions::right << ") scalar: (" << direction_scalar_.x << ", " << direction_scalar_.y << ")" << std::endl;
         body_.set_index(level_config::directions::right);
         return;
     }
     else if(position_.x > target.x){
-        // moving left
         direction_scalar_ = level_config::direction_scalars[level_config::directions::left];
+        std::cout << "[determine_direction] -> LEFT set_index(" << level_config::directions::left << ") scalar: (" << direction_scalar_.x << ", " << direction_scalar_.y << ")" << std::endl;
         body_.set_index(level_config::directions::left);
         return;
     }
     else if(position_.y < target.y){
-        // moving down 
         direction_scalar_ = level_config::direction_scalars[level_config::directions::down];
+        std::cout << "[determine_direction] -> DOWN (no index change) scalar: (" << direction_scalar_.x << ", " << direction_scalar_.y << ")" << std::endl;
         return;
     }
     else if(position_.y > target.y){
-        // moving up
         direction_scalar_ = level_config::direction_scalars[level_config::directions::up];
+        std::cout << "[determine_direction] -> UP (no index change) scalar: (" << direction_scalar_.x << ", " << direction_scalar_.y << ")" << std::endl;
         return;
     }
+    std::cout << "[determine_direction] -> NO DIRECTION (pos == target)" << std::endl;
 }
 
-void entities::player_dog::draw_path(){
-    for(auto position : move_path_){
-        int row = position.y / level_config::edge_weight;
-        int row_length = level_config::world_x / level_config::edge_weight;
-        int col = position.x / level_config::edge_weight;
-        int index = (row * row_length) + col;
-        DrawCircle(position.x, position.y, 15, YELLOW);
-        DrawText(TextFormat("%d", index), position.x, position.y, 12, WHITE);
-    }
-}
 void entities::player_dog::interact(entity& other){
     (void) other;
     return;
@@ -127,10 +111,15 @@ void entities::player_dog::render(Vector2 draw_position, int frame){
 }
 
 void entities::player_dog::set_path(std::vector<Vector2>& path){
+    std::cout << "[set_path] id: " << id_ << " path size: " << path.size() << std::endl;
+    if(path.empty()){
+        std::cout << "[set_path] empty path, skipping" << std::endl;
+        return;
+    }
     move_path_ = path;
-    // when the path is set, also pick a direction 
-    // compare the position with the next position in the path
+    std::cout << "[set_path] first waypoint: (" << move_path_.front().x << ", " << move_path_.front().y << ")" << std::endl;
     determine_direction(move_path_.front());
+    std::cout << "[set_path] complete" << std::endl;
 }
 
 
