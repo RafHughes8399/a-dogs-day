@@ -1,5 +1,4 @@
 #include "level.h"
-#include <iostream>
 
 // ----------------------------------------- level graph ----------------------------------------- //
 bool level::level_graph::can_place_decoration(const queries::can_place_decoration& query){
@@ -76,16 +75,13 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
     return visited;
 }
 std::vector<Vector2> level::level_graph::make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id){
-    std::cout << "[make_position_path] start_id: " << start_id << " end_id: " << end_id << " visited[end]: " << visited[end_id] << std::endl;
     if(visited[end_id] == -1 && end_id != start_id){
-        std::cout << "[make_position_path] end node unreachable, returning empty" << std::endl;
         return {};
     }
 
     auto path = std::vector<Vector2>{};
     size_t current_id = end_id;
     while(current_id != start_id){
-        std::cout << "[make_position_path] tracing: node " << current_id << " pos (" << graph_[current_id].first.position_.x << ", " << graph_[current_id].first.position_.y << ") parent: " << visited[current_id] << std::endl;
         path.push_back(graph_[current_id].first.position_);
         current_id = static_cast<size_t>(visited[current_id]);
     }
@@ -98,24 +94,15 @@ std::vector<Vector2> level::level_graph::make_position_path(std::vector<Vector2>
     return path;
 }
 std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end, Vector2 direction){
-    std::cout << "[find_path] start: (" << start.x << ", " << start.y << ") end: (" << end.x << ", " << end.y << ") direction: (" << direction.x << ", " << direction.y << ")" << std::endl;
-
     int start_node = position_to_node(start, direction);
     int end_node = position_to_node(end, direction);
-    std::cout << "[find_path] start_node: " << start_node << " end_node: " << end_node << " graph_size: " << graph_.size() << std::endl;
 
     auto node_path = bfs(start_node, end_node);
-    std::cout << "[find_path] bfs complete, visited[end]: " << node_path[end_node] << std::endl;
 
     auto position_path = std::vector<Vector2>();
     make_position_path(position_path, node_path, start_node, end_node);
-    std::cout << "[find_path] path size: " << position_path.size() << std::endl;
-    for(size_t i = 0; i < position_path.size(); ++i){
-        std::cout << "  [" << i << "] (" << position_path[i].x << ", " << position_path[i].y << ")" << std::endl;
-    }
 
     return position_path;
-
 } 
 
 int level::level_graph::categorise_node(int row, int column){
