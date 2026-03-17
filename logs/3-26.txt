@@ -34,6 +34,7 @@ bugs to fix too :
 
 
 -> after this next steps include (code)
+-> actually implement the hud
 -> setup items (tables, cook stations)
     -> their functionality (dogs interacting with them)
 -> separate huds and drawing at approrpaite times

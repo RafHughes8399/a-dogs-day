@@ -1,4 +1,5 @@
 #include "hitbox.h"
+#include "config.h"
 // ----------------------- global declaration ----------------------- //
 hitbox::hitbox_builder hitbox::h_builder_;
 
@@ -83,5 +84,5 @@ hitbox::hitbox hitbox::hitbox_builder::build_test_decoration_hitbox(Vector2 posi
     return hitbox(Rectangle{position.x, position.y, entity_config::test_decoration_attributes[entity_config::attributes::frame_width], entity_config::test_decoration_attributes[entity_config::attributes::frame_height]});
 }
 hitbox::hitbox hitbox::hitbox_builder::build_gargoyle_hitbox(Vector2 position){
-    return hitbox(Rectangle{})
+    return hitbox(Rectangle{position.x, position.y, entity_config::gargoyle_decoration_attributes[entity_config::attributes::frame_width], entity_config::gargoyle_decoration_attributes[entity_config::attributes::frame_height]});
 }
