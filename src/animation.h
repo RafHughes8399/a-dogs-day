@@ -13,14 +13,14 @@ namespace animation{
     class animation{
         public:
             ~animation() = default;
-            animation(float frame_width, float frame_height, int frames, int animations)
-            : frame_(Rectangle{0.0f, 0.0f, frame_width, frame_height}), frames_(frames), animations_(animations){
+            animation(float frame_width, float frame_height, int frames, int animations, int play_speed = 1)
+            : frame_(Rectangle{0.0f, 0.0f, frame_width, frame_height}), animations_(animations), frames_(frames), play_speed_(play_speed){
             }
             animation(const animation& other) = default;
             animation(animation&& other)= default;
                 
             animation& operator=(const animation& other) = default;
-            animation& operator=(animation&& other) = default;
+            animation& operator=(animation&& other) = delete;
 
             bool playing();
             const Rectangle& get_frame() const;
@@ -33,12 +33,12 @@ namespace animation{
             void next_animation();
             void next_frame(bool wrap = true);
 
-
+            void advance(int frame);
             void pause();
             void play();
 
-            const int num_frames();
-            const int num_animations();
+            int num_frames();
+            int num_animations();
         private:
         // the frame of the sprite sheet
         Rectangle frame_;
@@ -50,6 +50,7 @@ namespace animation{
         // default frame is the origin upon construction 
         int current_frame_ = 0;
         int current_animation_ = 0;
+        int play_speed_;
         bool is_playing_ = false;
 
     };

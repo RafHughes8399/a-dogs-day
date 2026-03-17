@@ -16,11 +16,11 @@ int animation::animation::get_current_animation(){
     return current_animation_;
 }
 
-const int animation::animation::num_animations(){
+int animation::animation::num_animations(){
     return animations_;
 }
 
-const int animation::animation::num_frames(){
+int animation::animation::num_frames(){
     return frames_;
 }
 void animation::animation::goto_animation(const int animation){
@@ -58,6 +58,11 @@ void animation::animation::next_frame(bool wrap){
 }
 
 
+void animation::animation::advance(int frame){
+    if(is_playing_ && play_speed_ > 0 && frame % play_speed_ == 0){
+        next_frame();
+    }
+}
 void animation::animation::play(){
     is_playing_ = true;
 }

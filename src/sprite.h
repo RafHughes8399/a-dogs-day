@@ -19,16 +19,16 @@ namespace sprite{
             sprite(sprite&& other) = default;
             
             sprite& operator=(const sprite& other) = default;
-            sprite& operator=(sprite&& other) = default;
+            sprite& operator=(sprite&& other) = delete;
 
             animation::animation& get_animation();
-            Texture2D& get_texture();
-            void render(Vector2 position);
+            const Texture2D& get_texture();
+            void render(Vector2 position, int frame);
         private:
             // has the texture 
             // and the animation
             animation::animation sprite_animation_;
-            Texture2D sprite_texture_; 
+            const Texture2D sprite_texture_; 
     };
     class spriteset{
         public:
@@ -50,7 +50,7 @@ namespace sprite{
             std::vector<sprite>& get_sprites();
             
             void set_index(size_t index);
-            void render(Vector2 position);
+            void render(Vector2 position, int frame);
         private:
             size_t current_;
             std::vector<sprite> sprites_;

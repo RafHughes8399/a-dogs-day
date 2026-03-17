@@ -45,17 +45,17 @@ namespace level_config{
     };
 
     enum directions{
-        up = 0,
-        down = 1,
-        left = 2,
-        right = 3,
+        left = 0,
+        right = 1,
+        up = 2,
+        down = 3,
         directions_size = 4
     };
     inline const Vector2 direction_scalars[directions::directions_size] = {
-        Vector2{0, -1}, // up 
-        Vector2{0, 1},  // down
-        Vector2{-1, 0}, // left
-        Vector2{1, 0} // right
+        Vector2{-1, 0}, // left  (index 0)
+        Vector2{1, 0},  // right (index 1)
+        Vector2{0, -1}, // up    (index 2)
+        Vector2{0, 1}   // down  (index 3)
     };
     
 }
@@ -87,6 +87,8 @@ namespace entity_config{
     inline const char* mack_down_outline_path = "../sprites/mack_down_outline.png";
 
     inline const char* test_decoration_path ="../sprites/test_decoration.png";
+    inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle_void.png";
+    inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
     enum attributes{
         frame_width = 0,
@@ -104,7 +106,7 @@ namespace entity_config{
     inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (4/11)
     inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (4/11)
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (3/02)
-    
+    inline const float gargoyle_decoration_attributes[attributes::size] = {level_config::edge_weight * 0.75f, level_config::edge_weight * 1.75f, 1.0f, 1.0f};
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     
 }
@@ -136,7 +138,8 @@ namespace hud_config{
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
     inline Color red_decoration_highlight = Color {255, 255, 0, opacity};
-    
+    inline Color decoration_grid_highlight = Color{243, 252, 255, opacity};
+    inline const int decoration_grid_thickness = 3;
     // hud elements paths 
     inline const char* cursor_edit_progres_wheel = "../sprites/edit_wheel.png";
     inline const char* edit_grid = "../sprite/edit_grid.png";

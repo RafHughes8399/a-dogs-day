@@ -1,0 +1,34 @@
+#include "body.h"
+size_t body::body::get_index(){
+    return index_;
+}
+void body::body::set_index(size_t index){
+    index_ = index;
+}
+hitbox::hitbox& body::body::get_hitbox(){
+    return hitboxes_[index_];
+}
+sprite::sprite& body::body::get_sprite(){
+    return sprites_[index_];
+}
+std::vector<hitbox::hitbox> body::body::get_hitboxes(){
+    return hitboxes_;
+}
+std::vector<sprite::sprite> body::body::get_sprites(){
+    return sprites_;
+}
+
+void body::body::render(Vector2 position, int frame){
+    if(index_ >= sprites_.size() || index_ >= hitboxes_.size()) return;
+    sprites_[index_].render(position, frame);
+
+    // temp for debug purposes
+    auto box = hitboxes_[index_].get_box();
+    // draw the hitbox at its actual place 
+    DrawRectangleLines(box.x, box.y, box.width, box.height, GREEN);
+}
+
+void body::body::update_hitboxes(Vector2 new_position){
+    std::for_each(hitboxes_.begin(), hitboxes_.end(), [new_position](hitbox::hitbox& h) -> void {h.update(new_position);});
+
+}

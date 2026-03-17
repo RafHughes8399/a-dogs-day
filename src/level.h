@@ -26,7 +26,7 @@
 #include "raglib.h"
 #include "render_layer.h"
 #include "texture.h"
-
+#include "raylib.h"
 
 namespace level{
     class level_graph{
@@ -74,7 +74,7 @@ namespace level{
             void build_edges();
             void update_decoration(Rectangle rectangle, int id = level_config::empty_node);
             std::vector<int> bfs(int start_id, int end_id);
-            std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, int start_id, int end_id);
+            std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id);
             
             // fields
             events::event_handler<events::moved_decoration> moved_decoration_handler_;
@@ -107,8 +107,8 @@ namespace level{
             level_graph(level_graph&& other) = default;
             
             
-            level_graph& operator=(const level_graph& other) = default;
-            level_graph& operator=(level_graph&& other) = default;
+            level_graph& operator=(const level_graph& other) = delete;
+            level_graph& operator=(level_graph&& other) = delete;
             
             bool can_place_decoration(const queries::can_place_decoration& query);
             
@@ -146,8 +146,8 @@ namespace level{
             level(const level& other) = default;
             level(level&& other) = default;
             
-            level& operator=(const level& other) = default;
-            level& operator=(level&& other) = default;
+            level& operator=(const level& other) = delete;
+            level& operator=(level&& other) = delete;
 
             int entity_id();
             int num_entities();
@@ -156,8 +156,8 @@ namespace level{
             void on_left_mouse_click_event(const events::left_mouse_click& event);
             void on_move_view_frame_event(const events::move_view_frame& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
-            void render();
-            void update(float delta);
+            void render(int frame);
+            void update(float delta, int frame);
         private :
             // event handlers
             events::event_handler<events::left_mouse_click> left_mouse_click_handler_;

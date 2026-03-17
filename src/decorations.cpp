@@ -1,4 +1,9 @@
+#include "config.h"
 #include "entities.h"
+#include "hitbox.h"
+#include "texture.h"
+#include "queries.h"
+#include "query_interface.h"
 
 // ------------------------ decorations -----------------------------------// 
 
@@ -20,28 +25,28 @@ void entities::decoration::pick_up(){
 }
 bool entities::decoration::can_place_down(){
     Vector2 rounded_position = round_position();
-    Rectangle box = hitboxes_[sprites_.index()].get_box();
-    std::cout << "pre round box position " << box.x << ", " << box.y << std::endl;
+    Rectangle box = body_.get_hitbox().get_box();
+
     
     Vector2 rounded_position_difference = Vector2Subtract(rounded_position, position_);
     box.x += rounded_position_difference.x;
     box.y += rounded_position_difference.y;
-    std::cout << "post round box position " << box.x << ", " << box.y << std::endl;
 
-    std::cout << "query with id " << id_ << std::endl;
+
+
     std::unique_ptr<queries::query> can_place_decoration = std::make_unique<queries::can_place_decoration>(box, id_);
     return query_interface::execute_query(queries::bool_executor_, *can_place_decoration);
 }
 void entities::decoration::place_down(){
     Vector2 rounded_position = round_position();
-    std::cout << "can place " << std::endl;
+
     move(rounded_position);
     unsubscribe_from_cursor();
         
     // update the post move position after it has been rounded
     post_move_position_ = position_;
-    auto width = hitboxes_[sprites_.index()].get_box().width;
-    auto height = hitboxes_[sprites_.index()].get_box().height;
+    auto width = body_.get_hitbox().get_box().width;
+    auto height = body_.get_hitbox().get_box().height;
         
     auto pre_move_rectangle = Rectangle{pre_move_position_.x, pre_move_position_.y, width, height};
     auto post_move_rectangle = Rectangle{post_move_position_.x, post_move_position_.y, width, height};
@@ -77,6 +82,32 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_test_decoratio
     auto hitbox = hitbox::h_builder_.build_test_decoration_hitbox(position);
     std::vector<sprite::sprite> sprites = {sprite};
     std::vector<hitbox::hitbox> hitboxes = {hitbox};
+    auto body = body::body(hitboxes, sprites);
 
-    return std::make_unique<entities::decoration>(sprites, hitboxes, position, id);
+    return std::make_unique<entities::decoration>(body, position, id);
+}
+
+std::unique_ptr<entities::entity> entities::entity_builder::build_gargoyle(Vector2 position, int id){
+    auto gargoyle_void = sprite::sprite(
+        textures::textures_.get_texture(textures::gargoyle_void, entity_config::gargoyle_void_decoration_path),
+        entity_config::gargoyle_decoration_attributes[entity_config::attributes::frame_width],
+        entity_config::gargoyle_decoration_attributes[entity_config::attributes::frame_height],
+        entity_config::gargoyle_decoration_attributes[entity_config::attributes::frames],
+        entity_config::gargoyle_decoration_attributes[entity_config::attributes::animations]
+    );
+    auto gargoyle_sick_of_it = sprite::sprite(
+        textures::textures_.get_texture(textures::gargoyle_sick_of_it, entity_config::gargoyle_void_decoration_path),
+        entity_config::gargoyle_decoration_attributes[entity_config::attributes::frame_width],
+        entity_config::gargoyle_decoration_attributes[entity_config::attributes::frame_height],
+        entity_config::gargoyle_decoration_attributes[entity_config::attributes::frames],
+        entity_config::gargoyle_decoration_attributes[entity_config::attributes::animations]
+    );
+
+    auto hitbox = hitbox::h_builder_.build_gargoyle_hitbox(position);
+
+    std::vector<sprite::sprite> sprites = {gargoyle_void, gargoyle_sick_of_it};
+    std::vector<hitbox::hitbox> hitboxes = {hitbox, hitbox};
+    auto body = body::body(hitboxes, sprites);
+
+    return std::make_unique<entities::decoration>(body, position, id);
 }

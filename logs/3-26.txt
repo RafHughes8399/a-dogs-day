@@ -7,3 +7,55 @@ for hud elements
 -> there is some position offset that must be coded in 
 -> reset frame after stop holding
 ->  
+
+basic quality of life todo 
+-> after this deco and hud stuff is done, do a bit of that QOL stuff you were talking about 
+    -> remove dog up and down x 
+    -> the rest of the hud for edit
+    -> refactor sprite and hitbox into the same class (this hitbox[sprite.index()] thing is weird) x
+    -> for dogs, separate the head from the body sprite to its own sprite, (to enable head animations) 
+        -> done in code, need to do in art
+
+    -> setup animation play speeds
+        -> instead of playing every frame, the animation plays every n frames x 
+
+    -> also adjust the level size and edge weights, 4096 is massive, probably too big
+    -> dog head art separation like in aseprite
+
+    -> the is a nasty seg fault happening when dog pathfinds 
+    this is more cpp best practice though
+    -> const-correctness
+    -> references too
+    -> delete the copy constructors
+    
+bugs to fix too :
+-> seg fault dog pathfingind x
+-> arrow screen navigation directions are mucked up
+
+
+-> after this next steps include (code)
+-> setup items (tables, cook stations)
+    -> their functionality (dogs interacting with them)
+-> separate huds and drawing at approrpaite times
+    -> default hud 
+    -> editing hud
+    -> menu huds 
+
+and for art 
+-> dog animations
+    -> idle
+    -> interacting
+-> more decorations
+    -> lemongrass
+    -> the couch
+    -> table ware 
+
+
+and after that (code)
+    -> npc dogs
+        -> their pathfinding, their interacting with tables
+    -> meal creation and service
+
+and art
+    -> some npc dogs (tex, saba, minnie, molly, coops)
+    -> meals (lasagna, boiled chicken, charcuterie snack board)

@@ -1,37 +1,32 @@
 #include "entities.h"
-#include <iostream>
 // --------------------------- entity --------------------------- // 
 bool entities::entity::check_collision(const hitbox::hitbox other){
-    return hitboxes_[sprites_.index()].check_collision(other);
+    return body_.get_hitbox().check_collision(other);
+}
+body::body& entities::entity::get_body(){
+    return body_;
 }
 hitbox::hitbox& entities::entity::get_hitbox(){
-    return hitboxes_[sprites_.index()];
+    return body_.get_hitbox();
 }
 int entities::entity::get_id(){
     return id_;
-}
-
-sprite::spriteset& entities::entity::get_spriteset(){
-    return sprites_;
 }
 
 Vector2 entities::entity::get_position(){
     return position_;
 }
 
-void entities::entity::render(Vector2 draw_position ){
-    sprites_.render(draw_position);
-    auto box = hitboxes_[sprites_.index()].get_box();
-    // draw the hitbox at its actual place 
+void entities::entity::render(Vector2 draw_position, int frame){
+    body_.render(draw_position, frame);
 
-    DrawRectangleLines(box.x, box.y, box.width, box.height, GREEN);
 }
 void entities::entity::move(Vector2 new_position){
     // update hte position
     position_ = new_position;
 
     // update the hitboxes
-    std::for_each(hitboxes_.begin(), hitboxes_.end(), [this](hitbox::hitbox& h) -> void {h.update(position_);});
+    body_.update_hitboxes(position_);
     // move in the quadtree
     std::unique_ptr<events::event> move_event = std::make_unique<events::move_entity>(id_);
     event_interface::queue_event(move_event);

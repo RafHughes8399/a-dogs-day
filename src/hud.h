@@ -29,17 +29,33 @@ namespace hud{
                 event_strategy(std::unique_ptr<events::event_handler_interface> handler)
                 : handler_(std::move(handler)){
                 }
-                event_strategy(const event_strategy& other) = default;
+                event_strategy(const event_strategy& other) = delete;
                 event_strategy(event_strategy&& other) = default;
 
-                event_strategy& operator=(const event_strategy& other) = default;
+                event_strategy& operator=(const event_strategy& other) = delete;
                 event_strategy& operator=(event_strategy&& other) = default;
                 virtual void on_event(const events::event& event) = 0;
                 virtual void unsubscribe() = 0;
                 virtual void subscribe() = 0;
-                virtual void bind_position(Vector2* position){};
             protected:
                 std::unique_ptr<events::event_handler_interface> handler_;
+        };
+        class empty_handler_strategy : public event_strategy{
+            public:
+                ~empty_handler_strategy() = default;
+                empty_handler_strategy()
+                : event_strategy(std::make_unique<events::event_handler<events::empty_event>>([this](const events::empty_event& event) -> void {on_event(event);})){};
+                void on_event(const events::event& event) override{
+                    // do nothing
+                }
+                void unsubscribe() override{
+                    // do nothing
+                }
+                void subscribe() override{
+                    // do nothing
+                }
+            private:
+                std::unique_ptr<events::event_handler<events::empty_event>> handler_;
         };
         class edit_wheel_strategy : public event_strategy{
             public:
@@ -68,15 +84,15 @@ namespace hud{
                     event_interface::subscribe<events::edit_hold>(*handler_cast);
                 }
             private:
-                sprite::sprite* sprite_;
-                Vector2* position_;
+                sprite::sprite* const sprite_;
+                Vector2* const position_;
         };
         // ------------------------------- event hand strategies --------------------------------------//
         // ------------------ draw strateiges --------------------------------------- //
         class draw_strategy{
             public:
             virtual ~draw_strategy() = default;
-            draw_strategy(Vector2 position = {0, 0}) : position_(position) {};
+            draw_strategy(Vector2 position = Vector2Zero()) : position_(position) {};
             draw_strategy(const draw_strategy& other) = default;
             draw_strategy(draw_strategy&& other) = default;
 
@@ -87,6 +103,7 @@ namespace hud{
             void set_position(Vector2 position) { position_ = position; }
             Vector2 get_position() { return position_; }
             Vector2* get_position_ptr() {return &position_;}
+            
             protected:
             Vector2 position_;
         };
@@ -95,23 +112,17 @@ namespace hud{
             virtual ~sprite_draw() = default;
             sprite_draw(sprite::sprite sprite, Vector2 position = {0, 0})
             : draw_strategy(position), sprite_(sprite){
-                int end_frame = sprite_.get_animation().num_frames();
-                std::cout << "num frames : " << end_frame << std::endl;
-                std::cout << "set frame "<< std::endl;
-                sprite_.get_animation().goto_frame(end_frame - 1);
-                // ! temp placeholder just to test that hud creation works 
-                // ! it will not behave like this 
-                // TODO change once at that point 
             };
 
             sprite_draw(const sprite_draw& other) = default;
             sprite_draw(sprite_draw&& other) = default;
 
-            sprite_draw& operator=(const sprite_draw& other) = default;
-            sprite_draw& operator=(sprite_draw&& other) = default;
+            sprite_draw& operator=(const sprite_draw& other) = delete;
+            sprite_draw& operator=(sprite_draw&& other) = delete;
 
             void draw() override;
             sprite::sprite* get_sprite() { return &sprite_; }
+
             private:
             sprite::sprite sprite_;
         };
@@ -153,13 +164,12 @@ namespace hud{
             hud_element(Rectangle outline, std::unique_ptr<draw_strategy> draw_strat, std::unique_ptr<event_strategy> event_strat)
             : outline_(outline), draw_strategy_(std::move(draw_strat)), event_handler_strategy_(std::move(event_strat)) {
                 if(event_handler_strategy_ && draw_strategy_){
-                    event_handler_strategy_->bind_position(draw_strategy_->get_position_ptr());
                 }
             }
 
-            hud_element(const hud_element& other) = default;
+            hud_element(const hud_element& other) = delete;
             hud_element(hud_element&& other) = default;
-            hud_element& operator=(const hud_element& other) = default;
+            hud_element& operator=(const hud_element& other) = delete;
             hud_element& operator=(hud_element&& other) = default;
 
             Rectangle get_outline();
@@ -181,9 +191,9 @@ namespace hud{
             : hud_element(outline, std::move(sprite_draw), std::move(event_handler)){};
 
             
-            button(const button& other) = default;
+            button(const button& other) = delete;
             button(button&& other) = default;
-            button& operator=(const button& other) = default;
+            button& operator=(const button& other) = delete;
             button& operator=(button&& other) = default;
 
             void subscribe();
@@ -224,6 +234,9 @@ namespace hud{
         // builder picks the strategy
         std::unique_ptr<hud_element> build_item_hud_element(items::item& item);
         std::unique_ptr<hud_element> build_edit_wheel();
+        std::unique_ptr<hud_element> build_decoration_grid();
+        std::unique_ptr<hud_element> build_green_highlight();
+        std::unique_ptr<hud_element> build_red_highlight();
         // .....
     };
     extern hud_builder h_builder_;

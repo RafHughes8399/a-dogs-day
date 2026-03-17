@@ -16,8 +16,8 @@ namespace items{
             item(const item& other) = default;
             item(item&& other) = default;
 
-            item& operator=(const item& other) = default;
-            item& operator=(item&& other) = default;
+            item& operator=(const item& other) = delete;
+            item& operator=(item&& other) = delete;
 
 
             protected:
@@ -29,8 +29,7 @@ namespace items{
     class inventory_item : public item{
         public:
         private:
-            int quantity_;
-                                                                      
+            int quantity_;                             
     };
     class shop_item : public item {
         public:
@@ -38,18 +37,24 @@ namespace items{
             // the assocaited "buy button"
             class access_state{
                 public:
+                    virtual ~access_state() = default;
+                    access_state() = default;
+
+                    access_state(access_state&& other) = default;
                     virtual bool can_buy() = 0;
                     virtual bool is_locked() = 0;
                 private:
             };
             class locked : public access_state{
                 public:
+                    locked() : access_state(){};
                     bool can_buy() override { return false;}
                     bool is_locked() override { return true;}
                     private:
                 };
                 class unlocked : public access_state{
                     public:
+                    unlocked() : access_state(){};
                     bool can_buy() override { return true;}
                     bool is_locked() override { return false;}
                     private:

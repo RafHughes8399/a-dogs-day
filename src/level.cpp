@@ -1,22 +1,21 @@
 #include "level.h"
 // ----------------------------------------- level ----------------------------------------- //
-void level::level::update(float delta){
-    auto to_remove = level_entities_.update(delta); // could return a list of entiteis to remove ? 
+void level::level::update(float delta, int frame){
+    std::vector<std::unique_ptr<entities::entity>> graveyard;
+    auto to_remove = level_entities_.update(delta, frame, graveyard);
 
-    // only if there are entities to remove
     if(! to_remove.empty()){
-
         for(auto & layer : render_layers_){
             layer.remove_entities(to_remove);
         }
     }
-    return;
+    // graveyard destroyed here -- dead entities stay alive until render layers are cleaned up
 }
-void level::level::render(){
+void level::level::render(int frame){
     // draw the background 
     DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
     // for debugging purposes
-    graph_.render(view_frame_);
+    // graph_.render(view_frame_);
 
 
     // draw the entities, based on the view frame
@@ -31,7 +30,7 @@ void level::level::render(){
     };
 
     for(size_t i = 0; i < level_config::draw_layers::size; ++i){
-        render_layers_[i].draw(render_precdicate, Vector2{view_frame_.x, view_frame_.y});
+        render_layers_[i].draw(render_precdicate, Vector2{view_frame_.x, view_frame_.y}, frame);
     }
     return;
 }
@@ -70,8 +69,6 @@ void level::level::on_right_mouse_event(const events::right_mouse_click& event){
     auto dog_id = event.get_selected_dog();
     if(dog_id != -1){
         auto dog = id_entity_map_[dog_id];
-        // add the direction too
-        // cast and set the path
         auto dog_cast = static_cast<entities::player_dog*>(dog);
         auto direction = dog_cast->get_direction_scalar();
         auto dog_path = graph_.find_path(dog->get_position(), click_position, direction);

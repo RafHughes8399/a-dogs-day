@@ -4,11 +4,12 @@
 animation::animation& sprite::sprite::get_animation(){
     return sprite_animation_;
 }
-Texture2D& sprite::sprite::get_texture(){
+const Texture2D& sprite::sprite::get_texture(){
     return sprite_texture_;
 }
 
-void sprite::sprite::render(Vector2 position){
+void sprite::sprite::render(Vector2 position, int frame){
+    sprite_animation_.advance(frame);
     DrawTextureRec(sprite_texture_, sprite_animation_.get_frame(), position, WHITE);
 }
 
@@ -29,6 +30,6 @@ void sprite::spriteset::set_index(size_t index){
     current_ = index;
 }
 
-void sprite::spriteset::render(Vector2 position){
-    sprites_[current_].render(position);
+void sprite::spriteset::render(Vector2 position, int frame){
+    sprites_[current_].render(position, frame);
 }

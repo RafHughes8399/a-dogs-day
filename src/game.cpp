@@ -4,7 +4,7 @@ void game::game::update(float delta){
     // deal with queued events 
     events::global_dispatcher_.process_events(delta);
     // update the level
-    level_.update(delta);
+    level_.update(delta, frame_count_);
     // then the player
     controls_.check(delta);
     player_.update(delta);
@@ -21,7 +21,7 @@ void game::game::update(float delta){
 
 void game::game::render(float delta){
     (void) delta;
-    level_.render();
+    level_.render(frame_count_);
     player_.render();
     menus_.render();
     DrawFPS(25, 25);

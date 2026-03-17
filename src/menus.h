@@ -34,9 +34,11 @@ namespace menus{
     class item_menu : public menu{
         public:
             item_menu();
-            item_menu(const item_menu& other) = default;
+
+            item_menu(const item_menu& other) = delete;
             item_menu(item_menu&& other) = default;
-            item_menu& operator=(const item_menu& other) = default;
+
+            item_menu& operator=(const item_menu& other) = delete;
             item_menu& operator=(item_menu&& other) = default;
 
             void render() override;
@@ -93,8 +95,8 @@ namespace menus{
             menu_graph(const menu_graph& other) = default;
             menu_graph(menu_graph&& other) = default;
             
-            menu_graph& operator=(const menu_graph& other) = default;
-            menu_graph& operator=(menu_graph&& other) = default;
+            menu_graph& operator=(const menu_graph& other) = delete;
+            menu_graph& operator=(menu_graph&& other) = delete;
 
             // needs to listen to key presses
             

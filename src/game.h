@@ -9,7 +9,6 @@
 #include  "menus.h"
 #include "level.h"
 #include "player.h"
-#include <iostream>
 namespace game{
     class game {
         public:
@@ -19,8 +18,8 @@ namespace game{
             game(const game& other) = default;
             game(game&& other) = default;
 
-            game& operator=(const game& other) = default;
-            game& operator=(game&& other) = default;
+            game& operator=(const game& other) = delete;
+            game& operator=(game&& other) = delete;
 
             void update(float delta_time);
             void render(float delta_time);

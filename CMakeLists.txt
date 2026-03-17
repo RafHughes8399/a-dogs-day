@@ -3,6 +3,7 @@ project(dog-days)
 
 
 # Generate compile_commands.json
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
@@ -25,6 +26,28 @@ set(MY_COMPILE_OPTIONS
   -Wzero-as-null-pointer-constant
   -Wsuggest-override
   -fstack-protector-strong
+  -Wshadow
+  -Wimplicit-fallthrough
+  -Wundef
+  -Wcast-qual
+  -Wconditional-uninitialized
+  -Wunused-lambda-capture
+  -Wloop-analysis
+  -Wmove
+  -Wself-assign
+  -Wself-move
+  -Wdangling
+  -Wdelete-non-virtual-dtor
+  -Wsuggest-destructor-override
+  -Winconsistent-missing-destructor-override
+  -Wreturn-std-move
+  -Wtautological-compare
+  -Wvla
+  -Wduplicate-enum
+  -Wextra-semi
+  -Wdeprecated
+  -Wsign-conversion
+  -Wfloat-equal
   # Disable problematic warnings for external headers
   -Wno-double-promotion
   -Wno-missing-field-initializers
@@ -81,6 +104,8 @@ link_libraries(hud)
 add_library(hitbox src/hitbox.cpp)
 link_libraries(hitbox)
 
+add_library(body src/body.cpp)
+link_libraries(body)
 
 add_library(texture src/texture.cpp)
 link_libraries(texture)
@@ -120,6 +145,15 @@ link_libraries(game)
 
 add_executable(${PROJECT_NAME} src/dog_days.cpp)
 target_link_libraries(${PROJECT_NAME} raylib)
+
+set(PROJECT_TARGETS
+  raglib events queries animation sprite item menu hud hitbox body texture
+  player controls entities cursor dogs decorations render_layer quadtree
+  graph level game ${PROJECT_NAME}
+)
+foreach(target IN LISTS PROJECT_TARGETS)
+  target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})
+endforeach()
 
 # Web Configurations
 if (${PLATFORM} STREQUAL "Web")

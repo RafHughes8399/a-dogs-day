@@ -1,16 +1,15 @@
 #include "entities.h"
-
+#include "texture.h"
 // ------------------------------- render states ------------------------------- //
-void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position){
-    // draw the outlines
-    size_t render_index = dog.get_spriteset().index();
-    dog.outlines_[render_index].render(draw_position);
+void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position, int frame){
+    size_t render_index = dog.get_body().get_index();
+    dog.outlines_[render_index].render(draw_position, frame);
 }
 
-void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_position){
-    // do nothing, already handled
+void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_position, int frame){
     (void) dog;
     (void) draw_position;
+    (void) frame;
     return;
 }
 void entities::player_dog::select(){
@@ -21,9 +20,7 @@ void entities::player_dog::unselect(){
 }
 // ------------------------------- player dogs ------------------------------- //
 bool entities::player_dog::reached_position(Vector2 target){
-
     float position_to_target = Vector2Distance(position_, target);
-    // which is 3.2
     if(position_to_target <= level_config::edge_weight * 0.05){
         position_ = target;
         return true;
@@ -31,21 +28,12 @@ bool entities::player_dog::reached_position(Vector2 target){
     return false;
 }
 
-int entities::player_dog::update(float delta){
-    (void) delta;
-    /**
-     * the dog should store its move path
-     * if the dog path is empty, then the dog is not moving,
-     * for now do nothing 
-     */
-    // process the head of the move path if it exists,
-    
-    // need an iniital setting of the direction
-    draw_path();
+int entities::player_dog::update(float delta, int frame){
+    (void) frame;
     if(! move_path_.empty()){
         auto next_position = move_path_.front();
         if(reached_position(next_position)){
-            move_path_.erase(move_path_.begin()); // the direction of movement should be the same until a new position in the path is reached
+            move_path_.erase(move_path_.begin());
             if(! move_path_.empty()){
                 next_position = move_path_.front();
                 determine_direction(next_position);
@@ -53,10 +41,7 @@ int entities::player_dog::update(float delta){
         }
         auto new_position = Vector2Add(position_, Vector2Scale(Vector2Multiply(move_speed_, direction_scalar_), delta));
         position_ = new_position;
-        // update the hitbox too 
-        std::for_each(hitboxes_.begin(), hitboxes_.end(), [this](hitbox::hitbox& h) -> void {
-            h.update(position_);
-        });
+        body_.update_hitboxes(position_);
     }
     return status_codes::nothing;
 }
@@ -65,44 +50,26 @@ Vector2 entities::player_dog::get_direction_scalar(){
     return direction_scalar_;
 }
 void entities::player_dog::determine_direction(Vector2 target){
-    // it is either up down left or right
-    // x is left right, y is up down 
     if(position_.x < target.x){
-        // moving right
         direction_scalar_ = level_config::direction_scalars[level_config::directions::right];
-        sprites_.set_index(level_config::directions::right);
+        body_.set_index(level_config::directions::right);
         return;
     }
     else if(position_.x > target.x){
-        // moving left
         direction_scalar_ = level_config::direction_scalars[level_config::directions::left];
-        sprites_.set_index(level_config::directions::left);
+        body_.set_index(level_config::directions::left);
         return;
     }
     else if(position_.y < target.y){
-        // moving down 
         direction_scalar_ = level_config::direction_scalars[level_config::directions::down];
-        sprites_.set_index(level_config::directions::down);
         return;
     }
     else if(position_.y > target.y){
-        // moving up
         direction_scalar_ = level_config::direction_scalars[level_config::directions::up];
-        sprites_.set_index(level_config::directions::up);
         return;
     }
 }
 
-void entities::player_dog::draw_path(){
-    for(auto position : move_path_){
-        int row = position.y / level_config::edge_weight;
-        int row_length = level_config::world_x / level_config::edge_weight;
-        int col = position.x / level_config::edge_weight;
-        int index = (row * row_length) + col;
-        DrawCircle(position.x, position.y, 15, YELLOW);
-        DrawText(TextFormat("%d", index), position.x, position.y, 12, WHITE);
-    }
-}
 void entities::player_dog::interact(entity& other){
     (void) other;
     return;
@@ -122,15 +89,17 @@ void entities::player_dog::on_right_click_event(const events::right_mouse_click&
     (void) destination;
     return;
 }
-void entities::player_dog::render(Vector2 draw_position){
-    entity::render(draw_position);
-    selected_state_->render(*this, draw_position);
+
+void entities::player_dog::render(Vector2 draw_position, int frame){
+    entity::render(draw_position, frame);
+    auto draw_position_offset = draw_position;
+    head_.render(draw_position, frame);
+    selected_state_->render(*this, draw_position, frame);
 }
 
 void entities::player_dog::set_path(std::vector<Vector2>& path){
+    if(path.empty()) return;
     move_path_ = path;
-    // when the path is set, also pick a direction 
-    // compare the position with the next position in the path
     determine_direction(move_path_.front());
 }
 
@@ -140,13 +109,9 @@ void entities::player_dog::set_path(std::vector<Vector2>& path){
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){
     auto khiri_left_texture = textures::textures_.get_texture(textures::khiri_left, entity_config::khiri_left_path);
     auto khiri_right_texture = textures::textures_.get_texture(textures::khiri_right, entity_config::khiri_right_path);
-    auto khiri_up_texture = textures::textures_.get_texture(textures::khiri_up, entity_config::khiri_up_path);
-    auto khiri_down_texture = textures::textures_.get_texture(textures::khiri_down, entity_config::khiri_down_path);
 
-   auto khiri_left_outline_texture = textures::textures_.get_texture(textures::khiri_left_out, entity_config::khiri_left_outline_path);
-   auto khiri_right_outline_texture = textures::textures_.get_texture(textures::khiri_right_out, entity_config::khiri_right_outline_path);
-   auto khiri_up_outline_texture = textures::textures_.get_texture(textures::khiri_up_out, entity_config::khiri_up_outline_path);
-   auto khiri_down_outline_texture = textures::textures_.get_texture(textures::khiri_down_out, entity_config::khiri_down_outline_path);
+    auto khiri_left_outline_texture = textures::textures_.get_texture(textures::khiri_left_out, entity_config::khiri_left_outline_path);
+    auto khiri_right_outline_texture = textures::textures_.get_texture(textures::khiri_right_out, entity_config::khiri_right_outline_path);
 
     auto khiri_left_sprite = sprite::sprite(khiri_left_texture,
         entity_config::khiri_across_attributes[entity_config::attributes::frame_width],
@@ -160,18 +125,6 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
         entity_config::khiri_across_attributes[entity_config::attributes::frames],
         entity_config::khiri_across_attributes[entity_config::attributes::animations]);
 
-    auto khiri_up_sprite = sprite::sprite(khiri_up_texture,
-        entity_config::khiri_down_attributes[entity_config::attributes::frame_width],
-        entity_config::khiri_down_attributes[entity_config::attributes::frame_height],
-        entity_config::khiri_down_attributes[entity_config::attributes::frames],
-        entity_config::khiri_down_attributes[entity_config::attributes::animations]);
-    
-    auto khiri_down_sprite = sprite::sprite(khiri_down_texture,
-        entity_config::khiri_down_attributes[entity_config::attributes::frame_width],
-        entity_config::khiri_down_attributes[entity_config::attributes::frame_height],
-        entity_config::khiri_down_attributes[entity_config::attributes::frames],
-        entity_config::khiri_down_attributes[entity_config::attributes::animations]);
-
     auto khiri_left_outline_sprite = sprite::sprite(khiri_left_outline_texture,
         entity_config::khiri_across_attributes[entity_config::attributes::frame_width],
         entity_config::khiri_across_attributes[entity_config::attributes::frame_height],
@@ -184,44 +137,38 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
         entity_config::khiri_across_attributes[entity_config::attributes::frames],
         entity_config::khiri_across_attributes[entity_config::attributes::animations]);
 
-    auto khiri_up_outline_sprite = sprite::sprite(khiri_up_outline_texture,
-        entity_config::khiri_down_attributes[entity_config::attributes::frame_width],
-        entity_config::khiri_down_attributes[entity_config::attributes::frame_height],
-        entity_config::khiri_down_attributes[entity_config::attributes::frames],
-        entity_config::khiri_down_attributes[entity_config::attributes::animations]);
-    
-    auto khiri_down_outline_sprite = sprite::sprite(khiri_down_outline_texture,
-        entity_config::khiri_down_attributes[entity_config::attributes::frame_width],
-        entity_config::khiri_down_attributes[entity_config::attributes::frame_height],
-        entity_config::khiri_down_attributes[entity_config::attributes::frames],
-        entity_config::khiri_down_attributes[entity_config::attributes::animations]);
-       
 
     auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
-    auto down_hitbox = hitbox::h_builder_.build_player_dog_down_hitbox(position);
 
     // ! up down left right
-    auto khiri_sprites = std::vector<sprite::sprite>{khiri_up_sprite, khiri_down_sprite, khiri_left_sprite, khiri_right_sprite};
-    auto khiri_outlines = std::vector<sprite::sprite>{khiri_up_outline_sprite, khiri_down_outline_sprite, khiri_left_outline_sprite, khiri_right_outline_sprite};
-    auto khiri_hitboxes = std::vector<hitbox::hitbox>{down_hitbox, down_hitbox, across_hitbox, across_hitbox};
+    std::vector<sprite::sprite> khiri_sprites;
+    khiri_sprites.push_back(std::move(khiri_left_sprite));
+    khiri_sprites.push_back(std::move(khiri_right_sprite));
 
+    std::vector<sprite::sprite> khiri_outlines;
+    khiri_outlines.push_back(std::move(khiri_left_outline_sprite));
+    khiri_outlines.push_back(std::move(khiri_right_outline_sprite));
+
+    std::vector<hitbox::hitbox> khiri_hitboxes;
+    khiri_hitboxes.push_back(across_hitbox);
+    khiri_hitboxes.push_back(across_hitbox);
+
+    auto body = body::body(khiri_hitboxes, khiri_sprites);
+    auto head = body::body(); // TODO fill !
     return std::make_unique<entities::player_dog>(
-        khiri_sprites,
-        khiri_outlines,
-        khiri_hitboxes,
+        std::move(body),
+        std::move(head),
+        std::move(khiri_outlines),
         position,
         id);
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 position, int id){
     auto mack_left_texture = textures::textures_.get_texture(textures::mack_left, entity_config::mack_left_path);
     auto mack_right_texture = textures::textures_.get_texture(textures::mack_right, entity_config::mack_right_path);
-    auto mack_up_texture = textures::textures_.get_texture(textures::mack_up, entity_config::mack_up_path);
-    auto mack_down_texture = textures::textures_.get_texture(textures::mack_down, entity_config::mack_down_path);
 
    auto mack_left_outline_texture = textures::textures_.get_texture(textures::mack_left_out, entity_config::mack_left_outline_path);
    auto mack_right_outline_texture = textures::textures_.get_texture(textures::mack_right_out, entity_config::mack_right_outline_path);
-   auto mack_up_outline_texture = textures::textures_.get_texture(textures::mack_up_out, entity_config::mack_up_outline_path);
-   auto mack_down_outline_texture = textures::textures_.get_texture(textures::mack_down_out, entity_config::mack_down_outline_path);
+
 
     auto mack_left_sprite = sprite::sprite(mack_left_texture,
         entity_config::mack_across_attributes[entity_config::attributes::frame_width],
@@ -235,18 +182,6 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
         entity_config::mack_across_attributes[entity_config::attributes::frames],
         entity_config::mack_across_attributes[entity_config::attributes::animations]);
 
-    auto mack_up_sprite = sprite::sprite(mack_up_texture,
-        entity_config::mack_down_attributes[entity_config::attributes::frame_width],
-        entity_config::mack_down_attributes[entity_config::attributes::frame_height],
-        entity_config::mack_down_attributes[entity_config::attributes::frames],
-        entity_config::mack_down_attributes[entity_config::attributes::animations]);
-    
-    auto mack_down_sprite = sprite::sprite(mack_down_texture,
-        entity_config::mack_down_attributes[entity_config::attributes::frame_width],
-        entity_config::mack_down_attributes[entity_config::attributes::frame_height],
-        entity_config::mack_down_attributes[entity_config::attributes::frames],
-        entity_config::mack_down_attributes[entity_config::attributes::animations]);
-
     auto mack_left_outline_sprite = sprite::sprite(mack_left_outline_texture,
         entity_config::mack_across_attributes[entity_config::attributes::frame_width],
         entity_config::mack_across_attributes[entity_config::attributes::frame_height],
@@ -256,34 +191,32 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
     auto mack_right_outline_sprite = sprite::sprite(mack_right_outline_texture,
         entity_config::mack_across_attributes[entity_config::attributes::frame_width],
         entity_config::mack_across_attributes[entity_config::attributes::frame_height],
-        entity_config::mack_across_attributes[entity_config::attributes::frames],
-        entity_config::mack_across_attributes[entity_config::attributes::animations]);
+        static_cast<int>(entity_config::mack_across_attributes[entity_config::attributes::frames]),
+        static_cast<int>(entity_config::mack_across_attributes[entity_config::attributes::animations]));
 
-    auto mack_up_outline_sprite = sprite::sprite(mack_up_outline_texture,
-        entity_config::mack_down_attributes[entity_config::attributes::frame_width],
-        entity_config::mack_down_attributes[entity_config::attributes::frame_height],
-        entity_config::mack_down_attributes[entity_config::attributes::frames],
-        entity_config::mack_down_attributes[entity_config::attributes::animations]);
-    
-    auto mack_down_outline_sprite = sprite::sprite(mack_down_outline_texture,
-        entity_config::mack_down_attributes[entity_config::attributes::frame_width],
-        entity_config::mack_down_attributes[entity_config::attributes::frame_height],
-        entity_config::mack_down_attributes[entity_config::attributes::frames],
-        entity_config::mack_down_attributes[entity_config::attributes::animations]);
-       
     auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
-    auto down_hitbox = hitbox::h_builder_.build_player_dog_down_hitbox(position);
 
     // ! up down left right
-    auto mack_sprites = std::vector<sprite::sprite>{mack_up_sprite, mack_down_sprite, mack_left_sprite, mack_right_sprite};
-    auto mack_outlines = std::vector<sprite::sprite>{mack_up_outline_sprite, mack_down_outline_sprite, mack_left_outline_sprite, mack_right_outline_sprite};
-    auto mack_hitboxes = std::vector<hitbox::hitbox>{down_hitbox, down_hitbox, across_hitbox, across_hitbox};
+    std::vector<sprite::sprite> mack_sprites;
+    mack_sprites.push_back(std::move(mack_left_sprite));
+    mack_sprites.push_back(std::move(mack_right_sprite));
 
+    std::vector<sprite::sprite> mack_outlines;
+    mack_outlines.push_back(std::move(mack_left_outline_sprite));
+    mack_outlines.push_back(std::move(mack_right_outline_sprite));
 
+    std::vector<hitbox::hitbox> mack_hitboxes;
+    mack_hitboxes.push_back(across_hitbox);
+    mack_hitboxes.push_back(across_hitbox);
+
+    auto body = body::body(mack_hitboxes, mack_sprites);
+    auto head = body::body(); // TODO fill ! and build the head sprites and hitboxes
+
+    // and build the head, pending
     return std::make_unique<entities::player_dog>(
-        mack_sprites,
-        mack_outlines,
-        mack_hitboxes,
+        std::move(body),
+        std::move(head),
+        std::move(mack_outlines),
         position,
         id);
 }

@@ -26,10 +26,10 @@ int main(){
     }
     /**
      * 
-     auto background = LoadTexture(config::background_path);
-     Vector2 background_position = Vector2Zero();
-     auto view_frame = Rectangle{0.0f, 0.0f, static_cast<float>(GetScreenWidth()),static_cast<float>(GetScreenHeight())};
-     Vector2 mouse_delta = Vector2Zero();
+    auto background = LoadTexture(config::background_path);
+    Vector2 background_position = Vector2Zero();
+    auto view_frame = Rectangle{0.0f, 0.0f, static_cast<float>(GetScreenWidth()),static_cast<float>(GetScreenHeight())};
+    Vector2 mouse_delta = Vector2Zero();
     // specify the frame being drawn
     
     while(! WindowShouldClose()){

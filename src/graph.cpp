@@ -24,9 +24,9 @@ bool level::level_graph::is_node_empty(int node_id){
 bool level::level_graph::is_node_occupied(int node_id, int decoration_id){
     auto node_decoration = id_to_node(node_id)->decoration_;
     bool empty = node_decoration == level_config::empty_node;
-    std::cout << "empty ? : " << empty <<  std::endl;
+
     bool self = node_decoration == decoration_id;
-    std::cout << "self ? : " << self << std::endl;
+
     // is occupied if not empty and not the self 
     return ! empty && ! self;
 }
@@ -74,12 +74,16 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
     }
     return visited;
 }
-std::vector<Vector2> level::level_graph::make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, int start_id, int end_id){
+std::vector<Vector2> level::level_graph::make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id){
+    if(visited[end_id] == -1 && end_id != start_id){
+        return {};
+    }
+
     auto path = std::vector<Vector2>{};
-    int current_id = end_id;
+    size_t current_id = end_id;
     while(current_id != start_id){
         path.push_back(graph_[current_id].first.position_);
-        current_id = visited[current_id];
+        current_id = static_cast<size_t>(visited[current_id]);
     }
     path.push_back(graph_[start_id].first.position_);
     std::reverse(path.begin(), path.end());
@@ -90,18 +94,15 @@ std::vector<Vector2> level::level_graph::make_position_path(std::vector<Vector2>
     return path;
 }
 std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end, Vector2 direction){
-
     int start_node = position_to_node(start, direction);
     int end_node = position_to_node(end, direction);
-    
+
     auto node_path = bfs(start_node, end_node);
 
-    // convert node path to position path
     auto position_path = std::vector<Vector2>();
     make_position_path(position_path, node_path, start_node, end_node);
 
     return position_path;
-
 } 
 
 int level::level_graph::categorise_node(int row, int column){
@@ -404,9 +405,9 @@ bool level::level_graph::check_for_decoration(Rectangle rectangle, int id){
     for(auto col = rectangle.x; col <= rectangle.x + rectangle.width; col += level_config::edge_weight){
         for(auto row = rectangle.y; row <= rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
-            std::cout << "check position " << position.x << ", " << position.y << std::endl;
+
             int node_index = position_to_node(position);
-            std::cout << "node:  " << node_index << " has decoration " << graph_[node_index].first.decoration_ << std::endl;
+
             if(is_node_occupied(node_index, id) ){
                 return true;
             }
@@ -429,14 +430,14 @@ void level::level_graph::update_decoration(Rectangle rectangle, int id){
 // the decoration is placed at positions that are multiples of edge weights
 // and so too are their dimensions (width and height)
 void level::level_graph::on_moved_decoration(const events::moved_decoration& event){
-    std::cout << "move decoration in graph representation" << std::endl;
-    std::cout << "update pre move" << std::endl;
+
+
     update_decoration(event.get_pre_move());
-    std::cout << "update post move" << std::endl;
+
     update_decoration(event.get_post_move(), event.get_id());
 }
 void level::level_graph::on_placed_decoration(const events::placed_decoration& event){
-    std::cout << "place decoration in graph representation" << std::endl;
+
     update_decoration(event.get_rectangle(), event.get_id());
 }
 void level::level_graph::render(Rectangle frame){
