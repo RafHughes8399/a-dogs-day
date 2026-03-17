@@ -60,3 +60,13 @@ and after that (code)
 and art
     -> some npc dogs (tex, saba, minnie, molly, coops)
     -> meals (lasagna, boiled chicken, charcuterie snack board)
+
+
+
+hud plan;
+the current hud should be based on the player state
+so add a hud to each state and then draw off that ? 
+but that would require prety frequent constructing and destructing 
+a player has a list of huds (each a list of elements)
+and a current_hud index, each state has an index based on an enum
+you draw the hud based on the index provided by the current state
