@@ -1,8 +1,7 @@
 #ifndef HITBOX_H
 #define HITBOX_H
 
-#include <algorithm>
-#include <iostream>
+
 #include <vector>
 #include "config.h"
 
@@ -12,9 +11,9 @@ namespace hitbox{
         public:
             ~hitbox() = default;
             hitbox(Rectangle box)
-            : box_(box), sub_boxes_({}){};
+            : box_(box), sub_boxes_({}){}
             hitbox(Rectangle box, std::vector<Rectangle> sub_boxes)
-            : box_(box), sub_boxes_(sub_boxes){};
+            : box_(box), sub_boxes_(sub_boxes){}
 
             hitbox(const hitbox& other) = default;
             hitbox(hitbox&& other) = default;
@@ -41,7 +40,7 @@ namespace hitbox{
     class hitbox_builder{
         public:
             ~hitbox_builder() = default;
-            hitbox_builder() {};
+            hitbox_builder() {}
             hitbox_builder(const hitbox_builder& other) = default;
             hitbox_builder(hitbox_builder&& other) = default;
 
@@ -52,7 +51,9 @@ namespace hitbox{
             hitbox build_paw_mark_hitbox(Vector2 position);
             hitbox build_player_dog_across_hitbox(Vector2 position);
             hitbox build_player_dog_down_hitbox(Vector2 position);
+
             hitbox build_test_decoration_hitbox(Vector2 position);
+            hitbox build_gargoyle_hitbox(Vector2 position);
     }
     extern h_builder_;
 } // namespace hitbox

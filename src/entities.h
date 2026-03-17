@@ -341,7 +341,6 @@ namespace entities{
              */
             bool reached_position(Vector2 target);
             void determine_direction(Vector2 target);
-            void draw_path();
             
             body::body head_;
             
@@ -398,8 +397,9 @@ namespace entities{
             std::unique_ptr<entity> build_paw_mark(Vector2 position, int id);
 
             std::unique_ptr<entity> build_test_decoration(Vector2 position, int id);
+            std::unique_ptr<entity> build_gargoyle(Vector2 position, int id);
             ~entity_builder() = default;
-            entity_builder() {};
+            entity_builder() {}
             entity_builder(const entity_builder& other) = default;
             entity_builder(entity_builder&& other) = default;
 

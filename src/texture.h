@@ -31,7 +31,9 @@ namespace textures{
         mack_right_out = 11,
         test_decoration = 12,
         hud_edit_wheel = 13,
-        size = 14
+        gargoyle_void = 14,
+        gargoyle_sick_of_it = 15,
+        size = 16
         // and so on
     };
     class texture{

@@ -87,6 +87,8 @@ namespace entity_config{
     inline const char* mack_down_outline_path = "../sprites/mack_down_outline.png";
 
     inline const char* test_decoration_path ="../sprites/test_decoration.png";
+    inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle_void.png";
+    inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
     enum attributes{
         frame_width = 0,
