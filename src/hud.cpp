@@ -9,8 +9,13 @@ hud::hud_builder hud::h_builder_;
 
 hud::hud hud::hud_builder::build_player_hud(){
     hud player_hud = hud();
-    player_hud.add_element(std::move(h_builder_.build_edit_wheel()));
-    player_hud.add_element(std::move(h_builder_.build_decoration_grid()));
+    // build the base hud 
+    player_hud.add_element(h_builder_.build_edit_wheel(), hud::hud_types::base);
+
+    // build the editing hud
+    player_hud.add_element(h_builder_.build_decoration_grid(), hud::hud_types::editing); // the deco grid
+    // and the hover rectangle, maybe just one and change the colour, yeah that's better than two
+    player_hud.add_element(h_builder_.build_green_highlight(), size_t hud)
     return player_hud;
 }
 std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
@@ -96,7 +101,7 @@ void hud::button::unsubscribe(){
 // ---------------------------------- hud  ---------------------------------- //
 
 void hud::hud::buttons_subscribe(){
-    for(auto & component : elements_){
+    for(auto & component : elements_[index_]){
         button* button_cast = dynamic_cast<button*>(component.get());
         if(button_cast){
             button_cast->subscribe();
@@ -104,7 +109,7 @@ void hud::hud::buttons_subscribe(){
     }
 }
 void hud::hud::buttons_unsubscribe(){
-    for(auto & component : elements_){
+    for(auto & component : elements_[index_]){
         button* button_cast = dynamic_cast<button*>(component.get());
         if(button_cast){
             button_cast->unsubscribe();
@@ -112,13 +117,18 @@ void hud::hud::buttons_unsubscribe(){
     }
 }
 
-void hud::hud::add_element(std::unique_ptr<hud_element> element){
-    elements_.push_back(std::move(element));
+void hud::hud::add_element(std::unique_ptr<hud_element> element, size_t hud){
+    elements_[hud].push_back(std::move(element));
 }
 
 void hud::hud::render(){
-    for(const std::unique_ptr<hud_element> & element : elements_){
-
+    for(const std::unique_ptr<hud_element> & element : elements_[index_]){
         element->draw();
     }
+}
+std::vector<std::unique_ptr<hud::hud_element>>& hud::hud::get_hud(){
+    return elements_[index_];
+}
+void hud::hud::pick_hud(size_t index){
+    index_ = index;
 }

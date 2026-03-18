@@ -207,9 +207,15 @@ namespace hud{
 
     class hud{
         public:
+            enum hud_types{
+                base = 0,
+                editing = 1,
+                size = 2
+                // as i think or more, but these should do for now
+            };
             ~hud() = default;
             hud()
-            : elements_(){};
+            : elements_(){}
 
             hud(const hud& other) = delete;
             hud(hud&& other) = default;
@@ -219,10 +225,15 @@ namespace hud{
             void buttons_subscribe();
             void buttons_unsubscribe();
             
-            void add_element(std::unique_ptr<hud_element> element);
+            void add_element(std::unique_ptr<hud_element> element, size_t hud);
             void render();
+
+            std::vector<std::unique_ptr<hud_element>>& get_hud();
+            void pick_hud(size_t index);
+
         private:
-            std::vector<std::unique_ptr<hud_element>> elements_;
+            size_t index_;
+            std::vector<std::vector<std::unique_ptr<hud_element>>> elements_;
 
     };
 
