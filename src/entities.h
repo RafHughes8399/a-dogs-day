@@ -24,9 +24,7 @@ namespace entities{
         public:
             virtual ~entity() = default;
             entity(body::body body, Vector2 position, int id)
-            : body_(body), position_(position), id_(id){
-
-            };
+            : body_(body), position_(position), id_(id){}
             entity(const entity& other) = default;
             entity(entity&& other) = default;
 
@@ -71,7 +69,7 @@ namespace entities{
             class state {
                 public:
                     virtual ~state() = default;
-                    state(){};
+                    state(){}
                     state(const state& other) = default;
                     state(state&& other) = default;
                     
@@ -84,15 +82,13 @@ namespace entities{
             };
             class in_menus : public state{
                 // to be implemented
-                ~in_menus() = default;
                 in_menus()
-                : state() {};
+                : state() {}
             };
             class editing : public state{
                 public:
-                    virtual ~editing() = default;
                     editing()
-                    : state(){};
+                    : state(){}
                     editing(const editing& other) = default;
                     editing(editing&& other) = default;
                     
@@ -105,9 +101,8 @@ namespace entities{
                 };
                 class carrying_decoration : public editing {
                     public:
-                    ~carrying_decoration() = default;
                     carrying_decoration(entity* carried)
-                    : editing(), carried_decoration_(carried){};
+                    : editing(), carried_decoration_(carried){}
                     carrying_decoration(const carrying_decoration& other) = default;
                     carrying_decoration(carrying_decoration&& other) = default;
                     
@@ -122,7 +117,7 @@ namespace entities{
             class interaction_strategy{
                 public:
                     virtual ~interaction_strategy() = default;
-                    interaction_strategy(){};
+                    interaction_strategy(){}
                     interaction_strategy(const interaction_strategy& other) = default;
                     interaction_strategy(interaction_strategy&& other) = default;
                     
@@ -135,7 +130,7 @@ namespace entities{
             class default_strategy : public interaction_strategy{
                 public:
                     default_strategy()
-                    : interaction_strategy() {};
+                    : interaction_strategy() {}
                     default_strategy(const default_strategy& other) = default;
                     default_strategy(default_strategy&& other) = default;
                         
@@ -148,7 +143,7 @@ namespace entities{
             class left_click_strategy : public interaction_strategy{
                 public:
                     left_click_strategy()
-                    : interaction_strategy() {};
+                    : interaction_strategy() {}
                     left_click_strategy(const left_click_strategy& other) = default;
                     left_click_strategy(left_click_strategy&& other) = default;
                     
@@ -163,7 +158,7 @@ namespace entities{
                 class right_click_strategy : public interaction_strategy{
                     public:
                     right_click_strategy()
-                    : interaction_strategy() {};
+                    : interaction_strategy() {}
                     right_click_strategy(const right_click_strategy& other) = default;
                     right_click_strategy(right_click_strategy&& other) = default;
                     
@@ -174,7 +169,7 @@ namespace entities{
                     private:
                 };
 
-                ~cursor() {
+                ~cursor() override {
                     event_interface::unsubscribe<events::enter_edit_mode>(enter_edit_mode_handler_);
                     event_interface::unsubscribe<events::exit_edit_mode>(exit_edit_mode_handler_);
                     event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
@@ -195,13 +190,13 @@ namespace entities{
                     event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
                     event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
-                };
+                }
 
                 cursor(const cursor& other) = delete;
                 cursor(cursor&& other) = default;
                     
                 cursor& operator=(const cursor& other) = delete;
-                cursor& operator=(cursor&& other)  = default;
+                cursor& operator=(cursor&& other)  = delete;
                 
 
                 int update(float delta, int frame) override;
@@ -233,9 +228,8 @@ namespace entities{
         
         class paw_mark : public entity{
         public:
-        ~paw_mark() = default;
         paw_mark(body::body body, Vector2 position, int id)
-        : entity(body, position, id){};
+        : entity(body, position, id){}
             paw_mark(const paw_mark& other) = default;
             paw_mark(paw_mark&& other) = default;
 

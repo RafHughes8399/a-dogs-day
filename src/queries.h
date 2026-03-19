@@ -23,23 +23,22 @@ namespace queries{
         public:
             virtual ~query() = default;
             query(int id)
-            : type_(id){};
+            : type_(id){}
 
             query(query&& other) = default;
-            query& operator=(query&& other) = default;
+            query& operator=(query&& other) = delete;
 
-            const int get_type() const{
+            int get_type() const{
                 return type_;
             }
     };
 
     class is_colliding_query : public query{
         public:
-            ~is_colliding_query() = default;
             is_colliding_query(hitbox::hitbox box, int id)
-            : query(ids::is_colliding), box_(box), id_(id){};
+            : query(ids::is_colliding), box_(box), id_(id){}
 
-            static const int get_static_type(){
+            static int get_static_type(){
                 return ids::is_colliding;
             }
 
@@ -55,11 +54,10 @@ namespace queries{
     };
     class collision_query : public query{
         public:
-            ~collision_query() = default;
             collision_query(hitbox::hitbox box, int id)
-            : query(ids::collision), box_(box), id_(id){};
+            : query(ids::collision), box_(box), id_(id){}
 
-            static const int get_static_type(){
+            static int get_static_type(){
                 return ids::collision;
             }
 
@@ -75,11 +73,10 @@ namespace queries{
     };
     class can_place_decoration : public query{
         public:
-            ~can_place_decoration() = default;
             can_place_decoration(Rectangle rectangle, int id)
-            : query(ids::place_decoration), decoration_rectanlge_(rectangle), decoration_id_(id){};
+            : query(ids::place_decoration), decoration_rectanlge_(rectangle), decoration_id_(id){}
 
-            static const int get_static_type(){
+            static int get_static_type(){
                 return ids::place_decoration;
             }
             Rectangle get_decoration_rectangle() const{
@@ -108,8 +105,7 @@ namespace queries{
         public:
             ~query_handler() = default;
             query_handler(std::function<bool(const Q& q)> handle)
-            : handler_(handle){};
-	        
+            : handler_(handle){}
             query_handler(const query_handler& other) = default;
 		    query_handler(query_handler&& other) = default;
 		

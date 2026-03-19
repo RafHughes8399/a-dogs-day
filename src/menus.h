@@ -2,14 +2,14 @@
 #define MENU_H
 
 #include <memory>
-#include <map>
+
 #include <vector>
 
 #include "events.h"
 #include "items.h"
 #include "hud.h"
 #include "raylib.h"
-#include "sprite.h"
+
 namespace menus{
     class menu{
         public:
@@ -17,7 +17,7 @@ namespace menus{
             // ! baasic implementation, currently (23.01), for testing menu navigation
             // ! proper implementation will follow 
             menu(Rectangle box, hud::hud components)
-            :box_(box), components_(std::move(components)) {};
+            :box_(box), components_(std::move(components)) {}
             menu(const menu& other) = delete;
             menu(menu&& other) = default;
             menu& operator=(const menu& other) = delete;
