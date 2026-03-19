@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "events.h"
+#include "events_interface.h"
 #include "items.h"
 #include "sprite.h"
 #include "texture.h"
@@ -42,17 +43,19 @@ namespace hud{
         };
         class empty_handler_strategy : public event_strategy{
             public:
-                ~empty_handler_strategy() = default;
                 empty_handler_strategy()
-                : event_strategy(std::make_unique<events::event_handler<events::empty_event>>([this](const events::empty_event& event) -> void {on_event(event);})){};
+                : event_strategy(std::make_unique<events::event_handler<events::empty_event>>([this](const events::empty_event& event) -> void {on_event(event);})){}
                 void on_event(const events::event& event) override{
                     // do nothing
+                    (void) event;
                 }
                 void unsubscribe() override{
                     // do nothing
+                    return;
                 }
                 void subscribe() override{
                     // do nothing
+                    return;
                 }
             private:
                 std::unique_ptr<events::event_handler<events::empty_event>> handler_;
@@ -92,7 +95,7 @@ namespace hud{
         class draw_strategy{
             public:
             virtual ~draw_strategy() = default;
-            draw_strategy(Vector2 position = Vector2Zero()) : position_(position) {};
+            draw_strategy(Vector2 position = Vector2Zero()) : position_(position) {}
             draw_strategy(const draw_strategy& other) = default;
             draw_strategy(draw_strategy&& other) = default;
 
@@ -109,10 +112,9 @@ namespace hud{
         };
         class sprite_draw : public draw_strategy{
             public:
-            virtual ~sprite_draw() = default;
             sprite_draw(sprite::sprite sprite, Vector2 position = {0, 0})
             : draw_strategy(position), sprite_(sprite){
-            };
+            }
 
             sprite_draw(const sprite_draw& other) = default;
             sprite_draw(sprite_draw&& other) = default;
@@ -129,9 +131,8 @@ namespace hud{
         
         class rectangle_draw : public draw_strategy{
             public:
-                virtual ~rectangle_draw() = default;
                 rectangle_draw(Rectangle rectangle, Color colour)
-                : draw_strategy({rectangle.x, rectangle.y}), rectangle_(rectangle), colour_(colour){};
+                : draw_strategy({rectangle.x, rectangle.y}), rectangle_(rectangle), colour_(colour){}
 
                 rectangle_draw(const rectangle_draw& other) = default;
                 rectangle_draw(rectangle_draw&& other) = default;
@@ -142,12 +143,11 @@ namespace hud{
             private:
                 Rectangle rectangle_;
                 Color colour_; // damn american spelling
-            };
+        };
         class grid_draw : public draw_strategy{
             public:
-                virtual ~grid_draw() = default;
                 grid_draw(Vector2 position = {0, 0})
-                : draw_strategy(position){};
+                : draw_strategy(position){}
 
                 grid_draw(const grid_draw& other) = default;
                 grid_draw(grid_draw&& other) = default;
@@ -185,10 +185,9 @@ namespace hud{
     };
     class button : hud_element {
         public:
-            ~button() = default;
             // here specify what the draw strat type and event listener types are ? 
             button(Rectangle outline, std::unique_ptr<draw_strategy> sprite_draw, std::unique_ptr<event_strategy> event_handler)
-            : hud_element(outline, std::move(sprite_draw), std::move(event_handler)){};
+            : hud_element(outline, std::move(sprite_draw), std::move(event_handler)){}
 
             
             button(const button& other) = delete;
@@ -210,29 +209,45 @@ namespace hud{
             enum hud_types{
                 base = 0,
                 editing = 1,
-                size = 2
-                // as i think or more, but these should do for now
+                carrying = 2,
+                size = 3
             };
-            ~hud() = default;
+            ~hud(){
+                event_interface::unsubscribe<events::enter_edit_mode>(*enter_edit_mode_handler_);
+                event_interface::unsubscribe<events::exit_edit_mode>(*exit_edit_mode_handler_);
+            }
             hud()
-            : elements_(){}
+            : elements_(), index_(hud::hud_types::base),
+            enter_edit_mode_handler_(std::make_unique<events::event_handler<events::enter_edit_mode>>(
+                [this](const events::enter_edit_mode& event) -> void {on_enter_edit_mode(event);})),
+            exit_edit_mode_handler_(std::make_unique<events::event_handler<events::exit_edit_mode>>(
+                [this](const events::exit_edit_mode& event) -> void {on_exit_edit_mode(event);}))
+            {
+                event_interface::subscribe<events::enter_edit_mode>(*enter_edit_mode_handler_);
+                event_interface::subscribe<events::exit_edit_mode>(*exit_edit_mode_handler_);
+            }
 
             hud(const hud& other) = delete;
             hud(hud&& other) = default;
-            hud& operator=(const hud& other) =delete;
+            hud& operator=(const hud& other) = delete;
             hud& operator=(hud&& other) = default;
+
+            void on_enter_edit_mode(const events::enter_edit_mode& event);
+            void on_exit_edit_mode(const events::exit_edit_mode& event);
 
             void buttons_subscribe();
             void buttons_unsubscribe();
             
             void add_element(std::unique_ptr<hud_element> element, size_t hud);
+            void pick_hud(size_t index);
             void render();
 
             std::vector<std::unique_ptr<hud_element>>& get_hud();
-            void pick_hud(size_t index);
 
         private:
             size_t index_;
+            std::unique_ptr<events::event_handler<events::enter_edit_mode>> enter_edit_mode_handler_;
+            std::unique_ptr<events::event_handler<events::exit_edit_mode>> exit_edit_mode_handler_;
             std::vector<std::vector<std::unique_ptr<hud_element>>> elements_;
 
     };
@@ -245,9 +260,9 @@ namespace hud{
         // builder picks the strategy
         std::unique_ptr<hud_element> build_item_hud_element(items::item& item);
         std::unique_ptr<hud_element> build_edit_wheel();
+
         std::unique_ptr<hud_element> build_decoration_grid();
-        std::unique_ptr<hud_element> build_green_highlight();
-        std::unique_ptr<hud_element> build_red_highlight();
+        std::unique_ptr<hud_element> build_decoration_overlay();
         // .....
     };
     extern hud_builder h_builder_;

@@ -77,3 +77,17 @@ and for art :
 -> separate dog heads
 -> add the queen crown and jester hat
 -> and the dog poker table
+
+
+
+-> do i want the ability to draw multiple huds or lieke double dip the elements
+-> extend the player statte to carrying like for editing, events too maybe, or you can just listen to the cursor eve nts taht arealready created
+lets quickly list some animations:
+
+mack interaction :
+khiri interaction : 
+
+mack idles : 
+khiri idles :
+
+dog poker : animate a few hands, dogs throwing chips in, dogs folding, dealer revealing cards, dogs winning, dogs cheating ( the magnifying glass guy)

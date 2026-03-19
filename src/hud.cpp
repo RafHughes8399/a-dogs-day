@@ -1,6 +1,7 @@
 #include "hud.h"
 #include "config.h"
 #include "raylib.h"
+#include <memory>
 
 
 
@@ -15,7 +16,9 @@ hud::hud hud::hud_builder::build_player_hud(){
     // build the editing hud
     player_hud.add_element(h_builder_.build_decoration_grid(), hud::hud_types::editing); // the deco grid
     // and the hover rectangle, maybe just one and change the colour, yeah that's better than two
-    player_hud.add_element(h_builder_.build_green_highlight(), size_t hud)
+    // initally build the rectangle as a {0,0,0,0}, rectangle and white, then have it listen to a pickup event to resize the rectangle 
+    // and a deco move event to update the colour 
+    player_hud.add_element(h_builder_.build_decoration_overlay(), hud::hud_types::carrying);
     return player_hud;
 }
 std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
@@ -44,6 +47,10 @@ std::unique_ptr<hud::hud_element> hud::hud_builder::build_decoration_grid(){
     return std::make_unique<hud_element>(Rectangle {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())}, std::move(draw_strategy), std::move(empty_handler_strategy));
 }
 
+std::unique_ptr<hud::hud_element> hud::hud_builder::build_decoration_overlay(){
+    auto draw_strategy = std::make_unique<hud_element::rectangle_draw>(Rectangle{0,0,0,0}, WHITE);
+
+}
 // ---------------------------------- hud element ----------------------------- //
 Vector2 hud::hud_element::get_position(){
     return draw_strategy_->get_position();
@@ -99,6 +106,16 @@ void hud::button::unsubscribe(){
 }
 
 // ---------------------------------- hud  ---------------------------------- //
+
+
+void hud::hud::on_enter_edit_mode(const events::enter_edit_mode& event){
+    (void) event;
+    index_ = hud_types::editing;
+}
+void hud::hud::on_exit_edit_mode(const events::exit_edit_mode& event){
+    (void) event;
+    index_ = hud_types::base;
+}
 
 void hud::hud::buttons_subscribe(){
     for(auto & component : elements_[index_]){

@@ -29,7 +29,7 @@ namespace items{
     class inventory_item : public item{
         public:
         private:
-            int quantity_;                             
+            //int quantity_;                             
     };
     class shop_item : public item {
         public:

@@ -61,8 +61,8 @@ void player::player::edit(float delta){
         increment_meter();
     }
     if(edit_meter_ >= game_config::hold_duration){
-        // change the player state
         std::cout << "edit meter filled " << std::endl;
+        state_ = std::make_unique<editing>();
         std::unique_ptr<events::event> enter_edit = std::make_unique<events::enter_edit_mode>();
         event_interface::queue_event(enter_edit);
         reset_meter();
@@ -76,8 +76,7 @@ void player::player::edit(float delta){
 }
 
 void player::player::exit_edit(){
-    // make an event for the cursor
-    // change the control state 
+    state_ = std::make_unique<state>(hud::hud::hud_types::base);
     std::unique_ptr<events::event> exit_edit = std::make_unique<events::exit_edit_mode>();
     event_interface::queue_event(exit_edit);
 }
@@ -141,7 +140,6 @@ void player::player::right_click(){
     state_->right_click(*this);
 }
 void player::player::update(float delta){
-
     // check pressed keys 
     /**
      * 
@@ -172,6 +170,8 @@ void player::player::update(float delta){
     return;
     */
 }
+
+
 void player::player::render(){
     hud_.render();
     return;
