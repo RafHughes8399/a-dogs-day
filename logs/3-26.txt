@@ -82,6 +82,15 @@ and for art :
 
 -> do i want the ability to draw multiple huds or lieke double dip the elements
 -> extend the player statte to carrying like for editing, events too maybe, or you can just listen to the cursor eve nts taht arealready created
+
+-> test hud drawing (like does it draw correctly)
+-> fix the edit wheel positioning
+-> setup deco overly event listening
+-> then some art (the couch / the poker table / the lemongrass)
+-> then the dog head art separation 
+-> then cosmetics
+-> and some art 
+
 lets quickly list some animations:
 
 mack interaction :

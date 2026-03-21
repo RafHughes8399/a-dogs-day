@@ -91,9 +91,13 @@ void player::controls::check(float delta){
 }
 
 void player::controls::on_enter_edit_mode(const events::enter_edit_mode& event){
+    (void) event;
     current_scheme_ = control_states::editing;
+    std::cout << "[controls on enter edit]: change scheme to  " << current_scheme_ << std::endl;
 }
 void player::controls::on_exit_edit_mode(const events::exit_edit_mode& event){
+    (void) event;
     current_scheme_ = control_states::regular;
+    std::cout << "[controls on exitt edit]: change scheme to  " << current_scheme_ << std::endl;
 
 }

@@ -65,8 +65,6 @@ namespace player{
                     editing& operator=(const editing& other) = default;
                     editing& operator=(editing&& other) = default;
                     
-                    void left_click(player& player) override;
-                    //void right_click(player& player) override;
             };
             class carrying_decoration : public editing {
                 public:
