@@ -9,7 +9,7 @@
 #include "items.h"
 #include "hud.h"
 #include "raylib.h"
-
+#include <iostream>
 namespace menus{
     class menu{
         public:
@@ -88,6 +88,7 @@ namespace menus{
             menu_graph()
             : current_(0), graph_(), key_event_handler_([this](const events::key_press& event) -> void {on_key_press_event(event);}),
             menu_interact_handler_([this](const events::interact_menu& event) -> void {on_menu_interact_event(event);}){
+                std::cout << "[menu_graph constructor] finish init list" << std::endl;
                 build_graph();
                 event_interface::subscribe<events::interact_menu>(menu_interact_handler_);
                 event_interface::subscribe<events::key_press>(key_event_handler_);

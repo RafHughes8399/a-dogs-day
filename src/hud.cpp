@@ -2,23 +2,28 @@
 #include "config.h"
 #include "raylib.h"
 #include <memory>
-
+#include <iostream>
 
 
 // ----------------------------------- builder ---------------------------- // 
 hud::hud_builder hud::h_builder_;
 
 hud::hud hud::hud_builder::build_player_hud(){
+    std::cout << "[build player hud] : declare hud " << std::endl;
     hud player_hud = hud();
     // build the base hud 
     player_hud.add_element(h_builder_.build_edit_wheel(), hud::hud_types::base);
-
+    std::cout << "[build player hud] : build edit wheel " << std::endl;
+    
     // build the editing hud
     player_hud.add_element(h_builder_.build_decoration_grid(), hud::hud_types::editing); // the deco grid
+    std::cout << "[build player hud] : build decoration grid " << std::endl;
     // and the hover rectangle, maybe just one and change the colour, yeah that's better than two
     // initally build the rectangle as a {0,0,0,0}, rectangle and white, then have it listen to a pickup event to resize the rectangle 
     // and a deco move event to update the colour 
     player_hud.add_element(h_builder_.build_decoration_overlay(), hud::hud_types::carrying);
+    std::cout << "[build player hud] : build decoration overlay " << std::endl;
+    player_hud.subscribe_edit_mode_events();
     return player_hud;
 }
 std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
@@ -49,7 +54,9 @@ std::unique_ptr<hud::hud_element> hud::hud_builder::build_decoration_grid(){
 
 std::unique_ptr<hud::hud_element> hud::hud_builder::build_decoration_overlay(){
     auto draw_strategy = std::make_unique<hud_element::rectangle_draw>(Rectangle{0,0,0,0}, WHITE);
-
+    // for now empty but should respond to a move event
+    auto empty_handler_strategy = std::make_unique<hud_element::empty_handler_strategy>();
+    return std::make_unique<hud_element>(Rectangle{0,0,0,0}, std::move(draw_strategy), std::move(empty_handler_strategy));
 }
 // ---------------------------------- hud element ----------------------------- //
 Vector2 hud::hud_element::get_position(){
@@ -107,6 +114,58 @@ void hud::button::unsubscribe(){
 
 // ---------------------------------- hud  ---------------------------------- //
 
+void hud::hud::subscribe_edit_mode_events(){
+    enter_edit_mode_handler_ = std::make_unique<events::event_handler<events::enter_edit_mode>>(
+        [this](const events::enter_edit_mode& event) -> void {on_enter_edit_mode(event);});
+    exit_edit_mode_handler_ = std::make_unique<events::event_handler<events::exit_edit_mode>>(
+        [this](const events::exit_edit_mode& event) -> void {on_exit_edit_mode(event);});
+    event_interface::subscribe<events::enter_edit_mode>(*enter_edit_mode_handler_);
+    event_interface::subscribe<events::exit_edit_mode>(*exit_edit_mode_handler_);
+    std::cout << "[hud] : edit-mode event subscribes (player hud)" << std::endl;
+}
+
+hud::hud::hud(hud&& other) noexcept(false)
+    : index_(other.index_), elements_(std::move(other.elements_)),
+      enter_edit_mode_handler_(nullptr), exit_edit_mode_handler_(nullptr){
+    other.index_ = hud_types::base;
+    const bool other_had_edit = (other.enter_edit_mode_handler_ != nullptr);
+    if(other_had_edit){
+        event_interface::unsubscribe<events::enter_edit_mode>(*other.enter_edit_mode_handler_);
+        event_interface::unsubscribe<events::exit_edit_mode>(*other.exit_edit_mode_handler_);
+        other.enter_edit_mode_handler_.reset();
+        other.exit_edit_mode_handler_.reset();
+        subscribe_edit_mode_events();
+    }
+}
+
+hud::hud& hud::hud::operator=(hud&& other) noexcept(false){
+    if(this == &other){
+        return *this;
+    }
+    if(enter_edit_mode_handler_){
+        event_interface::unsubscribe<events::enter_edit_mode>(*enter_edit_mode_handler_);
+        event_interface::unsubscribe<events::exit_edit_mode>(*exit_edit_mode_handler_);
+    }
+    enter_edit_mode_handler_.reset();
+    exit_edit_mode_handler_.reset();
+
+    const bool other_had_edit = (other.enter_edit_mode_handler_ != nullptr);
+    if(other_had_edit){
+        event_interface::unsubscribe<events::enter_edit_mode>(*other.enter_edit_mode_handler_);
+        event_interface::unsubscribe<events::exit_edit_mode>(*other.exit_edit_mode_handler_);
+        other.enter_edit_mode_handler_.reset();
+        other.exit_edit_mode_handler_.reset();
+    }
+
+    index_ = other.index_;
+    elements_ = std::move(other.elements_);
+    other.index_ = hud_types::base;
+
+    if(other_had_edit){
+        subscribe_edit_mode_events();
+    }
+    return *this;
+}
 
 void hud::hud::on_enter_edit_mode(const events::enter_edit_mode& event){
     (void) event;

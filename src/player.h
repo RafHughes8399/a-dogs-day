@@ -11,9 +11,9 @@
 #include "events_interface.h"
 #include "hud.h"
 #include "raylib.h"
-#include "sprite.h"
 
 #include <map>
+#include <iostream>
 #include <functional>
 namespace player{
     enum mouse{
@@ -91,6 +91,7 @@ namespace player{
             : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_press_controls_({}),
             key_hold_controls_({}), selected_dog_(selected_dog), state_(std::make_unique<state>(hud::hud::hud_types::base)), hud_(hud::h_builder_.build_player_hud()),
             select_dog_handler_([this](const events::selected_dog& event) -> void{on_selected_dog(event);}){
+                std::cout << "[player constructor] : completed init list " << std::endl;
                 event_interface::subscribe(select_dog_handler_);
                 setup_control_maps();
                 select_dog();

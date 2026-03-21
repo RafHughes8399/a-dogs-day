@@ -1,4 +1,5 @@
 #include "menus.h"
+#include <iostream>
 
 // define the builder 
 menus::menu_builder menus::m_builder_;
@@ -25,41 +26,48 @@ void menus::menu::unsubscribe_hud(){
 }
 // ------------------------------ builder ---------------------------------- // 
 std::unique_ptr<menus::menu> menus::menu_builder::build_blank_menu() {
-    
+    std::cout << "[menu_builder] construct blank menu" << std::endl;
     return std::make_unique<menus::menu>(Rectangle{-1, -1, 0, 0}, hud::hud());
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_pause_menu(){
+    std::cout << "[menu_builder] construct pause menu" << std::endl;
     std::string text = "pause";
     Rectangle box = { 400, 400,  200, 200};
     return std::make_unique<menus::menu>(box, hud::hud());
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_tab_menu(){
+    std::cout << "[menu_builder] construct tab menu" << std::endl;
     std::string text = "tab";
     Rectangle box = { 400 , 400 ,  200, 200};
     return std::make_unique<menus::menu>(box, hud::hud());
     
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_shop_menu(){
+    std::cout << "[menu_builder] construct shop menu" << std::endl;
     std::string text = "shop";
     Rectangle box = { 400 , 400 ,  200, 200};
     return std::make_unique<menus::menu>(box, hud::hud());
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_map_menu(){
+    std::cout << "[menu_builder] construct map menu" << std::endl;
     std::string text = "map";
     Rectangle box = { 400 , 400 ,  200, 200};
     return std::make_unique<menus::menu>(box, hud::hud());
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_quest_menu(){
+    std::cout << "[menu_builder] construct quest menu" << std::endl;
     std::string text = "quest";
     Rectangle box = { 400 , 400 ,  200, 200};
     return std::make_unique<menus::menu>(box, hud::hud());
 }
 std::unique_ptr<menus::menu> menus::menu_builder::build_inventory_menu(){
+    std::cout << "[menu_builder] construct inventory menu" << std::endl;
     std::string text = "inventory";
     Rectangle box = { 400 , 400 ,  200, 200};
     return std::make_unique<menus::menu>(box, hud::hud());    
 }
 menus::menu_graph menus::menu_builder::build_menus(){
+    std::cout << "[menu_builder build]: return menu graph" << std::endl;
     return menu_graph();
 }
 // ------------------------------ graph --------------------------------------- // 
@@ -70,16 +78,19 @@ menus::menu_graph::node menus::menu_graph::build_node(std::unique_ptr<menu> menu
     return node {std::move(menu), id};
 }
 void menus::menu_graph::build_graph(){
+    std::cout << "[menu_graph build] construct nodes " << std::endl;
     graph_.push_back(std::make_pair(build_node(m_builder_.build_blank_menu(), menu_ids::blank), std::vector<edge>{}));
+    std::cout << "[menu_graph build] constructed blank menu " << std::endl;
     graph_.push_back(std::make_pair(build_node(m_builder_.build_pause_menu(), menu_ids::pause), std::vector<edge>{}));
     graph_.push_back(std::make_pair(build_node(m_builder_.build_tab_menu(), menu_ids::tab), std::vector<edge>{}));
     graph_.push_back(std::make_pair(build_node(m_builder_.build_inventory_menu(), menu_ids::inventory), std::vector<edge>{}));
     graph_.push_back(std::make_pair(build_node(m_builder_.build_map_menu(), menu_ids::map), std::vector<edge>{}));
     graph_.push_back(std::make_pair(build_node(m_builder_.build_shop_menu(), menu_ids::shop), std::vector<edge>{}));
     graph_.push_back(std::make_pair(build_node(m_builder_.build_quest_menu(), menu_ids::quest), std::vector<edge>{}));
-
+    
     // Now add edges using pointers to nodes in the graph
     // Blank menu edges
+    std::cout << "[menu_graph build] construct edges " << std::endl;
     graph_[menu_ids::blank].second = {
         build_edge(&graph_[menu_ids::pause].first, controls_config::key_press_actions::back),
         build_edge(&graph_[menu_ids::tab].first, controls_config::key_press_actions::menu_open),
@@ -89,6 +100,7 @@ void menus::menu_graph::build_graph(){
         build_edge(&graph_[menu_ids::map].first, controls_config::key_press_actions::map_open),
     };
     
+    std::cout << "[menu_graph build] construct edges " << std::endl;
     // Other menus all go back to blank
     graph_[menu_ids::pause].second = { build_edge(&graph_[menu_ids::blank].first, controls_config::key_press_actions::back) };
     graph_[menu_ids::tab].second = { build_edge(&graph_[menu_ids::blank].first, controls_config::key_press_actions::back) };

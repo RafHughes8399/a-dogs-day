@@ -29,10 +29,7 @@ namespace render_layer{
             void draw(UnaryPred p, Vector2 frame_position, int frame){
                 for(auto & entity : entities_){
                     if(p(entity)){
-
-                        auto position = entity->get_position();
                         auto draw_position = Vector2Subtract(entity->get_position(), frame_position);
-
                         entity->render(draw_position, frame); 
                     }
                 }

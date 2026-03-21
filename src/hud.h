@@ -9,8 +9,8 @@
 #include "texture.h"
 #include <memory>
 #include <vector>
-#include <string>
 
+#include <iostream>
 namespace hud{
     // some habve a sprite, some are just a draw rectangle / draw line
     // here's some thinking, a hud elemetn will need to respond to events
@@ -62,7 +62,7 @@ namespace hud{
         };
         class edit_wheel_strategy : public event_strategy{
             public:
-                ~edit_wheel_strategy(){
+                ~edit_wheel_strategy() override{
                     unsubscribe();
                 }
                 edit_wheel_strategy(sprite::sprite* sprite, Vector2* position)
@@ -213,24 +213,29 @@ namespace hud{
                 size = 3
             };
             ~hud(){
-                event_interface::unsubscribe<events::enter_edit_mode>(*enter_edit_mode_handler_);
-                event_interface::unsubscribe<events::exit_edit_mode>(*exit_edit_mode_handler_);
+                if(enter_edit_mode_handler_){
+                    event_interface::unsubscribe<events::enter_edit_mode>(*enter_edit_mode_handler_);
+                }
+                if(exit_edit_mode_handler_){
+                    event_interface::unsubscribe<events::exit_edit_mode>(*exit_edit_mode_handler_);
+                }
             }
+            /** Default: no edit-mode listeners (menu HUDs). Player HUD calls subscribe_edit_mode_events()
+             *  after elements are filled. On move, if the source had edit handlers we drop the old
+             *  dispatcher registrations (they pointed at the source address) and re-subscribe on *this*. */
             hud()
-            : elements_(), index_(hud::hud_types::base),
-            enter_edit_mode_handler_(std::make_unique<events::event_handler<events::enter_edit_mode>>(
-                [this](const events::enter_edit_mode& event) -> void {on_enter_edit_mode(event);})),
-            exit_edit_mode_handler_(std::make_unique<events::event_handler<events::exit_edit_mode>>(
-                [this](const events::exit_edit_mode& event) -> void {on_exit_edit_mode(event);}))
+            : index_(hud::hud_types::base), elements_(hud_types::size),
+            enter_edit_mode_handler_(nullptr), exit_edit_mode_handler_(nullptr)
             {
-                event_interface::subscribe<events::enter_edit_mode>(*enter_edit_mode_handler_);
-                event_interface::subscribe<events::exit_edit_mode>(*exit_edit_mode_handler_);
+                std::cout << "[hud constructor] : complete init list" << std::endl;
             }
 
             hud(const hud& other) = delete;
-            hud(hud&& other) = default;
+            hud(hud&& other) noexcept(false);
             hud& operator=(const hud& other) = delete;
-            hud& operator=(hud&& other) = default;
+            hud& operator=(hud&& other) noexcept(false);
+
+            void subscribe_edit_mode_events();
 
             void on_enter_edit_mode(const events::enter_edit_mode& event);
             void on_exit_edit_mode(const events::exit_edit_mode& event);
@@ -246,9 +251,9 @@ namespace hud{
 
         private:
             size_t index_;
+            std::vector<std::vector<std::unique_ptr<hud_element>>> elements_;
             std::unique_ptr<events::event_handler<events::enter_edit_mode>> enter_edit_mode_handler_;
             std::unique_ptr<events::event_handler<events::exit_edit_mode>> exit_edit_mode_handler_;
-            std::vector<std::vector<std::unique_ptr<hud_element>>> elements_;
 
     };
 
