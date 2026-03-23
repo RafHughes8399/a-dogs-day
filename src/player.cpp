@@ -78,15 +78,7 @@ void player::player::edit(float delta){
     }
 }
 
-void player::player::cancel_incomplete_edit_hold(){
-    if(edit_buffer_ > 0){
-        return;
-    }
-    if(edit_meter_ > 0 && edit_meter_ < game_config::hold_duration){
-        std::cout << "[player edit hold]: key released, reset meter " << std::endl;
-        reset_meter();
-    }
-}
+
 
 void player::player::exit_edit(){
     edit_buffer_ = game_config::edit_cooldown;
