@@ -104,6 +104,7 @@ namespace player{
 
             void back();
             void edit(float delta);
+            void cancel_incomplete_edit_hold();
             void exit_edit();
             void move(Vector2 direction_scalar, float delta);            
             void open_inventory();
@@ -132,7 +133,7 @@ namespace player{
             hud::hud hud_;
             inventory inventory_;
             int edit_meter_ = 0;
-
+            int edit_buffer_ = 0;
             int bones_ = player_config::max_bones;
             int level_ = player_config::max_level;
             int selected_dog_;

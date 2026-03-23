@@ -1,4 +1,5 @@
 #include "player.h"
+#include "config.h"
 #include <iostream>
 
 // ----------------------- player ----------------------- //
@@ -57,29 +58,38 @@ void player::player::back(){
 
 void player::player::edit(float delta){
     (void) delta;
-    if(edit_meter_ < game_config::hold_duration){
-        std::cout << "[player edit hold] : increment" << std::endl;
-        increment_meter();
-    }
-    if(edit_meter_ >= game_config::hold_duration){
-        std::cout << "[player edit hold]: edit meter filled " << std::endl;
-        state_ = std::make_unique<editing>();
-        std::cout << "[player edit hold]: swap state, enter edit mode " << std::endl;
-        std::unique_ptr<events::event> enter_edit = std::make_unique<events::enter_edit_mode>();
-        event_interface::queue_event(enter_edit);
-        std::cout << "[player edit hold]: reset meter " << std::endl;
-        reset_meter();
+    if(edit_buffer_ > 0){
+        edit_buffer_--;
     }
     else{
-        if(! IsKeyDown(controls_config::key_hold_actions::edit_mode)){
-            std::cout << "[player edit hold]: broke, reset meter " << std::endl;
+        if(edit_meter_ < game_config::hold_duration){
+            std::cout << "[player edit hold] : increment" << std::endl;
+            increment_meter();
+        }
+        if(edit_meter_ >= game_config::hold_duration){
+            std::cout << "[player edit hold]: edit meter filled " << std::endl;
+            state_ = std::make_unique<editing>();
+            std::cout << "[player edit hold]: swap state, enter edit mode " << std::endl;
+            std::unique_ptr<events::event> enter_edit = std::make_unique<events::enter_edit_mode>();
+            event_interface::queue_event(enter_edit);
+            std::cout << "[player edit hold]: reset meter " << std::endl;
             reset_meter();
         }
     }
+}
 
+void player::player::cancel_incomplete_edit_hold(){
+    if(edit_buffer_ > 0){
+        return;
+    }
+    if(edit_meter_ > 0 && edit_meter_ < game_config::hold_duration){
+        std::cout << "[player edit hold]: key released, reset meter " << std::endl;
+        reset_meter();
+    }
 }
 
 void player::player::exit_edit(){
+    edit_buffer_ = game_config::edit_cooldown;
     state_ = std::make_unique<state>(hud::hud::hud_types::base);
     std::unique_ptr<events::event> exit_edit = std::make_unique<events::exit_edit_mode>();
     event_interface::queue_event(exit_edit);
