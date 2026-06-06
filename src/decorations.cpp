@@ -19,7 +19,7 @@ void entities::decoration::subscribe_to_cursor(){
     
 void entities::decoration::pick_up(){
     // store the "start position"
-    std::cout << "[decoration pick up] << subscribe to cursor" << std::endl;
+    std::cout << "[decoration pick up] " << get_debug_id() << " subscribe to cursor" << std::endl;
     pre_move_position_ = position_;
     subscribe_to_cursor();
     // make the hud element subscribe 
@@ -68,6 +68,49 @@ Vector2 entities::decoration::round_position(){
     //move(rounded_position);
     return rounded_position;
 }
+
+// ------------------------ stations -----------------------------------// 
+entities::station::station_type entities::station::get_station_type(){
+    return type_;
+}
+
+void entities::station::interact(entity& other){
+    (void) other;
+    return;
+}
+
+// ------------------------ tables -----------------------------------// 
+bool entities::table::can_accept_dog(){
+    return state_ == table_state::available;
+}
+
+bool entities::table::reserve_for(int dog_id){
+    if(! can_accept_dog()){
+        return false;
+    }
+
+    state_ = table_state::reserved;
+    assigned_dog_id_ = dog_id;
+    return true;
+}
+
+void entities::table::occupy(){
+    state_ = table_state::occupied;
+}
+
+void entities::table::clear(){
+    state_ = table_state::available;
+    assigned_dog_id_ = level_config::empty_node;
+}
+
+entities::table::table_state entities::table::get_state(){
+    return state_;
+}
+
+int entities::table::get_assigned_dog_id(){
+    return assigned_dog_id_;
+}
+
 // ------------------------------ builds -------------------------------- //
 
 std::unique_ptr<entities::entity> entities::entity_builder::build_test_decoration(Vector2 position, int id){
@@ -85,7 +128,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_test_decoratio
     std::vector<hitbox::hitbox> hitboxes = {hitbox};
     auto body = body::body(hitboxes, sprites);
 
-    return std::make_unique<entities::decoration>(body, position, id);
+    return std::make_unique<entities::decoration>(body, position, id, next_debug_id("dec_"));
 }
 
 std::unique_ptr<entities::entity> entities::entity_builder::build_gargoyle(Vector2 position, int id){
@@ -110,5 +153,5 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_gargoyle(Vecto
     std::vector<hitbox::hitbox> hitboxes = {hitbox, hitbox};
     auto body = body::body(hitboxes, sprites);
 
-    return std::make_unique<entities::decoration>(body, position, id);
+    return std::make_unique<entities::decoration>(body, position, id, next_debug_id("dec_"));
 }

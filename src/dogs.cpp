@@ -18,8 +18,8 @@ void entities::player_dog::select(){
 void entities::player_dog::unselect(){
     selected_state_ = std::make_unique<unselected>();
 }
-// ------------------------------- player dogs ------------------------------- //
-bool entities::player_dog::reached_position(Vector2 target){
+// ------------------------------- dogs ------------------------------- //
+bool entities::dog::reached_position(Vector2 target){
     float position_to_target = Vector2Distance(position_, target);
     if(position_to_target <= level_config::edge_weight * 0.05){
         position_ = target;
@@ -28,7 +28,7 @@ bool entities::player_dog::reached_position(Vector2 target){
     return false;
 }
 
-int entities::player_dog::update(float delta, int frame){
+int entities::dog::update(float delta, int frame){
     (void) frame;
     if(! move_path_.empty()){
         auto next_position = move_path_.front();
@@ -46,30 +46,52 @@ int entities::player_dog::update(float delta, int frame){
     return status_codes::nothing;
 }
 
-Vector2 entities::player_dog::get_direction_scalar(){
+Vector2 entities::dog::get_direction_scalar(){
     return direction_scalar_;
 }
-void entities::player_dog::determine_direction(Vector2 target){
+void entities::dog::set_direction_index(size_t direction){
+    if(direction < body_.num_sprites()){
+        body_.set_index(direction);
+    }
+    if(direction < head_.num_sprites()){
+        head_.set_index(direction);
+    }
+}
+void entities::dog::determine_direction(Vector2 target){
     if(position_.x < target.x){
         direction_scalar_ = level_config::direction_scalars[level_config::directions::right];
-        body_.set_index(level_config::directions::right);
+        set_direction_index(level_config::directions::right);
         return;
     }
     else if(position_.x > target.x){
         direction_scalar_ = level_config::direction_scalars[level_config::directions::left];
-        body_.set_index(level_config::directions::left);
+        set_direction_index(level_config::directions::left);
         return;
     }
     else if(position_.y < target.y){
         direction_scalar_ = level_config::direction_scalars[level_config::directions::down];
+        set_direction_index(level_config::directions::down);
         return;
     }
     else if(position_.y > target.y){
         direction_scalar_ = level_config::direction_scalars[level_config::directions::up];
+        set_direction_index(level_config::directions::up);
         return;
     }
 }
 
+void entities::dog::render(Vector2 draw_position, int frame){
+    entity::render(draw_position, frame);
+    head_.render(draw_position, frame);
+}
+
+void entities::dog::set_path(std::vector<Vector2>& path){
+    if(path.empty()) return;
+    move_path_ = path;
+    determine_direction(move_path_.front());
+}
+
+// ------------------------------- player dogs ------------------------------- //
 void entities::player_dog::interact(entity& other){
     (void) other;
     return;
@@ -91,16 +113,21 @@ void entities::player_dog::on_right_click_event(const events::right_mouse_click&
 }
 
 void entities::player_dog::render(Vector2 draw_position, int frame){
-    entity::render(draw_position, frame);
-    auto draw_position_offset = draw_position;
-    head_.render(draw_position, frame);
+    dog::render(draw_position, frame);
     selected_state_->render(*this, draw_position, frame);
 }
 
-void entities::player_dog::set_path(std::vector<Vector2>& path){
-    if(path.empty()) return;
-    move_path_ = path;
-    determine_direction(move_path_.front());
+// ------------------------------- npc dogs ------------------------------- //
+int entities::npc_dog::update(float delta, int frame){
+    return dog::update(delta, frame);
+}
+
+entities::npc_dog::state entities::npc_dog::get_state(){
+    return state_;
+}
+
+void entities::npc_dog::set_state(state new_state){
+    state_ = new_state;
 }
 
 
@@ -182,7 +209,8 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
         std::move(head),
         std::move(khiri_outlines),
         position,
-        id);
+        id,
+        next_debug_id("pd_"));
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 position, int id){
     auto mack_left_texture = textures::textures_.get_texture(textures::mack_left, entity_config::mack_left_path);
@@ -262,5 +290,6 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
         std::move(head),
         std::move(mack_outlines),
         position,
-        id);
+        id,
+        next_debug_id("pd_"));
 }

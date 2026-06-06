@@ -19,6 +19,7 @@ namespace body{
             
             size_t get_index();
             void set_index(size_t index);
+            size_t num_sprites();
 
             hitbox::hitbox& get_hitbox();
             sprite::sprite& get_sprite();

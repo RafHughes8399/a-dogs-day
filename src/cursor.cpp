@@ -206,7 +206,8 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2
     return std::make_unique<entities::cursor>(
         body,
         GetMousePosition(),
-        id
+        id,
+        next_debug_id("cursor_")
     );
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vector2 position, int id){
@@ -225,6 +226,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vecto
     return std::make_unique<entities::paw_mark>(
         body,
         position,
-        id
+        id,
+        next_debug_id("paw_")
     );
 }

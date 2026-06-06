@@ -5,6 +5,9 @@ size_t body::body::get_index(){
 void body::body::set_index(size_t index){
     index_ = index;
 }
+size_t body::body::num_sprites(){
+    return sprites_.size();
+}
 hitbox::hitbox& body::body::get_hitbox(){
     return hitboxes_[index_];
 }

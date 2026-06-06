@@ -12,6 +12,10 @@
 #include "sprite.h"
 #include "raylib.h"
 #include "body.h"
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace entities{
     enum status_codes{
@@ -23,8 +27,8 @@ namespace entities{
     class entity {
         public:
             virtual ~entity() = default;
-            entity(body::body body, Vector2 position, int id)
-            : body_(body), position_(position), id_(id){}
+            entity(body::body body, Vector2 position, int id, std::string debug_id)
+            : id_(id), body_(body), position_(position), debug_id_(std::move(debug_id)){}
             entity(const entity& other) = default;
             entity(entity&& other) = default;
 
@@ -38,6 +42,7 @@ namespace entities{
             bool check_collision(const hitbox::hitbox other);
             body::body& get_body();
             int get_id();
+            const std::string& get_debug_id();
             hitbox::hitbox& get_hitbox();
             sprite::sprite& get_sprite();
 
@@ -61,6 +66,7 @@ namespace entities{
             const int id_;    
             body::body body_;  
             Vector2 position_;
+            const std::string debug_id_;
 
     };
 
@@ -176,8 +182,8 @@ namespace entities{
                     event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
                     event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 }
-                cursor(body::body body, Vector2 position, int id)
-                : entity(body, position, id), 
+                cursor(body::body body, Vector2 position, int id, std::string debug_id)
+                : entity(body, position, id, std::move(debug_id)), 
                 enter_edit_mode_handler_([this](const events::enter_edit_mode& event) -> void{on_enter_edit_mode_event(event);}),
                 exit_edit_mode_handler_([this](const events::exit_edit_mode& event) -> void{on_exit_edit_mode_event(event);}),
                 left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
@@ -228,8 +234,8 @@ namespace entities{
         
         class paw_mark : public entity{
         public:
-        paw_mark(body::body body, Vector2 position, int id)
-        : entity(body, position, id){}
+        paw_mark(body::body body, Vector2 position, int id, std::string debug_id)
+        : entity(body, position, id, std::move(debug_id)){}
             paw_mark(const paw_mark& other) = default;
             paw_mark(paw_mark&& other) = default;
 
@@ -253,7 +259,38 @@ namespace entities{
      * -> hepler dogs (waiters, cooks, etc)
      * -> customer dogs 
      */
-    class player_dog : public entity{
+    class dog : public entity{
+        public:
+            dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
+            int direction = level_config::directions::right)
+            : entity(body, position, id, std::move(debug_id)), head_(head),
+            direction_scalar_(level_config::direction_scalars[direction]){
+                body_.set_index(static_cast<size_t>(direction));
+                head_.set_index(static_cast<size_t>(direction));
+            }
+            dog(const dog& other) = delete;
+            dog(dog&& other) = default;
+
+            dog& operator=(const dog& other) = delete;
+            dog& operator=(dog&& other) = delete;
+
+            int update(float delta, int frame) override;
+            Vector2 get_direction_scalar();
+            void render(Vector2 draw_position, int frame) override;
+            void set_path(std::vector<Vector2>& path);
+
+        protected:
+            bool reached_position(Vector2 target);
+            void determine_direction(Vector2 target);
+            void set_direction_index(size_t direction);
+
+            body::body head_;
+            const Vector2 move_speed_ = entity_config::dog_move_speed;
+            Vector2 direction_scalar_;
+            std::vector<Vector2> move_path_;
+    };
+
+    class player_dog : public dog{
         public:
             class state{
                 public:
@@ -298,14 +335,13 @@ namespace entities{
                 event_interface::unsubscribe<events::selected_dog>(selected_dog_handler_);
             }
             player_dog(body::body body, body::body head, std::vector<sprite::sprite> outlines, Vector2 position, int id,
-            int direction = level_config::directions::right, std::unique_ptr<player_dog::state> state = std::make_unique<unselected>())
-            : entity(body, position, id), head_(head), outlines_(outlines), cosmetics_(), 
-            direction_scalar_(level_config::direction_scalars[direction]), selected_state_(std::move(state)),
+            std::string debug_id, int direction = level_config::directions::right, std::unique_ptr<player_dog::state> state = std::make_unique<unselected>())
+            : dog(body, head, position, id, std::move(debug_id), direction), outlines_(outlines), cosmetics_(), 
+            selected_state_(std::move(state)),
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}),
             selected_dog_handler_([this](const events::selected_dog& event)->void {on_dog_select_event(event);}){
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 event_interface::subscribe<events::selected_dog>(selected_dog_handler_);
-                body_.set_index(static_cast<size_t>(direction));
             }
             player_dog(const player_dog& other) = delete;
             player_dog(player_dog&& other) = default;
@@ -313,49 +349,56 @@ namespace entities{
             player_dog& operator=(const player_dog& other) = delete;
             player_dog& operator=(player_dog&& other) = delete;
 
-            int update(float delta, int frame) override;
-            Vector2 get_direction_scalar();
-
             void interact(entity& other) override;
             void select();
             void unselect();
             void render(Vector2 draw_position, int frame) override;
             void on_dog_select_event(const events::selected_dog& event);
             void on_right_click_event(const events::right_mouse_click& event);
-            void set_path(std::vector<Vector2>& path);
 
             
         private:
-            /**
-             * setup a direction map to a scalar vector
-             * so up = {0, -1}
-             * so right = {1, 0}
-             * 
-             * so left = {-1, 0}
-             */
-            bool reached_position(Vector2 target);
-            void determine_direction(Vector2 target);
-            
-            body::body head_;
-            
-            const Vector2 move_speed_ = entity_config::dog_move_speed;
-            Vector2 direction_scalar_;
-
             std::unique_ptr<state> selected_state_;
             std::vector<sprite::sprite> outlines_;
             std::vector<sprite::sprite> cosmetics_;
-            std::vector<Vector2> move_path_; // the prev array from the path algorithm
             
 
             events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
             events::event_handler<events::selected_dog> selected_dog_handler_;
 
     };
+
+    class npc_dog : public dog{
+        public:
+            enum state{
+                entering = 0,
+                waiting_for_table = 1,
+                seated = 2,
+                eating = 3,
+                leaving = 4
+            };
+
+            npc_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
+            state current_state = state::entering, int direction = level_config::directions::right)
+            : dog(body, head, position, id, std::move(debug_id), direction), state_(current_state){}
+            npc_dog(const npc_dog& other) = delete;
+            npc_dog(npc_dog&& other) = default;
+
+            npc_dog& operator=(const npc_dog& other) = delete;
+            npc_dog& operator=(npc_dog&& other) = delete;
+
+            int update(float delta, int frame) override;
+            state get_state();
+            void set_state(state new_state);
+
+        private:
+            state state_;
+    };
     // body behaves slightly differently for decorations, it will have the variants for the decoration (probably should be called deocraiotn)
     class decoration : public entity {
         public:
-            decoration(body::body body, Vector2 position, int id)
-            : entity(body, position, id), pre_move_position_(position_), post_move_position_(position_),
+            decoration(body::body body, Vector2 position, int id, std::string debug_id)
+            : entity(body, position, id, std::move(debug_id)), pre_move_position_(position_), post_move_position_(position_),
             moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ){
                 // upon creating a decoration, let the graph know where it was placed with the event
                 auto rectangle = body_.get_hitbox().get_box();
@@ -382,23 +425,79 @@ namespace entities{
             Vector2 post_move_position_;
         
     };
+
+    class station : public decoration {
+        public:
+            enum station_type{
+                table_station = 0
+            };
+
+            station(body::body body, Vector2 position, int id, std::string debug_id, station_type type)
+            : decoration(body, position, id, std::move(debug_id)), type_(type){}
+            station(const station& other) = default;
+            station(station&& other) = default;
+
+            station& operator=(const station& other) = delete;
+            station& operator=(station&& other) = delete;
+
+            station_type get_station_type();
+            void interact(entity& other) override;
+
+        private:
+            station_type type_;
+    };
+
+    class table : public station {
+        public:
+            enum table_state{
+                available = 0,
+                reserved = 1,
+                occupied = 2
+            };
+
+            table(body::body body, Vector2 position, int id, std::string debug_id)
+            : station(body, position, id, std::move(debug_id), station_type::table_station),
+            state_(table_state::available), assigned_dog_id_(level_config::empty_node){}
+            table(const table& other) = default;
+            table(table&& other) = default;
+
+            table& operator=(const table& other) = delete;
+            table& operator=(table&& other) = delete;
+
+            bool can_accept_dog();
+            bool reserve_for(int dog_id);
+            void occupy();
+            void clear();
+            table_state get_state();
+            int get_assigned_dog_id();
+
+        private:
+            table_state state_;
+            int assigned_dog_id_;
+    };
     // ------------------ entity builder ------------------ //
     class entity_builder{
         public:
             std::unique_ptr<entity> build_cursor(Vector2 position, int id);
             std::unique_ptr<entity> build_mack(Vector2 position, int id);
             std::unique_ptr<entity> build_khiri(Vector2 position, int id);
+            // NPC dog sprite art/config pending.
+            // std::unique_ptr<entity> build_npc_dog(Vector2 position, int id);
             std::unique_ptr<entity> build_paw_mark(Vector2 position, int id);
 
             std::unique_ptr<entity> build_test_decoration(Vector2 position, int id);
             std::unique_ptr<entity> build_gargoyle(Vector2 position, int id);
             ~entity_builder() = default;
-            entity_builder() {}
+            entity_builder() : debug_id_counts_() {}
             entity_builder(const entity_builder& other) = default;
             entity_builder(entity_builder&& other) = default;
 
             entity_builder& operator=(const entity_builder& other) = default;
             entity_builder& operator=(entity_builder&& other) = default;
+
+        private:
+            std::string next_debug_id(const std::string& prefix);
+            std::map<std::string, size_t> debug_id_counts_;
 
     };
     extern entity_builder e_builder;
