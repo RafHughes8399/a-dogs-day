@@ -1,4 +1,5 @@
 #include "player.h"
+#include "config.h"
 #include <iostream>
 
 // ----------------------- player ----------------------- //
@@ -25,6 +26,8 @@ void player::player::setup_control_maps(){
 // ----------------------------- player states ----------------------------- // 
 
 void player::player::state::left_click(player& player){
+    (void) player;
+    std::cout << "[default state]: player left click" << std::endl;
     std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(GetMousePosition(), 
     entity_config::cursor_attributes[entity_config::attributes::frame_width], entity_config::cursor_attributes[entity_config::attributes::frame_height]);
     event_interface::queue_event(left_mouse_click_event);
@@ -34,13 +37,11 @@ void player::player::state::right_click(player& player){
     event_interface::queue_event(right_mouse_click_event);
 }
 
-void player::player::editing::left_click(player& player){
-    
-    std::cout << "edit left click " << std::endl;
-}
 
 void player::player::carrying_decoration::left_click(player& player){
-
+    std::cout << "[carrying state] : player left click" << std::endl;
+    (void) player;
+    return;
 }
 
 void player::player::on_selected_dog(const events::selected_dog& event){
@@ -56,31 +57,36 @@ void player::player::back(){
 }
 
 void player::player::edit(float delta){
-    
-    if(edit_meter_ < game_config::hold_duration){
-        increment_meter();
-    }
-    if(edit_meter_ >= game_config::hold_duration){
-        // change the player state
-        std::cout << "edit meter filled " << std::endl;
-        std::unique_ptr<events::event> enter_edit = std::make_unique<events::enter_edit_mode>();
-        event_interface::queue_event(enter_edit);
-        reset_meter();
+    (void) delta;
+    if(edit_buffer_ > 0){
+        edit_buffer_--;
     }
     else{
-        if(! IsKeyDown(controls_config::key_hold_actions::edit_mode)){
+        if(edit_meter_ < game_config::hold_duration){
+            std::cout << "[player edit hold] : increment" << std::endl;
+            increment_meter();
+        }
+        if(edit_meter_ >= game_config::hold_duration){
+            std::cout << "[player edit hold]: edit meter filled " << std::endl;
+            state_ = std::make_unique<editing>();
+            std::cout << "[player edit hold]: swap state, enter edit mode " << std::endl;
+            std::unique_ptr<events::event> enter_edit = std::make_unique<events::enter_edit_mode>();
+            event_interface::queue_event(enter_edit);
+            std::cout << "[player edit hold]: reset meter " << std::endl;
             reset_meter();
         }
     }
-
 }
 
+
+
 void player::player::exit_edit(){
-    // make an event for the cursor
-    // change the control state 
+    edit_buffer_ = game_config::edit_cooldown;
+    state_ = std::make_unique<state>(hud::hud::hud_types::base);
     std::unique_ptr<events::event> exit_edit = std::make_unique<events::exit_edit_mode>();
     event_interface::queue_event(exit_edit);
 }
+
 void player::player::move(Vector2 direction_scalar, float delta){
     
     auto move_vector = Vector2Scale(Vector2Multiply(level_config::frame_move, direction_scalar), delta);
@@ -134,14 +140,13 @@ void player::player::open_shop(){
 
 
 void player::player::left_click(){
-    std::cout << "left mouse clicked " << std::endl;
+    std::cout << "[player left click] state left click" << std::endl;
     state_->left_click(*this);
 }
 void player::player::right_click(){
     state_->right_click(*this);
 }
 void player::player::update(float delta){
-
     // check pressed keys 
     /**
      * 
@@ -171,7 +176,11 @@ void player::player::update(float delta){
     }
     return;
     */
+    (void) delta;
+
 }
+
+
 void player::player::render(){
     hud_.render();
     return;
@@ -183,7 +192,9 @@ void player::player::reset_meter(){
     event_interface::queue_event(edit_hold_event);
 }
 void player::player::increment_meter(){
+    std::cout << "[edit incremenet] : increment " << std::endl;
     edit_meter_ += 1;
     std::unique_ptr<events::event> edit_hold_event = std::make_unique<events::edit_hold>(GetMousePosition(), edit_meter_);
     event_interface::queue_event(edit_hold_event);
+    std::cout << "[edit incremenet] : create and queue event" << std::endl;
 }

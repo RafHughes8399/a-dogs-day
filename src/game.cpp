@@ -1,7 +1,8 @@
 #include "game.h"
-
+// #include <iostream>
 void game::game::update(float delta){
     // deal with queued events 
+    // std::cout << "[game update]: update" << std::endl;
     events::global_dispatcher_.process_events(delta);
     // update the level
     level_.update(delta, frame_count_);
@@ -15,11 +16,12 @@ void game::game::update(float delta){
     if(frame_count_ == game_config::twenty_seconds){
         frame_count_ = 0;
     }
-
+    
     return;
 }
 
 void game::game::render(float delta){
+    // std::cout << "[game update]: render" << std::endl;
     (void) delta;
     level_.render(frame_count_);
     player_.render();

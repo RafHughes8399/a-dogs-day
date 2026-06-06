@@ -142,7 +142,7 @@ namespace level{
                 event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
                 event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
-            };
+            }
             level(const level& other) = default;
             level(level&& other) = default;
             

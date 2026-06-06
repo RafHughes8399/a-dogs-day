@@ -11,9 +11,9 @@
 #include "events_interface.h"
 #include "hud.h"
 #include "raylib.h"
-#include "sprite.h"
 
 #include <map>
+#include <iostream>
 #include <functional>
 namespace player{
     enum mouse{
@@ -39,7 +39,8 @@ namespace player{
             class state {
                 public:
                     virtual ~state() = default;
-                    state(){};
+                    state(size_t hud_index)
+                    :hud_index_(hud_index){}
                     state(const state& other) = default;
                     state(state&& other) = default;
                     
@@ -49,26 +50,26 @@ namespace player{
                     // has the "default " control behaviour
                     virtual void left_click(player& player);
                     virtual void right_click(player& player);
+
+                    size_t hud_index();
+                protected: 
+                    size_t hud_index_;
             };
             class editing : public state{
                 public:
-                    virtual ~editing() = default;
                     editing()
-                    : state(){};
+                    : state(hud::hud::hud_types::editing){}
                     editing(const editing& other) = default;
                     editing(editing&& other) = default;
                     
                     editing& operator=(const editing& other) = default;
                     editing& operator=(editing&& other) = default;
                     
-                    void left_click(player& player) override;
-                    //void right_click(player& player) override;
             };
             class carrying_decoration : public editing {
                 public:
-                    ~carrying_decoration() = default;
                     carrying_decoration()
-                    : editing(){};
+                    : editing(){}
                     carrying_decoration(const carrying_decoration& other) = default;
                     carrying_decoration(carrying_decoration&& other) = default;
                     
@@ -86,14 +87,15 @@ namespace player{
             }
             player(int selected_dog = level_config::mack_id)
             : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_press_controls_({}),
-            key_hold_controls_({}), selected_dog_(selected_dog), state_(std::make_unique<state>()), hud_(hud::h_builder_.build_player_hud()),
+            key_hold_controls_({}), selected_dog_(selected_dog), state_(std::make_unique<state>(hud::hud::hud_types::base)), hud_(hud::h_builder_.build_player_hud()),
             select_dog_handler_([this](const events::selected_dog& event) -> void{on_selected_dog(event);}){
+                std::cout << "[player constructor] : completed init list " << std::endl;
                 event_interface::subscribe(select_dog_handler_);
                 setup_control_maps();
                 select_dog();
                 std::unique_ptr<events::event> level_up_event = std::make_unique<events::level_up>(level_);
                 //event_interface::queue_event(level_up_event);
-            };
+            }
             player(const player& other) = delete;
             player(player&& other) = default;
         
@@ -102,6 +104,7 @@ namespace player{
 
             void back();
             void edit(float delta);
+            void cancel_incomplete_edit_hold();
             void exit_edit();
             void move(Vector2 direction_scalar, float delta);            
             void open_inventory();
@@ -121,14 +124,8 @@ namespace player{
 
         private:
             //controls control_scheme_;
-            //viewport frame_; // what can be seen by the player, essentially a rectangle, maybe better for the world ?
             void reset_meter();
             void increment_meter();
-            /** 
-             * 
-             hud hud_; // for now hud is just a list of elements, will change when it becomes more intricate
-             */
-            
             void setup_control_maps();
 
             events::event_handler<events::selected_dog> select_dog_handler_;       
@@ -136,7 +133,7 @@ namespace player{
             hud::hud hud_;
             inventory inventory_;
             int edit_meter_ = 0;
-
+            int edit_buffer_ = 0;
             int bones_ = player_config::max_bones;
             int level_ = player_config::max_level;
             int selected_dog_;

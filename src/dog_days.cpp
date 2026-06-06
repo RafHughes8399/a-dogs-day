@@ -1,20 +1,26 @@
 #include <iostream>
 #include "raylib.h"
-#include "raymath.h"
 
-#include "config.h"
+
 #include "game.h"
 int main(){
     InitWindow(GetScreenWidth(), GetScreenHeight(), "dog day");
     auto level_builder = level::level_builder();
     auto level = level_builder.build_main_level();
+    std::cout << "[dog_days init] : built level " << std::endl;
     auto menus = menus::m_builder_.build_menus();
+    std::cout << "[dog_days init] : built menu " << std::endl;
     auto player = player::player();
+    std::cout << "[dog_days init] : built player " << std::endl;
     auto controls = player::controls(&player);
+    std::cout << "[dog_days init] : built controls " << std::endl;
     auto game = game::game(level, player, menus, controls);
+    std::cout << "[dog_days init] : built game " << std::endl;
     HideCursor();
     SetTargetFPS(60);
     bool loop = true;
+    
+    std::cout << "[dog_days init] : start loop " << std::endl;
     while(loop){
         float delta = GetFrameTime();
         BeginDrawing();

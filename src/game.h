@@ -14,7 +14,7 @@ namespace game{
         public:
             ~game() = default;
             game(level::level& level, player::player& player, menus::menu_graph& menu, player::controls& controls)
-                : level_(level), player_(player), frame_count_(0), menus_(menu), controls_(controls){};
+                : level_(level), player_(player), frame_count_(0), menus_(menu), controls_(controls){}
             game(const game& other) = default;
             game(game&& other) = default;
 

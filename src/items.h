@@ -29,7 +29,7 @@ namespace items{
     class inventory_item : public item{
         public:
         private:
-            int quantity_;                             
+            //int quantity_;                             
     };
     class shop_item : public item {
         public:
@@ -47,21 +47,21 @@ namespace items{
             };
             class locked : public access_state{
                 public:
-                    locked() : access_state(){};
+                    locked() : access_state(){}
                     bool can_buy() override { return false;}
                     bool is_locked() override { return true;}
                     private:
                 };
                 class unlocked : public access_state{
                     public:
-                    unlocked() : access_state(){};
+                    unlocked() : access_state(){}
                     bool can_buy() override { return true;}
                     bool is_locked() override { return false;}
                     private:
 
             };
 
-            ~shop_item() {
+            ~shop_item() override {
                 event_interface::unsubscribe<events::level_up>(level_up_handler_);
             }
             shop_item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name, int price, int level_req)

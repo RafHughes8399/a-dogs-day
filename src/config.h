@@ -12,6 +12,8 @@ namespace game_config {
     inline const int frames = 60;
     inline const int twenty_seconds = frames * 60; // 20 seconds in frames
     inline const float hold_duration = frames * 1.2; // 1.2 seconds in frames
+    /** Frames to ignore edit-hold after exiting edit (prevents instant re-enter). */
+    inline const int edit_cooldown = frames * 0.5;
 }
 namespace player_config{
     inline const int max_bones = 999999;
@@ -142,7 +144,7 @@ namespace hud_config{
     inline const int decoration_grid_thickness = 3;
     // hud elements paths 
     inline const char* cursor_edit_progres_wheel = "../sprites/edit_wheel.png";
-    inline const char* edit_grid = "../sprite/edit_grid.png";
+    inline const char* edit_grid = "../sprites/edit_grid.png";
     
     inline const float edit_wheel_attributes[entity_config::attributes::size] = {35.0f, 35.0f, game_config::hold_duration,  1.0f}; // for now, pending animation play speed implementation , frames is 90
 

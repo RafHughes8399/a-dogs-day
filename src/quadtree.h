@@ -138,7 +138,7 @@ namespace tree{
             query_interface::subscribe<queries::is_colliding_query, bool>(queries::bool_executor_, is_colliding_handler_);
 
             // and resub
-        };
+        }
 
         quadtree(quadtree&& other);
         
@@ -224,7 +224,6 @@ namespace tree{
         void on_interact_event(const events::interact_entity& event){
             size_t id = event.get_id();
             auto entity = get_entity(root_, id);
-            const hitbox::hitbox& hb = event.get_hitbox();
             perform_interactions(root_, entity);
             return;
         }

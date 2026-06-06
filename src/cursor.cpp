@@ -1,8 +1,8 @@
 #include "entities.h"
 #include "queries.h"
-#include "query_interface.h"
-#include "texture.h"
 
+#include "texture.h"
+#include <iostream>
 // -------------------------------- interaction strategies --------------------------------//
 void entities::cursor::default_strategy::interact(cursor& cursor, entity& other){
     (void) cursor;
@@ -19,6 +19,7 @@ void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& ot
 
 void entities::cursor::state::create_move_event(cursor& cursor){
     // don't make an event
+    (void) cursor;
 }
 void entities::cursor::state::left_click(cursor& cursor, entity& other){
     // for "selecting a dog" and bringing up the hud
@@ -42,8 +43,10 @@ void entities::cursor::carrying_decoration::create_move_event(cursor& cursor){
 
 void entities::cursor::editing::left_click(cursor& cursor, entity& other){
     // makes other subscribe to cursor move events
+    std::cout << "[editing cursor] left click " << std::endl;
     if(decoration* decoration_cast = dynamic_cast<decoration*>(&other)){
-
+        
+        std::cout << "[editing cursor] pick up decoration, switch to carrying " << std::endl;
         decoration_cast->pick_up();
         cursor.state_ = std::make_unique<carrying_decoration>(decoration_cast);
     }
@@ -52,6 +55,8 @@ void entities::cursor::editing::left_click(cursor& cursor, entity& other){
 }
 void entities::cursor::editing::right_click(cursor& cursor, entity& other){
     // override, do nothing
+    (void) cursor;
+    (void) other;
 
 }
 
@@ -73,6 +78,7 @@ void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& o
 // -------------------------------- cursor --------------------------------//
 
 int entities::cursor::update(float delta, int frame){
+    (void) delta;
     (void) frame;
     auto old_position = position_;
     position_ =  GetMousePosition();
@@ -113,11 +119,15 @@ void entities::cursor::interact(entities::entity& other){
 
 void entities::cursor::on_enter_edit_mode_event(const events::enter_edit_mode& event){
     // change the state of the cursor
+    (void) event;
+    std::cout << "[cursor on enter edit]: swap to editing state" << std::endl;
+    std::cout << "[cursor on enter edit]: swap to editing state" << std::endl;
     state_ = std::make_unique<editing>();
     return;
 }
 void entities::cursor::on_exit_edit_mode_event(const events::exit_edit_mode& event){
     // change the state of the cursor
+    (void) event;
     state_ = std::make_unique<state>();
     return;
 }
@@ -162,6 +172,7 @@ void entities::cursor::on_right_mouse_click_event(const events::right_mouse_clic
 // -------------------------------- paw mark --------------------------------//
 int entities::paw_mark::update(float delta, int frame){
     (void) frame;
+    (void) delta;
     auto& animation = body_.get_sprite().get_animation();
     animation.next_frame(false);
     auto new_frame = animation.get_current_frame();
@@ -175,6 +186,7 @@ int entities::paw_mark::update(float delta, int frame){
 }
 
 void entities::paw_mark::interact(entities::entity& other){
+    (void) other;
     return;
 }
 

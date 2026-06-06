@@ -53,7 +53,7 @@ namespace events{
 		public:
 			virtual ~event() = default;	
 			event(int id, float delay=0.0f)
-			: type_(id), handled_(false), delay_(delay){};
+			: type_(id), handled_(false), delay_(delay){}
 			
 			event(event&& other) = default;
 			event& operator=(event&& other) = delete;
@@ -61,7 +61,7 @@ namespace events{
 			bool is_handled(){
 				return handled_;
 			}
-			const int get_type() const{
+			int get_type() const{
 					return type_;
 			}
 			bool update_delay(float delta){
@@ -77,11 +77,11 @@ namespace events{
 
 	class test_event : public  event{
 	public:
-		~test_event() = default;
-		test_event(float delay=0.0f)
-		: event(ids::test, delay), time_(std::time(nullptr)){};
 
-		static const int get_static_type(){
+		test_event(float delay=0.0f)
+		: event(ids::test, delay), time_(std::time(nullptr)){}
+
+		static int get_static_type(){
 			return ids::test;
 		}
 		char* get_event_time() const{
@@ -95,22 +95,20 @@ namespace events{
 	// listens to change its state
 	class enter_edit_mode : public event{
 		public:
-			~enter_edit_mode() = default;
 			enter_edit_mode()
-			:event(ids::enter_edit){};
+			:event(ids::enter_edit){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::enter_edit;
 			}
 		private:
 	};
 	class exit_edit_mode : public event{
 		public:
-			~exit_edit_mode() = default;
 			exit_edit_mode()
-			:event(ids::exit_edit){};
+			:event(ids::exit_edit){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::exit_edit;
 			}
 		private:
@@ -118,11 +116,10 @@ namespace events{
 	// for when the player holds down the edit key, main listener is the edit wheel hud component
 	class edit_hold : public event{
 		public:
-			~edit_hold() = default;
 			edit_hold(Vector2 position, int frame)
-			:event(ids::hold_edit), position_(position), edit_progress_(frame){};
+			:event(ids::hold_edit), position_(position), edit_progress_(frame){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::hold_edit;
 			}
 			Vector2 get_position() const{
@@ -138,11 +135,10 @@ namespace events{
 	};
 	class empty_event : public event{
 		public:
-			~empty_event() = default;
 			empty_event()
-			:event(ids::empty){};
+			:event(ids::empty){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::empty;
 			}
 		private:
@@ -150,11 +146,11 @@ namespace events{
 	// for when an entity potentailly interacts with another, main listener is the quad tree to check collisionss
 	class interact_entity : public event{
 		public:
-			~interact_entity() = default;
-			interact_entity(size_t id, hitbox::hitbox hitbox)
-			:event(ids::interact), id_(id), hitbox_(hitbox){};
 
-			static const int get_static_type(){
+			interact_entity(size_t id, hitbox::hitbox hitbox)
+			:event(ids::interact), id_(id), hitbox_(hitbox){}
+
+			static int get_static_type(){
 				return ids::interact;
 			}
 			size_t get_id() const {
@@ -172,11 +168,10 @@ namespace events{
 		// on the current menu 
 	class interact_menu : public event {
 		public:
-			~interact_menu() = default;
 			interact_menu(hitbox::hitbox hitbox)
-			:event(ids::menu_interact), hitbox_(hitbox){};
+			:event(ids::menu_interact), hitbox_(hitbox){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::menu_interact;
 			}
 			const hitbox::hitbox& get_hitbox() const{
@@ -189,11 +184,11 @@ namespace events{
 
 	class key_press: public event{
 		public:	
-			~key_press() = default;
-			key_press(int key)
-			:event(ids::press_key), key_(key){};
 
-			static const int get_static_type(){
+			key_press(int key)
+			:event(ids::press_key), key_(key){}
+
+			static int get_static_type(){
 				return ids::press_key;
 			}
 			int get_key() const {
@@ -207,11 +202,11 @@ namespace events{
 	// and in future to play level up hud animations
 	class level_up: public event{
 		public:	
-			~level_up() = default;
-			level_up(int new_level)
-			:event(ids::lvl_up), new_level_(new_level){};
 
-			static const int get_static_type(){
+			level_up(int new_level)
+			:event(ids::lvl_up), new_level_(new_level){}
+
+			static int get_static_type(){
 				return ids::lvl_up;
 			}
 			int get_new_level() const {
@@ -223,12 +218,10 @@ namespace events{
 	// when the cursor left click occurs, main listener is the quad tree to check collisions
 	class left_mouse_click : public event{
 		public:
-			~left_mouse_click() = default;
 			left_mouse_click(Vector2 position, float box_width, float box_length)
 			:	event(ids::left_mouse), mouse_position_(position), collision_box_(Rectangle{position.x, position.y, box_width, box_length}){ // TODO fill in (16/12)
-
-			};
-			static const int get_static_type(){
+			}
+			static int get_static_type(){
 				return ids::left_mouse;
 			}
 			Vector2 get_mouse_position() const{
@@ -246,10 +239,9 @@ namespace events{
 	// when an entity moves, main listener is the quad tree to move entities into the correct node
 	class move_entity : public event{
 		public:
-		~move_entity() = default;
 		move_entity(size_t id)
-			: event(ids::move), id_(id){};
-		static const int get_static_type(){
+			: event(ids::move), id_(id){}
+		static int get_static_type(){
 			return ids::move;
 		}
 		size_t get_id() const{
@@ -261,11 +253,10 @@ namespace events{
 
 	class moved_cursor : public event{
 		public:
-			~moved_cursor() = default;
 			moved_cursor(Vector2 position)
-			: event(ids::cursor_move), new_position_(position){};
+			: event(ids::cursor_move), new_position_(position){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::cursor_move;
 			}
 			
@@ -277,11 +268,10 @@ namespace events{
 	};
 	class moved_decoration : public event{
 		public:
-			~moved_decoration() = default;
 			moved_decoration(Rectangle pre, Rectangle post, int id)
 			: event(ids::decoration_move), pre_move_(pre), post_move_(post), id_(id){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::decoration_move;
 			}
 			Rectangle get_pre_move() const{
@@ -300,11 +290,10 @@ namespace events{
 	};
 	class placed_decoration : public event{
 		public:
-			~placed_decoration() = default;
 			placed_decoration(Rectangle rec, size_t id)
 			: event(ids::decoration_place), rectangle_(rec), id_(id){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::decoration_place;
 			}
 			Rectangle get_rectangle() const{
@@ -322,11 +311,11 @@ namespace events{
 	// moves it
 	class move_view_frame : public event{
 		public:
-		~move_view_frame() = default;
+
 		move_view_frame(Vector2 delta)
-		: event(ids::move_frame), delta_(delta){};
+		: event(ids::move_frame), delta_(delta){}
 		
-		static const int get_static_type(){
+		static int get_static_type(){
 			return ids::move_frame;
 		}
 		Vector2 get_delta() const{
@@ -338,11 +327,10 @@ namespace events{
 	// when a right click occurs, main listener is the level to create a paw mark
 	class right_mouse_click : public event{
 		public:
-			~right_mouse_click() = default;
 			right_mouse_click(Vector2 position, int selected_dog)
-			: event(ids::right_mouse), mouse_position_(position), selected_dog_(selected_dog){};
+			: event(ids::right_mouse), mouse_position_(position), selected_dog_(selected_dog){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::right_mouse;
 			}
 			Vector2 get_mouse_position() const{
@@ -358,11 +346,10 @@ namespace events{
 	// for when an entity need be removed from the level, main listener is the quad tree
 	class remove_entity : public event{
 		public:
-			~remove_entity() = default;
 			remove_entity(size_t id)
-			: event(ids::remove), id_(id){};
+			: event(ids::remove), id_(id){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::remove;
 			}
 			size_t get_id() const{
@@ -376,11 +363,10 @@ namespace events{
 	// for when a dog is selected, main listener is the player to update the id
 	class selected_dog : public event{
 		public:
-			~selected_dog() = default;
 			selected_dog(size_t id)
-			:event(ids::select_dog), id_(id){};
+			:event(ids::select_dog), id_(id){}
 
-			static const int get_static_type(){
+			static int get_static_type(){
 				return ids::select_dog;
 			}
 			size_t get_id() const {
@@ -395,7 +381,7 @@ namespace events{
 		void execute(const event& e){
 			call_event(e);
 		}
-		virtual const int get_type() const = 0;
+		virtual int get_type() const = 0;
 		private:
 		virtual void call_event(const event& e) = 0;
 
@@ -407,7 +393,7 @@ namespace events{
 		~event_handler() override = default;
 		event_handler(std::function<void(const E& e)> handle)
 			: handler_(handle), handler_type_(E::get_static_type()){
-			};
+			}
 		
 		event_handler(const event_handler& other) = default;
 		event_handler(event_handler&& other) = default;
@@ -424,7 +410,7 @@ namespace events{
 			}
 			return;
 		}
-		const int get_type() const override{
+		int get_type() const override{
 			return handler_type_;
 		}
 		bool operator==(const event_handler& other){
