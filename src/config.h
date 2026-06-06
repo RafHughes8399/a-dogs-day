@@ -71,6 +71,9 @@ namespace entity_config{
     inline const char* khiri_right_path = "../sprites/khiri_right.png";
     inline const char* khiri_up_path = "../sprites/khiri_up.png";
     inline const char* khiri_down_path = "../sprites/khiri_down.png";
+    // Head sprite art pending.
+    // inline const char* khiri_head_left_path = "../sprites/khiri_head_left.png";
+    // inline const char* khiri_head_right_path = "../sprites/khiri_head_right.png";
 
     inline const char* khiri_left_outline_path = "../sprites/khiri_left_outline.png";
     inline const char* khiri_right_outline_path = "../sprites/khiri_right_outline.png";
@@ -82,6 +85,9 @@ namespace entity_config{
     inline const char* mack_right_path = "../sprites/mack_right.png";
     inline const char* mack_up_path = "../sprites/mack_up.png";
     inline const char* mack_down_path = "../sprites/mack_down.png";
+    // Head sprite art pending.
+    // inline const char* mack_head_left_path = "../sprites/mack_head_left.png";
+    // inline const char* mack_head_right_path = "../sprites/mack_head_right.png";
 
     inline const char* mack_left_outline_path = "../sprites/mack_left_outline.png";
     inline const char* mack_right_outline_path = "../sprites/mack_right_outline.png";
@@ -105,8 +111,14 @@ namespace entity_config{
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
     inline const float khiri_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (4/11)
     inline const float khiri_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (4/11)
+    // inline const float khiri_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    // inline const Vector2 khiri_head_left_offset = Vector2{0.0f, 0.0f};
+    // inline const Vector2 khiri_head_right_offset = Vector2{0.0f, 0.0f};
     inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (4/11)
     inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (4/11)
+    // inline const float mack_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    // inline const Vector2 mack_head_left_offset = Vector2{0.0f, 0.0f};
+    // inline const Vector2 mack_head_right_offset = Vector2{0.0f, 0.0f};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (3/02)
     inline const float gargoyle_decoration_attributes[attributes::size] = {level_config::edge_weight * 0.75f, level_config::edge_weight * 1.75f, 1.0f, 1.0f};
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};

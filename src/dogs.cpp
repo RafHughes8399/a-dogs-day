@@ -154,6 +154,28 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
     khiri_hitboxes.push_back(across_hitbox);
 
     auto body = body::body(khiri_hitboxes, khiri_sprites);
+    // Head sprite art pending.
+    // auto khiri_head_left_texture = textures::textures_.get_texture(textures::khiri_head_left, entity_config::khiri_head_left_path);
+    // auto khiri_head_right_texture = textures::textures_.get_texture(textures::khiri_head_right, entity_config::khiri_head_right_path);
+    // auto khiri_head_left_sprite = sprite::sprite(khiri_head_left_texture,
+    //     entity_config::khiri_head_across_attributes[entity_config::attributes::frame_width],
+    //     entity_config::khiri_head_across_attributes[entity_config::attributes::frame_height],
+    //     entity_config::khiri_head_across_attributes[entity_config::attributes::frames],
+    //     entity_config::khiri_head_across_attributes[entity_config::attributes::animations],
+    //     entity_config::khiri_head_left_offset);
+    // auto khiri_head_right_sprite = sprite::sprite(khiri_head_right_texture,
+    //     entity_config::khiri_head_across_attributes[entity_config::attributes::frame_width],
+    //     entity_config::khiri_head_across_attributes[entity_config::attributes::frame_height],
+    //     entity_config::khiri_head_across_attributes[entity_config::attributes::frames],
+    //     entity_config::khiri_head_across_attributes[entity_config::attributes::animations],
+    //     entity_config::khiri_head_right_offset);
+    // std::vector<sprite::sprite> khiri_head_sprites;
+    // khiri_head_sprites.push_back(std::move(khiri_head_left_sprite));
+    // khiri_head_sprites.push_back(std::move(khiri_head_right_sprite));
+    // std::vector<hitbox::hitbox> khiri_head_hitboxes;
+    // khiri_head_hitboxes.push_back(across_hitbox);
+    // khiri_head_hitboxes.push_back(across_hitbox);
+    // auto head = body::body(khiri_head_hitboxes, khiri_head_sprites);
     auto head = body::body(); // TODO fill !
     return std::make_unique<entities::player_dog>(
         std::move(body),
@@ -210,6 +232,28 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
     mack_hitboxes.push_back(across_hitbox);
 
     auto body = body::body(mack_hitboxes, mack_sprites);
+    // Head sprite art pending.
+    // auto mack_head_left_texture = textures::textures_.get_texture(textures::mack_head_left, entity_config::mack_head_left_path);
+    // auto mack_head_right_texture = textures::textures_.get_texture(textures::mack_head_right, entity_config::mack_head_right_path);
+    // auto mack_head_left_sprite = sprite::sprite(mack_head_left_texture,
+    //     entity_config::mack_head_across_attributes[entity_config::attributes::frame_width],
+    //     entity_config::mack_head_across_attributes[entity_config::attributes::frame_height],
+    //     entity_config::mack_head_across_attributes[entity_config::attributes::frames],
+    //     entity_config::mack_head_across_attributes[entity_config::attributes::animations],
+    //     entity_config::mack_head_left_offset);
+    // auto mack_head_right_sprite = sprite::sprite(mack_head_right_texture,
+    //     entity_config::mack_head_across_attributes[entity_config::attributes::frame_width],
+    //     entity_config::mack_head_across_attributes[entity_config::attributes::frame_height],
+    //     entity_config::mack_head_across_attributes[entity_config::attributes::frames],
+    //     entity_config::mack_head_across_attributes[entity_config::attributes::animations],
+    //     entity_config::mack_head_right_offset);
+    // std::vector<sprite::sprite> mack_head_sprites;
+    // mack_head_sprites.push_back(std::move(mack_head_left_sprite));
+    // mack_head_sprites.push_back(std::move(mack_head_right_sprite));
+    // std::vector<hitbox::hitbox> mack_head_hitboxes;
+    // mack_head_hitboxes.push_back(across_hitbox);
+    // mack_head_hitboxes.push_back(across_hitbox);
+    // auto head = body::body(mack_head_hitboxes, mack_head_sprites);
     auto head = body::body(); // TODO fill ! and build the head sprites and hitboxes
 
     // and build the head, pending

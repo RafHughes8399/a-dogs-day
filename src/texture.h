@@ -33,6 +33,11 @@ namespace textures{
         hud_edit_wheel = 13,
         gargoyle_void = 14,
         gargoyle_sick_of_it = 15,
+        // Head sprite art pending.
+        // khiri_head_left = 16,
+        // khiri_head_right = 17,
+        // mack_head_left = 18,
+        // mack_head_right = 19,
         size = 16
         // and so on
     };
