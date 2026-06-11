@@ -19,7 +19,7 @@ namespace animation{
             animation(const animation& other) = default;
             animation(animation&& other)= default;
                 
-            animation& operator=(const animation& other) = default;
+            animation& operator=(const animation& other) = delete;
             animation& operator=(animation&& other) = delete;
 
             bool playing();

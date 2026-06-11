@@ -16,9 +16,9 @@ bool raglib::bounding_box_2::contains(const bounding_box_2& other) const{
 }
 bool raglib::bounding_box_2::contains(const Rectangle& box) const{
     // other is contained in this
-    auto min = Vector2 {box.x, box.y};
-    auto max = Vector2 {box.x + box.width, box.y + box.height};
-    auto bounds = bounding_box_2(min, max);
+    auto box_min = Vector2 {box.x, box.y};
+    auto box_max = Vector2 {box.x + box.width, box.y + box.height};
+    auto bounds = bounding_box_2(box_min, box_max);
     return contains(bounds);
 
 }

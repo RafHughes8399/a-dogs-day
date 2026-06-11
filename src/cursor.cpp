@@ -6,6 +6,7 @@
 // -------------------------------- interaction strategies --------------------------------//
 void entities::cursor::default_strategy::interact(cursor& cursor, entity& other){
     (void) cursor;
+    (void) other;
     return;
 }
 void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){\
@@ -135,6 +136,8 @@ void entities::cursor::on_exit_edit_mode_event(const events::exit_edit_mode& eve
 void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click& event){
     auto position = event.get_mouse_position();
     auto hitbox = event.get_hitbox();
+    (void) position;
+    (void) hitbox;
     // check interactions within the quadtree, use the correct interaction stategy (the left click one)
     interaction_strategy_ = std::make_unique<left_click_strategy>();
     
@@ -163,6 +166,7 @@ void entities::cursor::on_move_view_frame_event(const events::move_view_frame& e
 }
 
 void entities::cursor::on_right_mouse_click_event(const events::right_mouse_click& event){
+    (void) event;
     // for now just change the interact state
     interaction_strategy_ = std::make_unique<right_click_strategy>();
     // do something, then go back

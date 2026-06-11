@@ -17,7 +17,7 @@ namespace menus{
             // ! baasic implementation, currently (23.01), for testing menu navigation
             // ! proper implementation will follow 
             menu(Rectangle box, hud::hud components)
-            :box_(box), components_(std::move(components)) {}
+            : components_(std::move(components)), box_(box) {}
             menu(const menu& other) = delete;
             menu(menu&& other) = default;
             menu& operator=(const menu& other) = delete;
@@ -86,8 +86,9 @@ namespace menus{
                 event_interface::unsubscribe<events::key_press>(key_event_handler_);
             }
             menu_graph()
-            : current_(0), graph_(), key_event_handler_([this](const events::key_press& event) -> void {on_key_press_event(event);}),
-            menu_interact_handler_([this](const events::interact_menu& event) -> void {on_menu_interact_event(event);}){
+            : key_event_handler_([this](const events::key_press& event) -> void {on_key_press_event(event);}),
+            menu_interact_handler_([this](const events::interact_menu& event) -> void {on_menu_interact_event(event);}),
+            current_(0), graph_(){
                 std::cout << "[menu_graph constructor] finish init list" << std::endl;
                 build_graph();
                 event_interface::subscribe<events::interact_menu>(menu_interact_handler_);

@@ -13,7 +13,7 @@ namespace game_config {
     inline const int twenty_seconds = frames * 60; // 20 seconds in frames
     inline const float hold_duration = frames * 1.2; // 1.2 seconds in frames
     /** Frames to ignore edit-hold after exiting edit (prevents instant re-enter). */
-    inline const int edit_cooldown = frames * 0.5;
+    inline const int edit_cooldown = static_cast<int>(frames * 0.5);
 }
 namespace player_config{
     inline const int max_bones = 999999;

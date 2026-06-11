@@ -93,6 +93,12 @@ namespace queries{
     class query_handler_interface{
         public:
             virtual ~query_handler_interface() = default;
+            query_handler_interface() = default;
+            query_handler_interface(const query_handler_interface& other) = default;
+            query_handler_interface(query_handler_interface&& other) = default;
+
+            query_handler_interface& operator=(const query_handler_interface& other) = delete;
+            query_handler_interface& operator=(query_handler_interface&& other) = delete;
             T execute(const query& q){
                 return call_query(q);
             }
@@ -103,8 +109,8 @@ namespace queries{
     template<typename Q, typename T> // Q for query, T for type 
     class query_handler : public query_handler_interface<T>{
         public:
-            ~query_handler() = default;
-            query_handler(std::function<bool(const Q& q)> handle)
+            ~query_handler() override = default;
+            query_handler(std::function<T(const Q& q)> handle)
             : handler_(handle){}
             query_handler(const query_handler& other) = default;
 		    query_handler(query_handler&& other) = default;

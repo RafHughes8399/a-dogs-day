@@ -71,18 +71,19 @@ void hud::hud_element::sprite_draw::draw(){
     sprite_.render(position_, 0);
 }    
 void hud::hud_element::rectangle_draw::draw(){
-    DrawRectangle(position_.x, position_.y, rectangle_.width, rectangle_.height, colour_);
+    DrawRectangle(static_cast<int>(position_.x), static_cast<int>(position_.y),
+        static_cast<int>(rectangle_.width), static_cast<int>(rectangle_.height), colour_);
 }
 // position is assumed to be Vector2Zero(), the grid will cover the whole screen (for now)
 void hud::hud_element::grid_draw::draw(){
 
     float screen_w = static_cast<float>(GetScreenWidth());
     float screen_h = static_cast<float>(GetScreenHeight());
-    for(int x = position_.x; x <= screen_w; x += level_config::edge_weight){
-        DrawLineEx({(float)x, position_.y}, {(float)x, screen_h}, hud_config::decoration_grid_thickness, hud_config::decoration_grid_highlight);
+    for(int x = static_cast<int>(position_.x); x <= static_cast<int>(screen_w); x += static_cast<int>(level_config::edge_weight)){
+        DrawLineEx({static_cast<float>(x), position_.y}, {static_cast<float>(x), screen_h}, hud_config::decoration_grid_thickness, hud_config::decoration_grid_highlight);
     }
-    for(int y = position_.y; y <= screen_h; y += level_config::edge_weight){
-        DrawLineEx({position_.x, (float)y}, {screen_w, (float)y}, hud_config::decoration_grid_thickness, hud_config::decoration_grid_highlight);
+    for(int y = static_cast<int>(position_.y); y <= static_cast<int>(screen_h); y += static_cast<int>(level_config::edge_weight)){
+        DrawLineEx({position_.x, static_cast<float>(y)}, {screen_w, static_cast<float>(y)}, hud_config::decoration_grid_thickness, hud_config::decoration_grid_highlight);
     }
 }
 // ------------------------------- draw strategies ------------------------------- //

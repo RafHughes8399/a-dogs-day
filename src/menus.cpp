@@ -8,7 +8,8 @@ menus::menu_builder menus::m_builder_;
 // ------------------------------- menu --------------------------------------- //
 void menus::menu::render(){
     // TODO
-    DrawRectangle(box_.x, box_.y, box_.width, box_.height, YELLOW);
+    DrawRectangle(static_cast<int>(box_.x), static_cast<int>(box_.y),
+        static_cast<int>(box_.width), static_cast<int>(box_.height), YELLOW);
     //DrawText(text_.c_str(), box_.x + 32, box_.y + 32, 32, BLACK);
     return;
 }
@@ -131,7 +132,7 @@ void menus::menu_graph::on_menu_interact_event(const events::interact_menu& even
     return;
 }
 void menus::menu_graph::on_key_press_event(const events::key_press& event){
-    size_t key = event.get_key();
+    int key = event.get_key();
     // check the edges of current, if there is a key match, "move" 
     size_t old_current = current_;
     for(auto & edge : graph_[current_].second){
@@ -152,4 +153,3 @@ void menus::menu_graph::on_key_press_event(const events::key_press& event){
 void menus::menu_graph::render(){
     graph_[current_].first.menu_->render();
 }
-

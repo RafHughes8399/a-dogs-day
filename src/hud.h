@@ -67,7 +67,7 @@ namespace hud{
                 }
                 edit_wheel_strategy(sprite::sprite* sprite, Vector2* position)
                 : event_strategy(std::make_unique<events::event_handler<events::edit_hold>>([this](const events::edit_hold& event) -> void {on_event(event);})), 
-                position_(position), sprite_(sprite){
+                sprite_(sprite), position_(position){
                     subscribe();
                 }
                 void on_event(const events::event& event) override{

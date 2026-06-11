@@ -33,7 +33,7 @@ bool level::level_graph::is_node_occupied(int node_id, int decoration_id){
 
 level::level_graph::node* level::level_graph::id_to_node(int id){
     // is it just as simple as 
-    return &graph_[id].first;
+    return &graph_[static_cast<size_t>(id)].first;
 }
 std::vector<int> level::level_graph::bfs(int start_id, int end_id){
     size_t visited_size = graph_.size();
@@ -41,7 +41,7 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
     // init all with -1 
     bool found = false;
     
-    visited[start_id] = start_id;
+    visited[static_cast<size_t>(start_id)] = start_id;
     
     auto nodes = std::queue<int>();
     nodes.push(start_id);
@@ -54,7 +54,7 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
         }
         else{
             // for each outgoing edge from current 
-            for(auto & edge : graph_[current].second){
+            for(auto & edge : graph_[static_cast<size_t>(current)].second){
                 // if not visited, and closer to the end 
                 // TODO and not "occupied", like not blocked by a decoration
                 /**
@@ -63,10 +63,11 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
                  * ? closer" path may not exist
                  */
                 auto closer = is_node_closer(current, edge.destination_->id_, end_id);
+                (void) closer;
                 auto empty = is_node_empty(edge.destination_->id_);
                 // then explore if not visited and if empty
-                if(visited[edge.destination_->id_] == -1 && empty){
-                    visited[edge.destination_->id_] = current;
+                if(visited[static_cast<size_t>(edge.destination_->id_)] == -1 && empty){
+                    visited[static_cast<size_t>(edge.destination_->id_)] = current;
                     nodes.push(edge.destination_->id_);
                 }
             }
@@ -100,7 +101,7 @@ std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end, V
     auto node_path = bfs(start_node, end_node);
 
     auto position_path = std::vector<Vector2>();
-    make_position_path(position_path, node_path, start_node, end_node);
+    make_position_path(position_path, node_path, static_cast<size_t>(start_node), static_cast<size_t>(end_node));
 
     return position_path;
 } 
@@ -110,7 +111,6 @@ int level::level_graph::categorise_node(int row, int column){
     bool bottom_row = row == num_rows_ - 1;
     bool first_column = column == 0;
     bool last_column = column == row_length_ - 1;
-    bool first_or_last = column == 0; // || column == max_column;
 
     bool corner = ((top_row || bottom_row) && first_column) || ((top_row || bottom_row) && last_column);
     bool perimeter = (top_row || bottom_row) || (first_column || last_column);
@@ -122,8 +122,8 @@ int level::level_graph::categorise_node(int row, int column){
 // similar to the function below, but assumes that the position is 
 // a clean multiple of edge weight
 int level::level_graph::position_to_node(Vector2 position){
-    int row = position.y / level_config::edge_weight;
-    int col= position.x / level_config::edge_weight;
+    int row = static_cast<int>(position.y / level_config::edge_weight);
+    int col= static_cast<int>(position.x / level_config::edge_weight);
 
     return (row * row_length_ ) + col;
 }
@@ -154,6 +154,8 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
     bool bottom_row = row == num_rows_ -1;
     bool left_column = column == 0;
     bool right_column = column == row_length_ - 1;
+    (void) bottom_row;
+    (void) right_column;
     std::vector<edge> edges = {};
     int source_index = (row * row_length_) + column; // index of the current node
     int destination_index = source_index;
@@ -161,53 +163,57 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
 
     if(top_row && left_column){ // top left corner
         destination_index = source_index + row_length_;
-        auto y_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_plus);
         destination_index = source_index + 1;
-        auto x_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto x_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_plus);
         
         destination_index = source_index + row_length_ + 1;
-        auto x_plus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_plus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_plus_y_plus;
         // edges.push_back(x_plus_y_plus);
     } 
     else if(top_row && ! left_column){ // top right corner
         destination_index = source_index + row_length_;
-        auto y_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_plus);
         
         destination_index = source_index - 1;
-        auto x_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto x_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_minus);
         
         destination_index = source_index - row_length_ - 1;
-        auto x_minus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_minus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_minus_y_plus;
         // edges.push_back(x_minus_y_plus);
     }
     else if(! top_row && left_column){ // bottom left corner
         destination_index = source_index - row_length_;
-        auto y_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_minus);
 
         destination_index = source_index + 1;
-        auto x_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto x_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_plus);
         
         destination_index = source_index - row_length_ + 1;
-        auto x_plus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};      
+        auto x_plus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};      
+        (void) x_plus_y_minus;
         // edges.push_back(x_plus_y_minus);  
     } 
     else if(! top_row && ! left_column){
         destination_index = source_index - row_length_;
-        auto y_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_minus);
         
         destination_index = source_index - 1;
-        auto x_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto x_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_minus);
 
         destination_index = source_index - row_length_ - 1;
-        auto x_minus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_minus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_minus_y_minus;
         // edges.push_back(x_minus_y_minus);
     } // bottom right corner
     return edges;
@@ -219,37 +225,41 @@ std::vector<level::level_graph::edge> level::level_graph::build_interior_edges(i
     int destination_index = source_index;
     
     destination_index = source_index - row_length_;
-    auto y_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+    auto y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
     edges.push_back(y_minus);
 
     destination_index =  source_index + row_length_;
-    auto y_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+    auto y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
     edges.push_back(y_plus);
     
     destination_index = source_index - 1;
-    auto x_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+    auto x_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
     edges.push_back(x_minus);
 
     destination_index = source_index + 1;
-    auto x_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+    auto x_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
     edges.push_back(x_plus);
     
     auto hypotenuse_weight = std::hypotf(level_config::edge_weight, level_config::edge_weight);
     
     destination_index = source_index - row_length_ - 1;
-    auto x_minus_y_minus =  edge{&graph_[destination_index].first, hypotenuse_weight};
+    auto x_minus_y_minus =  edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+    (void) x_minus_y_minus;
     // edges.push_back(x_minus_y_minus);
     
     destination_index = source_index - row_length_ +  1;
-    auto x_plus_y_minus =  edge{&graph_[destination_index].first, hypotenuse_weight};
+    auto x_plus_y_minus =  edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+    (void) x_plus_y_minus;
     // edges.push_back(x_plus_y_minus);
     
     destination_index = source_index + row_length_ - 1;
-    auto x_minus_y_plus =  edge{&graph_[destination_index].first, hypotenuse_weight};
+    auto x_minus_y_plus =  edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+    (void) x_minus_y_plus;
     // edges.push_back(x_minus_y_plus);
     
     destination_index = source_index + row_length_ + 1;
-    auto x_plus_y_plus =  edge{&graph_[destination_index].first, hypotenuse_weight};
+    auto x_plus_y_plus =  edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+    (void) x_plus_y_plus;
     // edges.push_back(x_plus_y_plus);
 
     return edges;   
@@ -267,84 +277,92 @@ std::vector<level::level_graph::edge> level::level_graph::build_perimeter_edges(
     std::vector<edge> edges = {};
     if(top_row){
         destination_index = source_index - 1;
-        auto x_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto x_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_minus);
 
         destination_index = source_index + 1;
-        auto x_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto x_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_plus);
 
         destination_index = source_index + row_length_;
-        auto y_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_plus);
         
         destination_index = source_index + row_length_ - 1;
-        auto x_minus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_minus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_minus_y_plus;
         // edges.push_back(x_minus_y_plus);
         
         destination_index = source_index + row_length_ + 1;
-        auto x_plus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_plus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_plus_y_plus;
         // edges.push_back(x_plus_y_plus);
     }
     else if(bottom_row){
         destination_index = source_index - 1;
-        auto x_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto x_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_minus);
 
         destination_index = source_index + 1;
-        auto x_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto x_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_plus);
 
         destination_index = source_index - row_length_;
-        auto y_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_minus);
         
         destination_index = source_index - row_length_ - 1;
-        auto x_minus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_minus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_minus_y_minus;
         // edges.push_back(x_minus_y_minus);
         
         destination_index = source_index - row_length_ + 1;
-        auto x_plus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_plus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_plus_y_minus;
         // edges.push_back(x_plus_y_minus);
     }
     else if(left_column){
         destination_index = source_index - row_length_;
-        auto y_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_minus);
         destination_index = source_index + row_length_;
-        auto y_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_plus);
         
         destination_index = source_index + 1;
-        auto x_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto x_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_plus);
         
         destination_index = source_index - row_length_ + 1;
-        auto x_plus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_plus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_plus_y_minus;
         // edges.push_back(x_plus_y_minus);
 
         destination_index = source_index + row_length_ + 1;
-        auto x_plus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_plus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_plus_y_plus;
         // edges.push_back(x_plus_y_plus);
     }
     else if(right_column){
         destination_index = source_index - row_length_;
-        auto y_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_minus);
         destination_index = source_index + row_length_;
-        auto y_plus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_plus);
         
         destination_index = source_index -1;
-        auto x_minus = edge{&graph_[destination_index].first, level_config::edge_weight};
+        auto x_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_minus);
         
         destination_index = source_index - row_length_ - 1;
-        auto x_minus_y_minus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_minus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_minus_y_minus;
         // edges.push_back(x_minus_y_minus);
 
         destination_index = source_index + row_length_ - 1;
-        auto x_minus_y_plus = edge{&graph_[destination_index].first, hypotenuse_weight};
+        auto x_minus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
+        (void) x_minus_y_plus;
         // edges.push_back(x_minus_y_plus);
     }
     return edges;
@@ -356,8 +374,8 @@ void level::level_graph::build_edges(){
         auto & n = node.first;
         auto & edges = node.second;
         // determine node, based on its row and its column
-        int node_row = n.position_.y / level_config::edge_weight;
-        int node_column = n.position_.x / level_config::edge_weight;
+        int node_row = static_cast<int>(n.position_.y / level_config::edge_weight);
+        int node_column = static_cast<int>(n.position_.x / level_config::edge_weight);
         // enum the node tpyes and do a switch
         auto node_type = categorise_node(node_row, node_column);
         auto node_edges = std::vector<edge>{};
@@ -383,8 +401,8 @@ void level::level_graph::build_nodes(int level_x, int level_y){
     // goes across the row, and then down the column so you. a node can be found by
     // ! (row * row_length) + column
     int num_nodes = 0;
-    for(int y = 0; y < level_y; y += level_config::edge_weight){
-        for(int x = 0; x < level_x; x += level_config::edge_weight){
+    for(int y = 0; y < level_y; y += static_cast<int>(level_config::edge_weight)){
+        for(int x = 0; x < level_x; x += static_cast<int>(level_config::edge_weight)){
             Vector2 node_position = Vector2 {static_cast<float>(x),static_cast<float>(y)};
             insert_node(num_nodes, node_position);
             num_nodes++;
@@ -397,6 +415,9 @@ void level::level_graph::insert_node(int id, Vector2 position){
     return;
 }
 void level::level_graph::insert_edge(int source_num, node& destination, float weight){
+    (void) source_num;
+    (void) destination;
+    (void) weight;
     return;
 }
 // returns true if there is a decoration there, that is not the id one
@@ -422,7 +443,7 @@ void level::level_graph::update_decoration(Rectangle rectangle, int id){
             auto position = Vector2{col, row};
             int node_index = position_to_node(position);
 
-            graph_[node_index].first.decoration_ = id;
+            graph_[static_cast<size_t>(node_index)].first.decoration_ = id;
         }
     }
 }
@@ -438,28 +459,30 @@ void level::level_graph::on_moved_decoration(const events::moved_decoration& eve
 }
 void level::level_graph::on_placed_decoration(const events::placed_decoration& event){
 
-    update_decoration(event.get_rectangle(), event.get_id());
+    update_decoration(event.get_rectangle(), static_cast<int>(event.get_id()));
 }
 void level::level_graph::render(Rectangle frame){
     for(auto x = frame.x; x <= frame.x + frame.width; x += level_config::edge_weight){
         for(auto y = frame.y; y <= frame.y + frame.height; y += level_config::edge_weight){
             // (row * row_length) + col
-            int row = y / level_config::edge_weight;
-            int row_length = level_config::world_x / level_config::edge_weight;
-            int col = x / level_config::edge_weight;
+            int row = static_cast<int>(y / level_config::edge_weight);
+            int row_length = static_cast<int>(level_config::world_x / level_config::edge_weight);
+            int col = static_cast<int>(x / level_config::edge_weight);
             int index = (row * row_length) + col;
-            auto position = graph_[index].first.position_;
-            if(graph_[index].first.decoration_ == level_config::empty_node){
-                DrawCircle(position.x, position.y, 15, DARKGREEN);
+            auto position = graph_[static_cast<size_t>(index)].first.position_;
+            if(graph_[static_cast<size_t>(index)].first.decoration_ == level_config::empty_node){
+                DrawCircle(static_cast<int>(position.x), static_cast<int>(position.y), 15, DARKGREEN);
             }
             else{
-                DrawCircle(position.x, position.y, 15, RED);
+                DrawCircle(static_cast<int>(position.x), static_cast<int>(position.y), 15, RED);
             }
-            DrawText(TextFormat("%d", graph_[index].first.id_), position.x, position.y, 12, WHITE);
+            DrawText(TextFormat("%d", graph_[static_cast<size_t>(index)].first.id_),
+                static_cast<int>(position.x), static_cast<int>(position.y), 12, WHITE);
             
-            auto edges = graph_[index].second;
+            auto edges = graph_[static_cast<size_t>(index)].second;
             for(auto & e : edges){
-                DrawLine(position.x, position.y, e.destination_->position_.x, e.destination_->position_.y, DARKGREEN);
+                DrawLine(static_cast<int>(position.x), static_cast<int>(position.y),
+                    static_cast<int>(e.destination_->position_.x), static_cast<int>(e.destination_->position_.y), DARKGREEN);
             }
         }
     }

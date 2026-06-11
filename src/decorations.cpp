@@ -11,6 +11,7 @@
 void entities::decoration::on_moved_cursor(const events::moved_cursor& event){
     move(event.get_position());
     // and let the hud_element know too
+    return;
 }
 
 void entities::decoration::subscribe_to_cursor(){

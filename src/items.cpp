@@ -184,6 +184,7 @@ std::unique_ptr<items::shop_item> items::item_builder::snack_cupboard(){
 // -------------------------------------- inventory item ---------------------------------- //
 // -------------------------------------- shop item ---------------------------------- //
 bool items::shop_item::can_buy(){
+    (void) price_;
     return locked_state_->can_buy(); // and if the price is greater or equal
 }
 bool items::shop_item::is_locked(){

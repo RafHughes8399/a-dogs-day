@@ -46,7 +46,7 @@ void player::player::carrying_decoration::left_click(player& player){
 
 void player::player::on_selected_dog(const events::selected_dog& event){
     auto id = event.get_id();
-    selected_dog_ = id;
+    selected_dog_ = static_cast<int>(id);
 }
 
 void player::player::back(){

@@ -57,7 +57,7 @@ namespace events{
 		public:
 			virtual ~event() = default;	
 			event(int id, float delay=0.0f)
-			: type_(id), handled_(false), delay_(delay){}
+			: handled_(false), type_(id), delay_(delay){}
 			
 			event(event&& other) = default;
 			event& operator=(event&& other) = delete;
@@ -70,7 +70,7 @@ namespace events{
 			}
 			bool update_delay(float delta){
 				delay_ = std::max(0.0f, delay_ - delta);
-				return delay_ == 0;
+				return delay_ <= 0.0f;
 			}
 			protected:
 			bool handled_ = false;
@@ -452,6 +452,12 @@ namespace events{
 	class event_handler_interface{
 		public:
 		virtual ~event_handler_interface() = default;
+		event_handler_interface() = default;
+		event_handler_interface(const event_handler_interface& other) = default;
+		event_handler_interface(event_handler_interface&& other) = default;
+
+		event_handler_interface& operator=(const event_handler_interface& other) = delete;
+		event_handler_interface& operator=(event_handler_interface&& other) = delete;
 		void execute(const event& e){
 			call_event(e);
 		}

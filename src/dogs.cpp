@@ -97,7 +97,7 @@ void entities::player_dog::interact(entity& other){
     return;
 }
 void entities::player_dog::on_dog_select_event(const events::selected_dog& event){
-    auto dog_id = event.get_id();
+    auto dog_id = static_cast<int>(event.get_id());
     if(dog_id == id_){
         select();
     }

@@ -22,6 +22,7 @@ void level::level::render(int frame){
     auto render_precdicate = [this](entities::entity*& entity) -> bool { // auto is std::unique_ptr<entity>
         const Rectangle& entity_box = entity->get_hitbox().get_box();
         auto position = entity->get_position();
+        (void) position;
 
         return view_frame_.x <= entity_box.x && view_frame_.y <= entity_box.y 
         && (view_frame_.x + view_frame_.width) >= (entity_box.x + entity_box.width) 
@@ -41,14 +42,14 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
     level_entities_.insert(std::move(entity));
     // insert into the draw layer ?
     render_layers_[layer].add_entity(entity_raw);
-    id_entity_map_[entity_raw->get_id()] = entity_raw;
+    id_entity_map_[static_cast<int>(entity_raw->get_id())] = entity_raw;
 }
 
 int level::level::entity_id(){
-    return level_entities_.get_next_id();
+    return static_cast<int>(level_entities_.get_next_id());
 }
 int level::level::num_entities(){
-    return level_entities_.size();
+    return static_cast<int>(level_entities_.size());
 }
 
 void level::level::on_left_mouse_click_event(const events::left_mouse_click& event){
@@ -63,7 +64,7 @@ void level::level::on_move_view_frame_event(const events::move_view_frame& event
 }
 void level::level::on_right_mouse_event(const events::right_mouse_click& event){
     auto click_position = event.get_mouse_position();
-    auto paw = entities::e_builder.build_paw_mark(click_position, level_entities_.get_next_id());
+    auto paw = entities::e_builder.build_paw_mark(click_position, static_cast<int>(level_entities_.get_next_id()));
     add_entity(std::move(paw), level_config::draw_layers::hud);
 
     auto dog_id = event.get_selected_dog();
