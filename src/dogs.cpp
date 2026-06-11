@@ -293,3 +293,41 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
         id,
         next_debug_id("pd_"));
 }
+
+// NPC dog sprite art/config pending.
+// std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(Vector2 position, int id){
+//     auto npc_left_texture = textures::textures_.get_texture(textures::npc_dog_left, entity_config::npc_dog_left_path);
+//     auto npc_right_texture = textures::textures_.get_texture(textures::npc_dog_right, entity_config::npc_dog_right_path);
+//
+//     auto npc_left_sprite = sprite::sprite(npc_left_texture,
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_width],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_height],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frames],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::animations]);
+//     auto npc_right_sprite = sprite::sprite(npc_right_texture,
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_width],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_height],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frames],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::animations]);
+//
+//     auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
+//     std::vector<sprite::sprite> sprites;
+//     sprites.push_back(std::move(npc_left_sprite));
+//     sprites.push_back(std::move(npc_right_sprite));
+//     std::vector<hitbox::hitbox> hitboxes;
+//     hitboxes.push_back(across_hitbox);
+//     hitboxes.push_back(across_hitbox);
+//     auto body = body::body(hitboxes, sprites);
+//
+//     // Head sprite art pending.
+//     // auto npc_head_left_texture = textures::textures_.get_texture(textures::npc_dog_head_left, entity_config::npc_dog_head_left_path);
+//     // auto npc_head_right_texture = textures::textures_.get_texture(textures::npc_dog_head_right, entity_config::npc_dog_head_right_path);
+//     auto head = body::body();
+//
+//     return std::make_unique<entities::npc_dog>(
+//         std::move(body),
+//         std::move(head),
+//         position,
+//         id,
+//         next_debug_id("npc_"));
+// }

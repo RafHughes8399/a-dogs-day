@@ -8,13 +8,15 @@
 
 #include  "menus.h"
 #include "level.h"
+#include "maitre_d.h"
 #include "player.h"
 namespace game{
     class game {
         public:
             ~game() = default;
             game(level::level& level, player::player& player, menus::menu_graph& menu, player::controls& controls)
-                : level_(level), player_(player), frame_count_(0), menus_(menu), controls_(controls){}
+                : frame_count_(0), level_(level), maitre_d_(maitre_d::maitre_d::get_instance()),
+                menus_(menu), controls_(controls), player_(player){}
             game(const game& other) = default;
             game(game&& other) = default;
 
@@ -29,6 +31,7 @@ namespace game{
             int frame_count_;
             
             level::level& level_;
+            maitre_d::maitre_d& maitre_d_;
             menus::menu_graph& menus_;
             player::controls& controls_;
             player::player& player_;

@@ -78,7 +78,11 @@ void player::player::edit(float delta){
     }
 }
 
-
+void player::player::cancel_incomplete_edit_hold(){
+    if(edit_meter_ > 0 && edit_meter_ < game_config::hold_duration){
+        reset_meter();
+    }
+}
 
 void player::player::exit_edit(){
     edit_buffer_ = game_config::edit_cooldown;

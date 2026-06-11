@@ -38,6 +38,11 @@ namespace textures{
         // khiri_head_right = 17,
         // mack_head_left = 18,
         // mack_head_right = 19,
+        // NPC dog sprite art pending.
+        // npc_dog_left = 20,
+        // npc_dog_right = 21,
+        // npc_dog_head_left = 22,
+        // npc_dog_head_right = 23,
         size = 16
         // and so on
     };

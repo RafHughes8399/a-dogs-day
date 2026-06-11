@@ -97,6 +97,11 @@ namespace entity_config{
     inline const char* test_decoration_path ="../sprites/test_decoration.png";
     inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle_void.png";
     inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
+    // NPC dog sprite art pending.
+    // inline const char* npc_dog_left_path = "../sprites/npc_dog_left.png";
+    // inline const char* npc_dog_right_path = "../sprites/npc_dog_right.png";
+    // inline const char* npc_dog_head_left_path = "../sprites/npc_dog_head_left.png";
+    // inline const char* npc_dog_head_right_path = "../sprites/npc_dog_head_right.png";
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
     enum attributes{
         frame_width = 0,
@@ -121,6 +126,11 @@ namespace entity_config{
     // inline const Vector2 mack_head_right_offset = Vector2{0.0f, 0.0f};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (3/02)
     inline const float gargoyle_decoration_attributes[attributes::size] = {level_config::edge_weight * 0.75f, level_config::edge_weight * 1.75f, 1.0f, 1.0f};
+    inline const float table_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
+    // inline const float npc_dog_across_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
+    // inline const float npc_dog_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    // inline const Vector2 npc_dog_head_left_offset = Vector2{0.0f, 0.0f};
+    // inline const Vector2 npc_dog_head_right_offset = Vector2{0.0f, 0.0f};
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     
 }

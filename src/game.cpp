@@ -4,6 +4,7 @@ void game::game::update(float delta){
     // deal with queued events 
     // std::cout << "[game update]: update" << std::endl;
     events::global_dispatcher_.process_events(delta);
+    maitre_d_.process_events();
     // update the level
     level_.update(delta, frame_count_);
     // then the player

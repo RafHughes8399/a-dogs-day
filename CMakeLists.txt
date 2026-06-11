@@ -140,6 +140,9 @@ link_libraries(graph)
 add_library(level src/level.cpp)
 link_libraries(level)
 
+add_library(maitre_d src/maitre_d.cpp src/maitre_d_interface.cpp)
+link_libraries(maitre_d)
+
 add_library(game src/game.cpp)
 link_libraries(game)
 
@@ -149,7 +152,7 @@ target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
   raglib events queries animation sprite item menu hud hitbox body texture
   player controls entities cursor dogs decorations render_layer quadtree
-  graph level game ${PROJECT_NAME}
+  graph level maitre_d game ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})

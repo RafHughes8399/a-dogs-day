@@ -487,6 +487,7 @@ namespace entities{
 
             std::unique_ptr<entity> build_test_decoration(Vector2 position, int id);
             std::unique_ptr<entity> build_gargoyle(Vector2 position, int id);
+            std::unique_ptr<entity> build_table(Vector2 position, int id);
             ~entity_builder() = default;
             entity_builder() : debug_id_counts_() {}
             entity_builder(const entity_builder& other) = default;

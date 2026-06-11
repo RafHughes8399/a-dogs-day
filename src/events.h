@@ -45,8 +45,12 @@ namespace events{
 		decoration_move = 14,
 		decoration_place = 15,
 		hold_edit = 16,
-		empty = 18,
-		size = 17
+		empty = 17,
+		register_table = 18,
+		register_customer = 19,
+		request_customer_table = 20,
+		seat_customer_at_table = 21,
+		size = 22
 	};
 	class event{
 
@@ -306,6 +310,76 @@ namespace events{
 		private:
 			const Rectangle rectangle_;
 			const size_t id_;
+	};
+	// Cafe-domain fact: a table entity exists in the level and can be tracked by
+	// the maitre d'. The event carries ids only so the cafe/order system does not
+	// need concrete entity types or ownership of level entities.
+	class registered_table : public event{
+		public:
+			registered_table(size_t table_id)
+			: event(ids::register_table), table_id_(table_id){}
+
+			static int get_static_type(){
+				return ids::register_table;
+			}
+			size_t get_table_id() const{
+				return table_id_;
+			}
+		private:
+			const size_t table_id_;
+	};
+	// Cafe-domain fact: a customer dog exists in the level and can enter the
+	// restaurant flow. The maitre d' records the id, not the dog object.
+	class registered_customer : public event{
+		public:
+			registered_customer(size_t customer_id)
+			: event(ids::register_customer), customer_id_(customer_id){}
+
+			static int get_static_type(){
+				return ids::register_customer;
+			}
+			size_t get_customer_id() const{
+				return customer_id_;
+			}
+		private:
+			const size_t customer_id_;
+	};
+	// Cafe-domain fact/request: a customer dog needs a table assignment. The
+	// maitre d' listens for this and resolves it into command events later.
+	class requested_customer_table : public event{
+		public:
+			requested_customer_table(size_t customer_id)
+			: event(ids::request_customer_table), customer_id_(customer_id){}
+
+			static int get_static_type(){
+				return ids::request_customer_table;
+			}
+			size_t get_customer_id() const{
+				return customer_id_;
+			}
+		private:
+			const size_t customer_id_;
+	};
+	// Cafe-domain command: the maitre d' has decided which customer should sit at
+	// which table. A world-owning system, such as the level, should listen for
+	// this event and perform the concrete entity mutation/pathing by id.
+	class seat_customer_at_table : public event{
+		public:
+			seat_customer_at_table(size_t customer_id, size_t table_id)
+			: event(ids::seat_customer_at_table), customer_id_(customer_id), table_id_(table_id){}
+
+			static int get_static_type(){
+				return ids::seat_customer_at_table;
+			}
+			size_t get_customer_id() const{
+				return customer_id_;
+			}
+			size_t get_table_id() const{
+				return table_id_;
+			}
+		private:
+			const size_t customer_id_;
+			const size_t table_id_;
 	};
 	// when an view_Frame moves, main listener is the level to adjust the view_frame when the player
 	// moves it
