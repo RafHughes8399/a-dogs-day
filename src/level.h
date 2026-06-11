@@ -55,7 +55,7 @@ namespace level{
                 float weight_;
                 int decoration_ = level_config::empty_node; // -1 means empty, there is no decoration, any other number refers to the id of the decoration stored within
                 bool operator==(const edge& other){
-                    return destination_ == other.destination_ && weight_ == other.weight_;
+                    return destination_ == other.destination_ && std::fabs(weight_ - other.weight_) <= 0.0001f;
                 }
             };
             // builder 
@@ -92,10 +92,12 @@ namespace level{
                 query_interface::unsubscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
             }
             level_graph(int level_x, int level_y)
-            : graph_({}), num_rows_(level_y / level_config::edge_weight), row_length_(level_x / level_config::edge_weight),
-            moved_decoration_handler_([this](const events::moved_decoration& event) -> void{on_moved_decoration(event);}),
+            : moved_decoration_handler_([this](const events::moved_decoration& event) -> void{on_moved_decoration(event);}),
             placed_decoration_handler_([this](const events::placed_decoration& event) -> void{on_placed_decoration(event);}),
-            can_place_decoration_handler_([this](const queries::can_place_decoration& query) -> bool {return can_place_decoration(query);}){
+            num_rows_(static_cast<int>(level_y / level_config::edge_weight)),
+            row_length_(static_cast<int>(level_x / level_config::edge_weight)),
+            can_place_decoration_handler_([this](const queries::can_place_decoration& query) -> bool {return can_place_decoration(query);}),
+            graph_({}){
                 // ! columns is x, rows is y
                 build_nodes(level_x, level_y);
                 build_edges();
@@ -133,11 +135,12 @@ namespace level{
             event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
             }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
-            : background_(sprite), view_frame_(frame), dimensions_(dimensions), graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
-            level_entities_(tree::quadtree(raglib::bounding_box_2{Vector2Zero(), dimensions})), id_entity_map_({}),
-            left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
+            : left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
             move_view_frame_handler_([this](const events::move_view_frame& event) -> void{on_move_view_frame_event(event);}),
-            right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);})
+            right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);}),
+            graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
+            view_frame_(frame), background_(sprite), id_entity_map_({}),
+            level_entities_(tree::quadtree(raglib::bounding_box_2{Vector2Zero(), dimensions}))
             {
                 event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
                 event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
@@ -171,7 +174,6 @@ namespace level{
             std::map<int, entities::entity*> id_entity_map_;
             render_layer::layer render_layers_[level_config::size];
             tree::quadtree level_entities_;
-            Vector2 dimensions_;
 
 
     };

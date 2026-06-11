@@ -336,8 +336,8 @@ namespace entities{
             }
             player_dog(body::body body, body::body head, std::vector<sprite::sprite> outlines, Vector2 position, int id,
             std::string debug_id, int direction = level_config::directions::right, std::unique_ptr<player_dog::state> state = std::make_unique<unselected>())
-            : dog(body, head, position, id, std::move(debug_id), direction), outlines_(outlines), cosmetics_(), 
-            selected_state_(std::move(state)),
+            : dog(body, head, position, id, std::move(debug_id), direction), selected_state_(std::move(state)),
+            outlines_(outlines), cosmetics_(), 
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}),
             selected_dog_handler_([this](const events::selected_dog& event)->void {on_dog_select_event(event);}){
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
@@ -398,8 +398,9 @@ namespace entities{
     class decoration : public entity {
         public:
             decoration(body::body body, Vector2 position, int id, std::string debug_id)
-            : entity(body, position, id, std::move(debug_id)), pre_move_position_(position_), post_move_position_(position_),
-            moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ){
+            : entity(body, position, id, std::move(debug_id)),
+            moved_cursor_handler([this](const events::moved_cursor& event) -> void { on_moved_cursor(event);} ),
+            pre_move_position_(position_), post_move_position_(position_){
                 // upon creating a decoration, let the graph know where it was placed with the event
                 auto rectangle = body_.get_hitbox().get_box();
                 std::unique_ptr<events::event> place_decoration = std::make_unique<events::placed_decoration>(rectangle, id_);

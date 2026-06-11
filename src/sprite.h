@@ -13,14 +13,14 @@ namespace sprite{
     class sprite{
         public:
             ~sprite() = default;
-            sprite(Texture2D texture, float frame_width, float frame_height, int frames, int animations, Vector2 draw_position_offset = Vector2Zero())
-                : sprite_animation_(animation::animation(frame_width, frame_height, frames, animations)),
+            sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations, Vector2 draw_position_offset = Vector2Zero())
+                : sprite_animation_(animation::animation(frame_width, frame_height, static_cast<int>(frames), static_cast<int>(animations))),
                 sprite_texture_(texture),
                 draw_position_offset_(draw_position_offset){}
             sprite(const sprite& other) = default;
             sprite(sprite&& other) = default;
             
-            sprite& operator=(const sprite& other) = default;
+            sprite& operator=(const sprite& other) = delete;
             sprite& operator=(sprite&& other) = delete;
 
             animation::animation& get_animation();
@@ -37,7 +37,7 @@ namespace sprite{
         public:
             ~spriteset() = default;
             spriteset(std::vector<sprite>& sprites, size_t index = 0)
-            : sprites_(sprites), current_(index){}
+            : current_(index), sprites_(sprites){}
             spriteset(const spriteset& other) = default;
             spriteset(spriteset&& other) = default;
 

@@ -65,8 +65,8 @@ namespace items{
                 event_interface::unsubscribe<events::level_up>(level_up_handler_);
             }
             shop_item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name, int price, int level_req)
-            : item(id, icon, sprite, name), price_(price), level_requirement_(level_req), locked_state_(std::make_unique<locked>()),
-            level_up_handler_([this](const events::level_up& event)->void {on_level_up_event(event);}){
+            : item(id, icon, sprite, name), level_up_handler_([this](const events::level_up& event)->void {on_level_up_event(event);}),
+            price_(price), level_requirement_(level_req), locked_state_(std::make_unique<locked>()){
                 event_interface::subscribe<events::level_up>(level_up_handler_);
 
             }

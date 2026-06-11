@@ -12,6 +12,7 @@
     
     template<typename Q, typename T> // q for query
     inline void unsubscribe(queries::query_executor<T>& executor, const queries::query_handler<Q, T>& handler){
+        (void) handler;
         executor.unsubscribe(Q::get_static_type());
     } 
     template<typename T>

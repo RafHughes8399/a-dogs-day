@@ -86,9 +86,10 @@ namespace player{
                 event_interface::unsubscribe<events::selected_dog>(select_dog_handler_);
             }
             player(int selected_dog = level_config::mack_id)
-            : mouse_position_(GetMousePosition()), mouse_controls_(controls_config::mouse_controls), key_press_controls_({}),
-            key_hold_controls_({}), selected_dog_(selected_dog), state_(std::make_unique<state>(hud::hud::hud_types::base)), hud_(hud::h_builder_.build_player_hud()),
-            select_dog_handler_([this](const events::selected_dog& event) -> void{on_selected_dog(event);}){
+            : select_dog_handler_([this](const events::selected_dog& event) -> void{on_selected_dog(event);}),
+            hud_(hud::h_builder_.build_player_hud()), selected_dog_(selected_dog),
+            mouse_controls_(controls_config::mouse_controls), key_hold_controls_({}), key_press_controls_({}),
+            state_(std::make_unique<state>(hud::hud::hud_types::base)), mouse_position_(GetMousePosition()){
                 std::cout << "[player constructor] : completed init list " << std::endl;
                 event_interface::subscribe(select_dog_handler_);
                 setup_control_maps();
@@ -153,9 +154,10 @@ namespace player{
                 event_interface::unsubscribe<events::exit_edit_mode>(exit_edit_mode_handler_);
             }
             controls(player* player, size_t index = control_states::regular)
-            :player_(player), current_scheme_(index),
+            : current_scheme_(index),
             enter_edit_mode_handler_([this](const events::enter_edit_mode& event) -> void {on_enter_edit_mode(event);}),
-            exit_edit_mode_handler_([this](const events::exit_edit_mode& event) -> void {on_exit_edit_mode(event);})
+            exit_edit_mode_handler_([this](const events::exit_edit_mode& event) -> void {on_exit_edit_mode(event);}),
+            player_(player)
             {
 
                 build_controls();

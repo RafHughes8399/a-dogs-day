@@ -28,7 +28,8 @@ void body::body::render(Vector2 position, int frame){
     // temp for debug purposes
     auto box = hitboxes_[index_].get_box();
     // draw the hitbox at its actual place 
-    DrawRectangleLines(box.x, box.y, box.width, box.height, GREEN);
+    DrawRectangleLines(static_cast<int>(box.x), static_cast<int>(box.y),
+        static_cast<int>(box.width), static_cast<int>(box.height), GREEN);
 }
 
 void body::body::update_hitboxes(Vector2 new_position){

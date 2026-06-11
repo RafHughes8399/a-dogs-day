@@ -96,11 +96,11 @@ namespace tree{
         }
         // creates an empty quadtree with a root node
         quadtree(raglib::bounding_box_2 root_bounds, int depth=MAX_DEPTH)
-        : root_(std::make_unique<node>()), max_depth_(depth), next_id_(0), next_ids_(),
-        interact_entity_handler_([this](const events::interact_entity& event) -> void {on_interact_event(event);}), 
-        moved_entity_handler_([this](const events::move_entity& event) -> void {on_move_event(event);}), 
+        : moved_entity_handler_([this](const events::move_entity& event) -> void {on_move_event(event);}), 
         removed_entity_handler_([this](const events::remove_entity& event) -> void {on_remove_event(event);}),
-        is_colliding_handler_([this](const queries::is_colliding_query& query) -> bool {return on_is_colliding_query(query);}) {
+        interact_entity_handler_([this](const events::interact_entity& event) -> void {on_interact_event(event);}), 
+        is_colliding_handler_([this](const queries::is_colliding_query& query) -> bool {return on_is_colliding_query(query);}),
+        max_depth_(depth), next_ids_(), next_id_(0), root_(std::make_unique<node>()) {
             root_->bounds_ = root_bounds;
             root_->life_ = 0;
             root_->depth_ = 0;
@@ -126,11 +126,11 @@ namespace tree{
         
         // copy and move overloads, root, depth and next id
         quadtree(const quadtree& other)
-        :  max_depth_(other.max_depth_), next_id_(other.next_id_), next_ids_(other.next_ids_),
-        interact_entity_handler_(other.interact_entity_handler_), 
-        moved_entity_handler_(other.moved_entity_handler_), 
+        : moved_entity_handler_(other.moved_entity_handler_), 
         removed_entity_handler_(other.removed_entity_handler_),
-        is_colliding_handler_(other.is_colliding_handler_){
+        interact_entity_handler_(other.interact_entity_handler_), 
+        is_colliding_handler_(other.is_colliding_handler_),
+        max_depth_(other.max_depth_), next_ids_(other.next_ids_), next_id_(other.next_id_){
             root_ = copy_tree(other.root_.get(), nullptr);
             event_interface::subscribe<events::interact_entity>(interact_entity_handler_);
             event_interface::subscribe<events::move_entity>(moved_entity_handler_);

@@ -13,7 +13,7 @@ void render_layer::layer::remove_entity(entities::entity* entity){
 
 void render_layer::layer::remove_entities(std::vector<int> entity_ids){
     for(auto it = entities_.begin(); it != entities_.end();){
-        size_t current_id = (*it)->get_id();
+        int current_id = (*it)->get_id();
         bool removed = false;
         for(auto & remove_id : entity_ids){
             if(remove_id == current_id){

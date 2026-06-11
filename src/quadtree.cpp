@@ -120,7 +120,7 @@ void tree::quadtree::erase(std::unique_ptr<node>& tree, size_t object_id){
     } 
     auto new_end = std::remove_if(tree->objects_.begin(), tree->objects_.end(),
         [object_id](auto& obj) -> bool{
-            if(object_id == obj->get_id()){
+            if(object_id == static_cast<size_t>(obj->get_id())){
                 return true;
             }
             return false;
@@ -144,7 +144,7 @@ std::unique_ptr<entities::entity> tree::quadtree::extract(std::unique_ptr<node>&
     // find them remove
     auto entity = std::find_if(tree->objects_.begin(), tree->objects_.end(),
         [object_id](auto& obj) -> bool{
-            if(object_id == obj->get_id()){
+            if(object_id == static_cast<size_t>(obj->get_id())){
                 return true;
             }
             return false;
@@ -262,7 +262,7 @@ bool tree::quadtree::is_leaf(std::unique_ptr<node>& tree) {
 entities::entity* tree::quadtree::get_entity(std::unique_ptr<node>& tree, size_t id){
     if(! tree) {return nullptr;}
     for(auto & entity : tree->objects_){
-        if(entity->get_id() == id){
+        if(static_cast<size_t>(entity->get_id()) == id){
             return entity.get();
         }
     }
@@ -338,6 +338,7 @@ void tree::quadtree::prune_leaves(std::unique_ptr<node>& tree, double delta) {
 } 
 
 std::unique_ptr<tree::quadtree::node> tree::quadtree::copy_tree(node* tree, std::unique_ptr<node>* parent){
+    (void) parent;
     if(! tree){
         return nullptr;
     }
@@ -363,6 +364,7 @@ void tree::quadtree::traverse_tree(std::unique_ptr<node>& tree){
 			return;
 		}
 		for(auto& object : tree->objects_){
+            (void) object;
 		}
 		for(auto& child : tree->children_){
 			traverse_tree(child);
@@ -390,7 +392,7 @@ std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta
                 break;
             case entities::status_codes::dead:
                 to_remove.push_back((*it)->get_id());
-                next_ids_.push((*it)->get_id());
+                next_ids_.push(static_cast<size_t>((*it)->get_id()));
                 graveyard.push_back(std::move(*it));
                 it = tree->objects_.erase(it);
                 break;
@@ -428,8 +430,8 @@ void tree::quadtree::identify_collisions(std::unique_ptr<node>& tree , std::vect
     // so if object 1 is checked against 2 ,
     // then it avoids checking object two against 1, and so on
     if(tree->objects_.size() > 1 ){
-        for(auto i = 0; i < tree->objects_.size() - 1; ++i){
-            for(auto j = i + 1; j < tree->objects_.size(); ++j){
+        for(size_t i = 0; i < tree->objects_.size() - 1; ++i){
+            for(size_t j = i + 1; j < tree->objects_.size(); ++j){
                 auto i_rectangle = tree->objects_[i]->get_hitbox().get_box();
 
                 auto j_rectangle = tree->objects_[j]->get_hitbox().get_box();
