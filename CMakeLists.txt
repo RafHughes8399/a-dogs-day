@@ -156,6 +156,7 @@ set(PROJECT_TARGETS
 )
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})
+  target_include_directories(${target} SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)
 endforeach()
 
 # Web Configurations

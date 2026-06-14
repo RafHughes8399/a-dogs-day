@@ -14,7 +14,9 @@
 #define MAITRE_D_H
 
 #include "events.h"
+#include "raylib.h"
 #include <cstddef>
+#include <queue>
 #include <unordered_map>
 
 namespace maitre_d{
@@ -27,11 +29,12 @@ namespace maitre_d{
     };
 
     enum customer_status{
-        waiting_for_table = 0,
-        going_to_table = 1,
-        seated = 2,
-        eating = 3,
-        leaving = 4
+        registered = 0,
+        waiting_for_table = 1,
+        going_to_table = 2,
+        seated = 3,
+        eating = 4,
+        leaving = 5
     };
 
     // Table availability lives here rather than on the table entity. A table
@@ -47,6 +50,14 @@ namespace maitre_d{
         size_t customer_id;
         customer_status status;
         size_t table_id;
+    };
+
+    // A queue slot is a physical waiting spot in the cafe. The queue order is
+    // the dog's place in line; its position is the world target the level can
+    // path the dog toward. empty_id means the slot is free.
+    struct queue_slot{
+        Vector2 position;
+        size_t dog_id;
     };
 
     namespace interface{
@@ -80,6 +91,7 @@ namespace maitre_d{
             void on_registered_table_event(const events::registered_table& event);
             void on_registered_customer_event(const events::registered_customer& event);
             void on_requested_customer_table_event(const events::requested_customer_table& event);
+            void on_customer_dog_arrived_event(const events::customer_dog_arrived& event);
 
         private:
             maitre_d();
@@ -106,9 +118,25 @@ namespace maitre_d{
             std::unordered_map<size_t, table_record> tables_;
             std::unordered_map<size_t, customer_record> customers_;
 
+            // Physical customer queue sketch:
+            // customer_dog_arrived(customer_id)
+            //   -> place the dog in the first free queue slot
+            //   -> emit/request pathing to queue_slot.position
+            //
+            // customer_dog_sent_to_table(customer_id, table_id)
+            //   -> clear the dog's queue slot
+            //   -> use the head slot position as the table pathing start
+            //   -> compact_queue()
+            //
+            // move_queue_forward()
+            //   -> each dog behind the head moves one slot forward
+            //   -> emit/request pathing to the new queue_slot.position
+            std::queue<queue_slot> waiting_customer_queue_;
+
             events::event_handler<events::registered_table> registered_table_handler_;
             events::event_handler<events::registered_customer> registered_customer_handler_;
             events::event_handler<events::requested_customer_table> requested_customer_table_handler_;
+            events::event_handler<events::customer_dog_arrived> customer_dog_arrived_handler_;
     };
 }
 

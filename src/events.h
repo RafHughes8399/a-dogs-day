@@ -50,7 +50,9 @@ namespace events{
 		register_customer = 19,
 		request_customer_table = 20,
 		seat_customer_at_table = 21,
-		size = 22
+		customer_arrived = 22,
+		customer_sent_to_table = 23,
+		size = 24
 	};
 	class event{
 
@@ -370,6 +372,42 @@ namespace events{
 
 			static int get_static_type(){
 				return ids::seat_customer_at_table;
+			}
+			size_t get_customer_id() const{
+				return customer_id_;
+			}
+			size_t get_table_id() const{
+				return table_id_;
+			}
+		private:
+			const size_t customer_id_;
+			const size_t table_id_;
+	};
+	// Cafe-domain fact: a customer dog has entered the cafe and should be placed
+	// into the physical waiting queue managed by the maitre d'.
+	class customer_dog_arrived : public event{
+		public:
+			customer_dog_arrived(size_t customer_id)
+			: event(ids::customer_arrived), customer_id_(customer_id){}
+
+			static int get_static_type(){
+				return ids::customer_arrived;
+			}
+			size_t get_customer_id() const{
+				return customer_id_;
+			}
+		private:
+			const size_t customer_id_;
+	};
+	// Cafe-domain command/fact: the maitre d' has taken a customer dog out of
+	// the waiting queue and sent it toward an assigned table.
+	class customer_dog_sent_to_table : public event{
+		public:
+			customer_dog_sent_to_table(size_t customer_id, size_t table_id)
+			: event(ids::customer_sent_to_table), customer_id_(customer_id), table_id_(table_id){}
+
+			static int get_static_type(){
+				return ids::customer_sent_to_table;
 			}
 			size_t get_customer_id() const{
 				return customer_id_;
