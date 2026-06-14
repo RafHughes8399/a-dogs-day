@@ -16,8 +16,8 @@
 #include "events.h"
 #include "raylib.h"
 #include <cstddef>
-#include <queue>
 #include <unordered_map>
+#include <vector>
 
 namespace maitre_d{
     inline constexpr size_t empty_id = static_cast<size_t>(-1);
@@ -43,6 +43,38 @@ namespace maitre_d{
     struct queue_slot{
         Vector2 position;
         size_t dog_id;
+    };
+
+    struct queued_dog{
+        size_t dog_id;
+        float height_edges;
+        Vector2 target_position;
+    };
+
+    class dog_queue{
+        public:
+            dog_queue() = default;
+            dog_queue(const dog_queue& other) = default;
+            dog_queue(dog_queue&& other) = default;
+
+            dog_queue& operator=(const dog_queue& other) = default;
+            dog_queue& operator=(dog_queue&& other) = default;
+
+            // The maitre d' interacts with this as a queue: dogs enter, dogs
+            // leave, and resolved target positions are hidden behind the queue.
+            // Internally this uses a vector so position offsets can be
+            // recalculated when dog sizes change the space behind them.
+            void enqueue(size_t dog_id, float height_edges);
+            void dequeue(size_t dog_id);
+            bool contains(size_t dog_id) const;
+            bool empty() const;
+            size_t size() const;
+            Vector2 get_target_position(size_t dog_id) const;
+
+        private:
+            void recalculate_positions();
+
+            std::vector<queued_dog> dogs_;
     };
 
     namespace interface{
@@ -104,18 +136,14 @@ namespace maitre_d{
 
             // Physical customer queue sketch:
             // customer_dog_arrived(customer_id)
-            //   -> place the dog in the first free queue slot
-            //   -> emit/request pathing to queue_slot.position
+            //   -> enqueue the dog with its height in edge units
+            //   -> emit/request pathing to the resolved queue target position
             //
             // customer_dog_sent_to_table(customer_id, table_id)
-            //   -> clear the dog's queue slot
+            //   -> dequeue the dog
             //   -> use the head slot position as the table pathing start
-            //   -> compact_queue()
-            //
-            // move_queue_forward()
-            //   -> each dog behind the head moves one slot forward
-            //   -> emit/request pathing to the new queue_slot.position
-            std::queue<queue_slot> waiting_customer_queue_;
+            //   -> dog_queue recalculates positions for the remaining dogs
+            dog_queue waiting_customer_queue_;
 
             events::event_handler<events::registered_table> registered_table_handler_;
             events::event_handler<events::registered_customer> registered_customer_handler_;

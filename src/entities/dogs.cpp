@@ -333,7 +333,9 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
 }
 
 // NPC dog sprite art/config pending.
-// std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(Vector2 position, int id){
+std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(Vector2 position, int id){
+    (void) position;
+    (void) id;
 //     auto npc_left_texture = textures::textures_.get_texture(textures::npc_dog_left, entity_config::npc_dog_left_path);
 //     auto npc_right_texture = textures::textures_.get_texture(textures::npc_dog_right, entity_config::npc_dog_right_path);
 //
@@ -368,4 +370,5 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
 //         position,
 //         id,
 //         next_debug_id("npc_"));
-// }
+    return nullptr; // TODO fill in once art and config are ready
+}

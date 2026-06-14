@@ -6,8 +6,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <vector>
 #include "raylib.h"
+#include <cstddef>
+#include <vector>
 namespace game_config {
     inline const int frames = 60;
     inline const int twenty_seconds = frames * 60; // 20 seconds in frames
@@ -59,7 +60,13 @@ namespace level_config{
         Vector2{0, -1}, // up    (index 2)
         Vector2{0, 1}   // down  (index 3)
     };
-    
+	    
+}
+namespace cafe_config{
+    inline const Vector2 dog_queue_start = Vector2{level_config::edge_weight * 8.0f, level_config::edge_weight * 8.0f};
+    inline const Vector2 dog_queue_direction = Vector2{0.0f, 1.0f};
+    inline const size_t dog_queue_capacity = 5;
+    inline const float dog_queue_base_spacing_edges = 1.0f;
 }
 namespace entity_config{
     // file paths
