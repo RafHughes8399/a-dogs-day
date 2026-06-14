@@ -28,15 +28,6 @@ namespace maitre_d{
         occupied = 2
     };
 
-    enum customer_status{
-        registered = 0,
-        waiting_for_table = 1,
-        going_to_table = 2,
-        seated = 3,
-        eating = 4,
-        leaving = 5
-    };
-
     // Table availability lives here rather than on the table entity. A table
     // entity is a physical prop in the level; the maitre d' owns the cafe
     // meaning of whether that prop is free, reserved, or occupied.
@@ -44,12 +35,6 @@ namespace maitre_d{
         size_t table_id;
         table_status status;
         size_t customer_id;
-    };
-
-    struct customer_record{
-        size_t customer_id;
-        customer_status status;
-        size_t table_id;
     };
 
     // A queue slot is a physical waiting spot in the cafe. The queue order is
@@ -116,7 +101,6 @@ namespace maitre_d{
             // move_table(table_id)
             //   -> no status change; level owns the physical position
             std::unordered_map<size_t, table_record> tables_;
-            std::unordered_map<size_t, customer_record> customers_;
 
             // Physical customer queue sketch:
             // customer_dog_arrived(customer_id)

@@ -13,6 +13,7 @@
 #include "raylib.h"
 #include "body.h"
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -370,17 +371,9 @@ namespace entities{
 
     class npc_dog : public dog{
         public:
-            enum state{
-                entering = 0,
-                waiting_for_table = 1,
-                seated = 2,
-                eating = 3,
-                leaving = 4
-            };
-
             npc_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
-            state current_state = state::entering, int direction = level_config::directions::right)
-            : dog(body, head, position, id, std::move(debug_id), direction), state_(current_state){}
+            int direction = level_config::directions::right)
+            : dog(body, head, position, id, std::move(debug_id), direction){}
             npc_dog(const npc_dog& other) = delete;
             npc_dog(npc_dog&& other) = default;
 
@@ -388,11 +381,71 @@ namespace entities{
             npc_dog& operator=(npc_dog&& other) = delete;
 
             int update(float delta, int frame) override;
-            state get_state();
-            void set_state(state new_state);
+    };
+
+    class customer_dog : public npc_dog{
+        public:
+            class state{
+                public:
+                    virtual ~state() = default;
+                    state() = default;
+                    state(const state& other) = default;
+                    state(state&& other) = default;
+
+                    state& operator=(const state& other) = default;
+                    state& operator=(state&& other) = default;
+
+                    virtual void update(customer_dog& dog, float delta, int frame) = 0;
+            };
+
+            class entering_queue : public state{
+                public:
+                    void update(customer_dog& dog, float delta, int frame) override;
+            };
+
+            class waiting_in_queue : public state{
+                public:
+                    void update(customer_dog& dog, float delta, int frame) override;
+            };
+
+            class going_to_table : public state{
+                public:
+                    void update(customer_dog& dog, float delta, int frame) override;
+            };
+
+            class seated : public state{
+                public:
+                    void update(customer_dog& dog, float delta, int frame) override;
+            };
+
+            class eating : public state{
+                public:
+                    void update(customer_dog& dog, float delta, int frame) override;
+            };
+
+            class leaving : public state{
+                public:
+                    void update(customer_dog& dog, float delta, int frame) override;
+            };
+
+            customer_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
+            int direction = level_config::directions::right,
+            std::unique_ptr<customer_dog::state> state = std::make_unique<entering_queue>())
+            : npc_dog(body, head, position, id, std::move(debug_id), direction), customer_state_(std::move(state)){}
+            customer_dog(const customer_dog& other) = delete;
+            customer_dog(customer_dog&& other) = default;
+
+            customer_dog& operator=(const customer_dog& other) = delete;
+            customer_dog& operator=(customer_dog&& other) = delete;
+
+            int update(float delta, int frame) override;
+            void set_state(std::unique_ptr<customer_dog::state> state);
 
         private:
-            state state_;
+            // Customer behaviour state belongs to the dog entity. The maitre d'
+            // only tracks queue/table allocation by id and emits commands that
+            // cause the level or dog to move between these states.
+            std::unique_ptr<state> customer_state_;
     };
     // body behaves slightly differently for decorations, it will have the variants for the decoration (probably should be called deocraiotn)
     class decoration : public entity {

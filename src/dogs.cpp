@@ -122,12 +122,50 @@ int entities::npc_dog::update(float delta, int frame){
     return dog::update(delta, frame);
 }
 
-entities::npc_dog::state entities::npc_dog::get_state(){
-    return state_;
+void entities::customer_dog::entering_queue::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
 }
 
-void entities::npc_dog::set_state(state new_state){
-    state_ = new_state;
+void entities::customer_dog::waiting_in_queue::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::customer_dog::going_to_table::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::customer_dog::seated::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::customer_dog::eating::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::customer_dog::leaving::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+int entities::customer_dog::update(float delta, int frame){
+    auto status = npc_dog::update(delta, frame);
+    customer_state_->update(*this, delta, frame);
+    return status;
+}
+
+void entities::customer_dog::set_state(std::unique_ptr<customer_dog::state> state){
+    customer_state_ = std::move(state);
 }
 
 
