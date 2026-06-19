@@ -168,6 +168,86 @@ void entities::customer_dog::set_state(std::unique_ptr<customer_dog::state> stat
     customer_state_ = std::move(state);
 }
 
+// ------------------------------- waiter dogs ------------------------------- //
+void entities::waiter_dog::idle::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::going_to_table::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::taking_order::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::going_to_kitchen::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::waiting_for_food::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::delivering_food::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::clearing_table::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::returning_to_station::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+int entities::waiter_dog::update(float delta, int frame){
+    auto status = npc_dog::update(delta, frame);
+    // if(has_checkpoint_ && ! checkpoint_reached_ && move_path_.empty() && reached_position(checkpoint_)){
+    //     on_checkpoint_reached();
+    // }
+    waiter_state_->update(*this, delta, frame);
+    return status;
+}
+
+void entities::waiter_dog::set_state(std::unique_ptr<waiter_dog::state> state){
+    waiter_state_ = std::move(state);
+}
+
+void entities::waiter_dog::set_checkpoint_route(Vector2 checkpoint, Vector2 destination){
+    checkpoint_ = checkpoint;
+    destination_ = destination;
+    has_checkpoint_ = true;
+    checkpoint_reached_ = false;
+
+    // std::vector<Vector2> path;
+    // path.push_back(checkpoint_);
+    // set_path(path);
+}
+
+void entities::waiter_dog::on_checkpoint_reached(){
+    checkpoint_reached_ = true;
+    // std::vector<Vector2> path;
+    // path.push_back(destination_);
+    // set_path(path);
+}
+
 
 
 // ------------------------------- builder ------------------------------- //

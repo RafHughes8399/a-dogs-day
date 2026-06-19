@@ -447,6 +447,86 @@ namespace entities{
             // cause the level or dog to move between these states.
             std::unique_ptr<state> customer_state_;
     };
+
+    class waiter_dog : public npc_dog{
+        public:
+            class state{
+                public:
+                    virtual ~state() = default;
+                    state() = default;
+                    state(const state& other) = default;
+                    state(state&& other) = default;
+
+                    state& operator=(const state& other) = default;
+                    state& operator=(state&& other) = default;
+
+                    virtual void update(waiter_dog& dog, float delta, int frame) = 0;
+            };
+
+            class idle : public state{
+                public:
+                    void update(waiter_dog& dog, float delta, int frame) override;
+            };
+
+            class going_to_table : public state{
+                public:
+                    void update(waiter_dog& dog, float delta, int frame) override;
+            };
+
+            class taking_order : public state{
+                public:
+                    void update(waiter_dog& dog, float delta, int frame) override;
+            };
+
+            class going_to_kitchen : public state{
+                public:
+                    void update(waiter_dog& dog, float delta, int frame) override;
+            };
+
+            class waiting_for_food : public state{
+                public:
+                    void update(waiter_dog& dog, float delta, int frame) override;
+            };
+
+            class delivering_food : public state{
+                public:
+                    void update(waiter_dog& dog, float delta, int frame) override;
+            };
+
+            class clearing_table : public state{
+                public:
+                    void update(waiter_dog& dog, float delta, int frame) override;
+            };
+
+            class returning_to_station : public state{
+                public:
+                    void update(waiter_dog& dog, float delta, int frame) override;
+            };
+
+            waiter_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
+            int direction = level_config::directions::right,
+            std::unique_ptr<waiter_dog::state> state = std::make_unique<idle>())
+            : npc_dog(body, head, position, id, std::move(debug_id), direction), checkpoint_(Vector2{0.0f, 0.0f}),
+            destination_(Vector2{0.0f, 0.0f}), has_checkpoint_(false), checkpoint_reached_(false),
+            waiter_state_(std::move(state)){}
+            waiter_dog(const waiter_dog& other) = delete;
+            waiter_dog(waiter_dog&& other) = default;
+
+            waiter_dog& operator=(const waiter_dog& other) = delete;
+            waiter_dog& operator=(waiter_dog&& other) = delete;
+
+            int update(float delta, int frame) override;
+            void set_state(std::unique_ptr<waiter_dog::state> state);
+            void set_checkpoint_route(Vector2 checkpoint, Vector2 destination);
+            void on_checkpoint_reached();
+
+        private:
+            Vector2 checkpoint_;
+            Vector2 destination_;
+            bool has_checkpoint_;
+            bool checkpoint_reached_;
+            std::unique_ptr<state> waiter_state_;
+    };
     // body behaves slightly differently for decorations, it will have the variants for the decoration (probably should be called deocraiotn)
     class decoration : public entity {
         public:
