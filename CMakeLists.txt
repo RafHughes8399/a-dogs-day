@@ -143,6 +143,9 @@ link_libraries(level)
 add_library(maitre_d src/systems/maitre_d.cpp src/systems/maitre_d_interface.cpp src/systems/dog_queue.cpp)
 link_libraries(maitre_d)
 
+add_library(expediter src/systems/expediter.cpp src/systems/expediter_interface.cpp)
+link_libraries(expediter)
+
 add_library(game src/engine/game.cpp)
 link_libraries(game)
 
@@ -152,7 +155,7 @@ target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
   raglib events queries animation sprite item menu hud hitbox body texture
   player controls entities cursor dogs decorations render_layer quadtree
-  graph level maitre_d game ${PROJECT_NAME}
+  graph level maitre_d expediter game ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})
