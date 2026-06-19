@@ -122,12 +122,130 @@ int entities::npc_dog::update(float delta, int frame){
     return dog::update(delta, frame);
 }
 
-entities::npc_dog::state entities::npc_dog::get_state(){
-    return state_;
+void entities::customer_dog::entering_queue::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
 }
 
-void entities::npc_dog::set_state(state new_state){
-    state_ = new_state;
+void entities::customer_dog::waiting_in_queue::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::customer_dog::going_to_table::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::customer_dog::seated::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::customer_dog::eating::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::customer_dog::leaving::update(customer_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+int entities::customer_dog::update(float delta, int frame){
+    auto status = npc_dog::update(delta, frame);
+    customer_state_->update(*this, delta, frame);
+    return status;
+}
+
+void entities::customer_dog::set_state(std::unique_ptr<customer_dog::state> state){
+    customer_state_ = std::move(state);
+}
+
+// ------------------------------- waiter dogs ------------------------------- //
+void entities::waiter_dog::idle::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::going_to_table::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::taking_order::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::going_to_kitchen::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::waiting_for_food::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::delivering_food::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::clearing_table::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+void entities::waiter_dog::returning_to_station::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+}
+
+int entities::waiter_dog::update(float delta, int frame){
+    auto status = npc_dog::update(delta, frame);
+    // if(has_checkpoint_ && ! checkpoint_reached_ && move_path_.empty() && reached_position(checkpoint_)){
+    //     on_checkpoint_reached();
+    // }
+    waiter_state_->update(*this, delta, frame);
+    return status;
+}
+
+void entities::waiter_dog::set_state(std::unique_ptr<waiter_dog::state> state){
+    waiter_state_ = std::move(state);
+}
+
+void entities::waiter_dog::set_checkpoint_route(Vector2 checkpoint, Vector2 destination){
+    checkpoint_ = checkpoint;
+    destination_ = destination;
+    has_checkpoint_ = true;
+    checkpoint_reached_ = false;
+
+    // std::vector<Vector2> path;
+    // path.push_back(checkpoint_);
+    // set_path(path);
+}
+
+void entities::waiter_dog::on_checkpoint_reached(){
+    checkpoint_reached_ = true;
+    // std::vector<Vector2> path;
+    // path.push_back(destination_);
+    // set_path(path);
 }
 
 
@@ -295,7 +413,9 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
 }
 
 // NPC dog sprite art/config pending.
-// std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(Vector2 position, int id){
+std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(Vector2 position, int id){
+    (void) position;
+    (void) id;
 //     auto npc_left_texture = textures::textures_.get_texture(textures::npc_dog_left, entity_config::npc_dog_left_path);
 //     auto npc_right_texture = textures::textures_.get_texture(textures::npc_dog_right, entity_config::npc_dog_right_path);
 //
@@ -330,4 +450,5 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
 //         position,
 //         id,
 //         next_debug_id("npc_"));
-// }
+    return nullptr; // TODO fill in once art and config are ready
+}
