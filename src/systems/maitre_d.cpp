@@ -1,6 +1,20 @@
 #include "maitre_d.h"
 
+#include "debug_log_interface.h"
 #include "events_interface.h"
+
+namespace{
+    std::string side_to_string(events::customer_queue_side queue_side){
+        if(queue_side == events::customer_queue_side::left_queue){
+            return "left_queue";
+        }
+        return "right_queue";
+    }
+
+    std::string vector_to_string(Vector2 position){
+        return "{" + std::to_string(position.x) + ", " + std::to_string(position.y) + "}";
+    }
+}
 
 maitre_d::maitre_d& maitre_d::maitre_d::get_instance(){
     static maitre_d instance;
@@ -54,6 +68,14 @@ void maitre_d::maitre_d::process_events(){
     return;
 }
 
+events::customer_queue_side maitre_d::maitre_d::get_customer_queue_side() const{
+    return waiting_customer_queue_.less_full_side();
+}
+
+Vector2 maitre_d::maitre_d::get_customer_spawn_position(events::customer_queue_side queue_side) const{
+    return waiting_customer_queue_.get_spawn_position(queue_side);
+}
+
 void maitre_d::maitre_d::check_customer_arrivals(float delta){
     if(! feature_flag_config::automatic_arrivals){
         return;
@@ -71,11 +93,27 @@ void maitre_d::maitre_d::check_customer_arrivals(float delta){
     auto should_add_customer = seconds_since_customer_arrived_ >= cafe_config::dog_queue_automatic_arrival_seconds
         || dogs_left_in_window_ >= cafe_config::dog_queue_dogs_left_trigger;
 
+    debug::log(
+        "[maitre_d::check_customer_arrivals, evaluated arrival rules] "
+        "outstanding_customers: " + std::to_string(outstanding_customers)
+        + ", pending_customer_builds: " + std::to_string(pending_customer_builds_)
+        + ", seconds_since_customer_arrived: " + std::to_string(seconds_since_customer_arrived_)
+        + ", dogs_left_in_window: " + std::to_string(dogs_left_in_window_)
+        + ", should_seed_queue: " + std::to_string(should_seed_queue)
+        + ", should_add_customer: " + std::to_string(should_add_customer));
+
     if(! waiting_customer_queue_.full() && pending_customer_builds_ == 0 && (should_seed_queue || should_add_customer)){
-        auto build_position = waiting_customer_queue_.get_next_open_position();
+        auto queue_side = waiting_customer_queue_.less_full_side();
+        auto build_position = waiting_customer_queue_.get_spawn_position(queue_side);
+        debug::log(
+            "[maitre_d::check_customer_arrivals, queueing customer build] "
+            "queue_side: " + side_to_string(queue_side)
+            + ", build_position: " + vector_to_string(build_position)
+            + ", dog_type: " + std::to_string(cafe_config::debug_customer_dog_type));
         std::unique_ptr<events::event> build_dog = std::make_unique<events::build_dog>(
             cafe_config::debug_customer_dog_type,
-            build_position);
+            build_position,
+            queue_side);
         event_interface::queue_event(build_dog);
         pending_customer_builds_++;
     }
@@ -95,7 +133,19 @@ void maitre_d::maitre_d::on_requested_customer_table_event(const events::request
 }
 
 void maitre_d::maitre_d::on_customer_dog_arrived_event(const events::customer_dog_arrived& event){
-    waiting_customer_queue_.enqueue(event.get_customer_id(), 1.0f);
+    auto customer_id = event.get_customer_id();
+    debug::log(
+        "[maitre_d::on_customer_dog_arrived_event, received customer arrival] "
+        "customer_id: " + std::to_string(customer_id)
+        + ", queue_side: " + side_to_string(event.get_queue_side()));
+    waiting_customer_queue_.enqueue(customer_id, event.get_queue_side(), 1.0f);
+    auto queue_position = waiting_customer_queue_.get_target_position(customer_id);
+    debug::log(
+        "[maitre_d::on_customer_dog_arrived_event, emitting queue path command] "
+        "customer_id: " + std::to_string(customer_id)
+        + ", queue_position: " + vector_to_string(queue_position));
+    auto send_customer_to_queue = events::send_customer_to_queue(customer_id, queue_position);
+    event_interface::execute_event(send_customer_to_queue);
     seconds_since_customer_arrived_ = 0.0f;
     if(pending_customer_builds_ > 0){
         pending_customer_builds_--;

@@ -49,6 +49,7 @@ namespace entities{
 
             Vector2 get_position();
             void move(Vector2 new_postion);
+            void move_without_event(Vector2 new_position);
             
             virtual int update(float delta, int frame){
                 (void) delta;

@@ -76,6 +76,8 @@ namespace cafe_config{
     inline const int dog_queue_dogs_left_trigger = 3;
     inline const int debug_customer_dog_type = 0;
     inline const Vector2 dog_queue_direction = Vector2{0.0f, 1.0f};
+    inline const float dog_spawn_out_of_bounds_distance = 100.0f;
+    inline const float void_entity_move_per_frame = 8.0f;
 
     inline float dog_queue_width = 0.0f;
     inline float dog_queue_height = 0.0f;
@@ -193,5 +195,18 @@ namespace hud_config{
     
     inline const float edit_wheel_attributes[entity_config::attributes::size] = {35.0f, 35.0f, game_config::hold_duration,  1.0f}; // for now, pending animation play speed implementation , frames is 90
 
+}
+namespace debug_logger_config{
+    inline const int toggle_key = KEY_SLASH;
+    inline const float backdrop_height_ratio = 0.33f;
+    inline const float backdrop_y_ratio = 1.0f - backdrop_height_ratio;
+    inline const int backdrop_opacity = 102;
+    inline const Color backdrop = Color{28, 28, 28, backdrop_opacity};
+    inline const Color text = Color{245, 240, 225, 255};
+    inline const int font_size = 18;
+    inline const int line_height = 24;
+    inline const int padding_x = 18;
+    inline const int padding_y = 16;
+    inline const size_t max_messages = 80;
 }
 #endif

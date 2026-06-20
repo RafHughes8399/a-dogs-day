@@ -6,6 +6,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "debug_log_interface.h"
+#include "debug_logger.h"
 #include  "menus.h"
 #include "level.h"
 #include "maitre_d.h"
@@ -16,7 +18,7 @@ namespace game{
             ~game() = default;
             game(level::level& level, player::player& player, menus::menu_graph& menu, player::controls& controls)
                 : frame_count_(0), level_(level), maitre_d_(maitre_d::maitre_d::get_instance()),
-                menus_(menu), controls_(controls), player_(player){}
+                logger_(debug::logger::get_instance()), menus_(menu), controls_(controls), player_(player){}
             game(const game& other) = default;
             game(game&& other) = default;
 
@@ -33,6 +35,7 @@ namespace game{
             
             level::level& level_;
             maitre_d::maitre_d& maitre_d_;
+            debug::logger& logger_;
             menus::menu_graph& menus_;
             player::controls& controls_;
             player::player& player_;

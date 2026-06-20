@@ -21,11 +21,17 @@
 #include <algorithm>
 #include <queue>
 #include <ctime>
+#include <string>
+#include <utility>
 
 // project includes
 #include "hitbox.h"
 #include "raylib.h"
 namespace events{
+	enum customer_queue_side{
+		left_queue = 0,
+		right_queue = 1
+	};
 	// an enum ID for event types
 	enum ids{
 		test = 0,
@@ -63,7 +69,9 @@ namespace events{
 		send_waiter_clear_table = 32,
 		customer_left = 33,
 		build_dog_id = 34,
-		size = 35
+		send_customer_queue = 35,
+		debug_log_id = 36,
+		size = 37
 	};
 	class event{
 
@@ -232,6 +240,20 @@ namespace events{
 		private:
 			const int new_level_;
 	};
+	class debug_log : public event{
+		public:
+			debug_log(std::string message)
+			:event(ids::debug_log_id), message_(std::move(message)){}
+
+			static int get_static_type(){
+				return ids::debug_log_id;
+			}
+			const std::string& get_message() const{
+				return message_;
+			}
+		private:
+			const std::string message_;
+	};
 	// when the cursor left click occurs, main listener is the quad tree to check collisions
 	class left_mouse_click : public event{
 		public:
@@ -398,8 +420,8 @@ namespace events{
 	// into the physical waiting queue managed by the maitre d'.
 	class customer_dog_arrived : public event{
 		public:
-			customer_dog_arrived(size_t customer_id)
-			: event(ids::customer_arrived), customer_id_(customer_id){}
+			customer_dog_arrived(size_t customer_id, customer_queue_side queue_side)
+			: event(ids::customer_arrived), customer_id_(customer_id), queue_side_(queue_side){}
 
 			static int get_static_type(){
 				return ids::customer_arrived;
@@ -407,8 +429,12 @@ namespace events{
 			size_t get_customer_id() const{
 				return customer_id_;
 			}
+			customer_queue_side get_queue_side() const{
+				return queue_side_;
+			}
 		private:
 			const size_t customer_id_;
+			const customer_queue_side queue_side_;
 	};
 	// Cafe-domain command/fact: the maitre d' has taken a customer dog out of
 	// the waiting queue and sent it toward an assigned table.
@@ -441,6 +467,26 @@ namespace events{
 				return ids::customer_left;
 			}
 		private:
+	};
+	// Cafe-domain command: the maitre d' has assigned a customer dog to a
+	// physical queue position. The level owns pathfinding and entity mutation.
+	class send_customer_to_queue : public event{
+		public:
+			send_customer_to_queue(size_t customer_id, Vector2 queue_position)
+			: event(ids::send_customer_queue), customer_id_(customer_id), queue_position_(queue_position){}
+
+			static int get_static_type(){
+				return ids::send_customer_queue;
+			}
+			size_t get_customer_id() const{
+				return customer_id_;
+			}
+			Vector2 get_queue_position() const{
+				return queue_position_;
+			}
+		private:
+			const size_t customer_id_;
+			const Vector2 queue_position_;
 	};
 	// Cafe-domain fact: a waiter dog exists and can be assigned service work by
 	// the expediter. The expediter records ids only, not dog references.
@@ -709,8 +755,8 @@ namespace events{
 	// for when we need to build a dog
 	class build_dog : public event{
 		public:
-			build_dog(int dog_type, Vector2 position)
-			:event(ids::build_dog_id), dog_type_(dog_type), position_(position){}
+			build_dog(int dog_type, Vector2 position, customer_queue_side queue_side)
+			:event(ids::build_dog_id), dog_type_(dog_type), position_(position), queue_side_(queue_side){}
 
 			static int get_static_type(){
 				return ids::build_dog_id;
@@ -721,9 +767,13 @@ namespace events{
 			Vector2 get_position() const {
 				return position_;
 			}
+			customer_queue_side get_queue_side() const{
+				return queue_side_;
+			}
 		private:
 			const int dog_type_;
 			const Vector2 position_;
+			const customer_queue_side queue_side_;
 	};
 	class event_handler_interface{
 		public:

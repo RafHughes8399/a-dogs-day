@@ -32,7 +32,11 @@ void events::event_dispatcher::unsubscribe(int event_key, const int handler_valu
 void events::event_dispatcher::execute_event(const event& event){
     //for all handlers of the event, execute the event
     auto key = event.get_type();
-    for(auto& handler : subscriber_map_.at(key)){
+    auto subscribers = subscriber_map_.find(key);
+    if(subscribers == subscriber_map_.end()){
+        return;
+    }
+    for(auto& handler : subscribers->second){
         handler->execute(event);
     }
     

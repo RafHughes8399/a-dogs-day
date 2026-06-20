@@ -9,6 +9,7 @@ void game::game::update(float delta){
     // std::cout << "[game update]: update" << std::endl;
     events::global_dispatcher_.process_events(delta);
     maitre_d_.update(delta);
+    logger_.update(delta);
     // update the level
     level_.update(delta, frame_count_);
     // then the player
@@ -27,9 +28,16 @@ void game::game::update(float delta){
 
 void game::game::run_debug_behaviours(){
     if(IsKeyPressed(KEY_L)){
+        auto queue_side = maitre_d_.get_customer_queue_side();
+        auto spawn_position = maitre_d_.get_customer_spawn_position(queue_side);
+        debug::log(
+            "[game::run_debug_behaviours, manual customer build key pressed] "
+            "queue_side: " + std::to_string(static_cast<int>(queue_side))
+            + ", spawn_position: {" + std::to_string(spawn_position.x) + ", " + std::to_string(spawn_position.y) + "}");
         std::unique_ptr<events::event> build_dog = std::make_unique<events::build_dog>(
             cafe_config::debug_customer_dog_type,
-            cafe_config::dog_queue_start);
+            spawn_position,
+            queue_side);
         event_interface::queue_event(build_dog);
     }
 }
@@ -41,6 +49,7 @@ void game::game::render(float delta){
     player_.render();
     menus_.render();
     DrawFPS(25, 25);
+    logger_.render();
     return;
 }
 

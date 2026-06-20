@@ -64,19 +64,24 @@ namespace maitre_d{
             // leave, and resolved target positions are hidden behind the queue.
             // Internally this uses a vector so position offsets can be
             // recalculated when dog sizes change the space behind them.
-            void enqueue(size_t dog_id, float height_edges);
+            void enqueue(size_t dog_id, events::customer_queue_side queue_side, float height_edges);
             void dequeue(size_t dog_id);
             bool contains(size_t dog_id) const;
             bool empty() const;
             bool full() const;
             size_t size() const;
-            Vector2 get_next_open_position() const;
+            events::customer_queue_side less_full_side() const;
+            Vector2 get_spawn_position(events::customer_queue_side queue_side) const;
             Vector2 get_target_position(size_t dog_id) const;
 
         private:
-            void recalculate_positions();
+            void recalculate_positions(std::vector<queued_dog>& dogs, events::customer_queue_side queue_side);
+            std::vector<queued_dog>& dogs_for_side(events::customer_queue_side queue_side);
+            const std::vector<queued_dog>& dogs_for_side(events::customer_queue_side queue_side) const;
+            Vector2 position_for_index(size_t index, events::customer_queue_side queue_side) const;
 
-            std::vector<queued_dog> dogs_;
+            std::vector<queued_dog> left_queue_;
+            std::vector<queued_dog> right_queue_;
     };
 
     namespace interface{
@@ -104,6 +109,8 @@ namespace maitre_d{
             void request_table_for_customer(size_t customer_id);
 
             void update(float delta);
+            events::customer_queue_side get_customer_queue_side() const;
+            Vector2 get_customer_spawn_position(events::customer_queue_side queue_side) const;
 
             void on_registered_table_event(const events::registered_table& event);
             void on_registered_customer_event(const events::registered_customer& event);

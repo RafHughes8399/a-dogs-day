@@ -77,3 +77,14 @@ ok and the debugging event render tool (like a logger, this is hwo you build it)
 like a visual debug tool, yeah let's build thjat   
 
 very simple tool 
+
+
+
+ok so we've setup the queue and dog building
+rfemember this checklist for the rest of this feature so next is 
+-> creating the dog build key input command
+-> checking the npc dog pathfinding (it should already exist in the player dog logic right ) ? 
+-> wiring up queue joining events for the matire d to actually give queue positions for path destinations
+-> then testing queue joining behaviour 
+-> then table setup 
+-> then table pathinding 

@@ -146,6 +146,12 @@ link_libraries(maitre_d)
 add_library(expediter src/systems/expediter.cpp src/systems/expediter_interface.cpp)
 link_libraries(expediter)
 
+add_library(debug_log_interface src/systems/debug_log_interface.cpp)
+link_libraries(debug_log_interface)
+
+add_library(debug_logger src/systems/debug_logger.cpp)
+link_libraries(debug_logger)
+
 add_library(game src/engine/game.cpp)
 link_libraries(game)
 
@@ -155,7 +161,7 @@ target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
   raglib events queries animation sprite item menu hud hitbox body texture
   player controls entities cursor dogs decorations render_layer quadtree
-  graph level maitre_d expediter game ${PROJECT_NAME}
+  graph level maitre_d expediter debug_log_interface debug_logger game ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})
