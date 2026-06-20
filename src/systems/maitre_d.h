@@ -86,6 +86,7 @@ namespace maitre_d{
         void register_table(size_t table_id);
         void register_customer(size_t customer_id);
         void request_table_for_customer(size_t customer_id);
+        void configure_customer_queue_layout();
     }
 
     class maitre_d {

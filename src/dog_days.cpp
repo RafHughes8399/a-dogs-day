@@ -4,7 +4,8 @@
 
 #include "game.h"
 int main(){
-    InitWindow(GetScreenWidth(), GetScreenHeight(), "dog day");
+    InitWindow(game_config::window_width, game_config::window_height, "dog day");
+    maitre_d::interface::configure_customer_queue_layout();
     auto level_builder = level::level_builder();
     auto level = level_builder.build_main_level();
     std::cout << "[dog_days init] : built level " << std::endl;

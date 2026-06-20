@@ -59,6 +59,21 @@ of complicated for not that much gain, like perhaps its best to just define each
 2 no build dog event doesnt need id, level will supply
 3 yes its redundandt
 4 of the screen
-5 i think static, contant positions is just way easier for us
-6
-7
+5 i think static, contant positions is just way easier for us to work with. i think we can have more posisiotns ,what ever the floor of  screen height - (10 * edge weights) / (3 * edge weifghts) is. 
+I would give a 5 edge buffer on either side for now, define these coefficients as constants too 
+6 float delta input to match other updates, i think is time since last frame unsure what hte unit of time is, is it  ms or  s. otherwise if frame is already wired throug hthe game then yeah use that  
+7 have it working for now, gate it befind a config flag though, new config namespcae, called feature_flag0config, and have it include bool automatic_arrivals = true. amend the ocndition to say if the queue is empoty, build a dog, otherwise we 
+would never have any dogs, yk , like we need at least 1 dog otherwise the system never starts
+
+
+i dont like functions in the config, they should be variables, it should be maitre_d::update(flaot delta){
+    - perform logic for checking customer arrival, 
+    - then call porocess events
+}
+
+
+
+ok and the debugging event render tool (like a logger, this is hwo you build it)
+like a visual debug tool, yeah let's build thjat   
+
+very simple tool 
