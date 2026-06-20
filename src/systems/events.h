@@ -61,7 +61,9 @@ namespace events{
 		waiter_cleared_table_id = 30,
 		send_waiter_table = 31,
 		send_waiter_clear_table = 32,
-		size = 33
+		customer_left = 33,
+		build_dog_id = 34,
+		size = 35
 	};
 	class event{
 
@@ -428,6 +430,18 @@ namespace events{
 			const size_t customer_id_;
 			const size_t table_id_;
 	};
+	// Cafe-domain fact: a customer dog has left the cafe. The maitre d' uses
+	// this as coarse arrival-pressure input without needing dog object access.
+	class customer_dog_left : public event{
+		public:
+			customer_dog_left()
+			: event(ids::customer_left){}
+
+			static int get_static_type(){
+				return ids::customer_left;
+			}
+		private:
+	};
 	// Cafe-domain fact: a waiter dog exists and can be assigned service work by
 	// the expediter. The expediter records ids only, not dog references.
 	class registered_waiter : public event{
@@ -689,6 +703,27 @@ namespace events{
 			}
 		private:
 			const size_t id_;
+	};
+
+
+	// for when we need to build a dog
+	class build_dog : public event{
+		public:
+			build_dog(int dog_type, Vector2 position)
+			:event(ids::build_dog_id), dog_type_(dog_type), position_(position){}
+
+			static int get_static_type(){
+				return ids::build_dog_id;
+			}
+			int get_dog_type() const {
+				return dog_type_;
+			}
+			Vector2 get_position() const {
+				return position_;
+			}
+		private:
+			const int dog_type_;
+			const Vector2 position_;
 	};
 	class event_handler_interface{
 		public:

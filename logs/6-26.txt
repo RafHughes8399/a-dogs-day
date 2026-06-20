@@ -1,0 +1,64 @@
+npc dogs
+-> first the customers, then the waiters 
+TODO:
+    -> dog building 
+    -> dog factory to schedule and automate building
+    -> define coords for the queue
+
+factory builds the dog
+factory is owned by the level
+
+level emits the build dog request when 
+that way the factory can have the requested id 
+
+but how does it insert the dog into the level, the 
+level needs to manage that
+
+so is the path game -> level, level builds 
+i think so
+the level will be a factory itself
+
+simples, then the level should listen for build dog events to be emitted
+how often is the question, 
+
+listen for hte cusomter_arrives event. doesn't have data, just emits .
+it would be a bit odd for the matire_d to handle this , but in a way it would make sense because the matire d owns the customer queue 
+it means that the matire d would need to have an update loop which it should already have and will definitely need at some point anyway if it doesnt have it yet. 
+
+for now i think we can jsut have customer arrive of a keyt press\, say l, can just wire it in a simple if branch in the game since its just debugging, add a 
+comment header and footer // debug beahvuiours in the game update loop, this check should exist there 
+
+in addition to the real logic which we can discuss and tweak for now it could look like 
+-> if the queue is not full
+    -> if a dog hasnt arrived in the last 2 minuts
+    -> or if at least 3 dogs have left in the last 30 seconds
+
+each frame check would look like 
+    if can_add_dog then 
+        emit build event 
+    update frames_since_dog_arrived -> (like a frames ++ increment)
+    update num_dogs_left_in_last_thirty_seconds (if (thirty_sceond_counter === config::THIRTY_SECONDS) then num_dogs = 0)
+    
+then the matire d listens for dog leave and dog arrive events to update counteres
+those events i dont think would need to carry any data 
+
+
+define the customer queue space
+
+for debugging purposes for now we should  the perimeter of the quesu sapce with raylibs drawLine, here add a debug section for level::render adn then draw this queue in
+I think it should take 10 % of the screen width, and the whole height which i think is (1920 * 108).
+
+then we define the constants for hte queue dog positions, at least the baseline part before potential dynamic validation
+
+again we discussed about possitions being malleable so this should also be behaviour that the matire_d handles in its update loop. unless this approach is messy and kind 
+of complicated for not that much gain, like perhaps its best to just define each position being like 3 * edge weights appart and then not making a dog taller than that, 
+
+
+
+1 yes, 
+2 no build dog event doesnt need id, level will supply
+3 yes its redundandt
+4 of the screen
+5 i think static, contant positions is just way easier for us
+6
+7

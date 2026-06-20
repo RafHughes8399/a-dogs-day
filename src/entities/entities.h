@@ -616,7 +616,7 @@ namespace entities{
             std::unique_ptr<entity> build_mack(Vector2 position, int id);
             std::unique_ptr<entity> build_khiri(Vector2 position, int id);
             // NPC dog sprite art/config pending.
-            std::unique_ptr<entity> build_npc_dog(Vector2 position, int id);
+            std::unique_ptr<entity> build_npc_dog(Vector2 position, int id, int dog_type);
             std::unique_ptr<entity> build_paw_mark(Vector2 position, int id);
 
             std::unique_ptr<entity> build_test_decoration(Vector2 position, int id);

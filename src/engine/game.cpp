@@ -1,10 +1,14 @@
 #include "game.h"
 // #include <iostream>
 void game::game::update(float delta){
+    // ---------------- debug behaviours ----------------
+    run_debug_behaviours();
+    // ---------------- debug behaviours ----------------
+
     // deal with queued events 
     // std::cout << "[game update]: update" << std::endl;
     events::global_dispatcher_.process_events(delta);
-    maitre_d_.process_events();
+    maitre_d_.update(delta);
     // update the level
     level_.update(delta, frame_count_);
     // then the player
@@ -19,6 +23,15 @@ void game::game::update(float delta){
     }
     
     return;
+}
+
+void game::game::run_debug_behaviours(){
+    if(IsKeyPressed(KEY_L)){
+        std::unique_ptr<events::event> build_dog = std::make_unique<events::build_dog>(
+            cafe_config::debug_customer_dog_type,
+            cafe_config::dog_queue_start);
+        event_interface::queue_event(build_dog);
+    }
 }
 
 void game::game::render(float delta){

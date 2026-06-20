@@ -4,3 +4,7 @@ build/*
 
 #ignore the .vscode
 .vscode/
+
+# macOS and local tool caches
+.DS_Store
+.cache/

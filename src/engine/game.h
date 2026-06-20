@@ -27,6 +27,7 @@ namespace game{
             void render(float delta_time);
             void debug(float delta_time);
         private:
+            void run_debug_behaviours();
             
             int frame_count_;
             

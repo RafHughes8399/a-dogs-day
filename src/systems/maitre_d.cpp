@@ -8,14 +8,20 @@ maitre_d::maitre_d& maitre_d::maitre_d::get_instance(){
 }
 
 maitre_d::maitre_d::maitre_d()
-: registered_table_handler_([this](const events::registered_table& event) -> void {on_registered_table_event(event);}),
+: seconds_since_customer_arrived_(cafe_config::dog_queue_automatic_arrival_seconds),
+dogs_left_window_seconds_(0.0f),
+dogs_left_in_window_(0),
+pending_customer_builds_(0),
+registered_table_handler_([this](const events::registered_table& event) -> void {on_registered_table_event(event);}),
 registered_customer_handler_([this](const events::registered_customer& event) -> void {on_registered_customer_event(event);}),
 requested_customer_table_handler_([this](const events::requested_customer_table& event) -> void {on_requested_customer_table_event(event);}),
-customer_dog_arrived_handler_([this](const events::customer_dog_arrived& event) -> void {on_customer_dog_arrived_event(event);}){
+customer_dog_arrived_handler_([this](const events::customer_dog_arrived& event) -> void {on_customer_dog_arrived_event(event);}),
+customer_dog_left_handler_([this](const events::customer_dog_left& event) -> void {on_customer_dog_left_event(event);}){
     event_interface::subscribe<events::registered_table>(registered_table_handler_);
     event_interface::subscribe<events::registered_customer>(registered_customer_handler_);
     event_interface::subscribe<events::requested_customer_table>(requested_customer_table_handler_);
     event_interface::subscribe<events::customer_dog_arrived>(customer_dog_arrived_handler_);
+    event_interface::subscribe<events::customer_dog_left>(customer_dog_left_handler_);
 }
 
 void maitre_d::maitre_d::register_table(size_t table_id){
@@ -37,7 +43,42 @@ void maitre_d::maitre_d::request_table_for_customer(size_t customer_id){
     (void) customer_id;
 }
 
+void maitre_d::maitre_d::update(float delta){
+    if(feature_flag_config::automatic_arrivals){
+        check_customer_arrivals(delta);
+    }
+    process_events();
+}
+
 void maitre_d::maitre_d::process_events(){
+    return;
+}
+
+void maitre_d::maitre_d::check_customer_arrivals(float delta){
+    if(! feature_flag_config::automatic_arrivals){
+        return;
+    }
+
+    seconds_since_customer_arrived_ += delta;
+    dogs_left_window_seconds_ += delta;
+    if(dogs_left_window_seconds_ >= cafe_config::dog_queue_dogs_left_window_seconds){
+        dogs_left_window_seconds_ = 0.0f;
+        dogs_left_in_window_ = 0;
+    }
+
+    auto outstanding_customers = waiting_customer_queue_.size() + static_cast<size_t>(pending_customer_builds_);
+    auto should_seed_queue = outstanding_customers == 0;
+    auto should_add_customer = seconds_since_customer_arrived_ >= cafe_config::dog_queue_automatic_arrival_seconds
+        || dogs_left_in_window_ >= cafe_config::dog_queue_dogs_left_trigger;
+
+    if(! waiting_customer_queue_.full() && pending_customer_builds_ == 0 && (should_seed_queue || should_add_customer)){
+        auto build_position = waiting_customer_queue_.get_next_open_position();
+        std::unique_ptr<events::event> build_dog = std::make_unique<events::build_dog>(
+            cafe_config::debug_customer_dog_type,
+            build_position);
+        event_interface::queue_event(build_dog);
+        pending_customer_builds_++;
+    }
     return;
 }
 
@@ -54,9 +95,14 @@ void maitre_d::maitre_d::on_requested_customer_table_event(const events::request
 }
 
 void maitre_d::maitre_d::on_customer_dog_arrived_event(const events::customer_dog_arrived& event){
-    // Future queue behavior:
-    // - find the first queue_slot whose dog_id == empty_id
-    // - set that slot's dog_id to event.get_customer_id()
-    // - emit/request pathing to queue_slot.position
+    waiting_customer_queue_.enqueue(event.get_customer_id(), 1.0f);
+    seconds_since_customer_arrived_ = 0.0f;
+    if(pending_customer_builds_ > 0){
+        pending_customer_builds_--;
+    }
+}
+
+void maitre_d::maitre_d::on_customer_dog_left_event(const events::customer_dog_left& event){
     (void) event;
+    dogs_left_in_window_++;
 }

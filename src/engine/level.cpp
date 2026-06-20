@@ -17,6 +17,11 @@ void level::level::render(int frame){
     // for debugging purposes
     // graph_.render(view_frame_);
 
+    // ---------------- debug behaviours ----------------
+    auto queue_bounds = cafe_config::dog_queue_debug_bounds;
+    DrawRectangleLinesEx(queue_bounds, 2.0f, RED);
+    // ---------------- debug behaviours ----------------
+
 
     // draw the entities, based on the view frame
     auto render_precdicate = [this](entities::entity*& entity) -> bool { // auto is std::unique_ptr<entity>
@@ -75,6 +80,22 @@ void level::level::on_right_mouse_event(const events::right_mouse_click& event){
         auto dog_path = graph_.find_path(dog->get_position(), click_position, direction);
         dog_cast->set_path(dog_path);
     }
+}
+
+void level::level::on_build_dog_event(const events::build_dog& event){
+    auto position = event.get_position();
+    auto dog_type = event.get_dog_type();
+    auto dog_id = static_cast<int>(level_entities_.get_next_id());
+    auto new_dog = entities::e_builder.build_npc_dog(position, dog_id, dog_type);
+    if(! new_dog){
+        return;
+    }
+    add_entity(std::move(new_dog), level_config::draw_layers::dogs);
+    auto customer_id = static_cast<size_t>(dog_id);
+    auto registered_customer = events::registered_customer(customer_id);
+    event_interface::execute_event(registered_customer);
+    auto customer_arrived = events::customer_dog_arrived(customer_id);
+    event_interface::execute_event(customer_arrived);
 }
 
 // --------------------- level builder ----------------------------------------- //

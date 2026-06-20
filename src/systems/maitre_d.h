@@ -68,7 +68,9 @@ namespace maitre_d{
             void dequeue(size_t dog_id);
             bool contains(size_t dog_id) const;
             bool empty() const;
+            bool full() const;
             size_t size() const;
+            Vector2 get_next_open_position() const;
             Vector2 get_target_position(size_t dog_id) const;
 
         private:
@@ -100,19 +102,23 @@ namespace maitre_d{
             void register_customer(size_t customer_id);
             void request_table_for_customer(size_t customer_id);
 
-            // Processes cafe actions gathered from events or direct interface
-            // calls. This mirrors the event dispatcher style: collect facts,
-            // then resolve them into command events during the game loop.
-            void process_events();
+            void update(float delta);
 
             void on_registered_table_event(const events::registered_table& event);
             void on_registered_customer_event(const events::registered_customer& event);
             void on_requested_customer_table_event(const events::requested_customer_table& event);
             void on_customer_dog_arrived_event(const events::customer_dog_arrived& event);
+            void on_customer_dog_left_event(const events::customer_dog_left& event);
 
         private:
             maitre_d();
             ~maitre_d() = default;
+
+            // Processes cafe actions gathered from events or direct interface
+            // calls. This mirrors the event dispatcher style: collect facts,
+            // then resolve them into command events during the game loop.
+            void process_events();
+            void check_customer_arrivals(float delta);
 
             // Table lifecycle sketch:
             // register_table(table_id)
@@ -144,11 +150,16 @@ namespace maitre_d{
             //   -> use the head slot position as the table pathing start
             //   -> dog_queue recalculates positions for the remaining dogs
             dog_queue waiting_customer_queue_;
+            float seconds_since_customer_arrived_;
+            float dogs_left_window_seconds_;
+            int dogs_left_in_window_;
+            int pending_customer_builds_;
 
             events::event_handler<events::registered_table> registered_table_handler_;
             events::event_handler<events::registered_customer> registered_customer_handler_;
             events::event_handler<events::requested_customer_table> requested_customer_table_handler_;
             events::event_handler<events::customer_dog_arrived> customer_dog_arrived_handler_;
+            events::event_handler<events::customer_dog_left> customer_dog_left_handler_;
     };
 }
 

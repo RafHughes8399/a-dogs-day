@@ -413,9 +413,8 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
 }
 
 // NPC dog sprite art/config pending.
-std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(Vector2 position, int id){
-    (void) position;
-    (void) id;
+std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(Vector2 position, int id, int dog_type){
+    (void) dog_type;
 //     auto npc_left_texture = textures::textures_.get_texture(textures::npc_dog_left, entity_config::npc_dog_left_path);
 //     auto npc_right_texture = textures::textures_.get_texture(textures::npc_dog_right, entity_config::npc_dog_right_path);
 //
@@ -450,5 +449,34 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(Vector
 //         position,
 //         id,
 //         next_debug_id("npc_"));
-    return nullptr; // TODO fill in once art and config are ready
+    auto customer_left_texture = textures::textures_.get_texture(textures::mack_left, entity_config::mack_left_path);
+    auto customer_right_texture = textures::textures_.get_texture(textures::mack_right, entity_config::mack_right_path);
+    auto customer_left_sprite = sprite::sprite(customer_left_texture,
+        entity_config::mack_across_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_across_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_across_attributes[entity_config::attributes::frames],
+        entity_config::mack_across_attributes[entity_config::attributes::animations]);
+    auto customer_right_sprite = sprite::sprite(customer_right_texture,
+        entity_config::mack_across_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_across_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_across_attributes[entity_config::attributes::frames],
+        entity_config::mack_across_attributes[entity_config::attributes::animations]);
+
+    auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
+    std::vector<sprite::sprite> sprites;
+    sprites.push_back(std::move(customer_left_sprite));
+    sprites.push_back(std::move(customer_right_sprite));
+
+    std::vector<hitbox::hitbox> hitboxes;
+    hitboxes.push_back(across_hitbox);
+    hitboxes.push_back(across_hitbox);
+
+    auto body = body::body(hitboxes, sprites);
+    auto head = body::body();
+    return std::make_unique<entities::customer_dog>(
+        std::move(body),
+        std::move(head),
+        position,
+        id,
+        next_debug_id("cd_"));
 }

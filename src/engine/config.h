@@ -8,6 +8,7 @@
 
 #include "raylib.h"
 #include <cstddef>
+#include <cmath>
 #include <vector>
 namespace game_config {
     inline const int frames = 60;
@@ -19,6 +20,9 @@ namespace game_config {
 namespace player_config{
     inline const int max_bones = 999999;
     inline const int max_level = 50;
+}
+namespace feature_flag_config{
+    inline const bool automatic_arrivals = true;
 }
 namespace level_config{
     // world dimensions
@@ -63,10 +67,22 @@ namespace level_config{
 	    
 }
 namespace cafe_config{
-    inline const Vector2 dog_queue_start = Vector2{level_config::edge_weight * 8.0f, level_config::edge_weight * 8.0f};
+    inline const float dog_queue_screen_width_ratio = 0.10f;
+    inline const float dog_queue_vertical_buffer_edges = 5.0f;
+    inline const float dog_queue_spacing_edges = 3.0f;
+    inline const float dog_queue_automatic_arrival_seconds = 120.0f;
+    inline const float dog_queue_dogs_left_window_seconds = 30.0f;
+    inline const int dog_queue_dogs_left_trigger = 3;
+    inline const int debug_customer_dog_type = 0;
+    inline const float dog_queue_width = level_config::screen_width * dog_queue_screen_width_ratio;
+    inline const float dog_queue_height = level_config::screen_height;
+    inline const Vector2 dog_queue_start = Vector2{dog_queue_width * 0.5f, level_config::edge_weight * dog_queue_vertical_buffer_edges};
     inline const Vector2 dog_queue_direction = Vector2{0.0f, 1.0f};
-    inline const size_t dog_queue_capacity = 5;
-    inline const float dog_queue_base_spacing_edges = 1.0f;
+    inline const float dog_queue_available_height = dog_queue_height - (2.0f * dog_queue_vertical_buffer_edges * level_config::edge_weight);
+    inline const size_t dog_queue_capacity = dog_queue_available_height <= 0.0f
+        ? 0
+        : static_cast<size_t>(std::floor(dog_queue_available_height / (dog_queue_spacing_edges * level_config::edge_weight)));
+    inline const Rectangle dog_queue_debug_bounds = Rectangle{0.0f, 0.0f, dog_queue_width, dog_queue_height};
 }
 namespace entity_config{
     // file paths
