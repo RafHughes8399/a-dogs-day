@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <queue>
 #include <ctime>
+#include <string>
 
 // project includes
 #include "hitbox.h"
@@ -61,7 +62,8 @@ namespace events{
 		waiter_cleared_table_id = 30,
 		send_waiter_table = 31,
 		send_waiter_clear_table = 32,
-		size = 33
+		debug_log_id = 33,
+		size = 34
 	};
 	class event{
 
@@ -229,6 +231,20 @@ namespace events{
 			}
 		private:
 			const int new_level_;
+	};
+	class debug_log : public event{
+		public:
+			debug_log(std::string message)
+			:event(ids::debug_log_id), message_(std::move(message)){}
+
+			static int get_static_type(){
+				return ids::debug_log_id;
+			}
+			const std::string& get_message() const{
+				return message_;
+			}
+		private:
+			const std::string message_;
 	};
 	// when the cursor left click occurs, main listener is the quad tree to check collisions
 	class left_mouse_click : public event{

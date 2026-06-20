@@ -1,10 +1,13 @@
 #include "game.h"
 // #include <iostream>
 void game::game::update(float delta){
+    debug::log("[game::update, frame tick] delta: " + std::to_string(delta));
+
     // deal with queued events 
     // std::cout << "[game update]: update" << std::endl;
     events::global_dispatcher_.process_events(delta);
     maitre_d_.process_events();
+    logger_.update(delta);
     // update the level
     level_.update(delta, frame_count_);
     // then the player
@@ -28,6 +31,7 @@ void game::game::render(float delta){
     player_.render();
     menus_.render();
     DrawFPS(25, 25);
+    logger_.render();
     return;
 }
 
