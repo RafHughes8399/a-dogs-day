@@ -12,6 +12,7 @@
 #include "sprite.h"
 #include "raylib.h"
 #include "body.h"
+#include "debug_log_interface.h"
 #include "query_interface.h"
 #include "queries.h"
 #include <map>
@@ -380,8 +381,18 @@ namespace entities{
             npc_dog(body::body body, body::body head, Vector2 position, Vector2 path_dst, int id, std::string debug_id, int direction = level_config::directions::right)
             : dog(body, head, position, id, std::move(debug_id), direction){
                 // upon creating an npc dog with a path destination, immediately query the graph for a path and set it
+                debug::log(
+                    "[npc_dog::npc_dog, querying path] "
+                    "dog_id: " + std::to_string(id)
+                    + ", source: {" + std::to_string(position.x) + ", " + std::to_string(position.y) + "}"
+                    + ", destination: {" + std::to_string(path_dst.x) + ", " + std::to_string(path_dst.y) + "}"
+                    + ", direction: {" + std::to_string(get_direction_scalar().x) + ", " + std::to_string(get_direction_scalar().y) + "}");
                 std::unique_ptr<queries::query> path_query = std::make_unique<queries::path_query>(position, path_dst, get_direction_scalar());
                 auto path = query_interface::execute_query(queries::path_executor_, *path_query);
+                debug::log(
+                    "[npc_dog::npc_dog, path query complete] "
+                    "dog_id: " + std::to_string(id)
+                    + ", path_size: " + std::to_string(path.size()));
                 set_path(path);
             }
             npc_dog(const npc_dog& other) = delete;

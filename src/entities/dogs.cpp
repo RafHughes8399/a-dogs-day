@@ -1,7 +1,8 @@
 #include "entities.h"
 #include "texture.h"
-#include <iostream>
+#include "debug_log_interface.h"
 #include "raglib.h"
+#include <iostream>
 // ------------------------------- render states ------------------------------- //
 void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position, int frame){
     size_t render_index = dog.get_body().get_index();
@@ -34,21 +35,17 @@ int entities::dog::update(float delta, int frame){
     (void) frame;
 
     if(! move_path_.empty()){
-        std::cout << "[entities::dog::update] move_path_.front(): " << raglib::vector_to_string(move_path_.front()) << std::endl;
         auto next_position = move_path_.front();
-        std::cout << "[entities::dog::update] next_position: " << raglib::vector_to_string(position_) << std::endl;
         if(reached_position(next_position)){
-            std::cout << "[entities::dog::update] reached next_position: " << raglib::vector_to_string(next_position) << std::endl;
+            std::cout << "[reached position]: " << raglib::vector_to_string(next_position) << std::endl;
             move_path_.erase(move_path_.begin());
             if(! move_path_.empty()){
-                std::cout << "[entities::dog::update] new move_path_.front(): " << raglib::vector_to_string(move_path_.front()) << std::endl;
                 next_position = move_path_.front();
                 determine_direction(next_position);
             }
         }
         auto new_position = Vector2Add(position_, Vector2Scale(Vector2Multiply(move_speed_, direction_scalar_), delta));
         position_ = new_position;
-        std::cout << "[entities::dog::update] new position: " << raglib::vector_to_string(position_) << std::endl;
         body_.update_hitboxes(position_);
     }
     return status_codes::nothing;
@@ -94,9 +91,21 @@ void entities::dog::render(Vector2 draw_position, int frame){
 }
 
 void entities::dog::set_path(std::vector<Vector2>& path){
-    if(path.empty()) return;
+    if(path.empty()){
+        debug::log(
+            "[dog::set_path, skipped empty path] "
+            "dog_id: " + std::to_string(id_));
+        return;
+    }
     move_path_ = path;
     determine_direction(move_path_.front());
+    debug::log(
+        "[dog::set_path, assigned path] "
+        "dog_id: " + std::to_string(id_)
+        + ", path_size: " + std::to_string(move_path_.size())
+        + ", current_position: " + raglib::vector_to_string(position_)
+        + ", first_position: " + raglib::vector_to_string(move_path_.front())
+        + ", direction: " + raglib::vector_to_string(direction_scalar_));
 }
 
 // ------------------------------- player dogs ------------------------------- //
@@ -422,7 +431,15 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
 
 // NPC dog sprite art/config pending.
 std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination = std::nullopt){
-    (void) dog_type;
+    debug::log(
+        "[entity_builder::build_npc_dog, building npc dog] "
+        "dog_id: " + std::to_string(id)
+        + ", dog_type: " + std::to_string(dog_type)
+        + ", position: " + raglib::vector_to_string(position)
+        + ", has_destination: " + std::to_string(destination.has_value())
+        + (destination.has_value()
+            ? ", destination: " + raglib::vector_to_string(destination.value())
+            : ""));
 //     auto npc_left_texture = textures::textures_.get_texture(textures::npc_dog_left, entity_config::npc_dog_left_path);
 //     auto npc_right_texture = textures::textures_.get_texture(textures::npc_dog_right, entity_config::npc_dog_right_path);
 //
@@ -482,6 +499,12 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id
     auto body = body::body(hitboxes, sprites);
     auto head = body::body();
     if(destination.has_value()){
+        debug::log(
+            "[entity_builder::build_npc_dog, constructing customer dog with destination] "
+            "dog_id: " + std::to_string(id)
+            + ", dog_type: " + std::to_string(dog_type)
+            + ", position: " + raglib::vector_to_string(position)
+            + ", destination: " + raglib::vector_to_string(destination.value()));
         return std::make_unique<entities::customer_dog>(
         std::move(body),
         std::move(head),
@@ -490,6 +513,11 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id
         id,
         next_debug_id("cd_"));
     }else{
+        debug::log(
+            "[entity_builder::build_npc_dog, constructing customer dog without destination] "
+            "dog_id: " + std::to_string(id)
+            + ", dog_type: " + std::to_string(dog_type)
+            + ", position: " + raglib::vector_to_string(position));
         return std::make_unique<entities::customer_dog>(
             std::move(body),
             std::move(head),
@@ -498,4 +526,3 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id
             next_debug_id("cd_"));
     }
 }
-

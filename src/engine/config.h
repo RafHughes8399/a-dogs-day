@@ -35,6 +35,8 @@ namespace level_config{
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder
 
+    inline const int screen_edges_x = screen_width/ edge_weight;
+    inline const int screen_edges_y = screen_height / edge_weight;
 
     inline const int empty_node = -1;
     inline const size_t mack_id = 0;
@@ -72,26 +74,34 @@ namespace cafe_config{
         left = 0,
         right = 1
     };
-    inline const float queue_width_edges = 5.0f;
-    inline const float queue_x_edges = 3.0f;
-    inline const float queue_y_buffer_edges = 5.0f;
-    inline const float queue_gap_edges = 3.0f;
+    inline const float queue_width_edges = 2.5f;
+    inline const int queue_x_edges = 1;
+    inline const int queue_y_buffer_edges = 1;
+    inline const int queue_y_edges = level_config::screen_edges_y - (2 * queue_y_buffer_edges);
+    inline const float queue_gap_edges = 2.0f;
     inline const float queue_arrival_s = 120.0f;
     inline const float queue_left_window_s = 30.0f;
     inline const int queue_left_trigger = 3;
     inline const int customer_dog_type = 0;
     inline const Vector2 queue_dir = Vector2{0.0f, 1.0f};
     inline const Vector2 customer_spawn_positions[2] = {
-        Vector2{queue_x_edges * level_config::edge_weight, -2.0f * level_config::edge_weight},
+        Vector2{queue_x_edges * level_config::edge_weight, 0 - (2.0f * level_config::edge_weight)},
         Vector2{queue_x_edges * level_config::edge_weight, level_config::screen_height + (2.0f * level_config::edge_weight)}
     };
     inline const float queue_width = queue_width_edges * level_config::edge_weight;
     inline const float queue_height = level_config::screen_height;
 
-    inline const Vector2 queue_start = Vector2{queue_x_edges * level_config::edge_weight, queue_y_buffer_edges * level_config::edge_weight};
-
-    inline const float queue_available_height = queue_height - (2.0f * queue_y_buffer_edges * level_config::edge_weight);
-    inline const int queue_capacity = static_cast<int>(std::floor(queue_available_height / level_config::edge_weight));
+    inline const float queue_midpoint_y = level_config::screen_height / 2.0f;
+    inline const Vector2 left_queue_head = Vector2{
+        queue_x_edges * level_config::edge_weight,
+        queue_midpoint_y - level_config::edge_weight
+    };
+    inline const Vector2 right_queue_head = Vector2{
+        queue_x_edges * level_config::edge_weight,
+        queue_midpoint_y + level_config::edge_weight
+    };
+    
+    inline const int queue_capacity = queue_y_edges;
     inline const Rectangle queue_debug_bounds = Rectangle{
         0.0f,
         0.0f,
@@ -217,8 +227,8 @@ namespace debug_logger_config{
     inline const int backdrop_opacity = 102;
     inline const Color backdrop = Color{28, 28, 28, backdrop_opacity};
     inline const Color text = Color{245, 240, 225, 255};
-    inline const int font_size = 18;
-    inline const int line_height = 24;
+    inline const int font_size = 24;
+    inline const int line_height = 36;
     inline const int padding_x = 18;
     inline const int padding_y = 16;
     inline const size_t max_messages = 80;

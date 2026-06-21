@@ -2,6 +2,22 @@
 #include "debug_log_interface.h"
 #include "events_interface.h"
 
+namespace{
+    std::string vector_to_string(Vector2 position){
+        return "{" + std::to_string(position.x) + ", " + std::to_string(position.y) + "}";
+    }
+
+    std::string side_to_string(int side){
+        if(side == cafe_config::queue_sides::left){
+            return "left";
+        }
+        if(side == cafe_config::queue_sides::right){
+            return "right";
+        }
+        return "unknown";
+    }
+}
+
 maitre_d::maitre_d& maitre_d::maitre_d::get_instance(){
     static maitre_d instance;
     return instance;
@@ -11,7 +27,6 @@ maitre_d::maitre_d::maitre_d()
 : seconds_since_customer_arrived_(cafe_config::queue_arrival_s),
 dogs_left_window_seconds_(0.0f),
 dogs_left_in_window_(0),
-customer_arrival_locked_(false),
 registered_table_handler_([this](const events::registered_table& event) -> void {on_registered_table_event(event);}),
 registered_customer_handler_([this](const events::registered_customer& event) -> void {on_registered_customer_event(event);}),
 requested_customer_table_handler_([this](const events::requested_customer_table& event) -> void {on_requested_customer_table_event(event);}),
@@ -78,23 +93,36 @@ void maitre_d::maitre_d::check_customer_arrivals(float delta){
 }
 
 bool maitre_d::maitre_d::can_request_customer_arrival() const{
-    return ! customer_arrival_locked_ && ! customer_queue_.full();
+    return ! customer_queue_.full();
 }
 
 void maitre_d::maitre_d::request_customer_arrival(){
     if(! can_request_customer_arrival()){
+        debug::log(
+            "[maitre_d::request_customer_arrival, blocked request] "
+            "queue_full: " + std::to_string(customer_queue_.full()));
         return;
     }
 
     int queue_side = customer_queue_.pick_side();
-    customer_arrival_locked_ = true;
     Vector2 spawn_position = cafe_config::customer_spawn_positions[queue_side];
     Vector2 destination = customer_queue_.get_enqueue_position(queue_side);
+    debug::log(
+        "[maitre_d::request_customer_arrival, reserved queue slot] "
+        "queue_side: " + side_to_string(queue_side)
+        + ", spawn_position: " + vector_to_string(spawn_position)
+        + ", destination: " + vector_to_string(destination));
     std::unique_ptr<events::event> build_customer_dog = std::make_unique<events::build_customer_dog>(
         cafe_config::customer_dog_type,
         spawn_position,
         destination);
     event_interface::queue_event(build_customer_dog);
+    debug::log(
+        "[maitre_d::request_customer_arrival, queued build event] "
+        "dog_type: " + std::to_string(cafe_config::customer_dog_type)
+        + ", queue_side: " + side_to_string(queue_side)
+        + ", spawn_position: " + vector_to_string(spawn_position)
+        + ", destination: " + vector_to_string(destination));
 }
 
 void maitre_d::maitre_d::on_registered_table_event(const events::registered_table& event){
@@ -102,8 +130,9 @@ void maitre_d::maitre_d::on_registered_table_event(const events::registered_tabl
 }
 
 void maitre_d::maitre_d::on_registered_customer_event(const events::registered_customer& event){
-    std::cout << "[maitre_d::on_registered_customer_event, registered customer] "
-        "customer_id: " + std::to_string(event.get_customer_id()) << std::endl;
+    debug::log(
+        "[maitre_d::on_registered_customer_event, registered customer] "
+        "customer_id: " + std::to_string(event.get_customer_id()));
     register_customer(event.get_customer_id());
 }
 
@@ -112,13 +141,15 @@ void maitre_d::maitre_d::on_requested_customer_table_event(const events::request
 }
 
 void maitre_d::maitre_d::on_customer_dog_created_event(const events::customer_dog_created& event){
+    debug::log(
+        "[maitre_d::on_customer_dog_created_event, confirming customer arrival] "
+        "customer_id: " + std::to_string(event.get_customer_id()));
     customer_queue_.enqueue(event.get_customer_id());
-    auto log =
-        "[maitre_d::on_customer_dog_created_event, entering queue at position] "
-        "customer_id: " + std::to_string(event.get_customer_id());
-    std::cout << log << std::endl;
     seconds_since_customer_arrived_ = 0.0f;
-    customer_arrival_locked_ = false;
+    debug::log(
+        "[maitre_d::on_customer_dog_created_event, reset arrival timer] "
+        "customer_id: " + std::to_string(event.get_customer_id())
+        + ", seconds_since_customer_arrived: " + std::to_string(seconds_since_customer_arrived_));
 }
 
 void maitre_d::maitre_d::on_customer_dog_left_event(const events::customer_dog_left& event){

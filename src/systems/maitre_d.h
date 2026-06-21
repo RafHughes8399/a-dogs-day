@@ -48,6 +48,12 @@ namespace maitre_d{
     struct queued_dog{
         size_t dog_id;
     };
+
+    struct queue_lane{
+        Vector2 head;
+        std::vector<queued_dog> dogs;
+    };
+
     class dog_queue{
         public:
             dog_queue() = default;
@@ -74,13 +80,15 @@ namespace maitre_d{
             Vector2 get_target_position(size_t dog_id) const;
 
         private:
+            queue_lane& lane_for_side(int queue_side);
+            const queue_lane& lane_for_side(int queue_side) const;
             std::vector<queued_dog>& dogs_for_side(events::customer_queue_side queue_side);
             const std::vector<queued_dog>& dogs_for_side(events::customer_queue_side queue_side) const;
             Vector2 position_for_index(size_t index, events::customer_queue_side queue_side) const;
             
-            std::vector<queued_dog> left_queue_;
-            std::vector<queued_dog> right_queue_;
-            int next_side_ = cafe_config::queue_sides::left;
+            queue_lane left_queue_{cafe_config::left_queue_head, {}};
+            queue_lane right_queue_{cafe_config::right_queue_head, {}};
+            int previous_side_ = cafe_config::queue_sides::right;
     };
 
     namespace interface{
@@ -160,7 +168,6 @@ namespace maitre_d{
             float seconds_since_customer_arrived_;
             float dogs_left_window_seconds_;
             int dogs_left_in_window_;
-            bool customer_arrival_locked_;
 
             events::event_handler<events::registered_table> registered_table_handler_;
             events::event_handler<events::registered_customer> registered_customer_handler_;
