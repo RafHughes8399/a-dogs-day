@@ -68,7 +68,7 @@ namespace events{
 		send_waiter_table = 31,
 		send_waiter_clear_table = 32,
 		customer_left = 33,
-		build_dog_id = 34,
+		build_customer_dog_id = 34,
 		send_customer_queue = 35,
 		debug_log_id = 36,
 		size = 37
@@ -418,23 +418,19 @@ namespace events{
 	};
 	// Cafe-domain fact: a customer dog has entered the cafe and should be placed
 	// into the physical waiting queue managed by the maitre d'.
-	class customer_dog_arrived : public event{
+	class customer_dog_created : public event{
 		public:
-			customer_dog_arrived(size_t customer_id, customer_queue_side queue_side)
-			: event(ids::customer_arrived), customer_id_(customer_id), queue_side_(queue_side){}
-
+			customer_dog_created(size_t customer_id)
+			: event(ids::customer_arrived), customer_id_(customer_id){}
+			
 			static int get_static_type(){
 				return ids::customer_arrived;
 			}
 			size_t get_customer_id() const{
 				return customer_id_;
 			}
-			customer_queue_side get_queue_side() const{
-				return queue_side_;
-			}
 		private:
 			const size_t customer_id_;
-			const customer_queue_side queue_side_;
 	};
 	// Cafe-domain command/fact: the maitre d' has taken a customer dog out of
 	// the waiting queue and sent it toward an assigned table.
@@ -753,13 +749,13 @@ namespace events{
 
 
 	// for when we need to build a dog
-	class build_dog : public event{
+	class build_customer_dog : public event{
 		public:
-			build_dog(int dog_type, Vector2 position, customer_queue_side queue_side)
-			:event(ids::build_dog_id), dog_type_(dog_type), position_(position), queue_side_(queue_side){}
+			build_customer_dog(int dog_type, Vector2 position, Vector2 destination)
+			:event(ids::build_customer_dog_id), dog_type_(dog_type), position_(position), destination_(destination){}
 
 			static int get_static_type(){
-				return ids::build_dog_id;
+				return ids::build_customer_dog_id;
 			}
 			int get_dog_type() const {
 				return dog_type_;
@@ -767,13 +763,13 @@ namespace events{
 			Vector2 get_position() const {
 				return position_;
 			}
-			customer_queue_side get_queue_side() const{
-				return queue_side_;
+			Vector2 get_destination() const{
+				return destination_;
 			}
 		private:
 			const int dog_type_;
 			const Vector2 position_;
-			const customer_queue_side queue_side_;
+			const Vector2 destination_;
 	};
 	class event_handler_interface{
 		public:

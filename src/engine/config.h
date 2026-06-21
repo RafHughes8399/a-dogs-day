@@ -23,14 +23,14 @@ namespace player_config{
     inline const int max_level = 50;
 }
 namespace feature_flag_config{
-    inline const bool automatic_arrivals = true;
+    inline const bool automatic_arrivals = false;
 }
 namespace level_config{
     // world dimensions
-    inline float screen_width = static_cast<float>(game_config::window_width);
-    inline float screen_height = static_cast<float>(game_config::window_height);
-    inline float world_x = 4096.0f;
-    inline float world_y = 4096.0f;
+    inline const float screen_width = static_cast<float>(game_config::window_width);
+    inline const float screen_height = static_cast<float>(game_config::window_height);
+    inline float world_x = 2048.0f;
+    inline float world_y = 2048.0f;
     
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder
@@ -41,7 +41,7 @@ namespace level_config{
     inline const size_t khiri_id = 1;
 
     inline const Vector2 frame_move = Vector2{375, 375};
-
+    inline const float void_move = edge_weight * 0.125;
     enum draw_layers{
         background = 0,
         decoration = 1,
@@ -65,27 +65,39 @@ namespace level_config{
         Vector2{0, -1}, // up    (index 2)
         Vector2{0, 1}   // down  (index 3)
     };
-	    
+
 }
 namespace cafe_config{
-    inline const float dog_queue_width_edges = 5.0f;
-    inline const float dog_queue_column_edges = 3.0f;
-    inline const float dog_queue_vertical_buffer_edges = 5.0f;
-    inline const float dog_queue_spacing_edges = 3.0f;
-    inline const float dog_queue_automatic_arrival_seconds = 120.0f;
-    inline const float dog_queue_dogs_left_window_seconds = 30.0f;
-    inline const int dog_queue_dogs_left_trigger = 3;
-    inline const int debug_customer_dog_type = 0;
-    inline const Vector2 dog_queue_direction = Vector2{0.0f, 1.0f};
-    inline const float dog_spawn_out_of_bounds_distance = 100.0f;
-    inline const float void_entity_move_per_frame = 8.0f;
+    enum queue_sides{
+        left = 0,
+        right = 1
+    };
+    inline const float queue_width_edges = 5.0f;
+    inline const float queue_x_edges = 3.0f;
+    inline const float queue_y_buffer_edges = 5.0f;
+    inline const float queue_gap_edges = 3.0f;
+    inline const float queue_arrival_s = 120.0f;
+    inline const float queue_left_window_s = 30.0f;
+    inline const int queue_left_trigger = 3;
+    inline const int customer_dog_type = 0;
+    inline const Vector2 queue_dir = Vector2{0.0f, 1.0f};
+    inline const Vector2 customer_spawn_positions[2] = {
+        Vector2{queue_x_edges * level_config::edge_weight, -2.0f * level_config::edge_weight},
+        Vector2{queue_x_edges * level_config::edge_weight, level_config::screen_height + (2.0f * level_config::edge_weight)}
+    };
+    inline const float queue_width = queue_width_edges * level_config::edge_weight;
+    inline const float queue_height = level_config::screen_height;
 
-    inline float dog_queue_width = 0.0f;
-    inline float dog_queue_height = 0.0f;
-    inline Vector2 dog_queue_start = Vector2{0.0f, 0.0f};
-    inline float dog_queue_available_height = 0.0f;
-    inline size_t dog_queue_capacity = 0;
-    inline Rectangle dog_queue_debug_bounds = Rectangle{0.0f, 0.0f, 0.0f, 0.0f};
+    inline const Vector2 queue_start = Vector2{queue_x_edges * level_config::edge_weight, queue_y_buffer_edges * level_config::edge_weight};
+
+    inline const float queue_available_height = queue_height - (2.0f * queue_y_buffer_edges * level_config::edge_weight);
+    inline const int queue_capacity = static_cast<int>(std::floor(queue_available_height / level_config::edge_weight));
+    inline const Rectangle queue_debug_bounds = Rectangle{
+        0.0f,
+        0.0f,
+        queue_width,
+        queue_height
+    };
 }
 namespace entity_config{
     // file paths

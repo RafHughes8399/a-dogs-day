@@ -138,14 +138,14 @@ namespace level{
             event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
             event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
             event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
-            event_interface::unsubscribe<events::build_dog>(build_dog_handler_);
+            event_interface::unsubscribe<events::build_customer_dog>(build_customer_dog_handler_);
             event_interface::unsubscribe<events::send_customer_to_queue>(send_customer_to_queue_handler_);
             }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
             : left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
             move_view_frame_handler_([this](const events::move_view_frame& event) -> void{on_move_view_frame_event(event);}),
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);}),
-            build_dog_handler_([this](const events::build_dog& event) -> void{on_build_dog_event(event);}),
+            build_customer_dog_handler_([this](const events::build_customer_dog& event) -> void{on_build_customer_dog_event(event);}),
             send_customer_to_queue_handler_([this](const events::send_customer_to_queue& event) -> void{on_send_customer_to_queue_event(event);}),
             graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
             view_frame_(frame), background_(sprite), id_entity_map_({}),
@@ -155,7 +155,7 @@ namespace level{
                 event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
                 event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
-                event_interface::subscribe<events::build_dog>(build_dog_handler_);
+                event_interface::subscribe<events::build_customer_dog>(build_customer_dog_handler_);
                 event_interface::subscribe<events::send_customer_to_queue>(send_customer_to_queue_handler_);
             }
             level(const level& other) = delete;
@@ -172,7 +172,7 @@ namespace level{
             void on_move_view_frame_event(const events::move_view_frame& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
 
-            void on_build_dog_event(const events::build_dog& event);
+            void on_build_customer_dog_event(const events::build_customer_dog& event);
             void on_send_customer_to_queue_event(const events::send_customer_to_queue& event);
             
             void render(int frame);
@@ -181,13 +181,9 @@ namespace level{
             struct void_entity_record{
                 std::unique_ptr<entities::entity> entity;
                 size_t layer;
-                events::customer_queue_side queue_side;
             };
 
-            void add_void_entity(
-                std::unique_ptr<entities::entity> entity,
-                size_t layer,
-                events::customer_queue_side queue_side);
+            void add_void_entity(std::unique_ptr<entities::entity> entity, size_t layer);
             void update_void_entities(float delta, int frame);
             bool is_inside_screen(entities::entity& entity) const;
             void move_void_entity_toward_screen(entities::entity& entity, int frame);
@@ -199,7 +195,7 @@ namespace level{
             events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
 
 
-            events::event_handler<events::build_dog> build_dog_handler_;
+            events::event_handler<events::build_customer_dog> build_customer_dog_handler_;
             events::event_handler<events::send_customer_to_queue> send_customer_to_queue_handler_;
             level_graph graph_;
             

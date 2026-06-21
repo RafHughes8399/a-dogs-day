@@ -380,8 +380,8 @@ namespace entities{
             npc_dog(body::body body, body::body head, Vector2 position, Vector2 path_dst, int id, std::string debug_id, int direction = level_config::directions::right)
             : dog(body, head, position, id, std::move(debug_id), direction){
                 // upon creating an npc dog with a path destination, immediately query the graph for a path and set it
-                std::unique_ptr<queries::query> path_query = std::make_unique<queries::path_query>(position, path_dst, level_config::direction_scalars);
-                auto path = query_interface::execute_query(*path_query);
+                std::unique_ptr<queries::query> path_query = std::make_unique<queries::path_query>(position, path_dst, get_direction_scalar());
+                auto path = query_interface::execute_query(queries::path_executor_, *path_query);
                 set_path(path);
             }
             npc_dog(const npc_dog& other) = delete;
@@ -442,6 +442,11 @@ namespace entities{
             int direction = level_config::directions::right,
             std::unique_ptr<customer_dog::state> state = std::make_unique<entering_queue>())
             : npc_dog(body, head, position, id, std::move(debug_id), direction), customer_state_(std::move(state)){}
+
+            customer_dog(body::body body, body::body head, Vector2 position, Vector2 path_dst, int id, std::string debug_id,
+            int direction = level_config::directions::right,
+            std::unique_ptr<customer_dog::state> state = std::make_unique<entering_queue>())
+            : npc_dog(body, head, position, path_dst, id, std::move(debug_id), direction), customer_state_(std::move(state)){}
             customer_dog(const customer_dog& other) = delete;
             customer_dog(customer_dog&& other) = default;
 
@@ -626,7 +631,7 @@ namespace entities{
             std::unique_ptr<entity> build_mack(Vector2 position, int id);
             std::unique_ptr<entity> build_khiri(Vector2 position, int id);
             // NPC dog sprite art/config pending.
-            std::unique_ptr<entity> build_npc_dog(Vector2 position, int id, int dog_type);
+            std::unique_ptr<entity> build_npc_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination);
             std::unique_ptr<entity> build_paw_mark(Vector2 position, int id);
 
             std::unique_ptr<entity> build_test_decoration(Vector2 position, int id);
