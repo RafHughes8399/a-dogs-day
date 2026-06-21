@@ -153,8 +153,8 @@ namespace level{
                 event_interface::subscribe<events::build_dog>(build_dog_handler_);
                 event_interface::subscribe<events::send_customer_to_queue>(send_customer_to_queue_handler_);
             }
-            level(const level& other) = default;
-            level(level&& other) = default;
+            level(const level& other) = delete;
+            level(level&& other) = delete;
             
             level& operator=(const level& other) = delete;
             level& operator=(level&& other) = delete;
@@ -220,7 +220,7 @@ namespace level{
             level_builder& operator=(const level_builder& other) = default;
             level_builder& operator=(level_builder&& other) = default;
 
-            level build_main_level();
+            std::unique_ptr<level> build_main_level();
     };
 }
 

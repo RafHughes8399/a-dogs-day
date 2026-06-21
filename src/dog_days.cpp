@@ -5,6 +5,8 @@
 #include "game.h"
 int main(){
     InitWindow(game_config::window_width, game_config::window_height, "dog day");
+    level_config::screen_width = static_cast<float>(GetScreenWidth());
+    level_config::screen_height = static_cast<float>(GetScreenHeight());
     maitre_d::interface::configure_customer_queue_layout();
     auto level_builder = level::level_builder();
     auto level = level_builder.build_main_level();
@@ -15,7 +17,7 @@ int main(){
     std::cout << "[dog_days init] : built player " << std::endl;
     auto controls = player::controls(&player);
     std::cout << "[dog_days init] : built controls " << std::endl;
-    auto game = game::game(level, player, menus, controls);
+    auto game = game::game(*level, player, menus, controls);
     std::cout << "[dog_days init] : built game " << std::endl;
     HideCursor();
     SetTargetFPS(60);

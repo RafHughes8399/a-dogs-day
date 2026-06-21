@@ -15,10 +15,10 @@ void maitre_d::interface::request_table_for_customer(size_t customer_id){
 }
 
 void maitre_d::interface::configure_customer_queue_layout(){
-    cafe_config::dog_queue_width = static_cast<float>(GetScreenWidth()) * cafe_config::dog_queue_screen_width_ratio;
+    cafe_config::dog_queue_width = cafe_config::dog_queue_width_edges * level_config::edge_weight;
     cafe_config::dog_queue_height = static_cast<float>(GetScreenHeight());
     cafe_config::dog_queue_start = Vector2{
-        cafe_config::dog_queue_width * 0.5f,
+        cafe_config::dog_queue_column_edges * level_config::edge_weight,
         level_config::edge_weight * cafe_config::dog_queue_vertical_buffer_edges
     };
     cafe_config::dog_queue_available_height = cafe_config::dog_queue_height

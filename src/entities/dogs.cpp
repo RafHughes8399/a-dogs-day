@@ -1,5 +1,7 @@
 #include "entities.h"
 #include "texture.h"
+#include <iostream>
+#include "raglib.h"
 // ------------------------------- render states ------------------------------- //
 void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position, int frame){
     size_t render_index = dog.get_body().get_index();
@@ -30,17 +32,23 @@ bool entities::dog::reached_position(Vector2 target){
 
 int entities::dog::update(float delta, int frame){
     (void) frame;
+
     if(! move_path_.empty()){
+        std::cout << "[entities::dog::update] move_path_.front(): " << raglib::vector_to_string(move_path_.front()) << std::endl;
         auto next_position = move_path_.front();
+        std::cout << "[entities::dog::update] next_position: " << raglib::vector_to_string(position_) << std::endl;
         if(reached_position(next_position)){
+            std::cout << "[entities::dog::update] reached next_position: " << raglib::vector_to_string(next_position) << std::endl;
             move_path_.erase(move_path_.begin());
             if(! move_path_.empty()){
+                std::cout << "[entities::dog::update] new move_path_.front(): " << raglib::vector_to_string(move_path_.front()) << std::endl;
                 next_position = move_path_.front();
                 determine_direction(next_position);
             }
         }
         auto new_position = Vector2Add(position_, Vector2Scale(Vector2Multiply(move_speed_, direction_scalar_), delta));
         position_ = new_position;
+        std::cout << "[entities::dog::update] new position: " << raglib::vector_to_string(position_) << std::endl;
         body_.update_hitboxes(position_);
     }
     return status_codes::nothing;

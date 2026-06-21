@@ -30,10 +30,6 @@ void game::game::run_debug_behaviours(){
     if(IsKeyPressed(KEY_L)){
         auto queue_side = maitre_d_.get_customer_queue_side();
         auto spawn_position = maitre_d_.get_customer_spawn_position(queue_side);
-        debug::log(
-            "[game::run_debug_behaviours, manual customer build key pressed] "
-            "queue_side: " + std::to_string(static_cast<int>(queue_side))
-            + ", spawn_position: {" + std::to_string(spawn_position.x) + ", " + std::to_string(spawn_position.y) + "}");
         std::unique_ptr<events::event> build_dog = std::make_unique<events::build_dog>(
             cafe_config::debug_customer_dog_type,
             spawn_position,

@@ -27,8 +27,8 @@ namespace feature_flag_config{
 }
 namespace level_config{
     // world dimensions
-    inline float screen_width = GetScreenWidth();
-    inline float screen_height = GetScreenHeight();
+    inline float screen_width = static_cast<float>(game_config::window_width);
+    inline float screen_height = static_cast<float>(game_config::window_height);
     inline float world_x = 4096.0f;
     inline float world_y = 4096.0f;
     
@@ -68,7 +68,8 @@ namespace level_config{
 	    
 }
 namespace cafe_config{
-    inline const float dog_queue_screen_width_ratio = 0.175f; // the percentage of the screen width taken up by the dog queue
+    inline const float dog_queue_width_edges = 5.0f;
+    inline const float dog_queue_column_edges = 3.0f;
     inline const float dog_queue_vertical_buffer_edges = 5.0f;
     inline const float dog_queue_spacing_edges = 3.0f;
     inline const float dog_queue_automatic_arrival_seconds = 120.0f;
@@ -198,8 +199,9 @@ namespace hud_config{
 }
 namespace debug_logger_config{
     inline const int toggle_key = KEY_SLASH;
-    inline const float backdrop_height_ratio = 0.33f;
-    inline const float backdrop_y_ratio = 1.0f - backdrop_height_ratio;
+    inline const int pause_key = KEY_P;
+    inline const float logger_height_ratio = 0.6f;
+    inline const float logger_y_position_scalar = 1.0f - logger_height_ratio;
     inline const int backdrop_opacity = 102;
     inline const Color backdrop = Color{28, 28, 28, backdrop_opacity};
     inline const Color text = Color{245, 240, 225, 255};

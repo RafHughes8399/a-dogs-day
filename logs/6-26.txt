@@ -88,3 +88,149 @@ rfemember this checklist for the rest of this feature so next is
 -> then testing queue joining behaviour 
 -> then table setup 
 -> then table pathinding 
+
+when the level builds a dog and enqueus it, that should a customer arrived, or rather trigger that process within the maitre_d, since i think the matire d would know when a dog is enequeued in the queue that it 
+manages right ? like this can be done in house. 
+then the dog needs to know what position they need to go to. lets dicuss how we can wire through this info. initial thoughts along the lines of 
+
+customer dog 
+that the matire_d emits an dog_queue_path  that passes the dog id and the position it needs to go to. 
+customer dogs in their waiting for queue postiion listen to those events. each dog does an id check against the event and then updates their value if the id matches
+
+
+alternatively i think the query system would be stronger in the scearion, liek consider the two systems
+
+an event is a one emitter many listeners kind of thing, but most of the listenres would actually not care. 
+
+a query is a many emitter one listener. the two differ in the bodies emitting and their flow right (maybe im describing it poorly but you see the pattern and how this situation is where it fits)
+
+
+main level should build two tables,
+on table build matire_d adds a table to its record <id, position (position should now be a pointer to the tables position, so it always knows what the tables pos is without repetitive and expensive lookups)
+on. table remvoed (but thhis is pending an entity remover like the anti factory) which will come later 
+
+i think we store table records as an id position ptr and stauts
+ so the table status should flip when the matire d assigns a dog to the table
+, the table is refreed when the dog leaves that table 
+
+furthermore, now that the dogs are assigned queue positions, we need to check two things. A. the queueue position it assigns is correct and B. does the dog move correctly
+
+when the dog reaches the head of the queue, and they have been at the queue for at least .5 seconds (we can do some state transition stuff here for this i think), or maybe a delayed event ? i think that 
+would work like 
+, the matire d should find the table and assign the dog. 
+
+slight redesign. depending on the table records are currently stored i propose an potential amendmant. the tables should be grouped into four quadrants. rather 
+there should be a boundary for where tables can go. they can go in the dining area (another condition for the placement when eidting). like we have defined the queue area, we need to define the dining it should be the entire screen and the 40% of the screen. 
+for 
+
+ the matire_d should store the tables in a quad tree representation too. 
+
+ the logic for lookup is pick a number 0 to 3. then the matire_d recursively always checsk that child node until it reaches the leaf of that index. it then  picks the first child that has a free table.
+
+ it then gives the dog that position, and marks the table as full
+
+
+ main level should build two tables,
+on table build matire_d adds a table to its record <id, position (position should now be a pointer to the tables position, so it always knows what the tables pos is without repetitive and expensive lookups)
+on. table remvoed (but thhis is pending an entity remover like the anti factory) which will come later 
+
+i think we store table records as an id position ptr and stauts
+ so the table status should flip when the matire d assigns a dog to the table
+, the table is refreed when the dog leaves that table 
+
+furthermore, now that the dogs are assigned queue positions, we need to check two things. A. the queueue position it assigns is correct and B. does the dog move correctly
+
+when the dog reaches the head of the queue, and they have been at the queue for at least .5 seconds (we can do some state transition stuff here for this i think), or maybe a delayed event ? i think that 
+would work like 
+, the matire d should find the table and assign the dog. 
+
+slight redesign. depending on the table records are currently stored i propose an potential amendmant. the tables should be grouped into four quadrants. rather 
+there should be a boundary for where tables can go. they can go in the dining area (another condition for the placement when eidting). like we have defined the queue area, we need to define the dining it should be the entire screen and the 40% of the screen. 
+for 
+
+ the matire_d should store the tables in a quad tree representation too. 
+
+ the logic for lookup is pick a number 0 to 3. then the matire_d recursively always checsk that child node until it reaches the leaf of that index. it then  picks the first child that has a free table.
+
+ it then gives the dog that position, and marks the table as fullmain level should build two tables,
+on table build matire_d adds a table to its record <id, position (position should now be a pointer to the tables position, so it always knows what the tables pos is without repetitive and expensive lookups)
+on. table remvoed (but thhis is pending an entity remover like the anti factory) which will come later 
+
+i think we store table records as an id position ptr and stauts
+ so the table status should flip when the matire d assigns a dog to the table
+, the table is refreed when the dog leaves that table 
+
+furthermore, now that the dogs are assigned queue positions, we need to check two things. A. the queueue position it assigns is correct and B. does the dog move correctly
+
+when the dog reaches the head of the queue, and they have been at the queue for at least .5 seconds (we can do some state transition stuff here for this i think), or maybe a delayed event ? i think that 
+would work like 
+, the matire d should find the table and assign the dog. 
+
+slight redesign. depending on the table records are currently stored i propose an potential amendmant. the tables should be grouped into four quadrants. rather 
+there should be a boundary for where tables can go. they can go in the dining area (another condition for the placement when eidting). like we have defined the queue area, we need to define the dining it should be the entire screen and the 40% of the screen. 
+for 
+
+ the matire_d should store the tables in a quad tree representation too. 
+
+ the logic for lookup is pick a number 0 to 3. then the matire_d recursively always checsk that child node until it reaches the leaf of that index. it then  picks the first child that has a free table.
+
+ it then gives the dog that position, and marks the table as fullmain level should build two tables,
+on table build matire_d adds a table to its record <id, position (position should now be a pointer to the tables position, so it always knows what the tables pos is without repetitive and expensive lookups)
+on. table remvoed (but thhis is pending an entity remover like the anti factory) which will come later 
+
+i think we store table records as an id position ptr and stauts
+ so the table status should flip when the matire d assigns a dog to the table
+, the table is refreed when the dog leaves that table 
+
+furthermore, now that the dogs are assigned queue positions, we need to check two things. A. the queueue position it assigns is correct and B. does the dog move correctly
+
+when the dog reaches the head of the queue, and they have been at the queue for at least .5 seconds (we can do some state transition stuff here for this i think), or maybe a delayed event ? i think that 
+would work like 
+, the matire d should find the table and assign the dog. 
+
+slight redesign. depending on the table records are currently stored i propose an potential amendmant. the tables should be grouped into four quadrants. rather 
+there should be a boundary for where tables can go. they can go in the dining area (another condition for the placement when eidting). like we have defined the queue area, we need to define the dining it should be the entire screen and the 40% of the screen. 
+for 
+
+ the matire_d should store the tables in a quad tree representation too. 
+
+ the logic for lookup is pick a number 0 to 3. then the matire_d recursively always checsk that child node until it reaches the leaf of that index. it then  picks the first child that has a free table.
+
+ it then gives the dog that position, and marks the table as fullmain level should build two tables,
+on table build matire_d adds a table to its record <id, position (position should now be a pointer to the tables position, so it always knows what the tables pos is without repetitive and expensive lookups)
+on. table remvoed (but thhis is pending an entity remover like the anti factory) which will come later 
+
+i think we store table records as an id position ptr and stauts
+ so the table status should flip when the matire d assigns a dog to the table
+, the table is refreed when the dog leaves that table 
+
+furthermore, now that the dogs are assigned queue positions, we need to check two things. A. the queueue position it assigns is correct and B. does the dog move correctly
+
+when the dog reaches the head of the queue, and they have been at the queue for at least .5 seconds (we can do some state transition stuff here for this i think), or maybe a delayed event ? i think that 
+would work like 
+, the matire d should find the table and assign the dog. 
+
+slight redesign. depending on the table records are currently stored i propose an potential amendmant. the tables should be grouped into four quadrants. rather 
+there should be a boundary for where tables can go. they can go in the dining area (another condition for the placement when eidting). like we have defined the queue area, we need to define the dining it should be the entire screen and the 40% of the screen. 
+for 
+
+ the matire_d should store the tables in a quad tree representation too. 
+
+ the logic for lookup is pick a number 0 to 3. then the matire_d recursively always checsk that child node until it reaches the leaf of that index. it then  picks the first child that has a free table.
+
+ it then gives the dog that position, and marks the table as full
+
+ ok so then the matire_d needs to listen for table move events too, write the dogs to be . slight change to the queue logic. I think the "door" to the restaurant should be in the middle and then dogs spawn at spawn points. slightly off each edge of the screen [at values <0 and > 1080] (they spawn in the out of bouinds state)
+
+ so the level needs to store entities in the "void", out of bounds entities. while out of bounds entity updates do not occur because only the octree calls entity updates, instead void entites have their position moved by 1 every frame closer to the bounds of the game, once passed entirely (i.e their entire height and width) they are actually insereted
+ into the world wit hthe rest of the entities'
+
+ then the middle is essentialy the head of two queues on either side. the side the dog spawns on determiens the queue that it joins'=
+
+ these two queues are indepenednet other the the fact that they are connected by the same head - will require a slight refactor to the dog queue logic, but it seems simple enough for you to handle on your own ? unless you need me to help direct you
+
+ 
+todo:\
+-> test dog queue entrace and lining up
+-> test dogs going to table 
+    

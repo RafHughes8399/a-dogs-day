@@ -1,44 +1,12 @@
 #include "maitre_d.h"
 
-#include "debug_log_interface.h"
-
-#include <string>
-
-namespace{
-    std::string side_to_string(events::customer_queue_side queue_side){
-        if(queue_side == events::customer_queue_side::left_queue){
-            return "left_queue";
-        }
-        return "right_queue";
-    }
-
-    std::string vector_to_string(Vector2 position){
-        return "{" + std::to_string(position.x) + ", " + std::to_string(position.y) + "}";
-    }
-}
-
 void maitre_d::dog_queue::enqueue(size_t dog_id, events::customer_queue_side queue_side, float height_edges){
     if(full() || contains(dog_id)){
-        debug::log(
-            "[dog_queue::enqueue, rejected enqueue] "
-            "dog_id: " + std::to_string(dog_id)
-            + ", queue_side: " + side_to_string(queue_side)
-            + ", is_full: " + std::to_string(full())
-            + ", already_contains: " + std::to_string(contains(dog_id))
-            + ", left_size: " + std::to_string(left_queue_.size())
-            + ", right_size: " + std::to_string(right_queue_.size()));
         return;
     }
     auto& dogs = dogs_for_side(queue_side);
     auto target_position = position_for_index(dogs.size(), queue_side);
     dogs.push_back(queued_dog{dog_id, height_edges, target_position});
-    debug::log(
-        "[dog_queue::enqueue, added dog to side queue] "
-        "dog_id: " + std::to_string(dog_id)
-        + ", queue_side: " + side_to_string(queue_side)
-        + ", target_position: " + vector_to_string(target_position)
-        + ", left_size: " + std::to_string(left_queue_.size())
-        + ", right_size: " + std::to_string(right_queue_.size()));
 }
 
 void maitre_d::dog_queue::dequeue(size_t dog_id){
@@ -85,31 +53,16 @@ size_t maitre_d::dog_queue::size() const{
 
 events::customer_queue_side maitre_d::dog_queue::less_full_side() const{
     if(left_queue_.size() <= right_queue_.size()){
-        debug::log(
-            "[dog_queue::less_full_side, selected side] "
-            "selected_side: left_queue"
-            ", left_size: " + std::to_string(left_queue_.size())
-            + ", right_size: " + std::to_string(right_queue_.size()));
         return events::customer_queue_side::left_queue;
     }
-    debug::log(
-        "[dog_queue::less_full_side, selected side] "
-        "selected_side: right_queue"
-        ", left_size: " + std::to_string(left_queue_.size())
-        + ", right_size: " + std::to_string(right_queue_.size()));
     return events::customer_queue_side::right_queue;
 }
 
 Vector2 maitre_d::dog_queue::get_spawn_position(events::customer_queue_side queue_side) const{
     auto spawn_y = queue_side == events::customer_queue_side::left_queue
-        ? -cafe_config::dog_spawn_out_of_bounds_distance
+        ? 0.0f - cafe_config::dog_spawn_out_of_bounds_distance
         : level_config::screen_height + cafe_config::dog_spawn_out_of_bounds_distance;
     auto spawn_position = Vector2{cafe_config::dog_queue_start.x, spawn_y};
-    debug::log(
-        "[dog_queue::get_spawn_position, resolved spawn position] "
-        "queue_side: " + side_to_string(queue_side)
-        + ", out_of_bounds_distance: " + std::to_string(cafe_config::dog_spawn_out_of_bounds_distance)
-        + ", spawn_position: " + vector_to_string(spawn_position));
     return spawn_position;
 }
 
@@ -127,25 +80,12 @@ Vector2 maitre_d::dog_queue::get_target_position(size_t dog_id) const{
 
     auto left_dog = find_dog(left_queue_);
     if(left_dog != nullptr){
-        debug::log(
-            "[dog_queue::get_target_position, found left queue target] "
-            "dog_id: " + std::to_string(dog_id)
-            + ", target_position: " + vector_to_string(left_dog->target_position));
         return left_dog->target_position;
     }
     auto right_dog = find_dog(right_queue_);
     if(right_dog != nullptr){
-        debug::log(
-            "[dog_queue::get_target_position, found right queue target] "
-            "dog_id: " + std::to_string(dog_id)
-            + ", target_position: " + vector_to_string(right_dog->target_position));
         return right_dog->target_position;
     }
-    debug::log(
-        "[dog_queue::get_target_position, missing target] "
-        "dog_id: " + std::to_string(dog_id)
-        + ", left_size: " + std::to_string(left_queue_.size())
-        + ", right_size: " + std::to_string(right_queue_.size()));
     return Vector2{};
 }
 

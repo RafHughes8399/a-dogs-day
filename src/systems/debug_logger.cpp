@@ -12,7 +12,8 @@ debug::logger::logger()
 : state_(std::make_unique<inactive>()),
 debug_log_handler_([this](const events::debug_log& event) -> void {on_debug_log_event(event);}),
 messages_({}),
-subscribed_(false){}
+subscribed_(false),
+paused_(false){}
 
 void debug::logger::inactive::render(logger& logger){
     (void) logger;
@@ -30,6 +31,9 @@ void debug::logger::update(float delta){
     if(wants_toggle){
         toggle();
     }
+    if(subscribed_ && IsKeyPressed(debug_logger_config::pause_key)){
+        toggle_pause();
+    }
 }
 
 void debug::logger::render(){
@@ -39,6 +43,7 @@ void debug::logger::render(){
 void debug::logger::toggle(){
     if(subscribed_){
         unsubscribe();
+        paused_ = false;
         state_ = std::make_unique<inactive>();
         return;
     }
@@ -46,7 +51,14 @@ void debug::logger::toggle(){
     state_ = std::make_unique<active>();
 }
 
+void debug::logger::toggle_pause(){
+    paused_ = ! paused_;
+}
+
 void debug::logger::on_debug_log_event(const events::debug_log& event){
+    if(paused_){
+        return;
+    }
     add_message(event.get_message());
 }
 
@@ -78,9 +90,9 @@ void debug::logger::render_backdrop(){
     auto screen_height = static_cast<float>(GetScreenHeight());
     auto backdrop = Rectangle{
         0.0f,
-        screen_height * debug_logger_config::backdrop_y_ratio,
+        screen_height * debug_logger_config::logger_y_position_scalar,
         screen_width,
-        screen_height * debug_logger_config::backdrop_height_ratio
+        screen_height * debug_logger_config::logger_height_ratio
     };
     DrawRectangleRec(backdrop, debug_logger_config::backdrop);
 }
@@ -88,10 +100,10 @@ void debug::logger::render_backdrop(){
 void debug::logger::render_messages(){
     auto screen_height = static_cast<float>(GetScreenHeight());
     auto start_x = debug_logger_config::padding_x;
-    auto start_y = static_cast<int>(screen_height * debug_logger_config::backdrop_y_ratio)
+    auto start_y = static_cast<int>(screen_height * debug_logger_config::logger_y_position_scalar)
         + debug_logger_config::padding_y;
     auto max_visible_lines = static_cast<size_t>(
-        ((screen_height * debug_logger_config::backdrop_height_ratio)
+        ((screen_height * debug_logger_config::logger_height_ratio)
             - static_cast<float>(debug_logger_config::padding_y * 2))
         / static_cast<float>(debug_logger_config::line_height));
     auto first_message = messages_.size() > max_visible_lines

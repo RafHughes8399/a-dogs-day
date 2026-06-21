@@ -45,6 +45,7 @@ namespace debug{
             void update(float delta);
             void render();
             void toggle();
+            void toggle_pause();
             void on_debug_log_event(const events::debug_log& event);
 
         private:
@@ -61,6 +62,7 @@ namespace debug{
             events::event_handler<events::debug_log> debug_log_handler_;
             std::vector<std::string> messages_;
             bool subscribed_;
+            bool paused_;
     };
 }
 

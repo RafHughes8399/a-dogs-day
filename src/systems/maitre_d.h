@@ -18,7 +18,7 @@
 #include <cstddef>
 #include <unordered_map>
 #include <vector>
-
+#include <iostream>
 namespace maitre_d{
     inline constexpr size_t empty_id = static_cast<size_t>(-1);
 
@@ -76,10 +76,11 @@ namespace maitre_d{
 
         private:
             void recalculate_positions(std::vector<queued_dog>& dogs, events::customer_queue_side queue_side);
+
             std::vector<queued_dog>& dogs_for_side(events::customer_queue_side queue_side);
             const std::vector<queued_dog>& dogs_for_side(events::customer_queue_side queue_side) const;
             Vector2 position_for_index(size_t index, events::customer_queue_side queue_side) const;
-
+            
             std::vector<queued_dog> left_queue_;
             std::vector<queued_dog> right_queue_;
     };

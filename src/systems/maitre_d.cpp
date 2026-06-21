@@ -1,5 +1,4 @@
 #include "maitre_d.h"
-
 #include "debug_log_interface.h"
 #include "events_interface.h"
 
@@ -47,6 +46,7 @@ void maitre_d::maitre_d::register_customer(size_t customer_id){
     // Customer behaviour state lives on the customer_dog entity. The maitre d'
     // only needs the id when placing that dog into a queue or assigning a table.
     (void) customer_id;
+    // TODO: this does nothing at the moment
 }
 
 void maitre_d::maitre_d::request_table_for_customer(size_t customer_id){
@@ -93,23 +93,13 @@ void maitre_d::maitre_d::check_customer_arrivals(float delta){
     auto should_add_customer = seconds_since_customer_arrived_ >= cafe_config::dog_queue_automatic_arrival_seconds
         || dogs_left_in_window_ >= cafe_config::dog_queue_dogs_left_trigger;
 
-    debug::log(
-        "[maitre_d::check_customer_arrivals, evaluated arrival rules] "
-        "outstanding_customers: " + std::to_string(outstanding_customers)
-        + ", pending_customer_builds: " + std::to_string(pending_customer_builds_)
-        + ", seconds_since_customer_arrived: " + std::to_string(seconds_since_customer_arrived_)
-        + ", dogs_left_in_window: " + std::to_string(dogs_left_in_window_)
-        + ", should_seed_queue: " + std::to_string(should_seed_queue)
-        + ", should_add_customer: " + std::to_string(should_add_customer));
-
     if(! waiting_customer_queue_.full() && pending_customer_builds_ == 0 && (should_seed_queue || should_add_customer)){
         auto queue_side = waiting_customer_queue_.less_full_side();
         auto build_position = waiting_customer_queue_.get_spawn_position(queue_side);
         debug::log(
-            "[maitre_d::check_customer_arrivals, queueing customer build] "
+            "[maitre_d::check_customer_arrivals, queueing automatic arrival] "
             "queue_side: " + side_to_string(queue_side)
-            + ", build_position: " + vector_to_string(build_position)
-            + ", dog_type: " + std::to_string(cafe_config::debug_customer_dog_type));
+            + ", build_position: " + vector_to_string(build_position));
         std::unique_ptr<events::event> build_dog = std::make_unique<events::build_dog>(
             cafe_config::debug_customer_dog_type,
             build_position,
@@ -125,6 +115,8 @@ void maitre_d::maitre_d::on_registered_table_event(const events::registered_tabl
 }
 
 void maitre_d::maitre_d::on_registered_customer_event(const events::registered_customer& event){
+    std::cout << "[maitre_d::on_registered_customer_event, registered customer] "
+        "customer_id: " + std::to_string(event.get_customer_id()) << std::endl;
     register_customer(event.get_customer_id());
 }
 
@@ -134,16 +126,15 @@ void maitre_d::maitre_d::on_requested_customer_table_event(const events::request
 
 void maitre_d::maitre_d::on_customer_dog_arrived_event(const events::customer_dog_arrived& event){
     auto customer_id = event.get_customer_id();
-    debug::log(
-        "[maitre_d::on_customer_dog_arrived_event, received customer arrival] "
-        "customer_id: " + std::to_string(customer_id)
-        + ", queue_side: " + side_to_string(event.get_queue_side()));
     waiting_customer_queue_.enqueue(customer_id, event.get_queue_side(), 1.0f);
     auto queue_position = waiting_customer_queue_.get_target_position(customer_id);
-    debug::log(
-        "[maitre_d::on_customer_dog_arrived_event, emitting queue path command] "
+    auto log =
+        "[maitre_d::on_customer_dog_arrived_event, entering queue at position] "
         "customer_id: " + std::to_string(customer_id)
-        + ", queue_position: " + vector_to_string(queue_position));
+        + ", queue_side: " + side_to_string(event.get_queue_side())
+        + ", queue_position: " + vector_to_string(queue_position);
+    std::cout << log << std::endl;
+    
     auto send_customer_to_queue = events::send_customer_to_queue(customer_id, queue_position);
     event_interface::execute_event(send_customer_to_queue);
     seconds_since_customer_arrived_ = 0.0f;

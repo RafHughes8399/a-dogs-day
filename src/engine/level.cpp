@@ -1,7 +1,6 @@
 #include "level.h"
-
 #include "debug_log_interface.h"
-
+#include <iostream>
 namespace{
     std::string side_to_string(events::customer_queue_side queue_side){
         if(queue_side == events::customer_queue_side::left_queue){
@@ -68,19 +67,15 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
     next_entity_id_ = std::max(next_entity_id_, entity_raw->get_id() + 1);
 }
 
-void level::level::add_void_entity(
-    std::unique_ptr<entities::entity> entity,
-    size_t layer,
-    events::customer_queue_side queue_side){
+void level::level::add_void_entity(std::unique_ptr<entities::entity> entity, size_t layer, events::customer_queue_side queue_side){
     auto entity_id = entity->get_id();
     auto position = entity->get_position();
     next_entity_id_ = std::max(next_entity_id_, entity_id + 1);
     debug::log(
-        "[level::add_void_entity, staged out of bounds entity] "
+        "[level::add_void_entity, created customer in void] "
         "entity_id: " + std::to_string(entity_id)
         + ", queue_side: " + side_to_string(queue_side)
-        + ", position: " + vector_to_string(position)
-        + ", move_per_frame: " + std::to_string(cafe_config::void_entity_move_per_frame));
+        + ", position: " + vector_to_string(position));
     void_entities_.push_back(void_entity_record{
         std::move(entity),
         layer,
@@ -95,14 +90,21 @@ void level::level::update_void_entities(float delta, int frame){
         move_void_entity_toward_screen(*record.entity, frame);
 
         if(is_inside_screen(*record.entity)){
-            debug::log(
-                "[level::update_void_entities, entity entered screen bounds] "
+            std::cout << "[level::update_void_entities, customer left void] "
                 "entity_id: " + std::to_string(record.entity->get_id())
                 + ", queue_side: " + side_to_string(record.queue_side)
-                + ", position: " + vector_to_string(record.entity->get_position()));
+                + ", position: " + vector_to_string(record.entity->get_position()) << std::endl;
             insert_void_entity(std::move(record));
             void_entities_.erase(void_entities_.begin() + static_cast<std::ptrdiff_t>(i));
             continue;
+        }
+        else{
+            auto position = record.entity->get_position();
+            std::cout <<
+                "[level::update_void_entities, customer in void] "
+                "entity_id: " + std::to_string(record.entity->get_id())
+                + ", queue_side: " + side_to_string(record.queue_side)
+                + ", position: " + vector_to_string(position) << std::endl;
         }
         ++i;
     }
@@ -117,8 +119,8 @@ bool level::level::is_inside_screen(entities::entity& entity) const{
 }
 
 void level::level::move_void_entity_toward_screen(entities::entity& entity, int frame){
+    (void) frame;
     auto position = entity.get_position();
-    auto previous_position = position;
     const auto& box = entity.get_hitbox().get_box();
 
     if(box.x < 0.0f){
@@ -134,13 +136,6 @@ void level::level::move_void_entity_toward_screen(entities::entity& entity, int 
     }
 
     entity.move_without_event(position);
-    debug::log(
-        "[level::move_void_entity_toward_screen, moved void entity] "
-        "frame: " + std::to_string(frame)
-        + ", entity_id: " + std::to_string(entity.get_id())
-        + ", previous_position: " + vector_to_string(previous_position)
-        + ", new_position: " + vector_to_string(position)
-        + ", move_per_frame: " + std::to_string(cafe_config::void_entity_move_per_frame));
 }
 
 void level::level::insert_void_entity(void_entity_record record){
@@ -157,9 +152,9 @@ void level::level::insert_void_entity(void_entity_record record){
     }
 
     debug::log(
-        "[level::insert_void_entity, inserted customer dog] "
-        "customer_id: " + std::to_string(entity_id)
-        + ", queue_side: " + side_to_string(queue_side));
+        "[level::insert_void_entity, inserted customer entity] "
+        "entity_id: " + std::to_string(entity_id));
+        
     auto registered_customer = events::registered_customer(entity_id);
     event_interface::execute_event(registered_customer);
     auto customer_arrived = events::customer_dog_arrived(entity_id, queue_side);
@@ -185,7 +180,7 @@ void level::level::on_move_view_frame_event(const events::move_view_frame& event
 }
 void level::level::on_right_mouse_event(const events::right_mouse_click& event){
     auto click_position = event.get_mouse_position();
-    auto paw = entities::e_builder.build_paw_mark(click_position, static_cast<int>(level_entities_.get_next_id()));
+    auto paw = entities::e_builder.build_paw_mark(click_position, entity_id());
     add_entity(std::move(paw), level_config::draw_layers::hud);
 
     auto dog_id = event.get_selected_dog();
@@ -201,41 +196,22 @@ void level::level::on_right_mouse_event(const events::right_mouse_click& event){
 void level::level::on_build_dog_event(const events::build_dog& event){
     auto position = event.get_position();
     auto dog_type = event.get_dog_type();
-    auto dog_id = static_cast<int>(level_entities_.get_next_id());
+    auto dog_id = entity_id();
+    auto new_dog = entities::e_builder.build_npc_dog(position, dog_id, dog_type);
+    // log this build
     debug::log(
-        "[level::on_build_dog_event, received build command] "
+        "[level::on_build_dog_event, building dog] "
         "dog_id: " + std::to_string(dog_id)
         + ", dog_type: " + std::to_string(dog_type)
-        + ", queue_side: " + side_to_string(event.get_queue_side())
-        + ", build_position: " + vector_to_string(position));
-    auto new_dog = entities::e_builder.build_npc_dog(position, dog_id, dog_type);
-    if(! new_dog){
-        debug::log(
-            "[level::on_build_dog_event, failed to build dog] "
-            "dog_id: " + std::to_string(dog_id)
-            + ", dog_type: " + std::to_string(dog_type));
-        return;
-    }
+        + ", position: " + vector_to_string(position)
+        + ", queue_side: " + side_to_string(event.get_queue_side()));
     add_void_entity(std::move(new_dog), level_config::draw_layers::dogs, event.get_queue_side());
-    auto customer_id = static_cast<size_t>(dog_id);
-    debug::log(
-        "[level::on_build_dog_event, staged customer dog outside level bounds] "
-        "customer_id: " + std::to_string(customer_id)
-        + ", queue_side: " + side_to_string(event.get_queue_side())
-        + ", position: " + vector_to_string(position));
 }
 
 void level::level::on_send_customer_to_queue_event(const events::send_customer_to_queue& event){
     auto customer_id = static_cast<int>(event.get_customer_id());
-    debug::log(
-        "[level::on_send_customer_to_queue_event, received queue path command] "
-        "customer_id: " + std::to_string(customer_id)
-        + ", queue_position: " + vector_to_string(event.get_queue_position()));
     auto dog_record = id_entity_map_.find(customer_id);
     if(dog_record == id_entity_map_.end()){
-        debug::log(
-            "[level::on_send_customer_to_queue_event, missing dog entity] "
-            "customer_id: " + std::to_string(customer_id));
         return;
     }
 
@@ -243,17 +219,16 @@ void level::level::on_send_customer_to_queue_event(const events::send_customer_t
     auto direction = dog->get_direction_scalar();
     auto destination = event.get_queue_position();
     auto queue_path = graph_.find_path(dog->get_position(), destination, direction);
-    debug::log(
-        "[level::on_send_customer_to_queue_event, assigned queue path] "
-        "customer_id: " + std::to_string(customer_id)
-        + ", current_position: " + vector_to_string(dog->get_position())
-        + ", destination: " + vector_to_string(destination)
-        + ", path_size: " + std::to_string(queue_path.size()));
     dog->set_path(queue_path);
+    std::cout << "[level::on_send_customer_to_queue_event] queue_path.size(): " << queue_path.size() << std::endl;
+    for(auto& position : queue_path){
+        std::cout << "[level::on_send_customer_to_queue_event] queue_path: " << vector_to_string(position) << std::endl;
+    }
+
 }
 
 // --------------------- level builder ----------------------------------------- //
-level::level level::level_builder::build_main_level(){
+std::unique_ptr<level::level> level::level_builder::build_main_level(){
     auto background = sprite::sprite(LoadTexture(entity_config::background_path), 
         entity_config::background_attributes[entity_config::attributes::frame_width], 
         entity_config::background_attributes[entity_config::attributes::frame_height],
@@ -263,27 +238,27 @@ level::level level::level_builder::build_main_level(){
     auto view_frame = Rectangle{0.0f, 0.0f, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())};
     auto dimensions = Vector2{level_config::world_x, level_config::world_y};
 
-    auto l = level(background, view_frame, dimensions);
+    auto l = std::make_unique<level>(background, view_frame, dimensions);
     
 
     // 0 
-    auto mack = entities::e_builder.build_mack(Vector2 {level_config::edge_weight * 7, level_config::edge_weight * 4}, l.entity_id());
-    l.add_entity(std::move(mack), level_config::draw_layers::dogs);
+    auto mack = entities::e_builder.build_mack(Vector2 {level_config::edge_weight * 7, level_config::edge_weight * 4}, l->entity_id());
+    l->add_entity(std::move(mack), level_config::draw_layers::dogs);
 
 
     // 1
-    auto khiri = entities::e_builder.build_khiri(Vector2 {level_config::edge_weight * 4, static_cast<float>(level_config::edge_weight * 3.5)}, l.entity_id());
-    l.add_entity(std::move(khiri), level_config::draw_layers::dogs);
+    auto khiri = entities::e_builder.build_khiri(Vector2 {level_config::edge_weight * 4, static_cast<float>(level_config::edge_weight * 3.5)}, l->entity_id());
+    l->add_entity(std::move(khiri), level_config::draw_layers::dogs);
 
     // 2
     //  append the cursor
-    auto cursor = entities::e_builder.build_cursor(GetMousePosition(), l.entity_id());
-    l.add_entity(std::move(cursor), level_config::draw_layers::cursor);
+    auto cursor = entities::e_builder.build_cursor(GetMousePosition(), l->entity_id());
+    l->add_entity(std::move(cursor), level_config::draw_layers::cursor);
     
-    auto test_decoration = entities::e_builder.build_test_decoration(Vector2 {level_config::edge_weight * 6, level_config::edge_weight * 6}, l.entity_id());
-    l.add_entity(std::move(test_decoration), level_config::draw_layers::decoration);
+    auto test_decoration = entities::e_builder.build_test_decoration(Vector2 {level_config::edge_weight * 6, level_config::edge_weight * 6}, l->entity_id());
+    l->add_entity(std::move(test_decoration), level_config::draw_layers::decoration);
     
-    auto second_decoration = entities::e_builder.build_test_decoration(Vector2 {level_config::edge_weight * 12, level_config::edge_weight * 12}, l.entity_id());
-    l.add_entity(std::move(second_decoration), level_config::draw_layers::decoration);
+    auto second_decoration = entities::e_builder.build_test_decoration(Vector2 {level_config::edge_weight * 12, level_config::edge_weight * 12}, l->entity_id());
+    l->add_entity(std::move(second_decoration), level_config::draw_layers::decoration);
     return l;
 }
