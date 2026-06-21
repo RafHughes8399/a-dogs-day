@@ -83,6 +83,7 @@ namespace level{
             int row_length_;
 
             queries::query_handler<queries::can_place_decoration, bool> can_place_decoration_handler_;
+            queries::query_handler<queries::path_query, std::vector<Vector2>> path_query_handler_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
         
         public:
@@ -90,6 +91,7 @@ namespace level{
                 event_interface::unsubscribe<events::moved_decoration>(moved_decoration_handler_);
                 event_interface::unsubscribe<events::placed_decoration>(placed_decoration_handler_);
                 query_interface::unsubscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
+                query_interface::unsubscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
             }
             level_graph(int level_x, int level_y)
             : moved_decoration_handler_([this](const events::moved_decoration& event) -> void{on_moved_decoration(event);}),
@@ -97,6 +99,7 @@ namespace level{
             num_rows_(static_cast<int>(level_y / level_config::edge_weight)),
             row_length_(static_cast<int>(level_x / level_config::edge_weight)),
             can_place_decoration_handler_([this](const queries::can_place_decoration& query) -> bool {return can_place_decoration(query);}),
+            path_query_handler_([this](const queries::path_query& query) -> std::vector<Vector2> {return get_path(query);}),
             graph_({}){
                 // ! columns is x, rows is y
                 build_nodes(level_x, level_y);
@@ -104,6 +107,7 @@ namespace level{
                 event_interface::subscribe<events::moved_decoration>(moved_decoration_handler_);
                 event_interface::subscribe<events::placed_decoration>(placed_decoration_handler_);
                 query_interface::subscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
+                query_interface::subscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
             }
             level_graph(const level_graph& other) = default;
             level_graph(level_graph&& other) = default;
@@ -113,6 +117,7 @@ namespace level{
             level_graph& operator=(level_graph&& other) = delete;
             
             bool can_place_decoration(const queries::can_place_decoration& query);
+            std::vector<Vector2> get_path(const queries::path_query& query);
             
             int position_to_node(Vector2 position);
             int position_to_node(Vector2 position, Vector2 direction);

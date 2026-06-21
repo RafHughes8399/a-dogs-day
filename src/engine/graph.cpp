@@ -5,6 +5,11 @@ bool level::level_graph::can_place_decoration(const queries::can_place_decoratio
     auto query_rectangle = query.get_decoration_rectangle();
     return  ! check_for_decoration(query_rectangle, query.get_decoration_id()); // is there no decoration
 }
+
+std::vector<Vector2> level::level_graph::get_path(const queries::path_query& query){
+    return find_path(query.get_source(), query.get_destination(), query.get_direction());
+}
+
 bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id){
     Vector2 current_position = id_to_node(current_id)->position_;
     Vector2 next_position = id_to_node(next_id)->position_;

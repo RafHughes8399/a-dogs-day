@@ -12,6 +12,8 @@
 #include "sprite.h"
 #include "raylib.h"
 #include "body.h"
+#include "query_interface.h"
+#include "queries.h"
 #include <map>
 #include <memory>
 #include <string>
@@ -71,7 +73,6 @@ namespace entities{
             const std::string debug_id_;
 
     };
-
     class cursor : public entity{
         public:
             class state {
@@ -249,7 +250,6 @@ namespace entities{
 
         private:
     };
-
     /**
      * there would be multiple kinds of dogs
      * 
@@ -290,8 +290,7 @@ namespace entities{
             const Vector2 move_speed_ = entity_config::dog_move_speed;
             Vector2 direction_scalar_;
             std::vector<Vector2> move_path_;
-    };
-
+    };    
     class player_dog : public dog{
         public:
             class state{
@@ -372,9 +371,19 @@ namespace entities{
 
     class npc_dog : public dog{
         public:
+            // default constructor
             npc_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right)
             : dog(body, head, position, id, std::move(debug_id), direction){}
+
+            // constructor that specifes a path destintion
+            npc_dog(body::body body, body::body head, Vector2 position, Vector2 path_dst, int id, std::string debug_id, int direction = level_config::directions::right)
+            : dog(body, head, position, id, std::move(debug_id), direction){
+                // upon creating an npc dog with a path destination, immediately query the graph for a path and set it
+                std::unique_ptr<queries::query> path_query = std::make_unique<queries::path_query>(position, path_dst, level_config::direction_scalars);
+                auto path = query_interface::execute_query(*path_query);
+                set_path(path);
+            }
             npc_dog(const npc_dog& other) = delete;
             npc_dog(npc_dog&& other) = default;
 
