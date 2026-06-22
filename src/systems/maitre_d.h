@@ -46,7 +46,10 @@ namespace maitre_d{
     };
 
     struct queued_dog{
-        size_t dog_id;
+        int dog_id;
+        Vector2 dog_position;
+        Vector2 queue_position;
+        bool reached_queue_position;
     };
 
     struct queue_lane{
@@ -68,14 +71,20 @@ namespace maitre_d{
             // Internally this uses a vector so position offsets can be
             // recalculated when dog sizes change the space behind them.
             void enqueue(size_t dog_id);
-            void dequeue(size_t dog_id);
+            queued_dog dequeue();
+
+            void update_dog_position(size_t dog_id, Vector2 position);
+            bool dog_at_head(queue_lane queue);
+            bool dog_has_reached_queue_position(size_t dog_id) const;
             bool contains(size_t dog_id) const;
             bool empty() const;
             bool full() const;
             size_t size() const;
 
             int pick_side();
+            
             Vector2 get_enqueue_position(int side) const;
+            Vector2 get_position(int side, size_t index) const;
             Vector2 get_spawn_position(events::customer_queue_side queue_side) const;
             Vector2 get_target_position(size_t dog_id) const;
 
@@ -84,7 +93,6 @@ namespace maitre_d{
             const queue_lane& lane_for_side(int queue_side) const;
             std::vector<queued_dog>& dogs_for_side(events::customer_queue_side queue_side);
             const std::vector<queued_dog>& dogs_for_side(events::customer_queue_side queue_side) const;
-            Vector2 position_for_index(size_t index, events::customer_queue_side queue_side) const;
             
             queue_lane left_queue_{cafe_config::left_queue_head, {}};
             queue_lane right_queue_{cafe_config::right_queue_head, {}};
@@ -115,6 +123,7 @@ namespace maitre_d{
             void request_table_for_customer(size_t customer_id);
 
             void update(float delta);
+            void update_dog_position(size_t id, Vector2 position);
             events::customer_queue_side get_customer_queue_side() const;
             Vector2 get_customer_spawn_position(events::customer_queue_side queue_side) const;
 
@@ -123,6 +132,7 @@ namespace maitre_d{
             void on_requested_customer_table_event(const events::requested_customer_table& event);
             void on_customer_dog_created_event(const events::customer_dog_created& event);
             void on_customer_dog_left_event(const events::customer_dog_left& event);
+            void on_dog_completed_path_event(const events::dog_completed_path& event);
         private:
             maitre_d();
             ~maitre_d() = default;
@@ -130,7 +140,8 @@ namespace maitre_d{
             // Processes cafe actions gathered from events or direct interface
             // calls. This mirrors the event dispatcher style: collect facts,
             // then resolve them into command events during the game loop.
-            void process_events();
+            void assign_tables();
+            bool are_tables_free();
             void check_customer_arrivals(float delta);
             bool can_request_customer_arrival() const;
             void request_customer_arrival();
@@ -174,6 +185,7 @@ namespace maitre_d{
             events::event_handler<events::requested_customer_table> requested_customer_table_handler_;
             events::event_handler<events::customer_dog_created> customer_dog_created_handler_;
             events::event_handler<events::customer_dog_left> customer_dog_left_handler_;
+            events::event_handler<events::dog_completed_path> dog_path_compelte_handler_;
     };
 }
 

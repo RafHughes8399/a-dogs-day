@@ -71,7 +71,8 @@ namespace events{
 		build_customer_dog_id = 34,
 		send_customer_queue = 35,
 		debug_log_id = 36,
-		size = 37
+		dog_path_complete = 37,
+		size = 38
 	};
 	class event{
 
@@ -431,6 +432,24 @@ namespace events{
 			}
 		private:
 			const size_t customer_id_;
+	};
+	class dog_completed_path : public event{
+		public:
+			dog_completed_path(size_t dog_id, Vector2  destination)
+			: event(ids::dog_path_complete), id_(dog_id), destination_(destination){}
+			
+			static int get_static_type(){
+				return ids::dog_path_complete;
+			}
+			Vector2 get_destination() const{
+				return destination_;
+			}
+			size_t get_id() const{
+				return id_;
+			}
+		private:
+			const size_t id_;
+			const Vector2 destination_;
 	};
 	// Cafe-domain command/fact: the maitre d' has taken a customer dog out of
 	// the waiting queue and sent it toward an assigned table.

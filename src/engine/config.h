@@ -102,6 +102,24 @@ namespace cafe_config{
     };
     
     inline const int queue_capacity = queue_y_edges;
+    inline const std::vector<Vector2> left_queue_positions = [](){
+        auto positions = std::vector<Vector2>{};
+        positions.reserve(static_cast<size_t>(queue_capacity));
+        for(int index = 0; index < queue_capacity; ++index){
+            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
+            positions.push_back(Vector2{left_queue_head.x, left_queue_head.y - offset});
+        }
+        return positions;
+    }();
+    inline const std::vector<Vector2> right_queue_positions = [](){
+        auto positions = std::vector<Vector2>{};
+        positions.reserve(static_cast<size_t>(queue_capacity));
+        for(int index = 0; index < queue_capacity; ++index){
+            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
+            positions.push_back(Vector2{right_queue_head.x, right_queue_head.y + offset});
+        }
+        return positions;
+    }();
     inline const Rectangle queue_debug_bounds = Rectangle{
         0.0f,
         0.0f,

@@ -31,12 +31,14 @@ registered_table_handler_([this](const events::registered_table& event) -> void 
 registered_customer_handler_([this](const events::registered_customer& event) -> void {on_registered_customer_event(event);}),
 requested_customer_table_handler_([this](const events::requested_customer_table& event) -> void {on_requested_customer_table_event(event);}),
 customer_dog_created_handler_([this](const events::customer_dog_created& event) -> void {on_customer_dog_created_event(event);}),
-customer_dog_left_handler_([this](const events::customer_dog_left& event) -> void {on_customer_dog_left_event(event);}){
+customer_dog_left_handler_([this](const events::customer_dog_left& event) -> void {on_customer_dog_left_event(event);}),
+dog_path_compelte_handler_([this](const events::dog_completed_path& event) -> void {on_dog_completed_path_event(event);}){
     event_interface::subscribe<events::registered_table>(registered_table_handler_);
     event_interface::subscribe<events::registered_customer>(registered_customer_handler_);
     event_interface::subscribe<events::requested_customer_table>(requested_customer_table_handler_);
     event_interface::subscribe<events::customer_dog_created>(customer_dog_created_handler_);
     event_interface::subscribe<events::customer_dog_left>(customer_dog_left_handler_);
+    event_interface::subscribe<events::dog_completed_path>(dog_path_compelte_handler_);
 }
 
 void maitre_d::maitre_d::register_table(size_t table_id){
@@ -63,14 +65,33 @@ void maitre_d::maitre_d::update(float delta){
     if(feature_flag_config::automatic_arrivals){
         check_customer_arrivals(delta);  
     }
+    // debug arrival behaviour //
     if(IsKeyPressed(KEY_L)){
         request_customer_arrival();
     }
-    process_events();
+    // assign_tables()
+    assign_tables();
 }
 
-void maitre_d::maitre_d::process_events(){
+void maitre_d::maitre_d::update_dog_position(size_t id, Vector2 position){
+    customer_queue_.update_dog_position(id, position);
+}
+
+void maitre_d::maitre_d::assign_tables(){
+    // if head not empty and reach and free tables
+    // try the left and try the right
+    auto dog_at_head = customer_queue_.dequeue();
+    if(are_tables_free() && dog_at_head.dog_id != -1){
+        //auto table = pick_table();
+        // send_dog_to_table(table);
+            // give dog position
+            // update table record
+    }
     return;
+}
+
+bool maitre_d::maitre_d::are_tables_free(){
+    return true;
 }
 
 void maitre_d::maitre_d::check_customer_arrivals(float delta){
@@ -155,4 +176,11 @@ void maitre_d::maitre_d::on_customer_dog_created_event(const events::customer_do
 void maitre_d::maitre_d::on_customer_dog_left_event(const events::customer_dog_left& event){
     (void) event;
     dogs_left_in_window_++;
+}
+void maitre_d::maitre_d::on_dog_completed_path_event(const events::dog_completed_path& event){
+    update_dog_position(event.get_id(), event.get_destination());
+    debug::log(
+        "[maitre_d::on_dog_compelted_path, dog completed path ] "
+        "customer_id: " + std::to_string(event.get_id())
+        + ", position: " + vector_to_string(event.get_destination()));
 }

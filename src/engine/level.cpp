@@ -23,7 +23,7 @@ void level::level::render(int frame){
     // draw the background 
     DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
     // for debugging purposes
-    // graph_.render(view_frame_);
+    graph_.render(view_frame_);
 
     // ---------------- debug behaviours ----------------
     auto queue_bounds = cafe_config::queue_debug_bounds;
@@ -252,10 +252,10 @@ std::unique_ptr<level::level> level::level_builder::build_main_level(){
     auto cursor = entities::e_builder.build_cursor(GetMousePosition(), l->entity_id());
     l->add_entity(std::move(cursor), level_config::draw_layers::cursor);
     
-    auto test_decoration = entities::e_builder.build_test_decoration(Vector2 {level_config::edge_weight * 6, level_config::edge_weight * 6}, l->entity_id());
-    l->add_entity(std::move(test_decoration), level_config::draw_layers::decoration);
+    auto first_table = entities::e_builder.build_table(Vector2 {level_config::edge_weight * 6, level_config::edge_weight * 6}, l->entity_id());
+    l->add_entity(std::move(first_table), level_config::draw_layers::stations);
     
-    auto second_decoration = entities::e_builder.build_test_decoration(Vector2 {level_config::edge_weight * 12, level_config::edge_weight * 12}, l->entity_id());
-    l->add_entity(std::move(second_decoration), level_config::draw_layers::decoration);
+    auto second_table = entities::e_builder.build_table(Vector2 {level_config::edge_weight * 12, level_config::edge_weight * 12}, l->entity_id());
+    l->add_entity(std::move(second_table), level_config::draw_layers::stations);
     return l;
 }

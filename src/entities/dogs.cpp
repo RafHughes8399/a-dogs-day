@@ -42,6 +42,10 @@ int entities::dog::update(float delta, int frame){
             if(! move_path_.empty()){
                 next_position = move_path_.front();
                 determine_direction(next_position);
+            } else {
+                // is destination
+                std::unique_ptr<events::event> reached_destination = std::make_unique<events::dog_completed_path>(id_, next_position);
+                event_interface::queue_event(reached_destination);
             }
         }
         auto new_position = Vector2Add(position_, Vector2Scale(Vector2Multiply(move_speed_, direction_scalar_), delta));
