@@ -22,18 +22,13 @@
 namespace maitre_d{
     inline constexpr size_t empty_id = static_cast<size_t>(-1);
 
-    enum table_status{
-        free = 0,
-        reserved = 1,
-        occupied = 2
-    };
-
     // Table availability lives here rather than on the table entity. A table
     // entity is a physical prop in the level; the maitre d' owns the cafe
     // meaning of whether that prop is free, reserved, or occupied.
     struct table_record{
         size_t table_id;
-        table_status status;
+        Vector2 position;
+        bool is_free;
         size_t customer_id;
     };
 
@@ -142,6 +137,7 @@ namespace maitre_d{
             // then resolve them into command events during the game loop.
             void assign_tables();
             bool are_tables_free();
+            Vector2 pick_table();
             void check_customer_arrivals(float delta);
             bool can_request_customer_arrival() const;
             void request_customer_arrival();
@@ -164,8 +160,7 @@ namespace maitre_d{
             //
             // move_table(table_id)
             //   -> no status change; level owns the physical position
-            std::unordered_map<size_t, table_record> tables_;
-
+            std::vector<table_record> tables_;
             // Physical customer queue sketch:
             // customer_dog_created(customer_id)
             //   -> enqueue the dog with its height in edge units

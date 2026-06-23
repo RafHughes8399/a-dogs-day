@@ -91,9 +91,13 @@ void maitre_d::maitre_d::assign_tables(){
 }
 
 bool maitre_d::maitre_d::are_tables_free(){
-    return true;
+    return std::any_of(tables_.begin(), tables_.end(), [](const auto& table) -> bool {
+        return table.is_free;
+    });
 }
+maitre_d::table_record matire_d::maitre_d::pick_table(){
 
+}
 void maitre_d::maitre_d::check_customer_arrivals(float delta){
     if(! feature_flag_config::automatic_arrivals){
         return;
