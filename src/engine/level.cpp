@@ -1,8 +1,14 @@
 #include "level.h"
 #include "debug_log_interface.h"
+#include <iostream>
 namespace{
     std::string vector_to_string(Vector2 position){
         return "{" + std::to_string(position.x) + ", " + std::to_string(position.y) + "}";
+    }
+
+    void debug_log_and_cout(const std::string& message){
+        debug::log(message);
+        std::cout << message << std::endl;
     }
 }
 // ----------------------------------------- level ----------------------------------------- //
@@ -52,11 +58,27 @@ void level::level::render(int frame){
 void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t layer){
     // make raw pointer and insert ot 
     auto entity_raw = entity.get();
+    auto table = dynamic_cast<entities::table*>(entity_raw);
+    auto entity_id = entity_raw->get_id();
+    auto position = entity_raw->get_position();
     level_entities_.insert(std::move(entity));
     // insert into the draw layer ?
     render_layers_[layer].add_entity(entity_raw);
-    id_entity_map_[static_cast<int>(entity_raw->get_id())] = entity_raw;
-    next_entity_id_ = std::max(next_entity_id_, entity_raw->get_id() + 1);
+    id_entity_map_[static_cast<int>(entity_id)] = entity_raw;
+    next_entity_id_ = std::max(next_entity_id_, entity_id + 1);
+
+    if(table != nullptr){
+        auto interaction_position = table->get_interaction_position();
+        auto message = "[level::add_entity, queued table registration] "
+            "table_id: " + std::to_string(entity_id)
+            + ", table_position: " + vector_to_string(position)
+            + ", interaction_position: " + vector_to_string(interaction_position);
+        debug_log_and_cout(message);
+        std::unique_ptr<events::event> registered_table = std::make_unique<events::registered_table>(
+            static_cast<size_t>(entity_id),
+            interaction_position);
+        event_interface::queue_event(registered_table);
+    }
 }
 
 void level::level::add_void_entity(std::unique_ptr<entities::entity> entity, size_t layer){
@@ -143,7 +165,7 @@ void level::level::insert_void_entity(void_entity_record record){
     debug::log(
         "[level::insert_void_entity, emitting customer created] "
         "entity_id: " + std::to_string(entity_id));
-    auto customer_arrived = events::customer_dog_created(entity_id);
+    auto customer_arrived = events::customer_dog_created(entity_id, position);
     event_interface::execute_event(customer_arrived);
 }
 
@@ -179,22 +201,19 @@ void level::level::on_right_mouse_event(const events::right_mouse_click& event){
 }
 void level::level::on_build_customer_dog_event(const events::build_customer_dog& event){
     auto position = event.get_position();
-    auto destination = event.get_destination();
     auto dog_type = event.get_dog_type();
     auto dog_id = entity_id();
     debug::log(
         "[level::on_build_customer_dog_event, received build request] "
         "dog_id: " + std::to_string(dog_id)
         + ", dog_type: " + std::to_string(dog_type)
-        + ", spawn_position: " + vector_to_string(position)
-        + ", destination: " + vector_to_string(destination));
-    auto new_dog = entities::e_builder.build_npc_dog(dog_id, dog_type, position, destination);
+        + ", spawn_position: " + vector_to_string(position));
+    auto new_dog = entities::e_builder.build_npc_dog(dog_id, dog_type, position, std::nullopt);
     debug::log(
         "[level::on_build_customer_dog_event, built customer dog] "
         "dog_id: " + std::to_string(dog_id)
         + ", dog_type: " + std::to_string(dog_type)
-        + ", spawn_position: " + vector_to_string(position)
-        + ", destination: " + vector_to_string(destination));
+        + ", spawn_position: " + vector_to_string(position));
     add_void_entity(std::move(new_dog), level_config::draw_layers::dogs);
 }
 
@@ -202,6 +221,10 @@ void level::level::on_send_customer_to_queue_event(const events::send_customer_t
     auto customer_id = static_cast<int>(event.get_customer_id());
     auto dog_record = id_entity_map_.find(customer_id);
     if(dog_record == id_entity_map_.end()){
+        debug_log_and_cout(
+            "[level::on_send_customer_to_queue_event, missing customer entity] "
+            "customer_id: " + std::to_string(customer_id)
+            + ", destination: " + vector_to_string(event.get_queue_position()));
         return;
     }
 
@@ -209,17 +232,19 @@ void level::level::on_send_customer_to_queue_event(const events::send_customer_t
     auto direction = dog->get_direction_scalar();
     auto destination = event.get_queue_position();
     auto source = dog->get_position();
-    debug::log(
+    debug_log_and_cout(
         "[level::on_send_customer_to_queue_event, querying queue path] "
         "customer_id: " + std::to_string(customer_id)
         + ", source: " + vector_to_string(source)
         + ", destination: " + vector_to_string(destination)
         + ", direction: " + vector_to_string(direction));
     auto queue_path = graph_.find_path(dog->get_position(), destination, direction);
-    dog->set_path(queue_path);
-    debug::log(
-        "[level::on_send_customer_to_queue_event, assigned queue path] "
+    std::unique_ptr<events::event> give_dog_path = std::make_unique<events::give_dog_path>(customer_id, queue_path);
+    event_interface::queue_event(give_dog_path);
+    debug_log_and_cout(
+        "[level::on_send_customer_to_queue_event, queued dog path] "
         "customer_id: " + std::to_string(customer_id)
+        + ", destination: " + vector_to_string(destination)
         + ", path_size: " + std::to_string(queue_path.size()));
 
 }

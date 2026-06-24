@@ -3,6 +3,12 @@
 #include "debug_log_interface.h"
 #include "raglib.h"
 #include <iostream>
+namespace{
+    void debug_log_and_cout(const std::string& message){
+        debug::log(message);
+        std::cout << message << std::endl;
+    }
+}
 // ------------------------------- render states ------------------------------- //
 void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position, int frame){
     size_t render_index = dog.get_body().get_index();
@@ -46,6 +52,8 @@ int entities::dog::update(float delta, int frame){
                 // is destination
                 std::unique_ptr<events::event> reached_destination = std::make_unique<events::dog_completed_path>(id_, next_position);
                 event_interface::queue_event(reached_destination);
+                body_.update_hitboxes(position_);
+                return status_codes::nothing;
             }
         }
         auto new_position = Vector2Add(position_, Vector2Scale(Vector2Multiply(move_speed_, direction_scalar_), delta));
@@ -94,16 +102,16 @@ void entities::dog::render(Vector2 draw_position, int frame){
     head_.render(draw_position, frame);
 }
 
-void entities::dog::set_path(std::vector<Vector2>& path){
+void entities::dog::set_path(const std::vector<Vector2>& path){
     if(path.empty()){
-        debug::log(
+        debug_log_and_cout(
             "[dog::set_path, skipped empty path] "
             "dog_id: " + std::to_string(id_));
         return;
     }
     move_path_ = path;
     determine_direction(move_path_.front());
-    debug::log(
+    debug_log_and_cout(
         "[dog::set_path, assigned path] "
         "dog_id: " + std::to_string(id_)
         + ", path_size: " + std::to_string(move_path_.size())
@@ -187,6 +195,18 @@ int entities::customer_dog::update(float delta, int frame){
 
 void entities::customer_dog::set_state(std::unique_ptr<customer_dog::state> state){
     customer_state_ = std::move(state);
+}
+
+void entities::customer_dog::on_give_dog_path_event(const events::give_dog_path& event){
+    if(static_cast<size_t>(id_) != event.get_dog_id()){
+        return;
+    }
+    debug_log_and_cout(
+        "[customer_dog::on_give_dog_path_event, accepted path] "
+        "dog_id: " + std::to_string(id_)
+        + ", current_position: " + raglib::vector_to_string(position_)
+        + ", path_size: " + std::to_string(event.get_path().size()));
+    set_path(event.get_path());
 }
 
 // ------------------------------- waiter dogs ------------------------------- //

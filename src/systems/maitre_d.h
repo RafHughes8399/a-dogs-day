@@ -15,12 +15,19 @@
 
 #include "events.h"
 #include "raylib.h"
+#include "raymath.h"
+#include <algorithm>
+#include <cassert>
+#include <utility>
 #include <cstddef>
 #include <unordered_map>
 #include <vector>
 #include <iostream>
 namespace maitre_d{
     inline constexpr size_t empty_id = static_cast<size_t>(-1);
+    inline Vector2 entrance_ = Vector2Zero(); // TODO DEFINE THIS POSITION PROPERLY
+    
+
 
     // Table availability lives here rather than on the table entity. A table
     // entity is a physical prop in the level; the maitre d' owns the cafe
@@ -31,7 +38,29 @@ namespace maitre_d{
         bool is_free;
         size_t customer_id;
     };
+    const table_record empty_table{
+        empty_id,
+        Vector2Zero(),
+        false,
+        empty_id
+    };
+    inline bool operator==(const table_record& a, const table_record&b ){
+        return a.table_id == b.table_id;
+    }
 
+    struct table_comparator{
+        bool operator()(const table_record& a, const table_record& b) const{
+            auto a_distance = Vector2Distance(a.position, entrance_);
+            auto b_distance = Vector2Distance(b.position, entrance_);
+            if(a_distance < b_distance){
+                return true;
+            }
+            if(a_distance > b_distance){
+                return false;
+            }
+            return a.table_id < b.table_id;
+        }
+    };
     // A queue slot is a physical waiting spot in the cafe. The queue order is
     // the dog's place in line; its position is the world target the level can
     // path the dog toward. empty_id means the slot is free.
@@ -46,12 +75,24 @@ namespace maitre_d{
         Vector2 queue_position;
         bool reached_queue_position;
     };
-
+    const queued_dog empty_dog = {
+        -1,
+        Vector2Zero(),
+        Vector2Zero(),
+        false
+    };
+    inline bool operator==(const queued_dog& a, const queued_dog&b){
+        return a.dog_id == b.dog_id;
+    }
     struct queue_lane{
         Vector2 head;
         std::vector<queued_dog> dogs;
     };
 
+
+    // define the empty dog and the empty table 
+    // define equality chceks based on id 
+    // so you can easily check if and mepty dog / table was returned
     class dog_queue{
         public:
             dog_queue() = default;
@@ -65,7 +106,7 @@ namespace maitre_d{
             // leave, and resolved target positions are hidden behind the queue.
             // Internally this uses a vector so position offsets can be
             // recalculated when dog sizes change the space behind them.
-            void enqueue(size_t dog_id);
+            queued_dog enqueue(size_t dog_id, int side);
             queued_dog dequeue();
 
             void update_dog_position(size_t dog_id, Vector2 position);
@@ -98,7 +139,7 @@ namespace maitre_d{
         // Small id-based facade for reporting cafe-domain facts to the maitre d'.
         // Entities and lower-level systems can use this without depending on the
         // full singleton class. The real maitre d' sits behind this interface.
-        void register_table(size_t table_id);
+        void register_table(size_t table_id, Vector2 position);
         void register_customer(size_t customer_id);
         void request_table_for_customer(size_t customer_id);
     }
@@ -113,7 +154,7 @@ namespace maitre_d{
             maitre_d& operator=(const maitre_d& other) = delete;
             maitre_d& operator=(maitre_d&& other) = delete;
 
-            void register_table(size_t table_id);
+            void register_table(size_t table_id, Vector2 position);
             void register_customer(size_t customer_id);
             void request_table_for_customer(size_t customer_id);
 
@@ -137,14 +178,15 @@ namespace maitre_d{
             // then resolve them into command events during the game loop.
             void assign_tables();
             bool are_tables_free();
-            Vector2 pick_table();
+            table_record& pick_table();
+            void send_dog_to_table(size_t id, Vector2 position);
             void check_customer_arrivals(float delta);
             bool can_request_customer_arrival() const;
             void request_customer_arrival();
 
             // Table lifecycle sketch:
-            // register_table(table_id)
-            //   -> tables_[table_id] = {table_id, free, empty_id}
+            // register_table(table_id, position)
+            //   -> tables_[table_id] = {table_id, position, free, empty_id}
             //
             // reserve_table(table_id, customer_id)
             //   -> table moves free -> reserved and records the customer id
@@ -160,7 +202,6 @@ namespace maitre_d{
             //
             // move_table(table_id)
             //   -> no status change; level owns the physical position
-            std::vector<table_record> tables_;
             // Physical customer queue sketch:
             // customer_dog_created(customer_id)
             //   -> enqueue the dog with its height in edge units
@@ -170,10 +211,16 @@ namespace maitre_d{
             //   -> dequeue the dog
             //   -> use the head slot position as the table pathing start
             //   -> dog_queue recalculates positions for the remaining dogs
+
+            
+
+            std::vector<table_record> tables_;
+            
             dog_queue customer_queue_;
             float seconds_since_customer_arrived_;
             float dogs_left_window_seconds_;
             int dogs_left_in_window_;
+            
 
             events::event_handler<events::registered_table> registered_table_handler_;
             events::event_handler<events::registered_customer> registered_customer_handler_;

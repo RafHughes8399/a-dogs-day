@@ -91,7 +91,8 @@ namespace cafe_config{
     inline const float queue_width = queue_width_edges * level_config::edge_weight;
     inline const float queue_height = level_config::screen_height;
 
-    inline const float queue_midpoint_y = level_config::screen_height / 2.0f;
+    inline const int queue_midpoint_y_edges = level_config::screen_edges_y / 2;
+    inline const float queue_midpoint_y = queue_midpoint_y_edges * level_config::edge_weight;
     inline const Vector2 left_queue_head = Vector2{
         queue_x_edges * level_config::edge_weight,
         queue_midpoint_y - level_config::edge_weight

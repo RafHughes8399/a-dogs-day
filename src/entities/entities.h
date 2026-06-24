@@ -280,7 +280,7 @@ namespace entities{
             int update(float delta, int frame) override;
             Vector2 get_direction_scalar();
             void render(Vector2 draw_position, int frame) override;
-            void set_path(std::vector<Vector2>& path);
+            void set_path(const std::vector<Vector2>& path);
 
         protected:
             bool reached_position(Vector2 target);
@@ -452,12 +452,21 @@ namespace entities{
             customer_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right,
             std::unique_ptr<customer_dog::state> state = std::make_unique<entering_queue>())
-            : npc_dog(body, head, position, id, std::move(debug_id), direction), customer_state_(std::move(state)){}
+            : npc_dog(body, head, position, id, std::move(debug_id), direction), customer_state_(std::move(state)),
+            give_dog_path_handler_([this](const events::give_dog_path& event) -> void {on_give_dog_path_event(event);}){
+                event_interface::subscribe<events::give_dog_path>(give_dog_path_handler_);
+            }
 
             customer_dog(body::body body, body::body head, Vector2 position, Vector2 path_dst, int id, std::string debug_id,
             int direction = level_config::directions::right,
             std::unique_ptr<customer_dog::state> state = std::make_unique<entering_queue>())
-            : npc_dog(body, head, position, path_dst, id, std::move(debug_id), direction), customer_state_(std::move(state)){}
+            : npc_dog(body, head, position, path_dst, id, std::move(debug_id), direction), customer_state_(std::move(state)),
+            give_dog_path_handler_([this](const events::give_dog_path& event) -> void {on_give_dog_path_event(event);}){
+                event_interface::subscribe<events::give_dog_path>(give_dog_path_handler_);
+            }
+            ~customer_dog() override{
+                event_interface::unsubscribe<events::give_dog_path>(give_dog_path_handler_);
+            }
             customer_dog(const customer_dog& other) = delete;
             customer_dog(customer_dog&& other) = default;
 
@@ -466,12 +475,14 @@ namespace entities{
 
             int update(float delta, int frame) override;
             void set_state(std::unique_ptr<customer_dog::state> state);
+            void on_give_dog_path_event(const events::give_dog_path& event);
 
         private:
             // Customer behaviour state belongs to the dog entity. The maitre d'
             // only tracks queue/table allocation by id and emits commands that
             // cause the level or dog to move between these states.
             std::unique_ptr<state> customer_state_;
+            events::event_handler<events::give_dog_path> give_dog_path_handler_;
     };
 
     class waiter_dog : public npc_dog{
@@ -630,6 +641,7 @@ namespace entities{
             void clear();
             table_state get_state();
             int get_assigned_dog_id();
+            Vector2 get_interaction_position() const;
 
         private:
             table_state state_;

@@ -233,4 +233,17 @@ for
 todo:\
 -> test dog queue entrace and lining up
 -> test dogs going to table 
-    
+
+
+
+build two tables in the level, replace the test decoratinos with them, same art
+turn on the graph debug
+
+
+ok lets game this out, no code just thoughts
+assigning a dog to a table and having it move to that table
+
+ we enqueue a dog before it technically arrives at its queue position, so we cannot do a queue.!empty() && free_tables (pop head) thaat easily
+ need to know if a dog has arrived at the position (can do a positional check against the queue position?)
+ i think each dog record should store the dog position and the queue position, when the customer dog reaches a position in the path it emits a reached position and the
+ maitre d listens and updates, when the two positions equal, the dog has reached. so then we can do if queue not empty && queue.head().reached and free tables 

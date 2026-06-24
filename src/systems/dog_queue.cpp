@@ -18,29 +18,31 @@ namespace{
     }
 }
 
-void maitre_d::dog_queue::enqueue(size_t dog_id){
+maitre_d::queued_dog maitre_d::dog_queue::enqueue(size_t dog_id, int side){
     if(full() || contains(dog_id)){
         debug::log(
             "[dog_queue::enqueue, blocked insert] "
             "dog_id: " + std::to_string(dog_id)
             + ", queue_full: " + std::to_string(full())
             + ", already_contains: " + std::to_string(contains(dog_id)));
-        return;
+        return empty_dog;
     }
-    auto queue_position = get_enqueue_position(previous_side_);
-    lane_for_side(previous_side_).dogs.push_back(queued_dog{
+    auto queue_position = get_enqueue_position(side);
+    auto dog = queued_dog{
         static_cast<int>(dog_id),
         Vector2{0.0f, 0.0f},
         queue_position,
         false
-    });
+    };
+    lane_for_side(side).dogs.push_back(dog);
     debug::log(
         "[dog_queue::enqueue, inserted dog] "
         "dog_id: " + std::to_string(dog_id)
-        + ", side: " + side_to_string(previous_side_)
+        + ", side: " + side_to_string(side)
         + ", queue_position: " + vector_to_string(queue_position)
         + ", left_queue_size: " + std::to_string(left_queue_.dogs.size())
         + ", right_queue_size: " + std::to_string(right_queue_.dogs.size()));
+    return dog;
 }
 bool maitre_d::dog_queue::dog_at_head(queue_lane queue){
     return queue.dogs.empty() ? false : queue.dogs.front().reached_queue_position;
@@ -58,21 +60,30 @@ maitre_d::queued_dog maitre_d::dog_queue::dequeue(){
 }
 
 void maitre_d::dog_queue::update_dog_position(size_t dog_id, Vector2 position){
-    auto update_dog = [dog_id, position](std::vector<queued_dog>& dogs) -> bool {
+    auto update_dog = [dog_id, position](std::vector<queued_dog>& dogs, const std::string& side) -> bool {
         auto dog = std::find_if(dogs.begin(), dogs.end(),
             [dog_id](const queued_dog& record) -> bool {
-                return record.dog_id == dog_id;
+                return static_cast<size_t>(record.dog_id) == dog_id;
             });
         if(dog == dogs.end()){
             return false;
         }
+        auto was_at_queue_position = dog->reached_queue_position;
         dog->dog_position = position;
         dog->reached_queue_position = Vector2Distance(position, dog->queue_position) <= level_config::edge_weight * 0.05f;
+        if(! was_at_queue_position && dog->reached_queue_position && dog == dogs.begin()){
+            debug::log(
+                "[dog_queue::update_dog_position, dog reached head of queue] "
+                "dog_id: " + std::to_string(dog_id)
+                + ", side: " + side
+                + ", position: " + vector_to_string(position)
+                + ", queue_position: " + vector_to_string(dog->queue_position));
+        }
         return true;
     };
 
-    bool updated_left = update_dog(left_queue_.dogs);
-    bool updated_right = update_dog(right_queue_.dogs);
+    bool updated_left = update_dog(left_queue_.dogs, "left");
+    bool updated_right = update_dog(right_queue_.dogs, "right");
     debug::log(
         "[dog_queue::update_dog_position, updated dog position] "
         "dog_id: " + std::to_string(dog_id)
@@ -85,7 +96,7 @@ bool maitre_d::dog_queue::dog_has_reached_queue_position(size_t dog_id) const{
     auto check_dog = [dog_id](const std::vector<queued_dog>& dogs) -> bool {
         auto dog = std::find_if(dogs.begin(), dogs.end(),
             [dog_id](const queued_dog& record) -> bool {
-                return record.dog_id == dog_id;
+                return static_cast<size_t>(record.dog_id) == dog_id;
             });
         return dog != dogs.end() && dog->reached_queue_position;
     };
@@ -96,7 +107,7 @@ bool maitre_d::dog_queue::contains(size_t dog_id) const{
     auto contains_dog = [dog_id](const std::vector<queued_dog>& dogs) -> bool {
         return std::any_of(dogs.begin(), dogs.end(),
         [dog_id](const queued_dog& dog) -> bool {
-            return dog.dog_id == dog_id;
+            return static_cast<size_t>(dog.dog_id) == dog_id;
         });
     };
     return contains_dog(left_queue_.dogs) || contains_dog(right_queue_.dogs);

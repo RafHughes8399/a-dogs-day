@@ -72,7 +72,8 @@ namespace events{
 		send_customer_queue = 35,
 		debug_log_id = 36,
 		dog_path_complete = 37,
-		size = 38
+		give_dog_path_id = 38,
+		size = 39
 	};
 	class event{
 
@@ -348,12 +349,12 @@ namespace events{
 			const size_t id_;
 	};
 	// Cafe-domain fact: a table entity exists in the level and can be tracked by
-	// the maitre d'. The event carries ids only so the cafe/order system does not
-	// need concrete entity types or ownership of level entities.
+	// the maitre d'. The event carries value data so the cafe/order system does
+	// not need concrete entity types or ownership of level entities.
 	class registered_table : public event{
 		public:
-			registered_table(size_t table_id)
-			: event(ids::register_table), table_id_(table_id){}
+			registered_table(size_t table_id, Vector2 position)
+			: event(ids::register_table), table_id_(table_id), position_(position){}
 
 			static int get_static_type(){
 				return ids::register_table;
@@ -361,8 +362,12 @@ namespace events{
 			size_t get_table_id() const{
 				return table_id_;
 			}
+			Vector2 get_position() const{
+				return position_;
+			}
 		private:
 			const size_t table_id_;
+			const Vector2 position_;
 	};
 	// Cafe-domain fact: a customer dog exists in the level and can enter the
 	// restaurant flow. The maitre d' records the id, not the dog object.
@@ -421,8 +426,8 @@ namespace events{
 	// into the physical waiting queue managed by the maitre d'.
 	class customer_dog_created : public event{
 		public:
-			customer_dog_created(size_t customer_id)
-			: event(ids::customer_arrived), customer_id_(customer_id){}
+			customer_dog_created(size_t customer_id, Vector2 position)
+			: event(ids::customer_arrived), customer_id_(customer_id), position_(position){}
 			
 			static int get_static_type(){
 				return ids::customer_arrived;
@@ -430,14 +435,18 @@ namespace events{
 			size_t get_customer_id() const{
 				return customer_id_;
 			}
+			Vector2 get_position() const{
+				return position_;
+			}
 		private:
 			const size_t customer_id_;
+			const Vector2 position_;
 	};
 	class dog_completed_path : public event{
 		public:
 			dog_completed_path(size_t dog_id, Vector2  destination)
 			: event(ids::dog_path_complete), id_(dog_id), destination_(destination){}
-			
+				
 			static int get_static_type(){
 				return ids::dog_path_complete;
 			}
@@ -450,6 +459,24 @@ namespace events{
 		private:
 			const size_t id_;
 			const Vector2 destination_;
+	};
+	class give_dog_path : public event{
+		public:
+			give_dog_path(size_t dog_id, std::vector<Vector2> path)
+			: event(ids::give_dog_path_id), dog_id_(dog_id), path_(std::move(path)){}
+
+			static int get_static_type(){
+				return ids::give_dog_path_id;
+			}
+			size_t get_dog_id() const{
+				return dog_id_;
+			}
+			const std::vector<Vector2>& get_path() const{
+				return path_;
+			}
+		private:
+			const size_t dog_id_;
+			const std::vector<Vector2> path_;
 	};
 	// Cafe-domain command/fact: the maitre d' has taken a customer dog out of
 	// the waiting queue and sent it toward an assigned table.
@@ -770,8 +797,8 @@ namespace events{
 	// for when we need to build a dog
 	class build_customer_dog : public event{
 		public:
-			build_customer_dog(int dog_type, Vector2 position, Vector2 destination)
-			:event(ids::build_customer_dog_id), dog_type_(dog_type), position_(position), destination_(destination){}
+			build_customer_dog(int dog_type, Vector2 position)
+			:event(ids::build_customer_dog_id), dog_type_(dog_type), position_(position){}
 
 			static int get_static_type(){
 				return ids::build_customer_dog_id;
@@ -782,13 +809,9 @@ namespace events{
 			Vector2 get_position() const {
 				return position_;
 			}
-			Vector2 get_destination() const{
-				return destination_;
-			}
 		private:
 			const int dog_type_;
 			const Vector2 position_;
-			const Vector2 destination_;
 	};
 	class event_handler_interface{
 		public:

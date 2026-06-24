@@ -173,3 +173,10 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_table(Vector2 
 
     return std::make_unique<entities::table>(body, position, id, next_debug_id("table_"));
 }
+
+Vector2 entities::table::get_interaction_position() const{
+    auto x = position_.x - level_config::edge_weight;
+    int y_edges_floor = std::floor(position_.y / level_config::edge_weight);
+    int y = position_.y + (level_config::edge_weight * y_edges_floor);
+    return Vector2{x, static_cast<float>(y)};
+}
