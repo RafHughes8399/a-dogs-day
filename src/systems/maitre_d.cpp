@@ -1,7 +1,6 @@
 #include "maitre_d.h"
 #include "debug_log_interface.h"
 #include "events_interface.h"
-#include <iostream>
 
 namespace{
     std::string vector_to_string(Vector2 position){
@@ -24,10 +23,6 @@ namespace{
             : cafe_config::queue_sides::right;
     }
 
-    void debug_log_and_cout(const std::string& message){
-        debug::log(message);
-        std::cout << message << std::endl;
-    }
 }
 
 maitre_d::maitre_d& maitre_d::maitre_d::get_instance(){
@@ -60,12 +55,6 @@ void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position){
 }
 
 void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position, events::table_interaction_positions interaction_positions){
-    debug_log_and_cout(
-        "[maitre_d::register_table, received table record] "
-        "table_id: " + std::to_string(table_id)
-        + ", position: " + vector_to_string(position)
-        + ", table_count_before: " + std::to_string(tables_.size()));
-
     auto existing_table = std::find_if(tables_.begin(), tables_.end(), [table_id](const auto& table) -> bool {
         return table.table_id == table_id;
     });
@@ -73,7 +62,7 @@ void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position, event
         existing_table->position = position;
         existing_table->interaction_positions = interaction_positions;
         std::sort(tables_.begin(), tables_.end(), table_comparator{});
-        debug_log_and_cout(
+        debug::log(
             "[maitre_d::register_table, updated existing table record] "
             "table_id: " + std::to_string(table_id)
             + ", position: " + vector_to_string(position)
@@ -91,7 +80,7 @@ void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position, event
         empty_id
     });
     std::sort(tables_.begin(), tables_.end(), table_comparator{});
-    debug_log_and_cout(
+    debug::log(
         "[maitre_d::register_table, inserted new table record] "
         "table_id: " + std::to_string(table_id)
         + ", position: " + vector_to_string(position)
@@ -106,7 +95,7 @@ void maitre_d::maitre_d::remove_table(size_t table_id){
     });
     auto removed_count = static_cast<size_t>(tables_.end() - new_end);
     tables_.erase(new_end, tables_.end());
-    debug_log_and_cout(
+    debug::log(
         "[maitre_d::remove_table, removed table record] "
         "table_id: " + std::to_string(table_id)
         + ", removed_count: " + std::to_string(removed_count)
@@ -148,9 +137,6 @@ void maitre_d::maitre_d::assign_tables(){
     // if head not empty and reach and free tables
     // try the left and try the right
     if(! are_tables_free()){
-        debug_log_and_cout(
-            "[maitre_d::assign_tables, no free table available] "
-            "table_count: " + std::to_string(tables_.size()));
         return;
     }
 
@@ -159,7 +145,7 @@ void maitre_d::maitre_d::assign_tables(){
     if(dog_at_head != empty_dog){
         auto& table = pick_table();
         auto table_position = pick_interaction_position(table, dog_at_head.dog_position);
-        debug_log_and_cout(
+        debug::log(
             "[maitre_d::assign_tables, assigning head dog to table] "
             "dog_id: " + std::to_string(dog_at_head.dog_id)
             + ", dog_position: " + vector_to_string(dog_at_head.dog_position)
@@ -181,19 +167,10 @@ bool maitre_d::maitre_d::are_tables_free(){
         return table.is_free;
     }));
     auto has_free_table = free_count > 0;
-    debug_log_and_cout(
-        "[maitre_d::are_tables_free, checked table availability] "
-        "table_count: " + std::to_string(tables_.size())
-        + ", free_table_count: " + std::to_string(free_count)
-        + ", has_free_table: " + std::to_string(has_free_table));
     return has_free_table;
 }
 
 void maitre_d::maitre_d::send_dog_to_table(size_t id, Vector2 position){
-    debug_log_and_cout(
-        "[maitre_d::send_dog_to_table, queued customer path command] "
-        "dog_id: " + std::to_string(id)
-        + ", destination: " + vector_to_string(position));
     std::unique_ptr<events::event> send_customer = std::make_unique<events::send_customer_to_queue>(id, position);
     event_interface::queue_event(send_customer);
 }
@@ -252,18 +229,9 @@ void maitre_d::maitre_d::request_customer_arrival(){
         cafe_config::customer_dog_type,
         spawn_position);
     event_interface::queue_event(build_customer_dog);
-    debug::log(
-        "[maitre_d::request_customer_arrival, queued build event] "
-        "dog_type: " + std::to_string(cafe_config::customer_dog_type)
-        + ", queue_side: " + side_to_string(queue_side)
-        + ", spawn_position: " + vector_to_string(spawn_position));
 }
 
 void maitre_d::maitre_d::on_registered_table_event(const events::registered_table& event){
-    debug_log_and_cout(
-        "[maitre_d::on_registered_table_event, registered table] "
-        "table_id: " + std::to_string(event.get_table_id())
-        + ", position: " + vector_to_string(event.get_position()));
     register_table(event.get_table_id(), event.get_position(), event.get_interaction_positions());
 }
 
@@ -298,10 +266,6 @@ void maitre_d::maitre_d::on_customer_dog_created_event(const events::customer_do
         send_dog_to_table(event.get_customer_id(), queued_dog.queue_position);
     }
     seconds_since_customer_arrived_ = 0.0f;
-    debug::log(
-        "[maitre_d::on_customer_dog_created_event, reset arrival timer] "
-        "customer_id: " + std::to_string(event.get_customer_id())
-        + ", seconds_since_customer_arrived: " + std::to_string(seconds_since_customer_arrived_));
 }
 
 void maitre_d::maitre_d::on_customer_dog_left_event(const events::customer_dog_left& event){

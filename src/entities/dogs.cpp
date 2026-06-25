@@ -2,13 +2,6 @@
 #include "texture.h"
 #include "debug_log_interface.h"
 #include "raglib.h"
-#include <iostream>
-namespace{
-    void debug_log_and_cout(const std::string& message){
-        debug::log(message);
-        std::cout << message << std::endl;
-    }
-}
 // ------------------------------- render states ------------------------------- //
 void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position, int frame){
     size_t render_index = dog.get_body().get_index();
@@ -43,7 +36,6 @@ int entities::dog::update(float delta, int frame){
     if(! move_path_.empty()){
         auto next_position = move_path_.front();
         if(reached_position(next_position)){
-            std::cout << "[reached position]: " << raglib::vector_to_string(next_position) << std::endl;
             move_path_.erase(move_path_.begin());
             if(! move_path_.empty()){
                 next_position = move_path_.front();
@@ -104,20 +96,13 @@ void entities::dog::render(Vector2 draw_position, int frame){
 
 void entities::dog::set_path(const std::vector<Vector2>& path){
     if(path.empty()){
-        debug_log_and_cout(
+        debug::log(
             "[dog::set_path, skipped empty path] "
             "dog_id: " + std::to_string(id_));
         return;
     }
     move_path_ = path;
     determine_direction(move_path_.front());
-    debug_log_and_cout(
-        "[dog::set_path, assigned path] "
-        "dog_id: " + std::to_string(id_)
-        + ", path_size: " + std::to_string(move_path_.size())
-        + ", current_position: " + raglib::vector_to_string(position_)
-        + ", first_position: " + raglib::vector_to_string(move_path_.front())
-        + ", direction: " + raglib::vector_to_string(direction_scalar_));
 }
 
 // ------------------------------- player dogs ------------------------------- //
@@ -201,11 +186,6 @@ void entities::customer_dog::on_give_dog_path_event(const events::give_dog_path&
     if(static_cast<size_t>(id_) != event.get_dog_id()){
         return;
     }
-    debug_log_and_cout(
-        "[customer_dog::on_give_dog_path_event, accepted path] "
-        "dog_id: " + std::to_string(id_)
-        + ", current_position: " + raglib::vector_to_string(position_)
-        + ", path_size: " + std::to_string(event.get_path().size()));
     set_path(event.get_path());
 }
 

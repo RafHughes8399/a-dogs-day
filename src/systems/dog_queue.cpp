@@ -99,14 +99,8 @@ void maitre_d::dog_queue::update_dog_position(size_t dog_id, Vector2 position){
         return true;
     };
 
-    bool updated_left = update_dog(left_queue_.dogs, "left");
-    bool updated_right = update_dog(right_queue_.dogs, "right");
-    debug::log(
-        "[dog_queue::update_dog_position, updated dog position] "
-        "dog_id: " + std::to_string(dog_id)
-        + ", position: " + vector_to_string(position)
-        + ", updated: " + std::to_string(updated_left || updated_right)
-        + ", reached_queue_position: " + std::to_string(dog_has_reached_queue_position(dog_id)));
+    update_dog(left_queue_.dogs, "left");
+    update_dog(right_queue_.dogs, "right");
 }
 
 bool maitre_d::dog_queue::dog_has_reached_queue_position(size_t dog_id) const{
@@ -148,11 +142,6 @@ int maitre_d::dog_queue::pick_side() {
     previous_side_ = previous_side_ == cafe_config::queue_sides::left
         ? cafe_config::queue_sides::right
         : cafe_config::queue_sides::left;
-    debug::log(
-        "[dog_queue::pick_side, selected side] "
-        "left_queue_size: " + std::to_string(left_queue_.dogs.size())
-        + ", right_queue_size: " + std::to_string(right_queue_.dogs.size())
-        + ", previous_side: " + side_to_string(previous_side_));
     return previous_side_;
 }
 
@@ -160,12 +149,6 @@ Vector2 maitre_d::dog_queue::get_enqueue_position(int side) const{
     auto& lane = lane_for_side(side);
     auto queue_size = lane.dogs.size();
     auto enqueue_position = get_position(side, queue_size);
-    debug::log(
-        "[dog_queue::get_enqueue_position, calculated position] "
-        "side: " + side_to_string(side)
-        + ", queue_size: " + std::to_string(queue_size)
-        + ", queue_head: " + vector_to_string(lane.head)
-        + ", enqueue_position: " + vector_to_string(enqueue_position));
     return enqueue_position;
 }
 

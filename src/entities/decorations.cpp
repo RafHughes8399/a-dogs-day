@@ -4,7 +4,6 @@
 #include "texture.h"
 #include "queries.h"
 #include "query_interface.h"
-#include <iostream>
 // ------------------------ decorations -----------------------------------// 
 
 
@@ -20,7 +19,6 @@ void entities::decoration::subscribe_to_cursor(){
     
 void entities::decoration::pick_up(){
     // store the "start position"
-    std::cout << "[decoration pick up] " << get_debug_id() << " subscribe to cursor" << std::endl;
     pre_move_position_ = position_;
     subscribe_to_cursor();
     // make the hud element subscribe 
