@@ -80,6 +80,7 @@ namespace tree{
         void erase(std::unique_ptr<node>& tree, size_t object_id);
         void identify_collisions(std::unique_ptr<node>& tree, std::vector<entities::entity*> parent_entities);
         void insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object);
+        void notify_removals(const std::vector<entities::entity*>& removed_entities);
         void perform_interactions(std::unique_ptr<node>& tree, entities::entity* entity);
         void prune_leaves(std::unique_ptr<node>& tree, double delta);
         void traverse_tree(std::unique_ptr<node>& tree);
@@ -210,6 +211,10 @@ namespace tree{
             clear(root_);
         }
         void erase(size_t id){
+            auto entity = get_entity(root_, id);
+            if(entity != nullptr){
+                notify_removals(std::vector<entities::entity*>{entity});
+            }
             erase(root_, id);
             // add the id to the queue
             next_ids_.push(id);

@@ -35,12 +35,14 @@ namespace maitre_d{
     struct table_record{
         size_t table_id;
         Vector2 position;
+        events::table_interaction_positions interaction_positions;
         bool is_free;
         size_t customer_id;
     };
     const table_record empty_table{
         empty_id,
         Vector2Zero(),
+        events::table_interaction_positions{Vector2Zero(), Vector2Zero()},
         false,
         empty_id
     };
@@ -89,6 +91,10 @@ namespace maitre_d{
         std::vector<queued_dog> dogs;
     };
 
+    struct dequeue_result{
+        queued_dog dog;
+        std::vector<queued_dog> moved_dogs;
+    };
 
     // define the empty dog and the empty table 
     // define equality chceks based on id 
@@ -107,7 +113,7 @@ namespace maitre_d{
             // Internally this uses a vector so position offsets can be
             // recalculated when dog sizes change the space behind them.
             queued_dog enqueue(size_t dog_id, int side);
-            queued_dog dequeue();
+            dequeue_result dequeue();
 
             void update_dog_position(size_t dog_id, Vector2 position);
             bool dog_at_head(queue_lane queue);
@@ -125,6 +131,7 @@ namespace maitre_d{
             Vector2 get_target_position(size_t dog_id) const;
 
         private:
+            std::vector<queued_dog> compact_lane(int queue_side);
             queue_lane& lane_for_side(int queue_side);
             const queue_lane& lane_for_side(int queue_side) const;
             std::vector<queued_dog>& dogs_for_side(events::customer_queue_side queue_side);
@@ -140,6 +147,8 @@ namespace maitre_d{
         // Entities and lower-level systems can use this without depending on the
         // full singleton class. The real maitre d' sits behind this interface.
         void register_table(size_t table_id, Vector2 position);
+        void register_table(size_t table_id, Vector2 position, events::table_interaction_positions interaction_positions);
+        void remove_table(size_t table_id);
         void register_customer(size_t customer_id);
         void request_table_for_customer(size_t customer_id);
     }
@@ -155,6 +164,8 @@ namespace maitre_d{
             maitre_d& operator=(maitre_d&& other) = delete;
 
             void register_table(size_t table_id, Vector2 position);
+            void register_table(size_t table_id, Vector2 position, events::table_interaction_positions interaction_positions);
+            void remove_table(size_t table_id);
             void register_customer(size_t customer_id);
             void request_table_for_customer(size_t customer_id);
 
@@ -164,6 +175,7 @@ namespace maitre_d{
             Vector2 get_customer_spawn_position(events::customer_queue_side queue_side) const;
 
             void on_registered_table_event(const events::registered_table& event);
+            void on_removed_table_event(const events::removed_table& event);
             void on_registered_customer_event(const events::registered_customer& event);
             void on_requested_customer_table_event(const events::requested_customer_table& event);
             void on_customer_dog_created_event(const events::customer_dog_created& event);
@@ -179,6 +191,7 @@ namespace maitre_d{
             void assign_tables();
             bool are_tables_free();
             table_record& pick_table();
+            Vector2 pick_interaction_position(const table_record& table, Vector2 dog_position) const;
             void send_dog_to_table(size_t id, Vector2 position);
             void check_customer_arrivals(float delta);
             bool can_request_customer_arrival() const;
@@ -223,6 +236,7 @@ namespace maitre_d{
             
 
             events::event_handler<events::registered_table> registered_table_handler_;
+            events::event_handler<events::removed_table> removed_table_handler_;
             events::event_handler<events::registered_customer> registered_customer_handler_;
             events::event_handler<events::requested_customer_table> requested_customer_table_handler_;
             events::event_handler<events::customer_dog_created> customer_dog_created_handler_;

@@ -40,12 +40,14 @@ maitre_d::maitre_d::maitre_d()
 dogs_left_window_seconds_(0.0f),
 dogs_left_in_window_(0),
 registered_table_handler_([this](const events::registered_table& event) -> void {on_registered_table_event(event);}),
+removed_table_handler_([this](const events::removed_table& event) -> void {on_removed_table_event(event);}),
 registered_customer_handler_([this](const events::registered_customer& event) -> void {on_registered_customer_event(event);}),
 requested_customer_table_handler_([this](const events::requested_customer_table& event) -> void {on_requested_customer_table_event(event);}),
 customer_dog_created_handler_([this](const events::customer_dog_created& event) -> void {on_customer_dog_created_event(event);}),
 customer_dog_left_handler_([this](const events::customer_dog_left& event) -> void {on_customer_dog_left_event(event);}),
 dog_path_compelte_handler_([this](const events::dog_completed_path& event) -> void {on_dog_completed_path_event(event);}){
     event_interface::subscribe<events::registered_table>(registered_table_handler_);
+    event_interface::subscribe<events::removed_table>(removed_table_handler_);
     event_interface::subscribe<events::registered_customer>(registered_customer_handler_);
     event_interface::subscribe<events::requested_customer_table>(requested_customer_table_handler_);
     event_interface::subscribe<events::customer_dog_created>(customer_dog_created_handler_);
@@ -54,6 +56,10 @@ dog_path_compelte_handler_([this](const events::dog_completed_path& event) -> vo
 }
 
 void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position){
+    register_table(table_id, position, events::table_interaction_positions{position, position});
+}
+
+void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position, events::table_interaction_positions interaction_positions){
     debug_log_and_cout(
         "[maitre_d::register_table, received table record] "
         "table_id: " + std::to_string(table_id)
@@ -65,6 +71,7 @@ void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position){
     });
     if(existing_table != tables_.end()){
         existing_table->position = position;
+        existing_table->interaction_positions = interaction_positions;
         std::sort(tables_.begin(), tables_.end(), table_comparator{});
         debug_log_and_cout(
             "[maitre_d::register_table, updated existing table record] "
@@ -79,6 +86,7 @@ void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position){
     tables_.push_back(table_record{
         table_id,
         position,
+        interaction_positions,
         true,
         empty_id
     });
@@ -89,6 +97,19 @@ void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position){
         + ", position: " + vector_to_string(position)
         + ", is_free: 1"
         + ", customer_id: " + std::to_string(empty_id)
+        + ", table_count_after: " + std::to_string(tables_.size()));
+}
+
+void maitre_d::maitre_d::remove_table(size_t table_id){
+    auto new_end = std::remove_if(tables_.begin(), tables_.end(), [table_id](const auto& table) -> bool {
+        return table.table_id == table_id;
+    });
+    auto removed_count = static_cast<size_t>(tables_.end() - new_end);
+    tables_.erase(new_end, tables_.end());
+    debug_log_and_cout(
+        "[maitre_d::remove_table, removed table record] "
+        "table_id: " + std::to_string(table_id)
+        + ", removed_count: " + std::to_string(removed_count)
         + ", table_count_after: " + std::to_string(tables_.size()));
 }
 
@@ -133,19 +154,24 @@ void maitre_d::maitre_d::assign_tables(){
         return;
     }
 
-    auto dog_at_head = customer_queue_.dequeue();
+    auto dequeue_result = customer_queue_.dequeue();
+    auto dog_at_head = dequeue_result.dog;
     if(dog_at_head != empty_dog){
         auto& table = pick_table();
+        auto table_position = pick_interaction_position(table, dog_at_head.dog_position);
         debug_log_and_cout(
             "[maitre_d::assign_tables, assigning head dog to table] "
             "dog_id: " + std::to_string(dog_at_head.dog_id)
             + ", dog_position: " + vector_to_string(dog_at_head.dog_position)
             + ", queue_position: " + vector_to_string(dog_at_head.queue_position)
             + ", table_id: " + std::to_string(table.table_id)
-            + ", table_position: " + vector_to_string(table.position));
+            + ", table_position: " + vector_to_string(table_position));
         table.is_free = false;
         table.customer_id = static_cast<size_t>(dog_at_head.dog_id);
-        send_dog_to_table(static_cast<size_t>(dog_at_head.dog_id), table.position);
+        send_dog_to_table(static_cast<size_t>(dog_at_head.dog_id), table_position);
+        for(const auto& moved_dog : dequeue_result.moved_dogs){
+            send_dog_to_table(static_cast<size_t>(moved_dog.dog_id), moved_dog.queue_position);
+        }
     }
     return;
 }
@@ -178,6 +204,12 @@ maitre_d::table_record& maitre_d::maitre_d::pick_table(){
     }
     assert(false && "pick_table called with no free tables");
     return tables_.front();
+}
+Vector2 maitre_d::maitre_d::pick_interaction_position(const table_record& table, Vector2 dog_position) const{
+    if(dog_position.x < table.position.x){
+        return table.interaction_positions.left;
+    }
+    return table.interaction_positions.right;
 }
 void maitre_d::maitre_d::check_customer_arrivals(float delta){
     if(! feature_flag_config::automatic_arrivals){
@@ -232,7 +264,11 @@ void maitre_d::maitre_d::on_registered_table_event(const events::registered_tabl
         "[maitre_d::on_registered_table_event, registered table] "
         "table_id: " + std::to_string(event.get_table_id())
         + ", position: " + vector_to_string(event.get_position()));
-    register_table(event.get_table_id(), event.get_position());
+    register_table(event.get_table_id(), event.get_position(), event.get_interaction_positions());
+}
+
+void maitre_d::maitre_d::on_removed_table_event(const events::removed_table& event){
+    remove_table(event.get_table_id());
 }
 
 void maitre_d::maitre_d::on_registered_customer_event(const events::registered_customer& event){

@@ -28,6 +28,11 @@
 #include "hitbox.h"
 #include "raylib.h"
 namespace events{
+	struct table_interaction_positions{
+		Vector2 left;
+		Vector2 right;
+	};
+
 	enum customer_queue_side{
 		left_queue = 0,
 		right_queue = 1
@@ -73,7 +78,8 @@ namespace events{
 		debug_log_id = 36,
 		dog_path_complete = 37,
 		give_dog_path_id = 38,
-		size = 39
+		table_removed = 39,
+		size = 40
 	};
 	class event{
 
@@ -353,8 +359,9 @@ namespace events{
 	// not need concrete entity types or ownership of level entities.
 	class registered_table : public event{
 		public:
-			registered_table(size_t table_id, Vector2 position)
-			: event(ids::register_table), table_id_(table_id), position_(position){}
+			registered_table(size_t table_id, Vector2 position, table_interaction_positions interaction_positions)
+			: event(ids::register_table), table_id_(table_id), position_(position),
+			interaction_positions_(interaction_positions){}
 
 			static int get_static_type(){
 				return ids::register_table;
@@ -365,9 +372,27 @@ namespace events{
 			Vector2 get_position() const{
 				return position_;
 			}
+			table_interaction_positions get_interaction_positions() const{
+				return interaction_positions_;
+			}
 		private:
 			const size_t table_id_;
 			const Vector2 position_;
+			const table_interaction_positions interaction_positions_;
+	};
+	class removed_table : public event{
+		public:
+			removed_table(size_t table_id)
+			: event(ids::table_removed), table_id_(table_id){}
+
+			static int get_static_type(){
+				return ids::table_removed;
+			}
+			size_t get_table_id() const{
+				return table_id_;
+			}
+		private:
+			const size_t table_id_;
 	};
 	// Cafe-domain fact: a customer dog exists in the level and can enter the
 	// restaurant flow. The maitre d' records the id, not the dog object.

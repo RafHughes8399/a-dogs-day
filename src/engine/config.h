@@ -129,6 +129,14 @@ namespace cafe_config{
     };
 }
 namespace entity_config{
+    inline const char* player_dog_debug_id_prefix = "pd_";
+    inline const char* customer_dog_debug_id_prefix = "cd_";
+    inline const char* npc_dog_debug_id_prefix = "npc_";
+    inline const char* cursor_debug_id_prefix = "cursor_";
+    inline const char* paw_mark_debug_id_prefix = "paw_";
+    inline const char* decoration_debug_id_prefix = "dec_";
+    inline const char* table_debug_id_prefix = "tbl_";
+
     // file paths
     inline const char* background_path = "../sprites/background.png" ;
     inline const char* cursor_path = "../sprites/cursor.png";

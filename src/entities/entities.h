@@ -584,7 +584,7 @@ namespace entities{
             
             void on_moved_cursor(const events::moved_cursor& event);
             bool can_place_down();
-            void place_down();
+            virtual void place_down();
             void pick_up();
             void subscribe_to_cursor();
             void unsubscribe_from_cursor();
@@ -628,7 +628,11 @@ namespace entities{
 
             table(body::body body, Vector2 position, int id, std::string debug_id)
             : station(body, position, id, std::move(debug_id), station_type::table_station),
-            state_(table_state::available), assigned_dog_id_(level_config::empty_node){}
+            state_(table_state::available), assigned_dog_id_(level_config::empty_node),
+            interaction_positions_(events::table_interaction_positions{
+                Vector2{position.x - level_config::edge_weight, position.y},
+                Vector2{position.x + (2.0f * level_config::edge_weight), position.y}
+            }){}
             table(const table& other) = default;
             table(table&& other) = default;
 
@@ -641,11 +645,14 @@ namespace entities{
             void clear();
             table_state get_state();
             int get_assigned_dog_id();
-            Vector2 get_interaction_position() const;
+            events::table_interaction_positions get_interaction_positions() const;
+            void place_down() override;
 
         private:
+            void update_interaction_positions();
             table_state state_;
             int assigned_dog_id_;
+            events::table_interaction_positions interaction_positions_;
     };
     // ------------------ entity builder ------------------ //
     class entity_builder{

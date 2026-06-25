@@ -47,16 +47,33 @@ maitre_d::queued_dog maitre_d::dog_queue::enqueue(size_t dog_id, int side){
 bool maitre_d::dog_queue::dog_at_head(queue_lane queue){
     return queue.dogs.empty() ? false : queue.dogs.front().reached_queue_position;
 }
-maitre_d::queued_dog maitre_d::dog_queue::dequeue(){
-    queued_dog dog = {-1, Vector2Zero(), Vector2Zero(), false};
+maitre_d::dequeue_result maitre_d::dog_queue::dequeue(){
+    dequeue_result result{empty_dog, {}};
     if(dog_at_head(left_queue_)){
-        dog = left_queue_.dogs.front();
+        result.dog = left_queue_.dogs.front();
         left_queue_.dogs.erase(left_queue_.dogs.begin());
+        result.moved_dogs = compact_lane(cafe_config::queue_sides::left);
     } else if(dog_at_head(right_queue_)){
-            dog = right_queue_.dogs.front();
-            right_queue_.dogs.erase(right_queue_.dogs.begin());
+        result.dog = right_queue_.dogs.front();
+        right_queue_.dogs.erase(right_queue_.dogs.begin());
+        result.moved_dogs = compact_lane(cafe_config::queue_sides::right);
     }
-    return dog;
+    return result;
+}
+
+std::vector<maitre_d::queued_dog> maitre_d::dog_queue::compact_lane(int queue_side){
+    auto& lane = lane_for_side(queue_side);
+    auto moved_dogs = std::vector<queued_dog>{};
+    for(size_t index = 0; index < lane.dogs.size(); ++index){
+        auto next_position = get_position(queue_side, index);
+        if(Vector2Equals(lane.dogs[index].queue_position, next_position)){
+            continue;
+        }
+        lane.dogs[index].queue_position = next_position;
+        lane.dogs[index].reached_queue_position = false;
+        moved_dogs.push_back(lane.dogs[index]);
+    }
+    return moved_dogs;
 }
 
 void maitre_d::dog_queue::update_dog_position(size_t dog_id, Vector2 position){

@@ -68,15 +68,17 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
     next_entity_id_ = std::max(next_entity_id_, entity_id + 1);
 
     if(table != nullptr){
-        auto interaction_position = table->get_interaction_position();
+        auto interaction_positions = table->get_interaction_positions();
         auto message = "[level::add_entity, queued table registration] "
             "table_id: " + std::to_string(entity_id)
             + ", table_position: " + vector_to_string(position)
-            + ", interaction_position: " + vector_to_string(interaction_position);
+            + ", left_interaction_position: " + vector_to_string(interaction_positions.left)
+            + ", right_interaction_position: " + vector_to_string(interaction_positions.right);
         debug_log_and_cout(message);
         std::unique_ptr<events::event> registered_table = std::make_unique<events::registered_table>(
             static_cast<size_t>(entity_id),
-            interaction_position);
+            position,
+            interaction_positions);
         event_interface::queue_event(registered_table);
     }
 }

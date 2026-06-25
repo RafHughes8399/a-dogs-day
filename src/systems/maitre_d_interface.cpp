@@ -3,6 +3,12 @@
 void maitre_d::interface::register_table(size_t table_id, Vector2 position){
     maitre_d::maitre_d::get_instance().register_table(table_id, position);
 }
+void maitre_d::interface::register_table(size_t table_id, Vector2 position, events::table_interaction_positions interaction_positions){
+    maitre_d::maitre_d::get_instance().register_table(table_id, position, interaction_positions);
+}
+void maitre_d::interface::remove_table(size_t table_id){
+    maitre_d::maitre_d::get_instance().remove_table(table_id);
+}
 
 void maitre_d::interface::register_customer(size_t customer_id){
     maitre_d::maitre_d::get_instance().register_customer(customer_id);

@@ -369,7 +369,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
         std::move(khiri_outlines),
         position,
         id,
-        next_debug_id("pd_"));
+        next_debug_id(entity_config::player_dog_debug_id_prefix));
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 position, int id){
     auto mack_left_texture = textures::textures_.get_texture(textures::mack_left, entity_config::mack_left_path);
@@ -450,7 +450,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
         std::move(mack_outlines),
         position,
         id,
-        next_debug_id("pd_"));
+        next_debug_id(entity_config::player_dog_debug_id_prefix));
 }
 
 // NPC dog sprite art/config pending.
@@ -497,7 +497,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id
 //         std::move(head),
 //         position,
 //         id,
-//         next_debug_id("npc_"));
+//         next_debug_id(entity_config::npc_dog_debug_id_prefix));
     auto customer_left_texture = textures::textures_.get_texture(textures::mack_left, entity_config::mack_left_path);
     auto customer_right_texture = textures::textures_.get_texture(textures::mack_right, entity_config::mack_right_path);
     auto customer_left_sprite = sprite::sprite(customer_left_texture,
@@ -535,7 +535,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id
         position,
         destination.value(),
         id,
-        next_debug_id("cd_"));
+        next_debug_id(entity_config::customer_dog_debug_id_prefix));
     }else{
         debug::log(
             "[entity_builder::build_npc_dog, constructing customer dog without destination] "
@@ -547,6 +547,6 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id
             std::move(head),
             position,
             id,
-            next_debug_id("cd_"));
+            next_debug_id(entity_config::customer_dog_debug_id_prefix));
     }
 }

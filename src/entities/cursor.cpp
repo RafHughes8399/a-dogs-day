@@ -211,7 +211,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2
         body,
         GetMousePosition(),
         id,
-        next_debug_id("cursor_")
+        next_debug_id(entity_config::cursor_debug_id_prefix)
     );
 }
 std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vector2 position, int id){
@@ -231,6 +231,6 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vecto
         body,
         position,
         id,
-        next_debug_id("paw_")
+        next_debug_id(entity_config::paw_mark_debug_id_prefix)
     );
 }
