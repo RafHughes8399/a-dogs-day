@@ -208,22 +208,23 @@ void level::level::on_build_customer_dog_event(const events::build_customer_dog&
     add_void_entity(std::move(new_dog), level_config::draw_layers::dogs);
 }
 
-void level::level::on_send_customer_to_queue_event(const events::send_customer_to_queue& event){
+void level::level::on_send_customer_to_position_event(const events::send_customer_to_position& event){
     auto customer_id = static_cast<int>(event.get_customer_id());
     auto dog_record = id_entity_map_.find(customer_id);
     if(dog_record == id_entity_map_.end()){
         debug::log(
-            "[level::on_send_customer_to_queue_event, missing customer entity] "
+            "[level::on_send_customer_to_position_event, missing customer entity] "
             "customer_id: " + std::to_string(customer_id)
-            + ", destination: " + vector_to_string(event.get_queue_position()));
+            + ", destination: " + vector_to_string(event.get_destination()));
         return;
     }
 
     auto dog = static_cast<entities::dog*>(dog_record->second);
     auto direction = dog->get_direction_scalar();
-    auto destination = event.get_queue_position();
-    auto queue_path = graph_.find_path(dog->get_position(), destination, direction);
-    std::unique_ptr<events::event> give_dog_path = std::make_unique<events::give_dog_path>(customer_id, queue_path);
+    auto source = event.has_source() ? event.get_source() : dog->get_position();
+    auto destination = event.get_destination();
+    auto path = graph_.find_path(source, destination, direction);
+    std::unique_ptr<events::event> give_dog_path = std::make_unique<events::give_dog_path>(customer_id, path);
     event_interface::queue_event(give_dog_path);
 
 }

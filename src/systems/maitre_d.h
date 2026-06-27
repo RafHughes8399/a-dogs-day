@@ -25,7 +25,10 @@
 #include <iostream>
 namespace maitre_d{
     inline constexpr size_t empty_id = static_cast<size_t>(-1);
-    inline Vector2 entrance_ = Vector2Zero(); // TODO DEFINE THIS POSITION PROPERLY
+    inline Vector2 entrance_ = Vector2 {
+        level_config::edge_weight * (cafe_config::queue_width_edges + cafe_config::queue_x_edges),
+        cafe_config::queue_midpoint_y
+    };
     
 
 
@@ -192,6 +195,9 @@ namespace maitre_d{
             bool are_tables_free();
             table_record& pick_table();
             Vector2 pick_interaction_position(const table_record& table, Vector2 dog_position) const;
+            void send_dog_to_position(size_t id, Vector2 position);
+            void send_dog_to_position(size_t id, Vector2 source, Vector2 destination);
+            void send_dog_to_queue_position(size_t id, Vector2 position);
             void send_dog_to_table(size_t id, Vector2 position);
             void check_customer_arrivals(float delta);
             bool can_request_customer_arrival() const;

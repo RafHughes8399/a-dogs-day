@@ -74,7 +74,7 @@ namespace cafe_config{
         left = 0,
         right = 1
     };
-    inline const float queue_width_edges = 2.5f;
+    inline const int queue_width_edges = 3;
     inline const int queue_x_edges = 1;
     inline const int queue_y_buffer_edges = 1;
     inline const int queue_y_edges = level_config::screen_edges_y - (2 * queue_y_buffer_edges);

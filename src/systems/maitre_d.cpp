@@ -156,7 +156,7 @@ void maitre_d::maitre_d::assign_tables(){
         table.customer_id = static_cast<size_t>(dog_at_head.dog_id);
         send_dog_to_table(static_cast<size_t>(dog_at_head.dog_id), table_position);
         for(const auto& moved_dog : dequeue_result.moved_dogs){
-            send_dog_to_table(static_cast<size_t>(moved_dog.dog_id), moved_dog.queue_position);
+            send_dog_to_queue_position(static_cast<size_t>(moved_dog.dog_id), moved_dog.queue_position);
         }
     }
     return;
@@ -170,9 +170,23 @@ bool maitre_d::maitre_d::are_tables_free(){
     return has_free_table;
 }
 
+void maitre_d::maitre_d::send_dog_to_position(size_t id, Vector2 position){
+    std::unique_ptr<events::event> send_customer_to_position = std::make_unique<events::send_customer_to_position>(id, position);
+    event_interface::queue_event(send_customer_to_position);
+}
+
+void maitre_d::maitre_d::send_dog_to_position(size_t id, Vector2 source, Vector2 destination){
+    std::unique_ptr<events::event> send_customer_to_position = std::make_unique<events::send_customer_to_position>(id, source, destination);
+    event_interface::queue_event(send_customer_to_position);
+}
+
+void maitre_d::maitre_d::send_dog_to_queue_position(size_t id, Vector2 position){
+    send_dog_to_position(id, position);
+}
+
 void maitre_d::maitre_d::send_dog_to_table(size_t id, Vector2 position){
-    std::unique_ptr<events::event> send_customer = std::make_unique<events::send_customer_to_queue>(id, position);
-    event_interface::queue_event(send_customer);
+    send_dog_to_position(id, entrance_);
+    send_dog_to_position(id, entrance_, position);
 }
 maitre_d::table_record& maitre_d::maitre_d::pick_table(){
     // TABLES ARE SORTED BY POSITION SO PICKING A TABLE IS REALLY EASY
@@ -263,7 +277,7 @@ void maitre_d::maitre_d::on_customer_dog_created_event(const events::customer_do
             "customer_id: " + std::to_string(event.get_customer_id())
             + ", queue_side: " + side_to_string(queue_side)
             + ", queue_position: " + vector_to_string(queued_dog.queue_position));
-        send_dog_to_table(event.get_customer_id(), queued_dog.queue_position);
+        send_dog_to_queue_position(event.get_customer_id(), queued_dog.queue_position);
     }
     seconds_since_customer_arrived_ = 0.0f;
 }

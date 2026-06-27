@@ -74,7 +74,7 @@ namespace events{
 		send_waiter_clear_table = 32,
 		customer_left = 33,
 		build_customer_dog_id = 34,
-		send_customer_queue = 35,
+		send_customer_position = 35,
 		debug_log_id = 36,
 		dog_path_complete = 37,
 		give_dog_path_id = 38,
@@ -536,24 +536,35 @@ namespace events{
 		private:
 	};
 	// Cafe-domain command: the maitre d' has assigned a customer dog to a
-	// physical queue position. The level owns pathfinding and entity mutation.
-	class send_customer_to_queue : public event{
+	// physical world position. The level owns pathfinding and entity mutation.
+	class send_customer_to_position : public event{
 		public:
-			send_customer_to_queue(size_t customer_id, Vector2 queue_position)
-			: event(ids::send_customer_queue), customer_id_(customer_id), queue_position_(queue_position){}
+			send_customer_to_position(size_t customer_id, Vector2 destination)
+			: event(ids::send_customer_position), customer_id_(customer_id), source_(Vector2{0.0f, 0.0f}), destination_(destination), has_source_(false){}
+
+			send_customer_to_position(size_t customer_id, Vector2 source, Vector2 destination)
+			: event(ids::send_customer_position), customer_id_(customer_id), source_(source), destination_(destination), has_source_(true){}
 
 			static int get_static_type(){
-				return ids::send_customer_queue;
+				return ids::send_customer_position;
 			}
 			size_t get_customer_id() const{
 				return customer_id_;
 			}
-			Vector2 get_queue_position() const{
-				return queue_position_;
+			bool has_source() const{
+				return has_source_;
+			}
+			Vector2 get_source() const{
+				return source_;
+			}
+			Vector2 get_destination() const{
+				return destination_;
 			}
 		private:
 			const size_t customer_id_;
-			const Vector2 queue_position_;
+			const Vector2 source_;
+			const Vector2 destination_;
+			const bool has_source_;
 	};
 	// Cafe-domain fact: a waiter dog exists and can be assigned service work by
 	// the expediter. The expediter records ids only, not dog references.

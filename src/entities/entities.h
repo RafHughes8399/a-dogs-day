@@ -20,6 +20,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <queue>
 
 namespace entities{
     enum status_codes{
@@ -53,7 +54,7 @@ namespace entities{
             Vector2 get_position();
             void move(Vector2 new_postion);
             void move_without_event(Vector2 new_position);
-            
+
             virtual int update(float delta, int frame){
                 (void) delta;
                 (void) frame;
@@ -218,7 +219,7 @@ namespace entities{
                 void on_left_mouse_click_event(const events::left_mouse_click& event);
                 void on_move_view_frame_event(const events::move_view_frame& event);
                 void on_right_mouse_click_event(const events::right_mouse_click& event);                
-            
+
             private:
                 
                 enum animation_tags{
@@ -263,6 +264,7 @@ namespace entities{
      * -> customer dogs 
      */
     class dog : public entity{
+        using path = std::vector<Vector2>;
         public:
             dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right)
@@ -290,7 +292,11 @@ namespace entities{
             body::body head_;
             const Vector2 move_speed_ = entity_config::dog_move_speed;
             Vector2 direction_scalar_;
-            std::vector<Vector2> move_path_;
+            // current path is the current path that the dog is walking
+            // move-paths are the next paths 9not that curent_path and move_path head are not the same
+            // the move_path head is the next path
+            std::queue<path> move_paths_;
+            path current_path_;
     };    
     class player_dog : public dog{
         public:

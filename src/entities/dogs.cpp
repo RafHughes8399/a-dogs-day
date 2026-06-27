@@ -33,18 +33,36 @@ bool entities::dog::reached_position(Vector2 target){
 int entities::dog::update(float delta, int frame){
     (void) frame;
 
-    if(! move_path_.empty()){
-        auto next_position = move_path_.front();
+    if(! current_path_.empty()){
+        auto next_position = current_path_.front();
         if(reached_position(next_position)){
-            move_path_.erase(move_path_.begin());
-            if(! move_path_.empty()){
-                next_position = move_path_.front();
+            current_path_.erase(current_path_.begin());
+            if(! current_path_.empty()){
+                next_position = current_path_.front();
                 determine_direction(next_position);
             } else {
-                // is destination
+                // is destination, the current path is finished
+                debug::log(
+                    "[dog::update, completed current path] "
+                    "dog_id: " + std::to_string(id_)
+                    + ", destination: " + raglib::vector_to_string(next_position)
+                    + ", queued_paths: " + std::to_string(move_paths_.size()));
                 std::unique_ptr<events::event> reached_destination = std::make_unique<events::dog_completed_path>(id_, next_position);
                 event_interface::queue_event(reached_destination);
                 body_.update_hitboxes(position_);
+
+                // check for the next path
+                if(!move_paths_.empty()){
+                    current_path_ = move_paths_.front();
+                    move_paths_.pop();
+                    determine_direction(current_path_.front());
+                    debug::log(
+                        "[dog::update, switched to queued path] "
+                        "dog_id: " + std::to_string(id_)
+                        + ", path_size: " + std::to_string(current_path_.size())
+                        + ", first_position: " + raglib::vector_to_string(current_path_.front())
+                        + ", queued_paths_remaining: " + std::to_string(move_paths_.size()));
+                }
                 return status_codes::nothing;
             }
         }
@@ -101,8 +119,28 @@ void entities::dog::set_path(const std::vector<Vector2>& path){
             "dog_id: " + std::to_string(id_));
         return;
     }
-    move_path_ = path;
-    determine_direction(move_path_.front());
+    if(current_path_.empty()){
+        current_path_ = path;
+        determine_direction(current_path_.front());
+        debug::log(
+            "[dog::set_path, assigned current path] "
+            "dog_id: " + std::to_string(id_)
+            + ", path_size: " + std::to_string(current_path_.size())
+            + ", first_position: " + raglib::vector_to_string(current_path_.front())
+            + ", queued_paths: " + std::to_string(move_paths_.size()));
+    }
+    else{
+        auto next_path = path;
+        next_path.front() = current_path_.back();
+        move_paths_.push(next_path);
+        debug::log(
+            "[dog::set_path, queued next path] "
+            "dog_id: " + std::to_string(id_)
+            + ", path_size: " + std::to_string(next_path.size())
+            + ", first_position: " + raglib::vector_to_string(next_path.front())
+            + ", queued_paths: " + std::to_string(move_paths_.size()));
+
+    }
 }
 
 // ------------------------------- player dogs ------------------------------- //
