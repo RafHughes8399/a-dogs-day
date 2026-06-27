@@ -9,6 +9,8 @@
 #include "debug_log_interface.h"
 #include "debug_logger.h"
 #include  "menus.h"
+#include "debug_log_interface.h"
+#include "debug_logger.h"
 #include "level.h"
 #include "maitre_d.h"
 #include "player.h"
