@@ -6,6 +6,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "debug_log_interface.h"
+#include "debug_logger.h"
 #include  "menus.h"
 #include "debug_log_interface.h"
 #include "debug_logger.h"
@@ -29,6 +31,7 @@ namespace game{
             void render(float delta_time);
             void debug(float delta_time);
         private:
+            void run_debug_behaviours();
             
             int frame_count_;
             

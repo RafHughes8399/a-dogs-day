@@ -10,6 +10,8 @@
 #include <cstddef>
 #include <vector>
 namespace game_config {
+    inline const int window_width = 1920;
+    inline const int window_height = 1080;
     inline const int frames = 60;
     inline const int twenty_seconds = frames * 60; // 20 seconds in frames
     inline const float hold_duration = frames * 1.2; // 1.2 seconds in frames
@@ -20,23 +22,28 @@ namespace player_config{
     inline const int max_bones = 999999;
     inline const int max_level = 50;
 }
+namespace feature_flag_config{
+    inline const bool automatic_arrivals = false;
+}
 namespace level_config{
     // world dimensions
-    inline float screen_width = GetScreenWidth();
-    inline float screen_height = GetScreenHeight();
-    inline float world_x = 4096.0f;
-    inline float world_y = 4096.0f;
+    inline const float screen_width = static_cast<float>(game_config::window_width);
+    inline const float screen_height = static_cast<float>(game_config::window_height);
+    inline float world_x = 2048.0f;
+    inline float world_y = 2048.0f;
     
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder
 
+    inline const int screen_edges_x = screen_width/ edge_weight;
+    inline const int screen_edges_y = screen_height / edge_weight;
 
     inline const int empty_node = -1;
     inline const size_t mack_id = 0;
     inline const size_t khiri_id = 1;
 
     inline const Vector2 frame_move = Vector2{375, 375};
-
+    inline const float void_move = edge_weight * 0.125;
     enum draw_layers{
         background = 0,
         decoration = 1,
@@ -60,15 +67,76 @@ namespace level_config{
         Vector2{0, -1}, // up    (index 2)
         Vector2{0, 1}   // down  (index 3)
     };
-	    
+
 }
 namespace cafe_config{
-    inline const Vector2 dog_queue_start = Vector2{level_config::edge_weight * 8.0f, level_config::edge_weight * 8.0f};
-    inline const Vector2 dog_queue_direction = Vector2{0.0f, 1.0f};
-    inline const size_t dog_queue_capacity = 5;
-    inline const float dog_queue_base_spacing_edges = 1.0f;
+    enum queue_sides{
+        left = 0,
+        right = 1
+    };
+    inline const int queue_width_edges = 3;
+    inline const int queue_x_edges = 1;
+    inline const int queue_y_buffer_edges = 1;
+    inline const int queue_y_edges = level_config::screen_edges_y - (2 * queue_y_buffer_edges);
+    inline const float queue_gap_edges = 2.0f;
+    inline const float queue_arrival_s = 120.0f;
+    inline const float queue_left_window_s = 30.0f;
+    inline const int queue_left_trigger = 3;
+    inline const int customer_dog_type = 0;
+    inline const Vector2 queue_dir = Vector2{0.0f, 1.0f};
+    inline const Vector2 customer_spawn_positions[2] = {
+        Vector2{queue_x_edges * level_config::edge_weight, 0 - (2.0f * level_config::edge_weight)},
+        Vector2{queue_x_edges * level_config::edge_weight, level_config::screen_height + (2.0f * level_config::edge_weight)}
+    };
+    inline const float queue_width = queue_width_edges * level_config::edge_weight;
+    inline const float queue_height = level_config::screen_height;
+
+    inline const int queue_midpoint_y_edges = level_config::screen_edges_y / 2;
+    inline const float queue_midpoint_y = queue_midpoint_y_edges * level_config::edge_weight;
+    inline const Vector2 left_queue_head = Vector2{
+        queue_x_edges * level_config::edge_weight,
+        queue_midpoint_y - level_config::edge_weight
+    };
+    inline const Vector2 right_queue_head = Vector2{
+        queue_x_edges * level_config::edge_weight,
+        queue_midpoint_y + level_config::edge_weight
+    };
+    
+    inline const int queue_capacity = queue_y_edges;
+    inline const std::vector<Vector2> left_queue_positions = [](){
+        auto positions = std::vector<Vector2>{};
+        positions.reserve(static_cast<size_t>(queue_capacity));
+        for(int index = 0; index < queue_capacity; ++index){
+            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
+            positions.push_back(Vector2{left_queue_head.x, left_queue_head.y - offset});
+        }
+        return positions;
+    }();
+    inline const std::vector<Vector2> right_queue_positions = [](){
+        auto positions = std::vector<Vector2>{};
+        positions.reserve(static_cast<size_t>(queue_capacity));
+        for(int index = 0; index < queue_capacity; ++index){
+            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
+            positions.push_back(Vector2{right_queue_head.x, right_queue_head.y + offset});
+        }
+        return positions;
+    }();
+    inline const Rectangle queue_debug_bounds = Rectangle{
+        0.0f,
+        0.0f,
+        queue_width,
+        queue_height
+    };
 }
 namespace entity_config{
+    inline const char* player_dog_debug_id_prefix = "pd_";
+    inline const char* customer_dog_debug_id_prefix = "cd_";
+    inline const char* npc_dog_debug_id_prefix = "npc_";
+    inline const char* cursor_debug_id_prefix = "cursor_";
+    inline const char* paw_mark_debug_id_prefix = "paw_";
+    inline const char* decoration_debug_id_prefix = "dec_";
+    inline const char* table_debug_id_prefix = "tbl_";
+
     // file paths
     inline const char* background_path = "../sprites/background.png" ;
     inline const char* cursor_path = "../sprites/cursor.png";
@@ -180,15 +248,16 @@ namespace hud_config{
 }
 namespace debug_logger_config{
     inline const int toggle_key = KEY_SLASH;
-    inline const float backdrop_height_ratio = 0.33f;
-    inline const float backdrop_y_ratio = 1.0f - backdrop_height_ratio;
+    inline const int pause_key = KEY_P;
+    inline const float logger_height_ratio = 0.6f;
+    inline const float logger_y_position_scalar = 1.0f - logger_height_ratio;
     inline const int backdrop_opacity = 102;
     inline const Color backdrop = Color{28, 28, 28, backdrop_opacity};
     inline const Color text = Color{245, 240, 225, 255};
-    inline const int font_size = 18;
-    inline const int line_height = 24;
+    inline const int font_size = 24;
+    inline const int line_height = 36;
     inline const int padding_x = 18;
     inline const int padding_y = 16;
-    inline const size_t max_messages = 40;
+    inline const size_t max_messages = 80;
 }
 #endif

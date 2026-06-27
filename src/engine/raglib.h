@@ -4,6 +4,7 @@
 #include <ostream>
 #include "raylib.h"
 #include "raymath.h"
+#include <string>
 namespace raglib{
     struct bounding_box_2{
         Vector2 min;
@@ -16,5 +17,9 @@ namespace raglib{
     };
     std::ostream& operator<<(std::ostream& stream, bounding_box_2& box);
     
+
+    inline std::string vector_to_string(const Vector2& vector){
+        return "{" + std::to_string(vector.x) + ", " + std::to_string(vector.y) + "}";
+    }
 }
 #endif

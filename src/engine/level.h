@@ -83,6 +83,7 @@ namespace level{
             int row_length_;
 
             queries::query_handler<queries::can_place_decoration, bool> can_place_decoration_handler_;
+            queries::query_handler<queries::path_query, std::vector<Vector2>> path_query_handler_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
         
         public:
@@ -90,6 +91,7 @@ namespace level{
                 event_interface::unsubscribe<events::moved_decoration>(moved_decoration_handler_);
                 event_interface::unsubscribe<events::placed_decoration>(placed_decoration_handler_);
                 query_interface::unsubscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
+                query_interface::unsubscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
             }
             level_graph(int level_x, int level_y)
             : moved_decoration_handler_([this](const events::moved_decoration& event) -> void{on_moved_decoration(event);}),
@@ -97,6 +99,7 @@ namespace level{
             num_rows_(static_cast<int>(level_y / level_config::edge_weight)),
             row_length_(static_cast<int>(level_x / level_config::edge_weight)),
             can_place_decoration_handler_([this](const queries::can_place_decoration& query) -> bool {return can_place_decoration(query);}),
+            path_query_handler_([this](const queries::path_query& query) -> std::vector<Vector2> {return get_path(query);}),
             graph_({}){
                 // ! columns is x, rows is y
                 build_nodes(level_x, level_y);
@@ -104,6 +107,7 @@ namespace level{
                 event_interface::subscribe<events::moved_decoration>(moved_decoration_handler_);
                 event_interface::subscribe<events::placed_decoration>(placed_decoration_handler_);
                 query_interface::subscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
+                query_interface::subscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
             }
             level_graph(const level_graph& other) = default;
             level_graph(level_graph&& other) = default;
@@ -113,6 +117,7 @@ namespace level{
             level_graph& operator=(level_graph&& other) = delete;
             
             bool can_place_decoration(const queries::can_place_decoration& query);
+            std::vector<Vector2> get_path(const queries::path_query& query);
             
             int position_to_node(Vector2 position);
             int position_to_node(Vector2 position, Vector2 direction);
@@ -133,21 +138,28 @@ namespace level{
             event_interface::unsubscribe<events::left_mouse_click>(left_mouse_click_handler_);
             event_interface::unsubscribe<events::move_view_frame>(move_view_frame_handler_);
             event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
+            event_interface::unsubscribe<events::build_customer_dog>(build_customer_dog_handler_);
+            event_interface::unsubscribe<events::send_customer_to_position>(send_customer_to_position_handler_);
             }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
             : left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
             move_view_frame_handler_([this](const events::move_view_frame& event) -> void{on_move_view_frame_event(event);}),
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);}),
+            build_customer_dog_handler_([this](const events::build_customer_dog& event) -> void{on_build_customer_dog_event(event);}),
+            send_customer_to_position_handler_([this](const events::send_customer_to_position& event) -> void{on_send_customer_to_position_event(event);}),
             graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
             view_frame_(frame), background_(sprite), id_entity_map_({}),
+            next_entity_id_(0),
             level_entities_(tree::quadtree(raglib::bounding_box_2{Vector2Zero(), dimensions}))
             {
                 event_interface::subscribe<events::left_mouse_click>(left_mouse_click_handler_);
                 event_interface::subscribe<events::move_view_frame>(move_view_frame_handler_);
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
+                event_interface::subscribe<events::build_customer_dog>(build_customer_dog_handler_);
+                event_interface::subscribe<events::send_customer_to_position>(send_customer_to_position_handler_);
             }
-            level(const level& other) = default;
-            level(level&& other) = default;
+            level(const level& other) = delete;
+            level(level&& other) = delete;
             
             level& operator=(const level& other) = delete;
             level& operator=(level&& other) = delete;
@@ -159,21 +171,41 @@ namespace level{
             void on_left_mouse_click_event(const events::left_mouse_click& event);
             void on_move_view_frame_event(const events::move_view_frame& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
+
+            void on_build_customer_dog_event(const events::build_customer_dog& event);
+            void on_send_customer_to_position_event(const events::send_customer_to_position& event);
+            
             void render(int frame);
             void update(float delta, int frame);
         private :
+            struct void_entity_record{
+                std::unique_ptr<entities::entity> entity;
+                size_t layer;
+            };
+
+            void add_void_entity(std::unique_ptr<entities::entity> entity, size_t layer);
+            void update_void_entities(float delta, int frame);
+            bool is_inside_screen(entities::entity& entity) const;
+            void move_void_entity_toward_screen(entities::entity& entity, int frame);
+            void insert_void_entity(void_entity_record record);
+
             // event handlers
             events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
             events::event_handler<events::move_view_frame> move_view_frame_handler_;
             events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
 
+
+            events::event_handler<events::build_customer_dog> build_customer_dog_handler_;
+            events::event_handler<events::send_customer_to_position> send_customer_to_position_handler_;
             level_graph graph_;
             
             Rectangle view_frame_;
             sprite::sprite background_;
             std::map<int, entities::entity*> id_entity_map_;
             render_layer::layer render_layers_[level_config::size];
+            int next_entity_id_;
             tree::quadtree level_entities_;
+            std::vector<void_entity_record> void_entities_;
 
 
     };
@@ -189,7 +221,7 @@ namespace level{
             level_builder& operator=(const level_builder& other) = default;
             level_builder& operator=(level_builder&& other) = default;
 
-            level build_main_level();
+            std::unique_ptr<level> build_main_level();
     };
 }
 

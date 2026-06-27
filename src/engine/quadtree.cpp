@@ -172,6 +172,21 @@ void tree::quadtree::clear(std::unique_ptr<node>& tree){
         clear(child);
     }
 }
+
+void tree::quadtree::notify_removals(const std::vector<entities::entity*>& removed_entities){
+    for(auto entity : removed_entities){
+        if(entity == nullptr){
+            continue;
+        }
+        if(! entity->get_debug_id().starts_with(entity_config::table_debug_id_prefix)){
+            continue;
+        }
+        std::unique_ptr<events::event> removed_table = std::make_unique<events::removed_table>(
+            static_cast<size_t>(entity->get_id()));
+        event_interface::queue_event(removed_table);
+    }
+}
+
 int tree::quadtree::height(std::unique_ptr<node>& tree) {
     if (!tree) {
         return -1;
@@ -391,6 +406,7 @@ std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta
                 }
                 break;
             case entities::status_codes::dead:
+                notify_removals(std::vector<entities::entity*>{it->get()});
                 to_remove.push_back((*it)->get_id());
                 next_ids_.push(static_cast<size_t>((*it)->get_id()));
                 graveyard.push_back(std::move(*it));

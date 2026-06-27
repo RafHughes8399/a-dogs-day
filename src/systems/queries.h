@@ -5,6 +5,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "hitbox.h"
@@ -14,7 +15,8 @@ namespace queries{
         is_colliding = 0,
         collision = 1,
         place_decoration = 2,
-        size = 3
+        path = 3,
+        size = 4
     };
     
     class query{
@@ -89,6 +91,28 @@ namespace queries{
             Rectangle decoration_rectanlge_;
             int decoration_id_;
     };
+    class path_query : public query{
+        public:
+            path_query(Vector2 source, Vector2 destination, Vector2 direction)
+            : query(ids::path), source_(source), destination_(destination), direction_(direction){}
+
+            static int get_static_type(){
+                return ids::path;
+            }
+            Vector2 get_source() const{
+                return source_;
+            }
+            Vector2 get_destination() const{
+                return destination_;
+            }
+            Vector2 get_direction() const{
+                return direction_;
+            }
+        private:
+            Vector2 source_;
+            Vector2 destination_;
+            Vector2 direction_;
+    };
     template <typename T>
     class query_handler_interface{
         public:
@@ -148,5 +172,6 @@ namespace queries{
     };
     extern query_executor<bool> bool_executor_; // bool executor, entities::entity* executor
     extern query_executor<int> int_executor_;
+    extern query_executor<std::vector<Vector2>> path_executor_;
 }
 #endif

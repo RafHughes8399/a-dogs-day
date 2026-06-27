@@ -4,7 +4,7 @@
 
 #include "game.h"
 int main(){
-    InitWindow(GetScreenWidth(), GetScreenHeight(), "dog day");
+    InitWindow(game_config::window_width, game_config::window_height, "dog day");
     auto level_builder = level::level_builder();
     auto level = level_builder.build_main_level();
     std::cout << "[dog_days init] : built level " << std::endl;
@@ -14,7 +14,7 @@ int main(){
     std::cout << "[dog_days init] : built player " << std::endl;
     auto controls = player::controls(&player);
     std::cout << "[dog_days init] : built controls " << std::endl;
-    auto game = game::game(level, player, menus, controls);
+    auto game = game::game(*level, player, menus, controls);
     std::cout << "[dog_days init] : built game " << std::endl;
     HideCursor();
     SetTargetFPS(60);

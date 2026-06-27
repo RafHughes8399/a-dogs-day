@@ -26,14 +26,14 @@ void entities::entity::render(Vector2 draw_position, int frame){
 
 }
 void entities::entity::move(Vector2 new_position){
-    // update hte position
-    position_ = new_position;
-
-    // update the hitboxes
-    body_.update_hitboxes(position_);
-    // move in the quadtree
+    move_without_event(new_position);
     std::unique_ptr<events::event> move_event = std::make_unique<events::move_entity>(id_);
     event_interface::queue_event(move_event);
+}
+
+void entities::entity::move_without_event(Vector2 new_position){
+    position_ = new_position;
+    body_.update_hitboxes(position_);
 }
 
 // --------------------------- builder --------------------------- //

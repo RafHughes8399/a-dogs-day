@@ -4,7 +4,6 @@
 #include "texture.h"
 #include "queries.h"
 #include "query_interface.h"
-#include <iostream>
 // ------------------------ decorations -----------------------------------// 
 
 
@@ -20,7 +19,6 @@ void entities::decoration::subscribe_to_cursor(){
     
 void entities::decoration::pick_up(){
     // store the "start position"
-    std::cout << "[decoration pick up] " << get_debug_id() << " subscribe to cursor" << std::endl;
     pre_move_position_ = position_;
     subscribe_to_cursor();
     // make the hud element subscribe 
@@ -129,7 +127,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_test_decoratio
     std::vector<hitbox::hitbox> hitboxes = {hitbox};
     auto body = body::body(hitboxes, sprites);
 
-    return std::make_unique<entities::decoration>(body, position, id, next_debug_id("dec_"));
+    return std::make_unique<entities::decoration>(body, position, id, next_debug_id(entity_config::decoration_debug_id_prefix));
 }
 
 std::unique_ptr<entities::entity> entities::entity_builder::build_gargoyle(Vector2 position, int id){
@@ -154,7 +152,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_gargoyle(Vecto
     std::vector<hitbox::hitbox> hitboxes = {hitbox, hitbox};
     auto body = body::body(hitboxes, sprites);
 
-    return std::make_unique<entities::decoration>(body, position, id, next_debug_id("dec_"));
+    return std::make_unique<entities::decoration>(body, position, id, next_debug_id(entity_config::decoration_debug_id_prefix));
 }
 
 std::unique_ptr<entities::entity> entities::entity_builder::build_table(Vector2 position, int id){
@@ -171,5 +169,26 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_table(Vector2 
     std::vector<hitbox::hitbox> hitboxes = {hitbox};
     auto body = body::body(hitboxes, sprites);
 
-    return std::make_unique<entities::table>(body, position, id, next_debug_id("table_"));
+    return std::make_unique<entities::table>(body, position, id, next_debug_id(entity_config::table_debug_id_prefix));
+}
+
+void entities::table::update_interaction_positions(){
+    interaction_positions_ = events::table_interaction_positions{
+        Vector2{position_.x - level_config::edge_weight, position_.y},
+        Vector2{position_.x + (2.0f * level_config::edge_weight), position_.y}
+    };
+}
+
+events::table_interaction_positions entities::table::get_interaction_positions() const{
+    return interaction_positions_;
+}
+
+void entities::table::place_down(){
+    decoration::place_down();
+    update_interaction_positions();
+    std::unique_ptr<events::event> registered_table = std::make_unique<events::registered_table>(
+        static_cast<size_t>(id_),
+        position_,
+        interaction_positions_);
+    event_interface::queue_event(registered_table);
 }
