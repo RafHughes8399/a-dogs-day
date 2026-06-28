@@ -65,7 +65,7 @@ namespace events{
 		register_food_counter = 25,
 		request_order_service = 26,
 		waiter_arrived_table = 27,
-		waiter_served_food_id = 28,
+		order_served_id = 28,
 		customer_finished_food = 29,
 		waiter_cleared_table_id = 30,
 		send_waiter_table = 31,
@@ -516,9 +516,9 @@ namespace events{
 	};
 	class give_dog_table_path : public event{
 		public:
-			give_dog_table_path(size_t dog_id, std::vector<Vector2> path, size_t table_id, Vector2 table_position)
+			give_dog_table_path(size_t dog_id, std::vector<Vector2> path, size_t table_id, Vector2 table_position, Vector2 interaction_position)
 			: event(ids::give_dog_table_path_id), dog_id_(dog_id), path_(std::move(path)),
-			table_id_(table_id), table_position_(table_position){}
+			table_id_(table_id), table_position_(table_position), interaction_position_(interaction_position){}
 
 			static int get_static_type(){
 				return ids::give_dog_table_path_id;
@@ -535,11 +535,15 @@ namespace events{
 			Vector2 get_table_position() const{
 				return table_position_;
 			}
+			Vector2 get_interaction_position() const{
+				return interaction_position_;
+			}
 		private:
 			const size_t dog_id_;
 			const std::vector<Vector2> path_;
 			const size_t table_id_;
 			const Vector2 table_position_;
+			const Vector2 interaction_position_;
 	};
 	class dog_reached_table : public event{
 		public:
@@ -744,25 +748,38 @@ namespace events{
 			const size_t waiter_id_;
 			const size_t order_id_;
 	};
-	// Cafe-domain fact: a waiter has served food for an order.
-	class waiter_served_food : public event{
-		public:
-			waiter_served_food(size_t waiter_id, size_t order_id)
-			: event(ids::waiter_served_food_id), waiter_id_(waiter_id), order_id_(order_id){}
+		// Cafe-domain fact: a waiter has served food for an order.
+		class order_served : public event{
+			public:
+				order_served(size_t order_id, size_t waiter_id, size_t customer_id, size_t table_id, Vector2 table_position)
+				: event(ids::order_served_id), order_id_(order_id), waiter_id_(waiter_id),
+				customer_id_(customer_id), table_id_(table_id), table_position_(table_position){}
 
-			static int get_static_type(){
-				return ids::waiter_served_food_id;
-			}
-			size_t get_waiter_id() const{
-				return waiter_id_;
-			}
-			size_t get_order_id() const{
-				return order_id_;
-			}
-		private:
-			const size_t waiter_id_;
-			const size_t order_id_;
-	};
+				static int get_static_type(){
+					return ids::order_served_id;
+				}
+				size_t get_order_id() const{
+					return order_id_;
+				}
+				size_t get_waiter_id() const{
+					return waiter_id_;
+				}
+				size_t get_customer_id() const{
+					return customer_id_;
+				}
+				size_t get_table_id() const{
+					return table_id_;
+				}
+				Vector2 get_table_position() const{
+					return table_position_;
+				}
+			private:
+				const size_t order_id_;
+				const size_t waiter_id_;
+				const size_t customer_id_;
+				const size_t table_id_;
+				const Vector2 table_position_;
+		};
 	// Cafe-domain fact: a customer has finished eating for an order.
 	class customer_finished_eating : public event{
 		public:

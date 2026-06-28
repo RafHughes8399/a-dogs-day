@@ -246,8 +246,34 @@ void level::level::on_send_customer_to_table_event(const events::send_customer_t
         customer_id,
         path,
         event.get_table_id(),
-        event.get_table_position());
+        event.get_table_position(),
+        event.get_destination());
     event_interface::queue_event(give_dog_table_path);
+}
+
+void level::level::on_order_served_event(const events::order_served& event){
+    auto customer_id = static_cast<int>(event.get_customer_id());
+    auto customer_record = id_entity_map_.find(customer_id);
+    if(customer_record == id_entity_map_.end()){
+        debug::log(
+            "[level::on_order_served_event, missing customer entity] "
+            "customer_id: " + std::to_string(customer_id)
+            + ", order_id: " + std::to_string(event.get_order_id())
+            + ", table_id: " + std::to_string(event.get_table_id()));
+        return;
+    }
+
+    auto customer = dynamic_cast<entities::customer_dog*>(customer_record->second);
+    if(customer == nullptr){
+        debug::log(
+            "[level::on_order_served_event, entity is not customer dog] "
+            "customer_id: " + std::to_string(customer_id)
+            + ", order_id: " + std::to_string(event.get_order_id())
+            + ", table_id: " + std::to_string(event.get_table_id()));
+        return;
+    }
+
+    customer->set_eating(event.get_order_id(), event.get_table_id(), event.get_table_position());
 }
 
 // --------------------- level builder ----------------------------------------- //

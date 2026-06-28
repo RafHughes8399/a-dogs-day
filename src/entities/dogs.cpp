@@ -194,25 +194,27 @@ int entities::npc_dog::update(float delta, int frame){
 void entities::customer_dog::state::on_path_finished(customer_dog& dog, Vector2 destination){
     (void) dog;
     (void) destination;
+    return;
 }
 
 void entities::customer_dog::default_state::update(customer_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
+    return;
 }
 
 void entities::customer_dog::walking_to_table::update(customer_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
+    return;
 }
 
 void entities::customer_dog::walking_to_table::on_path_finished(customer_dog& dog, Vector2 destination){
-    if(Vector2Distance(destination, table_position_) > level_config::edge_weight * 0.05f){
+    if(Vector2Distance(destination, interaction_position_) > level_config::edge_weight * 0.05f){
         return;
     }
-
     std::unique_ptr<events::event> dog_reached_table = std::make_unique<events::dog_reached_table>(
         static_cast<size_t>(dog.get_id()),
         table_id_,
@@ -225,12 +227,17 @@ void entities::customer_dog::seated::update(customer_dog& dog, float delta, int 
     (void) dog;
     (void) delta;
     (void) frame;
+    // play waiting animation
 }
 
 void entities::customer_dog::eating::update(customer_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
+    (void) order_id_;
+    (void) table_id_;
+    (void) table_position_;
+    // play eating animatino, count down too
 }
 
 void entities::customer_dog::leaving::update(customer_dog& dog, float delta, int frame){
@@ -249,8 +256,12 @@ void entities::customer_dog::set_state(std::unique_ptr<customer_dog::state> stat
     customer_state_ = std::move(state);
 }
 
-void entities::customer_dog::set_walking_to_table(size_t table_id, Vector2 table_position){
-    set_state(std::make_unique<customer_dog::walking_to_table>(table_id, table_position));
+void entities::customer_dog::set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position){
+    set_state(std::make_unique<customer_dog::walking_to_table>(table_id, table_position, interaction_position));
+}
+
+void entities::customer_dog::set_eating(size_t order_id, size_t table_id, Vector2 table_position){
+    set_state(std::make_unique<customer_dog::eating>(order_id, table_id, table_position));
 }
 
 void entities::customer_dog::on_give_dog_path_event(const events::give_dog_path& event){
@@ -264,7 +275,7 @@ void entities::customer_dog::on_give_dog_table_path_event(const events::give_dog
     if(static_cast<size_t>(id_) != event.get_dog_id()){
         return;
     }
-    set_walking_to_table(event.get_table_id(), event.get_table_position());
+    set_walking_to_table(event.get_table_id(), event.get_table_position(), event.get_interaction_position());
     set_path(event.get_path());
 }
 

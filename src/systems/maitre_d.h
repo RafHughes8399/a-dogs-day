@@ -197,7 +197,7 @@ namespace maitre_d{
             Vector2 pick_interaction_position(const table_record& table, Vector2 dog_position) const;
             void send_dog_to_position(size_t id, Vector2 position);
             void send_dog_to_queue_position(size_t id, Vector2 position);
-            void send_dog_to_table(size_t id, size_t table_id, Vector2 position);
+            void send_dog_to_table(size_t id, size_t table_id, Vector2 table_position, Vector2 interaction_position);
             void check_customer_arrivals(float delta);
             bool can_request_customer_arrival() const;
             void request_customer_arrival();
@@ -225,7 +225,7 @@ namespace maitre_d{
             //   -> enqueue the dog with its height in edge units
             //   -> emit/request pathing to the resolved queue target position
             //
-	            // send_dog_to_table(customer_id, table_id, position)
+	            // send_dog_to_table(customer_id, table_id, table_position, interaction_position)
             //   -> dequeue the dog
             //   -> use the head slot position as the table pathing start
             //   -> dog_queue recalculates positions for the remaining dogs

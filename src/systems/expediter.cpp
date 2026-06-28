@@ -11,17 +11,17 @@ void expediter::expediter::clear_table(){
 
     return;
 }
-void expediter::expediter::create_order(waiter& waiter, food_counter_record& food_counter, table_record table){
+void expediter::expediter::create_order(waiter& waiter, food_counter_record& food_counter, table_record table, size_t customer_id){
     // create an order to be fulfiled,
     // needs the position of the table and the foood counter
     // and then push back to the list of orders
-    order order = {waiter, table, food_counter, order_status::created};
+    order order = {next_order_id_++, customer_id, waiter, table, food_counter, order_status::created};
     orders_.push_back(order);
     return;
 }
 
-void expediter::expediter::schedule_order(table_record table){
-    order order = {empty_waiter, table, empty_counter, order_status::scheduled};
+void expediter::expediter::schedule_order(table_record table, size_t customer_id){
+    order order = {next_order_id_++, customer_id, empty_waiter, table, empty_counter, order_status::scheduled};
     scheduled_orders_.push_back(order);
     return;
 }
@@ -76,20 +76,15 @@ expediter::expediter& expediter::expediter::get_instance(){
 }
 
 expediter::expediter::expediter()
-: registered_waiter_handler_([this](const events::registered_waiter& event) -> void {on_registered_waiter_event(event);}),
+: next_order_id_(0),
+registered_waiter_handler_([this](const events::registered_waiter& event) -> void {on_registered_waiter_event(event);}),
 registered_food_counter_handler_([this](const events::registered_food_counter& event) -> void {on_registered_food_counter_event(event);}),
-requested_order_service_handler_([this](const events::requested_order_service& event) -> void {on_requested_order_service_event(event);}),
 dog_reached_table_handler_([this](const events::dog_reached_table& event) -> void {on_dog_reached_table_event(event);}),
-waiter_arrived_at_table_handler_([this](const events::waiter_arrived_at_table& event) -> void {on_waiter_arrived_at_table_event(event);}),
-waiter_served_food_handler_([this](const events::waiter_served_food& event) -> void {on_waiter_served_food_event(event);}),
 customer_finished_eating_handler_([this](const events::customer_finished_eating& event) -> void {on_customer_finished_eating_event(event);}),
 waiter_cleared_table_handler_([this](const events::waiter_cleared_table& event) -> void {on_waiter_cleared_table_event(event);}){
     event_interface::subscribe<events::registered_waiter>(registered_waiter_handler_);
     event_interface::subscribe<events::registered_food_counter>(registered_food_counter_handler_);
-    event_interface::subscribe<events::requested_order_service>(requested_order_service_handler_);
     event_interface::subscribe<events::dog_reached_table>(dog_reached_table_handler_);
-    event_interface::subscribe<events::waiter_arrived_at_table>(waiter_arrived_at_table_handler_);
-    event_interface::subscribe<events::waiter_served_food>(waiter_served_food_handler_);
     event_interface::subscribe<events::customer_finished_eating>(customer_finished_eating_handler_);
     event_interface::subscribe<events::waiter_cleared_table>(waiter_cleared_table_handler_);
 }
@@ -124,10 +119,6 @@ void expediter::expediter::on_registered_food_counter_event(const events::regist
     register_food_counter(event.get_counter_id(), event.get_position());
 }
 
-void expediter::expediter::on_requested_order_service_event(const events::requested_order_service& event){
-    request_order_service(event.get_order_id(), event.get_table_id(), event.get_customer_id(), event.get_table_position());
-}
-
 void expediter::expediter::on_dog_reached_table_event(const events::dog_reached_table& event){
 
     // there are two reasons why a order cannot be created.
@@ -138,22 +129,12 @@ void expediter::expediter::on_dog_reached_table_event(const events::dog_reached_
     auto counter = find_counter();
     auto table = table_record{static_cast<int>(event.get_table_id()), event.get_table_position()};
     if(can_create_order(waiter, counter)){
-        create_order(waiter, counter, table);
+        create_order(waiter, counter, table, event.get_customer_id());
     }
     else{
         // hence there should be some way for a dog to retrigger
-        schedule_order(table);
+        schedule_order(table, event.get_customer_id());
     }
-}
-
-void expediter::expediter::on_waiter_arrived_at_table_event(const events::waiter_arrived_at_table& event){
-    (void) event;
-    // mark_waiter_arrived_at_table(event.get_waiter_id(), event.get_order_id());
-}
-
-void expediter::expediter::on_waiter_served_food_event(const events::waiter_served_food& event){
-    (void) event;
-    // mark_food_served(event.get_waiter_id(), event.get_order_id());
 }
 
 void expediter::expediter::on_customer_finished_eating_event(const events::customer_finished_eating& event){

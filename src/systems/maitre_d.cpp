@@ -144,17 +144,18 @@ void maitre_d::maitre_d::assign_tables(){
     auto dog_at_head = dequeue_result.dog;
     if(dog_at_head != empty_dog){
         auto& table = pick_table();
-        auto table_position = pick_interaction_position(table, dog_at_head.dog_position);
+        auto interaction_position = pick_interaction_position(table, dog_at_head.dog_position);
         debug::log(
             "[maitre_d::assign_tables, assigning head dog to table] "
             "dog_id: " + std::to_string(dog_at_head.dog_id)
             + ", dog_position: " + vector_to_string(dog_at_head.dog_position)
             + ", queue_position: " + vector_to_string(dog_at_head.queue_position)
             + ", table_id: " + std::to_string(table.table_id)
-            + ", table_position: " + vector_to_string(table_position));
+            + ", table_position: " + vector_to_string(table.position)
+            + ", interaction_position: " + vector_to_string(interaction_position));
         table.is_free = false;
         table.customer_id = static_cast<size_t>(dog_at_head.dog_id);
-        send_dog_to_table(static_cast<size_t>(dog_at_head.dog_id), table.table_id, table_position);
+        send_dog_to_table(static_cast<size_t>(dog_at_head.dog_id), table.table_id, table.position, interaction_position);
         for(const auto& moved_dog : dequeue_result.moved_dogs){
             send_dog_to_queue_position(static_cast<size_t>(moved_dog.dog_id), moved_dog.queue_position);
         }
@@ -179,14 +180,14 @@ void maitre_d::maitre_d::send_dog_to_queue_position(size_t id, Vector2 position)
     send_dog_to_position(id, position);
 }
 
-void maitre_d::maitre_d::send_dog_to_table(size_t id, size_t table_id, Vector2 position){
+void maitre_d::maitre_d::send_dog_to_table(size_t id, size_t table_id, Vector2 table_position, Vector2 interaction_position){
     send_dog_to_position(id, entrance_);
     std::unique_ptr<events::event> send_customer_to_table = std::make_unique<events::send_customer_to_table>(
         id,
         entrance_,
-        position,
+        interaction_position,
         table_id,
-        position);
+        table_position);
     event_interface::queue_event(send_customer_to_table);
 }
 

@@ -207,7 +207,7 @@ namespace entity_config{
     // inline const Vector2 npc_dog_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 npc_dog_head_right_offset = Vector2{0.0f, 0.0f};
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
-    
+    inline const int dog_eating_duration = game_config::frames * 10;
 }
 namespace controls_config{
     // controls 

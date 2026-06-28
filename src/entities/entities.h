@@ -437,14 +437,15 @@ namespace entities{
 
             class walking_to_table : public state{
 	                public:
-                    walking_to_table(size_t table_id, Vector2 table_position)
-                    : table_id_(table_id), table_position_(table_position){}
+                    walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position)
+                    : table_id_(table_id), table_position_(table_position), interaction_position_(interaction_position){}
 
                     void update(customer_dog& dog, float delta, int frame) override;
                     void on_path_finished(customer_dog& dog, Vector2 destination) override;
                 private:
                     size_t table_id_;
                     Vector2 table_position_;
+                    Vector2 interaction_position_;
             };
 
             class seated : public state{
@@ -454,7 +455,14 @@ namespace entities{
 
             class eating : public state{
                 public:
+                    eating(size_t order_id, size_t table_id, Vector2 table_position)
+                    : order_id_(order_id), table_id_(table_id), table_position_(table_position){}
+
                     void update(customer_dog& dog, float delta, int frame) override;
+                private:
+                    size_t order_id_;
+                    size_t table_id_;
+                    Vector2 table_position_;
             };
 
             class leaving : public state{
@@ -493,7 +501,8 @@ namespace entities{
 
             int update(float delta, int frame) override;
             void set_state(std::unique_ptr<customer_dog::state> state);
-            void set_walking_to_table(size_t table_id, Vector2 table_position);
+            void set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position);
+            void set_eating(size_t order_id, size_t table_id, Vector2 table_position);
             void on_give_dog_path_event(const events::give_dog_path& event);
             void on_give_dog_table_path_event(const events::give_dog_table_path& event);
 

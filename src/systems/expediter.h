@@ -50,6 +50,8 @@ namespace expediter{
     };
 
     struct order{
+        size_t order_id;
+        size_t customer_id;
         waiter& assigned_waiter;
         table_record table;
         food_counter_record& food_counter;
@@ -84,8 +86,8 @@ namespace expediter{
             void fulfill_order(const order& order);
             void clear_table();
             bool can_create_order(waiter& waiter, food_counter_record& food_counter);
-            void create_order(waiter& waiter, food_counter_record& food_counter, table_record table);
-            void schedule_order(table_record table);
+            void create_order(waiter& waiter, food_counter_record& food_counter, table_record table, size_t customer_id);
+            void schedule_order(table_record table, size_t customer_id);
             void check_scheduled_orders();
             waiter& assign_waiter_to_order();
             food_counter_record& find_counter();
@@ -93,27 +95,22 @@ namespace expediter{
 
             void on_registered_waiter_event(const events::registered_waiter& event);
             void on_registered_food_counter_event(const events::registered_food_counter& event);
-            void on_requested_order_service_event(const events::requested_order_service& event);
             void on_dog_reached_table_event(const events::dog_reached_table& event);
-            void on_waiter_arrived_at_table_event(const events::waiter_arrived_at_table& event);
-            void on_waiter_served_food_event(const events::waiter_served_food& event);
             void on_customer_finished_eating_event(const events::customer_finished_eating& event);
             void on_waiter_cleared_table_event(const events::waiter_cleared_table& event);
         private:
             expediter();
             ~expediter() = default;
 
-
             std::vector<waiter> waiters_;
             std::vector<food_counter_record> food_counters_;
             std::vector<order> orders_;
             std::vector<order> scheduled_orders_;
+            size_t next_order_id_;
+
             events::event_handler<events::registered_waiter> registered_waiter_handler_;
             events::event_handler<events::registered_food_counter> registered_food_counter_handler_;
-            events::event_handler<events::requested_order_service> requested_order_service_handler_;
             events::event_handler<events::dog_reached_table> dog_reached_table_handler_;
-            events::event_handler<events::waiter_arrived_at_table> waiter_arrived_at_table_handler_;
-            events::event_handler<events::waiter_served_food> waiter_served_food_handler_;
             events::event_handler<events::customer_finished_eating> customer_finished_eating_handler_;
             events::event_handler<events::waiter_cleared_table> waiter_cleared_table_handler_;
     };
