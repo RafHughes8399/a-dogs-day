@@ -1,178 +1,73 @@
 #include "expediter.h"
-
 #include "events_interface.h"
 
-bool expediter::available::is_available() const{
-    return true;
-}
-
-bool expediter::assigned::is_available() const{
-    return false;
-}
-
-bool expediter::busy::is_available() const{
-    return false;
-}
-
-void expediter::waiting_for_waiter::on_assigned(expediter& manager, order_record& order){
-    (void) manager;
+void expediter::expediter::fulfill_order(const order& order){
     (void) order;
-    // manager.set_order_state(order, std::make_unique<waiter_assigned>());
+    // fulfill an order
+    return;
+}
+void expediter::expediter::clear_table(){
+    // send an availabel dog to clear a table
+
+    return;
+}
+void expediter::expediter::create_order(waiter& waiter, food_counter_record& food_counter, table_record table){
+    // create an order to be fulfiled,
+    // needs the position of the table and the foood counter
+    // and then push back to the list of orders
+    order order = {waiter, table, food_counter, order_status::created};
+    orders_.push_back(order);
+    return;
 }
 
-void expediter::waiting_for_waiter::on_waiter_arrived(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
+void expediter::expediter::schedule_order(table_record table){
+    order order = {empty_waiter, table, empty_counter, order_status::scheduled};
+    scheduled_orders_.push_back(order);
+    return;
 }
 
-void expediter::waiting_for_waiter::on_food_served(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
+bool expediter::expediter::can_create_order(waiter& waiter, food_counter_record& food_counter){
+    return !(waiter == empty_waiter) && !(food_counter == empty_counter);
 }
 
-void expediter::waiting_for_waiter::on_customer_finished(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
+void expediter::expediter::check_scheduled_orders(){
+    // Scaffold: scheduled orders should retry once waiter and food-counter availability is modeled.
+    return;
 }
 
-void expediter::waiting_for_waiter::on_table_cleared(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
+expediter::waiter& expediter::expediter::assign_waiter_to_order(){
+    // select a free waiter to fulfill an order
+    for(auto & waiter : waiters_){
+        if(! waiter.assigned_to_order){
+            return waiter;
+        }
+    }
+    return empty_waiter;
 }
 
-void expediter::waiter_assigned::on_assigned(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
+expediter::food_counter_record& expediter::expediter::find_counter(){
+    if(food_counters_.empty()){
+        return empty_counter;
+    }
+    // first counter that has food
+    return food_counters_.front();
 }
-
-void expediter::waiter_assigned::on_waiter_arrived(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-    // manager.set_order_state(order, std::make_unique<serving_food>());
+void expediter::expediter::send_dog_to_position(Vector2 position){
+    (void) position;
+    // akin to the maitre_d
+    return;
 }
+void expediter::expediter::process_orders(){
+    // iterate through orders and process them
+    for(const auto& order : orders_){
+        fulfill_order(order); // fulfill order if it can be
+    }
+    // check scheduled orders every half second, not every frame
+    check_scheduled_orders();
 
-void expediter::waiter_assigned::on_food_served(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
+    //clean up fulfilled orders
 
-void expediter::waiter_assigned::on_customer_finished(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::waiter_assigned::on_table_cleared(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::serving_food::on_assigned(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::serving_food::on_waiter_arrived(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::serving_food::on_food_served(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-    // manager.set_order_state(order, std::make_unique<customer_eating>());
-}
-
-void expediter::serving_food::on_customer_finished(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::serving_food::on_table_cleared(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::customer_eating::on_assigned(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::customer_eating::on_waiter_arrived(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::customer_eating::on_food_served(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::customer_eating::on_customer_finished(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-    // manager.set_order_state(order, std::make_unique<waiting_to_clear>());
-    // manager.release_waiter(order.waiter_id);
-    // order.waiter_id = empty_id;
-    // manager.queue_clear_order(order.order_id);
-    // manager.assign_next_order();
-}
-
-void expediter::customer_eating::on_table_cleared(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::waiting_to_clear::on_assigned(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::waiting_to_clear::on_waiter_arrived(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::waiting_to_clear::on_food_served(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::waiting_to_clear::on_customer_finished(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::waiting_to_clear::on_table_cleared(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-    // manager.set_order_state(order, std::make_unique<complete>());
-    // manager.release_waiter(order.waiter_id);
-    // manager.assign_next_order();
-}
-
-void expediter::complete::on_assigned(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::complete::on_waiter_arrived(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::complete::on_food_served(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::complete::on_customer_finished(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
-}
-
-void expediter::complete::on_table_cleared(expediter& manager, order_record& order){
-    (void) manager;
-    (void) order;
+    return;
 }
 
 expediter::expediter& expediter::expediter::get_instance(){
@@ -184,6 +79,7 @@ expediter::expediter::expediter()
 : registered_waiter_handler_([this](const events::registered_waiter& event) -> void {on_registered_waiter_event(event);}),
 registered_food_counter_handler_([this](const events::registered_food_counter& event) -> void {on_registered_food_counter_event(event);}),
 requested_order_service_handler_([this](const events::requested_order_service& event) -> void {on_requested_order_service_event(event);}),
+dog_reached_table_handler_([this](const events::dog_reached_table& event) -> void {on_dog_reached_table_event(event);}),
 waiter_arrived_at_table_handler_([this](const events::waiter_arrived_at_table& event) -> void {on_waiter_arrived_at_table_event(event);}),
 waiter_served_food_handler_([this](const events::waiter_served_food& event) -> void {on_waiter_served_food_event(event);}),
 customer_finished_eating_handler_([this](const events::customer_finished_eating& event) -> void {on_customer_finished_eating_event(event);}),
@@ -191,6 +87,7 @@ waiter_cleared_table_handler_([this](const events::waiter_cleared_table& event) 
     event_interface::subscribe<events::registered_waiter>(registered_waiter_handler_);
     event_interface::subscribe<events::registered_food_counter>(registered_food_counter_handler_);
     event_interface::subscribe<events::requested_order_service>(requested_order_service_handler_);
+    event_interface::subscribe<events::dog_reached_table>(dog_reached_table_handler_);
     event_interface::subscribe<events::waiter_arrived_at_table>(waiter_arrived_at_table_handler_);
     event_interface::subscribe<events::waiter_served_food>(waiter_served_food_handler_);
     event_interface::subscribe<events::customer_finished_eating>(customer_finished_eating_handler_);
@@ -216,84 +113,37 @@ void expediter::expediter::request_order_service(size_t order_id, size_t table_i
     (void) table_id;
     (void) customer_id;
     (void) table_position;
-    // create order_record with waiting_for_waiter state.
-    // pending_order_ids_.push(order_id);
-    // assign_next_order();
-}
-
-void expediter::expediter::mark_waiter_arrived_at_table(size_t waiter_id, size_t order_id){
-    (void) waiter_id;
-    (void) order_id;
-    // find order and invoke order.state->on_waiter_arrived(*this, order).
-}
-
-void expediter::expediter::mark_food_served(size_t waiter_id, size_t order_id){
-    (void) waiter_id;
-    (void) order_id;
-    // find order and invoke order.state->on_food_served(*this, order).
-}
-
-void expediter::expediter::mark_customer_finished(size_t customer_id, size_t order_id){
-    (void) customer_id;
-    (void) order_id;
-    // find order and invoke order.state->on_customer_finished(*this, order).
-}
-
-void expediter::expediter::mark_table_cleared(size_t waiter_id, size_t order_id){
-    (void) waiter_id;
-    (void) order_id;
-    // find order and invoke order.state->on_table_cleared(*this, order).
-}
-
-void expediter::expediter::process_events(){
-    return;
-}
-
-void expediter::expediter::set_order_state(order_record& order, std::unique_ptr<order_state> state){
-    (void) order;
-    (void) state;
-    // order.state = std::move(state);
-}
-
-void expediter::expediter::set_waiter_status(waiter_record& waiter, std::unique_ptr<waiter_status> status){
-    (void) waiter;
-    (void) status;
-    // waiter.status = std::move(status);
-}
-
-void expediter::expediter::release_waiter(size_t waiter_id){
-    (void) waiter_id;
-    // waiter.current_order_id = empty_id;
-    // set_waiter_status(waiter, std::make_unique<available>());
-}
-
-void expediter::expediter::queue_clear_order(size_t order_id){
-    (void) order_id;
-    // pending_clear_order_ids_.push(order_id);
-}
-
-void expediter::expediter::assign_next_order(){
-    // assign pending service orders to the first available waiter.
-    // choose_food_counter(order.table_position) should pick the nearest counter.
-    // queue send_waiter_to_table(waiter_id, order_id, pickup_point, table_position).
-    //
-    // assign pending clear orders to the first available waiter.
-    // queue send_waiter_to_clear_table(waiter_id, order_id, table_position).
+    // Scaffold: this should later create an order and queue waiter assignment.
 }
 
 void expediter::expediter::on_registered_waiter_event(const events::registered_waiter& event){
-    (void) event;
-    // register_waiter(event.get_waiter_id());
+    register_waiter(event.get_waiter_id());
 }
 
 void expediter::expediter::on_registered_food_counter_event(const events::registered_food_counter& event){
-    (void) event;
-    // register_food_counter(event.get_counter_id(), event.get_position());
+    register_food_counter(event.get_counter_id(), event.get_position());
 }
 
 void expediter::expediter::on_requested_order_service_event(const events::requested_order_service& event){
-    (void) event;
-    // request_order_service(event.get_order_id(), event.get_table_id(), event.get_customer_id(), event.get_table_position());
+    request_order_service(event.get_order_id(), event.get_table_id(), event.get_customer_id(), event.get_table_position());
+}
+
+void expediter::expediter::on_dog_reached_table_event(const events::dog_reached_table& event){
+
+    // there are two reasons why a order cannot be created.
+    // 1. no free waiters
+    // 2. no food on the counters - need to figure out the logic for this i think
+    // who is going to manage the dishes on each counter
+    auto waiter = assign_waiter_to_order();
+    auto counter = find_counter();
+    auto table = table_record{static_cast<int>(event.get_table_id()), event.get_table_position()};
+    if(can_create_order(waiter, counter)){
+        create_order(waiter, counter, table);
+    }
+    else{
+        // hence there should be some way for a dog to retrigger
+        schedule_order(table);
+    }
 }
 
 void expediter::expediter::on_waiter_arrived_at_table_event(const events::waiter_arrived_at_table& event){
@@ -314,27 +164,4 @@ void expediter::expediter::on_customer_finished_eating_event(const events::custo
 void expediter::expediter::on_waiter_cleared_table_event(const events::waiter_cleared_table& event){
     (void) event;
     // mark_table_cleared(event.get_waiter_id(), event.get_order_id());
-}
-
-expediter::waiter_record* expediter::expediter::find_waiter(size_t waiter_id){
-    (void) waiter_id;
-    // search waiters_ by id.
-    return nullptr;
-}
-
-expediter::waiter_record* expediter::expediter::find_available_waiter(){
-    // search waiters_ for waiter.status->is_available().
-    return nullptr;
-}
-
-expediter::food_counter* expediter::expediter::choose_food_counter(Vector2 table_position){
-    (void) table_position;
-    // return the registered food counter nearest to table_position.
-    return nullptr;
-}
-
-expediter::order_record* expediter::expediter::find_order(size_t order_id){
-    (void) order_id;
-    // search orders_ by id.
-    return nullptr;
 }

@@ -60,9 +60,7 @@ namespace events{
 		register_table = 18,
 		register_customer = 19,
 		request_customer_table = 20,
-		seat_customer_at_table = 21,
 		customer_arrived = 22,
-		customer_sent_to_table = 23,
 		register_waiter = 24,
 		register_food_counter = 25,
 		request_order_service = 26,
@@ -79,7 +77,10 @@ namespace events{
 		dog_path_complete = 37,
 		give_dog_path_id = 38,
 		table_removed = 39,
-		size = 40
+		send_customer_table = 40,
+		give_dog_table_path_id = 41,
+		dog_reached_table_id = 42,
+		size = 43
 	};
 	class event{
 
@@ -426,27 +427,6 @@ namespace events{
 		private:
 			const size_t customer_id_;
 	};
-	// Cafe-domain command: the maitre d' has decided which customer should sit at
-	// which table. A world-owning system, such as the level, should listen for
-	// this event and perform the concrete entity mutation/pathing by id.
-	class seat_customer_at_table : public event{
-		public:
-			seat_customer_at_table(size_t customer_id, size_t table_id)
-			: event(ids::seat_customer_at_table), customer_id_(customer_id), table_id_(table_id){}
-
-			static int get_static_type(){
-				return ids::seat_customer_at_table;
-			}
-			size_t get_customer_id() const{
-				return customer_id_;
-			}
-			size_t get_table_id() const{
-				return table_id_;
-			}
-		private:
-			const size_t customer_id_;
-			const size_t table_id_;
-	};
 	// Cafe-domain fact: a customer dog has entered the cafe and should be placed
 	// into the physical waiting queue managed by the maitre d'.
 	class customer_dog_created : public event{
@@ -503,15 +483,72 @@ namespace events{
 			const size_t dog_id_;
 			const std::vector<Vector2> path_;
 	};
-	// Cafe-domain command/fact: the maitre d' has taken a customer dog out of
-	// the waiting queue and sent it toward an assigned table.
-	class customer_dog_sent_to_table : public event{
+	class send_customer_to_table : public event{
 		public:
-			customer_dog_sent_to_table(size_t customer_id, size_t table_id)
-			: event(ids::customer_sent_to_table), customer_id_(customer_id), table_id_(table_id){}
+			send_customer_to_table(size_t customer_id, Vector2 source, Vector2 destination, size_t table_id, Vector2 table_position)
+			: event(ids::send_customer_table), customer_id_(customer_id), source_(source),
+			destination_(destination), table_id_(table_id), table_position_(table_position){}
 
 			static int get_static_type(){
-				return ids::customer_sent_to_table;
+				return ids::send_customer_table;
+			}
+			size_t get_customer_id() const{
+				return customer_id_;
+			}
+			Vector2 get_source() const{
+				return source_;
+			}
+			Vector2 get_destination() const{
+				return destination_;
+			}
+			size_t get_table_id() const{
+				return table_id_;
+			}
+			Vector2 get_table_position() const{
+				return table_position_;
+			}
+		private:
+			const size_t customer_id_;
+			const Vector2 source_;
+			const Vector2 destination_;
+			const size_t table_id_;
+			const Vector2 table_position_;
+	};
+	class give_dog_table_path : public event{
+		public:
+			give_dog_table_path(size_t dog_id, std::vector<Vector2> path, size_t table_id, Vector2 table_position)
+			: event(ids::give_dog_table_path_id), dog_id_(dog_id), path_(std::move(path)),
+			table_id_(table_id), table_position_(table_position){}
+
+			static int get_static_type(){
+				return ids::give_dog_table_path_id;
+			}
+			size_t get_dog_id() const{
+				return dog_id_;
+			}
+			const std::vector<Vector2>& get_path() const{
+				return path_;
+			}
+			size_t get_table_id() const{
+				return table_id_;
+			}
+			Vector2 get_table_position() const{
+				return table_position_;
+			}
+		private:
+			const size_t dog_id_;
+			const std::vector<Vector2> path_;
+			const size_t table_id_;
+			const Vector2 table_position_;
+	};
+	class dog_reached_table : public event{
+		public:
+			dog_reached_table(size_t customer_id, size_t table_id, Vector2 table_position)
+			: event(ids::dog_reached_table_id), customer_id_(customer_id), table_id_(table_id),
+			table_position_(table_position){}
+
+			static int get_static_type(){
+				return ids::dog_reached_table_id;
 			}
 			size_t get_customer_id() const{
 				return customer_id_;
@@ -519,9 +556,13 @@ namespace events{
 			size_t get_table_id() const{
 				return table_id_;
 			}
+			Vector2 get_table_position() const{
+				return table_position_;
+			}
 		private:
 			const size_t customer_id_;
 			const size_t table_id_;
+			const Vector2 table_position_;
 	};
 	// Cafe-domain fact: a customer dog has left the cafe. The maitre d' uses
 	// this as coarse arrival-pressure input without needing dog object access.

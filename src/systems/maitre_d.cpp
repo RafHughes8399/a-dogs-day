@@ -154,7 +154,7 @@ void maitre_d::maitre_d::assign_tables(){
             + ", table_position: " + vector_to_string(table_position));
         table.is_free = false;
         table.customer_id = static_cast<size_t>(dog_at_head.dog_id);
-        send_dog_to_table(static_cast<size_t>(dog_at_head.dog_id), table_position);
+        send_dog_to_table(static_cast<size_t>(dog_at_head.dog_id), table.table_id, table_position);
         for(const auto& moved_dog : dequeue_result.moved_dogs){
             send_dog_to_queue_position(static_cast<size_t>(moved_dog.dog_id), moved_dog.queue_position);
         }
@@ -175,19 +175,21 @@ void maitre_d::maitre_d::send_dog_to_position(size_t id, Vector2 position){
     event_interface::queue_event(send_customer_to_position);
 }
 
-void maitre_d::maitre_d::send_dog_to_position(size_t id, Vector2 source, Vector2 destination){
-    std::unique_ptr<events::event> send_customer_to_position = std::make_unique<events::send_customer_to_position>(id, source, destination);
-    event_interface::queue_event(send_customer_to_position);
-}
-
 void maitre_d::maitre_d::send_dog_to_queue_position(size_t id, Vector2 position){
     send_dog_to_position(id, position);
 }
 
-void maitre_d::maitre_d::send_dog_to_table(size_t id, Vector2 position){
+void maitre_d::maitre_d::send_dog_to_table(size_t id, size_t table_id, Vector2 position){
     send_dog_to_position(id, entrance_);
-    send_dog_to_position(id, entrance_, position);
+    std::unique_ptr<events::event> send_customer_to_table = std::make_unique<events::send_customer_to_table>(
+        id,
+        entrance_,
+        position,
+        table_id,
+        position);
+    event_interface::queue_event(send_customer_to_table);
 }
+
 maitre_d::table_record& maitre_d::maitre_d::pick_table(){
     // TABLES ARE SORTED BY POSITION SO PICKING A TABLE IS REALLY EASY
     for(auto& table : tables_){
