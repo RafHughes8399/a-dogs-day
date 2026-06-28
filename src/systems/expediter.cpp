@@ -1,6 +1,8 @@
 #include "expediter.h"
 #include "events_interface.h"
 
+#include <algorithm>
+
 void expediter::expediter::fulfill_order(const order& order){
     (void) order;
     // fulfill an order
@@ -90,17 +92,28 @@ waiter_cleared_table_handler_([this](const events::waiter_cleared_table& event) 
 }
 
 void expediter::expediter::register_waiter(size_t waiter_id){
-    (void) waiter_id;
-    // if(find_waiter(waiter_id) != nullptr) return;
-    // waiters_.push_back(waiter_record{waiter_id, std::make_unique<available>(), empty_id});
-    // assign_next_order();
+    auto id = static_cast<int>(waiter_id);
+    auto existing_waiter = std::find_if(waiters_.begin(), waiters_.end(), [id](const auto& waiter) -> bool {
+        return waiter.id == id;
+    });
+    if(existing_waiter != waiters_.end()){
+        return;
+    }
+
+    waiters_.push_back(waiter{id, Vector2{-1, -1}, false});
 }
 
 void expediter::expediter::register_food_counter(size_t counter_id, Vector2 position){
-    (void) counter_id;
-    (void) position;
-    // update existing counter or append a new food_counter.
-    // assign_next_order();
+    auto id = static_cast<int>(counter_id);
+    auto existing_counter = std::find_if(food_counters_.begin(), food_counters_.end(), [id](const auto& counter) -> bool {
+        return counter.id == id;
+    });
+    if(existing_counter != food_counters_.end()){
+        existing_counter->position = position;
+        return;
+    }
+
+    food_counters_.push_back(food_counter_record{id, position});
 }
 
 void expediter::expediter::request_order_service(size_t order_id, size_t table_id, size_t customer_id, Vector2 table_position){

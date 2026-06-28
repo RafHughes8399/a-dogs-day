@@ -631,7 +631,8 @@ namespace entities{
     class station : public decoration {
         public:
             enum station_type{
-                table_station = 0
+                table_station = 0,
+                food_counter_station = 1
             };
 
             station(body::body body, Vector2 position, int id, std::string debug_id, station_type type)
@@ -685,6 +686,20 @@ namespace entities{
             int assigned_dog_id_;
             events::table_interaction_positions interaction_positions_;
     };
+
+    class food_counter : public station {
+        public:
+            food_counter(body::body body, Vector2 position, int id, std::string debug_id)
+            : station(body, position, id, std::move(debug_id), station_type::food_counter_station){}
+            food_counter(const food_counter& other) = default;
+            food_counter(food_counter&& other) = default;
+
+            food_counter& operator=(const food_counter& other) = delete;
+            food_counter& operator=(food_counter&& other) = delete;
+
+            void place_down() override;
+    };
+
     // ------------------ entity builder ------------------ //
     class entity_builder{
         public:
@@ -692,12 +707,14 @@ namespace entities{
             std::unique_ptr<entity> build_mack(Vector2 position, int id);
             std::unique_ptr<entity> build_khiri(Vector2 position, int id);
             // NPC dog sprite art/config pending.
-            std::unique_ptr<entity> build_npc_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination);
+            std::unique_ptr<entity> build_customer_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination);
+            std::unique_ptr<entity> build_waiter_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination);
             std::unique_ptr<entity> build_paw_mark(Vector2 position, int id);
 
             std::unique_ptr<entity> build_test_decoration(Vector2 position, int id);
             std::unique_ptr<entity> build_gargoyle(Vector2 position, int id);
             std::unique_ptr<entity> build_table(Vector2 position, int id);
+            std::unique_ptr<entity> build_food_counter(Vector2 position, int id);
             ~entity_builder() = default;
             entity_builder() : debug_id_counts_() {}
             entity_builder(const entity_builder& other) = default;

@@ -136,6 +136,7 @@ namespace entity_config{
     inline const char* paw_mark_debug_id_prefix = "paw_";
     inline const char* decoration_debug_id_prefix = "dec_";
     inline const char* table_debug_id_prefix = "tbl_";
+    inline const char* food_counter_debug_id_prefix = "fc_";
 
     // file paths
     inline const char* background_path = "../sprites/background.png" ;
@@ -202,12 +203,23 @@ namespace entity_config{
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (3/02)
     inline const float gargoyle_decoration_attributes[attributes::size] = {level_config::edge_weight * 0.75f, level_config::edge_weight * 1.75f, 1.0f, 1.0f};
     inline const float table_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
+    inline const float food_counter_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     // inline const float npc_dog_across_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
     // inline const float npc_dog_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // inline const Vector2 npc_dog_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 npc_dog_head_right_offset = Vector2{0.0f, 0.0f};
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     inline const int dog_eating_duration = game_config::frames * 10;
+}
+namespace dog_config{
+    enum waiter_dog_types{
+        basic = 0,
+        size = 1
+    };
+    enum customer_dog_types{
+        fred = 0,
+        john = 1
+    };
 }
 namespace controls_config{
     // controls 

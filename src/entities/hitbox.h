@@ -55,6 +55,7 @@ namespace hitbox{
             hitbox build_test_decoration_hitbox(Vector2 position);
             hitbox build_gargoyle_hitbox(Vector2 position);
             hitbox build_table_hitbox(Vector2 position);
+            hitbox build_food_counter_hitbox(Vector2 position);
     }
     extern h_builder_;
 } // namespace hitbox
