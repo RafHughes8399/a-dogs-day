@@ -1,11 +1,24 @@
 #include "expediter.h"
+#include "dog_actions.h"
+#include "events.h"
 #include "events_interface.h"
-
+#include "raymath.h"
 #include <algorithm>
 
-void expediter::expediter::fulfill_order(const order& order){
-    (void) order;
+void expediter::expediter::fulfill_order(order& order){
     // fulfill an order
+   // TODO: fulifll the order
+    /**  
+     * update the order status
+     * send the waiter to the food counter and then
+     * to the table
+     * 
+     * update the watier states too
+    */
+    // ! use the dog action interface
+    send_dog_to_counter(order.assigned_waiter.id, order.food_counter);
+    send_dog_to_table(order.assigned_waiter.id, order.table);
+    order.status = order_status::serving;
     return;
 }
 void expediter::expediter::clear_table(){
@@ -54,14 +67,17 @@ expediter::food_counter_record& expediter::expediter::find_counter(){
     // first counter that has food
     return food_counters_.front();
 }
-void expediter::expediter::send_dog_to_position(Vector2 position){
-    (void) position;
-    // akin to the maitre_d
-    return;
+
+void expediter::expediter::send_dog_to_counter(int dog_id, food_counter_record counter){
+    dog_actions::send_dog_to_furniture(dog_id, counter.interaction_position, counter.id, counter.position);
 }
+void expediter::expediter::send_dog_to_table(int dog_id, table_record table){
+    dog_actions::send_dog_to_furniture(dog_id, table.interaction_position, table.id, table.position);
+}
+
 void expediter::expediter::process_orders(){
     // iterate through orders and process them
-    for(const auto& order : orders_){
+    for(auto& order : orders_){
         fulfill_order(order); // fulfill order if it can be
     }
     // check scheduled orders every half second, not every frame
@@ -103,7 +119,8 @@ void expediter::expediter::register_waiter(size_t waiter_id){
     waiters_.push_back(waiter{id, Vector2{-1, -1}, false});
 }
 
-void expediter::expediter::register_food_counter(size_t counter_id, Vector2 position){
+// TODO include interaction position
+void expediter::expediter::register_food_counter(size_t counter_id, Vector2 position, Vector2 interaction_position){
     auto id = static_cast<int>(counter_id);
     auto existing_counter = std::find_if(food_counters_.begin(), food_counters_.end(), [id](const auto& counter) -> bool {
         return counter.id == id;
@@ -113,7 +130,7 @@ void expediter::expediter::register_food_counter(size_t counter_id, Vector2 posi
         return;
     }
 
-    food_counters_.push_back(food_counter_record{id, position});
+    food_counters_.push_back(food_counter_record{id, position, interaction_position});
 }
 
 void expediter::expediter::request_order_service(size_t order_id, size_t table_id, size_t customer_id, Vector2 table_position){
@@ -129,7 +146,7 @@ void expediter::expediter::on_registered_waiter_event(const events::registered_w
 }
 
 void expediter::expediter::on_registered_food_counter_event(const events::registered_food_counter& event){
-    register_food_counter(event.get_counter_id(), event.get_position());
+    register_food_counter(event.get_counter_id(), event.get_position(), event.get_interaction_position());
 }
 
 void expediter::expediter::on_dog_reached_table_event(const events::dog_reached_table& event){

@@ -23,9 +23,9 @@
 #include <ctime>
 #include <string>
 #include <utility>
-
+#include <optional>
 // project includes
-#include "hitbox.h"
+#include "../entities/hitbox.h"
 #include "raylib.h"
 namespace events{
 	struct table_interaction_positions{
@@ -77,7 +77,7 @@ namespace events{
 		dog_path_complete = 37,
 		give_dog_path_id = 38,
 		table_removed = 39,
-		send_customer_table = 40,
+		dog_to_furniture = 40,
 		give_dog_table_path_id = 41,
 		dog_reached_table_id = 42,
 		size = 43
@@ -483,37 +483,38 @@ namespace events{
 			const size_t dog_id_;
 			const std::vector<Vector2> path_;
 	};
-	class send_customer_to_table : public event{
+	class send_dog_to_furniture : public event{
 		public:
-			send_customer_to_table(size_t customer_id, Vector2 source, Vector2 destination, size_t table_id, Vector2 table_position)
-			: event(ids::send_customer_table), customer_id_(customer_id), source_(source),
-			destination_(destination), table_id_(table_id), table_position_(table_position){}
+			send_dog_to_furniture(size_t dog_id, Vector2 destination, size_t furniture_id, Vector2 furniture_position, std::optional<Vector2> source = std::nullopt)
+			: event(ids::dog_to_furniture), dog_id_(dog_id), source_(source),
+			destination_(destination), furniture_id_(furniture_id), furniture_position_(furniture_position){}
 
 			static int get_static_type(){
-				return ids::send_customer_table;
+				return ids::dog_to_furniture;
 			}
-			size_t get_customer_id() const{
-				return customer_id_;
+			size_t get_dog_id() const{
+				return dog_id_;
 			}
-			Vector2 get_source() const{
+			std::optional<Vector2> get_source() const{
 				return source_;
 			}
 			Vector2 get_destination() const{
 				return destination_;
 			}
-			size_t get_table_id() const{
-				return table_id_;
+			size_t get_furniture_id() const{
+				return furniture_id_;
 			}
-			Vector2 get_table_position() const{
-				return table_position_;
+			Vector2 get_furniture_position() const{
+				return furniture_position_;
 			}
 		private:
-			const size_t customer_id_;
-			const Vector2 source_;
+			const size_t dog_id_;
+			const std::optional<Vector2> source_;
 			const Vector2 destination_;
-			const size_t table_id_;
-			const Vector2 table_position_;
+			const size_t furniture_id_;
+			const Vector2 furniture_position_;
 	};
+	// TODO refactor to give dog furniture path
 	class give_dog_table_path : public event{
 		public:
 			give_dog_table_path(size_t dog_id, std::vector<Vector2> path, size_t table_id, Vector2 table_position, Vector2 interaction_position)
@@ -545,6 +546,7 @@ namespace events{
 			const Vector2 table_position_;
 			const Vector2 interaction_position_;
 	};
+	//TODO refactor to dog reached furniture
 	class dog_reached_table : public event{
 		public:
 			dog_reached_table(size_t customer_id, size_t table_id, Vector2 table_position)
@@ -631,8 +633,8 @@ namespace events{
 	// these positions when routing waiter dogs through a pickup checkpoint.
 	class registered_food_counter : public event{
 		public:
-			registered_food_counter(size_t counter_id, Vector2 position)
-			: event(ids::register_food_counter), counter_id_(counter_id), position_(position){}
+			registered_food_counter(size_t counter_id, Vector2 position, Vector2 interaction_position)
+			: event(ids::register_food_counter), counter_id_(counter_id), position_(position), interaction_position_(interaction_position){}
 
 			static int get_static_type(){
 				return ids::register_food_counter;
@@ -643,9 +645,13 @@ namespace events{
 			Vector2 get_position() const{
 				return position_;
 			}
+			Vector2 get_interaction_position() const{
+				return interaction_position_;
+			}
 		private:
 			const size_t counter_id_;
 			const Vector2 position_;
+			const Vector2 interaction_position_;
 	};
 	// Cafe-domain request: an externally created order needs service. The
 	// expediter does not create order ids; it only assigns waiter labor.
@@ -677,7 +683,7 @@ namespace events{
 			const Vector2 table_position_;
 	};
 	// Cafe-domain command: the expediter has assigned a waiter to an order. The
-	// waiter should route through the pickup point before continuing to the table.
+	// waiter should route through the pickup point before continuing to the furniture.
 	class send_waiter_to_table : public event{
 		public:
 			send_waiter_to_table(size_t waiter_id, size_t order_id, Vector2 pickup_point, Vector2 table_position)

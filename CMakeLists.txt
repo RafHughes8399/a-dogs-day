@@ -140,10 +140,13 @@ link_libraries(graph)
 add_library(level src/engine/level.cpp)
 link_libraries(level)
 
+add_library(dog_actions src/systems/dog_actions.cpp)
+link_libraries(dog_actions)
+
 add_library(maitre_d src/systems/maitre_d.cpp src/systems/maitre_d_interface.cpp src/systems/dog_queue.cpp)
 link_libraries(maitre_d)
 
-add_library(expediter src/systems/expediter.cpp src/systems/expediter_interface.cpp)
+add_library(expediter src/systems/expediter.cpp)
 link_libraries(expediter)
 
 add_library(debug_log_interface src/systems/debug_log_interface.cpp)

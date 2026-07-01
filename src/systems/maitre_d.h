@@ -13,6 +13,7 @@
 #ifndef MAITRE_D_H
 #define MAITRE_D_H
 
+#include "dog_actions.h"
 #include "events.h"
 #include "raylib.h"
 #include "raymath.h"
@@ -195,9 +196,7 @@ namespace maitre_d{
             bool are_tables_free();
             table_record& pick_table();
             Vector2 pick_interaction_position(const table_record& table, Vector2 dog_position) const;
-            void send_dog_to_position(size_t id, Vector2 position);
             void send_dog_to_queue_position(size_t id, Vector2 position);
-            void send_dog_to_table(size_t id, size_t table_id, Vector2 table_position, Vector2 interaction_position);
             void check_customer_arrivals(float delta);
             bool can_request_customer_arrival() const;
             void request_customer_arrival();

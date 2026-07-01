@@ -1,5 +1,6 @@
 #include "level.h"
 #include "debug_log_interface.h"
+#include <raymath.h>
 namespace{
     std::string vector_to_string(Vector2 position){
         return "{" + std::to_string(position.x) + ", " + std::to_string(position.y) + "}";
@@ -82,9 +83,11 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
             "[level::add_entity, queued food counter registration] "
             "counter_id: " + std::to_string(entity_id)
             + ", position: " + vector_to_string(position));
+        auto interaction_position = Vector2Zero(); // TODO fix interaction position
         std::unique_ptr<events::event> registered_food_counter = std::make_unique<events::registered_food_counter>(
             static_cast<size_t>(entity_id),
-            position);
+            position,
+            interaction_position);
         event_interface::queue_event(registered_food_counter);
     }
     if(waiter != nullptr){
@@ -249,25 +252,27 @@ void level::level::on_send_customer_to_position_event(const events::send_custome
     event_interface::queue_event(give_dog_path);
 }
 
-void level::level::on_send_customer_to_table_event(const events::send_customer_to_table& event){
-    auto customer_id = static_cast<int>(event.get_customer_id());
-    auto dog_record = id_entity_map_.find(customer_id);
+void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture& event){
+    auto dog_id = static_cast<int>(event.get_dog_id());
+    auto dog_record = id_entity_map_.find(dog_id);
     if(dog_record == id_entity_map_.end()){
         debug::log(
-            "[level::on_send_customer_to_table_event, missing customer entity] "
-            "customer_id: " + std::to_string(customer_id)
-            + ", table_id: " + std::to_string(event.get_table_id())
+            "[level::on_send_dog_to_furniture, missing customer entity] "
+            "customer_id: " + std::to_string(dog_id)
+            + ", table_id: " + std::to_string(event.get_furniture_id())
             + ", destination: " + vector_to_string(event.get_destination()));
         return;
     }
 
     auto dog = static_cast<entities::dog*>(dog_record->second);
-    auto path = graph_.find_path(event.get_source(), event.get_destination(), dog->get_direction_scalar());
+    auto position = (event.get_source() == std::nullopt) ? dog->get_position() : event.get_source().value();
+    auto path = graph_.find_path(position, event.get_destination(), dog->get_direction_scalar());
+
     std::unique_ptr<events::event> give_dog_table_path = std::make_unique<events::give_dog_table_path>(
-        customer_id,
+        dog_id,
         path,
-        event.get_table_id(),
-        event.get_table_position(),
+        event.get_furniture_id(),
+        event.get_furniture_position(),
         event.get_destination());
     event_interface::queue_event(give_dog_table_path);
 }

@@ -197,7 +197,7 @@ void entities::table::update_interaction_positions(){
         Vector2{position_.x + (2.0f * level_config::edge_weight), position_.y}
     };
 }
-
+// TODO fix interaction positions
 events::table_interaction_positions entities::table::get_interaction_positions() const{
     return interaction_positions_;
 }
@@ -214,8 +214,10 @@ void entities::table::place_down(){
 
 void entities::food_counter::place_down(){
     decoration::place_down();
+    auto interaction_position = Vector2Zero(); // TODO update interaction position
     std::unique_ptr<events::event> registered_food_counter = std::make_unique<events::registered_food_counter>(
         static_cast<size_t>(id_),
-        position_);
+        position_,
+        interaction_position);
     event_interface::queue_event(registered_food_counter);
 }

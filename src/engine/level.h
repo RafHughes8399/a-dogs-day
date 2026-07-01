@@ -140,7 +140,7 @@ namespace level{
 	            event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
 		            event_interface::unsubscribe<events::build_customer_dog>(build_customer_dog_handler_);
 		            event_interface::unsubscribe<events::send_customer_to_position>(send_customer_to_position_handler_);
-		            event_interface::unsubscribe<events::send_customer_to_table>(send_customer_to_table_handler_);
+		            event_interface::unsubscribe<events::send_dog_to_furniture>(send_dog_to_furniture_handler_);
 		            event_interface::unsubscribe<events::order_served>(order_served_handler_);
 		            }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
@@ -149,7 +149,7 @@ namespace level{
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);}),
 		            build_customer_dog_handler_([this](const events::build_customer_dog& event) -> void{on_build_customer_dog_event(event);}),
 		            send_customer_to_position_handler_([this](const events::send_customer_to_position& event) -> void{on_send_customer_to_position_event(event);}),
-		            send_customer_to_table_handler_([this](const events::send_customer_to_table& event) -> void{on_send_customer_to_table_event(event);}),
+		            send_dog_to_furniture_handler_([this](const events::send_dog_to_furniture& event) -> void{on_send_dog_to_furniture(event);}),
 		            order_served_handler_([this](const events::order_served& event) -> void{on_order_served_event(event);}),
 		            graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
             view_frame_(frame), background_(sprite), id_entity_map_({}),
@@ -161,7 +161,7 @@ namespace level{
 	                event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
 		                event_interface::subscribe<events::build_customer_dog>(build_customer_dog_handler_);
 		                event_interface::subscribe<events::send_customer_to_position>(send_customer_to_position_handler_);
-		                event_interface::subscribe<events::send_customer_to_table>(send_customer_to_table_handler_);
+		                event_interface::subscribe<events::send_dog_to_furniture>(send_dog_to_furniture_handler_);
 		                event_interface::subscribe<events::order_served>(order_served_handler_);
 		            }
             level(const level& other) = delete;
@@ -180,7 +180,7 @@ namespace level{
 
 		            void on_build_customer_dog_event(const events::build_customer_dog& event);
 		            void on_send_customer_to_position_event(const events::send_customer_to_position& event);
-		            void on_send_customer_to_table_event(const events::send_customer_to_table& event);
+		            void on_send_dog_to_furniture(const events::send_dog_to_furniture& event);
 		            void on_order_served_event(const events::order_served& event);
             
             void render(int frame);
@@ -203,10 +203,12 @@ namespace level{
             events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
 
 
-		            events::event_handler<events::build_customer_dog> build_customer_dog_handler_;
-		            events::event_handler<events::send_customer_to_position> send_customer_to_position_handler_;
-		            events::event_handler<events::send_customer_to_table> send_customer_to_table_handler_;
-		            events::event_handler<events::order_served> order_served_handler_;
+		    events::event_handler<events::build_customer_dog> build_customer_dog_handler_;
+		    events::event_handler<events::send_customer_to_position> send_customer_to_position_handler_;
+		    events::event_handler<events::send_dog_to_furniture> send_dog_to_furniture_handler_;
+		    events::event_handler<events::order_served> order_served_handler_;
+
+            
             level_graph graph_;
             
             Rectangle view_frame_;
