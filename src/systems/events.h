@@ -63,13 +63,9 @@ namespace events{
 		customer_arrived = 22,
 		register_waiter = 24,
 		register_food_counter = 25,
-		request_order_service = 26,
 		waiter_arrived_table = 27,
 		order_served_id = 28,
-		customer_finished_food = 29,
-		waiter_cleared_table_id = 30,
 		send_waiter_table = 31,
-		send_waiter_clear_table = 32,
 		customer_left = 33,
 		build_customer_dog_id = 34,
 		send_customer_position = 35,
@@ -620,35 +616,6 @@ namespace events{
 			const Vector2 position_;
 			const Vector2 interaction_position_;
 	};
-	// Cafe-domain request: an externally created order needs service. The
-	// expediter does not create order ids; it only assigns waiter labor.
-	class requested_order_service : public event{
-		public:
-			requested_order_service(size_t order_id, size_t table_id, size_t customer_id, Vector2 table_position)
-			: event(ids::request_order_service), order_id_(order_id), table_id_(table_id),
-			customer_id_(customer_id), table_position_(table_position){}
-
-			static int get_static_type(){
-				return ids::request_order_service;
-			}
-			size_t get_order_id() const{
-				return order_id_;
-			}
-			size_t get_table_id() const{
-				return table_id_;
-			}
-			size_t get_customer_id() const{
-				return customer_id_;
-			}
-			Vector2 get_table_position() const{
-				return table_position_;
-			}
-		private:
-			const size_t order_id_;
-			const size_t table_id_;
-			const size_t customer_id_;
-			const Vector2 table_position_;
-	};
 	// Cafe-domain command: the expediter has assigned a waiter to an order. The
 	// waiter should route through the pickup point before continuing to the furniture.
 	class send_waiter_to_table : public event{
@@ -676,30 +643,6 @@ namespace events{
 			const size_t waiter_id_;
 			const size_t order_id_;
 			const Vector2 pickup_point_;
-			const Vector2 table_position_;
-	};
-	// Cafe-domain command: the expediter has assigned a waiter to clear a table.
-	class send_waiter_to_clear_table : public event{
-		public:
-			send_waiter_to_clear_table(size_t waiter_id, size_t order_id, Vector2 table_position)
-			: event(ids::send_waiter_clear_table), waiter_id_(waiter_id), order_id_(order_id),
-			table_position_(table_position){}
-
-			static int get_static_type(){
-				return ids::send_waiter_clear_table;
-			}
-			size_t get_waiter_id() const{
-				return waiter_id_;
-			}
-			size_t get_order_id() const{
-				return order_id_;
-			}
-			Vector2 get_table_position() const{
-				return table_position_;
-			}
-		private:
-			const size_t waiter_id_;
-			const size_t order_id_;
 			const Vector2 table_position_;
 	};
 	// Cafe-domain fact: a waiter reached the table for the assigned order.
@@ -753,44 +696,6 @@ namespace events{
 				const size_t table_id_;
 				const Vector2 table_position_;
 		};
-	// Cafe-domain fact: a customer has finished eating for an order.
-	class customer_finished_eating : public event{
-		public:
-			customer_finished_eating(size_t customer_id, size_t order_id)
-			: event(ids::customer_finished_food), customer_id_(customer_id), order_id_(order_id){}
-
-			static int get_static_type(){
-				return ids::customer_finished_food;
-			}
-			size_t get_customer_id() const{
-				return customer_id_;
-			}
-			size_t get_order_id() const{
-				return order_id_;
-			}
-		private:
-			const size_t customer_id_;
-			const size_t order_id_;
-	};
-	// Cafe-domain fact: a waiter has cleared the table for an order.
-	class waiter_cleared_table : public event{
-		public:
-			waiter_cleared_table(size_t waiter_id, size_t order_id)
-			: event(ids::waiter_cleared_table_id), waiter_id_(waiter_id), order_id_(order_id){}
-
-			static int get_static_type(){
-				return ids::waiter_cleared_table_id;
-			}
-			size_t get_waiter_id() const{
-				return waiter_id_;
-			}
-			size_t get_order_id() const{
-				return order_id_;
-			}
-		private:
-			const size_t waiter_id_;
-			const size_t order_id_;
-	};
 	// when an view_Frame moves, main listener is the level to adjust the view_frame when the player
 	// moves it
 	class move_view_frame : public event{

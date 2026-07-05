@@ -264,7 +264,6 @@ void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture&
             + ", destination: " + vector_to_string(event.get_destination()));
         return;
     }
-
     auto dog = static_cast<entities::dog*>(dog_record->second);
     auto position = (event.get_source() == std::nullopt) ? dog->get_position() : event.get_source().value();
     auto path = graph_.find_path(position, event.get_destination(), dog->get_direction_scalar());

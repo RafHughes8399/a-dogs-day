@@ -71,7 +71,6 @@ namespace expediter{
     namespace interface{
         void register_waiter(size_t waiter_id);
         void register_food_counter(size_t counter_id, Vector2 position);
-        void request_order_service(size_t order_id, size_t table_id, size_t customer_id, Vector2 table_position);
     }
 
     class expediter{
@@ -86,11 +85,9 @@ namespace expediter{
 
             void register_waiter(size_t waiter_id);
             void register_food_counter(size_t counter_id, Vector2 position, Vector2 interaction_position);
-            void request_order_service(size_t order_id, size_t table_id, size_t customer_id, Vector2 table_position);
 
             void process_orders();
             void fulfill_order(order& order);
-            void clear_table();
             bool can_create_order(waiter& waiter, food_counter_record& food_counter);
             void create_order(waiter& waiter, food_counter_record& food_counter, table_record table, size_t customer_id);
             void schedule_order(table_record table, size_t customer_id);
@@ -103,8 +100,6 @@ namespace expediter{
             void on_registered_waiter_event(const events::registered_waiter& event);
             void on_registered_food_counter_event(const events::registered_food_counter& event);
             void on_dog_reached_table_event(const events::dog_reached_table& event);
-            void on_customer_finished_eating_event(const events::customer_finished_eating& event);
-            void on_waiter_cleared_table_event(const events::waiter_cleared_table& event);
         private:
             expediter();
             ~expediter() = default;
@@ -118,8 +113,6 @@ namespace expediter{
             events::event_handler<events::registered_waiter> registered_waiter_handler_;
             events::event_handler<events::registered_food_counter> registered_food_counter_handler_;
             events::event_handler<events::dog_reached_table> dog_reached_table_handler_;
-            events::event_handler<events::customer_finished_eating> customer_finished_eating_handler_;
-            events::event_handler<events::waiter_cleared_table> waiter_cleared_table_handler_;
     };
 }
 

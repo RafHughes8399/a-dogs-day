@@ -21,11 +21,6 @@ void expediter::expediter::fulfill_order(order& order){
     order.status = order_status::serving;
     return;
 }
-void expediter::expediter::clear_table(){
-    // send an availabel dog to clear a table
-
-    return;
-}
 void expediter::expediter::create_order(waiter& waiter, food_counter_record& food_counter, table_record table, size_t customer_id){
     // create an order to be fulfiled,
     // needs the position of the table and the foood counter
@@ -97,14 +92,10 @@ expediter::expediter::expediter()
 : next_order_id_(0),
 registered_waiter_handler_([this](const events::registered_waiter& event) -> void {on_registered_waiter_event(event);}),
 registered_food_counter_handler_([this](const events::registered_food_counter& event) -> void {on_registered_food_counter_event(event);}),
-dog_reached_table_handler_([this](const events::dog_reached_table& event) -> void {on_dog_reached_table_event(event);}),
-customer_finished_eating_handler_([this](const events::customer_finished_eating& event) -> void {on_customer_finished_eating_event(event);}),
-waiter_cleared_table_handler_([this](const events::waiter_cleared_table& event) -> void {on_waiter_cleared_table_event(event);}){
+dog_reached_table_handler_([this](const events::dog_reached_table& event) -> void {on_dog_reached_table_event(event);}){
     event_interface::subscribe<events::registered_waiter>(registered_waiter_handler_);
     event_interface::subscribe<events::registered_food_counter>(registered_food_counter_handler_);
     event_interface::subscribe<events::dog_reached_table>(dog_reached_table_handler_);
-    event_interface::subscribe<events::customer_finished_eating>(customer_finished_eating_handler_);
-    event_interface::subscribe<events::waiter_cleared_table>(waiter_cleared_table_handler_);
 }
 
 void expediter::expediter::register_waiter(size_t waiter_id){
@@ -133,14 +124,6 @@ void expediter::expediter::register_food_counter(size_t counter_id, Vector2 posi
     food_counters_.push_back(food_counter_record{id, position, interaction_position});
 }
 
-void expediter::expediter::request_order_service(size_t order_id, size_t table_id, size_t customer_id, Vector2 table_position){
-    (void) order_id;
-    (void) table_id;
-    (void) customer_id;
-    (void) table_position;
-    // Scaffold: this should later create an order and queue waiter assignment.
-}
-
 void expediter::expediter::on_registered_waiter_event(const events::registered_waiter& event){
     register_waiter(event.get_waiter_id());
 }
@@ -165,14 +148,4 @@ void expediter::expediter::on_dog_reached_table_event(const events::dog_reached_
         // hence there should be some way for a dog to retrigger
         schedule_order(table, event.get_customer_id());
     }
-}
-
-void expediter::expediter::on_customer_finished_eating_event(const events::customer_finished_eating& event){
-    (void) event;
-    // mark_customer_finished(event.get_customer_id(), event.get_order_id());
-}
-
-void expediter::expediter::on_waiter_cleared_table_event(const events::waiter_cleared_table& event){
-    (void) event;
-    // mark_table_cleared(event.get_waiter_id(), event.get_order_id());
 }
