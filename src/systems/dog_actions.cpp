@@ -7,7 +7,7 @@ void dog_actions::send_dog_to_furniture(int dog_id, Vector2 destination, int fur
     return;
 }
 void dog_actions::send_dog_to_position(int dog_id, Vector2 position){
-    std::unique_ptr<events::event> send_customer_to_position = std::make_unique<events::send_customer_to_position>(dog_id, position);
-    event_interface::queue_event(send_customer_to_position);
+    std::unique_ptr<events::event> send_dog_to_position = std::make_unique<events::send_dog_to_position>(dog_id, position);
+    event_interface::queue_event(send_dog_to_position);
     return;
 }

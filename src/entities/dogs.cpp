@@ -2,6 +2,7 @@
 #include "texture.h"
 #include "debug_log_interface.h"
 #include "raglib.h"
+#include <vector>
 // ------------------------------- render states ------------------------------- //
 void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position, int frame){
     size_t render_index = dog.get_body().get_index();
@@ -154,6 +155,55 @@ void entities::dog::set_path(const std::vector<Vector2>& path){
 
 	}
 }
+void entities::dog::set_path(const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position){
+    (void) furniture_id;
+    (void) furniture_position;
+    set_path(path);
+}
+
+void entities::customer_dog_state::set_path(customer_dog& dog, const std::vector<Vector2>& path){
+    dog.dog::set_path(path);
+}
+void entities::customer_dog_state::set_path(customer_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position){
+    // A furniture-targeted path always means "go sit at this table" - transition
+    // the state directly here instead of round-tripping through an event. The
+    // path's last waypoint is the pathfinder's snapped interaction position, so
+    // customer_dog_traveling_state::on_path_finished will match it exactly on arrival.
+    if(! path.empty()){
+        dog.set_walking_to_table(static_cast<size_t>(furniture_id), furniture_position, path.back());
+    }
+    dog.dog::set_path(path);
+}
+
+void entities::customer_dog_traveling_state::on_path_finished(customer_dog& dog, Vector2 destination){
+    if(Vector2Distance(destination, destination_) > level_config::edge_weight * 0.05f){
+        return;
+    }
+    on_arrived(dog);
+}
+
+void entities::waiter_dog_state::set_path(waiter_dog& dog, const std::vector<Vector2>& path){
+    dog.dog::set_path(path);
+}
+void entities::waiter_dog_state::set_path(waiter_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position){
+    (void) furniture_id;
+    (void) furniture_position;
+    dog.dog::set_path(path);
+}
+void entities::waiter_dog_state::on_path_finished(waiter_dog& dog, Vector2 destination){
+    (void) dog;
+    (void) destination;
+    return;
+}
+
+void entities::waiter_dog_traveling_state::on_path_finished(waiter_dog& dog, Vector2 destination){
+    if(Vector2Distance(destination, destination_) > level_config::edge_weight * 0.05f){
+        return;
+    }
+    on_arrived(dog);
+}
+
+
 
 void entities::dog::on_path_finished(Vector2 destination){
     std::unique_ptr<events::event> reached_destination = std::make_unique<events::dog_completed_path>(id_, destination);
@@ -191,7 +241,7 @@ int entities::npc_dog::update(float delta, int frame){
     return dog::update(delta, frame);
 }
 
-void entities::customer_dog::state::on_path_finished(customer_dog& dog, Vector2 destination){
+void entities::customer_dog_state::on_path_finished(customer_dog& dog, Vector2 destination){
     (void) dog;
     (void) destination;
     return;
@@ -211,10 +261,7 @@ void entities::customer_dog::walking_to_table::update(customer_dog& dog, float d
     return;
 }
 
-void entities::customer_dog::walking_to_table::on_path_finished(customer_dog& dog, Vector2 destination){
-    if(Vector2Distance(destination, interaction_position_) > level_config::edge_weight * 0.05f){
-        return;
-    }
+void entities::customer_dog::walking_to_table::on_arrived(customer_dog& dog){
     std::unique_ptr<events::event> dog_reached_table = std::make_unique<events::dog_reached_table>(
         static_cast<size_t>(dog.get_id()),
         table_id_,
@@ -246,16 +293,6 @@ void entities::customer_dog::leaving::update(customer_dog& dog, float delta, int
     (void) frame;
 }
 
-int entities::customer_dog::update(float delta, int frame){
-    auto status = npc_dog::update(delta, frame);
-    customer_state_->update(*this, delta, frame);
-    return status;
-}
-
-void entities::customer_dog::set_state(std::unique_ptr<customer_dog::state> state){
-    customer_state_ = std::move(state);
-}
-
 void entities::customer_dog::set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position){
     set_state(std::make_unique<customer_dog::walking_to_table>(table_id, table_position, interaction_position));
 }
@@ -269,19 +306,6 @@ void entities::customer_dog::on_give_dog_path_event(const events::give_dog_path&
         return;
     }
     set_path(event.get_path());
-}
-
-void entities::customer_dog::on_give_dog_table_path_event(const events::give_dog_table_path& event){
-    if(static_cast<size_t>(id_) != event.get_dog_id()){
-        return;
-    }
-    set_walking_to_table(event.get_table_id(), event.get_table_position(), event.get_interaction_position());
-    set_path(event.get_path());
-}
-
-void entities::customer_dog::on_path_finished(Vector2 destination){
-    dog::on_path_finished(destination);
-    customer_state_->on_path_finished(*this, destination);
 }
 
 // ------------------------------- waiter dogs ------------------------------- //
@@ -332,39 +356,6 @@ void entities::waiter_dog::returning_to_station::update(waiter_dog& dog, float d
     (void) delta;
     (void) frame;
 }
-
-int entities::waiter_dog::update(float delta, int frame){
-    auto status = npc_dog::update(delta, frame);
-    // if(has_checkpoint_ && ! checkpoint_reached_ && move_path_.empty() && reached_position(checkpoint_)){
-    //     on_checkpoint_reached();
-    // }
-    waiter_state_->update(*this, delta, frame);
-    return status;
-}
-
-void entities::waiter_dog::set_state(std::unique_ptr<waiter_dog::state> state){
-    waiter_state_ = std::move(state);
-}
-
-void entities::waiter_dog::set_checkpoint_route(Vector2 checkpoint, Vector2 destination){
-    checkpoint_ = checkpoint;
-    destination_ = destination;
-    has_checkpoint_ = true;
-    checkpoint_reached_ = false;
-
-    // std::vector<Vector2> path;
-    // path.push_back(checkpoint_);
-    // set_path(path);
-}
-
-void entities::waiter_dog::on_checkpoint_reached(){
-    checkpoint_reached_ = true;
-    // std::vector<Vector2> path;
-    // path.push_back(destination_);
-    // set_path(path);
-}
-
-
 
 // ------------------------------- builder ------------------------------- //
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){

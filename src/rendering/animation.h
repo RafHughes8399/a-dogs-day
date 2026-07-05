@@ -54,7 +54,5 @@ namespace animation{
         bool is_playing_ = false;
 
     };
-    // TODO: 3D model animation
-    // class model_animation{}
 } // namespace name
 #endif

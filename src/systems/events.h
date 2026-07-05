@@ -78,7 +78,6 @@ namespace events{
 		give_dog_path_id = 38,
 		table_removed = 39,
 		dog_to_furniture = 40,
-		give_dog_table_path_id = 41,
 		dog_reached_table_id = 42,
 		size = 43
 	};
@@ -514,38 +513,6 @@ namespace events{
 			const size_t furniture_id_;
 			const Vector2 furniture_position_;
 	};
-	// TODO refactor to give dog furniture path
-	class give_dog_table_path : public event{
-		public:
-			give_dog_table_path(size_t dog_id, std::vector<Vector2> path, size_t table_id, Vector2 table_position, Vector2 interaction_position)
-			: event(ids::give_dog_table_path_id), dog_id_(dog_id), path_(std::move(path)),
-			table_id_(table_id), table_position_(table_position), interaction_position_(interaction_position){}
-
-			static int get_static_type(){
-				return ids::give_dog_table_path_id;
-			}
-			size_t get_dog_id() const{
-				return dog_id_;
-			}
-			const std::vector<Vector2>& get_path() const{
-				return path_;
-			}
-			size_t get_table_id() const{
-				return table_id_;
-			}
-			Vector2 get_table_position() const{
-				return table_position_;
-			}
-			Vector2 get_interaction_position() const{
-				return interaction_position_;
-			}
-		private:
-			const size_t dog_id_;
-			const std::vector<Vector2> path_;
-			const size_t table_id_;
-			const Vector2 table_position_;
-			const Vector2 interaction_position_;
-	};
 	//TODO refactor to dog reached furniture
 	class dog_reached_table : public event{
 		public:
@@ -584,12 +551,12 @@ namespace events{
 	};
 	// Cafe-domain command: the maitre d' has assigned a customer dog to a
 	// physical world position. The level owns pathfinding and entity mutation.
-	class send_customer_to_position : public event{
+	class send_dog_to_position : public event{
 		public:
-			send_customer_to_position(size_t customer_id, Vector2 destination)
+			send_dog_to_position(size_t customer_id, Vector2 destination)
 			: event(ids::send_customer_position), customer_id_(customer_id), source_(Vector2{0.0f, 0.0f}), destination_(destination), has_source_(false){}
 
-			send_customer_to_position(size_t customer_id, Vector2 source, Vector2 destination)
+			send_dog_to_position(size_t customer_id, Vector2 source, Vector2 destination)
 			: event(ids::send_customer_position), customer_id_(customer_id), source_(source), destination_(destination), has_source_(true){}
 
 			static int get_static_type(){

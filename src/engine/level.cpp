@@ -232,12 +232,12 @@ void level::level::on_build_customer_dog_event(const events::build_customer_dog&
     add_void_entity(std::move(new_dog), level_config::draw_layers::dogs);
 }
 
-void level::level::on_send_customer_to_position_event(const events::send_customer_to_position& event){
+void level::level::on_send_dog_to_position_event(const events::send_dog_to_position& event){
     auto customer_id = static_cast<int>(event.get_customer_id());
     auto dog_record = id_entity_map_.find(customer_id);
     if(dog_record == id_entity_map_.end()){
         debug::log(
-            "[level::on_send_customer_to_position_event, missing customer entity] "
+            "[level::on_send_dog_to_position_event, missing customer entity] "
             "customer_id: " + std::to_string(customer_id)
             + ", destination: " + vector_to_string(event.get_destination()));
         return;
@@ -253,6 +253,7 @@ void level::level::on_send_customer_to_position_event(const events::send_custome
 }
 
 void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture& event){
+    // find the dog, calculate the path, give the dog the path
     auto dog_id = static_cast<int>(event.get_dog_id());
     auto dog_record = id_entity_map_.find(dog_id);
     if(dog_record == id_entity_map_.end()){
@@ -268,13 +269,7 @@ void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture&
     auto position = (event.get_source() == std::nullopt) ? dog->get_position() : event.get_source().value();
     auto path = graph_.find_path(position, event.get_destination(), dog->get_direction_scalar());
 
-    std::unique_ptr<events::event> give_dog_table_path = std::make_unique<events::give_dog_table_path>(
-        dog_id,
-        path,
-        event.get_furniture_id(),
-        event.get_furniture_position(),
-        event.get_destination());
-    event_interface::queue_event(give_dog_table_path);
+    dog->set_path(path, static_cast<int>(event.get_furniture_id()), event.get_furniture_position());
 }
 
 void level::level::on_order_served_event(const events::order_served& event){
