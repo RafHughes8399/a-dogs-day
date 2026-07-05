@@ -752,7 +752,11 @@ namespace entities{
 
             void place_down() override;
     };
+    // food is an entity it exists 
+    //TODO: IMPLEMENT FOOD !
+    class food : entity{
 
+    };
     // ------------------ entity builder ------------------ //
     class entity_builder{
         public:
