@@ -9,6 +9,7 @@ void game::game::update(float delta){
     // std::cout << "[game update]: update" << std::endl;
     events::global_dispatcher_.process_events(delta);
     maitre_d_.update(delta);
+    expediter_.process_orders();
     logger_.update(delta);
     // update the level
     level_.update(delta, frame_count_);

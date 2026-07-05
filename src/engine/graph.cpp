@@ -60,13 +60,6 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
         else{
             // for each outgoing edge from current 
             for(auto & edge : graph_[static_cast<size_t>(current)].second){
-                // if not visited, and closer to the end 
-                // TODO and not "occupied", like not blocked by a decoration
-                /**
-                 * ? while i like the idea of not looking at nodes going in the wrong direction, i feel 
-                 * ? that it may cause errors down the line when many decorations are in the map and a direct, "always moving 
-                 * ? closer" path may not exist
-                 */
                 auto closer = is_node_closer(current, edge.destination_->id_, end_id);
                 (void) closer;
                 auto empty = is_node_empty(edge.destination_->id_);

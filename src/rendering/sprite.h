@@ -13,10 +13,11 @@ namespace sprite{
     class sprite{
         public:
             ~sprite() = default;
-            sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations, Vector2 draw_position_offset = Vector2Zero())
+            sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations, Vector2 draw_position_offset = Vector2Zero(), Color tint = WHITE)
                 : sprite_animation_(animation::animation(frame_width, frame_height, static_cast<int>(frames), static_cast<int>(animations))),
                 sprite_texture_(texture),
-                draw_position_offset_(draw_position_offset){}
+                draw_position_offset_(draw_position_offset),
+                tint_(tint){}
             sprite(const sprite& other) = default;
             sprite(sprite&& other) = default;
             
@@ -32,6 +33,7 @@ namespace sprite{
             animation::animation sprite_animation_;
             const Texture2D sprite_texture_; 
             Vector2 draw_position_offset_;
+            Color tint_;
     };
     class spriteset{
         public:

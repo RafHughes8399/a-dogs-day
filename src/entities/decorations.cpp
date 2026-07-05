@@ -172,13 +172,32 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_table(Vector2 
     return std::make_unique<entities::table>(body, position, id, next_debug_id(entity_config::table_debug_id_prefix));
 }
 
+std::unique_ptr<entities::entity> entities::entity_builder::build_food_counter(Vector2 position, int id){
+    auto food_counter_sprite = sprite::sprite(
+        textures::textures_.get_texture(textures::test_decoration, entity_config::test_decoration_path),
+        entity_config::food_counter_attributes[entity_config::attributes::frame_width],
+        entity_config::food_counter_attributes[entity_config::attributes::frame_height],
+        entity_config::food_counter_attributes[entity_config::attributes::frames],
+        entity_config::food_counter_attributes[entity_config::attributes::animations],
+        Vector2Zero(),
+        BLUE
+    );
+
+    auto hitbox = hitbox::h_builder_.build_food_counter_hitbox(position);
+    std::vector<sprite::sprite> sprites = {food_counter_sprite};
+    std::vector<hitbox::hitbox> hitboxes = {hitbox};
+    auto body = body::body(hitboxes, sprites);
+
+    return std::make_unique<entities::food_counter>(body, position, id, next_debug_id(entity_config::food_counter_debug_id_prefix));
+}
+
 void entities::table::update_interaction_positions(){
     interaction_positions_ = events::table_interaction_positions{
         Vector2{position_.x - level_config::edge_weight, position_.y},
         Vector2{position_.x + (2.0f * level_config::edge_weight), position_.y}
     };
 }
-
+// TODO fix interaction positions
 events::table_interaction_positions entities::table::get_interaction_positions() const{
     return interaction_positions_;
 }
@@ -191,4 +210,14 @@ void entities::table::place_down(){
         position_,
         interaction_positions_);
     event_interface::queue_event(registered_table);
+}
+
+void entities::food_counter::place_down(){
+    decoration::place_down();
+    auto interaction_position = Vector2Zero(); // TODO update interaction position
+    std::unique_ptr<events::event> registered_food_counter = std::make_unique<events::registered_food_counter>(
+        static_cast<size_t>(id_),
+        position_,
+        interaction_position);
+    event_interface::queue_event(registered_food_counter);
 }

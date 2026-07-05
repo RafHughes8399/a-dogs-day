@@ -11,6 +11,7 @@
 #include  "menus.h"
 #include "debug_log_interface.h"
 #include "debug_logger.h"
+#include "expediter.h"
 #include "level.h"
 #include "maitre_d.h"
 #include "player.h"
@@ -20,6 +21,7 @@ namespace game{
             ~game() = default;
             game(level::level& level, player::player& player, menus::menu_graph& menu, player::controls& controls)
                 : frame_count_(0), level_(level), maitre_d_(maitre_d::maitre_d::get_instance()),
+                expediter_(expediter::expediter::get_instance()),
                 logger_(debug::logger::get_instance()), menus_(menu), controls_(controls), player_(player){}
             game(const game& other) = default;
             game(game&& other) = default;
@@ -37,6 +39,7 @@ namespace game{
             
             level::level& level_;
             maitre_d::maitre_d& maitre_d_;
+            expediter::expediter& expediter_;
             debug::logger& logger_;
             menus::menu_graph& menus_;
             player::controls& controls_;

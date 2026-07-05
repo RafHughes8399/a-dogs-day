@@ -89,3 +89,7 @@ hitbox::hitbox hitbox::hitbox_builder::build_gargoyle_hitbox(Vector2 position){
 hitbox::hitbox hitbox::hitbox_builder::build_table_hitbox(Vector2 position){
     return hitbox(Rectangle{position.x, position.y, entity_config::table_attributes[entity_config::attributes::frame_width], entity_config::table_attributes[entity_config::attributes::frame_height]});
 }
+
+hitbox::hitbox hitbox::hitbox_builder::build_food_counter_hitbox(Vector2 position){
+    return hitbox(Rectangle{position.x, position.y, entity_config::food_counter_attributes[entity_config::attributes::frame_width], entity_config::food_counter_attributes[entity_config::attributes::frame_height]});
+}

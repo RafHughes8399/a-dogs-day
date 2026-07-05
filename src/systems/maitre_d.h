@@ -13,6 +13,7 @@
 #ifndef MAITRE_D_H
 #define MAITRE_D_H
 
+#include "dog_actions.h"
 #include "events.h"
 #include "raylib.h"
 #include "raymath.h"
@@ -195,10 +196,7 @@ namespace maitre_d{
             bool are_tables_free();
             table_record& pick_table();
             Vector2 pick_interaction_position(const table_record& table, Vector2 dog_position) const;
-            void send_dog_to_position(size_t id, Vector2 position);
-            void send_dog_to_position(size_t id, Vector2 source, Vector2 destination);
             void send_dog_to_queue_position(size_t id, Vector2 position);
-            void send_dog_to_table(size_t id, Vector2 position);
             void check_customer_arrivals(float delta);
             bool can_request_customer_arrival() const;
             void request_customer_arrival();
@@ -226,7 +224,7 @@ namespace maitre_d{
             //   -> enqueue the dog with its height in edge units
             //   -> emit/request pathing to the resolved queue target position
             //
-            // customer_dog_sent_to_table(customer_id, table_id)
+	            // send_dog_to_table(customer_id, table_id, table_position, interaction_position)
             //   -> dequeue the dog
             //   -> use the head slot position as the table pathing start
             //   -> dog_queue recalculates positions for the remaining dogs

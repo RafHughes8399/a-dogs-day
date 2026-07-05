@@ -2,6 +2,7 @@
 #include "texture.h"
 #include "debug_log_interface.h"
 #include "raglib.h"
+#include <vector>
 // ------------------------------- render states ------------------------------- //
 void entities::player_dog::selected::render(player_dog& dog, Vector2 draw_position, int frame){
     size_t render_index = dog.get_body().get_index();
@@ -32,45 +33,57 @@ bool entities::dog::reached_position(Vector2 target){
 
 int entities::dog::update(float delta, int frame){
     (void) frame;
-
-    if(! current_path_.empty()){
-        auto next_position = current_path_.front();
-        if(reached_position(next_position)){
-            current_path_.erase(current_path_.begin());
-            if(! current_path_.empty()){
-                next_position = current_path_.front();
-                determine_direction(next_position);
-            } else {
-                // is destination, the current path is finished
-                debug::log(
-                    "[dog::update, completed current path] "
-                    "dog_id: " + std::to_string(id_)
-                    + ", destination: " + raglib::vector_to_string(next_position)
-                    + ", queued_paths: " + std::to_string(move_paths_.size()));
-                std::unique_ptr<events::event> reached_destination = std::make_unique<events::dog_completed_path>(id_, next_position);
-                event_interface::queue_event(reached_destination);
-                body_.update_hitboxes(position_);
-
-                // check for the next path
-                if(!move_paths_.empty()){
-                    current_path_ = move_paths_.front();
-                    move_paths_.pop();
-                    determine_direction(current_path_.front());
-                    debug::log(
-                        "[dog::update, switched to queued path] "
-                        "dog_id: " + std::to_string(id_)
-                        + ", path_size: " + std::to_string(current_path_.size())
-                        + ", first_position: " + raglib::vector_to_string(current_path_.front())
-                        + ", queued_paths_remaining: " + std::to_string(move_paths_.size()));
-                }
-                return status_codes::nothing;
-            }
-        }
-        auto new_position = Vector2Add(position_, Vector2Scale(Vector2Multiply(move_speed_, direction_scalar_), delta));
-        position_ = new_position;
-        body_.update_hitboxes(position_);
-    }
+    update_path(delta);
     return status_codes::nothing;
+}
+
+void entities::dog::update_path(float delta){
+    if(current_path_.empty()){
+        return;
+    }
+
+    auto next_position = current_path_.front();
+    if(reached_position(next_position)){
+        current_path_.erase(current_path_.begin());
+
+        if(current_path_.empty()){
+            debug::log(
+                "[dog::update_path, completed current path] "
+                "dog_id: " + std::to_string(id_)
+                + ", destination: " + raglib::vector_to_string(next_position)
+                + ", queued_paths: " + std::to_string(move_paths_.size()));
+            on_path_finished(next_position);
+            body_.update_hitboxes(position_);
+            start_next_path();
+            return;
+        }
+
+        determine_direction(current_path_.front());
+    }
+
+    move_toward_current_waypoint(delta);
+}
+
+void entities::dog::move_toward_current_waypoint(float delta){
+    auto new_position = Vector2Add(position_, Vector2Scale(Vector2Multiply(move_speed_, direction_scalar_), delta));
+    position_ = new_position;
+    body_.update_hitboxes(position_);
+}
+
+void entities::dog::start_next_path(){
+    if(move_paths_.empty()){
+        return;
+    }
+
+    current_path_ = move_paths_.front();
+    move_paths_.pop();
+    determine_direction(current_path_.front());
+    debug::log(
+        "[dog::start_next_path, switched to queued path] "
+        "dog_id: " + std::to_string(id_)
+        + ", path_size: " + std::to_string(current_path_.size())
+        + ", first_position: " + raglib::vector_to_string(current_path_.front())
+        + ", queued_paths_remaining: " + std::to_string(move_paths_.size()));
 }
 
 Vector2 entities::dog::get_direction_scalar(){
@@ -140,7 +153,61 @@ void entities::dog::set_path(const std::vector<Vector2>& path){
             + ", first_position: " + raglib::vector_to_string(next_path.front())
             + ", queued_paths: " + std::to_string(move_paths_.size()));
 
+	}
+}
+void entities::dog::set_path(const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position){
+    (void) furniture_id;
+    (void) furniture_position;
+    set_path(path);
+}
+
+void entities::customer_dog_state::set_path(customer_dog& dog, const std::vector<Vector2>& path){
+    dog.dog::set_path(path);
+}
+void entities::customer_dog_state::set_path(customer_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position){
+    // A furniture-targeted path always means "go sit at this table" - transition
+    // the state directly here instead of round-tripping through an event. The
+    // path's last waypoint is the pathfinder's snapped interaction position, so
+    // customer_dog_traveling_state::on_path_finished will match it exactly on arrival.
+    if(! path.empty()){
+        dog.set_walking_to_table(static_cast<size_t>(furniture_id), furniture_position, path.back());
     }
+    dog.dog::set_path(path);
+}
+
+void entities::customer_dog_traveling_state::on_path_finished(customer_dog& dog, Vector2 destination){
+    if(Vector2Distance(destination, destination_) > level_config::edge_weight * 0.05f){
+        return;
+    }
+    on_arrived(dog);
+}
+
+void entities::waiter_dog_state::set_path(waiter_dog& dog, const std::vector<Vector2>& path){
+    dog.dog::set_path(path);
+}
+void entities::waiter_dog_state::set_path(waiter_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position){
+    (void) furniture_id;
+    (void) furniture_position;
+    dog.dog::set_path(path);
+}
+void entities::waiter_dog_state::on_path_finished(waiter_dog& dog, Vector2 destination){
+    (void) dog;
+    (void) destination;
+    return;
+}
+
+void entities::waiter_dog_traveling_state::on_path_finished(waiter_dog& dog, Vector2 destination){
+    if(Vector2Distance(destination, destination_) > level_config::edge_weight * 0.05f){
+        return;
+    }
+    on_arrived(dog);
+}
+
+
+
+void entities::dog::on_path_finished(Vector2 destination){
+    std::unique_ptr<events::event> reached_destination = std::make_unique<events::dog_completed_path>(id_, destination);
+    event_interface::queue_event(reached_destination);
 }
 
 // ------------------------------- player dogs ------------------------------- //
@@ -174,34 +241,50 @@ int entities::npc_dog::update(float delta, int frame){
     return dog::update(delta, frame);
 }
 
-void entities::customer_dog::entering_queue::update(customer_dog& dog, float delta, int frame){
+void entities::customer_dog_state::on_path_finished(customer_dog& dog, Vector2 destination){
     (void) dog;
-    (void) delta;
-    (void) frame;
+    (void) destination;
+    return;
 }
 
-void entities::customer_dog::waiting_in_queue::update(customer_dog& dog, float delta, int frame){
+void entities::customer_dog::default_state::update(customer_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
+    return;
 }
 
-void entities::customer_dog::going_to_table::update(customer_dog& dog, float delta, int frame){
+void entities::customer_dog::walking_to_table::update(customer_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
+    return;
+}
+
+void entities::customer_dog::walking_to_table::on_arrived(customer_dog& dog){
+    std::unique_ptr<events::event> dog_reached_table = std::make_unique<events::dog_reached_table>(
+        static_cast<size_t>(dog.get_id()),
+        table_id_,
+        table_position_);
+    event_interface::queue_event(dog_reached_table);
+    dog.set_state(std::make_unique<customer_dog::seated>());
 }
 
 void entities::customer_dog::seated::update(customer_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
+    // play waiting animation
 }
 
 void entities::customer_dog::eating::update(customer_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
+    (void) order_id_;
+    (void) table_id_;
+    (void) table_position_;
+    // play eating animatino, count down too
 }
 
 void entities::customer_dog::leaving::update(customer_dog& dog, float delta, int frame){
@@ -210,14 +293,12 @@ void entities::customer_dog::leaving::update(customer_dog& dog, float delta, int
     (void) frame;
 }
 
-int entities::customer_dog::update(float delta, int frame){
-    auto status = npc_dog::update(delta, frame);
-    customer_state_->update(*this, delta, frame);
-    return status;
+void entities::customer_dog::set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position){
+    set_state(std::make_unique<customer_dog::walking_to_table>(table_id, table_position, interaction_position));
 }
 
-void entities::customer_dog::set_state(std::unique_ptr<customer_dog::state> state){
-    customer_state_ = std::move(state);
+void entities::customer_dog::set_eating(size_t order_id, size_t table_id, Vector2 table_position){
+    set_state(std::make_unique<customer_dog::eating>(order_id, table_id, table_position));
 }
 
 void entities::customer_dog::on_give_dog_path_event(const events::give_dog_path& event){
@@ -275,39 +356,6 @@ void entities::waiter_dog::returning_to_station::update(waiter_dog& dog, float d
     (void) delta;
     (void) frame;
 }
-
-int entities::waiter_dog::update(float delta, int frame){
-    auto status = npc_dog::update(delta, frame);
-    // if(has_checkpoint_ && ! checkpoint_reached_ && move_path_.empty() && reached_position(checkpoint_)){
-    //     on_checkpoint_reached();
-    // }
-    waiter_state_->update(*this, delta, frame);
-    return status;
-}
-
-void entities::waiter_dog::set_state(std::unique_ptr<waiter_dog::state> state){
-    waiter_state_ = std::move(state);
-}
-
-void entities::waiter_dog::set_checkpoint_route(Vector2 checkpoint, Vector2 destination){
-    checkpoint_ = checkpoint;
-    destination_ = destination;
-    has_checkpoint_ = true;
-    checkpoint_reached_ = false;
-
-    // std::vector<Vector2> path;
-    // path.push_back(checkpoint_);
-    // set_path(path);
-}
-
-void entities::waiter_dog::on_checkpoint_reached(){
-    checkpoint_reached_ = true;
-    // std::vector<Vector2> path;
-    // path.push_back(destination_);
-    // set_path(path);
-}
-
-
 
 // ------------------------------- builder ------------------------------- //
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){
@@ -472,9 +520,9 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
 }
 
 // NPC dog sprite art/config pending.
-std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination = std::nullopt){
+std::unique_ptr<entities::entity> entities::entity_builder::build_customer_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination = std::nullopt){
     debug::log(
-        "[entity_builder::build_npc_dog, building npc dog] "
+        "[entity_builder::build_customer_dog, building npc dog] "
         "dog_id: " + std::to_string(id)
         + ", dog_type: " + std::to_string(dog_type)
         + ", position: " + raglib::vector_to_string(position)
@@ -542,7 +590,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id
     auto head = body::body();
     if(destination.has_value()){
         debug::log(
-            "[entity_builder::build_npc_dog, constructing customer dog with destination] "
+            "[entity_builder::build_customer_dog, constructing customer dog with destination] "
             "dog_id: " + std::to_string(id)
             + ", dog_type: " + std::to_string(dog_type)
             + ", position: " + raglib::vector_to_string(position)
@@ -556,7 +604,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id
         next_debug_id(entity_config::customer_dog_debug_id_prefix));
     }else{
         debug::log(
-            "[entity_builder::build_npc_dog, constructing customer dog without destination] "
+            "[entity_builder::build_customer_dog, constructing customer dog without destination] "
             "dog_id: " + std::to_string(id)
             + ", dog_type: " + std::to_string(dog_type)
             + ", position: " + raglib::vector_to_string(position));
@@ -566,5 +614,202 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_npc_dog(int id
             position,
             id,
             next_debug_id(entity_config::customer_dog_debug_id_prefix));
+    }
+}
+
+#if 0
+std::unique_ptr<entities::entity> entities::entity_builder::build_customer_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination = std::nullopt){
+    debug::log(
+        "[entity_builder::build_customer_dog, building npc dog] "
+        "dog_id: " + std::to_string(id)
+        + ", dog_type: " + std::to_string(dog_type)
+        + ", position: " + raglib::vector_to_string(position)
+        + ", has_destination: " + std::to_string(destination.has_value())
+        + (destination.has_value()
+            ? ", destination: " + raglib::vector_to_string(destination.value())
+            : ""));
+//     auto npc_left_texture = textures::textures_.get_texture(textures::npc_dog_left, entity_config::npc_dog_left_path);
+//     auto npc_right_texture = textures::textures_.get_texture(textures::npc_dog_right, entity_config::npc_dog_right_path);
+//
+//     auto npc_left_sprite = sprite::sprite(npc_left_texture,
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_width],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_height],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frames],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::animations]);
+//     auto npc_right_sprite = sprite::sprite(npc_right_texture,
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_width],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_height],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frames],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::animations]);
+//
+//     auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
+//     std::vector<sprite::sprite> sprites;
+//     sprites.push_back(std::move(npc_left_sprite));
+//     sprites.push_back(std::move(npc_right_sprite));
+//     std::vector<hitbox::hitbox> hitboxes;
+//     hitboxes.push_back(across_hitbox);
+//     hitboxes.push_back(across_hitbox);
+//     auto body = body::body(hitboxes, sprites);
+//
+//     // Head sprite art pending.
+//     // auto npc_head_left_texture = textures::textures_.get_texture(textures::npc_dog_head_left, entity_config::npc_dog_head_left_path);
+//     // auto npc_head_right_texture = textures::textures_.get_texture(textures::npc_dog_head_right, entity_config::npc_dog_head_right_path);
+//     auto head = body::body();
+//
+//     return std::make_unique<entities::npc_dog>(
+//         std::move(body),
+//         std::move(head),
+//         position,
+//         id,
+//         next_debug_id(entity_config::npc_dog_debug_id_prefix));
+    auto customer_left_texture = textures::textures_.get_texture(textures::mack_left, entity_config::mack_left_path);
+    auto customer_right_texture = textures::textures_.get_texture(textures::mack_right, entity_config::mack_right_path);
+    auto customer_left_sprite = sprite::sprite(customer_left_texture,
+        entity_config::mack_across_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_across_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_across_attributes[entity_config::attributes::frames],
+        entity_config::mack_across_attributes[entity_config::attributes::animations]);
+    auto customer_right_sprite = sprite::sprite(customer_right_texture,
+        entity_config::mack_across_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_across_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_across_attributes[entity_config::attributes::frames],
+        entity_config::mack_across_attributes[entity_config::attributes::animations]);
+
+    auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
+    std::vector<sprite::sprite> sprites;
+    sprites.push_back(std::move(customer_left_sprite));
+    sprites.push_back(std::move(customer_right_sprite));
+
+    std::vector<hitbox::hitbox> hitboxes;
+    hitboxes.push_back(across_hitbox);
+    hitboxes.push_back(across_hitbox);
+
+    auto body = body::body(hitboxes, sprites);
+    auto head = body::body();
+    if(destination.has_value()){
+        debug::log(
+            "[entity_builder::build_customer_dog, constructing customer dog with destination] "
+            "dog_id: " + std::to_string(id)
+            + ", dog_type: " + std::to_string(dog_type)
+            + ", position: " + raglib::vector_to_string(position)
+            + ", destination: " + raglib::vector_to_string(destination.value()));
+        return std::make_unique<entities::customer_dog>(
+        std::move(body),
+        std::move(head),
+        position,
+        destination.value(),
+        id,
+        next_debug_id(entity_config::customer_dog_debug_id_prefix));
+    }else{
+        debug::log(
+            "[entity_builder::build_customer_dog, constructing customer dog without destination] "
+            "dog_id: " + std::to_string(id)
+            + ", dog_type: " + std::to_string(dog_type)
+            + ", position: " + raglib::vector_to_string(position));
+        return std::make_unique<entities::customer_dog>(
+            std::move(body),
+            std::move(head),
+            position,
+            id,
+            next_debug_id(entity_config::customer_dog_debug_id_prefix));
+    }
+}
+#endif
+std::unique_ptr<entities::entity> entities::entity_builder::build_waiter_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination = std::nullopt){
+    debug::log(
+        "[entity_builder::build waiter dog] "
+        "dog_id: " + std::to_string(id)
+        + ", dog_type: " + std::to_string(dog_type)
+        + ", position: " + raglib::vector_to_string(position)
+        + ", has_destination: " + std::to_string(destination.has_value())
+        + (destination.has_value()
+            ? ", destination: " + raglib::vector_to_string(destination.value())
+            : ""));
+//     auto npc_left_texture = textures::textures_.get_texture(textures::npc_dog_left, entity_config::npc_dog_left_path);
+//     auto npc_right_texture = textures::textures_.get_texture(textures::npc_dog_right, entity_config::npc_dog_right_path);
+//
+//     auto npc_left_sprite = sprite::sprite(npc_left_texture,
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_width],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_height],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frames],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::animations]);
+//     auto npc_right_sprite = sprite::sprite(npc_right_texture,
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_width],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frame_height],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::frames],
+//         entity_config::npc_dog_across_attributes[entity_config::attributes::animations]);
+//
+//     auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
+//     std::vector<sprite::sprite> sprites;
+//     sprites.push_back(std::move(npc_left_sprite));
+//     sprites.push_back(std::move(npc_right_sprite));
+//     std::vector<hitbox::hitbox> hitboxes;
+//     hitboxes.push_back(across_hitbox);
+//     hitboxes.push_back(across_hitbox);
+//     auto body = body::body(hitboxes, sprites);
+//
+//     // Head sprite art pending.
+//     // auto npc_head_left_texture = textures::textures_.get_texture(textures::npc_dog_head_left, entity_config::npc_dog_head_left_path);
+//     // auto npc_head_right_texture = textures::textures_.get_texture(textures::npc_dog_head_right, entity_config::npc_dog_head_right_path);
+//     auto head = body::body();
+//
+//     return std::make_unique<entities::npc_dog>(
+//         std::move(body),
+//         std::move(head),
+//         position,
+//         id,
+//         next_debug_id(entity_config::npc_dog_debug_id_prefix));
+    auto customer_left_texture = textures::textures_.get_texture(textures::mack_left, entity_config::mack_left_path);
+    auto customer_right_texture = textures::textures_.get_texture(textures::mack_right, entity_config::mack_right_path);
+    auto customer_left_sprite = sprite::sprite(customer_left_texture,
+        entity_config::mack_across_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_across_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_across_attributes[entity_config::attributes::frames],
+        entity_config::mack_across_attributes[entity_config::attributes::animations]);
+    auto customer_right_sprite = sprite::sprite(customer_right_texture,
+        entity_config::mack_across_attributes[entity_config::attributes::frame_width],
+        entity_config::mack_across_attributes[entity_config::attributes::frame_height],
+        entity_config::mack_across_attributes[entity_config::attributes::frames],
+        entity_config::mack_across_attributes[entity_config::attributes::animations]);
+
+    auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
+    std::vector<sprite::sprite> sprites;
+    sprites.push_back(std::move(customer_left_sprite));
+    sprites.push_back(std::move(customer_right_sprite));
+
+    std::vector<hitbox::hitbox> hitboxes;
+    hitboxes.push_back(across_hitbox);
+    hitboxes.push_back(across_hitbox);
+
+    auto body = body::body(hitboxes, sprites);
+    auto head = body::body();
+    if(destination.has_value()){
+        debug::log(
+            "[entity_builder::build_customer_dog, constructing customer dog with destination] "
+            "dog_id: " + std::to_string(id)
+            + ", dog_type: " + std::to_string(dog_type)
+            + ", position: " + raglib::vector_to_string(position)
+            + ", destination: " + raglib::vector_to_string(destination.value()));
+        return std::make_unique<entities::customer_dog>(
+        std::move(body),
+        std::move(head),
+        position,
+        destination.value(),
+        id,
+        next_debug_id(entity_config::customer_dog_debug_id_prefix),
+        level_config::directions::left);
+    }else{
+        debug::log(
+            "[entity_builder::build_customer_dog, constructing customer dog without destination] "
+            "dog_id: " + std::to_string(id)
+            + ", dog_type: " + std::to_string(dog_type)
+            + ", position: " + raglib::vector_to_string(position));
+        return std::make_unique<entities::waiter_dog>(
+            std::move(body),
+            std::move(head),
+            position,
+            id,
+            next_debug_id(entity_config::customer_dog_debug_id_prefix),
+            level_config::directions::left);
     }
 }

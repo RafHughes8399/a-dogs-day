@@ -30,7 +30,7 @@ void entities::entity::move(Vector2 new_position){
     std::unique_ptr<events::event> move_event = std::make_unique<events::move_entity>(id_);
     event_interface::queue_event(move_event);
 }
-
+// TODO: change the name of this function
 void entities::entity::move_without_event(Vector2 new_position){
     position_ = new_position;
     body_.update_hitboxes(position_);
