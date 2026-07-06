@@ -70,6 +70,24 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
   endif()
 endif()
 
+# setup Catch2 (unit test framework)
+# Dependencies
+set(CATCH2_VERSION 3.15.1)
+find_package(Catch2 3 QUIET) # QUIET or REQUIRED
+if (NOT Catch2_FOUND) # If there's none, fetch and build Catch2
+  include(FetchContent)
+  FetchContent_Declare(
+    Catch2
+    DOWNLOAD_EXTRACT_TIMESTAMP OFF
+    URL https://github.com/catchorg/Catch2/archive/refs/tags/v${CATCH2_VERSION}.tar.gz
+  )
+  FetchContent_GetProperties(Catch2)
+  if (NOT catch2_POPULATED) # Have we downloaded Catch2 yet?
+    set(FETCHCONTENT_QUIET NO)
+    FetchContent_MakeAvailable(Catch2)
+  endif()
+endif()
+
 # Our Project
 
 # add_library(lib_name src/lib_name.cpp)
