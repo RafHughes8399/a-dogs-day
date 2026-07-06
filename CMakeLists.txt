@@ -161,7 +161,7 @@ link_libraries(level)
 add_library(dog_actions src/systems/dog_actions.cpp)
 link_libraries(dog_actions)
 
-add_library(maitre_d src/systems/maitre_d.cpp src/systems/maitre_d_interface.cpp src/systems/dog_queue.cpp)
+add_library(maitre_d src/systems/maitre_d.cpp src/systems/dog_queue.cpp)
 link_libraries(maitre_d)
 
 add_library(expediter src/systems/expediter.cpp)
@@ -176,9 +176,10 @@ link_libraries(debug_logger)
 add_library(game src/engine/game.cpp)
 link_libraries(game)
 
-add_executable(${PROJECT_NAME} src/dog_days.cpp)
-target_link_libraries(${PROJECT_NAME} raylib)
 
+add_executable(${PROJECT_NAME} src/dog_days.cpp)
+
+target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
   raglib events queries animation sprite item menu hud hitbox body texture
   player controls entities cursor dogs decorations render_layer quadtree
@@ -195,6 +196,34 @@ foreach(target IN LISTS PROJECT_TARGETS)
   )
   target_include_directories(${target} SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)
 endforeach()
+
+# Tests
+# Catch2 links ONLY here, never into the shipped dog-days binary.
+# Catch2::Catch2WithMain provides the test runner's main().
+# The game's static libs are already attached via the global link_libraries()
+# calls above; here we add the test sources, headers, and the test-only macro.
+add_executable(tests
+  tests/smoke_test.cpp
+  tests/test_game.cpp
+  tests/harness_scenarios.cpp
+  tests/player_scenarios.cpp
+  tests/maitre_d_scenarios.cpp
+  tests/expediter_scenarios.cpp
+)
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+# Test code needs the game's headers (and raylib), but deliberately NOT the
+# strict MY_COMPILE_OPTIONS - those would fire inside Catch2 / raylib headers.
+target_include_directories(tests PRIVATE
+  src/rendering
+  src/entities
+  src/systems
+  src/engine
+  src/interfaces
+)
+target_include_directories(tests SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)
+# Compile the DOG_DAYS_TESTING-guarded accessors (spec step 5) into this
+# target ONLY, so they never reach the shipped dog-days binary.
+target_compile_definitions(tests PRIVATE DOG_DAYS_TESTING)
 
 # Web Configurations
 if (${PLATFORM} STREQUAL "Web")

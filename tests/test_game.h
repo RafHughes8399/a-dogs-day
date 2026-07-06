@@ -1,0 +1,107 @@
+#ifndef TEST_GAME_H
+#define TEST_GAME_H
+
+// -----------------------------------------------------------------------------
+// test_game - the "testing interface" / composition root for logic tests.
+//
+// Owns fresh instances of the game systems needed to drive logic scenarios
+// (no rendering, no player/controls/menus). Each Catch2 SCENARIO declares its
+// own `test_game` on the stack, so every test starts from a clean world and
+// RAII teardown unsubscribes handlers between scenarios.
+//   design: docs/superpowers/specs/2026-07-05-test-game-catch2-design.md
+//
+// The public methods below ARE the interface: `build_*`/`insert_*` set up
+// state, `customer_arrives()` (etc.) trigger flows, `tick*()` advances the
+// simulation, and the accessors read state back for REQUIRE assertions.
+//
+// NOTE: these are STUBS - signatures only. Bodies live in test_game.cpp and
+// currently throw "not implemented"; fill them in as you go.
+// -----------------------------------------------------------------------------
+
+#include <functional>
+#include <memory>
+#include <optional>
+
+#include "raylib.h"    // Vector2
+#include "config.h"    // level_config::draw_layers, dog-type ids
+#include "entities.h"  // entities::entity, entities::e_builder, customer_dog...
+#include "level.h"     // level::level, level::level_builder
+#include "maitre_d.h"  // maitre_d::maitre_d  (owned once de-singletonised)
+#include "expediter.h" // expediter::expediter (owned once de-singletonised)
+
+namespace testing{
+
+    class test_game{
+        public:
+            // ---------------- lifecycle ("create game") ----------------
+            // InitWindow(FLAG_WINDOW_HIDDEN) once, build a fresh level_, and
+            // (after the de-singleton refactor) construct maitre_d_/expediter_.
+            test_game();
+            // Drain the shared event queue, then destroy members so their RAII
+            // destructors unsubscribe from events::global_dispatcher_.
+            ~test_game();
+
+            test_game(const test_game&) = delete;
+            test_game(test_game&&) = delete;
+            test_game& operator=(const test_game&) = delete;
+            test_game& operator=(test_game&&) = delete;
+
+            // ---------------- simulation clock ----------------
+            // Advance the sim `frames` step(s): process_events ->
+            // maitre_d_.update(delta) -> expediter_.process_orders(). No render.
+            void tick(float delta, int frames = 1);
+            // tick() in a loop up to max_frames, stopping early when predicate()
+            // is true. Returns whether the predicate became true (the "await a
+            // condition" mechanism - avoids hardcoded frame counts).
+            bool tick_until(const std::function<bool()>& predicate, int max_frames);
+
+            // ---------------- build actions ----------------
+            // Thin wrappers over entities::e_builder. These CONSTRUCT an entity
+            // but do NOT add it to the level - compose with insert_entity(), e.g.
+            //   insert_entity(build_customer_dog(1, pos), level_config::dogs);
+            std::unique_ptr<entities::entity> build_mack(int id, Vector2 position);  // player dog
+            std::unique_ptr<entities::entity> build_khiri(int id, Vector2 position); // player dog
+            std::unique_ptr<entities::entity> build_customer_dog(
+                int id, Vector2 position,
+                std::optional<Vector2> destination = std::nullopt,
+                int dog_type = cafe_config::customer_dog_type);
+            std::unique_ptr<entities::entity> build_waiter_dog(
+                int id, int dog_type, Vector2 position,
+                std::optional<Vector2> destination = std::nullopt);
+
+            // ---------------- insert actions ----------------
+            // Add an already-built entity to the level on the given draw layer.
+            void insert_entity(std::unique_ptr<entities::entity> entity, size_t layer);
+
+            // Convenience build+insert helpers (mirror the spec's example). These
+            // bypass the normal spawn-via-event flow for deterministic setup.
+            void insert_customer_dog(int id, Vector2 position,
+                                     std::optional<Vector2> destination = std::nullopt);
+            void insert_waiter_dog(int id, int dog_type, Vector2 position,
+                                   std::optional<Vector2> destination = std::nullopt);
+
+            // ---------------- event triggers ----------------
+            // Fire the same path the debug 'L' key fires
+            // (maitre_d_.request_customer_arrival()). No synthetic OS input.
+            void customer_arrives();
+
+            // ---------------- inspection accessors ----------------
+            // Look up an entity by id in the level; nullptr if absent.
+            entities::entity* find_entity(int id);
+            // Typed accessor for customer-dog scenarios (throws if id is not a
+            // customer dog / not present).
+            entities::customer_dog& get_customer_dog(int id);
+
+        private:
+            std::unique_ptr<level::level> level_;
+            // Owned BY VALUE so per-scenario RAII cleans up their event
+            // subscriptions when the test_game goes out of scope (spec
+            // Decisions 3 & 4). Construction order: level_, then maitre_d_,
+            // then expediter_; destruction unsubscribes in reverse.
+            maitre_d::maitre_d   maitre_d_;
+            expediter::expediter expediter_;
+    };
+
+} // namespace testing
+
+#endif // TEST_GAME_H

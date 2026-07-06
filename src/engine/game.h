@@ -20,11 +20,12 @@ namespace game{
         public:
             ~game() = default;
             game(level::level& level, player::player& player, menus::menu_graph& menu, player::controls& controls)
-                : frame_count_(0), level_(level), maitre_d_(maitre_d::maitre_d::get_instance()),
-                expediter_(expediter::expediter::get_instance()),
+                : frame_count_(0), level_(level), maitre_d_(), expediter_(),
                 logger_(debug::logger::get_instance()), menus_(menu), controls_(controls), player_(player){}
-            game(const game& other) = default;
-            game(game&& other) = default;
+            // game now owns maitre_d_/expediter_ by value; those are non-copyable
+            // and non-movable, so game is too. (dog_days constructs it in place.)
+            game(const game& other) = delete;
+            game(game&& other) = delete;
 
             game& operator=(const game& other) = delete;
             game& operator=(game&& other) = delete;
@@ -38,8 +39,8 @@ namespace game{
             int frame_count_;
             
             level::level& level_;
-            maitre_d::maitre_d& maitre_d_;
-            expediter::expediter& expediter_;
+            maitre_d::maitre_d maitre_d_;
+            expediter::expediter expediter_;
             debug::logger& logger_;
             menus::menu_graph& menus_;
             player::controls& controls_;

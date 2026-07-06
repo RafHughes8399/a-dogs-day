@@ -83,11 +83,6 @@ void expediter::expediter::process_orders(){
     return;
 }
 
-expediter::expediter& expediter::expediter::get_instance(){
-    static expediter instance;
-    return instance;
-}
-
 expediter::expediter::expediter()
 : next_order_id_(0),
 registered_waiter_handler_([this](const events::registered_waiter& event) -> void {on_registered_waiter_event(event);}),
@@ -96,6 +91,12 @@ dog_reached_table_handler_([this](const events::dog_reached_table& event) -> voi
     event_interface::subscribe<events::registered_waiter>(registered_waiter_handler_);
     event_interface::subscribe<events::registered_food_counter>(registered_food_counter_handler_);
     event_interface::subscribe<events::dog_reached_table>(dog_reached_table_handler_);
+}
+
+expediter::expediter::~expediter(){
+    event_interface::unsubscribe<events::registered_waiter>(registered_waiter_handler_);
+    event_interface::unsubscribe<events::registered_food_counter>(registered_food_counter_handler_);
+    event_interface::unsubscribe<events::dog_reached_table>(dog_reached_table_handler_);
 }
 
 void expediter::expediter::register_waiter(size_t waiter_id){
