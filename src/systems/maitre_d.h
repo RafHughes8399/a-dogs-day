@@ -146,20 +146,10 @@ namespace maitre_d{
             int previous_side_ = cafe_config::queue_sides::right;
     };
 
-    namespace interface{
-        // Small id-based facade for reporting cafe-domain facts to the maitre d'.
-        // Entities and lower-level systems can use this without depending on the
-        // full singleton class. The real maitre d' sits behind this interface.
-        void register_table(size_t table_id, Vector2 position);
-        void register_table(size_t table_id, Vector2 position, events::table_interaction_positions interaction_positions);
-        void remove_table(size_t table_id);
-        void register_customer(size_t customer_id);
-        void request_table_for_customer(size_t customer_id);
-    }
-
     class maitre_d {
         public:
-            static maitre_d& get_instance();
+            maitre_d();
+            ~maitre_d();
 
             maitre_d(const maitre_d& other) = delete;
             maitre_d(maitre_d&& other) = delete;
@@ -175,6 +165,9 @@ namespace maitre_d{
 
             void update(float delta);
             void update_dog_position(size_t id, Vector2 position);
+            // Debug/testing trigger (the former L-key path): spawns a customer
+            // arrival directly. Public so the test harness can fire it.
+            void request_customer_arrival();
             events::customer_queue_side get_customer_queue_side() const;
             Vector2 get_customer_spawn_position(events::customer_queue_side queue_side) const;
 
@@ -186,9 +179,6 @@ namespace maitre_d{
             void on_customer_dog_left_event(const events::customer_dog_left& event);
             void on_dog_completed_path_event(const events::dog_completed_path& event);
         private:
-            maitre_d();
-            ~maitre_d() = default;
-
             // Processes cafe actions gathered from events or direct interface
             // calls. This mirrors the event dispatcher style: collect facts,
             // then resolve them into command events during the game loop.
@@ -199,7 +189,6 @@ namespace maitre_d{
             void send_dog_to_queue_position(size_t id, Vector2 position);
             void check_customer_arrivals(float delta);
             bool can_request_customer_arrival() const;
-            void request_customer_arrival();
 
             // Table lifecycle sketch:
             // register_table(table_id, position)

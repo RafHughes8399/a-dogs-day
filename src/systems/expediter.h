@@ -68,14 +68,10 @@ namespace expediter{
     inline table_record empty_table = {-1, Vector2{-1, -1}};
     inline food_counter_record empty_counter = {-1, Vector2{-1, -1}};
 
-    namespace interface{
-        void register_waiter(size_t waiter_id);
-        void register_food_counter(size_t counter_id, Vector2 position);
-    }
-
     class expediter{
         public:
-            static expediter& get_instance();
+            expediter();
+            ~expediter();
 
             expediter(const expediter& other) = delete;
             expediter(expediter&& other) = delete;
@@ -101,9 +97,6 @@ namespace expediter{
             void on_registered_food_counter_event(const events::registered_food_counter& event);
             void on_dog_reached_table_event(const events::dog_reached_table& event);
         private:
-            expediter();
-            ~expediter() = default;
-
             std::vector<waiter> waiters_;
             std::vector<food_counter_record> food_counters_;
             std::vector<order> orders_;
