@@ -20,7 +20,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            ninja-build \
+            ninja-build clang \
             libgl1-mesa-dev libx11-dev libxrandr-dev \
             libxinerama-dev libxcursor-dev libxi-dev
 
@@ -28,9 +28,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/_deps
-          key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
+          key: deps-${{ runner.os }}-clang-${{ hashFiles('CMakeLists.txt') }}
 
       - name: configure CMake
+        env:
+          CC: clang
+          CXX: clang++
         run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
 
       - name: build tests
