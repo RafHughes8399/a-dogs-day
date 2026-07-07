@@ -61,6 +61,9 @@ namespace testing{
             //   insert_entity(build_customer_dog(1, pos), level_config::dogs);
             std::unique_ptr<entities::entity> build_mack(int id, Vector2 position);  // player dog
             std::unique_ptr<entities::entity> build_khiri(int id, Vector2 position); // player dog
+            std::unique_ptr<entities::entity> build_table(int id, Vector2 position);        // station
+            std::unique_ptr<entities::entity> build_food_counter(int id, Vector2 position); // station
+            std::unique_ptr<entities::food> build_test_food(int id, Vector2 position);      // food entity
             std::unique_ptr<entities::entity> build_customer_dog(
                 int id, Vector2 position,
                 std::optional<Vector2> destination = std::nullopt,
@@ -88,6 +91,8 @@ namespace testing{
             // ---------------- inspection accessors ----------------
             // Look up an entity by id in the level; nullptr if absent.
             entities::entity* find_entity(int id);
+            // Total entities currently in the level (public level API passthrough).
+            int num_entities();
             // Typed accessor for customer-dog scenarios (throws if id is not a
             // customer dog / not present).
             entities::customer_dog& get_customer_dog(int id);

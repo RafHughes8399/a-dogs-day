@@ -10,15 +10,19 @@
 
 using testing::test_game;
 
-SCENARIO("a player dog is built and inserted into the level", "[player][stub]"){
-    SKIP("stub - not yet implemented");
-    // GIVEN a fresh game
-    //   test_game game;
-    // WHEN mack is built and inserted on the dogs layer
-    //   game.insert_entity(game.build_mack(level_config::mack_id, spawn_pos),
-    //                      level_config::dogs);
-    // THEN the level contains a dog with mack's id
-    //   REQUIRE(game.find_entity(level_config::mack_id) != nullptr);
+SCENARIO("a player dog is built and inserted into the level", "[player]"){
+    GIVEN("a fresh game"){
+        test_game game;
+        WHEN("a player dog is built and inserted on the dogs layer"){
+            // build_main_level pre-populates ids 0-6, so use a fresh id here.
+            const int inserted_id = 100;
+            const Vector2 spawn_pos{level_config::edge_weight * 5, level_config::edge_weight * 5};
+            game.insert_entity(game.build_mack(inserted_id, spawn_pos), level_config::draw_layers::dogs);
+            THEN("the level contains a dog with that id"){
+                REQUIRE(game.find_entity(inserted_id) != nullptr);
+            }
+        }
+    }
 }
 
 SCENARIO("the selected player dog can be switched", "[player][stub]"){

@@ -173,7 +173,9 @@ namespace level{
             int entity_id();
             int num_entities();
             void add_entity(std::unique_ptr<entities::entity> entity, size_t layer);
-            
+            // Look up a registered entity by id; nullptr if none.
+            entities::entity* get_entity(int id);
+
             void on_left_mouse_click_event(const events::left_mouse_click& event);
             void on_move_view_frame_event(const events::move_view_frame& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
@@ -218,8 +220,6 @@ namespace level{
             int next_entity_id_;
             tree::quadtree level_entities_;
             std::vector<void_entity_record> void_entities_;
-
-
     };
         // self explanatory, a class to construct leveks, outline functions that build levels generating enetities, specifying background,
     // maybe the level map graph, and the tileset too

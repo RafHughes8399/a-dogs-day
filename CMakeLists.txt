@@ -207,6 +207,8 @@ add_executable(tests
   tests/test_game.cpp
   tests/harness_scenarios.cpp
   tests/player_scenarios.cpp
+  tests/decoration_scenarios.cpp
+  tests/food_scenarios.cpp
   tests/maitre_d_scenarios.cpp
   tests/expediter_scenarios.cpp
 )

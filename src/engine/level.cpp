@@ -196,6 +196,11 @@ int level::level::num_entities(){
     return static_cast<int>(level_entities_.size());
 }
 
+entities::entity* level::level::get_entity(int id){
+    auto entry = id_entity_map_.find(id);
+    return entry == id_entity_map_.end() ? nullptr : entry->second;
+}
+
 void level::level::on_left_mouse_click_event(const events::left_mouse_click& event){
     (void) event;
     return;
