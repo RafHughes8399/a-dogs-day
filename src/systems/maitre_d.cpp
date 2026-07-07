@@ -26,11 +26,6 @@ namespace{
 
 }
 
-maitre_d::maitre_d& maitre_d::maitre_d::get_instance(){
-    static maitre_d instance;
-    return instance;
-}
-
 maitre_d::maitre_d::maitre_d()
 : seconds_since_customer_arrived_(cafe_config::queue_arrival_s),
 dogs_left_window_seconds_(0.0f),
@@ -49,6 +44,16 @@ dog_path_compelte_handler_([this](const events::dog_completed_path& event) -> vo
     event_interface::subscribe<events::customer_dog_created>(customer_dog_created_handler_);
     event_interface::subscribe<events::customer_dog_left>(customer_dog_left_handler_);
     event_interface::subscribe<events::dog_completed_path>(dog_path_compelte_handler_);
+}
+
+maitre_d::maitre_d::~maitre_d(){
+    event_interface::unsubscribe<events::registered_table>(registered_table_handler_);
+    event_interface::unsubscribe<events::removed_table>(removed_table_handler_);
+    event_interface::unsubscribe<events::registered_customer>(registered_customer_handler_);
+    event_interface::unsubscribe<events::requested_customer_table>(requested_customer_table_handler_);
+    event_interface::unsubscribe<events::customer_dog_created>(customer_dog_created_handler_);
+    event_interface::unsubscribe<events::customer_dog_left>(customer_dog_left_handler_);
+    event_interface::unsubscribe<events::dog_completed_path>(dog_path_compelte_handler_);
 }
 
 void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position){
