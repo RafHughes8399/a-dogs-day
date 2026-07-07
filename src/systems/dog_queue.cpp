@@ -1,6 +1,7 @@
 #include "maitre_d.h"
 #include "debug_log_interface.h"
 #include "raymath.h"
+#include <algorithm>
 
 namespace{
     std::string vector_to_string(Vector2 position){
