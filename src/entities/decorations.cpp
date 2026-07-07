@@ -4,6 +4,7 @@
 #include "texture.h"
 #include "queries.h"
 #include "query_interface.h"
+#include <cassert>
 // ------------------------ decorations -----------------------------------// 
 
 
@@ -189,6 +190,75 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_food_counter(V
     auto body = body::body(hitboxes, sprites);
 
     return std::make_unique<entities::food_counter>(body, position, id, next_debug_id(entity_config::food_counter_debug_id_prefix));
+}
+
+std::unique_ptr<entities::food> entities::entity_builder::build_test_food(Vector2 position, int id){
+    auto food_sprite = sprite::sprite(
+        textures::textures_.get_texture(textures::test_decoration, entity_config::test_decoration_path),
+        entity_config::test_food_attributes[entity_config::attributes::frame_width],
+        entity_config::test_food_attributes[entity_config::attributes::frame_height],
+        entity_config::test_food_attributes[entity_config::attributes::frames],
+        entity_config::test_food_attributes[entity_config::attributes::animations],
+        Vector2Zero(),
+        RED
+    );
+
+    auto hitbox = hitbox::h_builder_.build_food_hitbox(position);
+    std::vector<sprite::sprite> sprites = {food_sprite};
+    std::vector<hitbox::hitbox> hitboxes = {hitbox};
+    auto body = body::body(hitboxes, sprites);
+
+    return std::make_unique<entities::food>(body, position, id, next_debug_id(entity_config::food_debug_id_prefix));
+}
+
+// ------------------------ food counter storage -----------------------------------//
+bool entities::food_counter::store(std::unique_ptr<food> item){
+    if(stored_food_.size() >= max_capacity_){
+        return false;
+    }
+    stored_food_.push_back(std::move(item));
+    return true;
+}
+
+std::unique_ptr<entities::food> entities::food_counter::take(){
+    // precondition: the counter is not empty (callers guard with !is_empty()).
+    assert(!stored_food_.empty() && "food_counter::take() called on an empty counter");
+    auto item = std::move(stored_food_.back());
+    stored_food_.pop_back();
+    return item;
+}
+
+bool entities::food_counter::is_empty() const{
+    return stored_food_.empty();
+}
+
+size_t entities::food_counter::current_capacity() const{
+    return stored_food_.size();
+}
+
+size_t entities::food_counter::max_capacity() const{
+    return max_capacity_;
+}
+
+entities::food_counter::counter_status entities::food_counter::status() const{
+    if(stored_food_.empty()){
+        return counter_status::empty;
+    }
+    if(stored_food_.size() >= max_capacity_){
+        return counter_status::full;
+    }
+    return counter_status::has_food;
+}
+
+void entities::food_counter::render(Vector2 draw_position, int frame){
+    entity::render(draw_position, frame);
+    if(! stored_food_.empty()){
+        Vector2 food_position = Vector2{
+            draw_position.x + entity_config::food_draw_offset.x,
+            draw_position.y + entity_config::food_draw_offset.y
+        };
+        stored_food_.front()->render(food_position, frame);
+    }
 }
 
 void entities::table::update_interaction_positions(){

@@ -137,6 +137,7 @@ namespace entity_config{
     inline const char* decoration_debug_id_prefix = "dec_";
     inline const char* table_debug_id_prefix = "tbl_";
     inline const char* food_counter_debug_id_prefix = "fc_";
+    inline const char* food_debug_id_prefix = "food_";
 
     // file paths
     inline const char* background_path = "../sprites/background.png" ;
@@ -204,6 +205,11 @@ namespace entity_config{
     inline const float gargoyle_decoration_attributes[attributes::size] = {level_config::edge_weight * 0.75f, level_config::edge_weight * 1.75f, 1.0f, 1.0f};
     inline const float table_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     inline const float food_counter_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
+    // food is a small one-tile entity; it reuses the test_decoration texture for now.
+    inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    // how many food a single counter can hold, and where stored food is drawn relative to the counter origin.
+    inline const size_t food_counter_capacity = 3;
+    inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
     // inline const float npc_dog_across_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
     // inline const float npc_dog_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // inline const Vector2 npc_dog_head_left_offset = Vector2{0.0f, 0.0f};
