@@ -1,4 +1,5 @@
 #include "body.h"
+#include <algorithm>
 size_t body::body::get_index(){
     return index_;
 }
