@@ -178,12 +178,23 @@ void tree::quadtree::notify_removals(const std::vector<entities::entity*>& remov
         if(entity == nullptr){
             continue;
         }
-        if(! entity->get_debug_id().starts_with(entity_config::table_debug_id_prefix)){
-            continue;
+        auto id = static_cast<size_t>(entity->get_id());
+        const auto& debug_id = entity->get_debug_id();
+        // A removed cafe entity must be announced so the systems holding a raw
+        // pointer to it (maitre_d' tables, expediter counters/waiters) drop that
+        // pointer before the entity is destroyed.
+        if(debug_id.starts_with(entity_config::table_debug_id_prefix)){
+            std::unique_ptr<events::event> removed_table = std::make_unique<events::removed_table>(id);
+            event_interface::queue_event(removed_table);
         }
-        std::unique_ptr<events::event> removed_table = std::make_unique<events::removed_table>(
-            static_cast<size_t>(entity->get_id()));
-        event_interface::queue_event(removed_table);
+        else if(debug_id.starts_with(entity_config::food_counter_debug_id_prefix)){
+            std::unique_ptr<events::event> removed_food_counter = std::make_unique<events::removed_food_counter>(id);
+            event_interface::queue_event(removed_food_counter);
+        }
+        else if(debug_id.starts_with(entity_config::waiter_dog_debug_id_prefix)){
+            std::unique_ptr<events::event> removed_waiter = std::make_unique<events::removed_waiter>(id);
+            event_interface::queue_event(removed_waiter);
+        }
     }
 }
 

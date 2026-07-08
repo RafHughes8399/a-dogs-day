@@ -261,14 +261,13 @@ void entities::food_counter::render(Vector2 draw_position, int frame){
     }
 }
 
-void entities::table::update_interaction_positions(){
+void entities::station::update_interaction_positions(){
     interaction_positions_ = events::table_interaction_positions{
         Vector2{position_.x - level_config::edge_weight, position_.y},
         Vector2{position_.x + (2.0f * level_config::edge_weight), position_.y}
     };
 }
-// TODO fix interaction positions
-events::table_interaction_positions entities::table::get_interaction_positions() const{
+events::table_interaction_positions entities::station::get_interaction_positions() const{
     return interaction_positions_;
 }
 
@@ -276,6 +275,7 @@ void entities::table::place_down(){
     decoration::place_down();
     update_interaction_positions();
     std::unique_ptr<events::event> registered_table = std::make_unique<events::registered_table>(
+        this,
         static_cast<size_t>(id_),
         position_,
         interaction_positions_);
@@ -284,8 +284,12 @@ void entities::table::place_down(){
 
 void entities::food_counter::place_down(){
     decoration::place_down();
-    auto interaction_position = Vector2Zero(); // TODO update interaction position
+    update_interaction_positions();
+    // The counter is interacted with from its flanking walkable node; use the
+    // left side (its right neighbour may be occupied by adjacent counters).
+    auto interaction_position = get_interaction_positions().left;
     std::unique_ptr<events::event> registered_food_counter = std::make_unique<events::registered_food_counter>(
+        this,
         static_cast<size_t>(id_),
         position_,
         interaction_position);

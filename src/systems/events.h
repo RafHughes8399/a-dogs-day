@@ -27,6 +27,18 @@
 // project includes
 #include "../entities/hitbox.h"
 #include "raylib.h"
+
+// Forward declarations so registration events can carry pointers to live level
+// entities without including the entity hierarchy (entities.h includes this
+// header, so including it back would be a cycle). A pointer member needs only a
+// forward declaration; the full type is required solely in the .cpp files that
+// create the pointer (level) or dereference it (the cafe systems).
+namespace entities{
+	class table;
+	class food_counter;
+	class waiter_dog;
+}
+
 namespace events{
 	struct table_interaction_positions{
 		Vector2 left;
@@ -74,8 +86,11 @@ namespace events{
 		give_dog_path_id = 38,
 		table_removed = 39,
 		dog_to_furniture = 40,
+		food_counter_removed = 41,
 		dog_reached_table_id = 42,
-		size = 43
+		waiter_removed = 44,
+		waiter_arrived_counter = 45,
+		size = 46
 	};
 	class event{
 
@@ -355,12 +370,15 @@ namespace events{
 	// not need concrete entity types or ownership of level entities.
 	class registered_table : public event{
 		public:
-			registered_table(size_t table_id, Vector2 position, table_interaction_positions interaction_positions)
-			: event(ids::register_table), table_id_(table_id), position_(position),
+			registered_table(entities::table* table, size_t table_id, Vector2 position, table_interaction_positions interaction_positions)
+			: event(ids::register_table), table_(table), table_id_(table_id), position_(position),
 			interaction_positions_(interaction_positions){}
 
 			static int get_static_type(){
 				return ids::register_table;
+			}
+			entities::table* get_table() const{
+				return table_;
 			}
 			size_t get_table_id() const{
 				return table_id_;
@@ -372,6 +390,7 @@ namespace events{
 				return interaction_positions_;
 			}
 		private:
+			entities::table* const table_;
 			const size_t table_id_;
 			const Vector2 position_;
 			const table_interaction_positions interaction_positions_;
@@ -580,11 +599,31 @@ namespace events{
 	// the expediter. The expediter records ids only, not dog references.
 	class registered_waiter : public event{
 		public:
-			registered_waiter(size_t waiter_id)
-			: event(ids::register_waiter), waiter_id_(waiter_id){}
+			registered_waiter(entities::waiter_dog* waiter, size_t waiter_id)
+			: event(ids::register_waiter), waiter_(waiter), waiter_id_(waiter_id){}
 
 			static int get_static_type(){
 				return ids::register_waiter;
+			}
+			entities::waiter_dog* get_waiter() const{
+				return waiter_;
+			}
+			size_t get_waiter_id() const{
+				return waiter_id_;
+			}
+		private:
+			entities::waiter_dog* const waiter_;
+			const size_t waiter_id_;
+	};
+	// Cafe-domain fact: a waiter dog was removed from the level; the expediter
+	// must drop its pointer to avoid dereferencing a destroyed entity.
+	class removed_waiter : public event{
+		public:
+			removed_waiter(size_t waiter_id)
+			: event(ids::waiter_removed), waiter_id_(waiter_id){}
+
+			static int get_static_type(){
+				return ids::waiter_removed;
 			}
 			size_t get_waiter_id() const{
 				return waiter_id_;
@@ -596,11 +635,14 @@ namespace events{
 	// these positions when routing waiter dogs through a pickup checkpoint.
 	class registered_food_counter : public event{
 		public:
-			registered_food_counter(size_t counter_id, Vector2 position, Vector2 interaction_position)
-			: event(ids::register_food_counter), counter_id_(counter_id), position_(position), interaction_position_(interaction_position){}
+			registered_food_counter(entities::food_counter* counter, size_t counter_id, Vector2 position, Vector2 interaction_position)
+			: event(ids::register_food_counter), counter_(counter), counter_id_(counter_id), position_(position), interaction_position_(interaction_position){}
 
 			static int get_static_type(){
 				return ids::register_food_counter;
+			}
+			entities::food_counter* get_counter() const{
+				return counter_;
 			}
 			size_t get_counter_id() const{
 				return counter_id_;
@@ -612,9 +654,26 @@ namespace events{
 				return interaction_position_;
 			}
 		private:
+			entities::food_counter* const counter_;
 			const size_t counter_id_;
 			const Vector2 position_;
 			const Vector2 interaction_position_;
+	};
+	// Cafe-domain fact: a food counter was removed from the level; the expediter
+	// must drop its pointer to avoid dereferencing a destroyed entity.
+	class removed_food_counter : public event{
+		public:
+			removed_food_counter(size_t counter_id)
+			: event(ids::food_counter_removed), counter_id_(counter_id){}
+
+			static int get_static_type(){
+				return ids::food_counter_removed;
+			}
+			size_t get_counter_id() const{
+				return counter_id_;
+			}
+		private:
+			const size_t counter_id_;
 	};
 	// Cafe-domain command: the expediter has assigned a waiter to an order. The
 	// waiter should route through the pickup point before continuing to the furniture.

@@ -74,18 +74,21 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
             + ", right_interaction_position: " + vector_to_string(interaction_positions.right);
         debug::log(message);
         std::unique_ptr<events::event> registered_table = std::make_unique<events::registered_table>(
+            table,
             static_cast<size_t>(entity_id),
             position,
             interaction_positions);
         event_interface::queue_event(registered_table);
     }
     if(food_counter != nullptr){
+        auto interaction_position = food_counter->get_interaction_positions().left;
         debug::log(
             "[level::add_entity, queued food counter registration] "
             "counter_id: " + std::to_string(entity_id)
-            + ", position: " + vector_to_string(position));
-        auto interaction_position = Vector2Zero(); // TODO fix interaction position
+            + ", position: " + vector_to_string(position)
+            + ", interaction_position: " + vector_to_string(interaction_position));
         std::unique_ptr<events::event> registered_food_counter = std::make_unique<events::registered_food_counter>(
+            food_counter,
             static_cast<size_t>(entity_id),
             position,
             interaction_position);
@@ -97,6 +100,7 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
             "waiter_id: " + std::to_string(entity_id)
             + ", position: " + vector_to_string(position));
         std::unique_ptr<events::event> registered_waiter = std::make_unique<events::registered_waiter>(
+            waiter,
             static_cast<size_t>(entity_id));
         event_interface::queue_event(registered_waiter);
     }
@@ -346,6 +350,14 @@ std::unique_ptr<level::level> level::level_builder::build_main_level(){
     main_level->add_entity(std::move(second_table), level_config::draw_layers::stations);
 
     auto food_counter = entities::e_builder.build_food_counter(Vector2 {level_config::edge_weight * 18, level_config::edge_weight * 6}, main_level->entity_id());
+    // Pre-stock the counter with food. Nothing produces food yet, so this stands
+    // in for a cook/kitchen until one is built; it lets the expediter model real
+    // counter availability (is_empty()/take()) for the serving flow.
+    if(auto* counter = dynamic_cast<entities::food_counter*>(food_counter.get())){
+        for(size_t i = 0; i < counter->max_capacity(); ++i){
+            counter->store(entities::e_builder.build_test_food(counter->get_position(), main_level->entity_id()));
+        }
+    }
     main_level->add_entity(std::move(food_counter), level_config::draw_layers::stations);
 
     auto waiter = entities::e_builder.build_waiter_dog(main_level->entity_id(), dog_config::waiter_dog_types::basic, {level_config::edge_weight * 22, level_config::edge_weight * 7}, std::nullopt);

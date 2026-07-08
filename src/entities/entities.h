@@ -689,7 +689,9 @@ namespace entities{
             };
 
             station(body::body body, Vector2 position, int id, std::string debug_id, station_type type)
-            : decoration(body, position, id, std::move(debug_id)), type_(type){}
+            : decoration(body, position, id, std::move(debug_id)), interaction_positions_{}, type_(type){
+                update_interaction_positions();
+            }
             station(const station& other) = default;
             station(station&& other) = default;
 
@@ -698,6 +700,16 @@ namespace entities{
 
             station_type get_station_type();
             void interact(entity& other) override;
+
+            // Interaction positions are the walkable nodes flanking the station
+            // (left and right) that a dog paths to in order to interact with it.
+            // Centralised here so every station type (table, food counter) shares
+            // one implementation instead of each recomputing its own.
+            events::table_interaction_positions get_interaction_positions() const;
+
+        protected:
+            void update_interaction_positions();
+            events::table_interaction_positions interaction_positions_; // TODO ! refactor this type, why the fuck is it under events 
 
         private:
             station_type type_;
@@ -713,11 +725,7 @@ namespace entities{
 
             table(body::body body, Vector2 position, int id, std::string debug_id)
             : station(body, position, id, std::move(debug_id), station_type::table_station),
-            state_(table_state::available), assigned_dog_id_(level_config::empty_node),
-            interaction_positions_(events::table_interaction_positions{
-                Vector2{position.x - level_config::edge_weight, position.y},
-                Vector2{position.x + (2.0f * level_config::edge_weight), position.y}
-            }){}
+            state_(table_state::available), assigned_dog_id_(level_config::empty_node){}
             table(const table& other) = default;
             table(table&& other) = default;
 
@@ -730,14 +738,11 @@ namespace entities{
             void clear();
             table_state get_state();
             int get_assigned_dog_id();
-            events::table_interaction_positions get_interaction_positions() const;
             void place_down() override;
 
         private:
-            void update_interaction_positions();
             table_state state_;
             int assigned_dog_id_;
-            events::table_interaction_positions interaction_positions_;
     };
 
     // food is a generic world entity. Different foods are produced by different
