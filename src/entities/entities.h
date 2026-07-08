@@ -740,19 +740,53 @@ namespace entities{
             events::table_interaction_positions interaction_positions_;
     };
 
+    // food is a generic world entity. Different foods are produced by different
+    // builders (see build_test_food); subclasses are introduced only as-needed.
+    class food : public entity {
+        public:
+            food(body::body body, Vector2 position, int id, std::string debug_id)
+            : entity(body, position, id, std::move(debug_id)){}
+            food(const food& other) = default;
+            food(food&& other) = default;
+
+            food& operator=(const food& other) = delete;
+            food& operator=(food&& other) = delete;
+    };
+
+    // A food_counter stores food as a FILO stack, up to a fixed capacity. Producers
+    // store() food onto it; waiters take() the top for service (ownership moves out).
     class food_counter : public station {
         public:
+            enum counter_status{
+                empty = 0,
+                has_food = 1,
+                full = 2
+            };
+
             food_counter(body::body body, Vector2 position, int id, std::string debug_id)
-            : station(body, position, id, std::move(debug_id), station_type::food_counter_station){}
-            food_counter(const food_counter& other) = default;
+            : station(body, position, id, std::move(debug_id), station_type::food_counter_station),
+            max_capacity_(entity_config::food_counter_capacity), stored_food_(){}
+            food_counter(const food_counter& other) = delete;
             food_counter(food_counter&& other) = default;
 
             food_counter& operator=(const food_counter& other) = delete;
             food_counter& operator=(food_counter&& other) = delete;
 
+            // store: push food onto the stack, rejects (returns false) when full.
+            bool store(std::unique_ptr<food> item);
+            // take: pop and move out the top of the stack. Precondition: !is_empty().
+            std::unique_ptr<food> take();
+            bool is_empty() const;
+            size_t current_capacity() const;
+            size_t max_capacity() const;
+            counter_status status() const;
+            void render(Vector2 draw_position, int frame) override;
             void place_down() override;
-    };
 
+        private:
+            size_t max_capacity_;
+            std::vector<std::unique_ptr<food>> stored_food_;
+    };
     // ------------------ entity builder ------------------ //
     class entity_builder{
         public:
@@ -768,6 +802,9 @@ namespace entities{
             std::unique_ptr<entity> build_gargoyle(Vector2 position, int id);
             std::unique_ptr<entity> build_table(Vector2 position, int id);
             std::unique_ptr<entity> build_food_counter(Vector2 position, int id);
+            // basic/first food builder; producers stocking a counter pass
+            // counter.get_position() + entity_config::food_draw_offset as the position.
+            std::unique_ptr<food> build_test_food(Vector2 position, int id);
             ~entity_builder() = default;
             entity_builder() : debug_id_counts_() {}
             entity_builder(const entity_builder& other) = default;

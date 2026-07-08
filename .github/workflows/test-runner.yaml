@@ -22,7 +22,8 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             ninja-build clang \
             libgl1-mesa-dev libx11-dev libxrandr-dev \
-            libxinerama-dev libxcursor-dev libxi-dev
+            libxinerama-dev libxcursor-dev libxi-dev \
+            xvfb libgl1-mesa-dri
 
       - name: cache CMake FetchContent (raylib, Catch2)
         uses: actions/cache@v4
@@ -40,7 +41,12 @@ jobs:
         run: cmake --build build --target tests
 
       - name: run test suite
-        run: ./build/tests --reporter console::out=- --reporter JUnit::out=test-results.xml
+        # test_game builds a hidden raylib window (needed for texture loads), which
+        # requires a GL context. The headless runner has no display, so provide a
+        # virtual one via xvfb and force Mesa software rendering (no GPU on CI).
+        env:
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: xvfb-run -a --server-args="-screen 0 1280x1024x24" ./build/tests --reporter console::out=- --reporter JUnit::out=test-results.xml
 
       - name: upload test results
         if: always()

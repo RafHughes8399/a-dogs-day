@@ -10,11 +10,13 @@
 
 using testing::test_game;
 
-SCENARIO("test_game constructs a game with a built level", "[harness][stub]"){
-    SKIP("stub - not yet implemented");
-    // GIVEN a fresh test_game
-    //   test_game game;                       // ctor: InitWindow(hidden) + build level_
-    // THEN the level exists and starts empty of dogs
-    //   REQUIRE(game.find_entity(0) == nullptr);   // (or a dedicated level accessor)
-    //   ... plus any invariants we want on a freshly-built main level.
+SCENARIO("test_game constructs a game with a built level", "[harness]"){
+    GIVEN("a fresh test_game"){
+        test_game game; // ctor: InitWindow(hidden) + build_main_level()
+        THEN("the pre-built main level contains the player dogs, and unknown ids are absent"){
+            REQUIRE(game.find_entity(static_cast<int>(level_config::mack_id)) != nullptr);
+            REQUIRE(game.find_entity(static_cast<int>(level_config::khiri_id)) != nullptr);
+            REQUIRE(game.find_entity(9999) == nullptr);
+        }
+    }
 }
