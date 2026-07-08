@@ -1,5 +1,6 @@
 #include "level.h"
 #include "debug_log_interface.h"
+#include "events.h"
 #include <raymath.h>
 namespace{
     std::string vector_to_string(Vector2 position){
@@ -61,7 +62,7 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
     level_entities_.insert(std::move(entity));
     // insert into the draw layer ?
     render_layers_[layer].add_entity(entity_raw);
-    id_entity_map_[static_cast<int>(entity_id)] = entity_raw;
+    id_entity_map_[static_cast<size_t>(entity_id)] = entity_raw;
     next_entity_id_ = std::max(next_entity_id_, entity_id + 1);
 
     if(table != nullptr){
@@ -192,6 +193,7 @@ void level::level::insert_void_entity(void_entity_record record){
 int level::level::entity_id(){
     return next_entity_id_;
 }
+
 int level::level::num_entities(){
     return static_cast<int>(level_entities_.size());
 }
@@ -275,7 +277,15 @@ void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture&
 
     dog->set_path(path, static_cast<int>(event.get_furniture_id()), event.get_furniture_position());
 }
-
+void level::level::on_removed_entity(const events::remove_entity& event){
+    // TODO: implement
+    // take over the quadtree remove
+    // and remove from the map 
+    // then write a test
+    size_t id = event.get_id();
+    level_entities_.erase(id);
+    id_entity_map_.erase(id);
+}
 void level::level::on_order_served_event(const events::order_served& event){
     auto customer_id = static_cast<int>(event.get_customer_id());
     auto customer_record = id_entity_map_.find(customer_id);

@@ -14,12 +14,14 @@
 #include <algorithm>
 #include <cmath>
 #include <map>
+#include <unordered_map>
 #include <memory>
 #include <queue>
 #include <utility>
 #include <vector>
 
 #include "config.h"
+#include "events.h"
 #include "quadtree.h"
 #include "queries.h"
 #include "query_interface.h"
@@ -142,6 +144,7 @@ namespace level{
 		            event_interface::unsubscribe<events::send_dog_to_position>(send_dog_to_position_handler_);
 		            event_interface::unsubscribe<events::send_dog_to_furniture>(send_dog_to_furniture_handler_);
 		            event_interface::unsubscribe<events::order_served>(order_served_handler_);
+		            event_interface::unsubscribe<events::remove_entity>(removed_entity_handler_);
 		            }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
             : left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
@@ -151,6 +154,7 @@ namespace level{
 		            send_dog_to_position_handler_([this](const events::send_dog_to_position& event) -> void{on_send_dog_to_position_event(event);}),
 		            send_dog_to_furniture_handler_([this](const events::send_dog_to_furniture& event) -> void{on_send_dog_to_furniture(event);}),
 		            order_served_handler_([this](const events::order_served& event) -> void{on_order_served_event(event);}),
+		            removed_entity_handler_([this](const events::remove_entity& event) -> void{on_removed_entity(event);}),
 		            graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
             view_frame_(frame), background_(sprite), id_entity_map_({}),
             next_entity_id_(0),
@@ -163,6 +167,7 @@ namespace level{
 		                event_interface::subscribe<events::send_dog_to_position>(send_dog_to_position_handler_);
 		                event_interface::subscribe<events::send_dog_to_furniture>(send_dog_to_furniture_handler_);
 		                event_interface::subscribe<events::order_served>(order_served_handler_);
+		                event_interface::subscribe<events::remove_entity>(removed_entity_handler_);
 		            }
             level(const level& other) = delete;
             level(level&& other) = delete;
@@ -180,11 +185,11 @@ namespace level{
             void on_move_view_frame_event(const events::move_view_frame& event);
             void on_right_mouse_event(const events::right_mouse_click& event);
 
-		            void on_build_customer_dog_event(const events::build_customer_dog& event);
-		            void on_send_dog_to_position_event(const events::send_dog_to_position& event);
-		            void on_send_dog_to_furniture(const events::send_dog_to_furniture& event);
-		            void on_order_served_event(const events::order_served& event);
-            
+		    void on_build_customer_dog_event(const events::build_customer_dog& event);
+		    void on_send_dog_to_position_event(const events::send_dog_to_position& event);
+            void on_order_served_event(const events::order_served& event);
+		    void on_send_dog_to_furniture(const events::send_dog_to_furniture& event);
+            void on_removed_entity(const events::remove_entity& event);
             void render(int frame);
             void update(float delta, int frame);
         private :
@@ -204,18 +209,18 @@ namespace level{
             events::event_handler<events::move_view_frame> move_view_frame_handler_;
             events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
 
-
 		    events::event_handler<events::build_customer_dog> build_customer_dog_handler_;
 		    events::event_handler<events::send_dog_to_position> send_dog_to_position_handler_;
 		    events::event_handler<events::send_dog_to_furniture> send_dog_to_furniture_handler_;
 		    events::event_handler<events::order_served> order_served_handler_;
 
+            events::event_handler<events::remove_entity> removed_entity_handler_;
             
             level_graph graph_;
             
             Rectangle view_frame_;
             sprite::sprite background_;
-            std::map<int, entities::entity*> id_entity_map_;
+            std::unordered_map<size_t, entities::entity*> id_entity_map_;
             render_layer::layer render_layers_[level_config::size];
             int next_entity_id_;
             tree::quadtree level_entities_;
