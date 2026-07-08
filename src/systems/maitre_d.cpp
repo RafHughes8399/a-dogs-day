@@ -2,6 +2,7 @@
 #include "debug_log_interface.h"
 #include "dog_actions.h"
 #include "events_interface.h"
+#include <algorithm>
 
 namespace{
     std::string vector_to_string(Vector2 position){

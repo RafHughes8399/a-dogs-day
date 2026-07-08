@@ -1,5 +1,6 @@
 #include "hitbox.h"
 #include "config.h"
+#include <algorithm>
 // ----------------------- global declaration ----------------------- //
 hitbox::hitbox_builder hitbox::h_builder_;
 
