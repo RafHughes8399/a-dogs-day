@@ -96,6 +96,11 @@ namespace expediter{
             void register_food_counter(entities::food_counter* counter);
             void remove_food_counter(size_t counter_id);
 
+            // Number of waiters / food counters currently tracked. Exposed for
+            // tests to assert registration and removal.
+            size_t num_waiters() const { return waiters_.size(); }
+            size_t num_counters() const { return food_counters_.size(); }
+
             void process_orders();
             void fulfill_order(order& order);
             bool are_waiters_available() const;

@@ -14,27 +14,65 @@
 
 using testing::test_game;
 
-SCENARIO("a food counter is built and inserted into the level", "[expediter][food_counter][stub]"){
-    SKIP("stub - not yet implemented");
-    // GIVEN a fresh game
-    //   test_game game;
-    // WHEN a food counter is built and inserted on the stations layer
-    //   (needs helper: test_game::build_food_counter(id, pos) wrapping e_builder.build_food_counter)
-    //   game.insert_entity(game.build_food_counter(20, counter_pos), level_config::stations);
-    // THEN the level holds it AND the expediter has registered it
-    //   REQUIRE(game.find_entity(20) != nullptr);
-    //   (insertion should emit events::registered_food_counter -> expediter records it;
-    //    assert via an expediter counter-count accessor - needs helper)
+SCENARIO("the expediter registers and removes a food counter", "[expediter][food_counter][registration]"){
+    // A registered_food_counter event (emitted when a counter is added to the
+    // level) makes the expediter track the counter by pointer; a removed_food_counter
+    // event (emitted from the quadtree when the entity leaves) drops it again.
+    test_game game;
+    game.tick(1.0f / 60.0f); // drain the main level's own registration events
+    const int baseline = game.num_counters();
+
+    GIVEN("a food counter inserted on the stations layer"){
+        const int counter_id = 60;
+        game.insert_entity(game.build_food_counter(counter_id,
+                               Vector2{level_config::edge_weight * 20, level_config::edge_weight * 10}),
+                           level_config::draw_layers::stations);
+        game.tick(1.0f / 60.0f); // process registered_food_counter
+
+        THEN("the expediter tracks one additional counter"){
+            REQUIRE(game.num_counters() == baseline + 1);
+        }
+
+        WHEN("the counter is removed from the level"){
+            // remove_entity destroys the entity and, in place, drops it from the
+            // expediter - so the count updates synchronously, no tick needed.
+            events::remove_entity remove{static_cast<size_t>(counter_id)};
+            event_interface::execute_event(remove);
+
+            THEN("the expediter no longer tracks it"){
+                REQUIRE(game.num_counters() == baseline);
+            }
+        }
+    }
 }
 
-SCENARIO("a food counter can be moved", "[expediter][food_counter][stub]"){
-    SKIP("stub - not yet implemented");
-    // GIVEN a food counter inserted and registered
-    //   test_game game;
-    //   game.insert_entity(game.build_food_counter(20, counter_pos), level_config::stations);
-    // WHEN the food counter is moved
-    //   (needs helper: test_game::move_food_counter(20, new_pos) / fire the move event)
-    // THEN the expediter tracks the new position
+SCENARIO("the expediter registers and removes a waiter dog", "[expediter][waiter][registration]"){
+    // registered_waiter / removed_waiter drive the expediter's waiter pointer list.
+    test_game game;
+    game.tick(1.0f / 60.0f); // drain the main level's own registration events
+    const int baseline = game.num_waiters();
+
+    GIVEN("a waiter dog inserted on the dogs layer"){
+        const int waiter_id = 61;
+        game.insert_waiter_dog(waiter_id, dog_config::waiter_dog_types::basic,
+                               Vector2{level_config::edge_weight * 22, level_config::edge_weight * 10});
+        game.tick(1.0f / 60.0f); // process registered_waiter
+
+        THEN("the expediter tracks one additional waiter"){
+            REQUIRE(game.num_waiters() == baseline + 1);
+        }
+
+        WHEN("the waiter is removed from the level"){
+            // remove_entity destroys the entity and, in place, drops it from the
+            // expediter - so the count updates synchronously, no tick needed.
+            events::remove_entity remove{static_cast<size_t>(waiter_id)};
+            event_interface::execute_event(remove);
+
+            THEN("the expediter no longer tracks it"){
+                REQUIRE(game.num_waiters() == baseline);
+            }
+        }
+    }
 }
 
 SCENARIO("the expediter listens for and records orders", "[expediter][order][stub]"){

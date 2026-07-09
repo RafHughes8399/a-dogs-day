@@ -238,4 +238,12 @@ if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework IOKit")
     target_link_libraries(${PROJECT_NAME} "-framework Cocoa")
     target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
+
+    # The global link_libraries() calls above append every static lib to each
+    # target's link line, so the executables list many of them more than once.
+    # Apple's new linker (ld-prime) then warns "ignoring duplicate libraries".
+    # The duplicates are already ignored and harmless; silence the noise. This
+    # flag exists only on the new linker, which is also the one that warns.
+    target_link_options(${PROJECT_NAME} PRIVATE -Wl,-no_warn_duplicate_libraries)
+    target_link_options(tests PRIVATE -Wl,-no_warn_duplicate_libraries)
 endif()

@@ -97,9 +97,8 @@ namespace testing{
     }
 
     std::unique_ptr<entities::entity> test_game::build_waiter_dog(
-        int /*id*/, int /*dog_type*/, Vector2 /*position*/, std::optional<Vector2> /*destination*/){
-        // impl: return entities::e_builder.build_waiter_dog(id, dog_type, position, destination);
-        todo("build_waiter_dog");
+        int id, int dog_type, Vector2 position, std::optional<Vector2> destination){
+        return entities::e_builder.build_waiter_dog(id, dog_type, position, destination);
     }
 
     // ---------------- insert actions ----------------
@@ -113,9 +112,8 @@ namespace testing{
         todo("insert_customer_dog");
     }
 
-    void test_game::insert_waiter_dog(int /*id*/, int /*dog_type*/, Vector2 /*position*/, std::optional<Vector2> /*destination*/){
-        // impl: insert_entity(build_waiter_dog(id, dog_type, position, destination), level_config::dogs);
-        todo("insert_waiter_dog");
+    void test_game::insert_waiter_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination){
+        insert_entity(build_waiter_dog(id, dog_type, position, destination), level_config::draw_layers::dogs);
     }
 
     // ---------------- event triggers ----------------
@@ -133,6 +131,22 @@ namespace testing{
 
     int test_game::num_entities(){
         return level_->num_entities();
+    }
+
+    int test_game::num_waiters(){
+        return static_cast<int>(expediter_.num_waiters());
+    }
+
+    int test_game::num_counters(){
+        return static_cast<int>(expediter_.num_counters());
+    }
+
+    int test_game::num_tables(){
+        return static_cast<int>(maitre_d_.num_tables());
+    }
+
+    int test_game::num_customers(){
+        return static_cast<int>(maitre_d_.num_customers());
     }
 
     entities::customer_dog& test_game::get_customer_dog(int /*id*/){

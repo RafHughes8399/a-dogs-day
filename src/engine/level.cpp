@@ -276,11 +276,20 @@ void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture&
     dog->set_path(path, static_cast<int>(event.get_furniture_id()), event.get_furniture_position());
 }
 void level::level::on_removed_entity(const events::remove_entity& event){
-    // TODO: implement
-    // take over the quadtree remove
-    // and remove from the map 
-    // then write a test
     size_t id = event.get_id();
+    // Drop the entity from every render layer before it is destroyed below.
+    // add_entity pushed its raw pointer into one of the render_layers_; leaving
+    // it there would dangle once level_entities_.erase frees the entity.
+    // render_layer::remove_entity matches by address, so clearing all layers is
+    // safe and only the layer actually holding it is affected.
+    auto entry = id_entity_map_.find(id);
+    if(entry != id_entity_map_.end()){
+        for(auto& layer : render_layers_){
+            layer.remove_entity(entry->second);
+        }
+    }
+    // Destroys the entity (quadtree owns it) and fires the in-place removed_*
+    // events so the cafe systems drop their pointers, then clear the id lookup.
     level_entities_.erase(id);
     id_entity_map_.erase(id);
 }

@@ -145,6 +145,11 @@ namespace maitre_d{
 
             void register_table(entities::table* table);
             void remove_table(size_t table_id);
+
+            // Number of tables tracked / customers queued. Exposed for tests to
+            // assert table registration/removal and customer arrival/seating.
+            size_t num_tables() const { return tables_.size(); }
+            size_t num_customers() const { return customer_queue_.size(); }
             void register_customer(size_t customer_id);
             void request_table_for_customer(size_t customer_id);
 

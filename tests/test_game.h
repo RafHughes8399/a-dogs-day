@@ -93,6 +93,12 @@ namespace testing{
             entities::entity* find_entity(int id);
             // Total entities currently in the level (public level API passthrough).
             int num_entities();
+            // Cafe-system tracking counts (passthroughs to expediter_/maitre_d_),
+            // for asserting registration and removal in scenarios.
+            int num_waiters();
+            int num_counters();
+            int num_tables();
+            int num_customers();
             // Typed accessor for customer-dog scenarios (throws if id is not a
             // customer dog / not present).
             entities::customer_dog& get_customer_dog(int id);

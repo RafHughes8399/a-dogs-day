@@ -182,18 +182,21 @@ void tree::quadtree::notify_removals(const std::vector<entities::entity*>& remov
         const auto& debug_id = entity->get_debug_id();
         // A removed cafe entity must be announced so the systems holding a raw
         // pointer to it (maitre_d' tables, expediter counters/waiters) drop that
-        // pointer before the entity is destroyed.
+        // pointer. This is executed IN PLACE, not queued: notify_removals runs
+        // while the entity is still alive, but the caller destroys it immediately
+        // afterwards. A queued removal would be handled a frame later, by which
+        // point the handlers would dereference (via get_id()) a freed entity.
         if(debug_id.starts_with(entity_config::table_debug_id_prefix)){
-            std::unique_ptr<events::event> removed_table = std::make_unique<events::removed_table>(id);
-            event_interface::queue_event(removed_table);
+            events::removed_table removed_table{id};
+            event_interface::execute_event(removed_table);
         }
         else if(debug_id.starts_with(entity_config::food_counter_debug_id_prefix)){
-            std::unique_ptr<events::event> removed_food_counter = std::make_unique<events::removed_food_counter>(id);
-            event_interface::queue_event(removed_food_counter);
+            events::removed_food_counter removed_food_counter{id};
+            event_interface::execute_event(removed_food_counter);
         }
         else if(debug_id.starts_with(entity_config::waiter_dog_debug_id_prefix)){
-            std::unique_ptr<events::event> removed_waiter = std::make_unique<events::removed_waiter>(id);
-            event_interface::queue_event(removed_waiter);
+            events::removed_waiter removed_waiter{id};
+            event_interface::execute_event(removed_waiter);
         }
     }
 }
