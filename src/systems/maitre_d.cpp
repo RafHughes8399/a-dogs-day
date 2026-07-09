@@ -57,48 +57,35 @@ maitre_d::maitre_d::~maitre_d(){
     event_interface::unsubscribe<events::dog_completed_path>(dog_path_compelte_handler_);
 }
 
-void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position){
-    register_table(table_id, position, events::table_interaction_positions{position, position});
-}
-
-void maitre_d::maitre_d::register_table(size_t table_id, Vector2 position, events::table_interaction_positions interaction_positions){
-    auto existing_table = std::find_if(tables_.begin(), tables_.end(), [table_id](const auto& table) -> bool {
-        return table.table_id == table_id;
+void maitre_d::maitre_d::register_table(entities::table* table){
+    auto table_id = table->get_id();
+    auto existing_table = std::find_if(tables_.begin(), tables_.end(), [table_id](entities::table* t) -> bool {
+        return t->get_id() == table_id;
     });
     if(existing_table != tables_.end()){
-        existing_table->position = position;
-        existing_table->interaction_positions = interaction_positions;
+        *existing_table = table;
         std::sort(tables_.begin(), tables_.end(), table_comparator{});
         debug::log(
-            "[maitre_d::register_table, updated existing table record] "
+            "[maitre_d::register_table, updated existing table pointer] "
             "table_id: " + std::to_string(table_id)
-            + ", position: " + vector_to_string(position)
-            + ", is_free: " + std::to_string(existing_table->is_free)
-            + ", customer_id: " + std::to_string(existing_table->customer_id)
+            + ", position: " + vector_to_string(table->get_position())
             + ", table_count_after: " + std::to_string(tables_.size()));
         return;
     }
 
-    tables_.push_back(table_record{
-        table_id,
-        position,
-        interaction_positions,
-        true,
-        empty_id
-    });
+    tables_.push_back(table);
     std::sort(tables_.begin(), tables_.end(), table_comparator{});
     debug::log(
-        "[maitre_d::register_table, inserted new table record] "
+        "[maitre_d::register_table, inserted new table pointer] "
         "table_id: " + std::to_string(table_id)
-        + ", position: " + vector_to_string(position)
-        + ", is_free: 1"
-        + ", customer_id: " + std::to_string(empty_id)
+        + ", position: " + vector_to_string(table->get_position())
         + ", table_count_after: " + std::to_string(tables_.size()));
 }
 
 void maitre_d::maitre_d::remove_table(size_t table_id){
-    auto new_end = std::remove_if(tables_.begin(), tables_.end(), [table_id](const auto& table) -> bool {
-        return table.table_id == table_id;
+    auto id = static_cast<int>(table_id);
+    auto new_end = std::remove_if(tables_.begin(), tables_.end(), [id](entities::table* t) -> bool {
+        return t->get_id() == id;
     });
     auto removed_count = static_cast<size_t>(tables_.end() - new_end);
     tables_.erase(new_end, tables_.end());
@@ -150,19 +137,18 @@ void maitre_d::maitre_d::assign_tables(){
     auto dequeue_result = customer_queue_.dequeue();
     auto dog_at_head = dequeue_result.dog;
     if(dog_at_head != empty_dog){
-        auto& table = pick_table();
+        auto* table = pick_table();
         auto interaction_position = pick_interaction_position(table, dog_at_head.dog_position);
         debug::log(
             "[maitre_d::assign_tables, assigning head dog to table] "
             "dog_id: " + std::to_string(dog_at_head.dog_id)
             + ", dog_position: " + vector_to_string(dog_at_head.dog_position)
             + ", queue_position: " + vector_to_string(dog_at_head.queue_position)
-            + ", table_id: " + std::to_string(table.table_id)
-            + ", table_position: " + vector_to_string(table.position)
+            + ", table_id: " + std::to_string(table->get_id())
+            + ", table_position: " + vector_to_string(table->get_position())
             + ", interaction_position: " + vector_to_string(interaction_position));
-        table.is_free = false;
-        table.customer_id = static_cast<size_t>(dog_at_head.dog_id);
-        dog_actions::send_dog_to_furniture(dog_at_head.dog_id, interaction_position, table.table_id, table.position);
+        table->reserve_for(dog_at_head.dog_id);
+        dog_actions::send_dog_to_furniture(dog_at_head.dog_id, interaction_position, table->get_id(), table->get_position());
         for(const auto& moved_dog : dequeue_result.moved_dogs){
             send_dog_to_queue_position(static_cast<size_t>(moved_dog.dog_id), moved_dog.queue_position);
         }
@@ -171,8 +157,8 @@ void maitre_d::maitre_d::assign_tables(){
 }
 
 bool maitre_d::maitre_d::are_tables_free(){
-    auto free_count = static_cast<size_t>(std::count_if(tables_.begin(), tables_.end(), [](const auto& table) -> bool {
-        return table.is_free;
+    auto free_count = static_cast<size_t>(std::count_if(tables_.begin(), tables_.end(), [](entities::table* table) -> bool {
+        return table->can_accept_dog();
     }));
     auto has_free_table = free_count > 0;
     return has_free_table;
@@ -184,19 +170,20 @@ void maitre_d::maitre_d::send_dog_to_queue_position(size_t id, Vector2 position)
 }
 
 
-maitre_d::table_record& maitre_d::maitre_d::pick_table(){
+entities::table* maitre_d::maitre_d::pick_table(){
     // TABLES ARE SORTED BY POSITION SO PICKING A TABLE IS REALLY EASY
-    for(auto& table : tables_){
-        if(table.is_free) {return table;}
+    for(auto* table : tables_){
+        if(table->can_accept_dog()) {return table;}
     }
     assert(false && "pick_table called with no free tables");
     return tables_.front();
 }
-Vector2 maitre_d::maitre_d::pick_interaction_position(const table_record& table, Vector2 dog_position) const{
-    if(dog_position.x < table.position.x){
-        return table.interaction_positions.left;
+Vector2 maitre_d::maitre_d::pick_interaction_position(entities::table* table, Vector2 dog_position) const{
+    auto interaction_positions = table->get_interaction_positions();
+    if(dog_position.x < table->get_position().x){
+        return interaction_positions.left;
     }
-    return table.interaction_positions.right;
+    return interaction_positions.right;
 }
 void maitre_d::maitre_d::check_customer_arrivals(float delta){
     if(! feature_flag_config::automatic_arrivals){
@@ -242,7 +229,7 @@ void maitre_d::maitre_d::request_customer_arrival(){
 }
 
 void maitre_d::maitre_d::on_registered_table_event(const events::registered_table& event){
-    register_table(event.get_table_id(), event.get_position(), event.get_interaction_positions());
+    register_table(event.get_table());
 }
 
 void maitre_d::maitre_d::on_removed_table_event(const events::removed_table& event){

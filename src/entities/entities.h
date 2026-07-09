@@ -283,7 +283,12 @@ namespace entities{
             Vector2 get_direction_scalar();
             void render(Vector2 draw_position, int frame) override;
             virtual void set_path(const std::vector<Vector2>& path);
-            virtual void set_path(const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position); 
+            virtual void set_path(const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
+            // Final waypoint of the current path (where the dog is ultimately
+            // headed), or {-1,-1} when it has no path. For tests/inspection.
+            Vector2 peek_destination() const {
+                return current_path_.empty() ? Vector2{-1.0f, -1.0f} : current_path_.back();
+            }
 
         protected:
             bool reached_position(Vector2 target);
@@ -450,6 +455,7 @@ namespace entities{
 
     class customer_dog;
     class waiter_dog;
+    class food; // defined below; waiter_dog holds a unique_ptr<food> while serving
 
     class customer_dog_state{
         public:
@@ -465,6 +471,8 @@ namespace entities{
             virtual void set_path(customer_dog& dog, const std::vector<Vector2>& path);
             virtual void set_path(customer_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
             virtual void on_path_finished(customer_dog& dog, Vector2 destination);
+            // Human-readable state name for inspection/tests.
+            virtual std::string state_name() const { return "unknown"; }
     };
 
     class customer_dog_traveling_state : public customer_dog_state{
@@ -486,6 +494,7 @@ namespace entities{
             class default_state : public customer_dog_state{
                 public:
                     void update(customer_dog& dog, float delta, int frame) override;
+                    std::string state_name() const override { return "default_state"; }
             };
 
             class walking_to_table : public customer_dog_traveling_state{
@@ -495,6 +504,7 @@ namespace entities{
                     table_id_(table_id), table_position_(table_position){}
 
                     void update(customer_dog& dog, float delta, int frame) override;
+                    std::string state_name() const override { return "walking_to_table"; }
 
                 protected:
                     void on_arrived(customer_dog& dog) override;
@@ -507,6 +517,7 @@ namespace entities{
             class seated : public customer_dog_state{
                 public:
                     void update(customer_dog& dog, float delta, int frame) override;
+                    std::string state_name() const override { return "seated"; }
             };
 
             class eating : public customer_dog_state{
@@ -515,15 +526,18 @@ namespace entities{
                     : order_id_(order_id), table_id_(table_id), table_position_(table_position){}
 
                     void update(customer_dog& dog, float delta, int frame) override;
+                    std::string state_name() const override { return "eating"; }
                 private:
                     size_t order_id_;
                     size_t table_id_;
                     Vector2 table_position_;
+                    float elapsed_ = 0.0f;
             };
 
             class leaving : public customer_dog_state{
                 public:
                     void update(customer_dog& dog, float delta, int frame) override;
+                    std::string state_name() const override { return "leaving"; }
             };
 
             customer_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
@@ -555,6 +569,7 @@ namespace entities{
             void set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position);
             void set_eating(size_t order_id, size_t table_id, Vector2 table_position);
             void on_give_dog_path_event(const events::give_dog_path& event);
+            std::string get_state_name() const { return state_->state_name(); }
 
         private:
             // Customer behaviour state belongs to the dog entity. The maitre d'
@@ -574,9 +589,11 @@ namespace entities{
             waiter_dog_state& operator=(waiter_dog_state&& other) = default;
 
             virtual void update(waiter_dog& dog, float delta, int frame) = 0;
+            virtual bool is_available_for_order() = 0;
             virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path);
             virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
             virtual void on_path_finished(waiter_dog& dog, Vector2 destination);
+            virtual std::string state_name() const { return "unknown"; }
     };
 
     class waiter_dog_traveling_state : public waiter_dog_state{
@@ -584,7 +601,7 @@ namespace entities{
             explicit waiter_dog_traveling_state(Vector2 destination) : destination_(destination) {}
 
             void on_path_finished(waiter_dog& dog, Vector2 destination) final;
-
+            bool is_available_for_order() override;
         protected:
             virtual void on_arrived(waiter_dog& dog) = 0;
 
@@ -597,44 +614,21 @@ namespace entities{
         public:
             class idle : public waiter_dog_state{
                 public:
+                    idle()
+                    : waiter_dog_state(){}
                     void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class going_to_table : public waiter_dog_state{
+                    bool is_available_for_order() override;
+                    std::string state_name() const override { return "idle"; }
+                };
+            // Busy marker: a serving waiter is not available for another order.
+            // The counter -> table journey is orchestrated by the expediter off
+            // dog_completed_path, so serving needs no per-leg travel logic itself.
+            class serving : public waiter_dog_state{
                 public:
                     void update(waiter_dog& dog, float delta, int frame) override;
+                    bool is_available_for_order() override;
+                    std::string state_name() const override { return "serving"; }
             };
-
-            class taking_order : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class going_to_kitchen : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class waiting_for_food : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class delivering_food : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class clearing_table : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class returning_to_station : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
             waiter_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right,
             std::unique_ptr<waiter_dog_state> state = std::make_unique<idle>())
@@ -643,9 +637,25 @@ namespace entities{
             }
             waiter_dog(const waiter_dog& other) = delete;
             waiter_dog(waiter_dog&& other) = default;
+            // Out of line so the unique_ptr<food> member can destruct where food
+            // is a complete type (food is only forward-declared here).
+            ~waiter_dog() override;
 
             waiter_dog& operator=(const waiter_dog& other) = delete;
             waiter_dog& operator=(waiter_dog&& other) = delete;
+
+            bool is_available_for_order();
+            std::string get_state_name() const { return state_->state_name(); }
+            void set_serving();
+            void set_idle();
+            // Carry food between the counter and the table. hold_food takes
+            // ownership; release_food hands it off (e.g. delivered to the table).
+            void hold_food(std::unique_ptr<food> item);
+            std::unique_ptr<food> release_food();
+            bool is_carrying_food() const;
+
+        private:
+            std::unique_ptr<food> held_food_;
     };
 
     // body behaves slightly differently for decorations, it will have the variants for the decoration (probably should be called deocraiotn)
@@ -683,13 +693,19 @@ namespace entities{
 
     class station : public decoration {
         public:
+            struct interaction_positions{
+                Vector2 left;
+                Vector2 right;
+            };
             enum station_type{
                 table_station = 0,
                 food_counter_station = 1
             };
 
             station(body::body body, Vector2 position, int id, std::string debug_id, station_type type)
-            : decoration(body, position, id, std::move(debug_id)), type_(type){}
+            : decoration(body, position, id, std::move(debug_id)), interaction_positions_{}, type_(type){
+                update_interaction_positions();
+            }
             station(const station& other) = default;
             station(station&& other) = default;
 
@@ -698,6 +714,16 @@ namespace entities{
 
             station_type get_station_type();
             void interact(entity& other) override;
+
+            // Interaction positions are the walkable nodes flanking the station
+            // (left and right) that a dog paths to in order to interact with it.
+            // Centralised here so every station type (table, food counter) shares
+            // one implementation instead of each recomputing its own.
+            interaction_positions get_interaction_positions() const;
+
+        protected:
+            void update_interaction_positions();
+            interaction_positions interaction_positions_; // TODO ! refactor this type, why the fuck is it under events 
 
         private:
             station_type type_;
@@ -713,11 +739,7 @@ namespace entities{
 
             table(body::body body, Vector2 position, int id, std::string debug_id)
             : station(body, position, id, std::move(debug_id), station_type::table_station),
-            state_(table_state::available), assigned_dog_id_(level_config::empty_node),
-            interaction_positions_(events::table_interaction_positions{
-                Vector2{position.x - level_config::edge_weight, position.y},
-                Vector2{position.x + (2.0f * level_config::edge_weight), position.y}
-            }){}
+            state_(table_state::available), assigned_dog_id_(level_config::empty_node){}
             table(const table& other) = default;
             table(table&& other) = default;
 
@@ -730,14 +752,11 @@ namespace entities{
             void clear();
             table_state get_state();
             int get_assigned_dog_id();
-            events::table_interaction_positions get_interaction_positions() const;
             void place_down() override;
 
         private:
-            void update_interaction_positions();
             table_state state_;
             int assigned_dog_id_;
-            events::table_interaction_positions interaction_positions_;
     };
 
     // food is a generic world entity. Different foods are produced by different
@@ -780,12 +799,21 @@ namespace entities{
             size_t current_capacity() const;
             size_t max_capacity() const;
             counter_status status() const;
+            // Reservations: food promised to an in-flight order that hasn't been
+            // collected yet. available_capacity() = stored - reserved, so a second
+            // order can't claim the same item before the first waiter picks it up.
+            void reserve();
+            void release_reservation();
+            size_t reserved() const;
+            size_t available_capacity() const;
+            bool has_available_food() const;
             void render(Vector2 draw_position, int frame) override;
             void place_down() override;
 
         private:
             size_t max_capacity_;
             std::vector<std::unique_ptr<food>> stored_food_;
+            size_t reserved_ = 0;
     };
     // ------------------ entity builder ------------------ //
     class entity_builder{

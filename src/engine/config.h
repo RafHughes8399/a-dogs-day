@@ -35,8 +35,8 @@ namespace level_config{
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder
 
-    inline const int screen_edges_x = screen_width/ edge_weight;
-    inline const int screen_edges_y = screen_height / edge_weight;
+    inline const int screen_edges_x = static_cast<int>(screen_width / edge_weight);
+    inline const int screen_edges_y = static_cast<int>(screen_height / edge_weight);
 
     inline const int empty_node = -1;
     inline const size_t mack_id = 0;
@@ -82,6 +82,8 @@ namespace cafe_config{
     inline const float queue_arrival_s = 120.0f;
     inline const float queue_left_window_s = 30.0f;
     inline const int queue_left_trigger = 3;
+    // How long a customer stays in the eating state before leaving (seconds).
+    inline const float eating_duration_s = 10.0f;
     inline const int customer_dog_type = 0;
     inline const Vector2 queue_dir = Vector2{0.0f, 1.0f};
     inline const Vector2 customer_spawn_positions[2] = {
@@ -138,6 +140,7 @@ namespace entity_config{
     inline const char* table_debug_id_prefix = "tbl_";
     inline const char* food_counter_debug_id_prefix = "fc_";
     inline const char* food_debug_id_prefix = "food_";
+    inline const char* waiter_dog_debug_id_prefix = "wd_";
 
     // file paths
     inline const char* background_path = "../sprites/background.png" ;

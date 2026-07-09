@@ -250,6 +250,24 @@ entities::food_counter::counter_status entities::food_counter::status() const{
     return counter_status::has_food;
 }
 
+void entities::food_counter::reserve(){
+    ++reserved_;
+}
+void entities::food_counter::release_reservation(){
+    if(reserved_ > 0){
+        --reserved_;
+    }
+}
+size_t entities::food_counter::reserved() const{
+    return reserved_;
+}
+size_t entities::food_counter::available_capacity() const{
+    return current_capacity() > reserved_ ? current_capacity() - reserved_ : 0;
+}
+bool entities::food_counter::has_available_food() const{
+    return available_capacity() > 0;
+}
+
 void entities::food_counter::render(Vector2 draw_position, int frame){
     entity::render(draw_position, frame);
     if(! stored_food_.empty()){
@@ -261,33 +279,39 @@ void entities::food_counter::render(Vector2 draw_position, int frame){
     }
 }
 
-void entities::table::update_interaction_positions(){
-    interaction_positions_ = events::table_interaction_positions{
-        Vector2{position_.x - level_config::edge_weight, position_.y},
-        Vector2{position_.x + (2.0f * level_config::edge_weight), position_.y}
+void entities::station::update_interaction_positions(){
+    // Defensive: keep interaction nodes on the map. A station near an edge could
+    // otherwise produce an off-map interaction position that snaps to a bogus node.
+    const float max_x = level_config::world_x - level_config::edge_weight;
+    const float max_y = level_config::world_y - level_config::edge_weight;
+    auto clamp_position = [max_x, max_y](Vector2 p) -> Vector2 {
+        return Vector2{
+            std::max(0.0f, std::min(p.x, max_x)),
+            std::max(0.0f, std::min(p.y, max_y))
+        };
+    };
+    interaction_positions_ = interaction_positions{
+        clamp_position(Vector2{position_.x - level_config::edge_weight, position_.y}),
+        clamp_position(Vector2{position_.x + (2.0f * level_config::edge_weight), position_.y})
     };
 }
-// TODO fix interaction positions
-events::table_interaction_positions entities::table::get_interaction_positions() const{
+entities::station::interaction_positions entities::station::get_interaction_positions() const{
     return interaction_positions_;
 }
 
 void entities::table::place_down(){
     decoration::place_down();
     update_interaction_positions();
-    std::unique_ptr<events::event> registered_table = std::make_unique<events::registered_table>(
-        static_cast<size_t>(id_),
-        position_,
-        interaction_positions_);
+    std::unique_ptr<events::event> registered_table = std::make_unique<events::registered_table>(this);
     event_interface::queue_event(registered_table);
 }
 
 void entities::food_counter::place_down(){
     decoration::place_down();
-    auto interaction_position = Vector2Zero(); // TODO update interaction position
+    // Recompute the flanking interaction nodes from the (possibly moved)
+    // position; the expediter reads them live off this pointer via the event.
+    update_interaction_positions();
     std::unique_ptr<events::event> registered_food_counter = std::make_unique<events::registered_food_counter>(
-        static_cast<size_t>(id_),
-        position_,
-        interaction_position);
+        this);
     event_interface::queue_event(registered_food_counter);
 }

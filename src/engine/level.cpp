@@ -74,21 +74,18 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
             + ", right_interaction_position: " + vector_to_string(interaction_positions.right);
         debug::log(message);
         std::unique_ptr<events::event> registered_table = std::make_unique<events::registered_table>(
-            static_cast<size_t>(entity_id),
-            position,
-            interaction_positions);
+            table);
         event_interface::queue_event(registered_table);
     }
     if(food_counter != nullptr){
+        auto interaction_position = food_counter->get_interaction_positions().left;
         debug::log(
             "[level::add_entity, queued food counter registration] "
             "counter_id: " + std::to_string(entity_id)
-            + ", position: " + vector_to_string(position));
-        auto interaction_position = Vector2Zero(); // TODO fix interaction position
+            + ", position: " + vector_to_string(position)
+            + ", interaction_position: " + vector_to_string(interaction_position));
         std::unique_ptr<events::event> registered_food_counter = std::make_unique<events::registered_food_counter>(
-            static_cast<size_t>(entity_id),
-            position,
-            interaction_position);
+            food_counter);
         event_interface::queue_event(registered_food_counter);
     }
     if(waiter != nullptr){
@@ -97,6 +94,7 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
             "waiter_id: " + std::to_string(entity_id)
             + ", position: " + vector_to_string(position));
         std::unique_ptr<events::event> registered_waiter = std::make_unique<events::registered_waiter>(
+            waiter,
             static_cast<size_t>(entity_id));
         event_interface::queue_event(registered_waiter);
     }
@@ -199,7 +197,7 @@ int level::level::num_entities(){
 }
 
 entities::entity* level::level::get_entity(int id){
-    auto entry = id_entity_map_.find(id);
+    auto entry = id_entity_map_.find(static_cast<size_t>(id));
     return entry == id_entity_map_.end() ? nullptr : entry->second;
 }
 
@@ -219,7 +217,7 @@ void level::level::on_right_mouse_event(const events::right_mouse_click& event){
 
     auto dog_id = event.get_selected_dog();
     if(dog_id != -1){
-        auto dog = id_entity_map_[dog_id];
+        auto dog = id_entity_map_[static_cast<size_t>(dog_id)];
         auto dog_cast = static_cast<entities::player_dog*>(dog);
         auto direction = dog_cast->get_direction_scalar();
         auto dog_path = graph_.find_path(dog->get_position(), click_position, direction);
@@ -241,7 +239,7 @@ void level::level::on_build_customer_dog_event(const events::build_customer_dog&
 
 void level::level::on_send_dog_to_position_event(const events::send_dog_to_position& event){
     auto customer_id = static_cast<int>(event.get_customer_id());
-    auto dog_record = id_entity_map_.find(customer_id);
+    auto dog_record = id_entity_map_.find(static_cast<size_t>(customer_id));
     if(dog_record == id_entity_map_.end()){
         debug::log(
             "[level::on_send_dog_to_position_event, missing customer entity] "
@@ -262,7 +260,7 @@ void level::level::on_send_dog_to_position_event(const events::send_dog_to_posit
 void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture& event){
     // find the dog, calculate the path, give the dog the path
     auto dog_id = static_cast<int>(event.get_dog_id());
-    auto dog_record = id_entity_map_.find(dog_id);
+    auto dog_record = id_entity_map_.find(static_cast<size_t>(dog_id));
     if(dog_record == id_entity_map_.end()){
         debug::log(
             "[level::on_send_dog_to_furniture, missing customer entity] "
@@ -278,17 +276,26 @@ void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture&
     dog->set_path(path, static_cast<int>(event.get_furniture_id()), event.get_furniture_position());
 }
 void level::level::on_removed_entity(const events::remove_entity& event){
-    // TODO: implement
-    // take over the quadtree remove
-    // and remove from the map 
-    // then write a test
     size_t id = event.get_id();
+    // Drop the entity from every render layer before it is destroyed below.
+    // add_entity pushed its raw pointer into one of the render_layers_; leaving
+    // it there would dangle once level_entities_.erase frees the entity.
+    // render_layer::remove_entity matches by address, so clearing all layers is
+    // safe and only the layer actually holding it is affected.
+    auto entry = id_entity_map_.find(id);
+    if(entry != id_entity_map_.end()){
+        for(auto& layer : render_layers_){
+            layer.remove_entity(entry->second);
+        }
+    }
+    // Destroys the entity (quadtree owns it) and fires the in-place removed_*
+    // events so the cafe systems drop their pointers, then clear the id lookup.
     level_entities_.erase(id);
     id_entity_map_.erase(id);
 }
 void level::level::on_order_served_event(const events::order_served& event){
     auto customer_id = static_cast<int>(event.get_customer_id());
-    auto customer_record = id_entity_map_.find(customer_id);
+    auto customer_record = id_entity_map_.find(static_cast<size_t>(customer_id));
     if(customer_record == id_entity_map_.end()){
         debug::log(
             "[level::on_order_served_event, missing customer entity] "
@@ -346,6 +353,14 @@ std::unique_ptr<level::level> level::level_builder::build_main_level(){
     main_level->add_entity(std::move(second_table), level_config::draw_layers::stations);
 
     auto food_counter = entities::e_builder.build_food_counter(Vector2 {level_config::edge_weight * 18, level_config::edge_weight * 6}, main_level->entity_id());
+    // Pre-stock the counter with food. Nothing produces food yet, so this stands
+    // in for a cook/kitchen until one is built; it lets the expediter model real
+    // counter availability (is_empty()/take()) for the serving flow.
+    if(auto* counter = dynamic_cast<entities::food_counter*>(food_counter.get())){
+        for(size_t i = 0; i < counter->max_capacity(); ++i){
+            counter->store(entities::e_builder.build_test_food(counter->get_position(), main_level->entity_id()));
+        }
+    }
     main_level->add_entity(std::move(food_counter), level_config::draw_layers::stations);
 
     auto waiter = entities::e_builder.build_waiter_dog(main_level->entity_id(), dog_config::waiter_dog_types::basic, {level_config::edge_weight * 22, level_config::edge_weight * 7}, std::nullopt);

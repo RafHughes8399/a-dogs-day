@@ -1,0 +1,4 @@
+interface:
+  display_name: "Event Wire"
+  short_description: "Wire repo events with guardrails"
+  default_prompt: "Use $event-wire to create an event wire from this trigger description using the existing event system in the codebase."

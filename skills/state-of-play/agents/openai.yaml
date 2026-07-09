@@ -1,0 +1,7 @@
+interface:
+  display_name: "State Of Play"
+  short_description: "Summarize branch status against a ticket."
+  default_prompt: "Use $state-of-play to summarize this branch against the supplied ticket, with completion %, correctness, next steps, and remaining TODO."
+
+policy:
+  allow_implicit_invocation: true

@@ -278,13 +278,17 @@ void entities::customer_dog::seated::update(customer_dog& dog, float delta, int 
 }
 
 void entities::customer_dog::eating::update(customer_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
     (void) frame;
     (void) order_id_;
     (void) table_id_;
     (void) table_position_;
-    // play eating animatino, count down too
+    // Count down the eating timer; when it elapses the customer is done and
+    // transitions to leaving. (Pathing the customer out of the cafe is a
+    // follow-up; the state transition is what the loop and tests depend on.)
+    elapsed_ += delta;
+    if(elapsed_ >= cafe_config::eating_duration_s){
+        dog.set_state(std::make_unique<customer_dog::leaving>());
+    }
 }
 
 void entities::customer_dog::leaving::update(customer_dog& dog, float delta, int frame){
@@ -309,54 +313,52 @@ void entities::customer_dog::on_give_dog_path_event(const events::give_dog_path&
 }
 
 // ------------------------------- waiter dogs ------------------------------- //
+
+bool entities::waiter_dog_traveling_state::is_available_for_order(){
+    return false;
+}
+
 void entities::waiter_dog::idle::update(waiter_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
+    // Idle waiters do nothing until the expediter assigns them an order.
+}
+bool entities::waiter_dog::idle::is_available_for_order(){
+    return true;
 }
 
-void entities::waiter_dog::going_to_table::update(waiter_dog& dog, float delta, int frame){
+void entities::waiter_dog::serving::update(waiter_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
+    // The expediter drives the serving journey via dog_completed_path; the
+    // serving state itself just marks the waiter busy.
+}
+bool entities::waiter_dog::serving::is_available_for_order(){
+    return false;
 }
 
-void entities::waiter_dog::taking_order::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
-}
+entities::waiter_dog::~waiter_dog() = default;
 
-void entities::waiter_dog::going_to_kitchen::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
+bool entities::waiter_dog::is_available_for_order(){
+    return state_->is_available_for_order();
 }
-
-void entities::waiter_dog::waiting_for_food::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
+void entities::waiter_dog::set_serving(){
+    set_state(std::make_unique<serving>());
 }
-
-void entities::waiter_dog::delivering_food::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
+void entities::waiter_dog::set_idle(){
+    set_state(std::make_unique<idle>());
 }
-
-void entities::waiter_dog::clearing_table::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
+void entities::waiter_dog::hold_food(std::unique_ptr<food> item){
+    held_food_ = std::move(item);
 }
-
-void entities::waiter_dog::returning_to_station::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
+std::unique_ptr<entities::food> entities::waiter_dog::release_food(){
+    return std::move(held_food_);
 }
-
+bool entities::waiter_dog::is_carrying_food() const{
+    return held_food_ != nullptr;
+}
 // ------------------------------- builder ------------------------------- //
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){
     auto khiri_left_texture = textures::textures_.get_texture(textures::khiri_left, entity_config::khiri_left_path);
@@ -785,31 +787,27 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_waiter_dog(int
     auto head = body::body();
     if(destination.has_value()){
         debug::log(
-            "[entity_builder::build_customer_dog, constructing customer dog with destination] "
+            "[entity_builder::build_waiter_dog, constructing waiter dog with destination] "
             "dog_id: " + std::to_string(id)
             + ", dog_type: " + std::to_string(dog_type)
             + ", position: " + raglib::vector_to_string(position)
             + ", destination: " + raglib::vector_to_string(destination.value()));
-        return std::make_unique<entities::customer_dog>(
-        std::move(body),
-        std::move(head),
-        position,
-        destination.value(),
-        id,
-        next_debug_id(entity_config::customer_dog_debug_id_prefix),
-        level_config::directions::left);
-    }else{
+    }
+    else{
         debug::log(
-            "[entity_builder::build_customer_dog, constructing customer dog without destination] "
+            "[entity_builder::build_waiter_dog, constructing waiter dog without destination] "
             "dog_id: " + std::to_string(id)
             + ", dog_type: " + std::to_string(dog_type)
             + ", position: " + raglib::vector_to_string(position));
-        return std::make_unique<entities::waiter_dog>(
-            std::move(body),
-            std::move(head),
-            position,
-            id,
-            next_debug_id(entity_config::customer_dog_debug_id_prefix),
-            level_config::directions::left);
     }
+    // A waiter starts idle and receives its paths from the expediter via events,
+    // so the destination argument is not applied at construction (unlike a
+    // customer, whose destination seeds its walk-to-table path).
+    return std::make_unique<entities::waiter_dog>(
+        std::move(body),
+        std::move(head),
+        position,
+        id,
+        next_debug_id(entity_config::waiter_dog_debug_id_prefix),
+        level_config::directions::left);
 }

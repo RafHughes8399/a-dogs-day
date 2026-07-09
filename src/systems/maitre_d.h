@@ -5,16 +5,19 @@
  * should only be one for the game. It listens to cafe-domain events and also
  * exposes an id-based interface for systems that need to report facts directly.
  *
- * It works with entity ids rather than entity references so it does not own
- * level entities, depend on concrete subclasses, or create include cycles with
- * the entity hierarchy. When it decides that a world mutation should happen, it
- * emits command events for a world-owning system, such as the level, to execute.
+ * It holds non-owning raw pointers to the table entities it tracks (the level
+ * owns them; register/remove events keep the pointers valid). Reading table
+ * position and cafe-state live from the entity avoids caching stale copies and
+ * removes the need to listen for table-moved events. When it decides that a
+ * world mutation should happen it still emits command events for a world-owning
+ * system, such as the level, to execute.
  */
 #ifndef MAITRE_D_H
 #define MAITRE_D_H
 
 #include "dog_actions.h"
 #include "events.h"
+#include "entities.h"
 #include "raylib.h"
 #include "raymath.h"
 #include <algorithm>
@@ -33,38 +36,21 @@ namespace maitre_d{
     
 
 
-    // Table availability lives here rather than on the table entity. A table
-    // entity is a physical prop in the level; the maitre d' owns the cafe
-    // meaning of whether that prop is free, reserved, or occupied.
-    struct table_record{
-        size_t table_id;
-        Vector2 position;
-        events::table_interaction_positions interaction_positions;
-        bool is_free;
-        size_t customer_id;
-    };
-    const table_record empty_table{
-        empty_id,
-        Vector2Zero(),
-        events::table_interaction_positions{Vector2Zero(), Vector2Zero()},
-        false,
-        empty_id
-    };
-    inline bool operator==(const table_record& a, const table_record&b ){
-        return a.table_id == b.table_id;
-    }
-
+    // The maitre d' tracks table entities by non-owning pointer. Table cafe-state
+    // (available/reserved/occupied) lives on the table entity itself; the maitre
+    // d' reads and mutates it through the entity's own interface rather than
+    // duplicating a freeness flag here.
     struct table_comparator{
-        bool operator()(const table_record& a, const table_record& b) const{
-            auto a_distance = Vector2Distance(a.position, entrance_);
-            auto b_distance = Vector2Distance(b.position, entrance_);
+        bool operator()(entities::table* a, entities::table* b) const{
+            auto a_distance = Vector2Distance(a->get_position(), entrance_);
+            auto b_distance = Vector2Distance(b->get_position(), entrance_);
             if(a_distance < b_distance){
                 return true;
             }
             if(a_distance > b_distance){
                 return false;
             }
-            return a.table_id < b.table_id;
+            return a->get_id() < b->get_id();
         }
     };
     // A queue slot is a physical waiting spot in the cafe. The queue order is
@@ -157,9 +143,13 @@ namespace maitre_d{
             maitre_d& operator=(const maitre_d& other) = delete;
             maitre_d& operator=(maitre_d&& other) = delete;
 
-            void register_table(size_t table_id, Vector2 position);
-            void register_table(size_t table_id, Vector2 position, events::table_interaction_positions interaction_positions);
+            void register_table(entities::table* table);
             void remove_table(size_t table_id);
+
+            // Number of tables tracked / customers queued. Exposed for tests to
+            // assert table registration/removal and customer arrival/seating.
+            size_t num_tables() const { return tables_.size(); }
+            size_t num_customers() const { return customer_queue_.size(); }
             void register_customer(size_t customer_id);
             void request_table_for_customer(size_t customer_id);
 
@@ -184,8 +174,8 @@ namespace maitre_d{
             // then resolve them into command events during the game loop.
             void assign_tables();
             bool are_tables_free();
-            table_record& pick_table();
-            Vector2 pick_interaction_position(const table_record& table, Vector2 dog_position) const;
+            entities::table* pick_table();
+            Vector2 pick_interaction_position(entities::table* table, Vector2 dog_position) const;
             void send_dog_to_queue_position(size_t id, Vector2 position);
             void check_customer_arrivals(float delta);
             bool can_request_customer_arrival() const;
@@ -220,8 +210,8 @@ namespace maitre_d{
 
             
 
-            std::vector<table_record> tables_;
-            
+            std::vector<entities::table*> tables_;
+
             dog_queue customer_queue_;
             float seconds_since_customer_arrived_;
             float dogs_left_window_seconds_;

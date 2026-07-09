@@ -6,147 +6,243 @@
 #include <algorithm>
 
 void expediter::expediter::fulfill_order(order& order){
-    // fulfill an order
-   // TODO: fulifll the order
-    /**  
-     * update the order status
-     * send the waiter to the food counter and then
-     * to the table
-     * 
-     * update the watier states too
-    */
-    // ! use the dog action interface
-    send_dog_to_counter(order.assigned_waiter.id, order.food_counter);
-    send_dog_to_table(order.assigned_waiter.id, order.table);
-    order.status = order_status::serving;
-    return;
-}
-void expediter::expediter::create_order(waiter& waiter, food_counter_record& food_counter, table_record table, size_t customer_id){
-    // create an order to be fulfiled,
-    // needs the position of the table and the foood counter
-    // and then push back to the list of orders
-    order order = {next_order_id_++, customer_id, waiter, table, food_counter, order_status::created};
-    orders_.push_back(order);
-    return;
-}
-
-void expediter::expediter::schedule_order(table_record table, size_t customer_id){
-    order order = {next_order_id_++, customer_id, empty_waiter, table, empty_counter, order_status::scheduled};
-    scheduled_orders_.push_back(order);
-    return;
-}
-
-bool expediter::expediter::can_create_order(waiter& waiter, food_counter_record& food_counter){
-    return !(waiter == empty_waiter) && !(food_counter == empty_counter);
-}
-
-void expediter::expediter::check_scheduled_orders(){
-    // Scaffold: scheduled orders should retry once waiter and food-counter availability is modeled.
-    return;
-}
-
-expediter::waiter& expediter::expediter::assign_waiter_to_order(){
-    // select a free waiter to fulfill an order
-    for(auto & waiter : waiters_){
-        if(! waiter.assigned_to_order){
-            return waiter;
-        }
-    }
-    return empty_waiter;
-}
-
-expediter::food_counter_record& expediter::expediter::find_counter(){
-    if(food_counters_.empty()){
-        return empty_counter;
-    }
-    // first counter that has food
-    return food_counters_.front();
-}
-
-void expediter::expediter::send_dog_to_counter(int dog_id, food_counter_record counter){
-    dog_actions::send_dog_to_furniture(dog_id, counter.interaction_position, counter.id, counter.position);
-}
-void expediter::expediter::send_dog_to_table(int dog_id, table_record table){
-    dog_actions::send_dog_to_furniture(dog_id, table.interaction_position, table.id, table.position);
+    // Dispatch: send the assigned waiter to the counter to collect food. The
+    // rest of the journey (counter -> table -> served) is driven by
+    // on_dog_completed_path_event as the waiter reaches each stop.
+    auto counter_interaction = order.counter->get_interaction_positions().left;
+    dog_actions::send_dog_to_furniture(order.waiter->get_id(), counter_interaction,
+        order.counter->get_id(), order.counter->get_position());
 }
 
 void expediter::expediter::process_orders(){
-    // iterate through orders and process them
+    // Drop completed orders so their (now idle) waiter is free again.
+    orders_.erase(std::remove_if(orders_.begin(), orders_.end(), [](const order& o) -> bool {
+        return o.status == order_status::fulfilled;
+    }), orders_.end());
+
+    // Status + availability driven: only dispatch a created order when both a
+    // free waiter and a stocked counter exist. Binding a waiter flips it to
+    // unavailable, so a second order in the same pass can't grab the same one.
     for(auto& order : orders_){
-        fulfill_order(order); // fulfill order if it can be
+        if(order.status != order_status::created){
+            continue;
+        }
+        if(!are_waiters_available() || !are_counters_available()){
+            break;
+        }
+        auto* waiter = assign_waiter_to_order(order);
+        auto* counter = pick_food_counter(order);
+        if(waiter == nullptr || counter == nullptr){
+            break;
+        }
+        counter->reserve(); // this item is promised to this order until collected
+        waiter->set_serving();
+        order.status = order_status::serving;
+        fulfill_order(order);
     }
-    // check scheduled orders every half second, not every frame
-    check_scheduled_orders();
-
-    //clean up fulfilled orders
-
-    return;
 }
 
-expediter::expediter::expediter()
-: next_order_id_(0),
-registered_waiter_handler_([this](const events::registered_waiter& event) -> void {on_registered_waiter_event(event);}),
-registered_food_counter_handler_([this](const events::registered_food_counter& event) -> void {on_registered_food_counter_event(event);}),
-dog_reached_table_handler_([this](const events::dog_reached_table& event) -> void {on_dog_reached_table_event(event);}){
-    event_interface::subscribe<events::registered_waiter>(registered_waiter_handler_);
-    event_interface::subscribe<events::registered_food_counter>(registered_food_counter_handler_);
-    event_interface::subscribe<events::dog_reached_table>(dog_reached_table_handler_);
-}
-
-expediter::expediter::~expediter(){
-    event_interface::unsubscribe<events::registered_waiter>(registered_waiter_handler_);
-    event_interface::unsubscribe<events::registered_food_counter>(registered_food_counter_handler_);
-    event_interface::unsubscribe<events::dog_reached_table>(dog_reached_table_handler_);
-}
-
-void expediter::expediter::register_waiter(size_t waiter_id){
-    auto id = static_cast<int>(waiter_id);
-    auto existing_waiter = std::find_if(waiters_.begin(), waiters_.end(), [id](const auto& waiter) -> bool {
-        return waiter.id == id;
+bool expediter::expediter::are_waiters_available() const{
+    return std::any_of(waiters_.begin(), waiters_.end(), [](entities::waiter_dog* w) -> bool {
+        return w->is_available_for_order();
     });
-    if(existing_waiter != waiters_.end()){
+}
+
+bool expediter::expediter::are_counters_available() const{
+    return std::any_of(food_counters_.begin(), food_counters_.end(), [](entities::food_counter* counter) -> bool {
+        return counter->has_available_food();
+    });
+}
+
+entities::waiter_dog* expediter::expediter::assign_waiter_to_order(order& order){
+    for(auto* waiter : waiters_){
+        if(waiter->is_available_for_order()){
+            order.waiter = waiter;
+            return waiter;
+        }
+    }
+    order.waiter = nullptr;
+    return nullptr;
+}
+
+entities::food_counter* expediter::expediter::pick_food_counter(order& order){
+    for(auto* counter : food_counters_){
+        if(counter->has_available_food()){
+            order.counter = counter;
+            return counter;
+        }
+    }
+    order.counter = nullptr;
+    return nullptr;
+}
+
+entities::table* expediter::expediter::find_table(int table_id){
+    for(auto* table : tables_){
+        if(table->get_id() == table_id){
+            return table;
+        }
+    }
+    return nullptr;
+}
+
+void expediter::expediter::register_waiter(entities::waiter_dog* dog){
+    auto id = dog->get_id();
+    auto existing_waiter = std::find_if(waiters_.begin(), waiters_.end(), [id](const auto& w) -> bool {
+        return w->get_id() == id;
+    });
+    if(existing_waiter == waiters_.end()){
+        waiters_.push_back(dog);
         return;
     }
-
-    waiters_.push_back(waiter{id, Vector2{-1, -1}, false});
 }
 
-// TODO include interaction position
-void expediter::expediter::register_food_counter(size_t counter_id, Vector2 position, Vector2 interaction_position){
-    auto id = static_cast<int>(counter_id);
-    auto existing_counter = std::find_if(food_counters_.begin(), food_counters_.end(), [id](const auto& counter) -> bool {
-        return counter.id == id;
+void expediter::expediter::remove_waiter(size_t waiter_id){
+    auto id = static_cast<int>(waiter_id);
+    // Abort any in-flight order bound to this waiter so we never dereference the
+    // dangling pointer later; the order re-queues as created for another waiter.
+    for(auto& order : orders_){
+        if(order.waiter != nullptr && order.waiter->get_id() == id){
+            // If the food hadn't been collected yet, give the reservation back so
+            // the counter's effective capacity is not permanently depleted.
+            if(order.counter != nullptr && !order.waiter->is_carrying_food()){
+                order.counter->release_reservation();
+            }
+            order.waiter = nullptr;
+            order.counter = nullptr;
+            order.status = order_status::created;
+        }
+    }
+    waiters_.erase(std::remove_if(waiters_.begin(), waiters_.end(), [id](const auto& w) -> bool {
+        return w->get_id() == id;
+    }), waiters_.end());
+}
+
+void expediter::expediter::register_food_counter(entities::food_counter* counter){
+    auto id = counter->get_id();
+    auto existing_counter = std::find_if(food_counters_.begin(), food_counters_.end(), [id](entities::food_counter* c) -> bool {
+        return c->get_id() == id;
     });
     if(existing_counter != food_counters_.end()){
-        existing_counter->position = position;
+        *existing_counter = counter;
         return;
     }
 
-    food_counters_.push_back(food_counter_record{id, position, interaction_position});
+    food_counters_.push_back(counter);
+}
+
+void expediter::expediter::remove_food_counter(size_t counter_id){
+    auto id = static_cast<int>(counter_id);
+    for(auto& order : orders_){
+        if(order.counter != nullptr && order.counter->get_id() == id){
+            order.counter = nullptr;
+            order.status = order_status::created;
+        }
+    }
+    food_counters_.erase(std::remove_if(food_counters_.begin(), food_counters_.end(), [id](entities::food_counter* c) -> bool {
+        return c->get_id() == id;
+    }), food_counters_.end());
+}
+
+void expediter::expediter::register_table(entities::table* table){
+    auto id = table->get_id();
+    auto existing_table = std::find_if(tables_.begin(), tables_.end(), [id](entities::table* t) -> bool {
+        return t->get_id() == id;
+    });
+    if(existing_table != tables_.end()){
+        *existing_table = table;
+        return;
+    }
+
+    tables_.push_back(table);
+}
+
+void expediter::expediter::remove_table(size_t table_id){
+    auto id = static_cast<int>(table_id);
+    tables_.erase(std::remove_if(tables_.begin(), tables_.end(), [id](entities::table* t) -> bool {
+        return t->get_id() == id;
+    }), tables_.end());
 }
 
 void expediter::expediter::on_registered_waiter_event(const events::registered_waiter& event){
-    register_waiter(event.get_waiter_id());
+    register_waiter(event.get_waiter());
+}
+
+void expediter::expediter::on_removed_waiter_event(const events::removed_waiter& event){
+    remove_waiter(event.get_waiter_id());
 }
 
 void expediter::expediter::on_registered_food_counter_event(const events::registered_food_counter& event){
-    register_food_counter(event.get_counter_id(), event.get_position(), event.get_interaction_position());
+    register_food_counter(event.get_counter());
+}
+
+void expediter::expediter::on_removed_food_counter_event(const events::removed_food_counter& event){
+    remove_food_counter(event.get_counter_id());
+}
+
+void expediter::expediter::on_registered_table_event(const events::registered_table& event){
+    register_table(event.get_table());
+}
+
+void expediter::expediter::on_removed_table_event(const events::removed_table& event){
+    remove_table(event.get_table_id());
 }
 
 void expediter::expediter::on_dog_reached_table_event(const events::dog_reached_table& event){
+    // The seated customer has requested an order. Record it as created and
+    // unassigned; process_orders() binds a waiter + counter once both are
+    // available.
+    auto table = table_record{
+        static_cast<int>(event.get_table_id()),
+        Vector2Zero(),
+        event.get_table_position()
+    };
+    orders_.push_back(order{
+        next_order_id_++,
+        event.get_customer_id(),
+        nullptr,
+        table,
+        nullptr,
+        order_status::created
+    });
+}
 
-    // there are two reasons why a order cannot be created.
-    // 1. no free waiters
-    // 2. no food on the counters - need to figure out the logic for this i think
-    // who is going to manage the dishes on each counter
-    auto waiter = assign_waiter_to_order();
-    auto counter = find_counter();
-    auto table = table_record{static_cast<int>(event.get_table_id()), event.get_table_position()};
-    if(can_create_order(waiter, counter)){
-        create_order(waiter, counter, table, event.get_customer_id());
+void expediter::expediter::on_dog_completed_path_event(const events::dog_completed_path& event){
+    auto dog_id = static_cast<int>(event.get_id());
+    // Match the completed path to the in-flight order for this waiter. Which leg
+    // it is (counter vs table) is told by whether the waiter is already carrying
+    // food: not carrying -> just reached the counter; carrying -> reached the table.
+    auto it = std::find_if(orders_.begin(), orders_.end(), [dog_id](const order& o) -> bool {
+        return o.status == order_status::serving && o.waiter != nullptr && o.waiter->get_id() == dog_id;
+    });
+    if(it == orders_.end()){
+        return;
+    }
+    auto& active_order = *it;
+
+    if(!active_order.waiter->is_carrying_food()){
+        // Reached the counter: collect food (the reservation is now fulfilled)
+        // and head to the table.
+        if(active_order.counter != nullptr && !active_order.counter->is_empty()){
+            active_order.waiter->hold_food(active_order.counter->take());
+            active_order.counter->release_reservation();
+        }
+        auto* table = find_table(active_order.table.id);
+        Vector2 table_interaction = (table != nullptr)
+            ? table->get_interaction_positions().right
+            : active_order.table.position;
+        dog_actions::send_dog_to_furniture(dog_id, table_interaction, active_order.table.id, active_order.table.position);
     }
     else{
-        // hence there should be some way for a dog to retrigger
-        schedule_order(table, event.get_customer_id());
+        // Reached the table carrying food: serve it, free the waiter.
+        std::unique_ptr<events::event> served = std::make_unique<events::order_served>(
+            active_order.order_id,
+            static_cast<size_t>(dog_id),
+            active_order.customer_id,
+            static_cast<size_t>(active_order.table.id),
+            active_order.table.position);
+        event_interface::queue_event(served);
+        active_order.waiter->release_food();
+        active_order.waiter->set_idle();
+        active_order.status = order_status::fulfilled;
     }
 }

@@ -39,6 +39,44 @@ SCENARIO("a food counter is built and inserted into the level", "[decoration][st
     }
 }
 
+SCENARIO("a station computes flanking interaction positions from its position",
+        "[decoration][station][interaction]"){
+    // Interaction positions are centralised on `station`, so a table and a food
+    // counter share the same geometry (left = one tile left, right = two tiles
+    // right). This is the fix for the waiter beelining to the world origin: the
+    // counter used to publish {0,0} for its interaction position.
+    test_game game;
+
+    GIVEN("a table built at a known position"){
+        const Vector2 position{level_config::edge_weight * 8, level_config::edge_weight * 8};
+        auto table_entity = game.build_table(210, position);
+        auto* station = dynamic_cast<entities::station*>(table_entity.get());
+        REQUIRE(station != nullptr);
+        THEN("its interaction positions flank the table"){
+            const auto interaction = station->get_interaction_positions();
+            REQUIRE(interaction.left.x == position.x - level_config::edge_weight);
+            REQUIRE(interaction.left.y == position.y);
+            REQUIRE(interaction.right.x == position.x + (2.0f * level_config::edge_weight));
+            REQUIRE(interaction.right.y == position.y);
+        }
+    }
+
+    GIVEN("a food counter built at a known position"){
+        const Vector2 position{level_config::edge_weight * 18, level_config::edge_weight * 6};
+        auto counter_entity = game.build_food_counter(211, position);
+        auto* station = dynamic_cast<entities::station*>(counter_entity.get());
+        REQUIRE(station != nullptr);
+        THEN("its interaction positions flank the counter and are not the world origin"){
+            const auto interaction = station->get_interaction_positions();
+            REQUIRE(interaction.left.x == position.x - level_config::edge_weight);
+            REQUIRE(interaction.left.y == position.y);
+            REQUIRE(interaction.right.x == position.x + (2.0f * level_config::edge_weight));
+            REQUIRE(interaction.right.y == position.y);
+            REQUIRE_FALSE((interaction.left.x == 0.0f && interaction.left.y == 0.0f));
+        }
+    }
+}
+
 SCENARIO("a decoration is removed from the level via remove_entity event",
         "[decoration][station][remove]"){
     GIVEN("a fresh game with a table inserted"){

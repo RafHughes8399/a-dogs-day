@@ -1,0 +1,7 @@
+interface:
+  display_name: "Map"
+  short_description: "Map code flows before design"
+  default_prompt: "Use $map to map the related code, data flow, APIs, and contracts for this ticket before design discussion."
+
+policy:
+  allow_implicit_invocation: true
