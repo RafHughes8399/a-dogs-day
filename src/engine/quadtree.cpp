@@ -186,6 +186,8 @@ void tree::quadtree::notify_removals(const std::vector<entities::entity*>& remov
         // while the entity is still alive, but the caller destroys it immediately
         // afterwards. A queued removal would be handled a frame later, by which
         // point the handlers would dereference (via get_id()) a freed entity.
+
+        // TODO: fix this pattern - should not belong in the quadtree
         if(debug_id.starts_with(entity_config::table_debug_id_prefix)){
             events::removed_table removed_table{id};
             event_interface::execute_event(removed_table);

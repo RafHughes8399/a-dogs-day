@@ -250,6 +250,24 @@ entities::food_counter::counter_status entities::food_counter::status() const{
     return counter_status::has_food;
 }
 
+void entities::food_counter::reserve(){
+    ++reserved_;
+}
+void entities::food_counter::release_reservation(){
+    if(reserved_ > 0){
+        --reserved_;
+    }
+}
+size_t entities::food_counter::reserved() const{
+    return reserved_;
+}
+size_t entities::food_counter::available_capacity() const{
+    return current_capacity() > reserved_ ? current_capacity() - reserved_ : 0;
+}
+bool entities::food_counter::has_available_food() const{
+    return available_capacity() > 0;
+}
+
 void entities::food_counter::render(Vector2 draw_position, int frame){
     entity::render(draw_position, frame);
     if(! stored_food_.empty()){
@@ -262,9 +280,19 @@ void entities::food_counter::render(Vector2 draw_position, int frame){
 }
 
 void entities::station::update_interaction_positions(){
+    // Defensive: keep interaction nodes on the map. A station near an edge could
+    // otherwise produce an off-map interaction position that snaps to a bogus node.
+    const float max_x = level_config::world_x - level_config::edge_weight;
+    const float max_y = level_config::world_y - level_config::edge_weight;
+    auto clamp_position = [max_x, max_y](Vector2 p) -> Vector2 {
+        return Vector2{
+            std::max(0.0f, std::min(p.x, max_x)),
+            std::max(0.0f, std::min(p.y, max_y))
+        };
+    };
     interaction_positions_ = interaction_positions{
-        Vector2{position_.x - level_config::edge_weight, position_.y},
-        Vector2{position_.x + (2.0f * level_config::edge_weight), position_.y}
+        clamp_position(Vector2{position_.x - level_config::edge_weight, position_.y}),
+        clamp_position(Vector2{position_.x + (2.0f * level_config::edge_weight), position_.y})
     };
 }
 entities::station::interaction_positions entities::station::get_interaction_positions() const{

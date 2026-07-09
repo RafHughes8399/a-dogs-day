@@ -421,8 +421,9 @@ void level::level_graph::insert_edge(int source_num, node& destination, float we
 // returns true if there is a decoration there, that is not the id one
 // returns false otherwise, (to place down, this must be false)
 bool level::level_graph::check_for_decoration(Rectangle rectangle, int id){
-    for(auto col = rectangle.x; col <= rectangle.x + rectangle.width; col += level_config::edge_weight){
-        for(auto row = rectangle.y; row <= rectangle.y + rectangle.height; row += level_config::edge_weight){
+    // Exclusive bounds, matching update_decoration (see note there).
+    for(auto col = rectangle.x; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
+        for(auto row = rectangle.y; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
 
             int node_index = position_to_node(position);
@@ -435,9 +436,12 @@ bool level::level_graph::check_for_decoration(Rectangle rectangle, int id){
     return false;
 }
 void level::level_graph::update_decoration(Rectangle rectangle, int id){
-    // start at the position x,y and iterate in increments of edge weight until 
-    for(auto col = rectangle.x; col <= rectangle.x + rectangle.width; col += level_config::edge_weight){
-        for(auto row = rectangle.y; row <= rectangle.y + rectangle.height; row += level_config::edge_weight){
+    // Mark exactly the cells the decoration covers: [x, x+width) x [y, y+height).
+    // The bound is exclusive - an inclusive `<=` marks one extra column/row on the
+    // +x/+y side, wrongly blocking the cell just past the decoration (e.g. a table's
+    // right interaction node), which breaks pathing to it.
+    for(auto col = rectangle.x; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
+        for(auto row = rectangle.y; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
             int node_index = position_to_node(position);
 

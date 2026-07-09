@@ -35,6 +35,7 @@ void expediter::expediter::process_orders(){
         if(waiter == nullptr || counter == nullptr){
             break;
         }
+        counter->reserve(); // this item is promised to this order until collected
         waiter->set_serving();
         order.status = order_status::serving;
         fulfill_order(order);
@@ -49,7 +50,7 @@ bool expediter::expediter::are_waiters_available() const{
 
 bool expediter::expediter::are_counters_available() const{
     return std::any_of(food_counters_.begin(), food_counters_.end(), [](entities::food_counter* counter) -> bool {
-        return !counter->is_empty();
+        return counter->has_available_food();
     });
 }
 
@@ -66,7 +67,7 @@ entities::waiter_dog* expediter::expediter::assign_waiter_to_order(order& order)
 
 entities::food_counter* expediter::expediter::pick_food_counter(order& order){
     for(auto* counter : food_counters_){
-        if(!counter->is_empty()){
+        if(counter->has_available_food()){
             order.counter = counter;
             return counter;
         }
@@ -101,7 +102,13 @@ void expediter::expediter::remove_waiter(size_t waiter_id){
     // dangling pointer later; the order re-queues as created for another waiter.
     for(auto& order : orders_){
         if(order.waiter != nullptr && order.waiter->get_id() == id){
+            // If the food hadn't been collected yet, give the reservation back so
+            // the counter's effective capacity is not permanently depleted.
+            if(order.counter != nullptr && !order.waiter->is_carrying_food()){
+                order.counter->release_reservation();
+            }
             order.waiter = nullptr;
+            order.counter = nullptr;
             order.status = order_status::created;
         }
     }
@@ -213,9 +220,11 @@ void expediter::expediter::on_dog_completed_path_event(const events::dog_complet
     auto& active_order = *it;
 
     if(!active_order.waiter->is_carrying_food()){
-        // Reached the counter: collect food and head to the table.
+        // Reached the counter: collect food (the reservation is now fulfilled)
+        // and head to the table.
         if(active_order.counter != nullptr && !active_order.counter->is_empty()){
             active_order.waiter->hold_food(active_order.counter->take());
+            active_order.counter->release_reservation();
         }
         auto* table = find_table(active_order.table.id);
         Vector2 table_interaction = (table != nullptr)

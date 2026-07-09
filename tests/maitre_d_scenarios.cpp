@@ -108,17 +108,59 @@ SCENARIO("the maitre d' assigns a queued customer to a free table", "[maitre_d][
     //   (table-reserved assertion needs a maitre_d accessor - helper)
 }
 
-SCENARIO("a customer dog transitions through its states", "[maitre_d][customer][stub]"){
-    SKIP("stub - not yet implemented");
-    // Walks the customer lifecycle: default_state -> walking_to_table -> seated
-    // -> eating -> leaving, ticking and asserting get_state_name() at each step.
-    // NOTE: per current work notes, only default_state and walking_to_table are
-    // functional today; seated/eating/leaving are stubs/unreachable - so this
-    // scenario is a placeholder until those states are built out.
-    //   test_game game;
-    //   game.insert_customer_dog(1, maitre_d::entrance_);
-    //   game.customer_arrives();
-    //   game.tick_until(... walking_to_table ...);
-    //   REQUIRE(game.get_customer_dog(1).get_state_name() == std::string("walking_to_table"));
-    //   ... (seated / eating / leaving once implemented)
+// Case D: customer state transitions following the setters/events that drive
+// them. (The waiter's idle -> serving -> idle transitions are covered by the
+// serving-journey scenario in expediter_scenarios.cpp.)
+SCENARIO("a customer dog transitions through its lifecycle states", "[customer][transitions]"){
+    test_game game;
+    const int customer_id = 90;
+    const Vector2 table_position{level_config::edge_weight * 6, level_config::edge_weight * 6};
+    game.insert_customer_dog(customer_id, table_position);
+
+    GIVEN("a newly inserted customer"){
+        THEN("it starts in the default state"){
+            REQUIRE(game.get_customer_dog(customer_id).get_state_name() == "default_state");
+        }
+
+        WHEN("it is sent walking to a table"){
+            game.get_customer_dog(customer_id).set_walking_to_table(3, table_position, table_position);
+            THEN("it is walking to the table"){
+                REQUIRE(game.get_customer_dog(customer_id).get_state_name() == "walking_to_table");
+            }
+        }
+
+        WHEN("an order_served event is delivered for the customer"){
+            std::unique_ptr<events::event> served = std::make_unique<events::order_served>(
+                0, 6, static_cast<size_t>(customer_id), 3, table_position);
+            event_interface::queue_event(served);
+            game.tick(1.0f / 60.0f); // level routes order_served -> customer.set_eating
+            THEN("the customer starts eating"){
+                REQUIRE(game.get_customer_dog(customer_id).get_state_name() == "eating");
+            }
+        }
+    }
+}
+
+// Case E: the eating duration is defined in config, and the customer leaves once
+// it elapses.
+SCENARIO("a customer leaves after the configured eating duration", "[customer][eating]"){
+    test_game game;
+    const int customer_id = 91;
+    const Vector2 table_position{level_config::edge_weight * 6, level_config::edge_weight * 6};
+    game.insert_customer_dog(customer_id, table_position);
+    game.get_customer_dog(customer_id).set_eating(0, 3, table_position);
+    REQUIRE(game.get_customer_dog(customer_id).get_state_name() == "eating");
+
+    WHEN("less than the eating duration elapses"){
+        game.tick(cafe_config::eating_duration_s * 0.5f, 1);
+        THEN("the customer is still eating"){
+            REQUIRE(game.get_customer_dog(customer_id).get_state_name() == "eating");
+        }
+    }
+    WHEN("the full eating duration elapses"){
+        game.tick(cafe_config::eating_duration_s + 1.0f, 1);
+        THEN("the customer transitions to leaving"){
+            REQUIRE(game.get_customer_dog(customer_id).get_state_name() == "leaving");
+        }
+    }
 }

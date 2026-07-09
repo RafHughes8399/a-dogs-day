@@ -799,12 +799,21 @@ namespace entities{
             size_t current_capacity() const;
             size_t max_capacity() const;
             counter_status status() const;
+            // Reservations: food promised to an in-flight order that hasn't been
+            // collected yet. available_capacity() = stored - reserved, so a second
+            // order can't claim the same item before the first waiter picks it up.
+            void reserve();
+            void release_reservation();
+            size_t reserved() const;
+            size_t available_capacity() const;
+            bool has_available_food() const;
             void render(Vector2 draw_position, int frame) override;
             void place_down() override;
 
         private:
             size_t max_capacity_;
             std::vector<std::unique_ptr<food>> stored_food_;
+            size_t reserved_ = 0;
     };
     // ------------------ entity builder ------------------ //
     class entity_builder{

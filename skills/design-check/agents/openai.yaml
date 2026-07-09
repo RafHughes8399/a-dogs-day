@@ -1,0 +1,7 @@
+interface:
+  display_name: "Design Check"
+  short_description: "Review and pressure-test design before coding"
+  default_prompt: "Use $design-check to review this implementation idea like a strict senior developer, score it out of 100, find reuse, gaps, risks, alternatives, and tell me what decisions are still needed."
+
+policy:
+  allow_implicit_invocation: true

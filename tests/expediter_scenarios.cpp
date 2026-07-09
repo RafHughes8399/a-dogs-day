@@ -11,6 +11,7 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "test_game.h"
+#include "raymath.h" // Vector2Distance
 
 using testing::test_game;
 
@@ -75,48 +76,168 @@ SCENARIO("the expediter registers and removes a waiter dog", "[expediter][waiter
     }
 }
 
-SCENARIO("the expediter listens for and records orders", "[expediter][order][stub]"){
-    SKIP("stub - not yet implemented");
-    // GIVEN a game with a registered waiter and food counter
-    //   test_game game;
-    //   (needs helper: test_game::register_waiter(id) / register_food_counter(id, pos)
-    //    -> fire events::registered_waiter / registered_food_counter)
-    // WHEN an order is scheduled for a seated customer
-    //   (needs helper: test_game::request_order(customer_id) / fire the order event)
-    //   game.tick();   // expediter.process_orders() runs inside tick
-    // THEN the expediter has the order recorded as created/scheduled
-    //   (assert via an expediter order-count/status accessor - needs helper)
+// Case A: order processing across the waiter x counter availability matrix.
+SCENARIO("the expediter only processes an order when a waiter and counter are both available",
+         "[expediter][order][processing]"){
+    test_game game;
+    game.tick(1.0f / 60.0f); // register the main level's waiter, counter, tables
+    const size_t customer_id = 100;
+    const size_t table_id = 3; // a main-level table (binding does not depend on it)
+    const Vector2 table_position{level_config::edge_weight * 6, level_config::edge_weight * 6};
+
+    WHEN("a free waiter and a stocked counter are both available"){
+        game.request_order(customer_id, table_id, table_position);
+        game.tick(1.0f / 60.0f);
+        THEN("the order is bound and dispatched (serving)"){
+            REQUIRE(game.num_orders() == 1);
+            REQUIRE(game.first_order_status() == expediter::order_status::serving);
+        }
+    }
+    WHEN("a waiter is free but the counter is empty"){
+        auto* counter = game.first_counter();
+        REQUIRE(counter != nullptr);
+        while(!counter->is_empty()){ counter->take(); }
+        game.request_order(customer_id, table_id, table_position);
+        game.tick(1.0f / 60.0f);
+        THEN("the order stays unprocessed (created)"){
+            REQUIRE(game.num_orders() == 1);
+            REQUIRE(game.first_order_status() == expediter::order_status::created);
+        }
+    }
+    WHEN("the counter is stocked but no waiter is free"){
+        auto* waiter = game.first_waiter();
+        REQUIRE(waiter != nullptr);
+        waiter->set_serving(); // busy -> unavailable
+        game.request_order(customer_id, table_id, table_position);
+        game.tick(1.0f / 60.0f);
+        THEN("the order stays unprocessed (created)"){
+            REQUIRE(game.first_order_status() == expediter::order_status::created);
+        }
+    }
+    WHEN("neither a waiter nor a stocked counter is available"){
+        auto* waiter = game.first_waiter();
+        auto* counter = game.first_counter();
+        REQUIRE(waiter != nullptr);
+        REQUIRE(counter != nullptr);
+        waiter->set_serving();
+        while(!counter->is_empty()){ counter->take(); }
+        game.request_order(customer_id, table_id, table_position);
+        game.tick(1.0f / 60.0f);
+        THEN("the order stays unprocessed (created)"){
+            REQUIRE(game.first_order_status() == expediter::order_status::created);
+        }
+    }
 }
 
-SCENARIO("the expediter creates an order", "[expediter][order][stub]"){
-    SKIP("stub - not yet implemented");
-    // GIVEN a registered free waiter, a food counter, and a seated customer's table
-    // WHEN the expediter creates an order
-    //   (drives expediter::create_order via the event/tick path)
-    // THEN a new order exists binding that waiter, counter, and table, status=created
+// Case B: a dispatched waiter walks to the counter, collects food, then delivers
+// to the table - checking the leg destinations, the counter decrement, and the
+// waiter's idle -> serving -> idle transition.
+SCENARIO("a dispatched waiter collects food from the counter and delivers it to the table",
+         "[expediter][waiter][serving]"){
+    test_game game;
+    game.tick(1.0f / 60.0f); // register waiter, counter, tables
+    auto* waiter = game.first_waiter();
+    auto* counter = game.first_counter();
+    REQUIRE(waiter != nullptr);
+    REQUIRE(counter != nullptr);
+
+    const int waiter_id = waiter->get_id();
+    const size_t counter_food_before = counter->current_capacity();
+    const Vector2 counter_interaction = counter->get_interaction_positions().left;
+
+    const int table_id = 3; // main-level table at {6,6} edges
+    const Vector2 table_position{level_config::edge_weight * 6, level_config::edge_weight * 6};
+    auto* table = dynamic_cast<entities::table*>(game.find_entity(table_id));
+    REQUIRE(table != nullptr);
+    const Vector2 table_interaction = table->get_interaction_positions().right;
+
+    GIVEN("an order is requested and dispatched"){
+        REQUIRE(waiter->is_available_for_order());              // idle
+        game.request_order(200, static_cast<size_t>(table_id), table_position);
+        game.tick(1.0f / 60.0f); // create + dispatch
+        game.tick(1.0f / 60.0f); // level assigns the path to the counter
+
+        THEN("the waiter is serving and heading to the counter's interaction node"){
+            REQUIRE(game.get_waiter_dog(waiter_id).get_state_name() == "serving");
+            REQUIRE_FALSE(waiter->is_available_for_order());
+            REQUIRE(Vector2Distance(waiter->peek_destination(), counter_interaction) < 1.0f);
+        }
+
+        WHEN("the waiter reaches the counter"){
+            const bool collected = game.tick_until([&]{ return waiter->is_carrying_food(); }, 3000);
+            // The onward path to the table is queued (send_dog_to_furniture) when
+            // food is collected; let it be assigned before checking the destination.
+            game.tick_until([&]{ return waiter->peek_destination().x >= 0.0f; }, 10);
+            THEN("it took one item of food and now heads to the table"){
+                REQUIRE(collected);
+                REQUIRE(counter->current_capacity() == counter_food_before - 1);
+                REQUIRE(Vector2Distance(waiter->peek_destination(), table_interaction) < 1.0f);
+            }
+            AND_WHEN("the waiter reaches the table"){
+                const bool delivered = game.tick_until([&]{ return waiter->is_available_for_order(); }, 3000);
+                THEN("the order is served and the waiter returns to idle, carrying nothing"){
+                    REQUIRE(delivered);
+                    REQUIRE(game.get_waiter_dog(waiter_id).get_state_name() == "idle");
+                    REQUIRE_FALSE(waiter->is_carrying_food());
+                }
+            }
+        }
+    }
 }
 
-SCENARIO("the expediter processes an order given an available waiter and food counter",
-         "[expediter][order][waiter][stub]"){
-    SKIP("stub - not yet implemented");
-    // GIVEN a created order with an available waiter and a food counter
-    //   test_game game;
-    //   ... register waiter + food counter + table, schedule an order ...
-    // WHEN the expediter processes orders over several ticks
-    //   game.tick_until([&]{ /* order moved past 'created' */ return false; }, 120);
-    // THEN the waiter is assigned and dispatched (fulfill_order): counter then table
-    //   (assert waiter assigned + has a path; needs expediter/waiter accessors)
+// Case C: table registration/removal against the EXPEDITER's table list (which
+// it now tracks so it can path waiters to the delivery node).
+SCENARIO("the expediter registers and removes tables", "[expediter][table][registration]"){
+    test_game game;
+    game.tick(1.0f / 60.0f); // register the main level's tables
+    const int baseline = game.num_expediter_tables();
+
+    GIVEN("a table inserted on the stations layer"){
+        const int table_id = 80;
+        game.insert_entity(game.build_table(table_id,
+                               Vector2{level_config::edge_weight * 14, level_config::edge_weight * 14}),
+                           level_config::draw_layers::stations);
+        game.tick(1.0f / 60.0f); // process registered_table
+
+        THEN("the expediter tracks one additional table"){
+            REQUIRE(game.num_expediter_tables() == baseline + 1);
+        }
+
+        WHEN("the table is removed from the level"){
+            game.remove_entity(table_id);
+            THEN("the expediter no longer tracks it"){
+                REQUIRE(game.num_expediter_tables() == baseline);
+            }
+        }
+    }
 }
 
-SCENARIO("a waiter dog navigates to the food counter and then the table",
-         "[expediter][waiter][pathfinding][stub]"){
-    SKIP("stub - not yet implemented");
-    // GIVEN a waiter dog inserted and an order assigned to it
-    //   test_game game;
-    //   game.insert_waiter_dog(30, waiter_dog_type, waiter_start_pos);
-    //   ... assign an order (counter + table) ...
-    // WHEN the sim advances
-    //   game.tick_until([&]{ /* waiter reached counter, then table */ return false; }, 240);
-    // THEN the waiter paths to the food counter first, then to the table
-    //   NOTE: waiter leaf states are no-op stubs today - aspirational until built out.
+// Effective counter capacity: dispatching an order reserves one item, so a
+// second order cannot claim the same food before the first waiter collects it.
+SCENARIO("the expediter reserves counter food so two orders cannot claim the same item",
+         "[expediter][order][reservation]"){
+    test_game game;
+    game.tick(1.0f / 60.0f);
+    auto* counter = game.first_counter();
+    REQUIRE(counter != nullptr);
+    // A second waiter so two orders *could* be dispatched in the same pass.
+    game.insert_waiter_dog(70, dog_config::waiter_dog_types::basic,
+                           Vector2{level_config::edge_weight * 22, level_config::edge_weight * 10});
+    game.tick(1.0f / 60.0f);
+    // Drain the counter to a single item.
+    while(counter->current_capacity() > 1){ counter->take(); }
+    REQUIRE(counter->current_capacity() == 1);
+    REQUIRE(counter->available_capacity() == 1);
+
+    WHEN("two orders are requested but only one item of food is available"){
+        game.request_order(300, 3, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
+        game.request_order(301, 4, Vector2{level_config::edge_weight * 12, level_config::edge_weight * 12});
+        game.tick(1.0f / 60.0f);
+
+        THEN("only one order reserves the food; the counter has no available capacity left"){
+            REQUIRE(game.num_orders() == 2);
+            REQUIRE(counter->reserved() == 1);
+            REQUIRE(counter->available_capacity() == 0);
+        }
+    }
 }
