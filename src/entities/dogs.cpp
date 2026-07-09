@@ -278,13 +278,17 @@ void entities::customer_dog::seated::update(customer_dog& dog, float delta, int 
 }
 
 void entities::customer_dog::eating::update(customer_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
     (void) frame;
     (void) order_id_;
     (void) table_id_;
     (void) table_position_;
-    // play eating animatino, count down too
+    // Count down the eating timer; when it elapses the customer is done and
+    // transitions to leaving. (Pathing the customer out of the cafe is a
+    // follow-up; the state transition is what the loop and tests depend on.)
+    elapsed_ += delta;
+    if(elapsed_ >= cafe_config::eating_duration_s){
+        dog.set_state(std::make_unique<customer_dog::leaving>());
+    }
 }
 
 void entities::customer_dog::leaving::update(customer_dog& dog, float delta, int frame){
@@ -323,8 +327,37 @@ void entities::waiter_dog::idle::update(waiter_dog& dog, float delta, int frame)
 bool entities::waiter_dog::idle::is_available_for_order(){
     return true;
 }
+
+void entities::waiter_dog::serving::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+    // The expediter drives the serving journey via dog_completed_path; the
+    // serving state itself just marks the waiter busy.
+}
+bool entities::waiter_dog::serving::is_available_for_order(){
+    return false;
+}
+
+entities::waiter_dog::~waiter_dog() = default;
+
 bool entities::waiter_dog::is_available_for_order(){
     return state_->is_available_for_order();
+}
+void entities::waiter_dog::set_serving(){
+    set_state(std::make_unique<serving>());
+}
+void entities::waiter_dog::set_idle(){
+    set_state(std::make_unique<idle>());
+}
+void entities::waiter_dog::hold_food(std::unique_ptr<food> item){
+    held_food_ = std::move(item);
+}
+std::unique_ptr<entities::food> entities::waiter_dog::release_food(){
+    return std::move(held_food_);
+}
+bool entities::waiter_dog::is_carrying_food() const{
+    return held_food_ != nullptr;
 }
 // ------------------------------- builder ------------------------------- //
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){

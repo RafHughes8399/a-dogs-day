@@ -82,6 +82,8 @@ namespace cafe_config{
     inline const float queue_arrival_s = 120.0f;
     inline const float queue_left_window_s = 30.0f;
     inline const int queue_left_trigger = 3;
+    // How long a customer stays in the eating state before leaving (seconds).
+    inline const float eating_duration_s = 10.0f;
     inline const int customer_dog_type = 0;
     inline const Vector2 queue_dir = Vector2{0.0f, 1.0f};
     inline const Vector2 customer_spawn_positions[2] = {

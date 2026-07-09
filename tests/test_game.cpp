@@ -91,9 +91,8 @@ namespace testing{
     }
 
     std::unique_ptr<entities::entity> test_game::build_customer_dog(
-        int /*id*/, Vector2 /*position*/, std::optional<Vector2> /*destination*/, int /*dog_type*/){
-        // impl: return entities::e_builder.build_customer_dog(id, dog_type, position, destination);
-        todo("build_customer_dog");
+        int id, Vector2 position, std::optional<Vector2> destination, int dog_type){
+        return entities::e_builder.build_customer_dog(id, dog_type, position, destination);
     }
 
     std::unique_ptr<entities::entity> test_game::build_waiter_dog(
@@ -107,9 +106,8 @@ namespace testing{
         level_->add_entity(std::move(entity), layer);
     }
 
-    void test_game::insert_customer_dog(int /*id*/, Vector2 /*position*/, std::optional<Vector2> /*destination*/){
-        // impl: insert_entity(build_customer_dog(id, position, destination), level_config::dogs);
-        todo("insert_customer_dog");
+    void test_game::insert_customer_dog(int id, Vector2 position, std::optional<Vector2> destination){
+        insert_entity(build_customer_dog(id, position, destination), level_config::draw_layers::dogs);
     }
 
     void test_game::insert_waiter_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination){
@@ -121,6 +119,17 @@ namespace testing{
     void test_game::customer_arrives(){
         // impl: maitre_d_.request_customer_arrival();
         todo("customer_arrives");
+    }
+
+    void test_game::request_order(size_t customer_id, size_t table_id, Vector2 table_position){
+        std::unique_ptr<events::event> reached = std::make_unique<events::dog_reached_table>(
+            customer_id, table_id, table_position);
+        event_interface::queue_event(reached);
+    }
+
+    void test_game::remove_entity(int id){
+        events::remove_entity remove{static_cast<size_t>(id)};
+        event_interface::execute_event(remove);
     }
 
     // ---------------- inspection accessors ----------------
@@ -149,9 +158,40 @@ namespace testing{
         return static_cast<int>(maitre_d_.num_customers());
     }
 
-    entities::customer_dog& test_game::get_customer_dog(int /*id*/){
-        // impl: dynamic_cast<customer_dog&> the result of find_entity(id).
-        todo("get_customer_dog");
+    int test_game::num_expediter_tables(){
+        return static_cast<int>(expediter_.num_tables());
+    }
+
+    int test_game::num_orders(){
+        return static_cast<int>(expediter_.num_orders());
+    }
+
+    expediter::order_status test_game::first_order_status(){
+        return expediter_.first_order_status();
+    }
+
+    entities::waiter_dog* test_game::first_waiter(){
+        return expediter_.first_waiter();
+    }
+
+    entities::food_counter* test_game::first_counter(){
+        return expediter_.first_counter();
+    }
+
+    entities::customer_dog& test_game::get_customer_dog(int id){
+        auto* customer = dynamic_cast<entities::customer_dog*>(find_entity(id));
+        if(customer == nullptr){
+            todo("get_customer_dog: id is not a customer dog / not present");
+        }
+        return *customer;
+    }
+
+    entities::waiter_dog& test_game::get_waiter_dog(int id){
+        auto* waiter = dynamic_cast<entities::waiter_dog*>(find_entity(id));
+        if(waiter == nullptr){
+            todo("get_waiter_dog: id is not a waiter dog / not present");
+        }
+        return *waiter;
     }
 
 } // namespace testing

@@ -87,6 +87,11 @@ namespace testing{
             // Fire the same path the debug 'L' key fires
             // (maitre_d_.request_customer_arrival()). No synthetic OS input.
             void customer_arrives();
+            // Fire dog_reached_table for the given customer/table - the "customer
+            // requests an order on seating" signal the expediter listens for.
+            void request_order(size_t customer_id, size_t table_id, Vector2 table_position);
+            // Remove an entity from the level (fires remove_entity).
+            void remove_entity(int id);
 
             // ---------------- inspection accessors ----------------
             // Look up an entity by id in the level; nullptr if absent.
@@ -97,11 +102,18 @@ namespace testing{
             // for asserting registration and removal in scenarios.
             int num_waiters();
             int num_counters();
-            int num_tables();
+            int num_tables();          // maitre d' table count
             int num_customers();
-            // Typed accessor for customer-dog scenarios (throws if id is not a
-            // customer dog / not present).
+            int num_expediter_tables(); // expediter table count (distinct system)
+            int num_orders();
+            expediter::order_status first_order_status();
+            // Live pointers to the first tracked waiter / counter, for driving
+            // availability in scenarios (nullptr if none). Not owned.
+            entities::waiter_dog* first_waiter();
+            entities::food_counter* first_counter();
+            // Typed accessors (throw if id is not that dog type / not present).
             entities::customer_dog& get_customer_dog(int id);
+            entities::waiter_dog& get_waiter_dog(int id);
 
         private:
             std::unique_ptr<level::level> level_;
