@@ -74,10 +74,7 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
             + ", right_interaction_position: " + vector_to_string(interaction_positions.right);
         debug::log(message);
         std::unique_ptr<events::event> registered_table = std::make_unique<events::registered_table>(
-            table,
-            static_cast<size_t>(entity_id),
-            position,
-            interaction_positions);
+            table);
         event_interface::queue_event(registered_table);
     }
     if(food_counter != nullptr){
@@ -88,10 +85,7 @@ void level::level::add_entity(std::unique_ptr<entities::entity> entity, size_t l
             + ", position: " + vector_to_string(position)
             + ", interaction_position: " + vector_to_string(interaction_position));
         std::unique_ptr<events::event> registered_food_counter = std::make_unique<events::registered_food_counter>(
-            food_counter,
-            static_cast<size_t>(entity_id),
-            position,
-            interaction_position);
+            food_counter);
         event_interface::queue_event(registered_food_counter);
     }
     if(waiter != nullptr){
@@ -203,7 +197,7 @@ int level::level::num_entities(){
 }
 
 entities::entity* level::level::get_entity(int id){
-    auto entry = id_entity_map_.find(id);
+    auto entry = id_entity_map_.find(static_cast<size_t>(id));
     return entry == id_entity_map_.end() ? nullptr : entry->second;
 }
 
@@ -223,7 +217,7 @@ void level::level::on_right_mouse_event(const events::right_mouse_click& event){
 
     auto dog_id = event.get_selected_dog();
     if(dog_id != -1){
-        auto dog = id_entity_map_[dog_id];
+        auto dog = id_entity_map_[static_cast<size_t>(dog_id)];
         auto dog_cast = static_cast<entities::player_dog*>(dog);
         auto direction = dog_cast->get_direction_scalar();
         auto dog_path = graph_.find_path(dog->get_position(), click_position, direction);
@@ -245,7 +239,7 @@ void level::level::on_build_customer_dog_event(const events::build_customer_dog&
 
 void level::level::on_send_dog_to_position_event(const events::send_dog_to_position& event){
     auto customer_id = static_cast<int>(event.get_customer_id());
-    auto dog_record = id_entity_map_.find(customer_id);
+    auto dog_record = id_entity_map_.find(static_cast<size_t>(customer_id));
     if(dog_record == id_entity_map_.end()){
         debug::log(
             "[level::on_send_dog_to_position_event, missing customer entity] "
@@ -266,7 +260,7 @@ void level::level::on_send_dog_to_position_event(const events::send_dog_to_posit
 void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture& event){
     // find the dog, calculate the path, give the dog the path
     auto dog_id = static_cast<int>(event.get_dog_id());
-    auto dog_record = id_entity_map_.find(dog_id);
+    auto dog_record = id_entity_map_.find(static_cast<size_t>(dog_id));
     if(dog_record == id_entity_map_.end()){
         debug::log(
             "[level::on_send_dog_to_furniture, missing customer entity] "
@@ -292,7 +286,7 @@ void level::level::on_removed_entity(const events::remove_entity& event){
 }
 void level::level::on_order_served_event(const events::order_served& event){
     auto customer_id = static_cast<int>(event.get_customer_id());
-    auto customer_record = id_entity_map_.find(customer_id);
+    auto customer_record = id_entity_map_.find(static_cast<size_t>(customer_id));
     if(customer_record == id_entity_map_.end()){
         debug::log(
             "[level::on_order_served_event, missing customer entity] "

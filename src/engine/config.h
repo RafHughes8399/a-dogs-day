@@ -35,8 +35,8 @@ namespace level_config{
     // for the main level graph
     inline const float edge_weight = 64.0f; // placeholder
 
-    inline const int screen_edges_x = screen_width/ edge_weight;
-    inline const int screen_edges_y = screen_height / edge_weight;
+    inline const int screen_edges_x = static_cast<int>(screen_width / edge_weight);
+    inline const int screen_edges_y = static_cast<int>(screen_height / edge_weight);
 
     inline const int empty_node = -1;
     inline const size_t mack_id = 0;

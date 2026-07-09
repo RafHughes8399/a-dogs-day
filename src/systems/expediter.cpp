@@ -17,30 +17,21 @@ void expediter::expediter::process_orders(){
     // free waiter and a stocked counter exist. Anything that cannot be served
     // now stays scheduled and is retried on a later tick when availability
     // returns (a freed waiter, a restocked counter).
-    for(auto& order : orders_){
-        if(order.status != order_status::scheduled){
-            continue;
-        }
-        if(!are_waiters_available() || !are_counters_available()){
-            break;
-        }
-        auto& assigned = assign_waiter_to_order();
-        auto* counter = find_counter();
-        if(assigned == empty_waiter || counter == nullptr){
-            break;
-        }
-        assigned.assigned_to_order = true;
-        order.waiter_id = assigned.id;
-        order.waiter = assigned.ptr;
-        order.counter = counter;
-        order.status = order_status::created;
+    bool can_process_orders = are_waiters_available() && are_counters_available();
+    if(can_process_orders){
+        for(auto& order: orders_){
+        // should be able to assign a waiter and counter,
+        // assigns and fulfills it
+        assign_waiter_to_order(order);
+        pick_food_counter(order);
         fulfill_order(order);
+        }
     }
 }
 
 bool expediter::expediter::are_waiters_available() const{
-    return std::any_of(waiters_.begin(), waiters_.end(), [](const waiter& w) -> bool {
-        return !w.assigned_to_order;
+    return std::any_of(waiters_.begin(), waiters_.end(), [](const auto& w) -> bool {
+        return !w->is_available_for_order();
     });
 }
 
@@ -50,65 +41,39 @@ bool expediter::expediter::are_counters_available() const{
     });
 }
 
-expediter::waiter& expediter::expediter::assign_waiter_to_order(){
-    // select a free waiter to fulfill an order
+void expediter::expediter::assign_waiter_to_order(order& order){
+    // select a free waiter to fulfill an order. precondition assumes that there 
+    // is a free waiter
     for(auto& waiter : waiters_){
-        if(! waiter.assigned_to_order){
-            return waiter;
+        if(waiter->is_available_for_order()){
+            order.waiter = waiter;
         }
     }
-    return empty_waiter;
 }
-
-entities::food_counter* expediter::expediter::find_counter(){
-    // first counter that has food
-    for(auto* counter : food_counters_){
-        if(! counter->is_empty()){
-            return counter;
+void expediter::expediter::pick_food_counter(order& order){
+    // ? in effect this is always going to pick the same counter until it is depleted  
+    // ? maybe include some random selected index
+    for(auto& counter : food_counters_){
+        if(!counter->is_empty()){
+            order.counter = counter;
         }
     }
-    return nullptr;
 }
-
-expediter::expediter::expediter()
-: next_order_id_(0),
-registered_waiter_handler_([this](const events::registered_waiter& event) -> void {on_registered_waiter_event(event);}),
-removed_waiter_handler_([this](const events::removed_waiter& event) -> void {on_removed_waiter_event(event);}),
-registered_food_counter_handler_([this](const events::registered_food_counter& event) -> void {on_registered_food_counter_event(event);}),
-removed_food_counter_handler_([this](const events::removed_food_counter& event) -> void {on_removed_food_counter_event(event);}),
-dog_reached_table_handler_([this](const events::dog_reached_table& event) -> void {on_dog_reached_table_event(event);}){
-    event_interface::subscribe<events::registered_waiter>(registered_waiter_handler_);
-    event_interface::subscribe<events::removed_waiter>(removed_waiter_handler_);
-    event_interface::subscribe<events::registered_food_counter>(registered_food_counter_handler_);
-    event_interface::subscribe<events::removed_food_counter>(removed_food_counter_handler_);
-    event_interface::subscribe<events::dog_reached_table>(dog_reached_table_handler_);
-}
-
-expediter::expediter::~expediter(){
-    event_interface::unsubscribe<events::registered_waiter>(registered_waiter_handler_);
-    event_interface::unsubscribe<events::removed_waiter>(removed_waiter_handler_);
-    event_interface::unsubscribe<events::registered_food_counter>(registered_food_counter_handler_);
-    event_interface::unsubscribe<events::removed_food_counter>(removed_food_counter_handler_);
-    event_interface::unsubscribe<events::dog_reached_table>(dog_reached_table_handler_);
-}
-
 void expediter::expediter::register_waiter(entities::waiter_dog* dog){
     auto id = dog->get_id();
-    auto existing_waiter = std::find_if(waiters_.begin(), waiters_.end(), [id](const waiter& w) -> bool {
-        return w.id == id;
+    auto existing_waiter = std::find_if(waiters_.begin(), waiters_.end(), [id](const auto& w) -> bool {
+        return w->get_id() == id;
     });
-    if(existing_waiter != waiters_.end()){
-        existing_waiter->ptr = dog;
+    if(existing_waiter == waiters_.end()){
+        waiters_.push_back(dog);
         return;
     }
-
-    waiters_.push_back(waiter{id, dog, false});
 }
 
 void expediter::expediter::remove_waiter(size_t waiter_id){
     auto id = static_cast<int>(waiter_id);
-    waiters_.erase(std::remove_if(waiters_.begin(), waiters_.end(), [id](const waiter& w) -> bool {
-        return w.id == id;
+    waiters_.erase(std::remove_if(waiters_.begin(), waiters_.end(), [id](const auto& w) -> bool {
+        return w->get_id() == id;
     }), waiters_.end());
 }
 
@@ -157,13 +122,13 @@ void expediter::expediter::on_dog_reached_table_event(const events::dog_reached_
         Vector2Zero(),
         event.get_table_position()
     };
+    // creates an order request without assigng a counter and watier
     orders_.push_back(order{
         next_order_id_++,
         event.get_customer_id(),
-        -1,
         nullptr,
         table,
         nullptr,
-        order_status::scheduled
+        order_status::created
     });
 }

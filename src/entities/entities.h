@@ -574,6 +574,7 @@ namespace entities{
             waiter_dog_state& operator=(waiter_dog_state&& other) = default;
 
             virtual void update(waiter_dog& dog, float delta, int frame) = 0;
+            virtual bool is_available_for_order() = 0;
             virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path);
             virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
             virtual void on_path_finished(waiter_dog& dog, Vector2 destination);
@@ -584,7 +585,7 @@ namespace entities{
             explicit waiter_dog_traveling_state(Vector2 destination) : destination_(destination) {}
 
             void on_path_finished(waiter_dog& dog, Vector2 destination) final;
-
+            bool is_available_for_order() override;
         protected:
             virtual void on_arrived(waiter_dog& dog) = 0;
 
@@ -597,44 +598,16 @@ namespace entities{
         public:
             class idle : public waiter_dog_state{
                 public:
+                    idle()
+                    : waiter_dog_state(){}
                     void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class going_to_table : public waiter_dog_state{
+                    bool is_available_for_order() override;
+                };
+            class serving : public waiter_dog_traveling_state{
                 public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
+                // TODO decide what overrides are necessary
 
-            class taking_order : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
             };
-
-            class going_to_kitchen : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class waiting_for_food : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class delivering_food : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class clearing_table : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
-            class returning_to_station : public waiter_dog_state{
-                public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
-            };
-
             waiter_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right,
             std::unique_ptr<waiter_dog_state> state = std::make_unique<idle>())
@@ -646,6 +619,8 @@ namespace entities{
 
             waiter_dog& operator=(const waiter_dog& other) = delete;
             waiter_dog& operator=(waiter_dog&& other) = delete;
+
+            bool is_available_for_order();
     };
 
     // body behaves slightly differently for decorations, it will have the variants for the decoration (probably should be called deocraiotn)
@@ -683,6 +658,10 @@ namespace entities{
 
     class station : public decoration {
         public:
+            struct interaction_positions{
+                Vector2 left;
+                Vector2 right;
+            };
             enum station_type{
                 table_station = 0,
                 food_counter_station = 1
@@ -705,11 +684,11 @@ namespace entities{
             // (left and right) that a dog paths to in order to interact with it.
             // Centralised here so every station type (table, food counter) shares
             // one implementation instead of each recomputing its own.
-            events::table_interaction_positions get_interaction_positions() const;
+            interaction_positions get_interaction_positions() const;
 
         protected:
             void update_interaction_positions();
-            events::table_interaction_positions interaction_positions_; // TODO ! refactor this type, why the fuck is it under events 
+            interaction_positions interaction_positions_; // TODO ! refactor this type, why the fuck is it under events 
 
         private:
             station_type type_;

@@ -40,11 +40,6 @@ namespace entities{
 }
 
 namespace events{
-	struct table_interaction_positions{
-		Vector2 left;
-		Vector2 right;
-	};
-
 	enum customer_queue_side{
 		left_queue = 0,
 		right_queue = 1
@@ -370,9 +365,8 @@ namespace events{
 	// not need concrete entity types or ownership of level entities.
 	class registered_table : public event{
 		public:
-			registered_table(entities::table* table, size_t table_id, Vector2 position, table_interaction_positions interaction_positions)
-			: event(ids::register_table), table_(table), table_id_(table_id), position_(position),
-			interaction_positions_(interaction_positions){}
+			registered_table(entities::table* table)
+			: event(ids::register_table), table_(table){}
 
 			static int get_static_type(){
 				return ids::register_table;
@@ -380,20 +374,8 @@ namespace events{
 			entities::table* get_table() const{
 				return table_;
 			}
-			size_t get_table_id() const{
-				return table_id_;
-			}
-			Vector2 get_position() const{
-				return position_;
-			}
-			table_interaction_positions get_interaction_positions() const{
-				return interaction_positions_;
-			}
 		private:
 			entities::table* const table_;
-			const size_t table_id_;
-			const Vector2 position_;
-			const table_interaction_positions interaction_positions_;
 	};
 	class removed_table : public event{
 		public:
@@ -635,8 +617,8 @@ namespace events{
 	// these positions when routing waiter dogs through a pickup checkpoint.
 	class registered_food_counter : public event{
 		public:
-			registered_food_counter(entities::food_counter* counter, size_t counter_id, Vector2 position, Vector2 interaction_position)
-			: event(ids::register_food_counter), counter_(counter), counter_id_(counter_id), position_(position), interaction_position_(interaction_position){}
+			registered_food_counter(entities::food_counter* counter)
+			: event(ids::register_food_counter), counter_(counter){}
 
 			static int get_static_type(){
 				return ids::register_food_counter;
@@ -644,20 +626,8 @@ namespace events{
 			entities::food_counter* get_counter() const{
 				return counter_;
 			}
-			size_t get_counter_id() const{
-				return counter_id_;
-			}
-			Vector2 get_position() const{
-				return position_;
-			}
-			Vector2 get_interaction_position() const{
-				return interaction_position_;
-			}
 		private:
 			entities::food_counter* const counter_;
-			const size_t counter_id_;
-			const Vector2 position_;
-			const Vector2 interaction_position_;
 	};
 	// Cafe-domain fact: a food counter was removed from the level; the expediter
 	// must drop its pointer to avoid dereferencing a destroyed entity.

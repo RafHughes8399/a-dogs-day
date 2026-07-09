@@ -26,12 +26,13 @@ namespace expediter{
 
     enum order_status{
         created = 0,
+        assigned = 1,
         scheduled = 2,
-        serving = 1,
-        served = 3,
-        clearing = 4,
-        cleared = 5,
-        fulfilled = 6
+        serving = 3,
+        served = 4,
+        clearing = 5,
+        cleared = 6,
+        fulfilled = 7
     };
     struct table_record{
         int id;
@@ -44,33 +45,45 @@ namespace expediter{
     // A waiter the expediter can assign to orders. The dog entity is held by
     // non-owning pointer (position read live from it); whether the waiter is
     // busy is expediter-domain state and lives here, not on the dog.
-    struct waiter{
-        int id;
-        entities::waiter_dog* ptr;
-        bool assigned_to_order;
 
-        bool operator==(const waiter& other) const{
-            return id == other.id;
-        }
-    };
+    // TODO: ! refactor waiter, only need the ptr, the watier dog should 
+    // TODO have a function to return its status of assigned or not based on the 
+    // TODO state machine
 
     struct order{
         size_t order_id;
-        size_t customer_id;
-        int waiter_id;                    // assigned waiter id, -1 while unassigned
+        size_t customer_id;          // assigned waiter id, -1 while unassigned
         entities::waiter_dog* waiter;     // stable entity pointer, nullptr while unassigned
         table_record table;
         entities::food_counter* counter;  // assigned counter, nullptr while unassigned
         order_status status;
     };
 
-    inline waiter empty_waiter = {-1, nullptr, false};
     inline table_record empty_table = {-1, Vector2{-1, -1}, Vector2{-1, -1}};
 
     class expediter{
         public:
-            expediter();
-            ~expediter();
+            ~expediter(){
+                event_interface::unsubscribe<events::registered_waiter>(registered_waiter_handler_);
+                event_interface::unsubscribe<events::removed_waiter>(removed_waiter_handler_);
+                event_interface::unsubscribe<events::registered_food_counter>(registered_food_counter_handler_);
+                event_interface::unsubscribe<events::removed_food_counter>(removed_food_counter_handler_);
+                event_interface::unsubscribe<events::dog_reached_table>(dog_reached_table_handler_);
+            }
+            expediter()
+            : next_order_id_(0),
+            registered_waiter_handler_([this](const events::registered_waiter& event) -> void {on_registered_waiter_event(event);}),
+            removed_waiter_handler_([this](const events::removed_waiter& event) -> void {on_removed_waiter_event(event);}),
+            registered_food_counter_handler_([this](const events::registered_food_counter& event) -> void {on_registered_food_counter_event(event);}),
+            removed_food_counter_handler_([this](const events::removed_food_counter& event) -> void {on_removed_food_counter_event(event);}),
+            dog_reached_table_handler_([this](const events::dog_reached_table& event) -> void {on_dog_reached_table_event(event);}){
+                event_interface::subscribe<events::registered_waiter>(registered_waiter_handler_);
+                event_interface::subscribe<events::removed_waiter>(removed_waiter_handler_);
+                event_interface::subscribe<events::registered_food_counter>(registered_food_counter_handler_);
+                event_interface::subscribe<events::removed_food_counter>(removed_food_counter_handler_);
+                event_interface::subscribe<events::dog_reached_table>(dog_reached_table_handler_);
+            }
+
 
             expediter(const expediter& other) = delete;
             expediter(expediter&& other) = delete;
@@ -87,8 +100,8 @@ namespace expediter{
             void fulfill_order(order& order);
             bool are_waiters_available() const;
             bool are_counters_available() const;
-            waiter& assign_waiter_to_order();
-            entities::food_counter* find_counter();
+            void assign_waiter_to_order(order& order);
+            void pick_food_counter(order& order);
 
             void on_registered_waiter_event(const events::registered_waiter& event);
             void on_removed_waiter_event(const events::removed_waiter& event);
@@ -96,7 +109,7 @@ namespace expediter{
             void on_removed_food_counter_event(const events::removed_food_counter& event);
             void on_dog_reached_table_event(const events::dog_reached_table& event);
         private:
-            std::vector<waiter> waiters_;
+            std::vector<entities::waiter_dog*> waiters_;
             std::vector<entities::food_counter*> food_counters_;
             std::vector<order> orders_;
             size_t next_order_id_;

@@ -309,54 +309,23 @@ void entities::customer_dog::on_give_dog_path_event(const events::give_dog_path&
 }
 
 // ------------------------------- waiter dogs ------------------------------- //
+
+bool entities::waiter_dog_traveling_state::is_available_for_order(){
+    return false;
+}
+
 void entities::waiter_dog::idle::update(waiter_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
+    // Idle waiters do nothing until the expediter assigns them an order.
 }
-
-void entities::waiter_dog::going_to_table::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
+bool entities::waiter_dog::idle::is_available_for_order(){
+    return true;
 }
-
-void entities::waiter_dog::taking_order::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
+bool entities::waiter_dog::is_available_for_order(){
+    return state_->is_available_for_order();
 }
-
-void entities::waiter_dog::going_to_kitchen::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
-}
-
-void entities::waiter_dog::waiting_for_food::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
-}
-
-void entities::waiter_dog::delivering_food::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
-}
-
-void entities::waiter_dog::clearing_table::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
-}
-
-void entities::waiter_dog::returning_to_station::update(waiter_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
-}
-
 // ------------------------------- builder ------------------------------- //
 std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 position, int id){
     auto khiri_left_texture = textures::textures_.get_texture(textures::khiri_left, entity_config::khiri_left_path);
