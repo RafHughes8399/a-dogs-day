@@ -15,13 +15,8 @@ namespace entities{
                 Vector2 left;
                 Vector2 right;
             };
-            enum station_type{
-                table_station = 0,
-                food_counter_station = 1
-            };
-
-            station(body::body body, Vector2 position, int id, std::string debug_id, station_type type)
-            : decoration(body, position, id, std::move(debug_id)), interaction_positions_{}, type_(type){
+            station(body::body body, Vector2 position, int id, std::string debug_id)
+            : decoration(body, position, id, std::move(debug_id)), interaction_positions_{}{
                 update_interaction_positions();
             }
             station(const station& other) = default;
@@ -35,15 +30,13 @@ namespace entities{
             // Centralised here so every station type (table, food counter) shares
             // one implementation instead of each recomputing its own.
             interaction_positions get_interaction_positions() const;
-            station_type get_station_type();
             void interact(entity& other) override;
 
         protected:
             void update_interaction_positions();
-            interaction_positions interaction_positions_; // TODO ! refactor this type, why the fuck is it under events
+            interaction_positions interaction_positions_; 
 
         private:
-            station_type type_;
     };
 
     class table : public station {
@@ -55,7 +48,7 @@ namespace entities{
             };
 
             table(body::body body, Vector2 position, int id, std::string debug_id)
-            : station(body, position, id, std::move(debug_id), station_type::table_station),
+            : station(body, position, id, std::move(debug_id)),
             assigned_dog_id_(level_config::empty_node), state_(table_state::available){}
             table(const table& other) = default;
             table(table&& other) = default;
@@ -87,7 +80,7 @@ namespace entities{
             };
 
             food_counter(body::body body, Vector2 position, int id, std::string debug_id)
-            : station(body, position, id, std::move(debug_id), station_type::food_counter_station),
+            : station(body, position, id, std::move(debug_id)),
             max_capacity_(entity_config::food_counter_capacity), stored_food_(){}
             food_counter(const food_counter& other) = delete;
             food_counter(food_counter&& other) = default;
@@ -118,6 +111,43 @@ namespace entities{
             size_t max_capacity_;
             size_t reserved_ = 0;
             std::vector<std::unique_ptr<food>> stored_food_;
+    };
+    class dishwasher : public station{
+        public:
+            enum capacity_state{
+                empty = 0,
+                non_empty = 1,
+                partially_full = 2,
+                near_full = 3,
+                full = 4
+            };
+            enum capcity_dishes{
+                
+            };
+            dishwasher(body::body body, Vector2 position, int id, std::string debug_id)
+            : station(body, position, id, std::move(debug_id)){}
+            dishwasher(const dishwasher& other) = delete;
+            dishwasher(dishwasher&& other) = default;
+
+            dishwasher& operator=(const dishwasher& other) = delete;
+            dishwasher& operator=(food_counter&& other) = delete;
+        private:
+            // dogs - the dogs currently interacting with the dishwasher - raw pointers ? // this is the interacting behaviour thing we need to discuss
+            // i dont think the dishwasher need the dog points like the 
+            
+            // ? in general stations should have an interacting state and a non-interacting state, i.e is the station being worked, yes or no
+            // ? now how can we measure that ?
+            // ? theory one, we tether a dog to a station through a pointer
+
+            // ? state switch when a dog leaves a station
+            // ? state switch when a dog arrives at a station, can be done through events ? but we then run into that event bloat problem right ?, emitted to heaps of listens but 
+            // ? only care about one
+
+            // ? 
+            
+            capacity_state dish_capacity_;
+            int max_plates_;
+            int num_plates_;
     };
 }
 #endif
