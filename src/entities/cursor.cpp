@@ -13,7 +13,7 @@ void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& oth
     cursor.state_->left_click(cursor, other);
 }
 void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
-    cursor.state_->right_click(cursor, other); 
+    cursor.state_->right_click(cursor, other);
 }
 
 // ------------------------------- cursor states ---------------------------- //
@@ -24,7 +24,7 @@ void entities::cursor::state::create_move_event(cursor& cursor){
 }
 void entities::cursor::state::left_click(cursor& cursor, entity& other){
     // for "selecting a dog" and bringing up the hud
-    // pending implementation 
+    // pending implementation
     (void) cursor;
     (void) other;
 }
@@ -46,12 +46,12 @@ void entities::cursor::editing::left_click(cursor& cursor, entity& other){
     // makes other subscribe to cursor move events
     std::cout << "[editing cursor] left click " << std::endl;
     if(decoration* decoration_cast = dynamic_cast<decoration*>(&other)){
-        
+
         std::cout << "[editing cursor] pick up decoration, switch to carrying " << std::endl;
         decoration_cast->pick_up();
         cursor.state_ = std::make_unique<carrying_decoration>(decoration_cast);
     }
-    
+
     return;
 }
 void entities::cursor::editing::right_click(cursor& cursor, entity& other){
@@ -65,7 +65,7 @@ void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& o
     (void) other;
     if(decoration* decoration_cast = dynamic_cast<decoration*>(carried_decoration_)){
 
-        bool can_place = decoration_cast->can_place_down(); 
+        bool can_place = decoration_cast->can_place_down();
         if(can_place){
 
             decoration_cast->place_down();
@@ -96,7 +96,7 @@ int entities::cursor::update(float delta, int frame){
         bool is_colliding = queries::bool_executor_.execute_query(*colliding_query);
 
         if(is_colliding){
-            // switch to colliding 
+            // switch to colliding
             body_.get_sprite().get_animation().goto_animation(animation_tags::hover);
 
         }
@@ -104,7 +104,7 @@ int entities::cursor::update(float delta, int frame){
             body_.get_sprite().get_animation().goto_animation(animation_tags::base);
             // switch to default anim
         }
-    
+
         return status_codes::moved;
     }
     return status_codes::nothing;
@@ -140,10 +140,10 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
     (void) hitbox;
     // check interactions within the quadtree, use the correct interaction stategy (the left click one)
     interaction_strategy_ = std::make_unique<left_click_strategy>();
-    
+
     // ?  can I pass the event the function I want called ? no
     // ? the state overrides the
-    
+
     // strategy is just state->left_click();
     std::unique_ptr<events::event> interaction_event = std::make_unique<events::interact_entity>(id_, body_.get_hitbox());
     event_interface::execute_event(*interaction_event);
@@ -151,14 +151,14 @@ void entities::cursor::on_left_mouse_click_event(const events::left_mouse_click&
     interaction_strategy_ = std::make_unique<default_strategy>();
 }
 void entities::cursor::on_move_view_frame_event(const events::move_view_frame& event){
-    // look, its left mouse down 
+    // look, its left mouse down
     auto mouse_delta = event.get_delta();
     auto new_position = Vector2Add(position_, mouse_delta);
     position_ = new_position;
     interaction_strategy_ = std::make_unique<left_click_strategy>();
     std::unique_ptr<events::event> moved_event = std::make_unique<events::move_entity>(id_);
 
-    event_interface::queue_event(moved_event); 
+    event_interface::queue_event(moved_event);
 
 
     // return to default interaction, for now
@@ -192,45 +192,4 @@ int entities::paw_mark::update(float delta, int frame){
 void entities::paw_mark::interact(entities::entity& other){
     (void) other;
     return;
-}
-
-// -------------------------------- builds -------------------------------- //
-std::unique_ptr<entities::entity> entities::entity_builder::build_cursor(Vector2 position, int id){
-    auto cursor_texture = textures::textures_.get_texture(textures::cursor, entity_config::cursor_path);
-    auto cursor_hitbox = hitbox::h_builder_.build_cursor_hitbox(position);
-    // otherwise load it 
-    auto cursor_sprite = sprite::sprite(cursor_texture, 
-        entity_config::cursor_attributes[entity_config::attributes::frame_width],
-        entity_config::cursor_attributes[entity_config::attributes::frame_height],
-        entity_config::cursor_attributes[entity_config::attributes::frames],
-        entity_config::cursor_attributes[entity_config::attributes::animations]);
-    auto sprites = std::vector<sprite::sprite>{cursor_sprite};
-    auto hitboxes = std::vector<hitbox::hitbox>{cursor_hitbox};
-    auto body = body::body(hitboxes, sprites);
-    return std::make_unique<entities::cursor>(
-        body,
-        GetMousePosition(),
-        id,
-        next_debug_id(entity_config::cursor_debug_id_prefix)
-    );
-}
-std::unique_ptr<entities::entity> entities::entity_builder::build_paw_mark(Vector2 position, int id){
-    auto paw_texture = textures::textures_.get_texture(textures::paw_mark, entity_config::paw_mark_path); 
-    auto paw_hitbox = hitbox::h_builder_.build_paw_mark_hitbox(position);
-    auto paw_sprite =         sprite::sprite(paw_texture,
-        entity_config::paw_mark_attributes[entity_config::attributes::frame_width],
-        entity_config::paw_mark_attributes[entity_config::attributes::frame_height],
-        entity_config::paw_mark_attributes[entity_config::attributes::frames],
-        entity_config::paw_mark_attributes[entity_config::attributes::animations]);
-
-
-    auto sprites = std::vector<sprite::sprite>{paw_sprite};
-    auto hitboxes = std::vector<hitbox::hitbox>{paw_hitbox};
-    auto body = body::body(hitboxes, sprites);
-    return std::make_unique<entities::paw_mark>(
-        body,
-        position,
-        id,
-        next_debug_id(entity_config::paw_mark_debug_id_prefix)
-    );
 }

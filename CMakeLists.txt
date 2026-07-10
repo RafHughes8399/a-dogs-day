@@ -134,17 +134,37 @@ link_libraries(player)
 add_library(controls src/interfaces/controls.cpp)
 link_libraries(controls)
 
-add_library(entities src/entities/entities.cpp)
+add_library(entities src/entities/entity.cpp src/entities/entity_builder.cpp)
 link_libraries(entities)
 
-add_library(cursor src/entities/cursor.cpp)
+add_library(cursor src/entities/cursor.cpp src/entities/cursor_builder.cpp)
 link_libraries(cursor)
 
-add_library(dogs src/entities/dogs.cpp)
+add_library(dogs
+  src/entities/dogs/dog.cpp
+  src/entities/dogs/player_dog.cpp
+  src/entities/dogs/customer_dog.cpp
+  src/entities/dogs/waiter_dog.cpp
+  src/entities/dogs/player_dog_builder.cpp
+  src/entities/dogs/customer_dog_builder.cpp
+  src/entities/dogs/waiter_dog_builder.cpp)
 link_libraries(dogs)
 
-add_library(decorations src/entities/decorations.cpp)
+add_library(decorations
+  src/entities/decorations/decoration.cpp
+  src/entities/decorations/decoration_builder.cpp)
 link_libraries(decorations)
+
+add_library(stations
+  src/entities/stations/station.cpp
+  src/entities/stations/table.cpp
+  src/entities/stations/food_counter.cpp
+  src/entities/stations/table_builder.cpp
+  src/entities/stations/food_counter_builder.cpp)
+link_libraries(stations)
+
+add_library(food src/entities/food/food_builder.cpp)
+link_libraries(food)
 
 add_library(render_layer src/engine/render_layer.cpp)
 link_libraries(render_layer)
@@ -182,7 +202,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
   raglib events queries animation sprite item menu hud hitbox body texture
-  player controls entities cursor dogs decorations render_layer quadtree
+  player controls entities cursor dogs decorations stations food render_layer quadtree
   graph level maitre_d expediter debug_log_interface debug_logger game ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
@@ -190,6 +210,10 @@ foreach(target IN LISTS PROJECT_TARGETS)
   target_include_directories(${target} PRIVATE
     src/rendering
     src/entities
+    src/entities/dogs
+    src/entities/decorations
+    src/entities/stations
+    src/entities/food
     src/systems
     src/engine
     src/interfaces
@@ -218,6 +242,10 @@ target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 target_include_directories(tests PRIVATE
   src/rendering
   src/entities
+  src/entities/dogs
+  src/entities/decorations
+  src/entities/stations
+  src/entities/food
   src/systems
   src/engine
   src/interfaces
