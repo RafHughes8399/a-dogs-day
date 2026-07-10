@@ -4,6 +4,10 @@
 #include "texture.h"
 #include <algorithm>
 // ------------------------ stations -----------------------------------//
+entities::station::interaction_positions entities::station::get_interaction_positions() const{
+    return interaction_positions_;
+}
+
 entities::station::station_type entities::station::get_station_type(){
     return type_;
 }
@@ -28,7 +32,4 @@ void entities::station::update_interaction_positions(){
         clamp_position(Vector2{position_.x - level_config::edge_weight, position_.y}),
         clamp_position(Vector2{position_.x + (2.0f * level_config::edge_weight), position_.y})
     };
-}
-entities::station::interaction_positions entities::station::get_interaction_positions() const{
-    return interaction_positions_;
 }

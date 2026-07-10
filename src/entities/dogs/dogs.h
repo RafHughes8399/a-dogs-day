@@ -18,8 +18,8 @@ namespace entities{
         public:
             dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right)
-            : entity(body, position, id, std::move(debug_id)), head_(head),
-            direction_scalar_(level_config::direction_scalars[direction]){
+            : entity(body, position, id, std::move(debug_id)), direction_scalar_(level_config::direction_scalars[direction]),
+            head_(head){
                 body_.set_index(static_cast<size_t>(direction));
                 head_.set_index(static_cast<size_t>(direction));
             }
@@ -29,34 +29,34 @@ namespace entities{
             dog& operator=(const dog& other) = delete;
             dog& operator=(dog&& other) = delete;
 
-            int update(float delta, int frame) override;
             Vector2 get_direction_scalar();
-            void render(Vector2 draw_position, int frame) override;
-            virtual void set_path(const std::vector<Vector2>& path);
-            virtual void set_path(const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
             // Final waypoint of the current path (where the dog is ultimately
             // headed), or {-1,-1} when it has no path. For tests/inspection.
             Vector2 peek_destination() const {
                 return current_path_.empty() ? Vector2{-1.0f, -1.0f} : current_path_.back();
             }
+            void render(Vector2 draw_position, int frame) override;
+            virtual void set_path(const std::vector<Vector2>& path);
+            virtual void set_path(const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
+            int update(float delta, int frame) override;
 
         protected:
-            bool reached_position(Vector2 target);
-            void update_path(float delta);
-            void move_toward_current_waypoint(float delta);
-            void start_next_path();
-            virtual void on_path_finished(Vector2 destination);
 	        void determine_direction(Vector2 target);
+            void move_toward_current_waypoint(float delta);
+            virtual void on_path_finished(Vector2 destination);
+            bool reached_position(Vector2 target);
 	        void set_direction_index(size_t direction);
+            void start_next_path();
+            void update_path(float delta);
 
-            body::body head_;
-            const Vector2 move_speed_ = entity_config::dog_move_speed;
-            Vector2 direction_scalar_;
             // current path is the current path that the dog is walking
             // move-paths are the next paths 9not that curent_path and move_path head are not the same
             // the move_path head is the next path
-            std::queue<path> move_paths_;
             path current_path_;
+            Vector2 direction_scalar_;
+            body::body head_;
+            std::queue<path> move_paths_;
+            const Vector2 move_speed_ = entity_config::dog_move_speed;
     };
     class player_dog : public dog{
         public:
@@ -104,10 +104,11 @@ namespace entities{
             }
             player_dog(body::body body, body::body head, std::vector<sprite::sprite> outlines, Vector2 position, int id,
             std::string debug_id, int direction = level_config::directions::right, std::unique_ptr<player_dog::state> state = std::make_unique<unselected>())
-            : dog(body, head, position, id, std::move(debug_id), direction), selected_state_(std::move(state)),
-            outlines_(outlines), cosmetics_(),
+            : dog(body, head, position, id, std::move(debug_id), direction), cosmetics_(),
+            outlines_(outlines),
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void {on_right_click_event(event);}),
-            selected_dog_handler_([this](const events::selected_dog& event)->void {on_dog_select_event(event);}){
+            selected_dog_handler_([this](const events::selected_dog& event)->void {on_dog_select_event(event);}),
+            selected_state_(std::move(state)){
                 event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
                 event_interface::subscribe<events::selected_dog>(selected_dog_handler_);
             }
@@ -118,21 +119,19 @@ namespace entities{
             player_dog& operator=(player_dog&& other) = delete;
 
             void interact(entity& other) override;
-            void select();
-            void unselect();
-            void render(Vector2 draw_position, int frame) override;
             void on_dog_select_event(const events::selected_dog& event);
             void on_right_click_event(const events::right_mouse_click& event);
+            void render(Vector2 draw_position, int frame) override;
+            void select();
+            void unselect();
 
 
         private:
-            std::unique_ptr<state> selected_state_;
-            std::vector<sprite::sprite> outlines_;
             std::vector<sprite::sprite> cosmetics_;
-
-
+            std::vector<sprite::sprite> outlines_;
             events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
             events::event_handler<events::selected_dog> selected_dog_handler_;
+            std::unique_ptr<state> selected_state_;
 
     };
 
@@ -179,11 +178,6 @@ namespace entities{
             template <typename... Args>
             explicit stateful_npc_dog(Args&&... args) : npc_dog(std::forward<Args>(args)...) {}
 
-            int update(float delta, int frame) override{
-                auto status = npc_dog::update(delta, frame);
-                state_->update(static_cast<Derived&>(*this), delta, frame);
-                return status;
-            }
             void set_path(const std::vector<Vector2>& path) override{
                 state_->set_path(static_cast<Derived&>(*this), path);
             }
@@ -192,6 +186,11 @@ namespace entities{
             }
             void set_state(std::unique_ptr<StateBase> state){
                 state_ = std::move(state);
+            }
+            int update(float delta, int frame) override{
+                auto status = npc_dog::update(delta, frame);
+                state_->update(static_cast<Derived&>(*this), delta, frame);
+                return status;
             }
 
         protected:
@@ -217,12 +216,12 @@ namespace entities{
             customer_dog_state& operator=(const customer_dog_state& other) = default;
             customer_dog_state& operator=(customer_dog_state&& other) = default;
 
-            virtual void update(customer_dog& dog, float delta, int frame) = 0;
+            virtual void on_path_finished(customer_dog& dog, Vector2 destination);
             virtual void set_path(customer_dog& dog, const std::vector<Vector2>& path);
             virtual void set_path(customer_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
-            virtual void on_path_finished(customer_dog& dog, Vector2 destination);
             // Human-readable state name for inspection/tests.
             virtual std::string state_name() const { return "unknown"; }
+            virtual void update(customer_dog& dog, float delta, int frame) = 0;
     };
 
     class customer_dog_traveling_state : public customer_dog_state{
@@ -243,8 +242,8 @@ namespace entities{
         public:
             class default_state : public customer_dog_state{
                 public:
-                    void update(customer_dog& dog, float delta, int frame) override;
                     std::string state_name() const override { return "default_state"; }
+                    void update(customer_dog& dog, float delta, int frame) override;
             };
 
             class walking_to_table : public customer_dog_traveling_state{
@@ -253,8 +252,8 @@ namespace entities{
                     : customer_dog_traveling_state(interaction_position),
                     table_id_(table_id), table_position_(table_position){}
 
-                    void update(customer_dog& dog, float delta, int frame) override;
                     std::string state_name() const override { return "walking_to_table"; }
+                    void update(customer_dog& dog, float delta, int frame) override;
 
                 protected:
                     void on_arrived(customer_dog& dog) override;
@@ -266,8 +265,8 @@ namespace entities{
 
             class seated : public customer_dog_state{
                 public:
-                    void update(customer_dog& dog, float delta, int frame) override;
                     std::string state_name() const override { return "seated"; }
+                    void update(customer_dog& dog, float delta, int frame) override;
             };
 
             class eating : public customer_dog_state{
@@ -275,19 +274,19 @@ namespace entities{
                     eating(size_t order_id, size_t table_id, Vector2 table_position)
                     : order_id_(order_id), table_id_(table_id), table_position_(table_position){}
 
-                    void update(customer_dog& dog, float delta, int frame) override;
                     std::string state_name() const override { return "eating"; }
+                    void update(customer_dog& dog, float delta, int frame) override;
                 private:
+                    float elapsed_ = 0.0f;
                     size_t order_id_;
                     size_t table_id_;
                     Vector2 table_position_;
-                    float elapsed_ = 0.0f;
             };
 
             class leaving : public customer_dog_state{
                 public:
-                    void update(customer_dog& dog, float delta, int frame) override;
                     std::string state_name() const override { return "leaving"; }
+                    void update(customer_dog& dog, float delta, int frame) override;
             };
 
             customer_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
@@ -316,10 +315,10 @@ namespace entities{
             customer_dog& operator=(const customer_dog& other) = delete;
             customer_dog& operator=(customer_dog&& other) = delete;
 
-            void set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position);
-            void set_eating(size_t order_id, size_t table_id, Vector2 table_position);
-            void on_give_dog_path_event(const events::give_dog_path& event);
             std::string get_state_name() const { return state_->state_name(); }
+            void on_give_dog_path_event(const events::give_dog_path& event);
+            void set_eating(size_t order_id, size_t table_id, Vector2 table_position);
+            void set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position);
 
         private:
             // Customer behaviour state belongs to the dog entity. The maitre d'
@@ -338,20 +337,20 @@ namespace entities{
             waiter_dog_state& operator=(const waiter_dog_state& other) = default;
             waiter_dog_state& operator=(waiter_dog_state&& other) = default;
 
-            virtual void update(waiter_dog& dog, float delta, int frame) = 0;
             virtual bool is_available_for_order() = 0;
+            virtual void on_path_finished(waiter_dog& dog, Vector2 destination);
             virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path);
             virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
-            virtual void on_path_finished(waiter_dog& dog, Vector2 destination);
             virtual std::string state_name() const { return "unknown"; }
+            virtual void update(waiter_dog& dog, float delta, int frame) = 0;
     };
 
     class waiter_dog_traveling_state : public waiter_dog_state{
         public:
             explicit waiter_dog_traveling_state(Vector2 destination) : destination_(destination) {}
 
-            void on_path_finished(waiter_dog& dog, Vector2 destination) final;
             bool is_available_for_order() override;
+            void on_path_finished(waiter_dog& dog, Vector2 destination) final;
         protected:
             virtual void on_arrived(waiter_dog& dog) = 0;
 
@@ -366,18 +365,18 @@ namespace entities{
                 public:
                     idle()
                     : waiter_dog_state(){}
-                    void update(waiter_dog& dog, float delta, int frame) override;
                     bool is_available_for_order() override;
                     std::string state_name() const override { return "idle"; }
+                    void update(waiter_dog& dog, float delta, int frame) override;
                 };
             // Busy marker: a serving waiter is not available for another order.
             // The counter -> table journey is orchestrated by the expediter off
             // dog_completed_path, so serving needs no per-leg travel logic itself.
             class serving : public waiter_dog_state{
                 public:
-                    void update(waiter_dog& dog, float delta, int frame) override;
                     bool is_available_for_order() override;
                     std::string state_name() const override { return "serving"; }
+                    void update(waiter_dog& dog, float delta, int frame) override;
             };
             waiter_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right,
@@ -394,15 +393,15 @@ namespace entities{
             waiter_dog& operator=(const waiter_dog& other) = delete;
             waiter_dog& operator=(waiter_dog&& other) = delete;
 
-            bool is_available_for_order();
             std::string get_state_name() const { return state_->state_name(); }
-            void set_serving();
-            void set_idle();
             // Carry food between the counter and the table. hold_food takes
             // ownership; release_food hands it off (e.g. delivered to the table).
             void hold_food(std::unique_ptr<food> item);
-            std::unique_ptr<food> release_food();
+            bool is_available_for_order();
             bool is_carrying_food() const;
+            std::unique_ptr<food> release_food();
+            void set_idle();
+            void set_serving();
 
         private:
             std::unique_ptr<food> held_food_;

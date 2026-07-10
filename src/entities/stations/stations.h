@@ -30,14 +30,13 @@ namespace entities{
             station& operator=(const station& other) = delete;
             station& operator=(station&& other) = delete;
 
-            station_type get_station_type();
-            void interact(entity& other) override;
-
             // Interaction positions are the walkable nodes flanking the station
             // (left and right) that a dog paths to in order to interact with it.
             // Centralised here so every station type (table, food counter) shares
             // one implementation instead of each recomputing its own.
             interaction_positions get_interaction_positions() const;
+            station_type get_station_type();
+            void interact(entity& other) override;
 
         protected:
             void update_interaction_positions();
@@ -57,7 +56,7 @@ namespace entities{
 
             table(body::body body, Vector2 position, int id, std::string debug_id)
             : station(body, position, id, std::move(debug_id), station_type::table_station),
-            state_(table_state::available), assigned_dog_id_(level_config::empty_node){}
+            assigned_dog_id_(level_config::empty_node), state_(table_state::available){}
             table(const table& other) = default;
             table(table&& other) = default;
 
@@ -65,16 +64,16 @@ namespace entities{
             table& operator=(table&& other) = delete;
 
             bool can_accept_dog();
-            bool reserve_for(int dog_id);
-            void occupy();
             void clear();
-            table_state get_state();
             int get_assigned_dog_id();
+            table_state get_state();
+            void occupy();
             void place_down() override;
+            bool reserve_for(int dog_id);
 
         private:
-            table_state state_;
             int assigned_dog_id_;
+            table_state state_;
     };
 
     // A food_counter stores food as a FILO stack, up to a fixed capacity. Producers
@@ -96,29 +95,29 @@ namespace entities{
             food_counter& operator=(const food_counter& other) = delete;
             food_counter& operator=(food_counter&& other) = delete;
 
+            // Reservations: food promised to an in-flight order that hasn't been
+            // collected yet. available_capacity() = stored - reserved, so a second
+            // order can't claim the same item before the first waiter picks it up.
+            size_t available_capacity() const;
+            size_t current_capacity() const;
+            bool has_available_food() const;
+            bool is_empty() const;
+            size_t max_capacity() const;
+            void place_down() override;
+            void release_reservation();
+            void render(Vector2 draw_position, int frame) override;
+            void reserve();
+            size_t reserved() const;
+            counter_status status() const;
             // store: push food onto the stack, rejects (returns false) when full.
             bool store(std::unique_ptr<food> item);
             // take: pop and move out the top of the stack. Precondition: !is_empty().
             std::unique_ptr<food> take();
-            bool is_empty() const;
-            size_t current_capacity() const;
-            size_t max_capacity() const;
-            counter_status status() const;
-            // Reservations: food promised to an in-flight order that hasn't been
-            // collected yet. available_capacity() = stored - reserved, so a second
-            // order can't claim the same item before the first waiter picks it up.
-            void reserve();
-            void release_reservation();
-            size_t reserved() const;
-            size_t available_capacity() const;
-            bool has_available_food() const;
-            void render(Vector2 draw_position, int frame) override;
-            void place_down() override;
 
         private:
             size_t max_capacity_;
-            std::vector<std::unique_ptr<food>> stored_food_;
             size_t reserved_ = 0;
+            std::vector<std::unique_ptr<food>> stored_food_;
     };
 }
 #endif

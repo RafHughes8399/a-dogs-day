@@ -34,7 +34,7 @@ namespace entities{
         public:
             virtual ~entity() = default;
             entity(body::body body, Vector2 position, int id, std::string debug_id)
-            : id_(id), body_(body), position_(position), debug_id_(std::move(debug_id)){}
+            : body_(body), debug_id_(std::move(debug_id)), id_(id), position_(position){}
             entity(const entity& other) = default;
             entity(entity&& other) = default;
 
@@ -47,14 +47,21 @@ namespace entities{
 
             bool check_collision(const hitbox::hitbox other);
             body::body& get_body();
-            int get_id();
             const std::string& get_debug_id();
             hitbox::hitbox& get_hitbox();
+            int get_id();
+            Vector2 get_position();
             sprite::sprite& get_sprite();
 
-            Vector2 get_position();
+            virtual void interact(entity& other){
+                (void) other;
+                return;
+            }
+
             void move(Vector2 new_postion);
             void move_without_event(Vector2 new_position);
+
+            virtual void render(Vector2 draw_position, int frame);
 
             virtual int update(float delta, int frame){
                 (void) delta;
@@ -62,18 +69,11 @@ namespace entities{
                 return status_codes::nothing;
             }
 
-            virtual void render(Vector2 draw_position, int frame);
-
-            virtual void interact(entity& other){
-                (void) other;
-                return;
-            }
-
         protected:
-            const int id_;
             body::body body_;
-            Vector2 position_;
             const std::string debug_id_;
+            const int id_;
+            Vector2 position_;
 
     };
 }

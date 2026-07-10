@@ -3,19 +3,6 @@
 
 #include "texture.h"
 #include <iostream>
-// -------------------------------- interaction strategies --------------------------------//
-void entities::cursor::default_strategy::interact(cursor& cursor, entity& other){
-    (void) cursor;
-    (void) other;
-    return;
-}
-void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){\
-    cursor.state_->left_click(cursor, other);
-}
-void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
-    cursor.state_->right_click(cursor, other);
-}
-
 // ------------------------------- cursor states ---------------------------- //
 
 void entities::cursor::state::create_move_event(cursor& cursor){
@@ -33,13 +20,6 @@ void entities::cursor::state::right_click(cursor& cursor, entity& other){
     (void) cursor;
     (void) other;
     return;
-}
-
-
-void entities::cursor::carrying_decoration::create_move_event(cursor& cursor){
-    // do make a move event
-    std::unique_ptr<events::event> cursor_moved_event = std::make_unique<events::moved_cursor>(cursor.position_);
-    event_interface::queue_event(cursor_moved_event);
 }
 
 void entities::cursor::editing::left_click(cursor& cursor, entity& other){
@@ -61,6 +41,12 @@ void entities::cursor::editing::right_click(cursor& cursor, entity& other){
 
 }
 
+void entities::cursor::carrying_decoration::create_move_event(cursor& cursor){
+    // do make a move event
+    std::unique_ptr<events::event> cursor_moved_event = std::make_unique<events::moved_cursor>(cursor.position_);
+    event_interface::queue_event(cursor_moved_event);
+}
+
 void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& other){
     (void) other;
     if(decoration* decoration_cast = dynamic_cast<decoration*>(carried_decoration_)){
@@ -76,39 +62,20 @@ void entities::cursor::carrying_decoration::left_click(cursor& cursor, entity& o
     }
 }
 
-// -------------------------------- cursor --------------------------------//
-
-int entities::cursor::update(float delta, int frame){
-    (void) delta;
-    (void) frame;
-    auto old_position = position_;
-    position_ =  GetMousePosition();
-
-    if(! Vector2Equals(old_position, position_)) {
-        body_.get_hitbox().update(position_);
-        create_move_event();
-
-        // create the query and execute it
-
-        // TODO change how this works to test your interaction theory  !
-        std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(body_.get_hitbox(), id_);
-        // the listener (singular) does something with the query and returns the information
-        bool is_colliding = queries::bool_executor_.execute_query(*colliding_query);
-
-        if(is_colliding){
-            // switch to colliding
-            body_.get_sprite().get_animation().goto_animation(animation_tags::hover);
-
-        }
-        else{
-            body_.get_sprite().get_animation().goto_animation(animation_tags::base);
-            // switch to default anim
-        }
-
-        return status_codes::moved;
-    }
-    return status_codes::nothing;
+// -------------------------------- interaction strategies --------------------------------//
+void entities::cursor::default_strategy::interact(cursor& cursor, entity& other){
+    (void) cursor;
+    (void) other;
+    return;
 }
+void entities::cursor::left_click_strategy::interact(cursor& cursor, entity& other){\
+    cursor.state_->left_click(cursor, other);
+}
+void entities::cursor::right_click_strategy::interact(cursor& cursor, entity& other){
+    cursor.state_->right_click(cursor, other);
+}
+
+// -------------------------------- cursor --------------------------------//
 
 void entities::cursor::create_move_event(){
     state_->create_move_event(*this);
@@ -173,7 +140,44 @@ void entities::cursor::on_right_mouse_click_event(const events::right_mouse_clic
     interaction_strategy_ = std::make_unique<default_strategy>();
 }
 
+int entities::cursor::update(float delta, int frame){
+    (void) delta;
+    (void) frame;
+    auto old_position = position_;
+    position_ =  GetMousePosition();
+
+    if(! Vector2Equals(old_position, position_)) {
+        body_.get_hitbox().update(position_);
+        create_move_event();
+
+        // create the query and execute it
+
+        // TODO change how this works to test your interaction theory  !
+        std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(body_.get_hitbox(), id_);
+        // the listener (singular) does something with the query and returns the information
+        bool is_colliding = queries::bool_executor_.execute_query(*colliding_query);
+
+        if(is_colliding){
+            // switch to colliding
+            body_.get_sprite().get_animation().goto_animation(animation_tags::hover);
+
+        }
+        else{
+            body_.get_sprite().get_animation().goto_animation(animation_tags::base);
+            // switch to default anim
+        }
+
+        return status_codes::moved;
+    }
+    return status_codes::nothing;
+}
+
 // -------------------------------- paw mark --------------------------------//
+void entities::paw_mark::interact(entities::entity& other){
+    (void) other;
+    return;
+}
+
 int entities::paw_mark::update(float delta, int frame){
     (void) frame;
     (void) delta;
@@ -187,9 +191,4 @@ int entities::paw_mark::update(float delta, int frame){
     else{
         return status_codes::nothing;
     }
-}
-
-void entities::paw_mark::interact(entities::entity& other){
-    (void) other;
-    return;
 }

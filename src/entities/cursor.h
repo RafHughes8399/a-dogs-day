@@ -123,10 +123,10 @@ namespace entities{
                 : entity(body, position, id, std::move(debug_id)),
                 enter_edit_mode_handler_([this](const events::enter_edit_mode& event) -> void{on_enter_edit_mode_event(event);}),
                 exit_edit_mode_handler_([this](const events::exit_edit_mode& event) -> void{on_exit_edit_mode_event(event);}),
+                interaction_strategy_(std::make_unique<default_strategy>()),
                 left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
                 move_view_frame_handler_([this](const events::move_view_frame& event) -> void{on_move_view_frame_event(event);}),
                 right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_click_event(event);}),
-                interaction_strategy_(std::make_unique<default_strategy>()),
                 state_(std::make_unique<state>()){
                     event_interface::subscribe<events::enter_edit_mode>(enter_edit_mode_handler_);
                     event_interface::subscribe<events::exit_edit_mode>(exit_edit_mode_handler_);
@@ -142,15 +142,14 @@ namespace entities{
                 cursor& operator=(cursor&& other)  = delete;
 
 
-                int update(float delta, int frame) override;
                 void create_move_event();
                 void interact(entity& other) override;
-
                 void on_enter_edit_mode_event(const events::enter_edit_mode& event);
                 void on_exit_edit_mode_event(const events::exit_edit_mode& event);
                 void on_left_mouse_click_event(const events::left_mouse_click& event);
                 void on_move_view_frame_event(const events::move_view_frame& event);
                 void on_right_mouse_click_event(const events::right_mouse_click& event);
+                int update(float delta, int frame) override;
 
             private:
 
@@ -161,11 +160,10 @@ namespace entities{
 
                 events::event_handler<events::enter_edit_mode> enter_edit_mode_handler_;
                 events::event_handler<events::exit_edit_mode> exit_edit_mode_handler_;
+                std::unique_ptr<interaction_strategy> interaction_strategy_;
                 events::event_handler<events::left_mouse_click> left_mouse_click_handler_;
                 events::event_handler<events::move_view_frame> move_view_frame_handler_;
                 events::event_handler<events::right_mouse_click> right_mouse_click_handler_;
-
-                std::unique_ptr<interaction_strategy> interaction_strategy_;
                 std::unique_ptr<state> state_;
         };
 

@@ -15,12 +15,6 @@ void entities::player_dog::unselected::render(player_dog& dog, Vector2 draw_posi
     (void) frame;
     return;
 }
-void entities::player_dog::select(){
-    selected_state_ = std::make_unique<selected>();
-}
-void entities::player_dog::unselect(){
-    selected_state_ = std::make_unique<unselected>();
-}
 
 // ------------------------------- player dogs ------------------------------- //
 void entities::player_dog::interact(entity& other){
@@ -46,4 +40,10 @@ void entities::player_dog::on_right_click_event(const events::right_mouse_click&
 void entities::player_dog::render(Vector2 draw_position, int frame){
     dog::render(draw_position, frame);
     selected_state_->render(*this, draw_position, frame);
+}
+void entities::player_dog::select(){
+    selected_state_ = std::make_unique<selected>();
+}
+void entities::player_dog::unselect(){
+    selected_state_ = std::make_unique<unselected>();
 }
