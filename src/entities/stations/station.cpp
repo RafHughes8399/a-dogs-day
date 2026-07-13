@@ -18,24 +18,53 @@ size_t entities::station::capacity() const{
 }
 
 bool entities::station::enter(int dog_id){
-    if(std::find(interacting_dog_ids_.begin(), interacting_dog_ids_.end(), dog_id) != interacting_dog_ids_.end()){
-        return false;
-    }
-    if(interacting_dog_ids_.size() >= capacity_){
-        return false;
-    }
-    interacting_dog_ids_.push_back(dog_id);
-    return true;
+    return state_->enter(*this, dog_id);
 }
 
 bool entities::station::is_interacting() const{
-    return ! interacting_dog_ids_.empty();
+    return state_->is_interacting();
 }
 
 void entities::station::leave(int dog_id){
-    interacting_dog_ids_.erase(
-        std::remove(interacting_dog_ids_.begin(), interacting_dog_ids_.end(), dog_id),
-        interacting_dog_ids_.end());
+    state_->leave(*this, dog_id);
+}
+
+std::unique_ptr<entities::station::station_state> entities::station::default_state(){
+    return std::make_unique<unworked>();
+}
+
+bool entities::station::unworked::enter(station& station, int dog_id){
+    // Unworked implies the dog set is already empty, so no duplicate/capacity
+    // check is needed here - that's worked's job once occupied.
+    station.interacting_dog_ids_.push_back(dog_id);
+    station.set_state(std::make_unique<worked>());
+    return true;
+}
+
+void entities::station::unworked::leave(station& station, int dog_id){
+    (void) station;
+    (void) dog_id;
+    // No-op: nothing to remove while unworked.
+}
+
+bool entities::station::worked::enter(station& station, int dog_id){
+    if(std::find(station.interacting_dog_ids_.begin(), station.interacting_dog_ids_.end(), dog_id)
+       != station.interacting_dog_ids_.end()){
+        return false;
+    }
+    if(station.interacting_dog_ids_.size() >= station.capacity_){
+        return false;
+    }
+    station.interacting_dog_ids_.push_back(dog_id);
+    return true;
+}
+
+void entities::station::worked::leave(station& station, int dog_id){
+    auto& ids = station.interacting_dog_ids_;
+    ids.erase(std::remove(ids.begin(), ids.end(), dog_id), ids.end());
+    if(ids.empty()){
+        station.set_state(std::make_unique<unworked>());
+    }
 }
 
 void entities::station::update_interaction_positions(){

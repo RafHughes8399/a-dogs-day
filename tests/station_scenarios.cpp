@@ -32,7 +32,6 @@ SCENARIO("a station enforces its interacting-dog capacity", "[station][capacity]
         }
     }
 }
-
 SCENARIO("enter/leave toggle a station's interacting state", "[station][enter][leave]"){
     GIVEN("a table built and inserted"){
         test_game game;
