@@ -13,9 +13,9 @@ void entities::waiter_dog_state::on_path_finished(waiter_dog& dog, Vector2 desti
 void entities::waiter_dog_state::set_path(waiter_dog& dog, const std::vector<Vector2>& path){
     dog.dog::set_path(path);
 }
-void entities::waiter_dog_state::set_path(waiter_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position){
-    (void) furniture_id;
-    (void) furniture_position;
+void entities::waiter_dog_state::set_path(waiter_dog& dog, const std::vector<Vector2>& path, int station_id, Vector2 station_position){
+    (void) station_id;
+    (void) station_position;
     dog.dog::set_path(path);
 }
 

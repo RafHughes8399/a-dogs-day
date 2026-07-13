@@ -80,9 +80,9 @@ namespace events{
 		dog_path_complete = 37,
 		give_dog_path_id = 38,
 		table_removed = 39,
-		dog_to_furniture = 40,
+		dog_to_station = 40,
 		food_counter_removed = 41,
-		dog_reached_table_id = 42,
+		dog_reached_station_id = 42,
 		waiter_removed = 44,
 		waiter_arrived_counter = 45,
 		size = 46
@@ -479,14 +479,14 @@ namespace events{
 			const size_t dog_id_;
 			const std::vector<Vector2> path_;
 	};
-	class send_dog_to_furniture : public event{
+	class send_dog_to_station : public event{
 		public:
-			send_dog_to_furniture(size_t dog_id, Vector2 destination, size_t furniture_id, Vector2 furniture_position, std::optional<Vector2> source = std::nullopt)
-			: event(ids::dog_to_furniture), dog_id_(dog_id), source_(source),
-			destination_(destination), furniture_id_(furniture_id), furniture_position_(furniture_position){}
+			send_dog_to_station(size_t dog_id, Vector2 destination, size_t station_id, Vector2 station_position, std::optional<Vector2> source = std::nullopt)
+			: event(ids::dog_to_station), dog_id_(dog_id), source_(source),
+			destination_(destination), station_id_(station_id), station_position_(station_position){}
 
 			static int get_static_type(){
-				return ids::dog_to_furniture;
+				return ids::dog_to_station;
 			}
 			size_t get_dog_id() const{
 				return dog_id_;
@@ -497,42 +497,41 @@ namespace events{
 			Vector2 get_destination() const{
 				return destination_;
 			}
-			size_t get_furniture_id() const{
-				return furniture_id_;
+			size_t get_station_id() const{
+				return station_id_;
 			}
-			Vector2 get_furniture_position() const{
-				return furniture_position_;
+			Vector2 get_station_position() const{
+				return station_position_;
 			}
 		private:
 			const size_t dog_id_;
 			const std::optional<Vector2> source_;
 			const Vector2 destination_;
-			const size_t furniture_id_;
-			const Vector2 furniture_position_;
+			const size_t station_id_;
+			const Vector2 station_position_;
 	};
-	//TODO refactor to dog reached furniture
-	class dog_reached_table : public event{
+	class dog_reached_station : public event{
 		public:
-			dog_reached_table(size_t customer_id, size_t table_id, Vector2 table_position)
-			: event(ids::dog_reached_table_id), customer_id_(customer_id), table_id_(table_id),
-			table_position_(table_position){}
+			dog_reached_station(size_t dog_id, size_t station_id, Vector2 station_position)
+			: event(ids::dog_reached_station_id), dog_id_(dog_id), station_id_(station_id),
+			station_position_(station_position){}
 
 			static int get_static_type(){
-				return ids::dog_reached_table_id;
+				return ids::dog_reached_station_id;
 			}
-			size_t get_customer_id() const{
-				return customer_id_;
+			size_t get_dog_id() const{
+				return dog_id_;
 			}
-			size_t get_table_id() const{
-				return table_id_;
+			size_t get_station_id() const{
+				return station_id_;
 			}
-			Vector2 get_table_position() const{
-				return table_position_;
+			Vector2 get_station_position() const{
+				return station_position_;
 			}
 		private:
-			const size_t customer_id_;
-			const size_t table_id_;
-			const Vector2 table_position_;
+			const size_t dog_id_;
+			const size_t station_id_;
+			const Vector2 station_position_;
 	};
 	// Cafe-domain fact: a customer dog has left the cafe. The maitre d' uses
 	// this as coarse arrival-pressure input without needing dog object access.
@@ -646,7 +645,7 @@ namespace events{
 			const size_t counter_id_;
 	};
 	// Cafe-domain command: the expediter has assigned a waiter to an order. The
-	// waiter should route through the pickup point before continuing to the furniture.
+	// waiter should route through the pickup point before continuing to the table.
 	class send_waiter_to_table : public event{
 		public:
 			send_waiter_to_table(size_t waiter_id, size_t order_id, Vector2 pickup_point, Vector2 table_position)

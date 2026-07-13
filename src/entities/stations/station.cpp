@@ -8,13 +8,34 @@ entities::station::interaction_positions entities::station::get_interaction_posi
     return interaction_positions_;
 }
 
-entities::station::station_type entities::station::get_station_type(){
-    return type_;
-}
-
 void entities::station::interact(entity& other){
     (void) other;
     return;
+}
+
+size_t entities::station::capacity() const{
+    return capacity_;
+}
+
+bool entities::station::enter(int dog_id){
+    if(std::find(interacting_dog_ids_.begin(), interacting_dog_ids_.end(), dog_id) != interacting_dog_ids_.end()){
+        return false;
+    }
+    if(interacting_dog_ids_.size() >= capacity_){
+        return false;
+    }
+    interacting_dog_ids_.push_back(dog_id);
+    return true;
+}
+
+bool entities::station::is_interacting() const{
+    return ! interacting_dog_ids_.empty();
+}
+
+void entities::station::leave(int dog_id){
+    interacting_dog_ids_.erase(
+        std::remove(interacting_dog_ids_.begin(), interacting_dog_ids_.end(), dog_id),
+        interacting_dog_ids_.end());
 }
 
 void entities::station::update_interaction_positions(){

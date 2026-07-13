@@ -235,6 +235,7 @@ add_executable(tests
   tests/food_scenarios.cpp
   tests/maitre_d_scenarios.cpp
   tests/expediter_scenarios.cpp
+  tests/station_scenarios.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the

@@ -16,10 +16,12 @@ bool entities::table::reserve_for(int dog_id){
 }
 
 void entities::table::occupy(){
+    enter(assigned_dog_id_);
     state_ = table_state::occupied;
 }
 
 void entities::table::clear(){
+    leave(assigned_dog_id_);
     state_ = table_state::available;
     assigned_dog_id_ = level_config::empty_node;
 }

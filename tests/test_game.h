@@ -87,7 +87,7 @@ namespace testing{
             // Fire the same path the debug 'L' key fires
             // (maitre_d_.request_customer_arrival()). No synthetic OS input.
             void customer_arrives();
-            // Fire dog_reached_table for the given customer/table - the "customer
+            // Fire dog_reached_station for the given customer/table - the "customer
             // requests an order on seating" signal the expediter listens for.
             void request_order(size_t customer_id, size_t table_id, Vector2 table_position);
             // Remove an entity from the level (fires remove_entity).

@@ -168,6 +168,11 @@ namespace maitre_d{
             void on_customer_dog_created_event(const events::customer_dog_created& event);
             void on_customer_dog_left_event(const events::customer_dog_left& event);
             void on_dog_completed_path_event(const events::dog_completed_path& event);
+            // dog_reached_station already names which station a customer
+            // reached (the dog's own traveling state resolves and carries that
+            // id), so occupying the right table is a direct id match against
+            // tables_ - no position scanning against the arrival event.
+            void on_dog_reached_station_event(const events::dog_reached_station& event);
         private:
             // Processes cafe actions gathered from events or direct interface
             // calls. This mirrors the event dispatcher style: collect facts,
@@ -225,6 +230,7 @@ namespace maitre_d{
             events::event_handler<events::customer_dog_created> customer_dog_created_handler_;
             events::event_handler<events::customer_dog_left> customer_dog_left_handler_;
             events::event_handler<events::dog_completed_path> dog_path_compelte_handler_;
+            events::event_handler<events::dog_reached_station> dog_reached_station_handler_;
     };
 }
 

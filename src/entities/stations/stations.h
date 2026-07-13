@@ -15,8 +15,10 @@ namespace entities{
                 Vector2 left;
                 Vector2 right;
             };
-            station(body::body body, Vector2 position, int id, std::string debug_id)
-            : decoration(body, position, id, std::move(debug_id)), interaction_positions_{}{
+            station(body::body body, Vector2 position, int id, std::string debug_id,
+                    size_t capacity = 1)
+            : decoration(body, position, id, std::move(debug_id)), interaction_positions_{},
+            capacity_(capacity), interacting_dog_ids_(){
                 update_interaction_positions();
             }
             station(const station& other) = default;
@@ -32,11 +34,23 @@ namespace entities{
             interaction_positions get_interaction_positions() const;
             void interact(entity& other) override;
 
+            // Generic "is a dog physically at this station" tracking, keyed by
+            // dog id (not a raw pointer - avoids station needing to handle
+            // entity-removal lifetime like maitre_d/expediter do for their
+            // pointer-holding table/counter tracking). Station is the sole
+            // source of truth: dogs never store a reference back.
+            size_t capacity() const;
+            bool enter(int dog_id);
+            bool is_interacting() const;
+            void leave(int dog_id);
+
         protected:
             void update_interaction_positions();
-            interaction_positions interaction_positions_; 
+            interaction_positions interaction_positions_;
 
         private:
+            size_t capacity_;
+            std::vector<int> interacting_dog_ids_;
     };
 
     class table : public station {
@@ -130,21 +144,14 @@ namespace entities{
             dishwasher(dishwasher&& other) = default;
 
             dishwasher& operator=(const dishwasher& other) = delete;
-            dishwasher& operator=(food_counter&& other) = delete;
+            dishwasher& operator=(dishwasher&& other) = delete;
         private:
-            // dogs - the dogs currently interacting with the dishwasher - raw pointers ? // this is the interacting behaviour thing we need to discuss
-            // i dont think the dishwasher need the dog points like the 
-            
-            // ? in general stations should have an interacting state and a non-interacting state, i.e is the station being worked, yes or no
-            // ? now how can we measure that ?
-            // ? theory one, we tether a dog to a station through a pointer
-
-            // ? state switch when a dog leaves a station
-            // ? state switch when a dog arrives at a station, can be done through events ? but we then run into that event bloat problem right ?, emitted to heaps of listens but 
-            // ? only care about one
-
-            // ? 
-            
+            // Interacting-dog tracking (station::enter/leave/is_interacting) is
+            // inherited from station, keyed by dog id and driven generically by
+            // level's arrival wiring - no dishwasher-specific handling needed.
+            // dishwasher itself remains an unwired stub (no .cpp, no CMakeLists
+            // registration, no orchestrator system): wash-cycle gameplay is a
+            // separate follow-up.
             capacity_state dish_capacity_;
             int max_plates_;
             int num_plates_;

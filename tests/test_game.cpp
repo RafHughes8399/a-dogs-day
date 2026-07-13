@@ -122,7 +122,7 @@ namespace testing{
     }
 
     void test_game::request_order(size_t customer_id, size_t table_id, Vector2 table_position){
-        std::unique_ptr<events::event> reached = std::make_unique<events::dog_reached_table>(
+        std::unique_ptr<events::event> reached = std::make_unique<events::dog_reached_station>(
             customer_id, table_id, table_position);
         event_interface::queue_event(reached);
     }

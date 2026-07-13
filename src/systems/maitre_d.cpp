@@ -37,7 +37,8 @@ registered_customer_handler_([this](const events::registered_customer& event) ->
 requested_customer_table_handler_([this](const events::requested_customer_table& event) -> void {on_requested_customer_table_event(event);}),
 customer_dog_created_handler_([this](const events::customer_dog_created& event) -> void {on_customer_dog_created_event(event);}),
 customer_dog_left_handler_([this](const events::customer_dog_left& event) -> void {on_customer_dog_left_event(event);}),
-dog_path_compelte_handler_([this](const events::dog_completed_path& event) -> void {on_dog_completed_path_event(event);}){
+dog_path_compelte_handler_([this](const events::dog_completed_path& event) -> void {on_dog_completed_path_event(event);}),
+dog_reached_station_handler_([this](const events::dog_reached_station& event) -> void {on_dog_reached_station_event(event);}){
     event_interface::subscribe<events::registered_table>(registered_table_handler_);
     event_interface::subscribe<events::removed_table>(removed_table_handler_);
     event_interface::subscribe<events::registered_customer>(registered_customer_handler_);
@@ -45,6 +46,7 @@ dog_path_compelte_handler_([this](const events::dog_completed_path& event) -> vo
     event_interface::subscribe<events::customer_dog_created>(customer_dog_created_handler_);
     event_interface::subscribe<events::customer_dog_left>(customer_dog_left_handler_);
     event_interface::subscribe<events::dog_completed_path>(dog_path_compelte_handler_);
+    event_interface::subscribe<events::dog_reached_station>(dog_reached_station_handler_);
 }
 
 maitre_d::maitre_d::~maitre_d(){
@@ -55,6 +57,7 @@ maitre_d::maitre_d::~maitre_d(){
     event_interface::unsubscribe<events::customer_dog_created>(customer_dog_created_handler_);
     event_interface::unsubscribe<events::customer_dog_left>(customer_dog_left_handler_);
     event_interface::unsubscribe<events::dog_completed_path>(dog_path_compelte_handler_);
+    event_interface::unsubscribe<events::dog_reached_station>(dog_reached_station_handler_);
 }
 
 void maitre_d::maitre_d::register_table(entities::table* table){
@@ -148,7 +151,7 @@ void maitre_d::maitre_d::assign_tables(){
             + ", table_position: " + vector_to_string(table->get_position())
             + ", interaction_position: " + vector_to_string(interaction_position));
         table->reserve_for(dog_at_head.dog_id);
-        dog_actions::send_dog_to_furniture(dog_at_head.dog_id, interaction_position, table->get_id(), table->get_position());
+        dog_actions::send_dog_to_station(dog_at_head.dog_id, interaction_position, table->get_id(), table->get_position());
         for(const auto& moved_dog : dequeue_result.moved_dogs){
             send_dog_to_queue_position(static_cast<size_t>(moved_dog.dog_id), moved_dog.queue_position);
         }
@@ -275,4 +278,25 @@ void maitre_d::maitre_d::on_dog_completed_path_event(const events::dog_completed
         "[maitre_d::on_dog_compelted_path, dog completed path ] "
         "customer_id: " + std::to_string(event.get_id())
         + ", position: " + vector_to_string(event.get_destination()));
+}
+
+void maitre_d::maitre_d::on_dog_reached_station_event(const events::dog_reached_station& event){
+    auto dog_id = static_cast<int>(event.get_dog_id());
+    auto table_id = static_cast<int>(event.get_station_id());
+    auto entry = std::find_if(tables_.begin(), tables_.end(), [table_id](entities::table* table) -> bool {
+        return table->get_id() == table_id;
+    });
+    if(entry == tables_.end()){
+        return;
+    }
+    auto* table = *entry;
+    if(table->get_state() != entities::table::table_state::reserved
+       || table->get_assigned_dog_id() != dog_id){
+        return;
+    }
+    debug::log(
+        "[maitre_d::on_dog_reached_station_event, occupying table] "
+        "dog_id: " + std::to_string(dog_id)
+        + ", table_id: " + std::to_string(table_id));
+    table->occupy();
 }

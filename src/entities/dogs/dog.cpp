@@ -71,9 +71,9 @@ void entities::dog::set_path(const std::vector<Vector2>& path){
     }
 }
 
-void entities::dog::set_path(const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position){
-    (void) furniture_id;
-    (void) furniture_position;
+void entities::dog::set_path(const std::vector<Vector2>& path, int station_id, Vector2 station_position){
+    (void) station_id;
+    (void) station_position;
     set_path(path);
 }
 
