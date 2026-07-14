@@ -141,6 +141,7 @@ namespace entity_config{
     inline const char* food_counter_debug_id_prefix = "fc_";
     inline const char* food_debug_id_prefix = "food_";
     inline const char* waiter_dog_debug_id_prefix = "wd_";
+    inline const char* dishwasher_dog_debug_id_prefix = "dwd_";
 
     // file paths
     inline const char* background_path = "../sprites/background.png" ;

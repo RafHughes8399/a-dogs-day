@@ -71,6 +71,7 @@ namespace testing{
             std::unique_ptr<entities::entity> build_waiter_dog(
                 int id, int dog_type, Vector2 position,
                 std::optional<Vector2> destination = std::nullopt);
+            std::unique_ptr<entities::entity> build_dishwasher_dog(int id, Vector2 position);
 
             // ---------------- insert actions ----------------
             // Add an already-built entity to the level on the given draw layer.
@@ -82,6 +83,7 @@ namespace testing{
                                      std::optional<Vector2> destination = std::nullopt);
             void insert_waiter_dog(int id, int dog_type, Vector2 position,
                                    std::optional<Vector2> destination = std::nullopt);
+            void insert_dishwasher_dog(int id, Vector2 position);
 
             // ---------------- event triggers ----------------
             // Fire the same path the debug 'L' key fires

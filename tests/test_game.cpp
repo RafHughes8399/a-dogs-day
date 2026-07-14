@@ -100,6 +100,10 @@ namespace testing{
         return entities::e_builder.build_waiter_dog(id, dog_type, position, destination);
     }
 
+    std::unique_ptr<entities::entity> test_game::build_dishwasher_dog(int id, Vector2 position){
+        return entities::e_builder.build_dishwasher_dog(id, position);
+    }
+
     // ---------------- insert actions ----------------
 
     void test_game::insert_entity(std::unique_ptr<entities::entity> entity, size_t layer){
@@ -112,6 +116,10 @@ namespace testing{
 
     void test_game::insert_waiter_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination){
         insert_entity(build_waiter_dog(id, dog_type, position, destination), level_config::draw_layers::dogs);
+    }
+
+    void test_game::insert_dishwasher_dog(int id, Vector2 position){
+        insert_entity(build_dishwasher_dog(id, position), level_config::draw_layers::dogs);
     }
 
     // ---------------- event triggers ----------------

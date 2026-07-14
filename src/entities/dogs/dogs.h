@@ -407,15 +407,14 @@ namespace entities{
             std::unique_ptr<food> held_food_;
     };
     class dishwasher_dog : public npc_dog{
+        public:
             dishwasher_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right)
             : npc_dog(body, head, position, id, std::move(debug_id), direction){
             }
             dishwasher_dog(const dishwasher_dog& other) = delete;
             dishwasher_dog(dishwasher_dog&& other) = default;
-            // Out of line so the unique_ptr<food> member can destruct where food
-            // is a complete type (food is only forward-declared here).
-            ~dishwasher_dog() override;
+            ~dishwasher_dog() override = default;
 
             dishwasher_dog& operator=(const dishwasher_dog& other) = delete;
             dishwasher_dog& operator=(dishwasher_dog&& other) = delete;

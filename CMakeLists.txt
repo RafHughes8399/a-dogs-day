@@ -147,7 +147,8 @@ add_library(dogs
   src/entities/dogs/waiter_dog.cpp
   src/entities/dogs/player_dog_builder.cpp
   src/entities/dogs/customer_dog_builder.cpp
-  src/entities/dogs/waiter_dog_builder.cpp)
+  src/entities/dogs/waiter_dog_builder.cpp
+  src/entities/dogs/dishwasher_dog_builder.cpp)
 link_libraries(dogs)
 
 add_library(decorations
@@ -236,6 +237,7 @@ add_executable(tests
   tests/maitre_d_scenarios.cpp
   tests/expediter_scenarios.cpp
   tests/station_scenarios.cpp
+  tests/dishwasher_dog_scenarios.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the
