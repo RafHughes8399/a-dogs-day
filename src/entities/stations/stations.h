@@ -9,22 +9,62 @@
 #include "food.h"
 
 namespace entities{
+    class station;
+
+    // Whether a station is currently being worked by a dog, expressed as an
+    // explicit state machine (mirrors customer_dog_state/waiter_dog_state)
+    // rather than a derived flag - consistent with how dog behaviour is
+    // modelled elsewhere in the codebase. Station owns the actual dog-id/
+    // capacity data; states operate on it via the station& reference, same
+    // as dog states operate on the owning dog.
+
+
     class station : public decoration {
         public:
+            class station_state{
+                public:
+                    virtual ~station_state() = default;
+                    station_state() = default;
+                    station_state(const station_state& other) = default;
+                    station_state(station_state&& other) = default;
+
+                    station_state& operator=(const station_state& other) = default;
+                    station_state& operator=(station_state&& other) = default;
+
+                    virtual bool enter(station& station, int dog_id) = 0;
+                    virtual bool is_interacting() const = 0;
+                    virtual void leave(station& station, int dog_id) = 0;
+                    // Human-readable state name for inspection/tests.
+            };            class unworked : public station_state{
+                public:
+                    bool enter(station& station, int dog_id) override;
+                    bool is_interacting() const override { return false; }
+                    void leave(station& station, int dog_id) override;
+            };
+
+            class worked : public station_state{
+                public:
+                    bool enter(station& station, int dog_id) override;
+                    bool is_interacting() const override { return true; }
+                    void leave(station& station, int dog_id) override;
+            };
             struct interaction_positions{
                 Vector2 left;
                 Vector2 right;
             };
-            enum station_type{
-                table_station = 0,
-                food_counter_station = 1
-            };
 
-            station(body::body body, Vector2 position, int id, std::string debug_id, station_type type)
-            : decoration(body, position, id, std::move(debug_id)), interaction_positions_{}, type_(type){
+            station(body::body body, Vector2 position, int id, std::string debug_id,
+                    size_t capacity = 1)
+            : decoration(body, position, id, std::move(debug_id)), interaction_positions_{},
+            capacity_(capacity), interacting_dog_ids_(), state_(){
                 update_interaction_positions();
+                set_state(default_state());
             }
-            station(const station& other) = default;
+            // Non-copyable: state_ is a polymorphic unique_ptr<station_state>
+            // (no clone() - the two states carry no data of their own, so
+            // deep-copy support isn't worth the complexity). Matches
+            // food_counter/dishwasher, which are already copy-deleted.
+            station(const station& other) = delete;
             station(station&& other) = default;
 
             station& operator=(const station& other) = delete;
@@ -35,17 +75,36 @@ namespace entities{
             // Centralised here so every station type (table, food counter) shares
             // one implementation instead of each recomputing its own.
             interaction_positions get_interaction_positions() const;
-            station_type get_station_type();
             void interact(entity& other) override;
+
+            // Generic "is a dog physically at this station" tracking, keyed by
+            // dog id (not a raw pointer - avoids station needing to handle
+            // entity-removal lifetime like maitre_d/expediter do for their
+            // pointer-holding table/counter tracking). Station is the sole
+            // source of truth: dogs never store a reference back. Backed by an
+            // explicit unworked/worked state machine (see station_state).
+            size_t capacity() const;
+            bool enter(int dog_id);
+            bool is_interacting() const;
+            void leave(int dog_id);
+            void set_state(std::unique_ptr<station_state> state){
+                state_ = std::move(state);
+            }
 
         protected:
             void update_interaction_positions();
-            interaction_positions interaction_positions_; // TODO ! refactor this type, why the fuck is it under events
+            interaction_positions interaction_positions_;
 
         private:
-            station_type type_;
-    };
+            // Only the concrete states need to touch the dog-id/capacity data
+            // directly; everyone else goes through enter()/leave()/is_interacting().
 
+            static std::unique_ptr<station_state> default_state();
+
+            size_t capacity_;
+            std::vector<int> interacting_dog_ids_;
+            std::unique_ptr<station_state> state_;
+    };
     class table : public station {
         public:
             enum table_state{
@@ -55,9 +114,9 @@ namespace entities{
             };
 
             table(body::body body, Vector2 position, int id, std::string debug_id)
-            : station(body, position, id, std::move(debug_id), station_type::table_station),
+            : station(body, position, id, std::move(debug_id)),
             assigned_dog_id_(level_config::empty_node), state_(table_state::available){}
-            table(const table& other) = default;
+            table(const table& other) = delete; // station is non-copyable
             table(table&& other) = default;
 
             table& operator=(const table& other) = delete;
@@ -87,7 +146,7 @@ namespace entities{
             };
 
             food_counter(body::body body, Vector2 position, int id, std::string debug_id)
-            : station(body, position, id, std::move(debug_id), station_type::food_counter_station),
+            : station(body, position, id, std::move(debug_id)),
             max_capacity_(entity_config::food_counter_capacity), stored_food_(){}
             food_counter(const food_counter& other) = delete;
             food_counter(food_counter&& other) = default;
@@ -118,6 +177,36 @@ namespace entities{
             size_t max_capacity_;
             size_t reserved_ = 0;
             std::vector<std::unique_ptr<food>> stored_food_;
+    };
+    class dishwasher : public station{
+        public:
+            enum capacity_state{
+                empty = 0,
+                non_empty = 1,
+                partially_full = 2,
+                near_full = 3,
+                full = 4
+            };
+            enum capcity_dishes{
+                
+            };
+            dishwasher(body::body body, Vector2 position, int id, std::string debug_id)
+            : station(body, position, id, std::move(debug_id)){}
+            dishwasher(const dishwasher& other) = delete;
+            dishwasher(dishwasher&& other) = default;
+
+            dishwasher& operator=(const dishwasher& other) = delete;
+            dishwasher& operator=(dishwasher&& other) = delete;
+        private:
+            // Interacting-dog tracking (station::enter/leave/is_interacting) is
+            // inherited from station, keyed by dog id and driven generically by
+            // level's arrival wiring - no dishwasher-specific handling needed.
+            // dishwasher itself remains an unwired stub (no .cpp, no CMakeLists
+            // registration, no orchestrator system): wash-cycle gameplay is a
+            // separate follow-up.
+            capacity_state dish_capacity_;
+            int max_plates_;
+            int num_plates_;
     };
 }
 #endif

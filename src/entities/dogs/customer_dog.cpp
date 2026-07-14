@@ -13,13 +13,13 @@ void entities::customer_dog_state::on_path_finished(customer_dog& dog, Vector2 d
 void entities::customer_dog_state::set_path(customer_dog& dog, const std::vector<Vector2>& path){
     dog.dog::set_path(path);
 }
-void entities::customer_dog_state::set_path(customer_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position){
-    // A furniture-targeted path always means "go sit at this table" - transition
+void entities::customer_dog_state::set_path(customer_dog& dog, const std::vector<Vector2>& path, int station_id, Vector2 station_position){
+    // A station-targeted path always means "go sit at this table" - transition
     // the state directly here instead of round-tripping through an event. The
     // path's last waypoint is the pathfinder's snapped interaction position, so
     // customer_dog_traveling_state::on_path_finished will match it exactly on arrival.
     if(! path.empty()){
-        dog.set_walking_to_table(static_cast<size_t>(furniture_id), furniture_position, path.back());
+        dog.set_walking_to_table(static_cast<size_t>(station_id), station_position, path.back());
     }
     dog.dog::set_path(path);
 }
@@ -40,11 +40,11 @@ void entities::customer_dog::default_state::update(customer_dog& dog, float delt
 }
 
 void entities::customer_dog::walking_to_table::on_arrived(customer_dog& dog){
-    std::unique_ptr<events::event> dog_reached_table = std::make_unique<events::dog_reached_table>(
+    std::unique_ptr<events::event> dog_reached_station = std::make_unique<events::dog_reached_station>(
         static_cast<size_t>(dog.get_id()),
         table_id_,
         table_position_);
-    event_interface::queue_event(dog_reached_table);
+    event_interface::queue_event(dog_reached_station);
     dog.set_state(std::make_unique<customer_dog::seated>());
 }
 

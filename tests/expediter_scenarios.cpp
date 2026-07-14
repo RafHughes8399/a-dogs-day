@@ -165,7 +165,7 @@ SCENARIO("a dispatched waiter collects food from the counter and delivers it to 
 
         WHEN("the waiter reaches the counter"){
             const bool collected = game.tick_until([&]{ return waiter->is_carrying_food(); }, 3000);
-            // The onward path to the table is queued (send_dog_to_furniture) when
+            // The onward path to the table is queued (send_dog_to_station) when
             // food is collected; let it be assigned before checking the destination.
             game.tick_until([&]{ return waiter->peek_destination().x >= 0.0f; }, 10);
             THEN("it took one item of food and now heads to the table"){

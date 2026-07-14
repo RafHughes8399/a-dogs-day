@@ -71,6 +71,7 @@ namespace testing{
             std::unique_ptr<entities::entity> build_waiter_dog(
                 int id, int dog_type, Vector2 position,
                 std::optional<Vector2> destination = std::nullopt);
+            std::unique_ptr<entities::entity> build_dishwasher_dog(int id, Vector2 position);
 
             // ---------------- insert actions ----------------
             // Add an already-built entity to the level on the given draw layer.
@@ -82,12 +83,13 @@ namespace testing{
                                      std::optional<Vector2> destination = std::nullopt);
             void insert_waiter_dog(int id, int dog_type, Vector2 position,
                                    std::optional<Vector2> destination = std::nullopt);
+            void insert_dishwasher_dog(int id, Vector2 position);
 
             // ---------------- event triggers ----------------
             // Fire the same path the debug 'L' key fires
             // (maitre_d_.request_customer_arrival()). No synthetic OS input.
             void customer_arrives();
-            // Fire dog_reached_table for the given customer/table - the "customer
+            // Fire dog_reached_station for the given customer/table - the "customer
             // requests an order on seating" signal the expediter listens for.
             void request_order(size_t customer_id, size_t table_id, Vector2 table_position);
             // Remove an entity from the level (fires remove_entity).

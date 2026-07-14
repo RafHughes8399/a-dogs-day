@@ -257,15 +257,15 @@ void level::level::on_send_dog_to_position_event(const events::send_dog_to_posit
     event_interface::queue_event(give_dog_path);
 }
 
-void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture& event){
+void level::level::on_send_dog_to_station(const events::send_dog_to_station& event){
     // find the dog, calculate the path, give the dog the path
     auto dog_id = static_cast<int>(event.get_dog_id());
     auto dog_record = id_entity_map_.find(static_cast<size_t>(dog_id));
     if(dog_record == id_entity_map_.end()){
         debug::log(
-            "[level::on_send_dog_to_furniture, missing customer entity] "
+            "[level::on_send_dog_to_station, missing customer entity] "
             "customer_id: " + std::to_string(dog_id)
-            + ", table_id: " + std::to_string(event.get_furniture_id())
+            + ", station_id: " + std::to_string(event.get_station_id())
             + ", destination: " + vector_to_string(event.get_destination()));
         return;
     }
@@ -273,7 +273,7 @@ void level::level::on_send_dog_to_furniture(const events::send_dog_to_furniture&
     auto position = (event.get_source() == std::nullopt) ? dog->get_position() : event.get_source().value();
     auto path = graph_.find_path(position, event.get_destination(), dog->get_direction_scalar());
 
-    dog->set_path(path, static_cast<int>(event.get_furniture_id()), event.get_furniture_position());
+    dog->set_path(path, static_cast<int>(event.get_station_id()), event.get_station_position());
 }
 void level::level::on_removed_entity(const events::remove_entity& event){
     size_t id = event.get_id();
@@ -293,6 +293,20 @@ void level::level::on_removed_entity(const events::remove_entity& event){
     level_entities_.erase(id);
     id_entity_map_.erase(id);
 }
+void level::level::on_dog_reached_station_event(const events::dog_reached_station& event){
+    auto* entity = get_entity(static_cast<int>(event.get_station_id()));
+    auto* station = dynamic_cast<entities::station*>(entity);
+    if(station == nullptr){
+        return;
+    }
+    auto dog_id = static_cast<int>(event.get_dog_id());
+    debug::log(
+        "[level::on_dog_reached_station_event, dog entered station] "
+        "dog_id: " + std::to_string(dog_id)
+        + ", station_id: " + std::to_string(station->get_id()));
+    station->enter(dog_id);
+}
+
 void level::level::on_order_served_event(const events::order_served& event){
     auto customer_id = static_cast<int>(event.get_customer_id());
     auto customer_record = id_entity_map_.find(static_cast<size_t>(customer_id));

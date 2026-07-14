@@ -15,6 +15,7 @@ namespace entities{
             std::unique_ptr<entity> build_cursor(Vector2 position, int id);
             // NPC dog sprite art/config pending.
             std::unique_ptr<entity> build_customer_dog(int id, int dog_type, Vector2 position, std::optional<Vector2> destination = std::nullopt);
+            std::unique_ptr<entity> build_dishwasher_dog(int id, Vector2 position);
             std::unique_ptr<entity> build_food_counter(Vector2 position, int id);
             std::unique_ptr<entity> build_gargoyle(Vector2 position, int id);
             std::unique_ptr<entity> build_khiri(Vector2 position, int id);

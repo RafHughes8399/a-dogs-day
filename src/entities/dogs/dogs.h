@@ -37,7 +37,7 @@ namespace entities{
             }
             void render(Vector2 draw_position, int frame) override;
             virtual void set_path(const std::vector<Vector2>& path);
-            virtual void set_path(const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
+            virtual void set_path(const std::vector<Vector2>& path, int station_id, Vector2 station_position);
             int update(float delta, int frame) override;
 
         protected:
@@ -181,8 +181,8 @@ namespace entities{
             void set_path(const std::vector<Vector2>& path) override{
                 state_->set_path(static_cast<Derived&>(*this), path);
             }
-            void set_path(const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position) override{
-                state_->set_path(static_cast<Derived&>(*this), path, furniture_id, furniture_position);
+            void set_path(const std::vector<Vector2>& path, int station_id, Vector2 station_position) override{
+                state_->set_path(static_cast<Derived&>(*this), path, station_id, station_position);
             }
             void set_state(std::unique_ptr<StateBase> state){
                 state_ = std::move(state);
@@ -218,7 +218,7 @@ namespace entities{
 
             virtual void on_path_finished(customer_dog& dog, Vector2 destination);
             virtual void set_path(customer_dog& dog, const std::vector<Vector2>& path);
-            virtual void set_path(customer_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
+            virtual void set_path(customer_dog& dog, const std::vector<Vector2>& path, int station_id, Vector2 station_position);
             // Human-readable state name for inspection/tests.
             virtual std::string state_name() const { return "unknown"; }
             virtual void update(customer_dog& dog, float delta, int frame) = 0;
@@ -340,7 +340,7 @@ namespace entities{
             virtual bool is_available_for_order() = 0;
             virtual void on_path_finished(waiter_dog& dog, Vector2 destination);
             virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path);
-            virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path, int furniture_id, Vector2 furniture_position);
+            virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path, int station_id, Vector2 station_position);
             virtual std::string state_name() const { return "unknown"; }
             virtual void update(waiter_dog& dog, float delta, int frame) = 0;
     };
@@ -405,6 +405,19 @@ namespace entities{
 
         private:
             std::unique_ptr<food> held_food_;
+    };
+    class dishwasher_dog : public npc_dog{
+        public:
+            dishwasher_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
+            int direction = level_config::directions::right)
+            : npc_dog(body, head, position, id, std::move(debug_id), direction){
+            }
+            dishwasher_dog(const dishwasher_dog& other) = delete;
+            dishwasher_dog(dishwasher_dog&& other) = default;
+            ~dishwasher_dog() override = default;
+
+            dishwasher_dog& operator=(const dishwasher_dog& other) = delete;
+            dishwasher_dog& operator=(dishwasher_dog&& other) = delete;
     };
 }
 #endif

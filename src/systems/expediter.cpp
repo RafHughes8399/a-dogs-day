@@ -10,7 +10,7 @@ void expediter::expediter::fulfill_order(order& order){
     // rest of the journey (counter -> table -> served) is driven by
     // on_dog_completed_path_event as the waiter reaches each stop.
     auto counter_interaction = order.counter->get_interaction_positions().left;
-    dog_actions::send_dog_to_furniture(order.waiter->get_id(), counter_interaction,
+    dog_actions::send_dog_to_station(order.waiter->get_id(), counter_interaction,
         order.counter->get_id(), order.counter->get_position());
 }
 
@@ -187,18 +187,18 @@ void expediter::expediter::on_removed_table_event(const events::removed_table& e
     remove_table(event.get_table_id());
 }
 
-void expediter::expediter::on_dog_reached_table_event(const events::dog_reached_table& event){
+void expediter::expediter::on_dog_reached_station_event(const events::dog_reached_station& event){
     // The seated customer has requested an order. Record it as created and
     // unassigned; process_orders() binds a waiter + counter once both are
     // available.
     auto table = table_record{
-        static_cast<int>(event.get_table_id()),
+        static_cast<int>(event.get_station_id()),
         Vector2Zero(),
-        event.get_table_position()
+        event.get_station_position()
     };
     orders_.push_back(order{
         next_order_id_++,
-        event.get_customer_id(),
+        event.get_dog_id(),
         nullptr,
         table,
         nullptr,
@@ -230,7 +230,7 @@ void expediter::expediter::on_dog_completed_path_event(const events::dog_complet
         Vector2 table_interaction = (table != nullptr)
             ? table->get_interaction_positions().right
             : active_order.table.position;
-        dog_actions::send_dog_to_furniture(dog_id, table_interaction, active_order.table.id, active_order.table.position);
+        dog_actions::send_dog_to_station(dog_id, table_interaction, active_order.table.id, active_order.table.position);
     }
     else{
         // Reached the table carrying food: serve it, free the waiter.

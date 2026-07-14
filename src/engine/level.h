@@ -40,9 +40,10 @@ namespace level{
 	            event_interface::unsubscribe<events::right_mouse_click>(right_mouse_click_handler_);
 		            event_interface::unsubscribe<events::build_customer_dog>(build_customer_dog_handler_);
 		            event_interface::unsubscribe<events::send_dog_to_position>(send_dog_to_position_handler_);
-		            event_interface::unsubscribe<events::send_dog_to_furniture>(send_dog_to_furniture_handler_);
+		            event_interface::unsubscribe<events::send_dog_to_station>(send_dog_to_station_handler_);
 		            event_interface::unsubscribe<events::order_served>(order_served_handler_);
 		            event_interface::unsubscribe<events::remove_entity>(removed_entity_handler_);
+		            event_interface::unsubscribe<events::dog_reached_station>(dog_reached_station_handler_);
 		            }
             level(sprite::sprite sprite, Rectangle frame, Vector2 dimensions)
             : left_mouse_click_handler_([this](const events::left_mouse_click& event) -> void{on_left_mouse_click_event(event);}),
@@ -50,9 +51,10 @@ namespace level{
             right_mouse_click_handler_([this](const events::right_mouse_click& event) -> void{on_right_mouse_event(event);}),
 		            build_customer_dog_handler_([this](const events::build_customer_dog& event) -> void{on_build_customer_dog_event(event);}),
 		            send_dog_to_position_handler_([this](const events::send_dog_to_position& event) -> void{on_send_dog_to_position_event(event);}),
-		            send_dog_to_furniture_handler_([this](const events::send_dog_to_furniture& event) -> void{on_send_dog_to_furniture(event);}),
+		            send_dog_to_station_handler_([this](const events::send_dog_to_station& event) -> void{on_send_dog_to_station(event);}),
 		            order_served_handler_([this](const events::order_served& event) -> void{on_order_served_event(event);}),
 		            removed_entity_handler_([this](const events::remove_entity& event) -> void{on_removed_entity(event);}),
+		            dog_reached_station_handler_([this](const events::dog_reached_station& event) -> void{on_dog_reached_station_event(event);}),
 		            graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
             view_frame_(frame), background_(sprite), id_entity_map_({}),
             next_entity_id_(0),
@@ -63,9 +65,10 @@ namespace level{
 	                event_interface::subscribe<events::right_mouse_click>(right_mouse_click_handler_);
 		                event_interface::subscribe<events::build_customer_dog>(build_customer_dog_handler_);
 		                event_interface::subscribe<events::send_dog_to_position>(send_dog_to_position_handler_);
-		                event_interface::subscribe<events::send_dog_to_furniture>(send_dog_to_furniture_handler_);
+		                event_interface::subscribe<events::send_dog_to_station>(send_dog_to_station_handler_);
 		                event_interface::subscribe<events::order_served>(order_served_handler_);
 		                event_interface::subscribe<events::remove_entity>(removed_entity_handler_);
+		                event_interface::subscribe<events::dog_reached_station>(dog_reached_station_handler_);
 		            }
             level(const level& other) = delete;
             level(level&& other) = delete;
@@ -86,8 +89,12 @@ namespace level{
 		    void on_build_customer_dog_event(const events::build_customer_dog& event);
 		    void on_send_dog_to_position_event(const events::send_dog_to_position& event);
             void on_order_served_event(const events::order_served& event);
-		    void on_send_dog_to_furniture(const events::send_dog_to_furniture& event);
+		    void on_send_dog_to_station(const events::send_dog_to_station& event);
             void on_removed_entity(const events::remove_entity& event);
+            // dog_reached_station already names the station a dog arrived at
+            // (the dog's own traveling state resolves and carries that id), so
+            // this is a direct id lookup - no scanning every station's position.
+            void on_dog_reached_station_event(const events::dog_reached_station& event);
             void render(int frame);
             void update(float delta, int frame);
         private :
@@ -109,11 +116,12 @@ namespace level{
 
 		    events::event_handler<events::build_customer_dog> build_customer_dog_handler_;
 		    events::event_handler<events::send_dog_to_position> send_dog_to_position_handler_;
-		    events::event_handler<events::send_dog_to_furniture> send_dog_to_furniture_handler_;
+		    events::event_handler<events::send_dog_to_station> send_dog_to_station_handler_;
 		    events::event_handler<events::order_served> order_served_handler_;
 
             events::event_handler<events::remove_entity> removed_entity_handler_;
-            
+            events::event_handler<events::dog_reached_station> dog_reached_station_handler_;
+
             level_graph graph_;
             
             Rectangle view_frame_;

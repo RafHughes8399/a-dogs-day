@@ -100,6 +100,10 @@ namespace testing{
         return entities::e_builder.build_waiter_dog(id, dog_type, position, destination);
     }
 
+    std::unique_ptr<entities::entity> test_game::build_dishwasher_dog(int id, Vector2 position){
+        return entities::e_builder.build_dishwasher_dog(id, position);
+    }
+
     // ---------------- insert actions ----------------
 
     void test_game::insert_entity(std::unique_ptr<entities::entity> entity, size_t layer){
@@ -114,6 +118,10 @@ namespace testing{
         insert_entity(build_waiter_dog(id, dog_type, position, destination), level_config::draw_layers::dogs);
     }
 
+    void test_game::insert_dishwasher_dog(int id, Vector2 position){
+        insert_entity(build_dishwasher_dog(id, position), level_config::draw_layers::dogs);
+    }
+
     // ---------------- event triggers ----------------
 
     void test_game::customer_arrives(){
@@ -122,7 +130,7 @@ namespace testing{
     }
 
     void test_game::request_order(size_t customer_id, size_t table_id, Vector2 table_position){
-        std::unique_ptr<events::event> reached = std::make_unique<events::dog_reached_table>(
+        std::unique_ptr<events::event> reached = std::make_unique<events::dog_reached_station>(
             customer_id, table_id, table_position);
         event_interface::queue_event(reached);
     }
