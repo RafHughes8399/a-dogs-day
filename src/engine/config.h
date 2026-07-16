@@ -8,6 +8,7 @@
 
 #include "raylib.h"
 #include <cstddef>
+#include <raymath.h>
 #include <vector>
 namespace game_config {
     inline const int window_width = 1920;
@@ -129,6 +130,9 @@ namespace cafe_config{
         queue_width,
         queue_height
     };
+    inline const Vector2 cafe_entrance = Vector2Zero();  // TODO placeholder, input actual value 
+    inline const Vector2 cafe_exit = Vector2Zero();  // TODO placeholder, input actual value 
+    
 }
 namespace entity_config{
     inline const char* player_dog_debug_id_prefix = "pd_";

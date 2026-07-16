@@ -319,7 +319,7 @@ namespace entities{
             void on_give_dog_path_event(const events::give_dog_path& event);
             void set_eating(size_t order_id, size_t table_id, Vector2 table_position);
             void set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position);
-
+            void leave();
         private:
             // Customer behaviour state belongs to the dog entity. The maitre d'
             // only tracks queue/table allocation by id and emits commands that

@@ -1,4 +1,8 @@
+#include "config.h"
+#include "dogs.h"
 #include "entities.h"
+#include "queries.h"
+#include "query_interface.h"
 #include "texture.h"
 #include "debug_log_interface.h"
 #include "raglib.h"
@@ -74,7 +78,7 @@ void entities::customer_dog::eating::update(customer_dog& dog, float delta, int 
     // follow-up; the state transition is what the loop and tests depend on.)
     elapsed_ += delta;
     if(elapsed_ >= cafe_config::eating_duration_s){
-        dog.set_state(std::make_unique<customer_dog::leaving>());
+        dog.leave();
     }
 }
 
@@ -98,4 +102,20 @@ void entities::customer_dog::set_eating(size_t order_id, size_t table_id, Vector
 
 void entities::customer_dog::set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position){
     set_state(std::make_unique<customer_dog::walking_to_table>(table_id, table_position, interaction_position));
+}
+
+
+void entities::customer_dog::leave(){
+    // route the dog to the exit position
+
+    // set to leaving state
+    set_state(std::make_unique<customer_dog::leaving>());
+    // set the path to the cafe entrance
+    const queries::path_query entrance_path_query =  queries::path_query(position_, cafe_config::cafe_entrance, direction_scalar_);
+    auto entrance_path = query_interface::execute_query(queries::path_executor_, entrance_path_query);
+    set_path(entrance_path);
+    // and then set the subsequent path to the exit position
+    const queries::path_query exit_path_query =  queries::path_query(cafe_config::cafe_entrance, cafe_config::cafe_exit, direction_scalar_);
+    auto exit_path = query_interface::execute_query(queries::path_executor_, exit_path_query);
+    set_path(exit_path);
 }
