@@ -187,6 +187,21 @@ void expediter::expediter::on_removed_table_event(const events::removed_table& e
     remove_table(event.get_table_id());
 }
 
+void expediter::expediter::on_clear_table(const events::clear_table& event){
+    // Future behavior:
+    // - event.get_table() / event.get_customer() name what needs clearing
+    // - create or reuse an order-like record with order_status::clearing
+    //   (see order_status above) so it can be picked up by process_orders()-
+    //   style waiter assignment, mirroring assign_waiter_to_order/
+    //   fulfill_order but routing the waiter straight to the table instead
+    //   of via a food counter
+    // - once the waiter reaches the table and clears it, flip the record to
+    //   order_status::cleared and free the waiter (set_idle()) - the same
+    //   shape as the existing served -> fulfilled transition in
+    //   on_dog_completed_path_event
+    (void) event;
+}
+
 void expediter::expediter::on_dog_reached_station_event(const events::dog_reached_station& event){
     // The seated customer has requested an order. Record it as created and
     // unassigned; process_orders() binds a waiter + counter once both are

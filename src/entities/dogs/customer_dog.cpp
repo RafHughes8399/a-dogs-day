@@ -1,11 +1,14 @@
 #include "config.h"
 #include "dogs.h"
 #include "entities.h"
+#include "events.h"
+#include "events_interface.h"
 #include "queries.h"
 #include "query_interface.h"
 #include "texture.h"
 #include "debug_log_interface.h"
 #include "raglib.h"
+#include <memory>
 #include <vector>
 // ------------------------------- customer dog state bases ------------------------------- //
 void entities::customer_dog_state::on_path_finished(customer_dog& dog, Vector2 destination){
@@ -118,4 +121,8 @@ void entities::customer_dog::leave(){
     const queries::path_query exit_path_query =  queries::path_query(cafe_config::cafe_entrance, cafe_config::cafe_exit, direction_scalar_);
     auto exit_path = query_interface::execute_query(queries::path_executor_, exit_path_query);
     set_path(exit_path);
+
+    // TODO must emit an event for the maitre_d to free the table 
+    std::unique_ptr<events::event> dog_left = std::make_unique<events::customer_dog_left>(this);
+    event_interface::queue_event(dog_left);
 }

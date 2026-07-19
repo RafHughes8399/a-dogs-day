@@ -1,8 +1,11 @@
 #include "maitre_d.h"
 #include "debug_log_interface.h"
 #include "dog_actions.h"
+#include "events.h"
+#include "events/event_core.h"
 #include "events_interface.h"
 #include <algorithm>
+#include <memory>
 
 namespace{
     std::string vector_to_string(Vector2 position){
@@ -38,7 +41,8 @@ requested_customer_table_handler_([this](const events::requested_customer_table&
 customer_dog_created_handler_([this](const events::customer_dog_created& event) -> void {on_customer_dog_created_event(event);}),
 customer_dog_left_handler_([this](const events::customer_dog_left& event) -> void {on_customer_dog_left_event(event);}),
 dog_path_compelte_handler_([this](const events::dog_completed_path& event) -> void {on_dog_completed_path_event(event);}),
-dog_reached_station_handler_([this](const events::dog_reached_station& event) -> void {on_dog_reached_station_event(event);}){
+dog_reached_station_handler_([this](const events::dog_reached_station& event) -> void {on_dog_reached_station_event(event);}),
+clear_table_handler_([this](const events::clear_table& event) -> void {on_clear_table_event(event);}){
     event_interface::subscribe<events::registered_table>(registered_table_handler_);
     event_interface::subscribe<events::removed_table>(removed_table_handler_);
     event_interface::subscribe<events::registered_customer>(registered_customer_handler_);
@@ -47,6 +51,7 @@ dog_reached_station_handler_([this](const events::dog_reached_station& event) ->
     event_interface::subscribe<events::customer_dog_left>(customer_dog_left_handler_);
     event_interface::subscribe<events::dog_completed_path>(dog_path_compelte_handler_);
     event_interface::subscribe<events::dog_reached_station>(dog_reached_station_handler_);
+    event_interface::subscribe<events::clear_table>(clear_table_handler_);
 }
 
 maitre_d::maitre_d::~maitre_d(){
@@ -57,6 +62,7 @@ maitre_d::maitre_d::~maitre_d(){
     event_interface::unsubscribe<events::customer_dog_created>(customer_dog_created_handler_);
     event_interface::unsubscribe<events::customer_dog_left>(customer_dog_left_handler_);
     event_interface::unsubscribe<events::dog_completed_path>(dog_path_compelte_handler_);
+    event_interface::unsubscribe<events::clear_table>(clear_table_handler_);
     event_interface::unsubscribe<events::dog_reached_station>(dog_reached_station_handler_);
 }
 
@@ -269,8 +275,33 @@ void maitre_d::maitre_d::on_customer_dog_created_event(const events::customer_do
 }
 
 void maitre_d::maitre_d::on_customer_dog_left_event(const events::customer_dog_left& event){
-    (void) event;
+    // TODO drop the dog from the list
     dogs_left_in_window_++;
+
+    auto* customer = event.get_dog();
+    auto entry = std::find_if(tables_.begin(), tables_.end(), [customer](entities::table* table) -> bool {
+        return table->get_assigned_dog_id() == customer->get_id();
+    });
+    if(entry == tables_.end()){
+        return;
+    }
+    std::unique_ptr<events::event> clear_table_event = std::make_unique<events::clear_table>(customer, *entry);
+    event_interface::queue_event(clear_table_event);
+}
+
+void maitre_d::maitre_d::on_clear_table_event(const events::clear_table& event){
+    // Future behavior:
+    // - event.get_table() names the table that needs clearing (the customer
+    //   has already left it, see on_customer_dog_left_event above)
+    // - switch the table out of "occupied" into a not-yet-available state
+    //   (a new table_state value, e.g. needs_clearing/dirty, since it isn't
+    //   safe to reassign until a waiter has actually cleared it - see
+    //   entities::table::table_state, stations.h)
+    // - the expediter is separately subscribed to this same event
+    //   (expediter::on_clear_table) and is responsible for dispatching a
+    //   waiter to physically clear the table; once that's done the table
+    //   should transition back to available
+    (void) event;
 }
 void maitre_d::maitre_d::on_dog_completed_path_event(const events::dog_completed_path& event){
     update_dog_position(event.get_id(), event.get_destination());

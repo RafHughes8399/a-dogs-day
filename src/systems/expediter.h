@@ -64,6 +64,7 @@ namespace expediter{
                 event_interface::unsubscribe<events::removed_table>(removed_table_handler_);
                 event_interface::unsubscribe<events::dog_reached_station>(dog_reached_station_handler_);
                 event_interface::unsubscribe<events::dog_completed_path>(dog_completed_path_handler_);
+                event_interface::unsubscribe<events::clear_table>(clear_table_handler_);
             }
             expediter()
             : next_order_id_(0),
@@ -74,7 +75,8 @@ namespace expediter{
             registered_table_handler_([this](const events::registered_table& event) -> void {on_registered_table_event(event);}),
             removed_table_handler_([this](const events::removed_table& event) -> void {on_removed_table_event(event);}),
             dog_reached_station_handler_([this](const events::dog_reached_station& event) -> void {on_dog_reached_station_event(event);}),
-            dog_completed_path_handler_([this](const events::dog_completed_path& event) -> void {on_dog_completed_path_event(event);}){
+            dog_completed_path_handler_([this](const events::dog_completed_path& event) -> void {on_dog_completed_path_event(event);}),
+            clear_table_handler_([this](const events::clear_table& event) -> void {on_clear_table(event);}){
                 event_interface::subscribe<events::registered_waiter>(registered_waiter_handler_);
                 event_interface::subscribe<events::removed_waiter>(removed_waiter_handler_);
                 event_interface::subscribe<events::registered_food_counter>(registered_food_counter_handler_);
@@ -83,6 +85,7 @@ namespace expediter{
                 event_interface::subscribe<events::removed_table>(removed_table_handler_);
                 event_interface::subscribe<events::dog_reached_station>(dog_reached_station_handler_);
                 event_interface::subscribe<events::dog_completed_path>(dog_completed_path_handler_);
+                event_interface::subscribe<events::clear_table>(clear_table_handler_);
             }
 
 
@@ -131,6 +134,7 @@ namespace expediter{
             void on_removed_table_event(const events::removed_table& event);
             void on_dog_reached_station_event(const events::dog_reached_station& event);
             void on_dog_completed_path_event(const events::dog_completed_path& event);
+            void on_clear_table(const events::clear_table& event);
         private:
             std::vector<entities::waiter_dog*> waiters_;
             std::vector<entities::food_counter*> food_counters_;
@@ -146,6 +150,7 @@ namespace expediter{
             events::event_handler<events::removed_table> removed_table_handler_;
             events::event_handler<events::dog_reached_station> dog_reached_station_handler_;
             events::event_handler<events::dog_completed_path> dog_completed_path_handler_;
+            events::event_handler<events::clear_table> clear_table_handler_;
     };
 }
 
