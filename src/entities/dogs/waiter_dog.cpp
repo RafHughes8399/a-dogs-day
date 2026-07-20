@@ -34,17 +34,18 @@ void entities::waiter_dog_traveling_state::on_path_finished(waiter_dog& dog, Vec
 bool entities::waiter_dog::idle::is_available_for_order(){
     return true;
 }
-void entities::waiter_dog::idle::update(waiter_dog& dog, float delta, int frame){
+int entities::waiter_dog::idle::update(waiter_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
     // Idle waiters do nothing until the expediter assigns them an order.
+    return status_codes::nothing;
 }
 
 bool entities::waiter_dog::serving::is_available_for_order(){
     return false;
 }
-void entities::waiter_dog::serving::update(waiter_dog& dog, float delta, int frame){
+int entities::waiter_dog::serving::update(waiter_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
@@ -55,12 +56,13 @@ void entities::waiter_dog::serving::update(waiter_dog& dog, float delta, int fra
     // animation's duration before expediter::on_dog_completed_path_event is
     // allowed to advance the leg - needs an elapsed_-style timer, see
     // customer_dog::eating for the existing pattern.
+    return status_codes::nothing;
 }
 
 bool entities::waiter_dog::clearing::is_available_for_order(){
     return false;
 }
-void entities::waiter_dog::clearing::update(waiter_dog& dog, float delta, int frame){
+int entities::waiter_dog::clearing::update(waiter_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
@@ -71,6 +73,7 @@ void entities::waiter_dog::clearing::update(waiter_dog& dog, float delta, int fr
     // and the dishwasher (animation::placing_plate), hold here for the
     // animation's duration before the expediter is allowed to advance the
     // leg - same elapsed_-style timer as noted on `serving` above.
+    return status_codes::nothing;
 }
 
 // ------------------------------- waiter dog ------------------------------- //

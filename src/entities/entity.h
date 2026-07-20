@@ -27,7 +27,8 @@ namespace entities{
     enum status_codes{
         nothing = 0,
         moved = 1,
-        dead = 2
+        dead = 2,
+        completed_path = 3
     };
     // ------------------------- entities ------------------------- //
     class entity {

@@ -1,4 +1,5 @@
 #include "entities.h"
+#include "entity.h"
 #include "texture.h"
 #include "debug_log_interface.h"
 #include "raglib.h"
@@ -79,8 +80,7 @@ void entities::dog::set_path(const std::vector<Vector2>& path, int station_id, V
 
 int entities::dog::update(float delta, int frame){
     (void) frame;
-    update_path(delta);
-    return status_codes::nothing;
+    return update_path(delta);
 }
 
 void entities::dog::set_direction_index(size_t direction){
@@ -101,9 +101,9 @@ void entities::dog::start_next_path(){
     determine_direction(current_path_.front());
 }
 
-void entities::dog::update_path(float delta){
+int entities::dog::update_path(float delta){
     if(current_path_.empty()){
-        return;
+        return status_codes::nothing;
     }
     auto next_position = current_path_.front();
     if(reached_position(next_position)){
@@ -113,12 +113,13 @@ void entities::dog::update_path(float delta){
             on_path_finished(next_position);
             body_.update_hitboxes(position_);
             start_next_path();
-            return;
+            return status_codes::completed_path; 
         }
 
         determine_direction(current_path_.front());
     }
     move_toward_current_waypoint(delta);
+    return status_codes::moved;
 }
 
 // ------------------------------- npc dogs ------------------------------- //

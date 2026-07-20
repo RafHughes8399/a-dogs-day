@@ -1,6 +1,7 @@
 #include "config.h"
 #include "dogs.h"
 #include "entities.h"
+#include "entity.h"
 #include "events.h"
 #include "events_interface.h"
 #include "queries.h"
@@ -39,11 +40,11 @@ void entities::customer_dog_traveling_state::on_path_finished(customer_dog& dog,
 }
 
 // ------------------------------- customer dog states ------------------------------- //
-void entities::customer_dog::default_state::update(customer_dog& dog, float delta, int frame){
+int entities::customer_dog::default_state::update(customer_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
-    return;
+    return status_codes::nothing;
 }
 
 void entities::customer_dog::walking_to_table::on_arrived(customer_dog& dog){
@@ -55,23 +56,24 @@ void entities::customer_dog::walking_to_table::on_arrived(customer_dog& dog){
     dog.set_state(std::make_unique<customer_dog::seated>());
 }
 
-void entities::customer_dog::walking_to_table::update(customer_dog& dog, float delta, int frame){
+int entities::customer_dog::walking_to_table::update(customer_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
-    return;
+    return status_codes::nothing;
 }
 
 
 
-void entities::customer_dog::seated::update(customer_dog& dog, float delta, int frame){
+int entities::customer_dog::seated::update(customer_dog& dog, float delta, int frame){
     (void) dog;
     (void) delta;
     (void) frame;
     // play waiting animation
+    return status_codes::nothing;
 }
 
-void entities::customer_dog::eating::update(customer_dog& dog, float delta, int frame){
+int entities::customer_dog::eating::update(customer_dog& dog, float delta, int frame){
     (void) frame;
     (void) order_id_;
     (void) table_id_;
@@ -89,14 +91,31 @@ void entities::customer_dog::eating::update(customer_dog& dog, float delta, int 
         // set down (see clear_table/expediter::dispatch_clearing_job, which
         // assumes the plate is sitting on the table by the time a waiter
         // arrives to collect it).
+        // dog.leave() calls set_state(), which destroys this eating instance
+        // (the unique_ptr assignment in set_state frees the old state) - it
+        // must stay the last thing this function touches on `this`.
         dog.leave();
+        return status_codes::nothing;
     }
+    return status_codes::nothing;
 }
 
-void entities::customer_dog::leaving::update(customer_dog& dog, float delta, int frame){
-    (void) dog;
+int entities::customer_dog::leaving::update(customer_dog& dog, float delta, int frame){
     (void) delta;
     (void) frame;
+    // Movement already happened this frame: stateful_npc_dog::update() calls
+    // npc_dog::update() (which steps current_path_/move_paths_) *before*
+    // calling state_->update() here, so there's no need to (and must not)
+    // call dog.update() again - that would re-enter this same function via
+    // state_->update(), since the state hasn't changed, and recurse forever.
+    // Once both legs (entrance, then exit) are exhausted the dog has
+    // arrived; signal dead so stateful_npc_dog::update() propagates it up to
+    // the quadtree, which harvests dead entities (quadtree.cpp status_codes
+    // switch).
+    if(dog.current_path_.empty() && dog.move_paths_.empty()){
+        return status_codes::dead;
+    }
+    return status_codes::nothing;
 }
 
 // ------------------------------- customer dog ------------------------------- //
@@ -130,7 +149,8 @@ void entities::customer_dog::leave(){
     auto exit_path = query_interface::execute_query(queries::path_executor_, exit_path_query);
     set_path(exit_path);
 
-    // TODO must emit an event for the maitre_d to free the table 
+    // Tells the maitre d' to free the table (see on_customer_dog_left_event,
+    // maitre_d.cpp, which resolves the table and fires clear_table).
     std::unique_ptr<events::event> dog_left = std::make_unique<events::customer_dog_left>(this);
     event_interface::queue_event(dog_left);
 }

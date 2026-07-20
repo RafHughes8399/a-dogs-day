@@ -47,7 +47,7 @@ namespace entities{
             bool reached_position(Vector2 target);
 	        void set_direction_index(size_t direction);
             void start_next_path();
-            void update_path(float delta);
+            int update_path(float delta);
 
             // current path is the current path that the dog is walking
             // move-paths are the next paths 9not that curent_path and move_path head are not the same
@@ -189,8 +189,26 @@ namespace entities{
             }
             int update(float delta, int frame) override{
                 auto status = npc_dog::update(delta, frame);
-                state_->update(static_cast<Derived&>(*this), delta, frame);
-                return status;
+                auto state_status = state_->update(static_cast<Derived&>(*this), delta, frame);
+                // A state signalling dead (e.g. customer_dog::leaving once it
+                // has arrived) always wins - the quadtree needs to see it to
+                // harvest the entity (quadtree.cpp on_update's status_codes
+                // switch), regardless of what movement itself returned.
+                //
+                // NOTE: only `dead` from state_->update() is special-cased
+                // here - `status` (movement's own result) is what carries
+                // status_codes::moved today, from update_path() stepping
+                // current_path_/move_paths_. If a future state needs to
+                // reposition the dog directly (bypassing the normal path
+                // system) it must return status_codes::moved itself, AND
+                // this combining logic needs extending to propagate that too
+                // - right now such a signal from state_->update() would be
+                // silently dropped, since we fall back to `status` whenever
+                // state_status isn't dead. Without `moved` reaching the
+                // quadtree, node_contains_object()'s re-insert check
+                // (quadtree.cpp:414-419) never runs and the entity goes
+                // stale in the wrong quadrant.
+                return state_status == status_codes::dead ? state_status : status;
             }
 
         protected:
@@ -221,7 +239,7 @@ namespace entities{
             virtual void set_path(customer_dog& dog, const std::vector<Vector2>& path, int station_id, Vector2 station_position);
             // Human-readable state name for inspection/tests.
             virtual std::string state_name() const { return "unknown"; }
-            virtual void update(customer_dog& dog, float delta, int frame) = 0;
+            virtual int update(customer_dog& dog, float delta, int frame) = 0;
     };
 
     class customer_dog_traveling_state : public customer_dog_state{
@@ -255,7 +273,7 @@ namespace entities{
             class default_state : public customer_dog_state{
                 public:
                     std::string state_name() const override { return "default_state"; }
-                    void update(customer_dog& dog, float delta, int frame) override;
+                    int update(customer_dog& dog, float delta, int frame) override;
             };
 
             class walking_to_table : public customer_dog_traveling_state{
@@ -265,7 +283,7 @@ namespace entities{
                     table_id_(table_id), table_position_(table_position){}
 
                     std::string state_name() const override { return "walking_to_table"; }
-                    void update(customer_dog& dog, float delta, int frame) override;
+                    int update(customer_dog& dog, float delta, int frame) override;
 
                 protected:
                     void on_arrived(customer_dog& dog) override;
@@ -278,7 +296,7 @@ namespace entities{
             class seated : public customer_dog_state{
                 public:
                     std::string state_name() const override { return "seated"; }
-                    void update(customer_dog& dog, float delta, int frame) override;
+                    int update(customer_dog& dog, float delta, int frame) override;
             };
 
             class eating : public customer_dog_state{
@@ -287,7 +305,7 @@ namespace entities{
                     : order_id_(order_id), table_id_(table_id), table_position_(table_position){}
 
                     std::string state_name() const override { return "eating"; }
-                    void update(customer_dog& dog, float delta, int frame) override;
+                    int update(customer_dog& dog, float delta, int frame) override;
                 private:
                     float elapsed_ = 0.0f;
                     size_t order_id_;
@@ -298,7 +316,7 @@ namespace entities{
             class leaving : public customer_dog_state{
                 public:
                     std::string state_name() const override { return "leaving"; }
-                    void update(customer_dog& dog, float delta, int frame) override;
+                    int update(customer_dog& dog, float delta, int frame) override;
             };
 
             customer_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
@@ -354,7 +372,7 @@ namespace entities{
             virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path);
             virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path, int station_id, Vector2 station_position);
             virtual std::string state_name() const { return "unknown"; }
-            virtual void update(waiter_dog& dog, float delta, int frame) = 0;
+            virtual int update(waiter_dog& dog, float delta, int frame) = 0;
     };
 
     class waiter_dog_traveling_state : public waiter_dog_state{
@@ -393,7 +411,7 @@ namespace entities{
                     : waiter_dog_state(){}
                     bool is_available_for_order() override;
                     std::string state_name() const override { return "idle"; }
-                    void update(waiter_dog& dog, float delta, int frame) override;
+                    int update(waiter_dog& dog, float delta, int frame) override;
                 };
             // Busy marker: a serving waiter is not available for another order.
             // The counter -> table journey is orchestrated by the expediter off
@@ -402,7 +420,7 @@ namespace entities{
                 public:
                     bool is_available_for_order() override;
                     std::string state_name() const override { return "serving"; }
-                    void update(waiter_dog& dog, float delta, int frame) override;
+                    int update(waiter_dog& dog, float delta, int frame) override;
             };
             // Busy marker: a waiter clearing a table collects the dirty plate
             // then routes to a dishwasher station. Same shape as `serving` -
@@ -414,7 +432,7 @@ namespace entities{
                 public:
                     bool is_available_for_order() override;
                     std::string state_name() const override { return "clearing"; }
-                    void update(waiter_dog& dog, float delta, int frame) override;
+                    int update(waiter_dog& dog, float delta, int frame) override;
             };
             waiter_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right,

@@ -412,6 +412,14 @@ std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta
         int update_result = (*it)->update(delta, frame);
         switch(update_result){
             case entities::status_codes::moved:
+            case entities::status_codes::completed_path:
+                // completed_path (a path leg finishing) doesn't move the dog
+                // itself this frame - position_ was already set by the prior
+                // moved frame - but treating it the same as moved is cheap
+                // insurance: if that assumption is ever violated (or a state
+                // repositions the dog directly during leg transition), the
+                // entity still gets its bounds re-checked instead of going
+                // stale in the wrong quadrant.
                 if(! node_contains_object(tree->bounds_, (*it)->get_hitbox().get_box())){
                         auto entity = std::move(*it);
                         it = tree->objects_.erase(it);
