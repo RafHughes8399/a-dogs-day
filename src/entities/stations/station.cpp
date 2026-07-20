@@ -1,9 +1,13 @@
 #include "config.h"
 #include "entities.h"
 #include "hitbox.h"
+#include "stations.h"
 #include "texture.h"
 #include <algorithm>
 // ------------------------ stations -----------------------------------//
+bool entities::station::can_accept_dog(){
+    return capacity_ > interacting_dog_ids_.size();
+}
 entities::station::interaction_positions entities::station::get_interaction_positions() const{
     return interaction_positions_;
 }

@@ -86,6 +86,7 @@ namespace entities{
             size_t capacity() const;
             bool enter(int dog_id);
             bool is_interacting() const;
+            bool can_accept_dog();
             void leave(int dog_id);
             void set_state(std::unique_ptr<station_state> state){
                 state_ = std::move(state);
@@ -95,7 +96,6 @@ namespace entities{
             void update_interaction_positions();
             interaction_positions interaction_positions_;
 
-        private:
             // Only the concrete states need to touch the dog-id/capacity data
             // directly; everyone else goes through enter()/leave()/is_interacting().
 
@@ -107,15 +107,9 @@ namespace entities{
     };
     class table : public station {
         public:
-            enum table_state{
-                available = 0,
-                reserved = 1,
-                occupied = 2
-            };
 
             table(body::body body, Vector2 position, int id, std::string debug_id)
-            : station(body, position, id, std::move(debug_id)),
-            assigned_dog_id_(level_config::empty_node), state_(table_state::available){}
+            : station(body, position, id, std::move(debug_id)){}; // default constructed with capacity = 1
             table(const table& other) = delete; // station is non-copyable
             table(table&& other) = default;
 
@@ -125,14 +119,8 @@ namespace entities{
             bool can_accept_dog();
             void clear();
             int get_assigned_dog_id();
-            table_state get_state();
-            void occupy();
             void place_down() override;
-            bool reserve_for(int dog_id);
-
         private:
-            int assigned_dog_id_;
-            table_state state_;
     };
 
     // A food_counter stores food as a FILO stack, up to a fixed capacity. Producers

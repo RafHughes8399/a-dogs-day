@@ -301,7 +301,10 @@ void maitre_d::maitre_d::on_clear_table_event(const events::clear_table& event){
     //   (expediter::on_clear_table) and is responsible for dispatching a
     //   waiter to physically clear the table; once that's done the table
     //   should transition back to available
-    (void) event;
+
+    auto table = event.get_table();
+    auto dog = event.get_customer();
+    table->leave(dog->get_id());
 }
 void maitre_d::maitre_d::on_dog_completed_path_event(const events::dog_completed_path& event){
     update_dog_position(event.get_id(), event.get_destination());
