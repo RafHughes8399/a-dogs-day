@@ -240,6 +240,18 @@ namespace entities{
     class customer_dog : public stateful_npc_dog<customer_dog, customer_dog_state>{
         using base = stateful_npc_dog<customer_dog, customer_dog_state>;
         public:
+            // The customer's own counterpart to waiter_dog::animation: picking
+            // up the food the waiter placed on the table (start of eating) and
+            // placing the empty plate back down (end of eating, ready for a
+            // waiter to collect - see clear_table/expediter::dispatch_clearing_job).
+            // `size` tracks the element count (same pattern as events::ids,
+            // events/event_core.h).
+            enum animation{
+                resting = 0,
+                picking_up_food,
+                placing_plate,
+                size
+            };
             class default_state : public customer_dog_state{
                 public:
                     std::string state_name() const override { return "default_state"; }
@@ -361,6 +373,20 @@ namespace entities{
     class waiter_dog : public stateful_npc_dog<waiter_dog, waiter_dog_state>{
         using base = stateful_npc_dog<waiter_dog, waiter_dog_state>;
         public:
+            // Pickup/placement animations the waiter plays while serving and
+            // clearing. `size` tracks the element count (same pattern as
+            // events::ids, events/event_core.h) - not tied to state
+            // transitions directly; see the TODOs on serving/clearing
+            // update() and expediter's dog_completed_path handling for where
+            // each of these needs to gate on playback time.
+            enum animation{
+                resting = 0,
+                picking_up_food,
+                placing_food,
+                picking_up_plate,
+                placing_plate,
+                size
+            };
             class idle : public waiter_dog_state{
                 public:
                     idle()
@@ -376,6 +402,18 @@ namespace entities{
                 public:
                     bool is_available_for_order() override;
                     std::string state_name() const override { return "serving"; }
+                    void update(waiter_dog& dog, float delta, int frame) override;
+            };
+            // Busy marker: a waiter clearing a table collects the dirty plate
+            // then routes to a dishwasher station. Same shape as `serving` -
+            // the table -> dishwasher journey is orchestrated by the
+            // expediter off dog_completed_path (see
+            // expediter::dispatch_clearing_job), this state just marks the
+            // waiter busy.
+            class clearing : public waiter_dog_state{
+                public:
+                    bool is_available_for_order() override;
+                    std::string state_name() const override { return "clearing"; }
                     void update(waiter_dog& dog, float delta, int frame) override;
             };
             waiter_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
@@ -402,6 +440,7 @@ namespace entities{
             std::unique_ptr<food> release_food();
             void set_idle();
             void set_serving();
+            void set_clearing();
 
         private:
             std::unique_ptr<food> held_food_;

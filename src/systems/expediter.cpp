@@ -188,18 +188,76 @@ void expediter::expediter::on_removed_table_event(const events::removed_table& e
 }
 
 void expediter::expediter::on_clear_table(const events::clear_table& event){
+    // Records the job; process_clearing_jobs() (called alongside
+    // process_orders() from the game loop) picks it up once a waiter is
+    // free, same shape as on_dog_reached_station_event creating an order for
+    // process_orders() to pick up.
+    auto* table = event.get_table();
+    clearing_jobs_.push_back(clearing_job{
+        next_clearing_job_id_++,
+        table_record{
+            table->get_id(),
+            table->get_interaction_positions().left,
+            table->get_position()
+        },
+        nullptr,
+        order_status::created
+    });
+}
+
+void expediter::expediter::process_clearing_jobs(){
+    // Mirrors process_orders(): drop finished jobs, then assign a free
+    // waiter to each newly-created job and dispatch it.
+    clearing_jobs_.erase(std::remove_if(clearing_jobs_.begin(), clearing_jobs_.end(), [](const clearing_job& j) -> bool {
+        return j.status == order_status::cleared;
+    }), clearing_jobs_.end());
+
+    for(auto& job : clearing_jobs_){
+        if(job.status != order_status::created){
+            continue;
+        }
+        if(!are_waiters_available()){
+            break;
+        }
+        auto* waiter = assign_waiter_to_clear_table(job);
+        if(waiter == nullptr){
+            break;
+        }
+        waiter->set_clearing();
+        job.status = order_status::clearing;
+        dispatch_clearing_job(job);
+    }
+}
+
+entities::waiter_dog* expediter::expediter::assign_waiter_to_clear_table(clearing_job& job){
+    for(auto* waiter : waiters_){
+        if(waiter->is_available_for_order()){
+            job.waiter = waiter;
+            return waiter;
+        }
+    }
+    job.waiter = nullptr;
+    return nullptr;
+}
+
+void expediter::expediter::dispatch_clearing_job(clearing_job& job){
     // Future behavior:
-    // - event.get_table() / event.get_customer() name what needs clearing
-    // - create or reuse an order-like record with order_status::clearing
-    //   (see order_status above) so it can be picked up by process_orders()-
-    //   style waiter assignment, mirroring assign_waiter_to_order/
-    //   fulfill_order but routing the waiter straight to the table instead
-    //   of via a food counter
-    // - once the waiter reaches the table and clears it, flip the record to
-    //   order_status::cleared and free the waiter (set_idle()) - the same
-    //   shape as the existing served -> fulfilled transition in
-    //   on_dog_completed_path_event
-    (void) event;
+    // - send job.waiter to job.table.interaction_position first, mirroring
+    //   fulfill_order()'s dispatch to the counter (dog_actions::send_dog_to_station)
+    // - on arrival (on_dog_completed_path_event) the waiter should: pick up
+    //   the dirty plate (see animation TODOs on waiter_dog::clearing /
+    //   customer_dog for pickup/placement timing), then path to a registered
+    //   dishwasher station (entities::dishwasher, stations.h) and place the
+    //   plate down
+    // - on_dog_completed_path_event currently distinguishes a serving
+    //   waiter's leg via is_carrying_food(); a clearing waiter will need an
+    //   equivalent signal (e.g. searching clearing_jobs_ by waiter pointer,
+    //   same as orders_ is searched today) to tell "reached the table" apart
+    //   from "reached the dishwasher"
+    // - once placed, flip job.status to order_status::cleared and call
+    //   job.waiter->set_idle() to free the waiter, mirroring the existing
+    //   served -> fulfilled transition below
+    (void) job;
 }
 
 void expediter::expediter::on_dog_reached_station_event(const events::dog_reached_station& event){
@@ -223,6 +281,12 @@ void expediter::expediter::on_dog_reached_station_event(const events::dog_reache
 
 void expediter::expediter::on_dog_completed_path_event(const events::dog_completed_path& event){
     auto dog_id = static_cast<int>(event.get_id());
+    // TODO: this only matches serving waiters against orders_. A waiter in
+    // waiter_dog::clearing completing a leg of the table -> dishwasher
+    // journey isn't handled here yet - see dispatch_clearing_job() above for
+    // the intended shape (an equivalent find_if against clearing_jobs_ by
+    // waiter id, branching on plate-carrying state instead of
+    // is_carrying_food()).
     // Match the completed path to the in-flight order for this waiter. Which leg
     // it is (counter vs table) is told by whether the waiter is already carrying
     // food: not carrying -> just reached the counter; carrying -> reached the table.

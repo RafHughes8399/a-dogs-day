@@ -50,6 +50,27 @@ void entities::waiter_dog::serving::update(waiter_dog& dog, float delta, int fra
     (void) frame;
     // The expediter drives the serving journey via dog_completed_path; the
     // serving state itself just marks the waiter busy.
+    // TODO: when the waiter reaches the counter (animation::picking_up_food)
+    // and the table (animation::placing_food), hold here for the
+    // animation's duration before expediter::on_dog_completed_path_event is
+    // allowed to advance the leg - needs an elapsed_-style timer, see
+    // customer_dog::eating for the existing pattern.
+}
+
+bool entities::waiter_dog::clearing::is_available_for_order(){
+    return false;
+}
+void entities::waiter_dog::clearing::update(waiter_dog& dog, float delta, int frame){
+    (void) dog;
+    (void) delta;
+    (void) frame;
+    // The expediter drives the table -> dishwasher journey via
+    // dog_completed_path (see expediter::dispatch_clearing_job); this state
+    // just marks the waiter busy, same shape as `serving`.
+    // TODO: when the waiter reaches the table (animation::picking_up_plate)
+    // and the dishwasher (animation::placing_plate), hold here for the
+    // animation's duration before the expediter is allowed to advance the
+    // leg - same elapsed_-style timer as noted on `serving` above.
 }
 
 // ------------------------------- waiter dog ------------------------------- //
@@ -72,4 +93,7 @@ void entities::waiter_dog::set_idle(){
 }
 void entities::waiter_dog::set_serving(){
     set_state(std::make_unique<serving>());
+}
+void entities::waiter_dog::set_clearing(){
+    set_state(std::make_unique<clearing>());
 }

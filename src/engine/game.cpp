@@ -10,6 +10,7 @@ void game::game::update(float delta){
     events::global_dispatcher_.process_events(delta);
     maitre_d_.update(delta);
     expediter_.process_orders();
+    expediter_.process_clearing_jobs();
     logger_.update(delta);
     // update the level
     level_.update(delta, frame_count_);

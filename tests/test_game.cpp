@@ -54,6 +54,7 @@ namespace testing{
             events::global_dispatcher_.process_events(delta);
             maitre_d_.update(delta);
             expediter_.process_orders();
+            expediter_.process_clearing_jobs();
             level_->update(delta, frame);
         }
     }

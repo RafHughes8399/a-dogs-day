@@ -51,6 +51,17 @@ namespace expediter{
         order_status status;
     };
 
+    // A table-clearing job: mirrors `order`'s shape but routes a waiter
+    // table -> dishwasher (collect the dirty plate, drop it off) instead of
+    // counter -> table. Reuses order_status::clearing/cleared, which already
+    // existed for exactly this purpose.
+    struct clearing_job{
+        size_t job_id;
+        table_record table;
+        entities::waiter_dog* waiter;  // stable entity pointer, nullptr while unassigned
+        order_status status;
+    };
+
     inline table_record empty_table = {-1, Vector2{-1, -1}, Vector2{-1, -1}};
 
     class expediter{
@@ -68,6 +79,7 @@ namespace expediter{
             }
             expediter()
             : next_order_id_(0),
+            next_clearing_job_id_(0),
             registered_waiter_handler_([this](const events::registered_waiter& event) -> void {on_registered_waiter_event(event);}),
             removed_waiter_handler_([this](const events::removed_waiter& event) -> void {on_removed_waiter_event(event);}),
             registered_food_counter_handler_([this](const events::registered_food_counter& event) -> void {on_registered_food_counter_event(event);}),
@@ -126,6 +138,16 @@ namespace expediter{
             entities::food_counter* pick_food_counter(order& order);
             entities::table* find_table(int table_id);
 
+            // Table-clearing counterpart to process_orders()/fulfill_order()/
+            // assign_waiter_to_order() above. Not yet called from anywhere
+            // (process_orders() isn't either - both are driven by whatever
+            // owns the game loop's update tick); wire process_clearing_jobs()
+            // in alongside process_orders() once the assignment logic below
+            // is filled in.
+            void process_clearing_jobs();
+            void dispatch_clearing_job(clearing_job& job);
+            entities::waiter_dog* assign_waiter_to_clear_table(clearing_job& job);
+
             void on_registered_waiter_event(const events::registered_waiter& event);
             void on_removed_waiter_event(const events::removed_waiter& event);
             void on_registered_food_counter_event(const events::registered_food_counter& event);
@@ -141,6 +163,8 @@ namespace expediter{
             std::vector<entities::table*> tables_;
             std::vector<order> orders_;
             size_t next_order_id_;
+            std::vector<clearing_job> clearing_jobs_;
+            size_t next_clearing_job_id_;
 
             events::event_handler<events::registered_waiter> registered_waiter_handler_;
             events::event_handler<events::removed_waiter> removed_waiter_handler_;
