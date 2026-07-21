@@ -1,0 +1,9 @@
+
+next up todo:
+-> implement dispatch clearing job
+-> and wire
+-> rename process orders nad fulfill order to serving job
+
+-> consider a state machine imlpementation. how could that work
+-> it may be cleaner than this stateful templated stuff going on
+-> then could better manage how state transitions work ?

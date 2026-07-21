@@ -36,23 +36,13 @@ namespace maitre_d{
     
 
 
-    // The maitre d' tracks table entities by non-owning pointer. Table cafe-state
-    // (available/reserved/occupied) lives on the table entity itself; the maitre
-    // d' reads and mutates it through the entity's own interface rather than
-    // duplicating a freeness flag here.
-    struct table_comparator{
-        bool operator()(entities::table* a, entities::table* b) const{
-            auto a_distance = Vector2Distance(a->get_position(), entrance_);
-            auto b_distance = Vector2Distance(b->get_position(), entrance_);
-            if(a_distance < b_distance){
-                return true;
-            }
-            if(a_distance > b_distance){
-                return false;
-            }
-            return a->get_id() < b->get_id();
-        }
-    };
+    // The maitre d' tracks table entities by id in an unordered_map (register/
+    // remove events keep it current), resolving the live pointer on demand.
+    // An id can't dangle, so remove_table() is a single map erase - no need
+    // to scan any other structure for a stale pointer. Table cafe-state
+    // (available/reserved/occupied) lives on the table entity itself; the
+    // maitre d' reads and mutates it through the entity's own interface
+    // rather than duplicating a freeness flag here.
     // A queue slot is a physical waiting spot in the cafe. The queue order is
     // the dog's place in line; its position is the world target the level can
     // path the dog toward. empty_id means the slot is free.
@@ -145,6 +135,7 @@ namespace maitre_d{
 
             void register_table(entities::table* table);
             void remove_table(size_t table_id);
+            entities::table* find_table(size_t table_id);
 
             // Number of tables tracked / customers queued. Exposed for tests to
             // assert table registration/removal and customer arrival/seating.
@@ -179,6 +170,10 @@ namespace maitre_d{
             // then resolve them into command events during the game loop.
             void assign_tables();
             bool are_tables_free();
+            // Finds the available table nearest to entrance_. tables_ isn't
+            // kept in any particular order (it's a map keyed by id), so this
+            // scans and compares distances directly rather than relying on
+            // pre-sorted order.
             entities::table* pick_table();
             Vector2 pick_interaction_position(entities::table* table, Vector2 dog_position) const;
             void send_dog_to_queue_position(size_t id, Vector2 position);
@@ -215,7 +210,7 @@ namespace maitre_d{
 
             
 
-            std::vector<entities::table*> tables_;
+            std::unordered_map<size_t, entities::table*> tables_;
 
             dog_queue customer_queue_;
             float seconds_since_customer_arrived_;

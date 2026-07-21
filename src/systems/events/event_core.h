@@ -37,6 +37,7 @@ namespace entities{
 	class food_counter;
 	class waiter_dog;
 	class customer_dog;
+	class dishwasher;
 }
 
 namespace events{
@@ -85,7 +86,9 @@ namespace events{
 		waiter_removed = 44,
 		waiter_arrived_counter = 45,
 		table_cleared = 46,
-		size = 47
+		register_dishwasher = 47,
+		dishwasher_removed = 48,
+		size = 49
 	};
 	class event{
 

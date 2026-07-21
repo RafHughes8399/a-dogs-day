@@ -64,42 +64,27 @@ maitre_d::maitre_d::~maitre_d(){
 }
 
 void maitre_d::maitre_d::register_table(entities::table* table){
-    auto table_id = table->get_id();
-    auto existing_table = std::find_if(tables_.begin(), tables_.end(), [table_id](entities::table* t) -> bool {
-        return t->get_id() == table_id;
-    });
-    if(existing_table != tables_.end()){
-        *existing_table = table;
-        std::sort(tables_.begin(), tables_.end(), table_comparator{});
-        debug::log(
-            "[maitre_d::register_table, updated existing table pointer] "
-            "table_id: " + std::to_string(table_id)
-            + ", position: " + vector_to_string(table->get_position())
-            + ", table_count_after: " + std::to_string(tables_.size()));
-        return;
-    }
-
-    tables_.push_back(table);
-    std::sort(tables_.begin(), tables_.end(), table_comparator{});
+    auto table_id = static_cast<size_t>(table->get_id());
+    tables_[table_id] = table;
     debug::log(
-        "[maitre_d::register_table, inserted new table pointer] "
+        "[maitre_d::register_table, tracked table pointer] "
         "table_id: " + std::to_string(table_id)
         + ", position: " + vector_to_string(table->get_position())
         + ", table_count_after: " + std::to_string(tables_.size()));
 }
 
 void maitre_d::maitre_d::remove_table(size_t table_id){
-    auto id = static_cast<int>(table_id);
-    auto new_end = std::remove_if(tables_.begin(), tables_.end(), [id](entities::table* t) -> bool {
-        return t->get_id() == id;
-    });
-    auto removed_count = static_cast<size_t>(tables_.end() - new_end);
-    tables_.erase(new_end, tables_.end());
+    auto removed_count = tables_.erase(table_id);
     debug::log(
         "[maitre_d::remove_table, removed table record] "
         "table_id: " + std::to_string(table_id)
         + ", removed_count: " + std::to_string(removed_count)
         + ", table_count_after: " + std::to_string(tables_.size()));
+}
+
+entities::table* maitre_d::maitre_d::find_table(size_t table_id){
+    auto entry = tables_.find(table_id);
+    return entry == tables_.end() ? nullptr : entry->second;
 }
 
 void maitre_d::maitre_d::register_customer(size_t customer_id){
@@ -163,8 +148,8 @@ void maitre_d::maitre_d::assign_tables(){
 }
 
 bool maitre_d::maitre_d::are_tables_free(){
-    auto free_count = static_cast<size_t>(std::count_if(tables_.begin(), tables_.end(), [](entities::table* table) -> bool {
-        return table->can_accept_dog();
+    auto free_count = static_cast<size_t>(std::count_if(tables_.begin(), tables_.end(), [](const auto& entry) -> bool {
+        return entry.second->can_accept_dog();
     }));
     auto has_free_table = free_count > 0;
     return has_free_table;
@@ -177,12 +162,24 @@ void maitre_d::maitre_d::send_dog_to_queue_position(size_t id, Vector2 position)
 
 
 entities::table* maitre_d::maitre_d::pick_table(){
-    // TABLES ARE SORTED BY POSITION SO PICKING A TABLE IS REALLY EASY
-    for(auto* table : tables_){
-        if(table->can_accept_dog()) {return table;}
+    // tables_ is a map keyed by id, not kept in any particular order, so the
+    // nearest available table is found by an explicit distance comparison
+    // rather than relying on pre-sorted order.
+    entities::table* nearest = nullptr;
+    float nearest_distance = 0.0f;
+    for(auto& entry : tables_){
+        auto* table = entry.second;
+        if(! table->can_accept_dog()){
+            continue;
+        }
+        auto distance = Vector2Distance(table->get_position(), entrance_);
+        if(nearest == nullptr || distance < nearest_distance){
+            nearest = table;
+            nearest_distance = distance;
+        }
     }
-    assert(false && "pick_table called with no free tables");
-    return tables_.front();
+    assert(nearest != nullptr && "pick_table called with no free tables");
+    return nearest;
 }
 Vector2 maitre_d::maitre_d::pick_interaction_position(entities::table* table, Vector2 dog_position) const{
     auto interaction_positions = table->get_interaction_positions();
@@ -282,14 +279,17 @@ void maitre_d::maitre_d::on_customer_dog_left_event(const events::customer_dog_l
     // clear_table broadcast - it already has the table pointer right here,
     // so there's nothing an event round-trip would tell it that it doesn't
     // already know.
+    // Keyed by table id, not customer id, so this stays a scan over the
+    // tracked tables rather than an O(1) lookup - the same complexity as
+    // before the switch to unordered_map.
     auto customer_id = event.get_customer_id();
-    auto entry = std::find_if(tables_.begin(), tables_.end(), [customer_id](entities::table* table) -> bool {
-        return table->get_assigned_dog_id() == static_cast<int>(customer_id);
+    auto entry = std::find_if(tables_.begin(), tables_.end(), [customer_id](const auto& e) -> bool {
+        return e.second->get_assigned_dog_id() == static_cast<int>(customer_id);
     });
     if(entry == tables_.end()){
         return;
     }
-    std::unique_ptr<events::event> clear_table_event = std::make_unique<events::clear_table>(*entry);
+    std::unique_ptr<events::event> clear_table_event = std::make_unique<events::clear_table>(entry->second);
     event_interface::queue_event(clear_table_event);
 }
 void maitre_d::maitre_d::on_dog_completed_path_event(const events::dog_completed_path& event){
@@ -302,14 +302,11 @@ void maitre_d::maitre_d::on_dog_completed_path_event(const events::dog_completed
 
 void maitre_d::maitre_d::on_dog_reached_station_event(const events::dog_reached_station& event){
     auto dog_id = static_cast<int>(event.get_dog_id());
-    auto table_id = static_cast<int>(event.get_station_id());
-    auto entry = std::find_if(tables_.begin(), tables_.end(), [table_id](entities::table* table) -> bool {
-        return table->get_id() == table_id;
-    });
-    if(entry == tables_.end()){
+    auto table_id = event.get_station_id();
+    auto* table = find_table(table_id);
+    if(table == nullptr){
         return;
     }
-    auto* table = *entry;
     if(table->get_state() != entities::table::table_state::reserved
        || table->get_assigned_dog_id() != dog_id){
         return;
