@@ -181,7 +181,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
         auto x_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(x_minus);
         
-        destination_index = source_index - row_length_ - 1;
+        destination_index = source_index + row_length_ - 1;
         auto x_minus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
         (void) x_minus_y_plus;
         // edges.push_back(x_minus_y_plus);
