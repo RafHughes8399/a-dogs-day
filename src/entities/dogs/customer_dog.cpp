@@ -150,7 +150,10 @@ void entities::customer_dog::leave(){
     set_path(exit_path);
 
     // Tells the maitre d' to free the table (see on_customer_dog_left_event,
-    // maitre_d.cpp, which resolves the table and fires clear_table).
-    std::unique_ptr<events::event> dog_left = std::make_unique<events::customer_dog_left>(this);
+    // maitre_d.cpp, which resolves the table and fires clear_table). Carries
+    // just the id - the maitre d' looks the table up itself by matching
+    // table::get_assigned_dog_id(), no dog object needed.
+    std::unique_ptr<events::event> dog_left = std::make_unique<events::customer_dog_left>(
+        static_cast<size_t>(get_id()));
     event_interface::queue_event(dog_left);
 }

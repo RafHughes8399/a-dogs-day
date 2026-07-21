@@ -170,21 +170,23 @@ namespace events{
 			const size_t station_id_;
 			const Vector2 station_position_;
 	};
-	// Cafe-domain fact: a customer dog has left the cafe. The maitre d' uses
-	// this as coarse arrival-pressure input without needing dog object access.
+	// Cafe-domain fact: a customer dog has left the cafe. Carries only the id
+	// (not a dog object) - the maitre d' uses it both as coarse
+	// arrival-pressure input and to resolve which table to clear, by
+	// matching against table::get_assigned_dog_id().
 	class customer_dog_left : public event{
 		public:
-			customer_dog_left(entities::customer_dog* dog)
-			: event(ids::customer_left), dog_(dog){}
+			customer_dog_left(size_t customer_id)
+			: event(ids::customer_left), customer_id_(customer_id){}
 
 			static int get_static_type(){
 				return ids::customer_left;
 			}
-			entities::customer_dog* get_dog() const{
-				return dog_;
+			size_t get_customer_id() const{
+				return customer_id_;
 			}
 		private:
-			entities::customer_dog* dog_;
+			const size_t customer_id_;
 	};
 	// Cafe-domain command: the maitre d' has assigned a customer dog to a
 	// physical world position. The level owns pathfinding and entity mutation.
@@ -353,26 +355,22 @@ namespace events{
 			const Vector2 position_;
 	};
 
-	// Cafe-domain fact: a customer has left their table and it needs clearing
-	// before it can be reassigned. Carries both pointers - the maitre d' switches
-	// the table's state on this, and the expediter separately dispatches a
-	// waiter to physically clear it.
+	// Cafe-domain fact: a table has been vacated and needs clearing before it
+	// can be reassigned. The maitre d' resolves and fires this (see
+	// on_customer_dog_left_event); the expediter is the sole listener,
+	// dispatching a waiter to physically clear it.
 	class clear_table : public event{
 		public:
-			clear_table(entities::customer_dog* customer, entities::table* table)
-			:event(ids::table_cleared), customer_(customer), table_(table){}
+			clear_table(entities::table* table)
+			:event(ids::table_cleared), table_(table){}
 
 			static int get_static_type(){
 				return ids::table_cleared;
-			}
-			entities::customer_dog* get_customer() const {
-				return customer_;
 			}
 			entities::table* get_table() const {
 				return table_;
 			}
 		private:
-			entities::customer_dog* const customer_;
 			entities::table* const table_;
 	};
 }

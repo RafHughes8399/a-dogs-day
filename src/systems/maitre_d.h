@@ -173,11 +173,6 @@ namespace maitre_d{
             // id), so occupying the right table is a direct id match against
             // tables_ - no position scanning against the arrival event.
             void on_dog_reached_station_event(const events::dog_reached_station& event);
-            // Fired once a customer has left their table (see
-            // customer_dog/clear_table). The expediter is also subscribed to
-            // this same event to dispatch a waiter to bus the table; this
-            // handler is only responsible for the table's tracked state.
-            void on_clear_table_event(const events::clear_table& event);
         private:
             // Processes cafe actions gathered from events or direct interface
             // calls. This mirrors the event dispatcher style: collect facts,
@@ -236,7 +231,6 @@ namespace maitre_d{
             events::event_handler<events::customer_dog_left> customer_dog_left_handler_;
             events::event_handler<events::dog_completed_path> dog_path_compelte_handler_;
             events::event_handler<events::dog_reached_station> dog_reached_station_handler_;
-            events::event_handler<events::clear_table> clear_table_handler_;
     };
 }
 

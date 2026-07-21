@@ -41,8 +41,7 @@ requested_customer_table_handler_([this](const events::requested_customer_table&
 customer_dog_created_handler_([this](const events::customer_dog_created& event) -> void {on_customer_dog_created_event(event);}),
 customer_dog_left_handler_([this](const events::customer_dog_left& event) -> void {on_customer_dog_left_event(event);}),
 dog_path_compelte_handler_([this](const events::dog_completed_path& event) -> void {on_dog_completed_path_event(event);}),
-dog_reached_station_handler_([this](const events::dog_reached_station& event) -> void {on_dog_reached_station_event(event);}),
-clear_table_handler_([this](const events::clear_table& event) -> void {on_clear_table_event(event);}){
+dog_reached_station_handler_([this](const events::dog_reached_station& event) -> void {on_dog_reached_station_event(event);}){
     event_interface::subscribe<events::registered_table>(registered_table_handler_);
     event_interface::subscribe<events::removed_table>(removed_table_handler_);
     event_interface::subscribe<events::registered_customer>(registered_customer_handler_);
@@ -51,7 +50,6 @@ clear_table_handler_([this](const events::clear_table& event) -> void {on_clear_
     event_interface::subscribe<events::customer_dog_left>(customer_dog_left_handler_);
     event_interface::subscribe<events::dog_completed_path>(dog_path_compelte_handler_);
     event_interface::subscribe<events::dog_reached_station>(dog_reached_station_handler_);
-    event_interface::subscribe<events::clear_table>(clear_table_handler_);
 }
 
 maitre_d::maitre_d::~maitre_d(){
@@ -62,7 +60,6 @@ maitre_d::maitre_d::~maitre_d(){
     event_interface::unsubscribe<events::customer_dog_created>(customer_dog_created_handler_);
     event_interface::unsubscribe<events::customer_dog_left>(customer_dog_left_handler_);
     event_interface::unsubscribe<events::dog_completed_path>(dog_path_compelte_handler_);
-    event_interface::unsubscribe<events::clear_table>(clear_table_handler_);
     event_interface::unsubscribe<events::dog_reached_station>(dog_reached_station_handler_);
 }
 
@@ -278,33 +275,22 @@ void maitre_d::maitre_d::on_customer_dog_left_event(const events::customer_dog_l
     // TODO drop the dog from the list
     dogs_left_in_window_++;
 
-    auto* customer = event.get_dog();
-    auto entry = std::find_if(tables_.begin(), tables_.end(), [customer](entities::table* table) -> bool {
-        return table->get_assigned_dog_id() == customer->get_id();
+    // Resolve which table this customer occupied by id - no dog object
+    // needed. clear_table is the sole notification for this fact; the
+    // expediter is the only other subscriber (dispatches a waiter to
+    // physically clear it). Maitre d' doesn't also listen to its own
+    // clear_table broadcast - it already has the table pointer right here,
+    // so there's nothing an event round-trip would tell it that it doesn't
+    // already know.
+    auto customer_id = event.get_customer_id();
+    auto entry = std::find_if(tables_.begin(), tables_.end(), [customer_id](entities::table* table) -> bool {
+        return table->get_assigned_dog_id() == static_cast<int>(customer_id);
     });
     if(entry == tables_.end()){
         return;
     }
-    std::unique_ptr<events::event> clear_table_event = std::make_unique<events::clear_table>(customer, *entry);
+    std::unique_ptr<events::event> clear_table_event = std::make_unique<events::clear_table>(*entry);
     event_interface::queue_event(clear_table_event);
-}
-
-void maitre_d::maitre_d::on_clear_table_event(const events::clear_table& event){
-    // Future behavior:
-    // - event.get_table() names the table that needs clearing (the customer
-    //   has already left it, see on_customer_dog_left_event above)
-    // - switch the table out of "occupied" into a not-yet-available state
-    //   (a new table_state value, e.g. needs_clearing/dirty, since it isn't
-    //   safe to reassign until a waiter has actually cleared it - see
-    //   entities::table::table_state, stations.h)
-    // - the expediter is separately subscribed to this same event
-    //   (expediter::on_clear_table) and is responsible for dispatching a
-    //   waiter to physically clear the table; once that's done the table
-    //   should transition back to available
-
-    auto table = event.get_table();
-    auto dog = event.get_customer();
-    table->leave(dog->get_id());
 }
 void maitre_d::maitre_d::on_dog_completed_path_event(const events::dog_completed_path& event){
     update_dog_position(event.get_id(), event.get_destination());
