@@ -8,3 +8,51 @@ next up todo:
 -> consider a state machine imlpementation. how could that work
 -> it may be cleaner than this stateful templated stuff going on
 -> then could better manage how state transitions work ?
+
+
+waiter clearing self-handle refactor - discussed moving arrival handling off
+the shared dog_completed_path event (expediter's on_dog_completed_path_event
+was doing too much reactive branching across orders_ and clearing_jobs_) and
+onto the dog itself via a query, self-handling the transition like
+customer_dog::walking_to_table/leave already do. marked every point of
+change as a TODO in place rather than implementing yet, dumping the refs
+here so i don't lose track:
+
+queries.h
+-> new query ids (next_serving_target, next_clearing_target) + size bump: src/systems/queries.h:14
+-> leg_target struct + the two query classes: src/systems/queries.h:122
+-> new leg_target_executor_ global (4th executor, same shape as bool/int/path): src/systems/queries.h:197
+
+dogs.h
+-> split serving into serving_counter / serving_table (traveling_state subclasses): src/entities/dogs/dogs.h:416
+-> split clearing into clearing_table / clearing_dishwasher: src/entities/dogs/dogs.h:448
+-> set_serving/set_clearing need a destination param now (like set_walking_to_table): src/entities/dogs/dogs.h:512
+
+waiter_dog.cpp
+-> delete serving::update, replace with serving_counter/serving_table update: src/entities/dogs/waiter_dog.cpp:69
+-> serving_counter::on_arrived - queries next_serving_target, self sets_path: src/entities/dogs/waiter_dog.cpp:77
+-> serving_table::on_arrived - fires order_served itself, self set_idle: src/entities/dogs/waiter_dog.cpp:91
+-> delete clearing::update - this is where the old "how do i get the dishwasher position, should the state carry it" question lived, resolved as "no, pull it live via query": src/entities/dogs/waiter_dog.cpp:114
+-> clearing_table::on_arrived - queries next_clearing_target, self paths to dishwasher: src/entities/dogs/waiter_dog.cpp:126
+-> clearing_dishwasher::on_arrived - places plate, fires waiter_finished_clearing, self set_idle: src/entities/dogs/waiter_dog.cpp:142
+-> new event needed - waiter_finished_clearing, add through the event-wire skill: src/entities/dogs/waiter_dog.cpp:154
+
+expediter.h
+-> dtor: dog_completed_path_handler_ unsubscribe to remove: src/systems/expediter.h:95
+-> new query handler decls (on_next_serving_target_query, on_next_clearing_target_query): src/systems/expediter.h:230
+-> on_dog_completed_path_event decl to remove: src/systems/expediter.h:252
+-> new on_waiter_finished_clearing_event handler decl: src/systems/expediter.h:260
+-> handler member storage swap (query_handler members instead of the dog_completed_path event_handler): src/systems/expediter.h:294
+
+expediter.cpp
+-> dispatch_clearing_job stays as-is, first-leg dispatch only: src/systems/expediter.cpp:321
+-> on_next_clearing_target_query new handler - note it has to mutate clearing_jobs_ (pick a dishwasher, write dishwasher_id), which would make it the only "query" in the file that isn't a pure lookup: src/systems/expediter.cpp:352
+-> on_waiter_finished_clearing_event new handler - erases the job only, does NOT call set_idle (waiter does that to itself): src/systems/expediter.cpp:372
+-> on_dog_completed_path_event to delete entirely once both legs self-handle: src/systems/expediter.cpp:402
+
+open question before actually writing any of this: query handler with a
+mutation side effect (dishwasher pick+assign happening lazily inside the
+query) vs. keeping queries pure and picking/assigning the dishwasher eagerly
+in process_clearing_jobs() instead (mirrors how counter_id is picked eagerly
+in process_orders(), not lazily on arrival). decide this before touching
+expediter.cpp for real.

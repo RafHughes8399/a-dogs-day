@@ -413,21 +413,73 @@ namespace entities{
                     std::string state_name() const override { return "idle"; }
                     int update(waiter_dog& dog, float delta, int frame) override;
                 };
-            // Busy marker: a serving waiter is not available for another order.
-            // The counter -> table journey is orchestrated by the expediter off
-            // dog_completed_path, so serving needs no per-leg travel logic itself.
+            // TODO: [waiter_dog::serving] [class shape] change from [one
+            // waiter_dog_state busy-marker; counter-vs-table leg told apart
+            // reactively in expediter via is_carrying_food()] to [split into
+            // two waiter_dog_traveling_state subclasses, mirroring
+            // customer_dog::walking_to_table:
+            //   class serving_counter : public waiter_dog_traveling_state{
+            //     public:
+            //       explicit serving_counter(Vector2 counter_interaction_pos);
+            //       bool is_available_for_order() override; // false
+            //       std::string state_name() const override; // "serving_counter"
+            //       int update(waiter_dog&, float, int) override; // no-op, same as today
+            //     protected:
+            //       void on_arrived(waiter_dog& dog) override; // see waiter_dog.cpp TODO
+            //   };
+            //   class serving_table : public waiter_dog_traveling_state{
+            //     public:
+            //       explicit serving_table(Vector2 table_interaction_pos);
+            //       bool is_available_for_order() override; // false
+            //       std::string state_name() const override; // "serving_table"
+            //       int update(waiter_dog&, float, int) override; // no-op
+            //     protected:
+            //       void on_arrived(waiter_dog& dog) override;
+            //   };
+            // The leg IS the class now - no more incidental-flag guessing.
+            // per project convention (CLAUDE.md: "prefer adding a state class
+            // over adding boolean flags").
             class serving : public waiter_dog_state{
                 public:
                     bool is_available_for_order() override;
                     std::string state_name() const override { return "serving"; }
                     int update(waiter_dog& dog, float delta, int frame) override;
             };
-            // Busy marker: a waiter clearing a table collects the dirty plate
-            // then routes to a dishwasher station. Same shape as `serving` -
-            // the table -> dishwasher journey is orchestrated by the
-            // expediter off dog_completed_path (see
-            // expediter::dispatch_clearing_job), this state just marks the
-            // waiter busy.
+            // TODO: [waiter_dog::clearing] [class shape] change from [one
+            // waiter_dog_state busy-marker; table-vs-dishwasher leg told
+            // apart reactively in expediter via job.dishwasher_id==empty_id]
+            // to [split into two waiter_dog_traveling_state subclasses, same
+            // shape as serving_counter/serving_table above:
+            //   class clearing_table : public waiter_dog_traveling_state{
+            //     public:
+            //       explicit clearing_table(Vector2 table_interaction_pos);
+            //       bool is_available_for_order() override; // false
+            //       std::string state_name() const override; // "clearing_table"
+            //       int update(waiter_dog&, float, int) override; // no-op
+            //     protected:
+            //       void on_arrived(waiter_dog& dog) override; // picks up
+            //       // plate, executes next_clearing_target_query, self
+            //       // sets_path to the dishwasher, transitions to
+            //       // clearing_dishwasher - see waiter_dog.cpp TODO.
+            //   };
+            //   class clearing_dishwasher : public waiter_dog_traveling_state{
+            //     public:
+            //       explicit clearing_dishwasher(Vector2 dishwasher_interaction_pos,
+            //         size_t table_id, size_t dishwasher_id);
+            //       bool is_available_for_order() override; // false
+            //       std::string state_name() const override; // "clearing_dishwasher"
+            //       int update(waiter_dog&, float, int) override; // no-op
+            //     protected:
+            //       void on_arrived(waiter_dog& dog) override; // places
+            //       // plate, fires a completion fact-event (new
+            //       // events::waiter_finished_clearing, add via the
+            //       // event-wire skill) so expediter erases the
+            //       // clearing_job, then self dog.set_idle() - mirrors
+            //       // customer_dog::eating calling dog.leave() itself.
+            //     private:
+            //       size_t table_id_; // needed on the completion event
+            //       size_t dishwasher_id_; // needed on the completion event
+            //   };
             class clearing : public waiter_dog_state{
                 public:
                     bool is_available_for_order() override;
@@ -457,6 +509,18 @@ namespace entities{
             bool is_carrying_food() const;
             std::unique_ptr<food> release_food();
             void set_idle();
+            // TODO: [waiter_dog::set_serving/set_clearing] [signature] change
+            // from [set_serving(), set_clearing() - no params, since the
+            // state carried no leg info] to [set_serving_counter(Vector2
+            // counter_interaction_pos), set_clearing_table(Vector2
+            // table_interaction_pos) - expediter already knows this position
+            // at dispatch time (fulfill_order/dispatch_clearing_job), so pass
+            // it in the same way customer_dog::set_walking_to_table(table_id,
+            // table_position, interaction_position) does. The *later* legs
+            // (serving_table, clearing_dishwasher) are never set externally -
+            // they're only ever entered via the previous state's on_arrived
+            // self-transitioning, so they need no set_* entry point on
+            // waiter_dog at all.]
             void set_serving();
             void set_clearing();
 

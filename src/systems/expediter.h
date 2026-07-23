@@ -92,6 +92,16 @@ public:
     event_interface::unsubscribe<events::dog_completed_path>(
         dog_completed_path_handler_);
     event_interface::unsubscribe<events::clear_table>(clear_table_handler_);
+    // TODO: [expediter destructor] [teardown] change from [unsubscribe
+    // dog_completed_path_handler_ here, since expediter listens to every
+    // waiter's completed path reactively] to [remove this unsubscribe (and
+    // the handler member/subscribe call below) entirely once
+    // serving/clearing self-handle via query - expediter no longer needs to
+    // observe dog_completed_path at all for waiter legs (see
+    // waiter_dog.cpp's on_arrived TODOs). Add
+    // queries::leg_target_executor_.unsubscribe(...) calls for
+    // next_serving_target/next_clearing_target instead, mirroring how
+    // level_graph unsubscribes its query handlers on teardown.]
   }
   expediter()
       : next_order_id_(0), next_clearing_job_id_(0),
@@ -217,6 +227,16 @@ public:
   void process_clearing_jobs();
   void dispatch_clearing_job(clearing_job &job);
   entities::waiter_dog *assign_waiter_to_clear_table(clearing_job &job);
+  // TODO: [expediter public API] [new query handler entry points] change
+  // from [no query handlers exist on expediter; all per-leg logic is
+  // reactive, inside on_dog_completed_path_event] to [add
+  // queries::leg_target on_next_serving_target_query(const
+  // queries::next_serving_target_query& q) and on_next_clearing_target_query
+  // analog - these are the functions expediter::expediter()'s constructor
+  // subscribes to queries::leg_target_executor_, same subscribe-in-ctor
+  // convention already used for every event handler below. The clearing one
+  // is where pick_food_counter()'s "loop the registry, pick one, mark it
+  // used" shape gets reused for dishwashers_.]
 
   void on_registered_waiter_event(const events::registered_waiter &event);
   void on_removed_waiter_event(const events::removed_waiter &event);
@@ -229,8 +249,23 @@ public:
       const events::registered_dishwasher &event);
   void on_removed_dishwasher_event(const events::removed_dishwasher &event);
   void on_dog_reached_station_event(const events::dog_reached_station &event);
+  // TODO: [expediter::on_dog_completed_path_event decl] [function to remove]
+  // change from [handles both orders_ and clearing_jobs_ waiter-leg
+  // transitions reactively off one shared event] to [delete once
+  // next_serving_target/next_clearing_target query handlers above cover
+  // both cases and waiter states self-handle - see the matching TODO on the
+  // .cpp definition for what happens to each branch].
   void on_dog_completed_path_event(const events::dog_completed_path &event);
   void on_clear_table(const events::clear_table &event);
+  // TODO: [expediter, new handler] [supporting change for
+  // clearing_dishwasher::on_arrived's completion signal] add
+  // void on_waiter_finished_clearing_event(const
+  // events::waiter_finished_clearing &event); - erases the matching
+  // clearing_jobs_ entry by waiter_id; no waiter->set_idle() call needed
+  // here since the waiter already does that itself on its own on_arrived
+  // (see waiter_dog.cpp TODO), same division of labor as
+  // customer_dog::leave() firing customer_dog_left and maitre_d's handler
+  // only freeing the *table*, not touching the dog.
 
 private:
   std::unordered_map<size_t, entities::waiter_dog *> waiters_;
@@ -256,6 +291,14 @@ private:
       removed_dishwasher_handler_;
   events::event_handler<events::dog_reached_station>
       dog_reached_station_handler_;
+  // TODO: [expediter private members] [handler storage] change from
+  // [dog_completed_path_handler_ member below, subscribed in ctor,
+  // unsubscribed in dtor] to [remove it; add
+  // queries::query_handler<queries::next_serving_target_query, queries::leg_target>
+  // and the clearing analog, matching how level_graph stores its query
+  // handlers (see graph.h) rather than events::event_handler<T>. Also add
+  // events::event_handler<events::waiter_finished_clearing>
+  // waiter_finished_clearing_handler_ for the new completion event.]
   events::event_handler<events::dog_completed_path> dog_completed_path_handler_;
   events::event_handler<events::clear_table> clear_table_handler_;
 };
