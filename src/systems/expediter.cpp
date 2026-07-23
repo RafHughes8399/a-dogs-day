@@ -318,7 +318,7 @@ void expediter::expediter::on_clear_table(const events::clear_table &event) {
 }
 
 void expediter::expediter::dispatch_clearing_job(clearing_job &job) {
-  // TODO 21/07 stubbed implementation for dispatch_clearing_job -
+  // TODO: 21/07 stubbed implementation for dispatch_clearing_job -
   // - send the waiter (find_waiter(job.waiter_id)) to the table's
   //   (find_table(job.table_id)) interaction position first, mirroring
   //   fulfill_order()'s dispatch to the counter
@@ -339,7 +339,18 @@ void expediter::expediter::dispatch_clearing_job(clearing_job &job) {
   //   served -> fulfilled transition below
   (void)job;
   // send waiter to table
+  auto waiter = waiters_.at(job.waiter_id);
+  waiter->set_clearing();
+  auto table = tables_.at(job.table_id);
+  // TODO decide on which one to pick,
+  // TODO maybe a helper is needed to have some decision logic based on position
+  // differneces
+  auto destination = table->get_interaction_positions().left;
+  std::unique_ptr<events::event> send_to_table =
+      std::make_unique<events::send_dog_to_station>(
+          job.waiter_id, destination, job.table_id, table->get_position());
   // update the waiter state (idle to clearing)
+  event_interface::queue_event(send_to_table);
   // waiter goes to the table, collects the plate
   // then routes to the dishwasher
 }
