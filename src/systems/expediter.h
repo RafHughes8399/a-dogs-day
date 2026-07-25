@@ -204,6 +204,7 @@ public:
   size_t num_tables() const { return tables_.size(); }
   size_t num_dishwashers() const { return dishwashers_.size(); }
   size_t num_serving_jobs() const { return serving_jobs_.size(); }
+  size_t num_clearing_jobs() const { return clearing_jobs_.size(); }
   // Status of the first order (for tests); serving_job_status::created acts as
   // the "no order" sentinel when the list is empty.
   serving_job_status first_serving_job_status() const {

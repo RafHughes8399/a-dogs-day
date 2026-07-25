@@ -142,6 +142,12 @@ namespace maitre_d{
             // assert table registration/removal and customer arrival/seating.
             size_t num_tables() const { return tables_.size(); }
             size_t num_customers() const { return customer_queue_.size(); }
+            // Customers tracked by pointer, which outlives queue membership -
+            // a seated customer has left the queue but is still tracked here.
+            size_t num_tracked_customers() const { return customers_.size(); }
+            entities::customer_dog* first_customer() const {
+                return customers_.empty() ? nullptr : customers_.begin()->second;
+            }
             // Customer dogs are tracked by non-owning raw pointer, the same way
             // the expediter tracks waiters (register on creation, drop on
             // removal). customer_queue_ still holds ids - the queue models

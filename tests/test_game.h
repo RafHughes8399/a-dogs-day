@@ -63,6 +63,7 @@ namespace testing{
             std::unique_ptr<entities::entity> build_khiri(int id, Vector2 position); // player dog
             std::unique_ptr<entities::entity> build_table(int id, Vector2 position);        // station
             std::unique_ptr<entities::entity> build_food_counter(int id, Vector2 position); // station
+            std::unique_ptr<entities::entity> build_dishwasher(int id, Vector2 position);  // station
             std::unique_ptr<entities::food> build_test_food(int id, Vector2 position);      // food entity
             std::unique_ptr<entities::entity> build_customer_dog(
                 int id, Vector2 position,
@@ -84,6 +85,9 @@ namespace testing{
             void insert_waiter_dog(int id, int dog_type, Vector2 position,
                                    std::optional<Vector2> destination = std::nullopt);
             void insert_dishwasher_dog(int id, Vector2 position);
+            void insert_dishwasher(int id, Vector2 position);   // station
+            void insert_table(int id, Vector2 position);
+            void insert_food_counter(int id, Vector2 position);
 
             // ---------------- event triggers ----------------
             // Fire the same path the debug 'L' key fires
@@ -94,6 +98,14 @@ namespace testing{
             void request_order(size_t customer_id, size_t table_id, Vector2 table_position);
             // Remove an entity from the level (fires remove_entity).
             void remove_entity(int id);
+            // Reposition an entity in place (fires move_entity), standing in for
+            // the player dragging a decoration - the cursor/carry flow needs
+            // input the harness deliberately does not simulate.
+            void move_entity(int id, Vector2 position);
+            // Fire clear_table for a table, the fact the maitre d' emits once a
+            // customer leaves. Lets a clearing job be driven without running the
+            // whole seat -> eat -> leave cycle first.
+            void request_clear_table(int table_id);
 
             // ---------------- inspection accessors ----------------
             // Look up an entity by id in the level; nullptr if absent.
@@ -107,15 +119,26 @@ namespace testing{
             int num_tables();          // maitre d' table count
             int num_customers();
             int num_expediter_tables(); // expediter table count (distinct system)
+            int num_dishwashers();
             int num_serving_jobs();
+            int num_clearing_jobs();
+            int num_tracked_customers(); // maitre d' pointer tracking, not queue length
             expediter::serving_job_status first_serving_job_status();
             // Live pointers to the first tracked waiter / counter, for driving
             // availability in scenarios (nullptr if none). Not owned.
             entities::waiter_dog* first_waiter();
             entities::food_counter* first_counter();
+            entities::dishwasher* first_dishwasher();
+            // First customer the maitre d' is tracking. The arrival flow builds
+            // the dog via an event, so the test never chose its id - this is how
+            // a scenario gets hold of a customer it did not insert itself.
+            entities::customer_dog* first_customer();
             // Typed accessors (throw if id is not that dog type / not present).
             entities::customer_dog& get_customer_dog(int id);
             entities::waiter_dog& get_waiter_dog(int id);
+            // Typed level lookups; nullptr when absent or the wrong kind.
+            entities::table* find_table(int id);
+            entities::dishwasher* find_dishwasher(int id);
 
         private:
             std::unique_ptr<level::level> level_;

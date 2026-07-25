@@ -241,3 +241,72 @@ SCENARIO("the expediter reserves counter food so two orders cannot claim the sam
         }
     }
 }
+
+// ---------------------------------------------------------------------------
+// Integration: the two job kinds arriving through the real cafe flow rather
+// than a synthetic request_order()/clear_table() event. These prove the seams
+// between maitre_d, the customer dog and the expediter, which the scenarios
+// above deliberately bypass.
+// ---------------------------------------------------------------------------
+
+SCENARIO("seating a customer creates a serving job", "[expediter][serving][integration]"){
+    test_game game;
+    game.tick(1.0f / 60.0f);
+    REQUIRE(game.num_serving_jobs() == 0);
+
+    GIVEN("a customer that arrives and is seated by the maitre d'"){
+        game.customer_arrives();
+        REQUIRE(game.tick_until([&]{ return game.first_customer() != nullptr; }, 60));
+        auto* customer = game.first_customer();
+        REQUIRE(customer != nullptr);
+        const int customer_id = customer->get_id();
+
+        WHEN("it reaches its table"){
+            const bool seated = game.tick_until([&]{
+                return game.find_entity(customer_id) != nullptr
+                    && game.get_customer_dog(customer_id).get_state_name() == "seated";
+            }, 3000);
+            REQUIRE(seated);
+
+            THEN("the expediter has a serving job for that customer's table"){
+                // dog_reached_station is what carries the order request, so the
+                // job appears without anything calling request_order directly.
+                const bool ordered = game.tick_until([&]{
+                    return game.num_serving_jobs() >= 1;
+                }, 120);
+                REQUIRE(ordered);
+            }
+        }
+    }
+}
+
+SCENARIO("a departing customer creates a clearing job", "[expediter][clearing][integration]"){
+    test_game game;
+    game.tick(1.0f / 60.0f);
+    REQUIRE(game.num_clearing_jobs() == 0);
+
+    GIVEN("a customer that runs the full cycle"){
+        game.customer_arrives();
+        REQUIRE(game.tick_until([&]{ return game.first_customer() != nullptr; }, 60));
+        const int customer_id = game.first_customer()->get_id();
+
+        WHEN("it finishes eating and leaves"){
+            const bool leaving = game.tick_until([&]{
+                auto* live = game.find_entity(customer_id);
+                return live == nullptr
+                    || game.get_customer_dog(customer_id).get_state_name() == "leaving";
+            }, 6000);
+            REQUIRE(leaving);
+
+            THEN("the maitre d' asks for the table to be cleared and the expediter records it"){
+                // customer_dog_left -> maitre_d resolves the table -> clear_table
+                // -> expediter. The job is erased again once a waiter finishes,
+                // so this catches it while it exists.
+                const bool cleared = game.tick_until([&]{
+                    return game.num_clearing_jobs() >= 1;
+                }, 300);
+                REQUIRE(cleared);
+            }
+        }
+    }
+}
