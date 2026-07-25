@@ -116,11 +116,41 @@ namespace entities{
             table& operator=(const table& other) = delete;
             table& operator=(table&& other) = delete;
 
+            // Cafe-domain state, distinct from the station's own
+            // unworked/worked interaction state: a table is available until
+            // the maitre d' reserves it for a specific customer, stays
+            // reserved until that customer physically arrives (occupy()), and
+            // stays occupied until the customer leaves and the table is
+            // cleared. The station's interacting state is driven off this -
+            // occupy() enters the assigned dog, clear() leaves it - so
+            // is_interacting() still answers "is a dog physically here", which
+            // reservation deliberately does not imply.
+            enum table_state{
+                available = 0,
+                reserved,
+                occupied
+            };
+
+            // Hides station::can_accept_dog on purpose: a table is claimable
+            // only while available. The base's capacity check would still say
+            // yes to a reserved table (reserving does not enter a dog), which
+            // would let the maitre d' hand the same table to two customers.
             bool can_accept_dog();
             void clear();
             int get_assigned_dog_id();
+            table_state get_state() const;
+            void occupy();
             void place_down() override;
+            // Returns false when the table is not available, so the caller
+            // can't silently steal a table already promised to another dog.
+            bool reserve_for(int dog_id);
         private:
+            static constexpr int no_dog_id = -1;
+
+            int assigned_dog_id_ = no_dog_id;
+            // Named to avoid confusion with station::state_, which holds the
+            // unworked/worked interaction state and is a different machine.
+            table_state cafe_state_ = table_state::available;
     };
 
     // A food_counter stores food as a FILO stack, up to a fixed capacity. Producers
