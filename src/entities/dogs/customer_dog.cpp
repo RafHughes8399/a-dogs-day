@@ -11,70 +11,54 @@
 #include "raglib.h"
 #include <memory>
 #include <vector>
-// ------------------------------- customer dog state bases ------------------------------- //
-void entities::customer_dog_state::on_path_finished(customer_dog& dog, Vector2 destination){
-    (void) dog;
-    (void) destination;
-    return;
-}
-
-void entities::customer_dog_state::set_path(customer_dog& dog, const std::vector<Vector2>& path){
-    dog.dog::set_path(path);
-}
-void entities::customer_dog_state::set_path(customer_dog& dog, const std::vector<Vector2>& path, int station_id, Vector2 station_position){
-    // A station-targeted path always means "go sit at this table" - transition
-    // the state directly here instead of round-tripping through an event. The
-    // path's last waypoint is the pathfinder's snapped interaction position, so
-    // customer_dog_traveling_state::on_path_finished will match it exactly on arrival.
-    if(! path.empty()){
-        dog.set_walking_to_table(static_cast<size_t>(station_id), station_position, path.back());
-    }
-    dog.dog::set_path(path);
-}
-
-void entities::customer_dog_traveling_state::on_path_finished(customer_dog& dog, Vector2 destination){
-    if(Vector2Distance(destination, destination_) > level_config::edge_weight * 0.05f){
-        return;
-    }
-    on_arrived(dog);
-}
-
 // ------------------------------- customer dog states ------------------------------- //
-int entities::customer_dog::default_state::update(customer_dog& dog, float delta, int frame){
+int entities::customer_dog::default_state::update(customer_dog& dog, float delta, int frame, int status){
     (void) dog;
     (void) delta;
     (void) frame;
+    (void) status;
     return status_codes::nothing;
 }
 
-void entities::customer_dog::walking_to_table::on_arrived(customer_dog& dog){
+int entities::customer_dog::walking_to_table::update(customer_dog& dog, float delta, int frame, int status){
+    (void) delta;
+    (void) frame;
+    // Arrival is "a leg finished AND nothing is left to walk", not just
+    // completed_path: update_path has already called start_next_path by the
+    // time this runs, so a queued second leg shows up as a non-empty
+    // current_path_. Today the maitre d' only ever dispatches a single-leg
+    // path here (dog_queue::dequeue won't release a dog until it has finished
+    // walking to its queue slot), but checking the queues keeps this correct
+    // if that ever changes - and replaces the old destination-matching guard
+    // without needing to store the destination.
+    if(status != status_codes::completed_path
+       || ! dog.current_path_.empty()
+       || ! dog.move_paths_.empty()){
+        return status_codes::nothing;
+    }
     std::unique_ptr<events::event> dog_reached_station = std::make_unique<events::dog_reached_station>(
         static_cast<size_t>(dog.get_id()),
         table_id_,
         table_position_);
     event_interface::queue_event(dog_reached_station);
+    // set_state frees this walking_to_table instance, so it must stay the last
+    // thing this function touches on `this` (same constraint as eating below).
     dog.set_state(std::make_unique<customer_dog::seated>());
-}
-
-int entities::customer_dog::walking_to_table::update(customer_dog& dog, float delta, int frame){
-    (void) dog;
-    (void) delta;
-    (void) frame;
     return status_codes::nothing;
 }
 
-
-
-int entities::customer_dog::seated::update(customer_dog& dog, float delta, int frame){
+int entities::customer_dog::seated::update(customer_dog& dog, float delta, int frame, int status){
     (void) dog;
     (void) delta;
     (void) frame;
+    (void) status;
     // play waiting animation
     return status_codes::nothing;
 }
 
-int entities::customer_dog::eating::update(customer_dog& dog, float delta, int frame){
+int entities::customer_dog::eating::update(customer_dog& dog, float delta, int frame, int status){
     (void) frame;
+    (void) status;
     (void) order_id_;
     (void) table_id_;
     (void) table_position_;
@@ -100,16 +84,21 @@ int entities::customer_dog::eating::update(customer_dog& dog, float delta, int f
     return status_codes::nothing;
 }
 
-int entities::customer_dog::leaving::update(customer_dog& dog, float delta, int frame){
+int entities::customer_dog::leaving::update(customer_dog& dog, float delta, int frame, int status){
     (void) delta;
     (void) frame;
-    // Movement already happened this frame: stateful_npc_dog::update() calls
+    (void) status;
+    // Movement already happened this frame: customer_dog::update() calls
     // npc_dog::update() (which steps current_path_/move_paths_) *before*
     // calling state_->update() here, so there's no need to (and must not)
     // call dog.update() again - that would re-enter this same function via
     // state_->update(), since the state hasn't changed, and recurse forever.
-    // Once both legs (entrance, then exit) are exhausted the dog has
-    // arrived; signal dead so stateful_npc_dog::update() propagates it up to
+    //
+    // leave() queues two legs (entrance, then exit), so this deliberately
+    // checks both queues rather than reacting to `status`: a completed_path
+    // for the first leg is not an exit, and a dog whose path queries both
+    // came back empty must still be harvested rather than idling forever at
+    // the table. Signalling dead propagates through customer_dog::update() to
     // the quadtree, which harvests dead entities (quadtree.cpp status_codes
     // switch).
     if(dog.current_path_.empty() && dog.move_paths_.empty()){
@@ -126,12 +115,41 @@ void entities::customer_dog::on_give_dog_path_event(const events::give_dog_path&
     set_path(event.get_path());
 }
 
+void entities::customer_dog::set_path(const std::vector<Vector2>& path, int station_id, Vector2 station_position){
+    // A station-targeted path always means "go sit at this table" - transition
+    // the state directly here instead of round-tripping through an event, or
+    // through a set_path hook on the state (which every state implemented
+    // identically anyway).
+    if(! path.empty()){
+        set_walking_to_table(static_cast<size_t>(station_id), station_position);
+    }
+    dog::set_path(path);
+}
+
 void entities::customer_dog::set_eating(size_t order_id, size_t table_id, Vector2 table_position){
     set_state(std::make_unique<customer_dog::eating>(order_id, table_id, table_position));
 }
 
-void entities::customer_dog::set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position){
-    set_state(std::make_unique<customer_dog::walking_to_table>(table_id, table_position, interaction_position));
+void entities::customer_dog::set_walking_to_table(size_t table_id, Vector2 table_position){
+    set_state(std::make_unique<customer_dog::walking_to_table>(table_id, table_position));
+}
+
+int entities::customer_dog::update(float delta, int frame){
+    auto status = npc_dog::update(delta, frame);
+    auto state_status = state_->update(*this, delta, frame, status);
+    // A state signalling dead (leaving, once it has run out of path) always
+    // wins - the quadtree needs to see it to harvest the entity (quadtree.cpp
+    // on_update's status_codes switch), regardless of what movement returned.
+    //
+    // NOTE: only `dead` from the state is special-cased. `status` is what
+    // carries moved/completed_path today, from update_path() stepping
+    // current_path_/move_paths_. A future state that repositions the dog
+    // directly (bypassing the path system) must return status_codes::moved
+    // itself AND this combining logic must be extended to propagate it -
+    // right now such a signal would be silently dropped, and without `moved`
+    // reaching the quadtree its re-insert check never runs and the entity
+    // goes stale in the wrong quadrant.
+    return state_status == status_codes::dead ? state_status : status;
 }
 
 

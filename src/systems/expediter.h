@@ -98,7 +98,7 @@ public:
     // the handler member/subscribe call below) entirely once
     // serving/clearing self-handle via query - expediter no longer needs to
     // observe dog_completed_path at all for waiter legs (see
-    // waiter_dog.cpp's on_arrived TODOs). Add
+    // waiter_dog.cpp's state TODOs). Add
     // queries::leg_target_executor_.unsubscribe(...) calls for
     // next_serving_target/next_clearing_target instead, mirroring how
     // level_graph unsubscribes its query handlers on teardown.]
@@ -258,11 +258,11 @@ public:
   void on_dog_completed_path_event(const events::dog_completed_path &event);
   void on_clear_table(const events::clear_table &event);
   // TODO: [expediter, new handler] [supporting change for
-  // clearing_dishwasher::on_arrived's completion signal] add
+  // clearing_dishwasher's completion signal] add
   // void on_waiter_finished_clearing_event(const
   // events::waiter_finished_clearing &event); - erases the matching
   // clearing_jobs_ entry by waiter_id; no waiter->set_idle() call needed
-  // here since the waiter already does that itself on its own on_arrived
+  // here since the waiter already does that itself in its own state
   // (see waiter_dog.cpp TODO), same division of labor as
   // customer_dog::leave() firing customer_dog_left and maitre_d's handler
   // only freeing the *table*, not touching the dog.

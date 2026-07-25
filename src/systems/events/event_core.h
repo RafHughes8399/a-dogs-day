@@ -88,7 +88,8 @@ namespace events{
 		table_cleared = 46,
 		register_dishwasher = 47,
 		dishwasher_removed = 48,
-		size = 49
+		customer_removed = 49,
+		size = 50
 	};
 	class event{
 

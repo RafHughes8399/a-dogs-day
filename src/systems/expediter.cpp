@@ -328,8 +328,8 @@ void expediter::expediter::dispatch_clearing_job(clearing_job &job) {
   // dishwasher progression is meant to happen inside
   // on_dog_completed_path_event (see the now-removed TODO block that used
   // to sit here); instead it will happen in
-  // waiter_dog::clearing_table::on_arrived /
-  // waiter_dog::clearing_dishwasher::on_arrived (see waiter_dog.cpp TODOs),
+  // waiter_dog::clearing_table's completed_path branch /
+  // waiter_dog::clearing_dishwasher's (see waiter_dog.cpp TODOs),
   // driven by next_clearing_target_query rather than this function.
   (void)job;
   // send waiter to table
@@ -355,7 +355,7 @@ void expediter::expediter::dispatch_clearing_job(clearing_job &job) {
 // inside the event handler, then mutate job.dishwasher_id and queue
 // send_dog_to_station directly] to [pull: handler for
 // queries::next_clearing_target_query, invoked synchronously from
-// waiter_dog::clearing_table::on_arrived. Body: find_if clearing_jobs_ by
+// waiter_dog::clearing_table on completed_path. Body: find_if clearing_jobs_ by
 // event.waiter_id(); if not found or no dishwasher available (mirror
 // are_counters_available()/pick_food_counter()'s loop-and-check shape over
 // dishwashers_ instead of food_counters_), return {has_next=false}; else
@@ -376,9 +376,9 @@ void expediter::expediter::dispatch_clearing_job(clearing_job &job) {
 // change from [reactive: on_dog_completed_path_event would erase the job and
 // call waiter->set_idle() itself] to [handler for the new
 // events::waiter_finished_clearing fact event fired by
-// clearing_dishwasher::on_arrived - erase_if clearing_jobs_ by waiter_id
+// clearing_dishwasher - erase_if clearing_jobs_ by waiter_id
 // only; do NOT call set_idle() here, the waiter already did that to itself
-// as the last step of on_arrived (see waiter_dog.cpp), same division of
+// as the last step of its completed_path branch (see waiter_dog.cpp), same division of
 // labor as on_clear_table not touching the customer dog that fired it.]
 
 void expediter::expediter::on_dog_reached_station_event(
@@ -409,16 +409,16 @@ void expediter::expediter::on_dog_reached_station_event(
 // this function, its handler member, and the dog_completed_path
 // subscribe/unsubscribe pair in expediter.h once both legs are covered:
 //   - the `!waiter->is_carrying_food()` branch below becomes
-//     waiter_dog::serving_counter::on_arrived (waiter_dog.cpp TODO) calling
+//     waiter_dog::serving_counter's completed_path branch (waiter_dog.cpp TODO) calling
 //     queries::next_serving_target_query
 //   - the `else` (served) branch below becomes
-//     waiter_dog::serving_table::on_arrived, firing order_served itself and
+//     waiter_dog::serving_table, firing order_served itself and
 //     calling dog.set_idle()/release_food() itself instead of expediter
 //     doing it to a resolved waiter* pointer
 //   - the clearing side (which this function never actually implemented -
 //     see the TODO that used to sit in dispatch_clearing_job) becomes
 //     on_next_clearing_target_query / on_waiter_finished_clearing_event
-//     above, plus waiter_dog::clearing_table/clearing_dishwasher::on_arrived
+//     above, plus the waiter_dog::clearing_table/clearing_dishwasher states
 // Net effect: expediter stops being a dog_completed_path subscriber
 // entirely for waiter purposes - maitre_d still subscribes to that same
 // event independently for customer_dog concerns, so the event itself

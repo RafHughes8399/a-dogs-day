@@ -199,7 +199,8 @@ void level::level::insert_void_entity(void_entity_record record) {
   debug::log("[level::insert_void_entity, emitting customer created] "
              "entity_id: " +
              std::to_string(entity_id));
-  auto customer_arrived = events::customer_dog_created(entity_id, position);
+  auto customer_arrived =
+      events::customer_dog_created(customer, entity_id, position);
   event_interface::execute_event(customer_arrived);
 }
 

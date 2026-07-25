@@ -5,12 +5,13 @@
  * should only be one for the game. It listens to cafe-domain events and also
  * exposes an id-based interface for systems that need to report facts directly.
  *
- * It holds non-owning raw pointers to the table entities it tracks (the level
- * owns them; register/remove events keep the pointers valid). Reading table
- * position and cafe-state live from the entity avoids caching stale copies and
- * removes the need to listen for table-moved events. When it decides that a
- * world mutation should happen it still emits command events for a world-owning
- * system, such as the level, to execute.
+ * It holds non-owning raw pointers to the table and customer-dog entities it
+ * tracks (the level owns them; register/remove events keep the pointers valid),
+ * the same tracking shape the expediter uses for waiters/counters/dishwashers.
+ * Reading position and cafe-state live from the entity avoids caching stale
+ * copies and removes the need to listen for moved events. When it decides that
+ * a world mutation should happen it still emits command events for a
+ * world-owning system, such as the level, to execute.
  */
 #ifndef MAITRE_D_H
 #define MAITRE_D_H
@@ -141,7 +142,15 @@ namespace maitre_d{
             // assert table registration/removal and customer arrival/seating.
             size_t num_tables() const { return tables_.size(); }
             size_t num_customers() const { return customer_queue_.size(); }
-            void register_customer(size_t customer_id);
+            // Customer dogs are tracked by non-owning raw pointer, the same way
+            // the expediter tracks waiters (register on creation, drop on
+            // removal). customer_queue_ still holds ids - the queue models
+            // physical line order, not entity identity - but anything that
+            // needs to read live dog state or command a dog resolves the
+            // pointer here instead of round-tripping through a command event.
+            void register_customer(entities::customer_dog* customer);
+            void remove_customer(size_t customer_id);
+            entities::customer_dog* find_customer(size_t customer_id);
             void request_table_for_customer(size_t customer_id);
 
             void update(float delta);
@@ -158,6 +167,7 @@ namespace maitre_d{
             void on_requested_customer_table_event(const events::requested_customer_table& event);
             void on_customer_dog_created_event(const events::customer_dog_created& event);
             void on_customer_dog_left_event(const events::customer_dog_left& event);
+            void on_removed_customer_event(const events::removed_customer& event);
             void on_dog_completed_path_event(const events::dog_completed_path& event);
             // dog_reached_station already names which station a customer
             // reached (the dog's own traveling state resolves and carries that
@@ -199,9 +209,14 @@ namespace maitre_d{
             // move_table(table_id)
             //   -> no status change; level owns the physical position
             // Physical customer queue sketch:
-            // customer_dog_created(customer_id)
+            // customer_dog_created(customer, customer_id, position)
+            //   -> track the customer pointer in customers_
             //   -> enqueue the dog with its height in edge units
             //   -> emit/request pathing to the resolved queue target position
+            //
+            // removed_customer(customer_id)
+            //   -> drop the pointer; assign_tables() drops the queue entry
+            //      lazily when it dequeues an id that no longer resolves
             //
 	            // send_dog_to_table(customer_id, table_id, table_position, interaction_position)
             //   -> dequeue the dog
@@ -211,6 +226,7 @@ namespace maitre_d{
             
 
             std::unordered_map<size_t, entities::table*> tables_;
+            std::unordered_map<size_t, entities::customer_dog*> customers_;
 
             dog_queue customer_queue_;
             float seconds_since_customer_arrived_;
@@ -224,6 +240,7 @@ namespace maitre_d{
             events::event_handler<events::requested_customer_table> requested_customer_table_handler_;
             events::event_handler<events::customer_dog_created> customer_dog_created_handler_;
             events::event_handler<events::customer_dog_left> customer_dog_left_handler_;
+            events::event_handler<events::removed_customer> removed_customer_handler_;
             events::event_handler<events::dog_completed_path> dog_path_compelte_handler_;
             events::event_handler<events::dog_reached_station> dog_reached_station_handler_;
     };

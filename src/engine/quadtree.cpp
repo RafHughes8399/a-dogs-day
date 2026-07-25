@@ -200,6 +200,10 @@ void tree::quadtree::notify_removals(const std::vector<entities::entity*>& remov
             events::removed_waiter removed_waiter{id};
             event_interface::execute_event(removed_waiter);
         }
+        else if(debug_id.starts_with(entity_config::customer_dog_debug_id_prefix)){
+            events::removed_customer removed_customer{id};
+            event_interface::execute_event(removed_customer);
+        }
         else if(debug_id.starts_with(entity_config::dishwasher_debug_id_prefix)){
             events::removed_dishwasher removed_dishwasher{id};
             event_interface::execute_event(removed_dishwasher);

@@ -54,17 +54,38 @@ private:
 // into the physical waiting queue managed by the maitre d'.
 class customer_dog_created : public event {
 public:
-  customer_dog_created(size_t customer_id, Vector2 position)
-      : event(ids::customer_arrived), customer_id_(customer_id),
-        position_(position) {}
+  customer_dog_created(entities::customer_dog *customer, size_t customer_id,
+                       Vector2 position)
+      : event(ids::customer_arrived), customer_(customer),
+        customer_id_(customer_id), position_(position) {}
 
   static int get_static_type() { return ids::customer_arrived; }
+  // Non-owning; the level owns the dog. Carried so the maitre d' can track the
+  // customer by pointer the same way the expediter tracks waiters, rather than
+  // holding an id it has to round-trip through a command event to act on.
+  entities::customer_dog *get_customer() const { return customer_; }
   size_t get_customer_id() const { return customer_id_; }
   Vector2 get_position() const { return position_; }
 
 private:
+  entities::customer_dog *const customer_;
   const size_t customer_id_;
   const Vector2 position_;
+};
+// Cafe-domain fact: a customer dog was removed from the level; the maitre d'
+// must drop its pointer to avoid dereferencing a destroyed entity. Mirrors
+// removed_waiter, and like it is executed in place (not queued) at removal
+// time - see quadtree::notify_removals.
+class removed_customer : public event {
+public:
+  removed_customer(size_t customer_id)
+      : event(ids::customer_removed), customer_id_(customer_id) {}
+
+  static int get_static_type() { return ids::customer_removed; }
+  size_t get_customer_id() const { return customer_id_; }
+
+private:
+  const size_t customer_id_;
 };
 class dog_completed_path : public event {
 public:

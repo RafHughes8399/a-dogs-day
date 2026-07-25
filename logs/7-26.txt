@@ -22,11 +22,20 @@ queries.h
 -> new query ids (next_serving_target, next_clearing_target) + size bump: src/systems/queries.h:14
 -> leg_target struct + the two query classes: src/systems/queries.h:122
 -> new leg_target_executor_ global (4th executor, same shape as bool/int/path): src/systems/queries.h:197
+[--------done--------------]
+
 
 dogs.h
 -> split serving into serving_counter / serving_table (traveling_state subclasses): src/entities/dogs/dogs.h:416
 -> split clearing into clearing_table / clearing_dishwasher: src/entities/dogs/dogs.h:448
 -> set_serving/set_clearing need a destination param now (like set_walking_to_table): src/entities/dogs/dogs.h:512
+
+- > use the travelling states to know the destination ? but we can know the destination from the path right, just get path .back()
+-> like we dont ened to carry that its not necessary i dont think
+-> and then when transitioning from states like serving counter -> table or clearing table -> diswasher then you query the job for hte new destination, 
+-> not even because you can queue the extra path on the dog and its when the first path ends and the second path begins is when 
+-> you switch state you dont need the query or the extra field or the on_finished_path, the dog should be 
+-> able to know itself that its path has finsihed and where it then needs to go, that is hat can trigger its self state transition  
 
 waiter_dog.cpp
 -> delete serving::update, replace with serving_counter/serving_table update: src/entities/dogs/waiter_dog.cpp:69
@@ -56,3 +65,62 @@ query) vs. keeping queries pure and picking/assigning the dishwasher eagerly
 in process_clearing_jobs() instead (mirrors how counter_id is picked eagerly
 in process_orders(), not lazily on arrival). decide this before touching
 expediter.cpp for real.
+
+
+
+-> yeah i think this stateful dog pattern or whatever the fuck it is is not working
+-> its confusing, bogging me down and i dont know how to effectively interact with it
+-> after this goes in i'm going to tear it down and
+-> just define a state machine for each dog independently
+
+[--------- teardown done ---------]
+
+stateful_npc_dog<Derived, StateBase> is gone. customer_dog and waiter_dog
+each derive straight from npc_dog and own their own
+unique_ptr<their_state_base> + set_state + update. deliberately parallel
+code, not shared code.
+
+the update chain is now:
+  customer_dog::update(delta, frame)
+    -> status = npc_dog::update(...)        // movement; returns completed_path
+    -> state_->update(*this, delta, frame, status)   // reacts to that status
+    -> `dead` from the state wins, else return status
+
+what that deleted:
+-> customer_dog_state::on_path_finished + customer_dog_traveling_state
+-> waiter_dog_state::on_path_finished + waiter_dog_traveling_state
+-> both set_path forwarding overloads on both state bases (every state
+   implemented them identically). customer_dog now overrides the 3-arg
+   set_path directly to self-transition into walking_to_table.
+-> the stored destination_ on the traveling states. arrival is
+   "status == completed_path && current_path_.empty() && move_paths_.empty()"
+   instead of position-matching a cached destination.
+-> dog::on_path_finished is no longer virtual. it still fires
+   dog_completed_path, because maitre_d uses it for queue bookkeeping and
+   expediter still uses it for the serving journey.
+
+NOT done here, still the next commit:
+-> the serving/clearing leg split (serving_counter/serving_table,
+   clearing_table/clearing_dishwasher). serving + clearing are still single
+   busy-marker states that ignore `status`. the TODOs in dogs.h/waiter_dog.cpp
+   are rewritten for the new shape - each leg's update() does its arrival work
+   on completed_path and set_state()s to the next leg.
+-> expediter pre-queueing both path legs at dispatch (dispatch_clearing_job
+   is back to the committed single-leg version; the WIP that picked a
+   dishwasher at dispatch didn't compile - dishwashers_.at(empty_id) throws,
+   and set_path takes a path not a Vector2, so expediter has to run the
+   path query itself).
+-> the dog_station_query / station_executor_ in queries.h was reverted:
+   pre-queueing both legs means there's nothing to query on arrival.
+
+maitre_d now tracks customer_dog* in customers_, same shape as expediter's
+waiters_. registration rides on customer_dog_created (which now carries the
+pointer); removal is a new removed_customer fact fired in place from
+quadtree::notify_removals off the "cd_" debug-id prefix, mirroring
+removed_waiter. assign_tables() resolves the pointer, reads the dog's live
+position for interaction-side picking, and drops a dequeued customer whose
+entity no longer resolves.
+
+open: pre-queued legs go stale if the player moves the target station
+mid-journey -> filed as issue #40 (recalibrate in-flight paths on
+station move).
