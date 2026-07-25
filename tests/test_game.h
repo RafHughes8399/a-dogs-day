@@ -48,7 +48,7 @@ namespace testing{
 
             // ---------------- simulation clock ----------------
             // Advance the sim `frames` step(s): process_events ->
-            // maitre_d_.update(delta) -> expediter_.process_orders(). No render.
+            // maitre_d_.update(delta) -> expediter_.process_serving_jobs(). No render.
             void tick(float delta, int frames = 1);
             // tick() in a loop up to max_frames, stopping early when predicate()
             // is true. Returns whether the predicate became true (the "await a
@@ -107,8 +107,8 @@ namespace testing{
             int num_tables();          // maitre d' table count
             int num_customers();
             int num_expediter_tables(); // expediter table count (distinct system)
-            int num_orders();
-            expediter::order_status first_order_status();
+            int num_serving_jobs();
+            expediter::serving_job_status first_serving_job_status();
             // Live pointers to the first tracked waiter / counter, for driving
             // availability in scenarios (nullptr if none). Not owned.
             entities::waiter_dog* first_waiter();

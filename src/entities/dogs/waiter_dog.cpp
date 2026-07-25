@@ -1,7 +1,11 @@
+#include "config.h"
 #include "debug_log_interface.h"
 #include "entities.h"
+#include "events.h"
+#include "events_interface.h"
 #include "raglib.h"
 #include "texture.h"
+#include <memory>
 #include <vector>
 
 // ------------------------------- waiter dog states
@@ -17,49 +21,184 @@ int entities::waiter_dog::idle::update(waiter_dog &dog, float delta, int frame,
   return status_codes::nothing;
 }
 
-bool entities::waiter_dog::serving::is_available_for_order() { return false; }
-int entities::waiter_dog::serving::update(waiter_dog &dog, float delta,
-                                          int frame, int status) {
-  (void)dog;
-  (void)delta;
+bool entities::waiter_dog::animating::is_available_for_order() { return false; }
+
+void entities::waiter_dog::animating::on_enter(waiter_dog &dog) {
+  dog.play_animation(anim_);
+}
+
+int entities::waiter_dog::animating::update(waiter_dog &dog, float delta,
+                                            int frame, int status) {
   (void)frame;
   (void)status;
-  // Still expediter-driven off dog_completed_path; this state only marks the
-  // waiter busy. `status` is deliberately ignored until the leg split lands
-  // (see the serving TODO in dogs.h) - that is what moves the counter/table
-  // transitions in here, keyed off status_codes::completed_path.
-  // TODO: when the waiter reaches the counter (animation::picking_up_food)
-  // and the table (animation::placing_food), hold here for the animation's
-  // duration before the leg is allowed to advance - needs an elapsed_-style
-  // timer, see customer_dog::eating for the existing pattern.
+  // delta-based rather than read off the sprite: next_frame() wraps, so an
+  // animation never reports "done", and advance() is driven from render, which
+  // the headless test harness never calls.
+  elapsed_ += delta;
+  if (elapsed_ < duration_) {
+    return status_codes::nothing;
+  }
+  // set_state frees this instance, so it must be the last touch on `this`.
+  dog.set_state(std::move(next_));
   return status_codes::nothing;
 }
 
-bool entities::waiter_dog::clearing::is_available_for_order() { return false; }
-int entities::waiter_dog::clearing::update(waiter_dog &dog, float delta,
-                                           int frame, int status) {
-  (void)dog;
+bool entities::waiter_dog::serving_counter::is_available_for_order() {
+  return false;
+}
+int entities::waiter_dog::serving_counter::update(waiter_dog &dog, float delta,
+                                                  int frame, int status) {
   (void)delta;
   (void)frame;
-  (void)status;
-  // Same as `serving`: busy marker only, until clearing splits into
-  // clearing_table/clearing_dishwasher. Once it does, the table -> dishwasher
-  // progression happens here on status_codes::completed_path rather than in
-  // expediter::on_dog_completed_path_event, and the dishwasher position comes
-  // from the second path leg the expediter queued at dispatch - the state
-  // never needs to cache or re-query it.
-  // TODO: when the waiter reaches the table (animation::picking_up_plate) and
-  // the dishwasher (animation::placing_plate), hold for the animation's
-  // duration before advancing - same elapsed_-style timer as `serving`.
+  if (dog.has_arrived(status)) {
+    dog.set_state(std::make_unique<animating>(
+        animation::picking_up_food, cafe_config::animation_duration_s,
+        std::make_unique<walking_to_table>(table_destination_)));
+    return status_codes::nothing;
+  }
+  // After arrival, never before - see clearing_table.
+  if (!dog.has_path()) {
+    dog.set_state(std::make_unique<abandoned_serving>());
+  }
   return status_codes::nothing;
 }
 
-// TODO: [event-wire, new event] add events::waiter_finished_clearing via the
-// event-wire skill (skills/event-wire/SKILL.md) - a Cafe-domain fact, same
-// shape as events::customer_dog_left, carrying just the waiter's dog id. Fired
-// by clearing_dishwasher once the plate is placed so the expediter can erase
-// the clearing_job; the waiter calls set_idle() on itself rather than having
-// the expediter do it.
+bool entities::waiter_dog::walking_to_table::is_available_for_order() {
+  return false;
+}
+void entities::waiter_dog::walking_to_table::on_enter(waiter_dog &dog) {
+  // Executed, not queued: the expediter hands over the food inside this call,
+  // so the waiter is carrying it before it takes a step.
+  const events::waiter_collected_food collected(
+      static_cast<size_t>(dog.get_id()));
+  event_interface::execute_event(collected);
+  dog.path_to(table_destination_);
+}
+int entities::waiter_dog::walking_to_table::update(waiter_dog &dog, float delta,
+                                                   int frame, int status) {
+  (void)delta;
+  (void)frame;
+  if (dog.has_arrived(status)) {
+    dog.set_state(std::make_unique<animating>(
+        animation::placing_food, cafe_config::animation_duration_s,
+        std::make_unique<finished_serving>()));
+    return status_codes::nothing;
+  }
+  if (!dog.has_path()) {
+    dog.set_state(std::make_unique<abandoned_serving>());
+  }
+  return status_codes::nothing;
+}
+
+bool entities::waiter_dog::finished_serving::is_available_for_order() {
+  return false;
+}
+void entities::waiter_dog::finished_serving::on_enter(waiter_dog &dog) {
+  // Executed, not queued: update() sets the waiter idle on the very next frame,
+  // so a queued handler could still be holding the job open (and the food) once
+  // the waiter already looks available.
+  const events::waiter_served_order served(static_cast<size_t>(dog.get_id()));
+  event_interface::execute_event(served);
+}
+int entities::waiter_dog::finished_serving::update(waiter_dog &dog, float delta,
+                                                   int frame, int status) {
+  (void)delta;
+  (void)frame;
+  (void)status;
+  dog.set_idle();
+  return status_codes::nothing;
+}
+
+bool entities::waiter_dog::abandoned_serving::is_available_for_order() {
+  return false;
+}
+void entities::waiter_dog::abandoned_serving::on_enter(waiter_dog &dog) {
+  // Executed for the same reason as finished_serving's.
+  const events::waiter_abandoned_serving abandoned(
+      static_cast<size_t>(dog.get_id()));
+  event_interface::execute_event(abandoned);
+}
+int entities::waiter_dog::abandoned_serving::update(waiter_dog &dog,
+                                                    float delta, int frame,
+                                                    int status) {
+  (void)delta;
+  (void)frame;
+  (void)status;
+  dog.set_idle();
+  return status_codes::nothing;
+}
+
+bool entities::waiter_dog::clearing_table::is_available_for_order() {
+  return false;
+}
+int entities::waiter_dog::clearing_table::update(waiter_dog &dog, float delta,
+                                                 int frame, int status) {
+  (void)delta;
+  (void)frame;
+  if (dog.has_arrived(status)) {
+    // set_state frees this instance - last touch on `this`.
+    dog.set_state(std::make_unique<animating>(
+        animation::picking_up_plate, cafe_config::animation_duration_s,
+        std::make_unique<walking_to_dishwasher>(dishwasher_destination_)));
+    return status_codes::nothing;
+  }
+  // Checked after arrival, never before - an arriving dog also has no path
+  // left. process_clearing_job dispatches this leg synchronously, so the path
+  // exists before the first update; nothing to walk means an unreachable table.
+  if (!dog.has_path()) {
+    dog.set_state(std::make_unique<finished_clearing>());
+  }
+  return status_codes::nothing;
+}
+
+bool entities::waiter_dog::walking_to_dishwasher::is_available_for_order() {
+  return false;
+}
+void entities::waiter_dog::walking_to_dishwasher::on_enter(waiter_dog &dog) {
+  // Pathed on entry, not at dispatch, so a dishwasher moved mid-journey is
+  // routed to where it actually is. Failure is handled in update() - on_enter
+  // must not set_state.
+  dog.path_to(dishwasher_destination_);
+}
+int entities::waiter_dog::walking_to_dishwasher::update(waiter_dog &dog,
+                                                        float delta, int frame,
+                                                        int status) {
+  (void)delta;
+  (void)frame;
+  if (dog.has_arrived(status)) {
+    dog.set_state(std::make_unique<animating>(
+        animation::placing_plate, cafe_config::animation_duration_s,
+        std::make_unique<finished_clearing>()));
+    return status_codes::nothing;
+  }
+  // Checked after arrival, never before - an arriving dog also has no path
+  // left. Reaching here with nothing to walk means on_enter's path_to failed.
+  if (!dog.has_path()) {
+    dog.set_state(std::make_unique<finished_clearing>());
+  }
+  return status_codes::nothing;
+}
+
+bool entities::waiter_dog::finished_clearing::is_available_for_order() {
+  return false;
+}
+void entities::waiter_dog::finished_clearing::on_enter(waiter_dog &dog) {
+  // Executed for the same reason as finished_serving's - the job must be closed
+  // before update() makes the waiter look available again.
+  const events::waiter_finished_clearing finished(
+      static_cast<size_t>(dog.get_id()));
+  event_interface::execute_event(finished);
+}
+int entities::waiter_dog::finished_clearing::update(waiter_dog &dog,
+                                                    float delta, int frame,
+                                                    int status) {
+  (void)delta;
+  (void)frame;
+  (void)status;
+  // set_idle frees this instance - last touch on `this`.
+  dog.set_idle();
+  return status_codes::nothing;
+}
 
 // ------------------------------- waiter dog ------------------------------- //
 entities::waiter_dog::~waiter_dog() = default;
@@ -77,18 +216,15 @@ std::unique_ptr<entities::food> entities::waiter_dog::release_food() {
   return std::move(held_food_);
 }
 void entities::waiter_dog::set_idle() { set_state(std::make_unique<idle>()); }
-void entities::waiter_dog::set_serving() {
-  set_state(std::make_unique<serving>());
+void entities::waiter_dog::set_serving(Vector2 table_destination) {
+  set_state(std::make_unique<serving_counter>(table_destination));
 }
-void entities::waiter_dog::set_clearing() {
-  set_state(std::make_unique<clearing>());
+void entities::waiter_dog::set_clearing(Vector2 dishwasher_destination) {
+  set_state(std::make_unique<clearing_table>(dishwasher_destination));
 }
 
 int entities::waiter_dog::update(float delta, int frame) {
   auto status = npc_dog::update(delta, frame);
-  auto state_status = state_->update(*this, delta, frame, status);
-  // Same combining rule as customer_dog::update - see the note there. No
-  // waiter state signals dead today, but keeping the shape identical means
-  // the two dogs stay readable side by side.
-  return state_status == status_codes::dead ? state_status : status;
+  // Same flag merge as customer_dog::update - see the note there.
+  return status | state_->update(*this, delta, frame, status);
 }

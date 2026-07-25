@@ -418,39 +418,28 @@ std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta
     std::vector<int> to_remove = {};
     for(auto it = tree->objects_.begin(); it != tree->objects_.end();){
         int update_result = (*it)->update(delta, frame);
-        switch(update_result){
-            case entities::status_codes::moved:
-            case entities::status_codes::completed_path:
-                // completed_path (a path leg finishing) doesn't move the dog
-                // itself this frame - position_ was already set by the prior
-                // moved frame - but treating it the same as moved is cheap
-                // insurance: if that assumption is ever violated (or a state
-                // repositions the dog directly during leg transition), the
-                // entity still gets its bounds re-checked instead of going
-                // stale in the wrong quadrant.
-                if(! node_contains_object(tree->bounds_, (*it)->get_hitbox().get_box())){
-                        auto entity = std::move(*it);
-                        it = tree->objects_.erase(it);
-                        insert(root_, std::move(entity));
-                }
-                else{
-                    ++it;
-                }
-                break;
-            case entities::status_codes::dead:
-                notify_removals(std::vector<entities::entity*>{it->get()});
-                to_remove.push_back((*it)->get_id());
-                next_ids_.push(static_cast<size_t>((*it)->get_id()));
-                graveyard.push_back(std::move(*it));
-                it = tree->objects_.erase(it);
-                break;
-            case entities::status_codes::nothing:
-                ++it;
-                break;
-            default:
-                ++it;
-                break;
+        // dead wins - an entity can report it alongside movement.
+        if(update_result & entities::status_codes::dead){
+            notify_removals(std::vector<entities::entity*>{it->get()});
+            to_remove.push_back((*it)->get_id());
+            next_ids_.push(static_cast<size_t>((*it)->get_id()));
+            graveyard.push_back(std::move(*it));
+            it = tree->objects_.erase(it);
+            continue;
         }
+        // completed_path doesn't move the dog itself, but re-checking bounds on
+        // it too is cheap insurance against a state repositioning the dog
+        // during a leg transition and going stale in the wrong quadrant.
+        if(update_result & (entities::status_codes::moved
+                          | entities::status_codes::completed_path)){
+            if(! node_contains_object(tree->bounds_, (*it)->get_hitbox().get_box())){
+                auto entity = std::move(*it);
+                it = tree->objects_.erase(it);
+                insert(root_, std::move(entity));
+                continue;
+            }
+        }
+        ++it;
     }
     for(auto & child : tree->children_){
         auto sub_remove = update(child, delta, frame, graveyard);

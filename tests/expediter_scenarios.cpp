@@ -89,8 +89,8 @@ SCENARIO("the expediter only processes an order when a waiter and counter are bo
         game.request_order(customer_id, table_id, table_position);
         game.tick(1.0f / 60.0f);
         THEN("the order is bound and dispatched (serving)"){
-            REQUIRE(game.num_orders() == 1);
-            REQUIRE(game.first_order_status() == expediter::order_status::serving);
+            REQUIRE(game.num_serving_jobs() == 1);
+            REQUIRE(game.first_serving_job_status() == expediter::serving_job_status::serving);
         }
     }
     WHEN("a waiter is free but the counter is empty"){
@@ -100,18 +100,18 @@ SCENARIO("the expediter only processes an order when a waiter and counter are bo
         game.request_order(customer_id, table_id, table_position);
         game.tick(1.0f / 60.0f);
         THEN("the order stays unprocessed (created)"){
-            REQUIRE(game.num_orders() == 1);
-            REQUIRE(game.first_order_status() == expediter::order_status::created);
+            REQUIRE(game.num_serving_jobs() == 1);
+            REQUIRE(game.first_serving_job_status() == expediter::serving_job_status::created);
         }
     }
     WHEN("the counter is stocked but no waiter is free"){
         auto* waiter = game.first_waiter();
         REQUIRE(waiter != nullptr);
-        waiter->set_serving(); // busy -> unavailable
+        waiter->set_serving(table_position); // busy -> unavailable
         game.request_order(customer_id, table_id, table_position);
         game.tick(1.0f / 60.0f);
         THEN("the order stays unprocessed (created)"){
-            REQUIRE(game.first_order_status() == expediter::order_status::created);
+            REQUIRE(game.first_serving_job_status() == expediter::serving_job_status::created);
         }
     }
     WHEN("neither a waiter nor a stocked counter is available"){
@@ -119,12 +119,12 @@ SCENARIO("the expediter only processes an order when a waiter and counter are bo
         auto* counter = game.first_counter();
         REQUIRE(waiter != nullptr);
         REQUIRE(counter != nullptr);
-        waiter->set_serving();
+        waiter->set_serving(table_position);
         while(!counter->is_empty()){ counter->take(); }
         game.request_order(customer_id, table_id, table_position);
         game.tick(1.0f / 60.0f);
         THEN("the order stays unprocessed (created)"){
-            REQUIRE(game.first_order_status() == expediter::order_status::created);
+            REQUIRE(game.first_serving_job_status() == expediter::serving_job_status::created);
         }
     }
 }
@@ -154,20 +154,20 @@ SCENARIO("a dispatched waiter collects food from the counter and delivers it to 
     GIVEN("an order is requested and dispatched"){
         REQUIRE(waiter->is_available_for_order());              // idle
         game.request_order(200, static_cast<size_t>(table_id), table_position);
-        game.tick(1.0f / 60.0f); // create + dispatch
-        game.tick(1.0f / 60.0f); // level assigns the path to the counter
+        game.tick(1.0f / 60.0f); // create the job
+        game.tick(1.0f / 60.0f); // dispatch; the path is assigned in the same tick
 
         THEN("the waiter is serving and heading to the counter's interaction node"){
-            REQUIRE(game.get_waiter_dog(waiter_id).get_state_name() == "serving");
+            REQUIRE(game.get_waiter_dog(waiter_id).get_state_name() == "serving_counter");
             REQUIRE_FALSE(waiter->is_available_for_order());
             REQUIRE(Vector2Distance(waiter->peek_destination(), counter_interaction) < 1.0f);
         }
 
         WHEN("the waiter reaches the counter"){
+            // Food is collected at the end of the pickup animation, by
+            // walking_to_table::on_enter, which paths to the table in the same
+            // call - so the destination is already set once this returns.
             const bool collected = game.tick_until([&]{ return waiter->is_carrying_food(); }, 3000);
-            // The onward path to the table is queued (send_dog_to_station) when
-            // food is collected; let it be assigned before checking the destination.
-            game.tick_until([&]{ return waiter->peek_destination().x >= 0.0f; }, 10);
             THEN("it took one item of food and now heads to the table"){
                 REQUIRE(collected);
                 REQUIRE(counter->current_capacity() == counter_food_before - 1);
@@ -235,7 +235,7 @@ SCENARIO("the expediter reserves counter food so two orders cannot claim the sam
         game.tick(1.0f / 60.0f);
 
         THEN("only one order reserves the food; the counter has no available capacity left"){
-            REQUIRE(game.num_orders() == 2);
+            REQUIRE(game.num_serving_jobs() == 2);
             REQUIRE(counter->reserved() == 1);
             REQUIRE(counter->available_capacity() == 0);
         }

@@ -431,6 +431,12 @@ std::unique_ptr<level::level> level::level_builder::build_main_level() {
   main_level->add_entity(std::move(food_counter),
                          level_config::draw_layers::stations);
 
+  auto dishwasher = entities::e_builder.build_dishwasher(
+      Vector2{level_config::edge_weight * 18, level_config::edge_weight * 12},
+      main_level->entity_id());
+  main_level->add_entity(std::move(dishwasher),
+                         level_config::draw_layers::stations);
+
   auto waiter = entities::e_builder.build_waiter_dog(
       main_level->entity_id(), dog_config::waiter_dog_types::basic,
       {level_config::edge_weight * 22, level_config::edge_weight * 7},

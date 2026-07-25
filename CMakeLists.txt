@@ -161,7 +161,8 @@ add_library(stations
   src/entities/stations/table.cpp
   src/entities/stations/food_counter.cpp
   src/entities/stations/table_builder.cpp
-  src/entities/stations/food_counter_builder.cpp)
+  src/entities/stations/food_counter_builder.cpp
+  src/entities/stations/dishwasher_builder.cpp)
 link_libraries(stations)
 
 add_library(food src/entities/food/food_builder.cpp)

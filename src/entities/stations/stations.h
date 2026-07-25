@@ -222,9 +222,8 @@ namespace entities{
             // dishwasher itself remains an unwired stub (no .cpp, no CMakeLists
             // registration, no orchestrator system): wash-cycle gameplay is a
             // separate follow-up.
-            capacity_state dish_capacity_;
-            int max_plates_;
-            int num_plates_;
+            // Capacity/wash-cycle state (capacity_state above) comes with the
+            // plate modelling work - deliberately not carried until then.
     };
 }
 #endif

@@ -53,7 +53,7 @@ namespace testing{
         for(int frame = 0; frame < frames; ++frame){
             events::global_dispatcher_.process_events(delta);
             maitre_d_.update(delta);
-            expediter_.process_orders();
+            expediter_.process_serving_jobs();
             expediter_.process_clearing_jobs();
             level_->update(delta, frame);
         }
@@ -171,12 +171,12 @@ namespace testing{
         return static_cast<int>(expediter_.num_tables());
     }
 
-    int test_game::num_orders(){
-        return static_cast<int>(expediter_.num_orders());
+    int test_game::num_serving_jobs(){
+        return static_cast<int>(expediter_.num_serving_jobs());
     }
 
-    expediter::order_status test_game::first_order_status(){
-        return expediter_.first_order_status();
+    expediter::serving_job_status test_game::first_serving_job_status(){
+        return expediter_.first_serving_job_status();
     }
 
     entities::waiter_dog* test_game::first_waiter(){

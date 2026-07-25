@@ -11,12 +11,6 @@
 #include "hitbox.h"
 #include "raglib.h"
 namespace queries{
-    // TODO: [queries::ids] [new query kinds for waiter self-handling] change
-    // from [4 existing ids, all answered by bool/int/path_executor_] to
-    // [add next_serving_target = 4, next_clearing_target = 5, size = 6 -
-    // two distinct query types, matching the existing convention of one type
-    // per need (is_colliding vs collision vs place_decoration vs path) rather
-    // than one generic type with an internal discriminator].
     enum ids{
         is_colliding = 0,
         collision = 1,
@@ -119,20 +113,6 @@ namespace queries{
             Vector2 destination_;
             Vector2 direction_;
     };
-    // TODO: [queries.h, after path_query] [new query classes for the waiter
-    // self-handling refactor] change from [no station-target query exists;
-    // expediter picks the next station reactively inside
-    // on_dog_completed_path_event] to [add:
-    //   struct leg_target{ bool has_next; int station_id; Vector2 station_position; };
-    //   class next_serving_target_query : public query{ ... size_t waiter_id_; };
-    //   class next_clearing_target_query : public query{ ... size_t waiter_id_; };
-    // Each carries only the waiter_id - the query TYPE itself already tells
-    // expediter's handler which leg is asking (serving vs clearing), so the
-    // handler doesn't need to guess from incidental state like
-    // is_carrying_food()/dishwasher_id==empty_id the way
-    // on_dog_completed_path_event does today. has_next=false on the response
-    // means "job complete, go idle" - mirrors how walking_to_table's path
-    // carries its own destination rather than the state re-deriving it.]
 
     template <typename T>
     class query_handler_interface{
@@ -194,13 +174,5 @@ namespace queries{
     extern query_executor<bool> bool_executor_; // bool executor, entities::entity* executor
     extern query_executor<int> int_executor_;
     extern query_executor<std::vector<Vector2>> path_executor_;
-    // TODO: [queries.h, global executors] [waiter self-handling refactor]
-    // change from [three executors, one per return type already in use] to
-    // [add extern query_executor<leg_target> leg_target_executor_; - same
-    // shape as the three above, just a fourth T. Defined/instantiated in
-    // queries.cpp alongside the others. expediter registers one handler per
-    // query type (next_serving_target/next_clearing_target) on this single
-    // executor, same as level_graph registering both is_colliding and path
-    // handlers on their respective executors today.]
 }
 #endif

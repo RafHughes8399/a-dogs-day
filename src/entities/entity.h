@@ -24,11 +24,12 @@
 #include <queue>
 
 namespace entities{
+    // Flags, not alternatives - one update can report several. Test with &.
     enum status_codes{
-        nothing = 0,
-        moved = 1,
-        dead = 2,
-        completed_path = 3
+        nothing        = 0,
+        moved          = 1 << 0,
+        dead           = 1 << 1,
+        completed_path = 1 << 2
     };
     // ------------------------- entities ------------------------- //
     class entity {

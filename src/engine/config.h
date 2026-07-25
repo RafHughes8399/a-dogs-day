@@ -85,6 +85,9 @@ namespace cafe_config{
     inline const int queue_left_trigger = 3;
     // How long a customer stays in the eating state before leaving (seconds).
     inline const float eating_duration_s = 10.0f;
+    // How long a pickup/placement animation holds a dog still (seconds). One
+    // value for all four until one of them needs to differ.
+    inline const float animation_duration_s = 0.5f;
     inline const int customer_dog_type = 0;
     inline const Vector2 queue_dir = Vector2{0.0f, 1.0f};
     inline const Vector2 customer_spawn_positions[2] = {
@@ -214,6 +217,7 @@ namespace entity_config{
     inline const float gargoyle_decoration_attributes[attributes::size] = {level_config::edge_weight * 0.75f, level_config::edge_weight * 1.75f, 1.0f, 1.0f};
     inline const float table_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     inline const float food_counter_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
+    inline const float dishwasher_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // how many food a single counter can hold, and where stored food is drawn relative to the counter origin.

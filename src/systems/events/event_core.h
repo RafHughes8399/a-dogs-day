@@ -89,7 +89,11 @@ namespace events{
 		register_dishwasher = 47,
 		dishwasher_removed = 48,
 		customer_removed = 49,
-		size = 50
+		waiter_finished_clearing_id = 50,
+		waiter_collected_food_id = 51,
+		waiter_served_order_id = 52,
+		waiter_abandoned_serving_id = 53,
+		size = 54
 	};
 	class event{
 

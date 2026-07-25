@@ -313,6 +313,64 @@ public:
 private:
   entities::table *const table_;
 };
+
+// Cafe-domain fact: a waiter has dropped the dirty plate at the dishwasher, so
+// its clearing job is done. The expediter only erases the job - the waiter has
+// already set itself idle.
+class waiter_finished_clearing : public event {
+public:
+  waiter_finished_clearing(size_t waiter_id)
+      : event(ids::waiter_finished_clearing_id), waiter_id_(waiter_id) {}
+
+  static int get_static_type() { return ids::waiter_finished_clearing_id; }
+  size_t get_waiter_id() const { return waiter_id_; }
+
+private:
+  const size_t waiter_id_;
+};
+
+// Cafe-domain fact: a waiter has reached the counter and picked up the food.
+// The expediter does the actual handoff - the dog can't resolve a counter id.
+class waiter_collected_food : public event {
+public:
+  waiter_collected_food(size_t waiter_id)
+      : event(ids::waiter_collected_food_id), waiter_id_(waiter_id) {}
+
+  static int get_static_type() { return ids::waiter_collected_food_id; }
+  size_t get_waiter_id() const { return waiter_id_; }
+
+private:
+  const size_t waiter_id_;
+};
+
+// Cafe-domain fact: a waiter has placed the food on the table. The expediter
+// turns this into order_served, which needs the table's assigned customer.
+class waiter_served_order : public event {
+public:
+  waiter_served_order(size_t waiter_id)
+      : event(ids::waiter_served_order_id), waiter_id_(waiter_id) {}
+
+  static int get_static_type() { return ids::waiter_served_order_id; }
+  size_t get_waiter_id() const { return waiter_id_; }
+
+private:
+  const size_t waiter_id_;
+};
+
+// Cafe-domain fact: a waiter gave up on its serving job (counter or table
+// unreachable). Distinct from waiter_served_order because the customer must NOT
+// be told food arrived - the job goes back in the queue instead.
+class waiter_abandoned_serving : public event {
+public:
+  waiter_abandoned_serving(size_t waiter_id)
+      : event(ids::waiter_abandoned_serving_id), waiter_id_(waiter_id) {}
+
+  static int get_static_type() { return ids::waiter_abandoned_serving_id; }
+  size_t get_waiter_id() const { return waiter_id_; }
+
+private:
+  const size_t waiter_id_;
+};
 } // namespace events
 
 #endif
