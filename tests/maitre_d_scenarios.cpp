@@ -71,7 +71,12 @@ SCENARIO("the maitre d' registers an arriving customer and drops it once seated"
     const Vector2 queue_slot = cafe_config::left_queue_positions[0];
 
     GIVEN("a customer that has arrived and enqueued"){
-        events::customer_dog_created created{customer_id, queue_slot};
+        // The maitre d' now tracks customers by pointer, so the arrival event
+        // needs a real dog behind it (assign_tables drops a dequeued customer
+        // whose entity no longer resolves).
+        game.insert_customer_dog(static_cast<int>(customer_id), queue_slot);
+        events::customer_dog_created created{
+            &game.get_customer_dog(static_cast<int>(customer_id)), customer_id, queue_slot};
         event_interface::execute_event(created);
 
         THEN("the maitre d' is tracking one queued customer"){
@@ -123,7 +128,7 @@ SCENARIO("a customer dog transitions through its lifecycle states", "[customer][
         }
 
         WHEN("it is sent walking to a table"){
-            game.get_customer_dog(customer_id).set_walking_to_table(3, table_position, table_position);
+            game.get_customer_dog(customer_id).set_walking_to_table(3, table_position);
             THEN("it is walking to the table"){
                 REQUIRE(game.get_customer_dog(customer_id).get_state_name() == "walking_to_table");
             }

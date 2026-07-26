@@ -1,8 +1,11 @@
 #include "maitre_d.h"
 #include "debug_log_interface.h"
 #include "dog_actions.h"
+#include "events.h"
+#include "events/event_core.h"
 #include "events_interface.h"
 #include <algorithm>
+#include <memory>
 
 namespace{
     std::string vector_to_string(Vector2 position){
@@ -37,6 +40,7 @@ registered_customer_handler_([this](const events::registered_customer& event) ->
 requested_customer_table_handler_([this](const events::requested_customer_table& event) -> void {on_requested_customer_table_event(event);}),
 customer_dog_created_handler_([this](const events::customer_dog_created& event) -> void {on_customer_dog_created_event(event);}),
 customer_dog_left_handler_([this](const events::customer_dog_left& event) -> void {on_customer_dog_left_event(event);}),
+removed_customer_handler_([this](const events::removed_customer& event) -> void {on_removed_customer_event(event);}),
 dog_path_compelte_handler_([this](const events::dog_completed_path& event) -> void {on_dog_completed_path_event(event);}),
 dog_reached_station_handler_([this](const events::dog_reached_station& event) -> void {on_dog_reached_station_event(event);}){
     event_interface::subscribe<events::registered_table>(registered_table_handler_);
@@ -45,6 +49,7 @@ dog_reached_station_handler_([this](const events::dog_reached_station& event) ->
     event_interface::subscribe<events::requested_customer_table>(requested_customer_table_handler_);
     event_interface::subscribe<events::customer_dog_created>(customer_dog_created_handler_);
     event_interface::subscribe<events::customer_dog_left>(customer_dog_left_handler_);
+    event_interface::subscribe<events::removed_customer>(removed_customer_handler_);
     event_interface::subscribe<events::dog_completed_path>(dog_path_compelte_handler_);
     event_interface::subscribe<events::dog_reached_station>(dog_reached_station_handler_);
 }
@@ -56,42 +61,23 @@ maitre_d::maitre_d::~maitre_d(){
     event_interface::unsubscribe<events::requested_customer_table>(requested_customer_table_handler_);
     event_interface::unsubscribe<events::customer_dog_created>(customer_dog_created_handler_);
     event_interface::unsubscribe<events::customer_dog_left>(customer_dog_left_handler_);
+    event_interface::unsubscribe<events::removed_customer>(removed_customer_handler_);
     event_interface::unsubscribe<events::dog_completed_path>(dog_path_compelte_handler_);
     event_interface::unsubscribe<events::dog_reached_station>(dog_reached_station_handler_);
 }
 
 void maitre_d::maitre_d::register_table(entities::table* table){
-    auto table_id = table->get_id();
-    auto existing_table = std::find_if(tables_.begin(), tables_.end(), [table_id](entities::table* t) -> bool {
-        return t->get_id() == table_id;
-    });
-    if(existing_table != tables_.end()){
-        *existing_table = table;
-        std::sort(tables_.begin(), tables_.end(), table_comparator{});
-        debug::log(
-            "[maitre_d::register_table, updated existing table pointer] "
-            "table_id: " + std::to_string(table_id)
-            + ", position: " + vector_to_string(table->get_position())
-            + ", table_count_after: " + std::to_string(tables_.size()));
-        return;
-    }
-
-    tables_.push_back(table);
-    std::sort(tables_.begin(), tables_.end(), table_comparator{});
+    auto table_id = static_cast<size_t>(table->get_id());
+    tables_[table_id] = table;
     debug::log(
-        "[maitre_d::register_table, inserted new table pointer] "
+        "[maitre_d::register_table, tracked table pointer] "
         "table_id: " + std::to_string(table_id)
         + ", position: " + vector_to_string(table->get_position())
         + ", table_count_after: " + std::to_string(tables_.size()));
 }
 
 void maitre_d::maitre_d::remove_table(size_t table_id){
-    auto id = static_cast<int>(table_id);
-    auto new_end = std::remove_if(tables_.begin(), tables_.end(), [id](entities::table* t) -> bool {
-        return t->get_id() == id;
-    });
-    auto removed_count = static_cast<size_t>(tables_.end() - new_end);
-    tables_.erase(new_end, tables_.end());
+    auto removed_count = tables_.erase(table_id);
     debug::log(
         "[maitre_d::remove_table, removed table record] "
         "table_id: " + std::to_string(table_id)
@@ -99,11 +85,44 @@ void maitre_d::maitre_d::remove_table(size_t table_id){
         + ", table_count_after: " + std::to_string(tables_.size()));
 }
 
-void maitre_d::maitre_d::register_customer(size_t customer_id){
-    // Customer behaviour state lives on the customer_dog entity. The maitre d'
-    // only needs the id when placing that dog into a queue or assigning a table.
-    (void) customer_id;
-    // TODO: this does nothing at the moment
+entities::table* maitre_d::maitre_d::find_table(size_t table_id){
+    auto entry = tables_.find(table_id);
+    return entry == tables_.end() ? nullptr : entry->second;
+}
+
+void maitre_d::maitre_d::register_customer(entities::customer_dog* customer){
+    // Customer *behaviour* still lives on the customer_dog entity - this only
+    // tracks the pointer so the maitre d' can read live dog state (position,
+    // current state) and command the dog directly, mirroring how the expediter
+    // tracks waiters_. Queue membership stays keyed by id in customer_queue_.
+    if(customer == nullptr){
+        return;
+    }
+    auto customer_id = static_cast<size_t>(customer->get_id());
+    customers_[customer_id] = customer;
+    debug::log(
+        "[maitre_d::register_customer, tracked customer pointer] "
+        "customer_id: " + std::to_string(customer_id)
+        + ", position: " + vector_to_string(customer->get_position())
+        + ", customer_count_after: " + std::to_string(customers_.size()));
+}
+
+void maitre_d::maitre_d::remove_customer(size_t customer_id){
+    // Pointer bookkeeping only. The queue is left alone here: a customer that
+    // is removed mid-queue is dropped from customer_queue_ lazily by
+    // assign_tables(), the same way the expediter's reconciliation passes drop
+    // jobs whose ids stop resolving.
+    auto removed_count = customers_.erase(customer_id);
+    debug::log(
+        "[maitre_d::remove_customer, removed customer record] "
+        "customer_id: " + std::to_string(customer_id)
+        + ", removed_count: " + std::to_string(removed_count)
+        + ", customer_count_after: " + std::to_string(customers_.size()));
+}
+
+entities::customer_dog* maitre_d::maitre_d::find_customer(size_t customer_id){
+    auto entry = customers_.find(customer_id);
+    return entry == customers_.end() ? nullptr : entry->second;
 }
 
 void maitre_d::maitre_d::request_table_for_customer(size_t customer_id){
@@ -140,12 +159,24 @@ void maitre_d::maitre_d::assign_tables(){
     auto dequeue_result = customer_queue_.dequeue();
     auto dog_at_head = dequeue_result.dog;
     if(dog_at_head != empty_dog){
+        // The queue caches each dog's position (updated on dog_completed_path),
+        // but the tracked pointer is the live entity - prefer it, and treat a
+        // failed lookup as "this customer was removed while queued", dropping
+        // it instead of reserving a table for a dog that no longer exists.
+        auto* customer = find_customer(static_cast<size_t>(dog_at_head.dog_id));
+        if(customer == nullptr){
+            debug::log(
+                "[maitre_d::assign_tables, dropping dequeued customer with no live entity] "
+                "dog_id: " + std::to_string(dog_at_head.dog_id));
+            return;
+        }
+        auto dog_position = customer->get_position();
         auto* table = pick_table();
-        auto interaction_position = pick_interaction_position(table, dog_at_head.dog_position);
+        auto interaction_position = pick_interaction_position(table, dog_position);
         debug::log(
             "[maitre_d::assign_tables, assigning head dog to table] "
             "dog_id: " + std::to_string(dog_at_head.dog_id)
-            + ", dog_position: " + vector_to_string(dog_at_head.dog_position)
+            + ", dog_position: " + vector_to_string(dog_position)
             + ", queue_position: " + vector_to_string(dog_at_head.queue_position)
             + ", table_id: " + std::to_string(table->get_id())
             + ", table_position: " + vector_to_string(table->get_position())
@@ -160,8 +191,8 @@ void maitre_d::maitre_d::assign_tables(){
 }
 
 bool maitre_d::maitre_d::are_tables_free(){
-    auto free_count = static_cast<size_t>(std::count_if(tables_.begin(), tables_.end(), [](entities::table* table) -> bool {
-        return table->can_accept_dog();
+    auto free_count = static_cast<size_t>(std::count_if(tables_.begin(), tables_.end(), [](const auto& entry) -> bool {
+        return entry.second->can_accept_dog();
     }));
     auto has_free_table = free_count > 0;
     return has_free_table;
@@ -174,12 +205,24 @@ void maitre_d::maitre_d::send_dog_to_queue_position(size_t id, Vector2 position)
 
 
 entities::table* maitre_d::maitre_d::pick_table(){
-    // TABLES ARE SORTED BY POSITION SO PICKING A TABLE IS REALLY EASY
-    for(auto* table : tables_){
-        if(table->can_accept_dog()) {return table;}
+    // tables_ is a map keyed by id, not kept in any particular order, so the
+    // nearest available table is found by an explicit distance comparison
+    // rather than relying on pre-sorted order.
+    entities::table* nearest = nullptr;
+    float nearest_distance = 0.0f;
+    for(auto& entry : tables_){
+        auto* table = entry.second;
+        if(! table->can_accept_dog()){
+            continue;
+        }
+        auto distance = Vector2Distance(table->get_position(), entrance_);
+        if(nearest == nullptr || distance < nearest_distance){
+            nearest = table;
+            nearest_distance = distance;
+        }
     }
-    assert(false && "pick_table called with no free tables");
-    return tables_.front();
+    assert(nearest != nullptr && "pick_table called with no free tables");
+    return nearest;
 }
 Vector2 maitre_d::maitre_d::pick_interaction_position(entities::table* table, Vector2 dog_position) const{
     auto interaction_positions = table->get_interaction_positions();
@@ -240,10 +283,13 @@ void maitre_d::maitre_d::on_removed_table_event(const events::removed_table& eve
 }
 
 void maitre_d::maitre_d::on_registered_customer_event(const events::registered_customer& event){
+    // Carries an id only, and currently has no emitter anywhere in the
+    // codebase - customer_dog_created is the event that actually registers a
+    // customer, because it is the one the level fires with the live pointer.
+    // Left subscribed as a trace point rather than deleted.
     debug::log(
         "[maitre_d::on_registered_customer_event, registered customer] "
         "customer_id: " + std::to_string(event.get_customer_id()));
-    register_customer(event.get_customer_id());
 }
 
 void maitre_d::maitre_d::on_requested_customer_table_event(const events::requested_customer_table& event){
@@ -255,6 +301,7 @@ void maitre_d::maitre_d::on_customer_dog_created_event(const events::customer_do
         "[maitre_d::on_customer_dog_created_event, confirming customer arrival] "
         "customer_id: " + std::to_string(event.get_customer_id())
         + ", position: " + vector_to_string(event.get_position()));
+    register_customer(event.get_customer());
     auto queue_side = queue_side_for_position(event.get_position());
     auto queued_dog = customer_queue_.enqueue(event.get_customer_id(), queue_side);
     if(queued_dog != empty_dog){
@@ -269,9 +316,33 @@ void maitre_d::maitre_d::on_customer_dog_created_event(const events::customer_do
 }
 
 void maitre_d::maitre_d::on_customer_dog_left_event(const events::customer_dog_left& event){
-    (void) event;
+    // TODO drop the dog from the list
     dogs_left_in_window_++;
+
+    // Resolve which table this customer occupied by id - no dog object
+    // needed. clear_table is the sole notification for this fact; the
+    // expediter is the only other subscriber (dispatches a waiter to
+    // physically clear it). Maitre d' doesn't also listen to its own
+    // clear_table broadcast - it already has the table pointer right here,
+    // so there's nothing an event round-trip would tell it that it doesn't
+    // already know.
+    // Keyed by table id, not customer id, so this stays a scan over the
+    // tracked tables rather than an O(1) lookup - the same complexity as
+    // before the switch to unordered_map.
+    auto customer_id = event.get_customer_id();
+    auto entry = std::find_if(tables_.begin(), tables_.end(), [customer_id](const auto& e) -> bool {
+        return e.second->get_assigned_dog_id() == static_cast<int>(customer_id);
+    });
+    if(entry == tables_.end()){
+        return;
+    }
+    std::unique_ptr<events::event> clear_table_event = std::make_unique<events::clear_table>(entry->second);
+    event_interface::queue_event(clear_table_event);
 }
+void maitre_d::maitre_d::on_removed_customer_event(const events::removed_customer& event){
+    remove_customer(event.get_customer_id());
+}
+
 void maitre_d::maitre_d::on_dog_completed_path_event(const events::dog_completed_path& event){
     update_dog_position(event.get_id(), event.get_destination());
     debug::log(
@@ -282,14 +353,11 @@ void maitre_d::maitre_d::on_dog_completed_path_event(const events::dog_completed
 
 void maitre_d::maitre_d::on_dog_reached_station_event(const events::dog_reached_station& event){
     auto dog_id = static_cast<int>(event.get_dog_id());
-    auto table_id = static_cast<int>(event.get_station_id());
-    auto entry = std::find_if(tables_.begin(), tables_.end(), [table_id](entities::table* table) -> bool {
-        return table->get_id() == table_id;
-    });
-    if(entry == tables_.end()){
+    auto table_id = event.get_station_id();
+    auto* table = find_table(table_id);
+    if(table == nullptr){
         return;
     }
-    auto* table = *entry;
     if(table->get_state() != entities::table::table_state::reserved
        || table->get_assigned_dog_id() != dog_id){
         return;

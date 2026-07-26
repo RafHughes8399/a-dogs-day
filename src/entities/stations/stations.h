@@ -86,6 +86,7 @@ namespace entities{
             size_t capacity() const;
             bool enter(int dog_id);
             bool is_interacting() const;
+            bool can_accept_dog();
             void leave(int dog_id);
             void set_state(std::unique_ptr<station_state> state){
                 state_ = std::move(state);
@@ -95,7 +96,6 @@ namespace entities{
             void update_interaction_positions();
             interaction_positions interaction_positions_;
 
-        private:
             // Only the concrete states need to touch the dog-id/capacity data
             // directly; everyone else goes through enter()/leave()/is_interacting().
 
@@ -107,32 +107,50 @@ namespace entities{
     };
     class table : public station {
         public:
-            enum table_state{
-                available = 0,
-                reserved = 1,
-                occupied = 2
-            };
 
             table(body::body body, Vector2 position, int id, std::string debug_id)
-            : station(body, position, id, std::move(debug_id)),
-            assigned_dog_id_(level_config::empty_node), state_(table_state::available){}
+            : station(body, position, id, std::move(debug_id)){}; // default constructed with capacity = 1
             table(const table& other) = delete; // station is non-copyable
             table(table&& other) = default;
 
             table& operator=(const table& other) = delete;
             table& operator=(table&& other) = delete;
 
+            // Cafe-domain state, distinct from the station's own
+            // unworked/worked interaction state: a table is available until
+            // the maitre d' reserves it for a specific customer, stays
+            // reserved until that customer physically arrives (occupy()), and
+            // stays occupied until the customer leaves and the table is
+            // cleared. The station's interacting state is driven off this -
+            // occupy() enters the assigned dog, clear() leaves it - so
+            // is_interacting() still answers "is a dog physically here", which
+            // reservation deliberately does not imply.
+            enum table_state{
+                available = 0,
+                reserved,
+                occupied
+            };
+
+            // Hides station::can_accept_dog on purpose: a table is claimable
+            // only while available. The base's capacity check would still say
+            // yes to a reserved table (reserving does not enter a dog), which
+            // would let the maitre d' hand the same table to two customers.
             bool can_accept_dog();
             void clear();
             int get_assigned_dog_id();
-            table_state get_state();
+            table_state get_state() const;
             void occupy();
             void place_down() override;
+            // Returns false when the table is not available, so the caller
+            // can't silently steal a table already promised to another dog.
             bool reserve_for(int dog_id);
-
         private:
-            int assigned_dog_id_;
-            table_state state_;
+            static constexpr int no_dog_id = -1;
+
+            int assigned_dog_id_ = no_dog_id;
+            // Named to avoid confusion with station::state_, which holds the
+            // unworked/worked interaction state and is a different machine.
+            table_state cafe_state_ = table_state::available;
     };
 
     // A food_counter stores food as a FILO stack, up to a fixed capacity. Producers
@@ -204,9 +222,8 @@ namespace entities{
             // dishwasher itself remains an unwired stub (no .cpp, no CMakeLists
             // registration, no orchestrator system): wash-cycle gameplay is a
             // separate follow-up.
-            capacity_state dish_capacity_;
-            int max_plates_;
-            int num_plates_;
+            // Capacity/wash-cycle state (capacity_state above) comes with the
+            // plate modelling work - deliberately not carried until then.
     };
 }
 #endif

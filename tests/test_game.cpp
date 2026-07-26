@@ -53,7 +53,8 @@ namespace testing{
         for(int frame = 0; frame < frames; ++frame){
             events::global_dispatcher_.process_events(delta);
             maitre_d_.update(delta);
-            expediter_.process_orders();
+            expediter_.process_serving_jobs();
+            expediter_.process_clearing_jobs();
             level_->update(delta, frame);
         }
     }
@@ -84,6 +85,10 @@ namespace testing{
 
     std::unique_ptr<entities::entity> test_game::build_food_counter(int id, Vector2 position){
         return entities::e_builder.build_food_counter(position, id);
+    }
+
+    std::unique_ptr<entities::entity> test_game::build_dishwasher(int id, Vector2 position){
+        return entities::e_builder.build_dishwasher(position, id);
     }
 
     std::unique_ptr<entities::food> test_game::build_test_food(int id, Vector2 position){
@@ -122,11 +127,24 @@ namespace testing{
         insert_entity(build_dishwasher_dog(id, position), level_config::draw_layers::dogs);
     }
 
+    void test_game::insert_dishwasher(int id, Vector2 position){
+        insert_entity(build_dishwasher(id, position), level_config::draw_layers::stations);
+    }
+
+    void test_game::insert_table(int id, Vector2 position){
+        insert_entity(build_table(id, position), level_config::draw_layers::stations);
+    }
+
+    void test_game::insert_food_counter(int id, Vector2 position){
+        insert_entity(build_food_counter(id, position), level_config::draw_layers::stations);
+    }
+
     // ---------------- event triggers ----------------
 
     void test_game::customer_arrives(){
-        // impl: maitre_d_.request_customer_arrival();
-        todo("customer_arrives");
+        // Queues build_customer_dog; the level builds the entity and fires
+        // customer_dog_created, so the customer only exists after a tick.
+        maitre_d_.request_customer_arrival();
     }
 
     void test_game::request_order(size_t customer_id, size_t table_id, Vector2 table_position){
@@ -138,6 +156,23 @@ namespace testing{
     void test_game::remove_entity(int id){
         events::remove_entity remove{static_cast<size_t>(id)};
         event_interface::execute_event(remove);
+    }
+
+    void test_game::move_entity(int id, Vector2 position){
+        auto* entity = find_entity(id);
+        if(entity == nullptr){
+            todo("move_entity: id not present");
+        }
+        entity->move(position);
+    }
+
+    void test_game::request_clear_table(int table_id){
+        auto* table = find_table(table_id);
+        if(table == nullptr){
+            todo("request_clear_table: id is not a table / not present");
+        }
+        events::clear_table clear{table};
+        event_interface::execute_event(clear);
     }
 
     // ---------------- inspection accessors ----------------
@@ -170,12 +205,24 @@ namespace testing{
         return static_cast<int>(expediter_.num_tables());
     }
 
-    int test_game::num_orders(){
-        return static_cast<int>(expediter_.num_orders());
+    int test_game::num_dishwashers(){
+        return static_cast<int>(expediter_.num_dishwashers());
     }
 
-    expediter::order_status test_game::first_order_status(){
-        return expediter_.first_order_status();
+    int test_game::num_serving_jobs(){
+        return static_cast<int>(expediter_.num_serving_jobs());
+    }
+
+    int test_game::num_clearing_jobs(){
+        return static_cast<int>(expediter_.num_clearing_jobs());
+    }
+
+    int test_game::num_tracked_customers(){
+        return static_cast<int>(maitre_d_.num_tracked_customers());
+    }
+
+    expediter::serving_job_status test_game::first_serving_job_status(){
+        return expediter_.first_serving_job_status();
     }
 
     entities::waiter_dog* test_game::first_waiter(){
@@ -184,6 +231,22 @@ namespace testing{
 
     entities::food_counter* test_game::first_counter(){
         return expediter_.first_counter();
+    }
+
+    entities::dishwasher* test_game::first_dishwasher(){
+        return expediter_.first_dishwasher();
+    }
+
+    entities::customer_dog* test_game::first_customer(){
+        return maitre_d_.first_customer();
+    }
+
+    entities::table* test_game::find_table(int id){
+        return dynamic_cast<entities::table*>(find_entity(id));
+    }
+
+    entities::dishwasher* test_game::find_dishwasher(int id){
+        return dynamic_cast<entities::dishwasher*>(find_entity(id));
     }
 
     entities::customer_dog& test_game::get_customer_dog(int id){

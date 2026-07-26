@@ -95,6 +95,10 @@ hitbox::hitbox hitbox::hitbox_builder::build_food_counter_hitbox(Vector2 positio
     return hitbox(Rectangle{position.x, position.y, entity_config::food_counter_attributes[entity_config::attributes::frame_width], entity_config::food_counter_attributes[entity_config::attributes::frame_height]});
 }
 
+hitbox::hitbox hitbox::hitbox_builder::build_dishwasher_hitbox(Vector2 position){
+    return hitbox(Rectangle{position.x, position.y, entity_config::dishwasher_attributes[entity_config::attributes::frame_width], entity_config::dishwasher_attributes[entity_config::attributes::frame_height]});
+}
+
 hitbox::hitbox hitbox::hitbox_builder::build_food_hitbox(Vector2 position){
     return hitbox(Rectangle{position.x, position.y, entity_config::test_food_attributes[entity_config::attributes::frame_width], entity_config::test_food_attributes[entity_config::attributes::frame_height]});
 }

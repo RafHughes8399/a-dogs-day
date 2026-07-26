@@ -1,0 +1,21 @@
+CompileFlags:
+  CompilationDatabase: build
+  # compile_commands.json only has entries for .cpp translation units, so
+  # headers opened directly (entity.h, config.h, etc.) have no matching
+  # command and clangd falls back to guessing one - which can miss the
+  # raylib/raymath include path and the project's own per-domain include
+  # dirs (see CMakeLists.txt's target_include_directories), showing
+  # "file not found" on raylib.h/raymath.h. Add them unconditionally so
+  # standalone headers resolve the same as their .cpp counterparts.
+  Add:
+    - -isystem
+    - build/_deps/raylib-src/src
+    - -Isrc/rendering
+    - -Isrc/entities
+    - -Isrc/entities/dogs
+    - -Isrc/entities/decorations
+    - -Isrc/entities/stations
+    - -Isrc/entities/food
+    - -Isrc/systems
+    - -Isrc/engine
+    - -Isrc/interfaces

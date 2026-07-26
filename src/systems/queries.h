@@ -18,7 +18,7 @@ namespace queries{
         path = 3,
         size = 4
     };
-    
+
     class query{
         protected:
             const int type_;
@@ -113,6 +113,7 @@ namespace queries{
             Vector2 destination_;
             Vector2 direction_;
     };
+
     template <typename T>
     class query_handler_interface{
         public:

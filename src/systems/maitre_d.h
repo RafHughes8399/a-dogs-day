@@ -5,12 +5,13 @@
  * should only be one for the game. It listens to cafe-domain events and also
  * exposes an id-based interface for systems that need to report facts directly.
  *
- * It holds non-owning raw pointers to the table entities it tracks (the level
- * owns them; register/remove events keep the pointers valid). Reading table
- * position and cafe-state live from the entity avoids caching stale copies and
- * removes the need to listen for table-moved events. When it decides that a
- * world mutation should happen it still emits command events for a world-owning
- * system, such as the level, to execute.
+ * It holds non-owning raw pointers to the table and customer-dog entities it
+ * tracks (the level owns them; register/remove events keep the pointers valid),
+ * the same tracking shape the expediter uses for waiters/counters/dishwashers.
+ * Reading position and cafe-state live from the entity avoids caching stale
+ * copies and removes the need to listen for moved events. When it decides that
+ * a world mutation should happen it still emits command events for a
+ * world-owning system, such as the level, to execute.
  */
 #ifndef MAITRE_D_H
 #define MAITRE_D_H
@@ -36,23 +37,13 @@ namespace maitre_d{
     
 
 
-    // The maitre d' tracks table entities by non-owning pointer. Table cafe-state
-    // (available/reserved/occupied) lives on the table entity itself; the maitre
-    // d' reads and mutates it through the entity's own interface rather than
-    // duplicating a freeness flag here.
-    struct table_comparator{
-        bool operator()(entities::table* a, entities::table* b) const{
-            auto a_distance = Vector2Distance(a->get_position(), entrance_);
-            auto b_distance = Vector2Distance(b->get_position(), entrance_);
-            if(a_distance < b_distance){
-                return true;
-            }
-            if(a_distance > b_distance){
-                return false;
-            }
-            return a->get_id() < b->get_id();
-        }
-    };
+    // The maitre d' tracks table entities by id in an unordered_map (register/
+    // remove events keep it current), resolving the live pointer on demand.
+    // An id can't dangle, so remove_table() is a single map erase - no need
+    // to scan any other structure for a stale pointer. Table cafe-state
+    // (available/reserved/occupied) lives on the table entity itself; the
+    // maitre d' reads and mutates it through the entity's own interface
+    // rather than duplicating a freeness flag here.
     // A queue slot is a physical waiting spot in the cafe. The queue order is
     // the dog's place in line; its position is the world target the level can
     // path the dog toward. empty_id means the slot is free.
@@ -145,12 +136,27 @@ namespace maitre_d{
 
             void register_table(entities::table* table);
             void remove_table(size_t table_id);
+            entities::table* find_table(size_t table_id);
 
             // Number of tables tracked / customers queued. Exposed for tests to
             // assert table registration/removal and customer arrival/seating.
             size_t num_tables() const { return tables_.size(); }
             size_t num_customers() const { return customer_queue_.size(); }
-            void register_customer(size_t customer_id);
+            // Customers tracked by pointer, which outlives queue membership -
+            // a seated customer has left the queue but is still tracked here.
+            size_t num_tracked_customers() const { return customers_.size(); }
+            entities::customer_dog* first_customer() const {
+                return customers_.empty() ? nullptr : customers_.begin()->second;
+            }
+            // Customer dogs are tracked by non-owning raw pointer, the same way
+            // the expediter tracks waiters (register on creation, drop on
+            // removal). customer_queue_ still holds ids - the queue models
+            // physical line order, not entity identity - but anything that
+            // needs to read live dog state or command a dog resolves the
+            // pointer here instead of round-tripping through a command event.
+            void register_customer(entities::customer_dog* customer);
+            void remove_customer(size_t customer_id);
+            entities::customer_dog* find_customer(size_t customer_id);
             void request_table_for_customer(size_t customer_id);
 
             void update(float delta);
@@ -167,6 +173,7 @@ namespace maitre_d{
             void on_requested_customer_table_event(const events::requested_customer_table& event);
             void on_customer_dog_created_event(const events::customer_dog_created& event);
             void on_customer_dog_left_event(const events::customer_dog_left& event);
+            void on_removed_customer_event(const events::removed_customer& event);
             void on_dog_completed_path_event(const events::dog_completed_path& event);
             // dog_reached_station already names which station a customer
             // reached (the dog's own traveling state resolves and carries that
@@ -179,6 +186,10 @@ namespace maitre_d{
             // then resolve them into command events during the game loop.
             void assign_tables();
             bool are_tables_free();
+            // Finds the available table nearest to entrance_. tables_ isn't
+            // kept in any particular order (it's a map keyed by id), so this
+            // scans and compares distances directly rather than relying on
+            // pre-sorted order.
             entities::table* pick_table();
             Vector2 pick_interaction_position(entities::table* table, Vector2 dog_position) const;
             void send_dog_to_queue_position(size_t id, Vector2 position);
@@ -204,9 +215,14 @@ namespace maitre_d{
             // move_table(table_id)
             //   -> no status change; level owns the physical position
             // Physical customer queue sketch:
-            // customer_dog_created(customer_id)
+            // customer_dog_created(customer, customer_id, position)
+            //   -> track the customer pointer in customers_
             //   -> enqueue the dog with its height in edge units
             //   -> emit/request pathing to the resolved queue target position
+            //
+            // removed_customer(customer_id)
+            //   -> drop the pointer; assign_tables() drops the queue entry
+            //      lazily when it dequeues an id that no longer resolves
             //
 	            // send_dog_to_table(customer_id, table_id, table_position, interaction_position)
             //   -> dequeue the dog
@@ -215,7 +231,8 @@ namespace maitre_d{
 
             
 
-            std::vector<entities::table*> tables_;
+            std::unordered_map<size_t, entities::table*> tables_;
+            std::unordered_map<size_t, entities::customer_dog*> customers_;
 
             dog_queue customer_queue_;
             float seconds_since_customer_arrived_;
@@ -229,6 +246,7 @@ namespace maitre_d{
             events::event_handler<events::requested_customer_table> requested_customer_table_handler_;
             events::event_handler<events::customer_dog_created> customer_dog_created_handler_;
             events::event_handler<events::customer_dog_left> customer_dog_left_handler_;
+            events::event_handler<events::removed_customer> removed_customer_handler_;
             events::event_handler<events::dog_completed_path> dog_path_compelte_handler_;
             events::event_handler<events::dog_reached_station> dog_reached_station_handler_;
     };

@@ -161,7 +161,8 @@ add_library(stations
   src/entities/stations/table.cpp
   src/entities/stations/food_counter.cpp
   src/entities/stations/table_builder.cpp
-  src/entities/stations/food_counter_builder.cpp)
+  src/entities/stations/food_counter_builder.cpp
+  src/entities/stations/dishwasher_builder.cpp)
 link_libraries(stations)
 
 add_library(food src/entities/food/food_builder.cpp)
@@ -238,6 +239,10 @@ add_executable(tests
   tests/expediter_scenarios.cpp
   tests/station_scenarios.cpp
   tests/dishwasher_dog_scenarios.cpp
+  tests/dishwasher_scenarios.cpp
+  tests/customer_dog_scenarios.cpp
+  tests/waiter_dog_scenarios.cpp
+  tests/quadtree_scenarios.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the

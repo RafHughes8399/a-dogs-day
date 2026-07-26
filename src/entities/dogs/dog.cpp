@@ -1,4 +1,5 @@
 #include "entities.h"
+#include "entity.h"
 #include "texture.h"
 #include "debug_log_interface.h"
 #include "raglib.h"
@@ -77,10 +78,23 @@ void entities::dog::set_path(const std::vector<Vector2>& path, int station_id, V
     set_path(path);
 }
 
+bool entities::dog::path_to(Vector2 destination){
+    return path_to(position_, destination);
+}
+
+bool entities::dog::path_to(Vector2 source, Vector2 destination){
+    const queries::path_query query(source, destination, direction_scalar_);
+    auto path = query_interface::execute_query(queries::path_executor_, query);
+    if(path.empty()){
+        return false;
+    }
+    set_path(path);
+    return true;
+}
+
 int entities::dog::update(float delta, int frame){
     (void) frame;
-    update_path(delta);
-    return status_codes::nothing;
+    return update_path(delta);
 }
 
 void entities::dog::set_direction_index(size_t direction){
@@ -89,6 +103,19 @@ void entities::dog::set_direction_index(size_t direction){
     }
     if(direction < head_.num_sprites()){
         head_.set_index(direction);
+    }
+}
+
+void entities::dog::play_animation(int animation){
+    // Guarded the same way as set_direction_index - get_sprite() indexes into
+    // the parallel arrays, which are empty for a body with no sprites.
+    if(body_.num_sprites() > 0){
+        body_.get_sprite().get_animation().goto_animation(animation);
+        body_.get_sprite().get_animation().play();
+    }
+    if(head_.num_sprites() > 0){
+        head_.get_sprite().get_animation().goto_animation(animation);
+        head_.get_sprite().get_animation().play();
     }
 }
 
@@ -101,9 +128,9 @@ void entities::dog::start_next_path(){
     determine_direction(current_path_.front());
 }
 
-void entities::dog::update_path(float delta){
+int entities::dog::update_path(float delta){
     if(current_path_.empty()){
-        return;
+        return status_codes::nothing;
     }
     auto next_position = current_path_.front();
     if(reached_position(next_position)){
@@ -113,12 +140,13 @@ void entities::dog::update_path(float delta){
             on_path_finished(next_position);
             body_.update_hitboxes(position_);
             start_next_path();
-            return;
+            return status_codes::completed_path; 
         }
 
         determine_direction(current_path_.front());
     }
     move_toward_current_waypoint(delta);
+    return status_codes::moved;
 }
 
 // ------------------------------- npc dogs ------------------------------- //

@@ -35,19 +35,48 @@ namespace entities{
             Vector2 peek_destination() const {
                 return current_path_.empty() ? Vector2{-1.0f, -1.0f} : current_path_.back();
             }
+            // A leg finished this frame and nothing is left to walk. Both halves
+            // matter: update_path calls start_next_path() before returning
+            // completed_path, so a queued next leg leaves current_path_ non-empty.
+            bool has_arrived(int status) const {
+                return (status & status_codes::completed_path)
+                    && current_path_.empty() && move_paths_.empty();
+            }
+            // Anything left to walk. A dog whose path_to failed reads false here
+            // without needing a flag to remember the failure.
+            bool has_path() const {
+                return ! current_path_.empty() || ! move_paths_.empty();
+            }
             void render(Vector2 draw_position, int frame) override;
             virtual void set_path(const std::vector<Vector2>& path);
             virtual void set_path(const std::vector<Vector2>& path, int station_id, Vector2 station_position);
+            // Query a path and adopt it. Returns false when the destination is
+            // unreachable - callers that would otherwise sit in a busy state
+            // with no path must handle that, since set_path ignores an empty one.
+            bool path_to(Vector2 destination);
+            bool path_to(Vector2 source, Vector2 destination);
+            // Animation counterpart to set_direction_index - applies to body and
+            // head together. Which sprite is showing is the direction axis;
+            // which row inside it is the animation axis, so these don't fight.
+            // TODO: route this through body-level animation helpers instead of
+            // reaching in via get_sprite().get_animation(), and use them to read
+            // playback state rather than having callers time the duration.
+            void play_animation(int animation);
             int update(float delta, int frame) override;
 
         protected:
 	        void determine_direction(Vector2 target);
             void move_toward_current_waypoint(float delta);
-            virtual void on_path_finished(Vector2 destination);
+            // Fires the dog_completed_path fact so position-tracking systems
+            // (maitre_d's queue bookkeeping) can react. Nothing overrides this
+            // any more: dog behaviour reacts to update_path's completed_path
+            // return value inside the owning dog's own state, not to a
+            // callback fanned out through the entity hierarchy.
+            void on_path_finished(Vector2 destination);
             bool reached_position(Vector2 target);
 	        void set_direction_index(size_t direction);
             void start_next_path();
-            void update_path(float delta);
+            int update_path(float delta);
 
             // current path is the current path that the dog is walking
             // move-paths are the next paths 9not that curent_path and move_path head are not the same
@@ -169,39 +198,6 @@ namespace entities{
             int update(float delta, int frame) override;
     };
 
-    // Shared glue between customer_dog and waiter_dog: owns the state pointer and
-    // forwards update/set_path/on_path_finished to it, casting to the concrete dog
-    // type so state classes always operate on their own dog type (no downcasting).
-    template <typename Derived, typename StateBase>
-    class stateful_npc_dog : public npc_dog{
-        public:
-            template <typename... Args>
-            explicit stateful_npc_dog(Args&&... args) : npc_dog(std::forward<Args>(args)...) {}
-
-            void set_path(const std::vector<Vector2>& path) override{
-                state_->set_path(static_cast<Derived&>(*this), path);
-            }
-            void set_path(const std::vector<Vector2>& path, int station_id, Vector2 station_position) override{
-                state_->set_path(static_cast<Derived&>(*this), path, station_id, station_position);
-            }
-            void set_state(std::unique_ptr<StateBase> state){
-                state_ = std::move(state);
-            }
-            int update(float delta, int frame) override{
-                auto status = npc_dog::update(delta, frame);
-                state_->update(static_cast<Derived&>(*this), delta, frame);
-                return status;
-            }
-
-        protected:
-            void on_path_finished(Vector2 destination) override{
-                dog::on_path_finished(destination);
-                state_->on_path_finished(static_cast<Derived&>(*this), destination);
-            }
-
-            std::unique_ptr<StateBase> state_;
-    };
-
     class customer_dog;
     class waiter_dog;
     class food; // waiter_dog holds a unique_ptr<food> while serving
@@ -216,47 +212,57 @@ namespace entities{
             customer_dog_state& operator=(const customer_dog_state& other) = default;
             customer_dog_state& operator=(customer_dog_state&& other) = default;
 
-            virtual void on_path_finished(customer_dog& dog, Vector2 destination);
-            virtual void set_path(customer_dog& dog, const std::vector<Vector2>& path);
-            virtual void set_path(customer_dog& dog, const std::vector<Vector2>& path, int station_id, Vector2 station_position);
             // Human-readable state name for inspection/tests.
             virtual std::string state_name() const { return "unknown"; }
-            virtual void update(customer_dog& dog, float delta, int frame) = 0;
+            // One-shot work on the way in/out - starting an animation, queueing
+            // a path, firing a fact. update() is the only place that calls
+            // set_state; on_enter must not, or set_state re-enters against a
+            // half-installed state.
+            virtual void on_enter(customer_dog& dog) { (void) dog; }
+            virtual void on_exit(customer_dog& dog) { (void) dog; }
+            // `status` is whatever the dog's own movement update returned this
+            // frame; status_codes::completed_path means a path leg finished on
+            // this frame. States react to that instead of receiving a separate
+            // arrival callback, so the dog answers "did I arrive" and the state
+            // answers "what happens now". Note that by the time a state sees
+            // completed_path the dog has already started the next queued leg
+            // (dog::update_path calls start_next_path before returning), so
+            // "the whole journey is over" is current_path_.empty() &&
+            // move_paths_.empty(), not completed_path on its own.
+            virtual int update(customer_dog& dog, float delta, int frame, int status) = 0;
     };
 
-    class customer_dog_traveling_state : public customer_dog_state{
+    class customer_dog : public npc_dog{
         public:
-            explicit customer_dog_traveling_state(Vector2 destination) : destination_(destination) {}
-
-            void on_path_finished(customer_dog& dog, Vector2 destination) final;
-
-        protected:
-            virtual void on_arrived(customer_dog& dog) = 0;
-
-        private:
-            Vector2 destination_;
-    };
-
-    class customer_dog : public stateful_npc_dog<customer_dog, customer_dog_state>{
-        using base = stateful_npc_dog<customer_dog, customer_dog_state>;
-        public:
+            // The customer's own counterpart to waiter_dog::animation: picking
+            // up the food the waiter placed on the table (start of eating) and
+            // placing the empty plate back down (end of eating, ready for a
+            // waiter to collect - see clear_table/expediter::process_clearing_job).
+            // `size` tracks the element count (same pattern as events::ids,
+            // events/event_core.h).
+            enum animation{
+                resting = 0,
+                picking_up_food,
+                placing_plate,
+                size
+            };
             class default_state : public customer_dog_state{
                 public:
                     std::string state_name() const override { return "default_state"; }
-                    void update(customer_dog& dog, float delta, int frame) override;
+                    int update(customer_dog& dog, float delta, int frame, int status) override;
             };
 
-            class walking_to_table : public customer_dog_traveling_state{
+            // Walks to the table it was given and seats itself on arrival. The
+            // interaction position it is walking to isn't stored: the dog owns
+            // the path, so "a leg finished and nothing is left to walk" is a
+            // complete arrival test on its own.
+            class walking_to_table : public customer_dog_state{
                 public:
-                    walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position)
-                    : customer_dog_traveling_state(interaction_position),
-                    table_id_(table_id), table_position_(table_position){}
+                    walking_to_table(size_t table_id, Vector2 table_position)
+                    : table_id_(table_id), table_position_(table_position){}
 
                     std::string state_name() const override { return "walking_to_table"; }
-                    void update(customer_dog& dog, float delta, int frame) override;
-
-                protected:
-                    void on_arrived(customer_dog& dog) override;
+                    int update(customer_dog& dog, float delta, int frame, int status) override;
 
                 private:
                     size_t table_id_;
@@ -266,7 +272,7 @@ namespace entities{
             class seated : public customer_dog_state{
                 public:
                     std::string state_name() const override { return "seated"; }
-                    void update(customer_dog& dog, float delta, int frame) override;
+                    int update(customer_dog& dog, float delta, int frame, int status) override;
             };
 
             class eating : public customer_dog_state{
@@ -275,7 +281,7 @@ namespace entities{
                     : order_id_(order_id), table_id_(table_id), table_position_(table_position){}
 
                     std::string state_name() const override { return "eating"; }
-                    void update(customer_dog& dog, float delta, int frame) override;
+                    int update(customer_dog& dog, float delta, int frame, int status) override;
                 private:
                     float elapsed_ = 0.0f;
                     size_t order_id_;
@@ -286,25 +292,27 @@ namespace entities{
             class leaving : public customer_dog_state{
                 public:
                     std::string state_name() const override { return "leaving"; }
-                    void update(customer_dog& dog, float delta, int frame) override;
+                    int update(customer_dog& dog, float delta, int frame, int status) override;
             };
 
             customer_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right,
             std::unique_ptr<customer_dog_state> state = std::make_unique<default_state>())
-            : base(body, head, position, id, std::move(debug_id), direction),
-            give_dog_path_handler_([this](const events::give_dog_path& event) -> void {on_give_dog_path_event(event);}){
-                state_ = std::move(state);
+            : npc_dog(body, head, position, id, std::move(debug_id), direction),
+            give_dog_path_handler_([this](const events::give_dog_path& event) -> void {on_give_dog_path_event(event);}),
+            state_(std::move(state)){
                 event_interface::subscribe<events::give_dog_path>(give_dog_path_handler_);
+                state_->on_enter(*this);
             }
 
             customer_dog(body::body body, body::body head, Vector2 position, Vector2 path_dst, int id, std::string debug_id,
             int direction = level_config::directions::right,
             std::unique_ptr<customer_dog_state> state = std::make_unique<default_state>())
-            : base(body, head, position, path_dst, id, std::move(debug_id), direction),
-            give_dog_path_handler_([this](const events::give_dog_path& event) -> void {on_give_dog_path_event(event);}){
-                state_ = std::move(state);
+            : npc_dog(body, head, position, path_dst, id, std::move(debug_id), direction),
+            give_dog_path_handler_([this](const events::give_dog_path& event) -> void {on_give_dog_path_event(event);}),
+            state_(std::move(state)){
                 event_interface::subscribe<events::give_dog_path>(give_dog_path_handler_);
+                state_->on_enter(*this);
             }
             ~customer_dog() override{
                 event_interface::unsubscribe<events::give_dog_path>(give_dog_path_handler_);
@@ -317,14 +325,27 @@ namespace entities{
 
             std::string get_state_name() const { return state_->state_name(); }
             void on_give_dog_path_event(const events::give_dog_path& event);
+            // A station-targeted path always means "go sit at this table", so
+            // the transition happens here rather than round-tripping an event.
+            using dog::set_path;
+            void set_path(const std::vector<Vector2>& path, int station_id, Vector2 station_position) override;
             void set_eating(size_t order_id, size_t table_id, Vector2 table_position);
-            void set_walking_to_table(size_t table_id, Vector2 table_position, Vector2 interaction_position);
-
+            void set_state(std::unique_ptr<customer_dog_state> state){
+                // on_exit runs before the assignment destroys the old state, so
+                // it can still touch its own members.
+                state_->on_exit(*this);
+                state_ = std::move(state);
+                state_->on_enter(*this);
+            }
+            void set_walking_to_table(size_t table_id, Vector2 table_position);
+            void leave();
+            int update(float delta, int frame) override;
         private:
             // Customer behaviour state belongs to the dog entity. The maitre d'
             // only tracks queue/table allocation by id and emits commands that
             // cause the level or dog to move between these states.
             events::event_handler<events::give_dog_path> give_dog_path_handler_;
+            std::unique_ptr<customer_dog_state> state_;
     };
 
     class waiter_dog_state{
@@ -338,51 +359,147 @@ namespace entities{
             waiter_dog_state& operator=(waiter_dog_state&& other) = default;
 
             virtual bool is_available_for_order() = 0;
-            virtual void on_path_finished(waiter_dog& dog, Vector2 destination);
-            virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path);
-            virtual void set_path(waiter_dog& dog, const std::vector<Vector2>& path, int station_id, Vector2 station_position);
             virtual std::string state_name() const { return "unknown"; }
-            virtual void update(waiter_dog& dog, float delta, int frame) = 0;
+            // Same contract as customer_dog_state's - see the note there.
+            virtual void on_enter(waiter_dog& dog) { (void) dog; }
+            virtual void on_exit(waiter_dog& dog) { (void) dog; }
+            // Same contract as customer_dog_state::update - `status` is the
+            // dog's own movement result for this frame, and completed_path is
+            // how a state learns a leg finished.
+            virtual int update(waiter_dog& dog, float delta, int frame, int status) = 0;
     };
 
-    class waiter_dog_traveling_state : public waiter_dog_state{
+    class waiter_dog : public npc_dog{
         public:
-            explicit waiter_dog_traveling_state(Vector2 destination) : destination_(destination) {}
-
-            bool is_available_for_order() override;
-            void on_path_finished(waiter_dog& dog, Vector2 destination) final;
-        protected:
-            virtual void on_arrived(waiter_dog& dog) = 0;
-
-        private:
-            Vector2 destination_;
-    };
-
-    class waiter_dog : public stateful_npc_dog<waiter_dog, waiter_dog_state>{
-        using base = stateful_npc_dog<waiter_dog, waiter_dog_state>;
-        public:
+            // Pickup/placement animations the waiter plays while serving and
+            // clearing. `size` tracks the element count (same pattern as
+            // events::ids, events/event_core.h) - not tied to state
+            // transitions directly.
+            enum animation{
+                resting = 0,
+                picking_up_food,
+                placing_food,
+                picking_up_plate,
+                placing_plate,
+                size
+            };
             class idle : public waiter_dog_state{
                 public:
                     idle()
                     : waiter_dog_state(){}
                     bool is_available_for_order() override;
                     std::string state_name() const override { return "idle"; }
-                    void update(waiter_dog& dog, float delta, int frame) override;
+                    int update(waiter_dog& dog, float delta, int frame, int status) override;
                 };
-            // Busy marker: a serving waiter is not available for another order.
-            // The counter -> table journey is orchestrated by the expediter off
-            // dog_completed_path, so serving needs no per-leg travel logic itself.
-            class serving : public waiter_dog_state{
+            // Holds the dog still for `duration` while an animation plays, then
+            // hands over to `next`. The animation is a phase between two legs,
+            // not a leg of its own, so nothing here touches paths. `next` must
+            // not be null - every construction site supplies the following leg.
+            class animating : public waiter_dog_state{
+                public:
+                    animating(animation anim, float duration,
+                              std::unique_ptr<waiter_dog_state> next)
+                    : anim_(anim), duration_(duration), next_(std::move(next)){}
+
+                    bool is_available_for_order() override;
+                    void on_enter(waiter_dog& dog) override;
+                    int update(waiter_dog& dog, float delta, int frame, int status) override;
+                private:
+                    animation anim_;
+                    float duration_;
+                    float elapsed_ = 0.0f;
+                    std::unique_ptr<waiter_dog_state> next_;
+            };
+            // Leg 1: walk to the counter. Carries the table's interaction
+            // position for leg 2, same reason clearing_table carries the
+            // dishwasher's.
+            class serving_counter : public waiter_dog_state{
+                public:
+                    serving_counter(Vector2 table_destination)
+                    : table_destination_(table_destination){}
+
+                    bool is_available_for_order() override;
+                    std::string state_name() const override { return "serving_counter"; }
+                    int update(waiter_dog& dog, float delta, int frame, int status) override;
+                private:
+                    Vector2 table_destination_;
+            };
+            // Leg 2: carry the food to the table. Announces the pickup on entry
+            // so the expediter can do the handoff, then paths itself.
+            class walking_to_table : public waiter_dog_state{
+                public:
+                    walking_to_table(Vector2 table_destination)
+                    : table_destination_(table_destination){}
+
+                    bool is_available_for_order() override;
+                    std::string state_name() const override { return "walking_to_table"; }
+                    void on_enter(waiter_dog& dog) override;
+                    int update(waiter_dog& dog, float delta, int frame, int status) override;
+                private:
+                    Vector2 table_destination_;
+            };
+            // Terminal, success. Unlike clearing, serving needs two terminals:
+            // this one makes the customer start eating, so an unreachable
+            // counter or table must NOT come through here.
+            class finished_serving : public waiter_dog_state{
                 public:
                     bool is_available_for_order() override;
-                    std::string state_name() const override { return "serving"; }
-                    void update(waiter_dog& dog, float delta, int frame) override;
+                    std::string state_name() const override { return "finished_serving"; }
+                    void on_enter(waiter_dog& dog) override;
+                    int update(waiter_dog& dog, float delta, int frame, int status) override;
+            };
+            // Terminal, failure - puts the job back in the queue instead.
+            class abandoned_serving : public waiter_dog_state{
+                public:
+                    bool is_available_for_order() override;
+                    std::string state_name() const override { return "abandoned_serving"; }
+                    void on_enter(waiter_dog& dog) override;
+                    int update(waiter_dog& dog, float delta, int frame, int status) override;
+            };
+            // Leg 1: walk to the table. Carries the dishwasher's interaction
+            // position for leg 2 - the expediter picked it at dispatch and the
+            // dog can't resolve a station id itself.
+            class clearing_table : public waiter_dog_state{
+                public:
+                    clearing_table(Vector2 dishwasher_destination)
+                    : dishwasher_destination_(dishwasher_destination){}
+
+                    bool is_available_for_order() override;
+                    std::string state_name() const override { return "clearing_table"; }
+                    int update(waiter_dog& dog, float delta, int frame, int status) override;
+                private:
+                    Vector2 dishwasher_destination_;
+            };
+            // Leg 2: carry the plate to the dishwasher. Paths itself on entry,
+            // so an unreachable dishwasher is caught rather than parking the
+            // waiter in a busy state forever.
+            class walking_to_dishwasher : public waiter_dog_state{
+                public:
+                    walking_to_dishwasher(Vector2 dishwasher_destination)
+                    : dishwasher_destination_(dishwasher_destination){}
+
+                    bool is_available_for_order() override;
+                    std::string state_name() const override { return "walking_to_dishwasher"; }
+                    void on_enter(waiter_dog& dog) override;
+                    int update(waiter_dog& dog, float delta, int frame, int status) override;
+                private:
+                    Vector2 dishwasher_destination_;
+            };
+            // Terminal: announces the job is done on entry, idles on its first
+            // update. `idle` can't carry the fact - it's entered from everywhere.
+            class finished_clearing : public waiter_dog_state{
+                public:
+                    bool is_available_for_order() override;
+                    std::string state_name() const override { return "finished_clearing"; }
+                    void on_enter(waiter_dog& dog) override;
+                    int update(waiter_dog& dog, float delta, int frame, int status) override;
             };
             waiter_dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right,
             std::unique_ptr<waiter_dog_state> state = std::make_unique<idle>())
-            : base(body, head, position, id, std::move(debug_id), direction){
-                state_ = std::move(state);
+            : npc_dog(body, head, position, id, std::move(debug_id), direction),
+            state_(std::move(state)){
+                state_->on_enter(*this);
             }
             waiter_dog(const waiter_dog& other) = delete;
             waiter_dog(waiter_dog&& other) = default;
@@ -401,10 +518,21 @@ namespace entities{
             bool is_carrying_food() const;
             std::unique_ptr<food> release_food();
             void set_idle();
-            void set_serving();
+            void set_state(std::unique_ptr<waiter_dog_state> state){
+                // See customer_dog::set_state for the ordering rationale.
+                state_->on_exit(*this);
+                state_ = std::move(state);
+                state_->on_enter(*this);
+            }
+            // Entry points for the *first leg* of each job. Later legs are only
+            // ever entered by the previous leg, so they need no set_*.
+            void set_serving(Vector2 table_destination);
+            void set_clearing(Vector2 dishwasher_destination);
+            int update(float delta, int frame) override;
 
         private:
             std::unique_ptr<food> held_food_;
+            std::unique_ptr<waiter_dog_state> state_;
     };
     class dishwasher_dog : public npc_dog{
         public:
