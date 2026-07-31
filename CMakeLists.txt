@@ -98,10 +98,10 @@ link_libraries(raylib)
 add_library(raglib src/engine/raglib.cpp)
 link_libraries(raglib)
 
-add_library(events src/systems/events.cpp)
+add_library(events src/systems/events/events.cpp)
 link_libraries(events)
 
-add_library(queries src/systems/queries.cpp)
+add_library(queries src/systems/queries/queries.cpp)
 link_libraries(queries)
 
 add_library(animation src/rendering/animation.cpp)
@@ -205,7 +205,7 @@ target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
   raglib events queries animation sprite item menu hud hitbox body texture
   player controls entities cursor dogs decorations stations food render_layer quadtree
-  graph level maitre_d expediter debug_log_interface debug_logger game ${PROJECT_NAME}
+  graph level maitre_d expediter dog_actions debug_log_interface debug_logger game ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})
@@ -217,6 +217,8 @@ foreach(target IN LISTS PROJECT_TARGETS)
     src/entities/stations
     src/entities/food
     src/systems
+    src/systems/events
+    src/systems/queries
     src/engine
     src/interfaces
   )
@@ -255,6 +257,8 @@ target_include_directories(tests PRIVATE
   src/entities/stations
   src/entities/food
   src/systems
+  src/systems/events
+  src/systems/queries
   src/engine
   src/interfaces
 )

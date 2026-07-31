@@ -18,3 +18,10 @@ order should be like. in essence a compoent should map to a field or characteris
 -> will change how the level class operates, and the game class, and pretty much everything, now we can just pass entities around
 bcecause all they are is an id essentially, and then lookups their components
 
+
+
+after this refactor order is as follows:
+-> logger refactor
+-> the reamining pathfinding work
+-> items, levelling and currency,
+-> inventory

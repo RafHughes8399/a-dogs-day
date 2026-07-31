@@ -35,6 +35,10 @@ cmake --build build --target tests
 
 Test sources live in `tests/*.cpp` and are registered explicitly in `CMakeLists.txt`'s `tests` executable — a new scenario file must be added there to be compiled in. Tests link Catch2 and the game's static libs, and compile with `DOG_DAYS_TESTING` defined (see "Testing accessors" below), but deliberately skip `MY_COMPILE_OPTIONS` so the strict warnings don't fire inside Catch2/raylib headers.
 
+## Code style
+
+- Prefer `class` over `struct` unless explicitly told otherwise, including for component-style types (e.g. the in-progress ECS work in `src/systems/components/`) — these are expected to carry member functions and encapsulated state, not stay plain data aggregates.
+
 ## Architecture
 
 ### Layering
