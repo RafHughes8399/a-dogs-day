@@ -1,0 +1,20 @@
+goal for the weekend is this ECS refactor, or at least the main chunk of it. this should be done in parallel to the current archetiecture so I have a tangible before and after
+refactor steps include:
+1. define the component architecutre, the ocmponent the managers, etc.
+2. then piecewise implemntation for each component, start basic with positional and rendering, then eventually work your way up to state machine
+
+sounds simple, but probably wont be , will require big changes to prettuy much everything
+order should be like. in essence a compoent should map to a field or characteristic that an entity has
+-> positional [position]
+-> renderable [sprite]
+-> collision [hitbox]
+-> event handling [event handlers]
+-> movement [paths]
+-> state machine [state machine]
+-> interaction 
+
+-> first setup the architecutre for components and entities
+-> and refactor their construction and placement in the world (quadtree would need only know about the collision one then)
+-> will change how the level class operates, and the game class, and pretty much everything, now we can just pass entities around
+bcecause all they are is an id essentially, and then lookups their components
+
