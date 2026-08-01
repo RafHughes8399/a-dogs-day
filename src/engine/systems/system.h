@@ -21,7 +21,12 @@ namespace systems{
     class storage_system{
 
     };
+    class collision_system{
 
+    };
+    class interaction_system{
+
+    };
     class key_input_system{
 
     };

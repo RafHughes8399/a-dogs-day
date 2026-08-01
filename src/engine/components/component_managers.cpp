@@ -12,10 +12,10 @@ namespace managers {
 
 components::component_manager<components::position_component> positional_manager_;
 components::component_manager<components::movement_component> movment_manager_;
-components::component_manager<components::sprite_component> sprite_manager_;
+components::component_manager<components::renderable_component> renderable_manager_;
 components::component_manager<components::collision_component> collision_manager_;
 components::component_manager<components::interaction_component> interaction_manager_;
 components::component_manager<components::state_machine_component> state_machine_manager_;
-components::component_manager<components::storage_component> storage_manager_;
+components::component_manager<components::food_component> food_manager_;
 
 } // namespace managers
