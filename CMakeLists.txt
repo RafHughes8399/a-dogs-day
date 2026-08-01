@@ -98,11 +98,14 @@ link_libraries(raylib)
 add_library(raglib src/engine/raglib.cpp)
 link_libraries(raglib)
 
-add_library(events src/systems/events/events.cpp)
+add_library(events src/engine/events/events.cpp)
 link_libraries(events)
 
-add_library(queries src/systems/queries/queries.cpp)
+add_library(queries src/engine/queries/queries.cpp)
 link_libraries(queries)
+
+add_library(components src/engine/components/component_managers.cpp)
+link_libraries(components)
 
 add_library(animation src/rendering/animation.cpp)
 link_libraries(animation)
@@ -180,19 +183,19 @@ link_libraries(graph)
 add_library(level src/engine/level.cpp)
 link_libraries(level)
 
-add_library(dog_actions src/systems/dog_actions.cpp)
+add_library(dog_actions src/engine/orchestrators/dog_actions.cpp)
 link_libraries(dog_actions)
 
-add_library(maitre_d src/systems/maitre_d.cpp src/systems/dog_queue.cpp)
+add_library(maitre_d src/engine/orchestrators/maitre_d.cpp src/engine/orchestrators/dog_queue.cpp)
 link_libraries(maitre_d)
 
-add_library(expediter src/systems/expediter.cpp)
+add_library(expediter src/engine/orchestrators/expediter.cpp)
 link_libraries(expediter)
 
-add_library(debug_log_interface src/systems/debug_log_interface.cpp)
+add_library(debug_log_interface src/engine/logger/debug_log_interface.cpp)
 link_libraries(debug_log_interface)
 
-add_library(debug_logger src/systems/debug_logger.cpp)
+add_library(debug_logger src/engine/logger/debug_logger.cpp)
 link_libraries(debug_logger)
 
 add_library(game src/engine/game.cpp)
@@ -203,7 +206,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
-  raglib events queries animation sprite item menu hud hitbox body texture
+  raglib events queries components animation sprite item menu hud hitbox body texture
   player controls entities cursor dogs decorations stations food render_layer quadtree
   graph level maitre_d expediter dog_actions debug_log_interface debug_logger game ${PROJECT_NAME}
 )
@@ -216,10 +219,13 @@ foreach(target IN LISTS PROJECT_TARGETS)
     src/entities/decorations
     src/entities/stations
     src/entities/food
-    src/systems
-    src/systems/events
-    src/systems/queries
     src/engine
+    src/engine/components
+    src/engine/events
+    src/engine/logger
+    src/engine/orchestrators
+    src/engine/queries
+    src/engine/systems
     src/interfaces
   )
   target_include_directories(${target} SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)
@@ -256,10 +262,13 @@ target_include_directories(tests PRIVATE
   src/entities/decorations
   src/entities/stations
   src/entities/food
-  src/systems
-  src/systems/events
-  src/systems/queries
   src/engine
+  src/engine/components
+  src/engine/events
+  src/engine/logger
+  src/engine/orchestrators
+  src/engine/queries
+  src/engine/systems
   src/interfaces
 )
 target_include_directories(tests SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)

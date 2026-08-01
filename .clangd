@@ -7,6 +7,10 @@ CompileFlags:
   # dirs (see CMakeLists.txt's target_include_directories), showing
   # "file not found" on raylib.h/raymath.h. Add them unconditionally so
   # standalone headers resolve the same as their .cpp counterparts.
+  #
+  # Keep this list in sync with CMakeLists.txt's target_include_directories -
+  # if a new src/ subdirectory is added there and not here, clangd reports
+  # phantom "file not found" on every header living in it.
   Add:
     - -isystem
     - build/_deps/raylib-src/src
@@ -16,6 +20,11 @@ CompileFlags:
     - -Isrc/entities/decorations
     - -Isrc/entities/stations
     - -Isrc/entities/food
-    - -Isrc/systems
     - -Isrc/engine
+    - -Isrc/engine/components
+    - -Isrc/engine/events
+    - -Isrc/engine/logger
+    - -Isrc/engine/orchestrators
+    - -Isrc/engine/queries
+    - -Isrc/engine/systems
     - -Isrc/interfaces

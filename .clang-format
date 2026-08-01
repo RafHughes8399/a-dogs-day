@@ -1,0 +1,6 @@
+# Formatting applied on save - clangd is the [cpp]/[c] formatter in
+# .vscode/settings.json, and clang-format looks for this file by walking up
+# from the file being formatted. Without it, clang-format falls back to its
+# built-in LLVM style, which wraps at 80 columns.
+BasedOnStyle: LLVM
+ColumnLimit: 100

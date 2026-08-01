@@ -25,3 +25,15 @@ after this refactor order is as follows:
 -> the reamining pathfinding work
 -> items, levelling and currency,
 -> inventory
+
+
+stage for components:
+-> define
+-> builder [ can keep entities as a process of building certain components and assinging]
+-> manager [how the manager will process component behaivour and update them]
+-> systems to execute the behviour (movement system, rendering system, state machine system, event system )
+-> scrap the event component is the system that listens for events, accesses the compoentns through the manager and performs behaviour
+
+compoents hold the data individually
+managers hold them and tie them to an entity
+systems define the behaviour to interact and manipualte them
