@@ -37,3 +37,17 @@ stage for components:
 compoents hold the data individually
 managers hold them and tie them to an entity
 systems define the behaviour to interact and manipualte them
+
+
+finish work on comppnnetn manager, 
+basic implmentation for moving and rendering and storage systems [essentially migrate over current quad tree nad rendering form level to these systems]
+
+then continue refactor in the order of
+-> building, inserting and rendering entities
+-> key and mouse input
+-> player dog selection and movement
+-> decoration placement 
+-> then the customer and waiter dog stuff
+
+
+-> wil come back to editing later 

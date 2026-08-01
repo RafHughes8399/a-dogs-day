@@ -22,6 +22,9 @@ namespace systems{
 
     };
 
+    class key_input_system{
+
+    };
     // hold a refernece to the glboal managers that they need to process things
     // and the events that they need ot process 
 }
