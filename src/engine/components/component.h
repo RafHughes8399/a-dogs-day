@@ -126,13 +126,28 @@ public:
   interaction_component& operator=(interaction_component&& other) = default;
 };
 
+
+// * player control input component
+class controls_component{
+    public:
+        ~controls_component() = default;
+        controls_component(std::vector<game_config::control> controls)
+        :controls_(controls){}
+        controls_component(const controls_component& other) = default;
+        controls_component(controls_component&& other) = default;
+
+        controls_component& operator=(const controls_component& other) = default;
+        controls_component& operator=(controls_component&& other) = default;
+    private:
+        std::vector<game_config::control> controls_;
+};
+
 // ! A STATE MACHINE IS A SET OF STATE COMPONENTS
 // ! a STATE MACHINE COMPONENT IS A SET OF STATE COMPONENTS
 // A STATE MACHINE DEFFINES TRANSITIONS BETWEEN STATES 
     // THE CONDITION TO TRANISITION
     // THE BEHAVIOUR OF TRANSITIONING
     // AND THE NEXT STATE
-// bruh we dont 
 class state_machine_component{
 public:
     // * virtual dtor because this is a polymorphic base - concrete states
@@ -179,7 +194,7 @@ class food_component {
 
 } // namespace components
 
-namespace managers {
+namespace component_managers {
     template <typename C> // C for component
 class component_manager {
 public:
@@ -216,18 +231,19 @@ private:
 
 // * one manager instance per component type, defined in component_managers.cpp.
 // * these live in their own namespace so call sites read
-// * managers::renderable_manager_ rather than components::renderable_manager_,
+// * component_managers::renderable_manager_ rather than components::renderable_manager_,
 // * which would blur the storage layer into the data layer.
 extern component_manager<components::position_component> positional_manager_;
 extern component_manager<components::movement_component> movment_manager_;
 extern component_manager<components::renderable_component> renderable_manager_;
 extern component_manager<components::collision_component> collision_manager_;
 extern component_manager<components::interaction_component> interaction_manager_;
+extern component_manager<components::controls_component> control_manager_;
 extern component_manager<components::state_machine_component> state_machine_manager_;
 extern component_manager<components::food_component> food_manager_;
-} // namespace managers
+} // namespace component_managers
 
-namespace builders{
+namespace component_builders{
     components::position_component build_positional_component(Vector2 position, Vector2 direction_scalar);
     components::movement_component build_movement_component(Vector2 move_speed, std::queue<type_config::path> paths = {});
     components::renderable_component::sprite_component build_sprite_component(std::vector<sprite::sprite>& sprites, size_t index);
@@ -237,10 +253,79 @@ namespace builders{
     components::collision_component build_collision_component();
     
     components::interaction_component build_interaction_component();
-    
+    components::controls_component build_controls_component(std::vector<game_config::control>& controls);
     components::state_machine_component::state_component build_state();
     components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
     components::food_component build_food_component();
 }
+// * thin forwarders so builders name one function instead of reaching into the
+// * right manager themselves. Defined here rather than in a .cpp, so they must
+// * be inline - component.h lands in several translation units and a non-inline
+// * definition at namespace scope would be a duplicate symbol at link time.
+namespace component_helpers{
+    inline void register_positional_component(size_t entity_id, components::position_component component){
+        component_managers::positional_manager_.register_component(entity_id, std::move(component));
+    }
+    inline void register_movement_component(size_t entity_id, components::movement_component component){
+        component_managers::movment_manager_.register_component(entity_id, std::move(component));
+    }
+    inline void register_renderable_component(size_t entity_id, components::renderable_component component){
+        component_managers::renderable_manager_.register_component(entity_id, std::move(component));
+    }
+    inline void register_collision_component(size_t entity_id, components::collision_component component){
+        component_managers::collision_manager_.register_component(entity_id, std::move(component));
+    }
+    inline void register_interaction_component(size_t entity_id, components::interaction_component component){
+        component_managers::interaction_manager_.register_component(entity_id, std::move(component));
+    }
+    inline void register_controls_component(size_t entity_id, components::controls_component component){
+        component_managers::control_manager_.register_component(entity_id, std::move(component));
+    }
+    inline void register_state_machine_component(size_t entity_id, components::state_machine_component component){
+        component_managers::state_machine_manager_.register_component(entity_id, std::move(component));
+    }
+    inline void register_food_component(size_t entity_id, components::food_component component){
+        component_managers::food_manager_.register_component(entity_id, std::move(component));
+    }
 
+    inline void unregister_positional_component(size_t entity_id){
+        component_managers::positional_manager_.unregister_component(entity_id);
+    }
+    inline void unregister_movement_component(size_t entity_id){
+        component_managers::movment_manager_.unregister_component(entity_id);
+    }
+    inline void unregister_renderable_component(size_t entity_id){
+        component_managers::renderable_manager_.unregister_component(entity_id);
+    }
+    inline void unregister_collision_component(size_t entity_id){
+        component_managers::collision_manager_.unregister_component(entity_id);
+    }
+    inline void unregister_interaction_component(size_t entity_id){
+        component_managers::interaction_manager_.unregister_component(entity_id);
+    }
+    inline void unregister_controls_component(size_t entity_id){
+        component_managers::control_manager_.unregister_component(entity_id);
+    }
+    inline void unregister_state_machine_component(size_t entity_id){
+        component_managers::state_machine_manager_.unregister_component(entity_id);
+    }
+    inline void unregister_food_component(size_t entity_id){
+        component_managers::food_manager_.unregister_component(entity_id);
+    }
+
+    // * teardown hits every manager unconditionally - erase on a missing key is
+    // * a no-op, so this stays correct for every entity kind without anyone
+    // * maintaining a list of which components a given builder registered.
+    // * Adding a component type means editing here, not auditing each destroyer.
+    inline void unregister_all_components(size_t entity_id){
+        unregister_positional_component(entity_id);
+        unregister_movement_component(entity_id);
+        unregister_renderable_component(entity_id);
+        unregister_collision_component(entity_id);
+        unregister_interaction_component(entity_id);
+        unregister_controls_component(entity_id);
+        unregister_state_machine_component(entity_id);
+        unregister_food_component(entity_id);
+    }
+}
 #endif

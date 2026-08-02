@@ -3,6 +3,7 @@
 #include "component.h"
 #include "events.h"
 #include "events_interface.h"
+#include "render_layer.h"
 
 // this should replace most of the logic required by the level and render layers
 namespace systems{
@@ -35,12 +36,28 @@ namespace systems{
         // and the viewframe
         public:
             ~rendering_system() = default;
-            rendering_system() = default;
+            // * no default constructor - sprite::sprite has none, so background_
+            // * cannot be default initialised.
+            rendering_system(sprite::sprite background, Rectangle view_frame)
+                : background_(background), view_frame_(view_frame), render_layers_(){}
             rendering_system(const rendering_system& other) = delete;
             rendering_system(rendering_system&& other) = delete;
 
             rendering_system& operator=(const rendering_system& other) = delete;
             rendering_system& operator=(rendering_system&& other) = delete;
+
+            void render(int frame);
+            // TODO listen for entity creations and removals, to add and remove from the render layer 
+            void on_created_entity();
+            void on_destroyed_entity();
+        private:
+            // on entity creation [and deletion ] so on_entity_created, on_entity _removed
+            // the render layer is a 2d list layering the entities  so you can draw in layers
+            // * refferencing like [j][k] is drawing entity k on layer j - ecs_layer
+            // * is the inner list, and owns the per-entity component lookup and draw.
+            sprite::sprite background_;
+            Rectangle view_frame_;
+            render_layer::ecs_layer render_layers_[level_config::draw_layers::size];
     };
     // * entity storage
     class spatial_system{
@@ -55,6 +72,9 @@ namespace systems{
 
             spatial_system& operator=(const spatial_system& other) = delete;
             spatial_system& operator=(spatial_system&& other) = delete;
+
+
+
     };
     class entity_lifecycle_system{
         // responsible for managing entity creation and destruction
@@ -66,6 +86,14 @@ namespace systems{
 
             entity_lifecycle_system& operator=(const entity_lifecycle_system& other) = delete;
             entity_lifecycle_system& operator=(entity_lifecycle_system&& other) = delete;
+
+            void build_entity();
+        private:
+            std::queue<size_t> recycled_ids_;
+            size_t fresh_id_;
+
+
+
     };
     class collision_system{
         // for physics based collisions
@@ -89,16 +117,18 @@ namespace systems{
             interaction_system& operator=(const interaction_system& other) = delete;
             interaction_system& operator=(interaction_system&& other) = delete;
     };
-    class key_input_system{
-        // for player input and control
+    class control_input_system{
+        // for player input and control, maps the control input to a function
         public:
-            ~key_input_system() = default;
-            key_input_system() = default;
-            key_input_system(const key_input_system& other) = delete;
-            key_input_system(key_input_system&& other) = delete;
+            
+            ~control_input_system() = default;
+            control_input_system() = default;
+            control_input_system(const control_input_system& other) = delete;
+            control_input_system(control_input_system&& other) = delete;
 
-            key_input_system& operator=(const key_input_system& other) = delete;
-            key_input_system& operator=(key_input_system&& other) = delete;
+            control_input_system& operator=(const control_input_system& other) = delete;
+            control_input_system& operator=(control_input_system&& other) = delete;
+
     };
     class npc_system{
         // uses the expediter and the maitre d to orchestrate

@@ -91,6 +91,8 @@ namespace ecs_entities {
     // * decorations [tables, counters, stations]
     // * food  */
     // ! dog builders and destroyers
+    void build_player(size_t player_id, size_t cursor_id);
+    void destroy_player(size_t player_id, size_t cursor_id);
     void build_player_dog(size_t id);
         void build_khiri(size_t id);
         void build_mack(size_t id);
@@ -132,5 +134,8 @@ namespace ecs_entities {
         */
     void destroy_station(size_t id);
 
+    // the level backdrop - renderable only, no hitbox, no collision
+    void build_background(size_t id);
+    void destroy_background(size_t id);
 }
 #endif

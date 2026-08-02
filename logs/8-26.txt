@@ -57,3 +57,9 @@ immediate todo:
 -> define basic entity building 
 -> build up the systems
 -> integrate into the game
+
+-> built the p[layer and the cursor
+-> setting up the rendering system so it can process rendering components-> need to setup the control system to 
+interpret and actuall perform controls
+_. setting up the lifecycle sysmte to manage entity inseration and remoaval, and emit t osother systems, adn other 
+systems react with on_entity_add

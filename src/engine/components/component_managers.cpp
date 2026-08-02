@@ -12,12 +12,13 @@
 // * these are variables, not functions, so the qualified-definition form used
 // * in the *_builder.cpp files (void ns::func(){}) is not available - a
 // * namespace block is the only way to define them in the right scope.
-namespace managers {
+namespace component_managers {
 component_manager<components::position_component> positional_manager_;
 component_manager<components::movement_component> movment_manager_;
 component_manager<components::renderable_component> renderable_manager_;
 component_manager<components::collision_component> collision_manager_;
 component_manager<components::interaction_component> interaction_manager_;
+component_manager<components::controls_component> control_manager_;
 component_manager<components::state_machine_component> state_machine_manager_;
 component_manager<components::food_component> food_manager_;
 }

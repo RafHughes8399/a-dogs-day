@@ -17,6 +17,37 @@ namespace type_config{
     using path = std::vector<Vector2>;
 }
 namespace game_config {
+    enum control_action{
+        key_press = 0,
+        key_hold = 1, 
+        mouse_press = 2, 
+        mouse_hold = 3,
+        mouse_relesed = 4,
+        mouse_up = 5
+    };
+    enum control_input{
+        dog_switch = KEY_F,
+        shop_open = KEY_S,
+        inventory_open = KEY_I,
+        menu_open = KEY_TAB,
+        quests_open = KEY_Q,
+        map_open = KEY_M,
+        back = KEY_ESCAPE,
+        move_down = KEY_DOWN,
+        move_up  = KEY_UP,
+        move_left = KEY_LEFT,
+        move_right = KEY_RIGHT
+    };
+    struct control{
+        int key_;
+        int action_;
+    };
+    inline std::vector<control> player_controls = {
+        {KEY_LEFT, key_hold},
+        {KEY_RIGHT, key_hold},
+        {KEY_DOWN, key_hold},
+        {KEY_UP, key_hold}
+    };
     inline const int window_width = 1920;
     inline const int window_height = 1080;
     inline const int frames = 60;

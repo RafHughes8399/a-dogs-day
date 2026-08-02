@@ -2,6 +2,7 @@
 #define RENDER_LAYER_H
 
 #include <vector>
+#include "component.h"
 #include "entities.h"
 namespace render_layer{
     class layer{
@@ -37,6 +38,45 @@ namespace render_layer{
         private:
             std::vector<entities::entity*> entities_;
 
+    };
+
+    // TODO: RENAME AFTER REFACTOR IS COMPLETE - replaces layer once level is gone.
+    // * same shape as layer: one insertion-ordered list per draw layer, iterated
+    // * in order with a predicate. Holds ids rather than entity pointers, so a
+    // * stale entry is harmless - the component lookup returns nullptr and the
+    // * entry is skipped, instead of dereferencing a dangling pointer.
+    class ecs_layer{
+        public:
+            ~ecs_layer() = default;
+            ecs_layer() = default;
+            ecs_layer(const ecs_layer& other) = default;
+            ecs_layer(ecs_layer&& other) = default;
+
+            ecs_layer& operator=(const ecs_layer& other) = default;
+            ecs_layer& operator=(ecs_layer&& other) = default;
+
+            void add_entity(size_t entity_id);
+            void remove_entity(size_t entity_id);
+            void remove_entities(const std::vector<size_t>& entity_ids);
+
+            template<typename UnaryPred>
+            void draw(UnaryPred p, Vector2 frame_position, int frame){
+                for(auto entity_id : entities_){
+                    auto* renderable = component_managers::renderable_manager_.get_component(entity_id);
+                    auto* position = component_managers::positional_manager_.get_component(entity_id);
+                    if(renderable == nullptr || position == nullptr){ continue; }
+                    if(!p(entity_id)){ continue; }
+
+                    auto draw_position = Vector2Subtract(position->get_position(), frame_position);
+                    // * one renderable holds several sprite_components - body,
+                    // * outlines, cosmetics - all drawn at the same position.
+                    for(auto & sprite_component : renderable->get_sprites()){
+                        sprite_component.get_sprite().render(draw_position, frame);
+                    }
+                }
+            }
+        private:
+            std::vector<size_t> entities_;
     };
 }
 

@@ -106,7 +106,8 @@ link_libraries(queries)
 
 add_library(components
   src/engine/components/component_managers.cpp
-  src/engine/components/component_builders.cpp)
+  src/engine/components/component_builders.cpp
+  src/engine/components/component_accessors.cpp)
 link_libraries(components)
 
 add_library(systems
