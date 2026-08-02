@@ -63,3 +63,8 @@ immediate todo:
 interpret and actuall perform controls
 _. setting up the lifecycle sysmte to manage entity inseration and remoaval, and emit t osother systems, adn other 
 systems react with on_entity_add
+
+-> finish building the cusror with a renderable and positional component
+-> input component to check mouse delta ? 
+-> maybe an update component ? 
+-> then finish arrow key input to move around the screen
