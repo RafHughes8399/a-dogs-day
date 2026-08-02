@@ -8,14 +8,12 @@
 // under a different namespace (or at global scope) they become unrelated
 // variables that merely share a name, and the externs stay undefined until
 // something references one and the link fails.
-namespace managers {
 
-components::component_manager<components::position_component> positional_manager_;
-components::component_manager<components::movement_component> movment_manager_;
-components::component_manager<components::renderable_component> renderable_manager_;
-components::component_manager<components::collision_component> collision_manager_;
-components::component_manager<components::interaction_component> interaction_manager_;
-components::component_manager<components::state_machine_component> state_machine_manager_;
-components::component_manager<components::food_component> food_manager_;
+managers::component_manager<components::position_component> positional_manager_;
+managers::component_manager<components::movement_component> movment_manager_;
+managers::component_manager<components::renderable_component> renderable_manager_;
+managers::component_manager<components::collision_component> collision_manager_;
+managers::component_manager<components::interaction_component> interaction_manager_;
+managers::component_manager<components::state_machine_component> state_machine_manager_;
+managers::component_manager<components::food_component> food_manager_;
 
-} // namespace managers

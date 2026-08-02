@@ -44,6 +44,7 @@ basic implmentation for moving and rendering and storage systems [essentially mi
 
 then continue refactor in the order of
 -> building, inserting and rendering entities
+-> entity files will transition from their current defs to begin essentially builders
 -> key and mouse input
 -> player dog selection and movement
 -> decoration placement 

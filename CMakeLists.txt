@@ -107,6 +107,16 @@ link_libraries(queries)
 add_library(components src/engine/components/component_managers.cpp)
 link_libraries(components)
 
+add_library(systems
+  src/engine/systems/movement_system.cpp
+  src/engine/systems/rendering_system.cpp
+  src/engine/systems/spatial_system.cpp
+  src/engine/systems/collision_system.cpp
+  src/engine/systems/interaction_system.cpp
+  src/engine/systems/key_input_system.cpp
+  src/engine/systems/npc_system.cpp)
+link_libraries(systems)
+
 add_library(animation src/rendering/animation.cpp)
 link_libraries(animation)
 
@@ -206,7 +216,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
-  raglib events queries components animation sprite item menu hud hitbox body texture
+  raglib events queries components systems animation sprite item menu hud hitbox body texture
   player controls entities cursor dogs decorations stations food render_layer quadtree
   graph level maitre_d expediter dog_actions debug_log_interface debug_logger game ${PROJECT_NAME}
 )

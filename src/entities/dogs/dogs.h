@@ -14,7 +14,7 @@
 
 namespace entities{
     class dog : public entity{
-        using path = std::vector<Vector2>;
+        using path = type_config::path;
         public:
             dog(body::body body, body::body head, Vector2 position, int id, std::string debug_id,
             int direction = level_config::directions::right)

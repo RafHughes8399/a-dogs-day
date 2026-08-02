@@ -10,6 +10,12 @@
 #include <cstddef>
 #include <raymath.h>
 #include <vector>
+namespace type_config{
+    // * an ordered run of world positions to walk through. Lives here rather
+    // * than inside any one class so the graph, the query layer, the movement
+    // * component and the dogs all name the same type.
+    using path = std::vector<Vector2>;
+}
 namespace game_config {
     inline const int window_width = 1920;
     inline const int window_height = 1080;
