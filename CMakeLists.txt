@@ -116,7 +116,8 @@ add_library(systems
   src/engine/systems/spatial_system.cpp
   src/engine/systems/collision_system.cpp
   src/engine/systems/interaction_system.cpp
-  src/engine/systems/key_input_system.cpp
+  src/engine/systems/control_input_system.cpp
+  src/engine/systems/entity_lifespan_system.cpp
   src/engine/systems/npc_system.cpp)
 link_libraries(systems)
 
@@ -252,6 +253,8 @@ endforeach()
 add_executable(tests
   tests/smoke_test.cpp
   tests/test_game.cpp
+  tests/ecs_test_game.cpp
+  tests/ecs_scenarios.cpp
   tests/harness_scenarios.cpp
   tests/player_scenarios.cpp
   tests/decoration_scenarios.cpp

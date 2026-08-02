@@ -1,8 +1,6 @@
 #include "component.h"
 
-// Definitions for the accessors declared on each component in component.h.
-// Declared there and defined here so the header stays a description of the
-// data rather than of how it is reached.
+// definitions for the accessors declared on each component in component.h
 
 Vector2 components::position_component::get_position(){
     return position_;

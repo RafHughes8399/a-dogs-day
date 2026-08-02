@@ -93,6 +93,7 @@ namespace events{
 		waiter_collected_food_id = 51,
 		waiter_served_order_id = 52,
 		waiter_abandoned_serving_id = 53,
+		create = 21,
 		size = 54
 	};
 	class event{

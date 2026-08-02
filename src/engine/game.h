@@ -49,24 +49,14 @@ namespace game{
     };
 
     // TODO: RENAME AFTER REFACTOR IS COMPLETE - replaces game once level is gone.
-    // * the composition root for the ECS side: owns every system by value, so
-    // * they are constructed and destroyed deterministically inside main rather
-    // * than during static teardown. That matters because each system
-    // * unsubscribes its handlers in its destructor and events::global_dispatcher_
-    // * is a global - a singleton system could outlive the dispatcher it
-    // * unsubscribes from.
-    // *
-    // * member declaration order IS the tick order, and reverse declaration
-    // * order is the teardown order. Keep the two in step:
-    // *   lifecycle -> input -> npc -> movement -> spatial -> collision
-    // *   -> interaction -> rendering
-    // * spatial refreshes the index after movement writes positions, so
-    // * collision and interaction read a current index.
+    // owns the systems by value so they are destroyed inside main, while
+    // events::global_dispatcher_ is still alive for them to unsubscribe from.
+    // member declaration order is the tick order, reversed is the teardown order.
     class ecs_game {
         public:
             ~ecs_game() = default;
             ecs_game(sprite::sprite background, Rectangle view_frame)
-                : frame_count_(0), lifecycle_(), input_(), npc_(), movement_(),
+                : frame_count_(0), lifespan_(), input_(), npc_(), movement_(),
                 spatial_(), collision_(), interaction_(),
                 rendering_(background, view_frame){}
             // systems subscribe handlers in their constructors, so they are
@@ -77,12 +67,8 @@ namespace game{
             ecs_game& operator=(const ecs_game& other) = delete;
             ecs_game& operator=(ecs_game&& other) = delete;
 
-            // * two-phase on purpose. The constructor only stands the systems
-            // * up; init populates the world. Separate because building entities
-            // * loads textures (raylib must already be running) and because the
-            // * builders write into managers the systems observe, so every
-            // * system has to exist first. Also makes a level reload / new game
-            // * a matter of calling init again.
+            // ctor stands the systems up, init populates the world - separate so
+            // raylib is running before textures load, and re-runnable for reloads
             void init();
 
             void update(float delta_time);
@@ -91,7 +77,7 @@ namespace game{
         private:
             int frame_count_;
 
-            systems::entity_lifecycle_system lifecycle_;
+            systems::entity_lifespan_system lifespan_;
             systems::control_input_system input_;
             systems::npc_system npc_;
             systems::movement_system movement_;

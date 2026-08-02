@@ -49,17 +49,13 @@ void game::game::debug(float delta){
 
 // ----------------------------------------- ecs_game ----------------------- //
 void game::ecs_game::init(){
-    // * ids come from lifecycle_ once it allocates them - literals until then.
-    // TODO replace with lifecycle_ id allocation
-    size_t player_id = 0;
-    size_t cursor_id = 1;
+    // the player and its cursor - two entities, so two creates
+    auto cursor_id = lifespan_.create(&ecs_entities::build_cursor, level_config::cursor);
+    lifespan_.create([cursor_id](size_t id){
+        ecs_entities::build_player(id, cursor_id);
+    }, level_config::hud);
 
-    // the player and its cursor - registers the control components the
-    // control_input_system reads
-    ecs_entities::build_player(player_id, cursor_id);
-
-    // TODO the backdrop
-    // ecs_entities::build_background(lifecycle_ id);
+    lifespan_.create(&ecs_entities::build_background, level_config::background);
 
     // TODO starting entities - khiri and mack, the starting stations
     // ecs_entities::build_khiri(...); ecs_entities::build_mack(...);
@@ -73,11 +69,9 @@ void game::ecs_game::init(){
 void game::ecs_game::update(float delta){
     events::global_dispatcher_.process_events(delta);
 
-    // TODO tick each system as it gains an update. Order is the member
-    // declaration order in game.h - lifecycle first so entities created this
-    // frame are visible to everything after it, spatial after movement so the
-    // index is current before collision and interaction read it.
-    (void) lifecycle_;
+    // TODO tick each system as it gains an update - order is the member
+    // declaration order in game.h
+    (void) lifespan_;
     (void) input_;
     (void) npc_;
     (void) movement_;

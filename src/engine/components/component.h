@@ -52,8 +52,7 @@ public:
     Vector2 get_move_speed();
 private:
     std::queue<type_config::path> paths_;
-    // * not const - a const member deletes both assignment operators, which
-    // * the manager needs to store components by value.
+    // not const - a const member deletes both assignment operators
     Vector2 move_speed_;
 };
 
@@ -150,8 +149,7 @@ class controls_component{
     // AND THE NEXT STATE
 class state_machine_component{
 public:
-    // * virtual dtor because this is a polymorphic base - concrete states
-    // * derive from it and are held through a base pointer.
+    // virtual dtor - concrete states are held through a base pointer
     class state_component {
     public:
         virtual ~state_component() = default;
@@ -206,9 +204,7 @@ public:
    component_manager& operator=(const component_manager& other) = default;
    component_manager& operator=(component_manager&& other) = default;
 
-   // * insert_or_assign, not operator[] - operator[] default-constructs on a
-   // * missing key, and position_component/movement_component have no default
-   // * constructor.
+   // insert_or_assign - operator[] needs a default ctor some components lack
    void register_component(size_t entity, C component){
         components_.insert_or_assign(entity, std::move(component));
    }
@@ -220,6 +216,14 @@ public:
    C* get_component(size_t entity){
         auto component_it = components_.find(entity);
         return component_it != components_.end() ? &component_it->second : nullptr;
+   }
+   size_t size() const{
+        return components_.size();
+   }
+   // the managers are globals, so the test harness needs a way back to empty
+   // between scenarios
+   void clear(){
+        components_.clear();
    }
    
 private:
@@ -258,10 +262,8 @@ namespace component_builders{
     components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
     components::food_component build_food_component();
 }
-// * thin forwarders so builders name one function instead of reaching into the
-// * right manager themselves. Defined here rather than in a .cpp, so they must
-// * be inline - component.h lands in several translation units and a non-inline
-// * definition at namespace scope would be a duplicate symbol at link time.
+// thin forwarders to the right manager. inline because this header lands in
+// several TUs
 namespace component_helpers{
     inline void register_positional_component(size_t entity_id, components::position_component component){
         component_managers::positional_manager_.register_component(entity_id, std::move(component));
@@ -313,10 +315,8 @@ namespace component_helpers{
         component_managers::food_manager_.unregister_component(entity_id);
     }
 
-    // * teardown hits every manager unconditionally - erase on a missing key is
-    // * a no-op, so this stays correct for every entity kind without anyone
-    // * maintaining a list of which components a given builder registered.
-    // * Adding a component type means editing here, not auditing each destroyer.
+    // blanket teardown - erase on a missing key is a no-op, so this is correct
+    // for every entity kind without tracking what a builder registered
     inline void unregister_all_components(size_t entity_id){
         unregister_positional_component(entity_id);
         unregister_movement_component(entity_id);
@@ -326,6 +326,32 @@ namespace component_helpers{
         unregister_controls_component(entity_id);
         unregister_state_machine_component(entity_id);
         unregister_food_component(entity_id);
+    }
+
+    // total components registered across every manager
+    inline size_t num_registered_components(size_t entity_id){
+        size_t count = 0;
+        count += component_managers::positional_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::movment_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::renderable_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::collision_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::interaction_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::control_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::state_machine_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::food_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        return count;
+    }
+
+    // wipes every manager - for the test harness between scenarios
+    inline void clear_all_components(){
+        component_managers::positional_manager_.clear();
+        component_managers::movment_manager_.clear();
+        component_managers::renderable_manager_.clear();
+        component_managers::collision_manager_.clear();
+        component_managers::interaction_manager_.clear();
+        component_managers::control_manager_.clear();
+        component_managers::state_machine_manager_.clear();
+        component_managers::food_manager_.clear();
     }
 }
 #endif

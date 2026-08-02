@@ -1,6 +1,7 @@
 #ifndef SYSTEMS_H
 #define SYSTEMS_H
 #include "component.h"
+#include "entity.h"
 #include "events.h"
 #include "events_interface.h"
 #include "render_layer.h"
@@ -12,13 +13,8 @@ namespace systems{
     // rendering system
     // menu system ? 
     // hud system ? 
-    // * systems are non-copyable and non-movable, not defaulted like the
-    // * components. Each one subscribes its event handlers in its constructor
-    // * and unsubscribes in its destructor, so a copy would double-subscribe
-    // * and a move would leave the dispatcher holding a handler whose owner
-    // * has gone. level and game delete all four for exactly this reason;
-    // * tree::quadtree keeps a copy constructor and has to manually re-subscribe
-    // * in it (quadtree.h) - avoid needing that here.
+    // systems are non-copyable and non-movable - they subscribe handlers in the
+    // constructor and unsubscribe in the destructor, so a copy double-subscribes
     class movement_system{
         // the level graph and pathfinding
         public:
@@ -35,11 +31,18 @@ namespace systems{
         // the backdrop
         // and the viewframe
         public:
-            ~rendering_system() = default;
-            // * no default constructor - sprite::sprite has none, so background_
-            // * cannot be default initialised.
+            ~rendering_system(){
+                event_interface::unsubscribe<events::create_entity>(create_entity_handler_);
+                event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+            }
+            // no default ctor - sprite::sprite has none
             rendering_system(sprite::sprite background, Rectangle view_frame)
-                : background_(background), view_frame_(view_frame), render_layers_(){}
+                : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
+                remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+                background_(background), view_frame_(view_frame), render_layers_(){
+                    event_interface::subscribe<events::create_entity>(create_entity_handler_);
+                    event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+                }
             rendering_system(const rendering_system& other) = delete;
             rendering_system(rendering_system&& other) = delete;
 
@@ -47,14 +50,19 @@ namespace systems{
             rendering_system& operator=(rendering_system&& other) = delete;
 
             void render(int frame);
-            // TODO listen for entity creations and removals, to add and remove from the render layer 
-            void on_created_entity();
-            void on_destroyed_entity();
+            void on_created_entity(const events::create_entity& event);
+            void on_destroyed_entity(const events::remove_entity& event);
+#ifdef DOG_DAYS_TESTING
+            render_layer::ecs_layer& get_layer(size_t layer){
+                return render_layers_[layer];
+            }
+#endif
         private:
-            // on entity creation [and deletion ] so on_entity_created, on_entity _removed
+            events::event_handler<events::create_entity> create_entity_handler_;
+            events::event_handler<events::remove_entity> remove_entity_handler_;
+
             // the render layer is a 2d list layering the entities  so you can draw in layers
-            // * refferencing like [j][k] is drawing entity k on layer j - ecs_layer
-            // * is the inner list, and owns the per-entity component lookup and draw.
+            // refferencing like [j][k] is drawing entity k on layer j
             sprite::sprite background_;
             Rectangle view_frame_;
             render_layer::ecs_layer render_layers_[level_config::draw_layers::size];
@@ -76,24 +84,35 @@ namespace systems{
 
 
     };
-    class entity_lifecycle_system{
+    class entity_lifespan_system{
         // responsible for managing entity creation and destruction
         public:
-            ~entity_lifecycle_system() = default;
-            entity_lifecycle_system() = default;
-            entity_lifecycle_system(const entity_lifecycle_system& other) = delete;
-            entity_lifecycle_system(entity_lifecycle_system&& other) = delete;
+            ~entity_lifespan_system() = default;
+            entity_lifespan_system() = default;
+            entity_lifespan_system(const entity_lifespan_system& other) = delete;
+            entity_lifespan_system(entity_lifespan_system&& other) = delete;
 
-            entity_lifecycle_system& operator=(const entity_lifecycle_system& other) = delete;
-            entity_lifecycle_system& operator=(entity_lifecycle_system&& other) = delete;
+            entity_lifespan_system& operator=(const entity_lifespan_system& other) = delete;
+            entity_lifespan_system& operator=(entity_lifespan_system&& other) = delete;
 
-            void build_entity();
+            // allocate -> build -> announce, so nothing can be built without
+            // reaching the spatial index and a render layer
+            template<typename Builder>
+            size_t create(Builder build, size_t layer){
+                auto entity_id = next_id();
+                build(entity_id);
+                // executed, never queued - listeners must see the entity this frame
+                events::create_entity created{entity_id, layer};
+                event_interface::execute_event(created);
+                return entity_id;
+            }
+
+            void remove(size_t entity_id);
         private:
+            size_t next_id();
+
             std::queue<size_t> recycled_ids_;
-            size_t fresh_id_;
-
-
-
+            size_t fresh_id_ = 0;
     };
     class collision_system{
         // for physics based collisions

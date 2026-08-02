@@ -1,9 +1,7 @@
 #include "entity.h"
 
-// * definitions are qualified with ecs_entities:: so they bind to the
-// * declarations in entity.h. A name that doesn't match one is a compile error
-// * here, rather than a silently unrelated function that leaves the declaration
-// * undefined until a call site fails to link.
+// qualified with ecs_entities:: so a name that doesn't match a declaration in
+// entity.h is a compile error here, not an undefined symbol at link time
 
 void ecs_entities::build_player(size_t player_id, size_t cursor_id){
     // build control components, start with the array keys, 
@@ -14,10 +12,6 @@ void ecs_entities::build_player(size_t player_id, size_t cursor_id){
     // ?  do we need an attachment compnent, a has_a_component ?
     build_cursor(cursor_id);
 }
-void ecs_entities::destroy_player(size_t player_id, size_t cursor_id){
-    component_helpers::unregister_all_components(player_id);
-    destroy_cursor(cursor_id);
-}
 void ecs_entities::build_player_dog(size_t id){
     (void) id;
 }
@@ -27,9 +21,6 @@ void ecs_entities::build_player_dog(size_t id){
     void ecs_entities::build_mack(size_t id){
         (void) id;
     }
-void ecs_entities::destroy_player_dog(size_t id){
-    (void) id;
-}
 
 void ecs_entities::build_customer_dog(size_t id){
     (void) id;
@@ -41,9 +32,6 @@ void ecs_entities::build_customer_dog(size_t id){
     // .
     // build duck_hunt_dog();
     //  */
-void ecs_entities::destroy_customer_dog(size_t id){
-    (void) id;
-}
 
 void ecs_entities::build_waiter_dog(size_t id){
     (void) id;
@@ -52,15 +40,9 @@ void ecs_entities::build_waiter_dog(size_t id){
 // build_saba()
 // build text
 //  */
-void ecs_entities::destroy_waiter_dog(size_t id){
-    (void) id;
-}
 
 void ecs_entities::build_cursor(size_t id){
     // 
-    (void) id;
-}
-void ecs_entities::destroy_cursor(size_t id){
     (void) id;
 }
 
@@ -73,9 +55,6 @@ void ecs_entities::build_decoration(size_t id){
     //**
     // void build_gargoyle();
     //  */
-void ecs_entities::destroy_decoration(size_t id){
-    (void) id;
-}
 
 void ecs_entities::build_station(size_t id){
     (void) id;
@@ -92,13 +71,8 @@ void ecs_entities::build_station(size_t id){
     /**
         // void build_stove();
     */
-void ecs_entities::destroy_station(size_t id){
-    (void) id;
-}
 
 void ecs_entities::build_background(size_t id){
-    // the background is just a sprite right ?, att a draw level
-}
-void ecs_entities::destroy_background(size_t id){
     (void) id;
+    // the background is just a sprite right ?, att a draw level
 }

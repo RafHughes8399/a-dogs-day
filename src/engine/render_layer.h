@@ -1,6 +1,7 @@
 #ifndef RENDER_LAYER_H
 #define RENDER_LAYER_H
 
+#include <algorithm>
 #include <vector>
 #include "component.h"
 #include "entities.h"
@@ -41,10 +42,8 @@ namespace render_layer{
     };
 
     // TODO: RENAME AFTER REFACTOR IS COMPLETE - replaces layer once level is gone.
-    // * same shape as layer: one insertion-ordered list per draw layer, iterated
-    // * in order with a predicate. Holds ids rather than entity pointers, so a
-    // * stale entry is harmless - the component lookup returns nullptr and the
-    // * entry is skipped, instead of dereferencing a dangling pointer.
+    // same shape as layer, holding ids - a stale entry is skipped via a null
+    // component lookup rather than dereferenced
     class ecs_layer{
         public:
             ~ecs_layer() = default;
@@ -68,13 +67,20 @@ namespace render_layer{
                     if(!p(entity_id)){ continue; }
 
                     auto draw_position = Vector2Subtract(position->get_position(), frame_position);
-                    // * one renderable holds several sprite_components - body,
-                    // * outlines, cosmetics - all drawn at the same position.
+                    // body, outlines and cosmetics all draw at the same position
                     for(auto & sprite_component : renderable->get_sprites()){
                         sprite_component.get_sprite().render(draw_position, frame);
                     }
                 }
             }
+#ifdef DOG_DAYS_TESTING
+            size_t size() const{
+                return entities_.size();
+            }
+            bool contains(size_t entity_id) const{
+                return std::find(entities_.begin(), entities_.end(), entity_id) != entities_.end();
+            }
+#endif
         private:
             std::vector<size_t> entities_;
     };

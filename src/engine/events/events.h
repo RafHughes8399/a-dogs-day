@@ -22,6 +22,7 @@
 #include "events/event_core.h"
 #include "events/dog_events.h"
 #include "events/entity_events.h"
+#include "events/system_events.h"
 #include "events/decoration_events.h"
 #include "events/input_events.h"
 #include "events/debug_events.h"

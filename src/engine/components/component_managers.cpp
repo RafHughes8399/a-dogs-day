@@ -9,9 +9,8 @@
 // variables that merely share a name, and the externs stay undefined until
 // something references one and the link fails.
 
-// * these are variables, not functions, so the qualified-definition form used
-// * in the *_builder.cpp files (void ns::func(){}) is not available - a
-// * namespace block is the only way to define them in the right scope.
+// variables, not functions - the qualified ns::name form used in the builders
+// is not available, so a namespace block is the only way to scope these
 namespace component_managers {
 component_manager<components::position_component> positional_manager_;
 component_manager<components::movement_component> movment_manager_;

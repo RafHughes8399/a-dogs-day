@@ -92,11 +92,9 @@ namespace ecs_entities {
     // * food  */
     // ! dog builders and destroyers
     void build_player(size_t player_id, size_t cursor_id);
-    void destroy_player(size_t player_id, size_t cursor_id);
     void build_player_dog(size_t id);
         void build_khiri(size_t id);
         void build_mack(size_t id);
-    void destroy_player_dog(size_t id);
 
     void build_customer_dog(size_t id);
         //**
@@ -106,24 +104,20 @@ namespace ecs_entities {
         // .
         // build duck_hunt_dog();
         //  */
-    void destroy_customer_dog(size_t id);
 
     void build_waiter_dog(size_t id);
     //**
     // build_saba()
     // build text
     //  */
-    void destroy_waiter_dog(size_t id);
 
     void build_cursor(size_t id);
-    void destroy_cursor(size_t id);
 
     void build_decoration(size_t id);
         void build_test_decoration(size_t id);
         //**
         // void build_gargoyle();
         //  */
-    void destroy_decoration(size_t id);
 
     void build_station(size_t id);
         void build_counter(size_t id);
@@ -132,10 +126,8 @@ namespace ecs_entities {
         /**
             // void build_stove();
         */
-    void destroy_station(size_t id);
 
     // the level backdrop - renderable only, no hitbox, no collision
     void build_background(size_t id);
-    void destroy_background(size_t id);
 }
 #endif
