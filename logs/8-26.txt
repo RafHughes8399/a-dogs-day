@@ -52,3 +52,8 @@ then continue refactor in the order of
 
 
 -> wil come back to editing later 
+
+immediate todo:
+-> define basic entity building 
+-> build up the systems
+-> integrate into the game

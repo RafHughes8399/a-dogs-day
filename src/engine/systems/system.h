@@ -46,6 +46,7 @@ namespace systems{
     class spatial_system{
         // has the quadtree, holding entities in a more effiecint spatial system so collision and interaciton
         // checks can be performed at O(n log n) instead of
+
         public:
             ~spatial_system() = default;
             spatial_system() = default;
@@ -54,6 +55,17 @@ namespace systems{
 
             spatial_system& operator=(const spatial_system& other) = delete;
             spatial_system& operator=(spatial_system&& other) = delete;
+    };
+    class entity_lifecycle_system{
+        // responsible for managing entity creation and destruction
+        public:
+            ~entity_lifecycle_system() = default;
+            entity_lifecycle_system() = default;
+            entity_lifecycle_system(const entity_lifecycle_system& other) = delete;
+            entity_lifecycle_system(entity_lifecycle_system&& other) = delete;
+
+            entity_lifecycle_system& operator=(const entity_lifecycle_system& other) = delete;
+            entity_lifecycle_system& operator=(entity_lifecycle_system&& other) = delete;
     };
     class collision_system{
         // for physics based collisions

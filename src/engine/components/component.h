@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "config.h"
-#include "config.h"
 #include "events.h"
 #include "events_interface.h"
 #include "raylib.h"
@@ -192,8 +191,11 @@ public:
    component_manager& operator=(const component_manager& other) = default;
    component_manager& operator=(component_manager&& other) = default;
 
+   // * insert_or_assign, not operator[] - operator[] default-constructs on a
+   // * missing key, and position_component/movement_component have no default
+   // * constructor.
    void register_component(size_t entity, C component){
-        components_[entity] = component;
+        components_.insert_or_assign(entity, std::move(component));
    }
    // * only need to unregister components when the entity is removed from the game
    void unregister_component(size_t entity){
@@ -240,4 +242,5 @@ namespace builders{
     components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
     components::food_component build_food_component();
 }
+
 #endif

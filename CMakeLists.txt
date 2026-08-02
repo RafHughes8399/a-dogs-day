@@ -104,7 +104,9 @@ link_libraries(events)
 add_library(queries src/engine/queries/queries.cpp)
 link_libraries(queries)
 
-add_library(components src/engine/components/component_managers.cpp)
+add_library(components
+  src/engine/components/component_managers.cpp
+  src/engine/components/component_builders.cpp)
 link_libraries(components)
 
 add_library(systems
@@ -147,7 +149,7 @@ link_libraries(player)
 add_library(controls src/interfaces/controls.cpp)
 link_libraries(controls)
 
-add_library(entities src/entities/entity.cpp src/entities/entity_builder.cpp)
+add_library(entities src/entities/entity.cpp src/entities/entity_builder.cpp src/entities/ecs_builders.cpp)
 link_libraries(entities)
 
 add_library(cursor src/entities/cursor.cpp src/entities/cursor_builder.cpp)
