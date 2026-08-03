@@ -1,13 +1,13 @@
 #include "component.h"
 
 // TODO implement all
-components::position_component component_builders::build_positional_component(Vector2 position, Vector2 direction_scalar){
-    return components::position_component(position, direction_scalar);
+components::position_component component_builders::build_positional_component(Vector2 position){
+    return components::position_component(position);
 }
 
-// * paths default to empty list {}
-components::movement_component component_builders::build_movement_component(Vector2 move_speed, std::queue<type_config::path> paths){
-    return components::movement_component(move_speed, paths);
+// * direction defaults to right, paths default to empty list {}
+components::movement_component component_builders::build_movement_component(Vector2 move_speed, Vector2 direction_scalar, std::queue<type_config::path> paths){
+    return components::movement_component(move_speed, direction_scalar, paths);
 }
 components::renderable_component::sprite_component component_builders::build_sprite_component(std::vector<sprite::sprite>& sprites, size_t index){
     return components::renderable_component::sprite_component(sprites, index);
@@ -24,6 +24,9 @@ components::interaction_component component_builders::build_interaction_componen
 }
 components::controls_component component_builders::build_controls_component(std::vector<game_config::control>& controls){
     return components::controls_component(controls);
+}
+components::mouse_input_component component_builders::build_mouse_input_component(std::vector<game_config::mouse_input>& inputs){
+    return components::mouse_input_component(inputs);
 }
 components::state_machine_component::state_component component_builders::build_state(){
     return components::state_machine_component::state_component();

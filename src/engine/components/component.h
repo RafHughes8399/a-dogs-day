@@ -21,14 +21,11 @@ namespace components {
 // * where a thing is, and nothing else. every system asks this - spatial,
 // * collision, rendering - including entities that never move, so it stays the
 // * cheapest possible component.
-// TODO direction_scalar_ moves to movement_component and this drops to a single
-// TODO Vector2 - see the note above ecs_entities::build_cursor for the why
 class position_component {
 public:
     ~position_component() = default;
-    // TODO set default value for direction scalar
-    position_component(Vector2 position, Vector2 direction_scalar)
-        : position_(position), direction_scalar_(direction_scalar) {}
+    position_component(Vector2 position)
+        : position_(position) {}
     position_component(const position_component& other) = default;
     position_component(position_component&& other) = default;
 
@@ -36,10 +33,8 @@ public:
     position_component& operator=(position_component&& other) = default;
 
     Vector2 get_position();
-    Vector2 get_direction_scalar();
 private:
     Vector2 position_;
-    Vector2 direction_scalar_;
 };
 // * the two halves of a velocity plus the route it is following. direction
 // * belongs here rather than in position because it is only ever read as a
@@ -54,14 +49,17 @@ private:
 // * answered by which components an entity has (movement + path vs controls),
 // * not by polymorphism inside one component. see the note above
 // * ecs_entities::build_cursor.
-// TODO add direction_scalar_ (and the facing index) once position_component
-// TODO gives it up
 class movement_component {
 
 public:
     ~movement_component() = default;
-    movement_component(Vector2 move_speed, std::queue<type_config::path> paths = {})
-        : paths_(paths), move_speed_(move_speed) {}
+    // direction defaults to facing right - it is recomputed from
+    // position -> next waypoint as soon as there is a path to walk, so the
+    // initial value only shows before the entity is given one
+    movement_component(Vector2 move_speed,
+        Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
+        std::queue<type_config::path> paths = {})
+        : paths_(paths), move_speed_(move_speed), direction_scalar_(direction_scalar) {}
     movement_component(const movement_component& other) = default;
     movement_component(movement_component&& other) = default;
 
@@ -70,10 +68,13 @@ public:
 
     type_config::path get_current_path();
     Vector2 get_move_speed();
+    Vector2 get_direction_scalar();
 private:
     std::queue<type_config::path> paths_;
     // not const - a const member deletes both assignment operators
     Vector2 move_speed_;
+    Vector2 direction_scalar_;
+
 };
 
 // * an entity gets ONE renderable_component holding however many sprites it
@@ -146,7 +147,8 @@ public:
 };
 
 
-// * player control input component
+// * player control input component - keyboard bindings only. Mouse input is
+// * mouse_input_component; see the note there for why they are not one type.
 class controls_component{
     public:
         ~controls_component() = default;
@@ -157,8 +159,40 @@ class controls_component{
 
         controls_component& operator=(const controls_component& other) = default;
         controls_component& operator=(controls_component&& other) = default;
+
+        std::vector<game_config::control>& get_controls();
     private:
         std::vector<game_config::control> controls_;
+};
+
+// * mouse input component - the button bindings for a mouse-driven entity.
+// * Kept apart from controls_component for two reasons:
+// *  1. a key binding and a button binding are different shapes. With one enum
+// *     and one struct, {KEY_F, mouse_press} was expressible and nothing caught
+// *     it; with two, it will not compile.
+// *  2. holding one of these IS what makes an entity mouse-positioned. The
+// *     control system syncs position from the device for everything in this
+// *     manager, which is why the cursor needs no movement_component and no
+// *     direction of its own - pointer movement is ambient device state, not a
+// *     binding, so there is nothing here to bind it to.
+// * Deliberately no raylib calls on this type: it says which buttons mean what,
+// * and the control system is the only thing that touches the device. A
+// * component that reads GetMouseDelta() cannot be built or reasoned about
+// * without a window open.
+class mouse_input_component{
+    public:
+        ~mouse_input_component() = default;
+        mouse_input_component(std::vector<game_config::mouse_input> inputs)
+        :inputs_(inputs){}
+        mouse_input_component(const mouse_input_component& other) = default;
+        mouse_input_component(mouse_input_component&& other) = default;
+
+        mouse_input_component& operator=(const mouse_input_component& other) = default;
+        mouse_input_component& operator=(mouse_input_component&& other) = default;
+
+        std::vector<game_config::mouse_input>& get_inputs();
+    private:
+        std::vector<game_config::mouse_input> inputs_;
 };
 
 // ! A STATE MACHINE IS A SET OF STATE COMPONENTS
@@ -263,13 +297,16 @@ extern component_manager<components::renderable_component> renderable_manager_;
 extern component_manager<components::collision_component> collision_manager_;
 extern component_manager<components::interaction_component> interaction_manager_;
 extern component_manager<components::controls_component> control_manager_;
+extern component_manager<components::mouse_input_component> mouse_input_manager_;
 extern component_manager<components::state_machine_component> state_machine_manager_;
 extern component_manager<components::food_component> food_manager_;
 } // namespace component_managers
 
 namespace component_builders{
-    components::position_component build_positional_component(Vector2 position, Vector2 direction_scalar);
-    components::movement_component build_movement_component(Vector2 move_speed, std::queue<type_config::path> paths = {});
+    components::position_component build_positional_component(Vector2 position);
+    components::movement_component build_movement_component(Vector2 move_speed,
+        Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
+        std::queue<type_config::path> paths = {});
     components::renderable_component::sprite_component build_sprite_component(std::vector<sprite::sprite>& sprites, size_t index);
     components::renderable_component build_renderable_component(
         std::vector<components::renderable_component::sprite_component>& sprite_components);
@@ -278,6 +315,7 @@ namespace component_builders{
     
     components::interaction_component build_interaction_component();
     components::controls_component build_controls_component(std::vector<game_config::control>& controls);
+    components::mouse_input_component build_mouse_input_component(std::vector<game_config::mouse_input>& inputs);
     components::state_machine_component::state_component build_state();
     components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
     components::food_component build_food_component();
@@ -302,6 +340,9 @@ namespace component_helpers{
     }
     inline void register_controls_component(size_t entity_id, components::controls_component component){
         component_managers::control_manager_.register_component(entity_id, std::move(component));
+    }
+    inline void register_mouse_input_component(size_t entity_id, components::mouse_input_component component){
+        component_managers::mouse_input_manager_.register_component(entity_id, std::move(component));
     }
     inline void register_state_machine_component(size_t entity_id, components::state_machine_component component){
         component_managers::state_machine_manager_.register_component(entity_id, std::move(component));
@@ -328,6 +369,9 @@ namespace component_helpers{
     inline void unregister_controls_component(size_t entity_id){
         component_managers::control_manager_.unregister_component(entity_id);
     }
+    inline void unregister_mouse_input_component(size_t entity_id){
+        component_managers::mouse_input_manager_.unregister_component(entity_id);
+    }
     inline void unregister_state_machine_component(size_t entity_id){
         component_managers::state_machine_manager_.unregister_component(entity_id);
     }
@@ -344,6 +388,7 @@ namespace component_helpers{
         unregister_collision_component(entity_id);
         unregister_interaction_component(entity_id);
         unregister_controls_component(entity_id);
+        unregister_mouse_input_component(entity_id);
         unregister_state_machine_component(entity_id);
         unregister_food_component(entity_id);
     }
@@ -357,6 +402,7 @@ namespace component_helpers{
         count += component_managers::collision_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::interaction_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::control_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::mouse_input_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::state_machine_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::food_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         return count;
@@ -370,6 +416,7 @@ namespace component_helpers{
         component_managers::collision_manager_.clear();
         component_managers::interaction_manager_.clear();
         component_managers::control_manager_.clear();
+        component_managers::mouse_input_manager_.clear();
         component_managers::state_machine_manager_.clear();
         component_managers::food_manager_.clear();
     }

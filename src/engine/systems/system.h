@@ -107,13 +107,10 @@ namespace systems{
                 event_interface::execute_event(created);
                 return entity_id;
             }
-
             void remove(size_t entity_id);
-
             void update(float delta);
         private:
             size_t next_id();
-
             std::queue<size_t> recycled_ids_;
             size_t fresh_id_ = 0;
     };
@@ -144,7 +141,18 @@ namespace systems{
             void update(float delta);
     };
     class control_input_system{
-        // for player input and control, maps the control input to a function
+        // for player input and control, maps the control input to a function.
+        // * owns both input components - controls_component (keyboard) and
+        // * mouse_input_component (buttons) - rather than splitting a mouse
+        // * system out, because they are two modalities of one job: turn device
+        // * state into world changes. it is also the only place that may call
+        // * raylib's input functions; the components hold bindings, not state.
+        // TODO update() runs two loops: the mouse pass syncs position from the
+        // TODO device for everything in mouse_input_manager_ (that is what makes
+        // TODO the cursor follow the pointer - see the note above
+        // TODO ecs_entities::build_cursor) then dispatches button bindings; the
+        // TODO keyboard pass dispatches key bindings. blocked on component_manager
+        // TODO gaining iteration and movement_system gaining move_to.
         public:
             
             ~control_input_system() = default;

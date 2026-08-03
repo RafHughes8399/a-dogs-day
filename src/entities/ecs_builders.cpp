@@ -12,7 +12,7 @@ void ecs_entities::build_player(size_t player_id, size_t cursor_id){
     component_helpers::register_controls_component(player_id,
          component_builders::build_controls_component(game_config::player_controls));
     // build the cursor,
-    // ?  do we need an attachment compnent, a has_a_component ?
+    // ?  do we need an attachment compnent, a has_a_component ? that way we can manage destruction properly
     build_cursor(cursor_id);
 }
 void ecs_entities::build_player_dog(size_t id){
@@ -44,11 +44,11 @@ void ecs_entities::build_waiter_dog(size_t id){
 // build text
 //  */
 
-// * the cursor is the case that settled two open questions - direction's home,
-// * and whether "different kinds of movement" wants a strategy object.
+// * the cursor is the case that settled where direction lives and how the
+// * different kinds of movement are told apart.
 // *
-// * 1. direction belongs in movement_component, not position_component.
-// *    it is one half of a velocity (dog::move_toward_current_waypoint is
+// * 1. direction belongs in movement_component, not position_component. it is
+// *    one half of a velocity (dog::move_toward_current_waypoint is
 // *    position + move_speed * direction * delta) and move_speed already lives
 // *    in movement. it is also derived state - determine_direction recomputes it
 // *    from position -> next waypoint every time the waypoint changes - so it
@@ -57,34 +57,32 @@ void ecs_entities::build_waiter_dog(size_t id){
 // *    (set_direction_index), and that becomes the movement system writing an
 // *    index into renderable_component, not a reason to keep it in position.
 // *
-// * 2. no movement strategy object. the variation is "what produces the
-// *    position delta", and in ECS that is expressed by which components an
-// *    entity has, not by a polymorphic member:
-// *      dog    = position + movement (speed, direction, path queue), written by
-// *               the pathing/npc system and integrated by movement_system
-// *      cursor = position + controls, written straight from the mouse by
+// * 2. no movement strategy object, and no marker component either. what makes
+// *    an entity mouse-positioned is simply holding a mouse_input_component:
+// *      dog    = position + movement (speed, direction, path queue), integrated
+// *               by movement_system from paths the npc system sets
+// *      cursor = position + mouse_input, position synced from the device by
 // *               control_input_system
-// *    the cursor is the proof - it has no speed, no facing, no interpolation
-// *    (see cursor::on_move_view_frame_event: position + mouse_delta), so it has
-// *    nothing to put in a shared movement abstraction. a strategy would also
-// *    need a unique_ptr member, which deletes the copy ctors every other
-// *    component here defaults, making this one manager move-only alone.
-// *    if a third mover ever appears (knockback, conveyor), split a
-// *    velocity_component out as the shared *output* and let each producer
-// *    system write to it - that is where the abstraction earns its keep.
+// *    a strategy would have put behaviour inside data and needed a unique_ptr
+// *    member, making this the one move-only component manager. a dedicated
+// *    cursor tag would have cost a whole manager plus five hand-maintained
+// *    entries in component.h to mark exactly one entity forever.
+// *    mouse_input_component avoids both: it carries real data (the button
+// *    bindings) and doubles as the mark, because "driven by the mouse" and
+// *    "positioned by the mouse" are the same fact.
 // *
-// * so the cursor takes no movement_component, and no direction. there is no
+// * so the cursor takes no movement_component and no direction. there is no
 // * "omnidirectional" direction to give it - not having the component IS the
 // * answer. (level_config::directions::all was an attempt at one: {1,1} is not a
 // * unit vector so it moves ~1.41x too fast, it has no matching sprite in the
 // * direction-indexed arrays, and position_to_node snaps it identically to
 // * right.)
 void ecs_entities::build_cursor(size_t id){
-    // TODO re-enable once position_component drops its direction_scalar_ param
-    // component_helpers::register_positional_component(id,
-    //     component_builders::build_positional_component(GetMousePosition()));
-    // TODO register_controls_component - cursor controls aren't defined yet
-    (void) id;
+    component_helpers::register_positional_component(id,
+        component_builders::build_positional_component(GetMousePosition()));
+    component_helpers::register_mouse_input_component(id,
+        component_builders::build_mouse_input_component(game_config::cursor_controls));
+    // TODO renderable - the cursor sprite, once cursor_builder's sprites move over
 }
 
 void ecs_entities::build_decoration(size_t id){

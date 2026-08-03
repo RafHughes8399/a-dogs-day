@@ -17,13 +17,19 @@ namespace type_config{
     using path = std::vector<Vector2>;
 }
 namespace game_config {
+    // * keyboard and mouse actions are separate enums, and `control`/`mouse_input`
+    // * are separate structs, so a keyboard binding cannot carry a mouse action
+    // * (or vice versa). While both lived in one enum, {KEY_F, mouse_press} was
+    // * a legal value that nothing would catch.
     enum control_action{
         key_press = 0,
-        key_hold = 1, 
-        mouse_press = 2, 
-        mouse_hold = 3,
-        mouse_relesed = 4,
-        mouse_up = 5
+        key_hold = 1
+    };
+    enum mouse_action{
+        mouse_press = 0,
+        mouse_hold = 1,
+        mouse_released = 2,
+        mouse_up = 3
     };
     enum control_input{
         dog_switch = KEY_F,
@@ -42,11 +48,22 @@ namespace game_config {
         int key_;
         int action_;
     };
+    struct mouse_input{
+        int button_;
+        int action_;
+    };
     inline std::vector<control> player_controls = {
         {KEY_LEFT, key_hold},
         {KEY_RIGHT, key_hold},
         {KEY_DOWN, key_hold},
         {KEY_UP, key_hold}
+    };
+    // * the cursor's bindings. Note there is no entry for pointer movement -
+    // * that is not a binding, it is ambient device state, and holding a
+    // * mouse_input_component at all is what makes an entity mouse-positioned.
+    inline std::vector<mouse_input> cursor_controls = {
+        {MOUSE_BUTTON_LEFT, mouse_press},
+        {MOUSE_BUTTON_RIGHT, mouse_press}
     };
     inline const int window_width = 1920;
     inline const int window_height = 1080;

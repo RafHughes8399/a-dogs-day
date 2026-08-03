@@ -44,7 +44,7 @@ namespace testing{
     size_t ecs_test_game::create_renderable(size_t layer, Vector2 position){
         return lifespan_.create([position](size_t id){
             component_helpers::register_positional_component(id,
-                component_builders::build_positional_component(position, Vector2{1.0f, 0.0f}));
+                component_builders::build_positional_component(position));
             component_helpers::register_renderable_component(id,
                 components::renderable_component());
         }, layer);
