@@ -22,8 +22,8 @@ components::collision_component component_builders::build_collision_component(){
 components::interaction_component component_builders::build_interaction_component(){
     return components::interaction_component();
 }
-components::controls_component component_builders::build_controls_component(std::vector<game_config::control>& controls){
-    return components::controls_component(controls);
+components::key_input_component component_builders::build_key_input_component(std::vector<game_config::control>& controls){
+    return components::key_input_component(controls);
 }
 components::mouse_input_component component_builders::build_mouse_input_component(std::vector<game_config::mouse_input>& inputs){
     return components::mouse_input_component(inputs);

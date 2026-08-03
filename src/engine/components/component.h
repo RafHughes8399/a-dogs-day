@@ -149,16 +149,16 @@ public:
 
 // * player control input component - keyboard bindings only. Mouse input is
 // * mouse_input_component; see the note there for why they are not one type.
-class controls_component{
+class key_input_component{
     public:
-        ~controls_component() = default;
-        controls_component(std::vector<game_config::control> controls)
+        ~key_input_component() = default;
+        key_input_component(std::vector<game_config::control> controls)
         :controls_(controls){}
-        controls_component(const controls_component& other) = default;
-        controls_component(controls_component&& other) = default;
+        key_input_component(const key_input_component& other) = default;
+        key_input_component(key_input_component&& other) = default;
 
-        controls_component& operator=(const controls_component& other) = default;
-        controls_component& operator=(controls_component&& other) = default;
+        key_input_component& operator=(const key_input_component& other) = default;
+        key_input_component& operator=(key_input_component&& other) = default;
 
         std::vector<game_config::control>& get_controls();
     private:
@@ -166,7 +166,7 @@ class controls_component{
 };
 
 // * mouse input component - the button bindings for a mouse-driven entity.
-// * Kept apart from controls_component for two reasons:
+// * Kept apart from key_input_component for two reasons:
 // *  1. a key binding and a button binding are different shapes. With one enum
 // *     and one struct, {KEY_F, mouse_press} was expressible and nothing caught
 // *     it; with two, it will not compile.
@@ -296,7 +296,7 @@ extern component_manager<components::movement_component> movment_manager_;
 extern component_manager<components::renderable_component> renderable_manager_;
 extern component_manager<components::collision_component> collision_manager_;
 extern component_manager<components::interaction_component> interaction_manager_;
-extern component_manager<components::controls_component> control_manager_;
+extern component_manager<components::key_input_component> control_manager_;
 extern component_manager<components::mouse_input_component> mouse_input_manager_;
 extern component_manager<components::state_machine_component> state_machine_manager_;
 extern component_manager<components::food_component> food_manager_;
@@ -314,7 +314,7 @@ namespace component_builders{
     components::collision_component build_collision_component();
     
     components::interaction_component build_interaction_component();
-    components::controls_component build_controls_component(std::vector<game_config::control>& controls);
+    components::key_input_component build_key_input_component(std::vector<game_config::control>& controls);
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::mouse_input>& inputs);
     components::state_machine_component::state_component build_state();
     components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
@@ -338,7 +338,7 @@ namespace component_helpers{
     inline void register_interaction_component(size_t entity_id, components::interaction_component component){
         component_managers::interaction_manager_.register_component(entity_id, std::move(component));
     }
-    inline void register_controls_component(size_t entity_id, components::controls_component component){
+    inline void register_key_input_component(size_t entity_id, components::key_input_component component){
         component_managers::control_manager_.register_component(entity_id, std::move(component));
     }
     inline void register_mouse_input_component(size_t entity_id, components::mouse_input_component component){
@@ -366,7 +366,7 @@ namespace component_helpers{
     inline void unregister_interaction_component(size_t entity_id){
         component_managers::interaction_manager_.unregister_component(entity_id);
     }
-    inline void unregister_controls_component(size_t entity_id){
+    inline void unregister_key_input_component(size_t entity_id){
         component_managers::control_manager_.unregister_component(entity_id);
     }
     inline void unregister_mouse_input_component(size_t entity_id){
@@ -387,7 +387,7 @@ namespace component_helpers{
         unregister_renderable_component(entity_id);
         unregister_collision_component(entity_id);
         unregister_interaction_component(entity_id);
-        unregister_controls_component(entity_id);
+        unregister_key_input_component(entity_id);
         unregister_mouse_input_component(entity_id);
         unregister_state_machine_component(entity_id);
         unregister_food_component(entity_id);

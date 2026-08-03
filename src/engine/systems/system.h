@@ -142,7 +142,7 @@ namespace systems{
     };
     class control_input_system{
         // for player input and control, maps the control input to a function.
-        // * owns both input components - controls_component (keyboard) and
+        // * owns both input components - key_input_component (keyboard) and
         // * mouse_input_component (buttons) - rather than splitting a mouse
         // * system out, because they are two modalities of one job: turn device
         // * state into world changes. it is also the only place that may call

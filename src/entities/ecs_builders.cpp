@@ -9,8 +9,8 @@
 void ecs_entities::build_player(size_t player_id, size_t cursor_id){
     // build control components, start with the array keys, 
     // TODO  literals for now, witll deffine in enum when refactor is complete
-    component_helpers::register_controls_component(player_id,
-         component_builders::build_controls_component(game_config::player_controls));
+    component_helpers::register_key_input_component(player_id,
+         component_builders::build_key_input_component(game_config::player_controls));
     // build the cursor,
     // ?  do we need an attachment compnent, a has_a_component ? that way we can manage destruction properly
     build_cursor(cursor_id);

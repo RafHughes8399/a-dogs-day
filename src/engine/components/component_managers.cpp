@@ -17,7 +17,7 @@ component_manager<components::movement_component> movment_manager_;
 component_manager<components::renderable_component> renderable_manager_;
 component_manager<components::collision_component> collision_manager_;
 component_manager<components::interaction_component> interaction_manager_;
-component_manager<components::controls_component> control_manager_;
+component_manager<components::key_input_component> control_manager_;
 component_manager<components::mouse_input_component> mouse_input_manager_;
 component_manager<components::state_machine_component> state_machine_manager_;
 component_manager<components::food_component> food_manager_;
