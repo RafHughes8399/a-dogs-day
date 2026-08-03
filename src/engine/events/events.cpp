@@ -57,9 +57,9 @@ void events::event_dispatcher::process_events(float delta){
     
     // pop is a void remove
     // front is a non-void inspect
-    while(! event_queue_.empty()){
+    while(not event_queue_.empty()){
         auto&  event = event_queue_.front();
-        if(! event->is_handled()){
+        if(not event->is_handled()){
             execute_event(*event.get());
         }
         event_queue_.pop();

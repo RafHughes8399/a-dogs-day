@@ -19,8 +19,8 @@ int tree::quadtree::object_contained_by_child(raglib::bounding_box_2& node, Rect
     Vector2 object_min = Vector2{object.x, object.y};
     Vector2 object_max = Vector2{object.x + object.width, object.y + object.height};
     // first check if the object crosses the centre of any axis, if it does then no child will fit it
-    bool crosses_centre = (object_min.x < centre.x && centre.x < object_max.x) 
-    || (object_min.y < centre.y && centre.y < object_max.y);
+    bool crosses_centre = (object_min.x < centre.x and centre.x < object_max.x) 
+    or (object_min.y < centre.y and centre.y < object_max.y);
     
     if(crosses_centre) {return -1;}
 
@@ -87,7 +87,7 @@ void tree::quadtree::build_children(std::unique_ptr<node>& tree){
 void tree::quadtree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object){
 	auto & object_bounds = object->get_hitbox();
     // check if the node contains the object, if not then immediately return
-	if(! node_contains_object(tree->bounds_, object_bounds.get_box())){ 
+	if(not node_contains_object(tree->bounds_, object_bounds.get_box())){ 
         return; 
     }
     else{
@@ -115,7 +115,7 @@ void tree::quadtree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entitie
 }
 
 void tree::quadtree::erase(std::unique_ptr<node>& tree, size_t object_id){
-    if(! tree){
+    if(not tree){
         return;
     } 
     auto new_end = std::remove_if(tree->objects_.begin(), tree->objects_.end(),
@@ -140,7 +140,7 @@ void tree::quadtree::erase(std::unique_ptr<node>& tree, size_t object_id){
 }
 
 std::unique_ptr<entities::entity> tree::quadtree::extract(std::unique_ptr<node>& tree, size_t object_id){
-    if(!tree){return nullptr;}
+    if(not tree){return nullptr;}
     // find them remove
     auto entity = std::find_if(tree->objects_.begin(), tree->objects_.end(),
         [object_id](auto& obj) -> bool{
@@ -212,7 +212,7 @@ void tree::quadtree::notify_removals(const std::vector<entities::entity*>& remov
 }
 
 int tree::quadtree::height(std::unique_ptr<node>& tree) {
-    if (!tree) {
+    if (not tree) {
         return -1;
     }
     else {
@@ -230,7 +230,7 @@ int tree::quadtree::height(std::unique_ptr<node>& tree) {
 size_t tree::quadtree::size(std::unique_ptr<node>& tree) {
     auto empty = is_empty(tree);
     if (empty) { return 0; }
-    if(! tree){
+    if(not tree){
         return 0;
     }
     else {
@@ -260,9 +260,9 @@ bool tree::quadtree::is_empty(std::unique_ptr<node>& tree) {
     // check the current list 
     auto empty = tree->objects_.size() == 0 ? true : false;
     // check the children
-    if (! empty) { return false; }
+    if (not empty) { return false; }
     for (auto& child : tree->children_) {
-        if (! is_empty(child)) {
+        if (not is_empty(child)) {
             return false;
         }
     }
@@ -273,13 +273,13 @@ bool tree::quadtree::is_root(std::unique_ptr<node>& tree){
 }
 bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, int id){
     // starts with the whole if node case
-    if(! tree) {
+    if(not tree) {
         return false;
     }
     // then check the objects
     for(auto & obj : tree->objects_){
         // it is checking collision with itself, make sure that is not the case
-        if(id != obj->get_id() && bounds.check_collision(obj->get_hitbox())){
+        if(id != obj->get_id() and bounds.check_collision(obj->get_hitbox())){
             return true;
         }
     }
@@ -299,7 +299,7 @@ bool tree::quadtree::is_leaf(std::unique_ptr<node>& tree) {
     return tree->children_.size() == 0 ? true : false;
 }
 entities::entity* tree::quadtree::get_entity(std::unique_ptr<node>& tree, size_t id){
-    if(! tree) {return nullptr;}
+    if(not tree) {return nullptr;}
     for(auto & entity : tree->objects_){
         if(static_cast<size_t>(entity->get_id()) == id){
             return entity.get();
@@ -321,7 +321,7 @@ void tree::quadtree::perform_interactions(std::unique_ptr<node>& tree, entities:
     // in the correct node, checck collisions using hitboxes 
 
     // perform any identified collisions
-    if(! tree) {
+    if(not tree) {
         return;
     }
     auto hitbox_rec = entity->get_hitbox().get_box();
@@ -330,7 +330,7 @@ void tree::quadtree::perform_interactions(std::unique_ptr<node>& tree, entities:
 
         // check the objects
         for(auto & other_entity : tree->objects_){
-            if(entity->check_collision(other_entity->get_hitbox()) && entity != other_entity.get()){
+            if(entity->check_collision(other_entity->get_hitbox()) and entity != other_entity.get()){
                 entity->interact(*other_entity);
             }
         }
@@ -351,8 +351,8 @@ void tree::quadtree::perform_interactions(std::unique_ptr<node>& tree, entities:
 // i need to remove it from the parent's children list
 void tree::quadtree::prune_leaves(std::unique_ptr<node>& tree, double delta) {
     // you're thinking about it wrong i think 
-        if (is_leaf(tree) && ! is_root(tree) 
-            && is_empty(tree)) {
+        if (is_leaf(tree) and not is_root(tree) 
+            and is_empty(tree)) {
             tree->life_ += short(delta);
             if (tree->life_ >= NODE_LIFETIME) {
                 tree.reset(); // but not removed from the 
@@ -378,7 +378,7 @@ void tree::quadtree::prune_leaves(std::unique_ptr<node>& tree, double delta) {
 
 std::unique_ptr<tree::quadtree::node> tree::quadtree::copy_tree(node* tree, std::unique_ptr<node>* parent){
     (void) parent;
-    if(! tree){
+    if(not tree){
         return nullptr;
     }
     auto copy = std::make_unique<node>();
@@ -399,7 +399,7 @@ std::unique_ptr<tree::quadtree::node> tree::quadtree::copy_tree(node* tree, std:
 }
 void tree::quadtree::traverse_tree(std::unique_ptr<node>& tree){
 		// print the box of the node 
-		if(!tree){
+		if(not tree){
 			return;
 		}
 		for(auto& object : tree->objects_){
@@ -414,7 +414,7 @@ void tree::quadtree::traverse_tree(std::unique_ptr<node>& tree){
 
 std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta, int frame,
                                         std::vector<std::unique_ptr<entities::entity>>& graveyard){
-    if(! tree) {return {};}
+    if(not tree) {return {};}
     std::vector<int> to_remove = {};
     for(auto it = tree->objects_.begin(); it != tree->objects_.end();){
         int update_result = (*it)->update(delta, frame);
@@ -432,7 +432,7 @@ std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta
         // during a leg transition and going stale in the wrong quadrant.
         if(update_result & (entities::status_codes::moved
                           | entities::status_codes::completed_path)){
-            if(! node_contains_object(tree->bounds_, (*it)->get_hitbox().get_box())){
+            if(not node_contains_object(tree->bounds_, (*it)->get_hitbox().get_box())){
                 auto entity = std::move(*it);
                 it = tree->objects_.erase(it);
                 insert(root_, std::move(entity));
@@ -448,7 +448,7 @@ std::vector<int> tree::quadtree::update(std::unique_ptr<node>& tree, float delta
     return to_remove;
 }
 void tree::quadtree::identify_collisions(std::unique_ptr<node>& tree , std::vector<entities::entity*> parent_entities){
-    if(! tree) {return;}
+    if(not tree) {return;}
     // check for collisions with objects from parent nodes
     // basic debugging for tests
     for(auto& parent_entity : parent_entities){

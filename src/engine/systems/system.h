@@ -25,6 +25,8 @@ namespace systems{
 
             movement_system& operator=(const movement_system& other) = delete;
             movement_system& operator=(movement_system&& other) = delete;
+
+            void update(float delta);
     };
     class rendering_system{
         // rendering layers
@@ -81,8 +83,7 @@ namespace systems{
             spatial_system& operator=(const spatial_system& other) = delete;
             spatial_system& operator=(spatial_system&& other) = delete;
 
-
-
+            void update(float delta);
     };
     class entity_lifespan_system{
         // responsible for managing entity creation and destruction
@@ -108,6 +109,8 @@ namespace systems{
             }
 
             void remove(size_t entity_id);
+
+            void update(float delta);
         private:
             size_t next_id();
 
@@ -124,6 +127,8 @@ namespace systems{
 
             collision_system& operator=(const collision_system& other) = delete;
             collision_system& operator=(collision_system&& other) = delete;
+
+            void update(float delta);
     };
     class interaction_system{
         // for behavioural interactions
@@ -135,6 +140,8 @@ namespace systems{
 
             interaction_system& operator=(const interaction_system& other) = delete;
             interaction_system& operator=(interaction_system&& other) = delete;
+
+            void update(float delta);
     };
     class control_input_system{
         // for player input and control, maps the control input to a function
@@ -148,6 +155,7 @@ namespace systems{
             control_input_system& operator=(const control_input_system& other) = delete;
             control_input_system& operator=(control_input_system&& other) = delete;
 
+            void update(float delta);
     };
     class npc_system{
         // uses the expediter and the maitre d to orchestrate
@@ -161,6 +169,8 @@ namespace systems{
 
             npc_system& operator=(const npc_system& other) = delete;
             npc_system& operator=(npc_system&& other) = delete;
+
+            void update(float delta);
     };
 
     // hold a refernece to the glboal managers that they need to process things

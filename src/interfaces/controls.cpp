@@ -81,7 +81,7 @@ void player::controls::check(float delta){
     }
 
     if(current_scheme_ == control_states::regular){
-        if(!IsKeyDown(controls_config::key_hold_actions::edit_mode)){
+        if(not IsKeyDown(controls_config::key_hold_actions::edit_mode)){
             player_->cancel_incomplete_edit_hold();
         }
     }

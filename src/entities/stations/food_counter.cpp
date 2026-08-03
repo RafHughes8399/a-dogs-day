@@ -12,7 +12,7 @@ bool entities::food_counter::store(std::unique_ptr<food> item){
 
 std::unique_ptr<entities::food> entities::food_counter::take(){
     // precondition: the counter is not empty (callers guard with !is_empty()).
-    assert(!stored_food_.empty() && "food_counter::take() called on an empty counter");
+    assert(not stored_food_.empty() and "food_counter::take() called on an empty counter");
     auto item = std::move(stored_food_.back());
     stored_food_.pop_back();
     return item;
@@ -60,7 +60,7 @@ bool entities::food_counter::has_available_food() const{
 
 void entities::food_counter::render(Vector2 draw_position, int frame){
     entity::render(draw_position, frame);
-    if(! stored_food_.empty()){
+    if(not stored_food_.empty()){
         Vector2 food_position = Vector2{
             draw_position.x + entity_config::food_draw_offset.x,
             draw_position.y + entity_config::food_draw_offset.y

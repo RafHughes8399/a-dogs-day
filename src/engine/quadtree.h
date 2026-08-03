@@ -39,7 +39,7 @@ namespace tree{
             short life_; // how long a node has lived without any objects
         
             friend bool operator==(const node& a, const node& b) {
-                return Vector2Equals(a.bounds_.min, b.bounds_.min) && 
+                return Vector2Equals(a.bounds_.min, b.bounds_.min) and 
                 Vector2Equals(a.bounds_.max, b.bounds_.max);
             }
         };

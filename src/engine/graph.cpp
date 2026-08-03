@@ -3,7 +3,7 @@
 // ----------------------------------------- level graph ----------------------------------------- //
 bool level::level_graph::can_place_decoration(const queries::can_place_decoration& query){
     auto query_rectangle = query.get_decoration_rectangle();
-    return  ! check_for_decoration(query_rectangle, query.get_decoration_id()); // is there no decoration
+    return  not check_for_decoration(query_rectangle, query.get_decoration_id()); // is there no decoration
 }
 
 std::vector<Vector2> level::level_graph::get_path(const queries::path_query& query){
@@ -33,7 +33,7 @@ bool level::level_graph::is_node_occupied(int node_id, int decoration_id){
     bool self = node_decoration == decoration_id;
 
     // is occupied if not empty and not the self 
-    return ! empty && ! self;
+    return not empty and not self;
 }
 
 level::level_graph::node* level::level_graph::id_to_node(int id){
@@ -50,7 +50,7 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
     
     auto nodes = std::queue<int>();
     nodes.push(start_id);
-    while(! nodes.empty() && ! found){
+    while(not nodes.empty() and not found){
         auto current = nodes.front();
         nodes.pop();
         if(current == end_id){
@@ -64,7 +64,7 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
                 (void) closer;
                 auto empty = is_node_empty(edge.destination_->id_);
                 // then explore if not visited and if empty
-                if(visited[static_cast<size_t>(edge.destination_->id_)] == -1 && empty){
+                if(visited[static_cast<size_t>(edge.destination_->id_)] == -1 and empty){
                     visited[static_cast<size_t>(edge.destination_->id_)] = current;
                     nodes.push(edge.destination_->id_);
                 }
@@ -74,7 +74,7 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
     return visited;
 }
 std::vector<Vector2> level::level_graph::make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id){
-    if(visited[end_id] == -1 && end_id != start_id){
+    if(visited[end_id] == -1 and end_id != start_id){
         return {};
     }
 
@@ -105,13 +105,13 @@ std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end, V
 } 
 
 int level::level_graph::categorise_node(int row, int column){
-    bool top_row = row == 0; // || row == max_row;
+    bool top_row = row == 0; // or row == max_row;
     bool bottom_row = row == num_rows_ - 1;
     bool first_column = column == 0;
     bool last_column = column == row_length_ - 1;
 
-    bool corner = ((top_row || bottom_row) && first_column) || ((top_row || bottom_row) && last_column);
-    bool perimeter = (top_row || bottom_row) || (first_column || last_column);
+    bool corner = ((top_row or bottom_row) and first_column) or ((top_row or bottom_row) and last_column);
+    bool perimeter = (top_row or bottom_row) or (first_column or last_column);
     if(corner){return nodes::corner;}
     else if(perimeter) {return nodes::perimeter;}
     else {return nodes::interior;}
@@ -159,7 +159,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
     int destination_index = source_index;
     auto hypotenuse_weight = std::hypotf(level_config::edge_weight, level_config::edge_weight);
 
-    if(top_row && left_column){ // top left corner
+    if(top_row and left_column){ // top left corner
         destination_index = source_index + row_length_;
         auto y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_plus);
@@ -172,7 +172,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
         (void) x_plus_y_plus;
         // edges.push_back(x_plus_y_plus);
     } 
-    else if(top_row && ! left_column){ // top right corner
+    else if(top_row and not left_column){ // top right corner
         destination_index = source_index + row_length_;
         auto y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_plus);
@@ -186,7 +186,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
         (void) x_minus_y_plus;
         // edges.push_back(x_minus_y_plus);
     }
-    else if(! top_row && left_column){ // bottom left corner
+    else if(not top_row and left_column){ // bottom left corner
         destination_index = source_index - row_length_;
         auto y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_minus);
@@ -200,7 +200,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
         (void) x_plus_y_minus;
         // edges.push_back(x_plus_y_minus);  
     } 
-    else if(! top_row && ! left_column){
+    else if(not top_row and not left_column){
         destination_index = source_index - row_length_;
         auto y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, level_config::edge_weight};
         edges.push_back(y_minus);

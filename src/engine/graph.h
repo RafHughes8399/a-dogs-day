@@ -44,7 +44,7 @@ namespace level{
                 float weight_;
                 int decoration_ = level_config::empty_node; // -1 means empty, there is no decoration, any other number refers to the id of the decoration stored within
                 bool operator==(const edge& other){
-                    return destination_ == other.destination_ && std::fabs(weight_ - other.weight_) <= 0.0001f;
+                    return destination_ == other.destination_ and std::fabs(weight_ - other.weight_) <= 0.0001f;
                 }
             };
             // builder

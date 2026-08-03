@@ -69,15 +69,14 @@ void game::ecs_game::init(){
 void game::ecs_game::update(float delta){
     events::global_dispatcher_.process_events(delta);
 
-    // TODO tick each system as it gains an update - order is the member
-    // declaration order in game.h
-    (void) lifespan_;
-    (void) input_;
-    (void) npc_;
-    (void) movement_;
-    (void) spatial_;
-    (void) collision_;
-    (void) interaction_;
+    // tick order is the member declaration order in game.h
+    lifespan_.update(delta);
+    input_.update(delta);
+    npc_.update(delta);
+    movement_.update(delta);
+    spatial_.update(delta);
+    collision_.update(delta);
+    interaction_.update(delta);
 
     frame_count_++;
     if(frame_count_ == game_config::twenty_seconds){

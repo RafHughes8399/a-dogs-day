@@ -63,8 +63,8 @@ namespace render_layer{
                 for(auto entity_id : entities_){
                     auto* renderable = component_managers::renderable_manager_.get_component(entity_id);
                     auto* position = component_managers::positional_manager_.get_component(entity_id);
-                    if(renderable == nullptr || position == nullptr){ continue; }
-                    if(!p(entity_id)){ continue; }
+                    if(renderable == nullptr or position == nullptr){ continue; }
+                    if(not p(entity_id)){ continue; }
 
                     auto draw_position = Vector2Subtract(position->get_position(), frame_position);
                     // body, outlines and cosmetics all draw at the same position

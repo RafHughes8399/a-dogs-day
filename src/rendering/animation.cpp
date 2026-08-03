@@ -59,7 +59,7 @@ void animation::animation::next_frame(bool wrap){
 
 
 void animation::animation::advance(int frame){
-    if(is_playing_ && play_speed_ > 0 && frame % play_speed_ == 0){
+    if(is_playing_ and play_speed_ > 0 and frame % play_speed_ == 0){
         next_frame();
     }
 }

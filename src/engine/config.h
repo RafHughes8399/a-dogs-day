@@ -92,18 +92,30 @@ namespace level_config{
         size = 6
     };
 
+    // these indices are shared with the direction-ordered sprite arrays
+    // (dog::set_direction_index indexes body_/head_ with a directions value), so
+    // an entry here without a matching sprite is a trap for whoever adds an
+    // animation next.
+    // TODO drop 'all' - it was an attempt at an omnidirectional cursor
+    // TODO direction, but {1,1} is not a unit vector so it moves ~1.41x too fast
+    // TODO when multiplied by move_speed, it has no sprite, and level_graph::
+    // TODO position_to_node snaps it identically to 'right'. an entity with no
+    // TODO facing wants no direction at all - i.e. no movement_component. see
+    // TODO the note above ecs_entities::build_cursor.
     enum directions{
         left = 0,
         right = 1,
         up = 2,
         down = 3,
-        directions_size = 4
+        all = 4,
+        directions_size = 5
     };
     inline const Vector2 direction_scalars[directions::directions_size] = {
         Vector2{-1, 0}, // left  (index 0)
         Vector2{1, 0},  // right (index 1)
         Vector2{0, -1}, // up    (index 2)
-        Vector2{0, 1}   // down  (index 3)
+        Vector2{0, 1} ,  // down  (index 3)
+        Vector2{1,1}    // all   (index 4) - see TODO above, no sprite for this
     };
 
 }

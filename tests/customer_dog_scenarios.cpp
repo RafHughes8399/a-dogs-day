@@ -25,7 +25,7 @@ namespace{
     class state_trace{
         public:
             void sample(const std::string& name){
-                if(names_.empty() || names_.back() != name){
+                if(names_.empty() or names_.back() != name){
                     names_.push_back(name);
                 }
             }
@@ -194,7 +194,7 @@ SCENARIO("a customer is only seated when a table is free", "[customer][maitre_d]
 
             const bool seated = game.tick_until([&]{
                 return game.find_entity(customer_id) != nullptr
-                    && game.get_customer_dog(customer_id).get_state_name() == "seated";
+                    and game.get_customer_dog(customer_id).get_state_name() == "seated";
             }, 3000);
 
             THEN("it is seated at the remaining table and leaves the queue"){
@@ -222,8 +222,8 @@ SCENARIO("a customer is only seated when a table is free", "[customer][maitre_d]
             const bool both_seated = game.tick_until([&]{
                 auto* first = game.find_table(first_table_id);
                 auto* second = game.find_table(second_table_id);
-                return first != nullptr && second != nullptr
-                    && first->is_interacting() && second->is_interacting();
+                return first != nullptr and second != nullptr
+                    and first->is_interacting() and second->is_interacting();
             }, 4000);
 
             THEN("both are seated, one per table, and the queue drains"){
@@ -257,7 +257,7 @@ SCENARIO("a customer re-routes when its table moves mid-journey",
 
         const bool walking = game.tick_until([&]{
             return game.find_entity(customer_id) != nullptr
-                && game.get_customer_dog(customer_id).get_state_name() == "walking_to_table";
+                and game.get_customer_dog(customer_id).get_state_name() == "walking_to_table";
         }, 3000);
         REQUIRE(walking);
 
@@ -269,7 +269,7 @@ SCENARIO("a customer re-routes when its table moves mid-journey",
 
             const bool seated = game.tick_until([&]{
                 return game.find_entity(customer_id) != nullptr
-                    && game.get_customer_dog(customer_id).get_state_name() == "seated";
+                    and game.get_customer_dog(customer_id).get_state_name() == "seated";
             }, 3000);
 
             THEN("it arrives at the table's new position"){
@@ -301,7 +301,7 @@ SCENARIO("a customer gives up when its table is removed mid-journey",
 
         const bool walking = game.tick_until([&]{
             return game.find_entity(customer_id) != nullptr
-                && game.get_customer_dog(customer_id).get_state_name() == "walking_to_table";
+                and game.get_customer_dog(customer_id).get_state_name() == "walking_to_table";
         }, 3000);
         REQUIRE(walking);
 
@@ -313,7 +313,7 @@ SCENARIO("a customer gives up when its table is removed mid-journey",
                 const bool left = game.tick_until([&]{
                     auto* live = game.find_entity(customer_id);
                     return live == nullptr
-                        || game.get_customer_dog(customer_id).get_state_name() == "leaving";
+                        or game.get_customer_dog(customer_id).get_state_name() == "leaving";
                 }, 3000);
                 REQUIRE(left);
             }

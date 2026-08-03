@@ -58,7 +58,7 @@ immediate todo:
 -> build up the systems
 -> integrate into the game
 
--> built the p[layer and the cursor
+-> built the player and the cursor
 -> setting up the rendering system so it can process rendering components-> need to setup the control system to 
 interpret and actuall perform controls
 _. setting up the lifecycle sysmte to manage entity inseration and remoaval, and emit t osother systems, adn other 
@@ -68,3 +68,38 @@ systems react with on_entity_add
 -> input component to check mouse delta ? 
 -> maybe an update component ? 
 -> then finish arrow key input to move around the screen
+
+// TODO 
+-> direction should exist in movmeent 
+-> movement should have a movement strategy, either path based, or otherwise (cursor uses getmouse delta), can easily define those function
+-> because direction is used to select the sprite, so it shuld be a thing that movemnet and renderable use to discuss amongst each other
+
+
+curor outline,
+-> define mouse moving as a control component
+-> the control section will check for mouse movement, and then update the position component, which will then trigger the event that the spatial 
+
+-> control system.update(
+    check control components{
+        for each control componet{
+            swtich action
+                case mouse move:
+                    If(getmousedelta != 0) {
+                        // call postion_manager.update_position(component id, mouseposition +  getMouseDelta)
+                    }
+
+                 
+        }
+    }
+)
+-> position_manager.update_position(id, new position){
+   component =  get position compoent (id)
+    component.position = new position
+    create an dexecute moved_entity event
+}
+
+-> spatial system
+    on_moved_entity{
+        iterate through quadtree, find entity, if still in the bounds then dont move
+        otherwise remove and reinsert
+    }

@@ -56,7 +56,7 @@ void expediter::expediter::process_serving_jobs() {
     auto *waiter = find_waiter(job.waiter_id);
     auto *counter = find_counter(job.counter_id);
     auto *table = find_table(static_cast<int>(job.table_id));
-    if (waiter != nullptr && counter != nullptr && table != nullptr) {
+    if (waiter != nullptr and counter != nullptr and table != nullptr) {
       continue; // still healthy
     }
     if (waiter != nullptr) {
@@ -74,7 +74,7 @@ void expediter::expediter::process_serving_jobs() {
   serving_jobs_.erase(
       std::remove_if(serving_jobs_.begin(), serving_jobs_.end(),
                      [this](const serving_job &j) -> bool {
-                       return j.status == serving_job_status::fulfilled ||
+                       return j.status == serving_job_status::fulfilled or
                               find_table(static_cast<int>(j.table_id)) ==
                                   nullptr;
                      }),
@@ -87,13 +87,13 @@ void expediter::expediter::process_serving_jobs() {
     if (job.status != serving_job_status::created) {
       continue;
     }
-    if (!are_waiters_available() || !are_counters_available()) {
+    if (not are_waiters_available() or not are_counters_available()) {
       break;
     }
     auto *waiter = assign_waiter_to_serving_job(job);
     auto *counter = pick_food_counter(job);
     auto *table = find_table(static_cast<int>(job.table_id));
-    if (waiter == nullptr || counter == nullptr || table == nullptr) {
+    if (waiter == nullptr or counter == nullptr or table == nullptr) {
       break;
     }
     counter->reserve(); // this item is promised to this order until collected
@@ -110,7 +110,7 @@ void expediter::expediter::process_clearing_jobs() {
   // left stuck in the clearing state forever with no job left to call
   // set_idle() on it.
   for (auto &job : clearing_jobs_) {
-    if (job.waiter_id == empty_id ||
+    if (job.waiter_id == empty_id or
         find_table(static_cast<int>(job.table_id)) != nullptr) {
       continue;
     }
@@ -137,7 +137,7 @@ void expediter::expediter::process_clearing_jobs() {
     if (job.waiter_id != empty_id) {
       continue; // already assigned/in progress
     }
-    if (!are_waiters_available() || !are_dishwashers_available()) {
+    if (not are_waiters_available() or not are_dishwashers_available()) {
       break;
     }
     // Dishwasher first: assign_waiter_to_clearing_job writes job.waiter_id,
@@ -173,7 +173,7 @@ bool expediter::expediter::are_counters_available() const {
 bool expediter::expediter::are_dishwashers_available() const {
   // No capacity model yet - dish_capacity_/num_plates_ on the station are
   // unused stubs, so any registered dishwasher will take a plate.
-  return !dishwashers_.empty();
+  return not dishwashers_.empty();
 }
 
 entities::waiter_dog *
@@ -238,7 +238,7 @@ void expediter::expediter::remove_waiter(size_t waiter_id) {
   // it resolves waiter_id to a failed lookup, so removal itself stays a
   // single map erase plus this one necessary read.
   auto *waiter = find_waiter(waiter_id);
-  if (waiter != nullptr && !waiter->is_carrying_food()) {
+  if (waiter != nullptr and not waiter->is_carrying_food()) {
     for (auto &job : serving_jobs_) {
       if (job.waiter_id == waiter_id) {
         auto *counter = find_counter(job.counter_id);
@@ -375,7 +375,7 @@ expediter::serving_job *
 expediter::expediter::find_serving_job_for_waiter(size_t waiter_id) {
   auto it = std::find_if(serving_jobs_.begin(), serving_jobs_.end(),
                          [waiter_id](const serving_job &j) -> bool {
-                           return j.status == serving_job_status::serving &&
+                           return j.status == serving_job_status::serving and
                                   j.waiter_id == waiter_id;
                          });
   return it == serving_jobs_.end() ? nullptr : &*it;
@@ -385,7 +385,7 @@ void expediter::expediter::abandon_serving_job(serving_job &job) {
   auto *waiter = find_waiter(job.waiter_id);
   // Exactly one of these applies: food already collected means the reservation
   // was consumed at pickup, food not collected means it is still outstanding.
-  if (waiter != nullptr && waiter->is_carrying_food()) {
+  if (waiter != nullptr and waiter->is_carrying_food()) {
     // TODO: return it to the counter once food-on-table is modelled.
     waiter->release_food();
   } else if (waiter != nullptr) {
@@ -407,7 +407,7 @@ void expediter::expediter::on_waiter_collected_food_event(
   }
   auto *waiter = find_waiter(job->waiter_id);
   auto *counter = find_counter(job->counter_id);
-  if (waiter == nullptr || counter == nullptr || counter->is_empty()) {
+  if (waiter == nullptr or counter == nullptr or counter->is_empty()) {
     return;
   }
   waiter->hold_food(counter->take());

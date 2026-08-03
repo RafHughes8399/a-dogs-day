@@ -28,7 +28,7 @@ namespace testing{
         // cache stays valid across scenarios. (Spec sketches per-scenario
         // Init/CloseWindow; we keep one process-global window instead to avoid
         // repeated GL init and stale cached texture handles - see ~test_game.)
-        if(!IsWindowReady()){
+        if(not IsWindowReady()){
             SetConfigFlags(FLAG_WINDOW_HIDDEN);
             InitWindow(1, 1, "dog-days tests");
         }

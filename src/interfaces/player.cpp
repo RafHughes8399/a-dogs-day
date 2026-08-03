@@ -79,7 +79,7 @@ void player::player::edit(float delta){
 }
 
 void player::player::cancel_incomplete_edit_hold(){
-    if(edit_meter_ > 0 && edit_meter_ < game_config::hold_duration){
+    if(edit_meter_ > 0 and edit_meter_ < game_config::hold_duration){
         reset_meter();
     }
 }

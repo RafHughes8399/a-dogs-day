@@ -22,7 +22,7 @@ namespace testing{
                  Rectangle{0.0f, 0.0f, level_config::screen_width, level_config::screen_height}){
         // one hidden window for the whole run, same as test_game - the builders
         // LoadTexture and the shared cache has to stay valid across scenarios
-        if(!IsWindowReady()){
+        if(not IsWindowReady()){
             SetConfigFlags(FLAG_WINDOW_HIDDEN);
             InitWindow(1, 1, "dog-days ecs tests");
         }

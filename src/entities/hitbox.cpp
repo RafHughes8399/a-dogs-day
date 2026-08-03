@@ -28,13 +28,13 @@ bool hitbox::hitbox::check_collision(const hitbox& other){
     if(CheckCollisionRecs(box_, other.box_)){
         bool this_empty = sub_boxes_.empty();
         bool other_empty = other.sub_boxes_.empty();
-        if(this_empty && other_empty){
+        if(this_empty and other_empty){
             return true;
         }
-        else if(this_empty && ! other_empty){
+        else if(this_empty and not other_empty){
             return check_collision_box_sub_boxes(box_, other.sub_boxes_);
         }
-        else if(! this_empty && other_empty){
+        else if(not this_empty and other_empty){
             return check_collision_box_sub_boxes(other.box_, sub_boxes_);
         }
         else{

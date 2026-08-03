@@ -22,7 +22,7 @@ namespace{
     class state_trace{
         public:
             void sample(const std::string& name){
-                if(names_.empty() || names_.back() != name){
+                if(names_.empty() or names_.back() != name){
                     names_.push_back(name);
                 }
             }
@@ -64,8 +64,8 @@ SCENARIO("a waiter runs the serving chain from counter to table", "[waiter][serv
             const bool completed = game.tick_until([&]{
                 trace.sample(game.get_waiter_dog(waiter_id).get_state_name());
                 return trace.size() > 1
-                    && game.get_waiter_dog(waiter_id).get_state_name() == "idle"
-                    && game.num_serving_jobs() == 0;
+                    and game.get_waiter_dog(waiter_id).get_state_name() == "idle"
+                    and game.num_serving_jobs() == 0;
             }, 6000);
 
             THEN("it walked both legs and finished the order"){
@@ -107,8 +107,8 @@ SCENARIO("a waiter runs the clearing chain from table to dishwasher", "[waiter][
             const bool completed = game.tick_until([&]{
                 trace.sample(game.get_waiter_dog(waiter_id).get_state_name());
                 return trace.size() > 1
-                    && game.get_waiter_dog(waiter_id).get_state_name() == "idle"
-                    && game.num_clearing_jobs() == 0;
+                    and game.get_waiter_dog(waiter_id).get_state_name() == "idle"
+                    and game.num_clearing_jobs() == 0;
             }, 6000);
 
             THEN("it walked both legs and closed the job"){
@@ -277,7 +277,7 @@ SCENARIO("a waiter still finishes when its dishwasher is removed mid-clear", "[w
             THEN("the waiter still returns to idle and the job is closed"){
                 const bool recovered = game.tick_until([&]{
                     return game.get_waiter_dog(waiter_id).get_state_name() == "idle"
-                        && game.num_clearing_jobs() == 0;
+                        and game.num_clearing_jobs() == 0;
                 }, 6000);
                 REQUIRE(recovered);
             }
@@ -353,7 +353,7 @@ SCENARIO("a waiter re-routes when its dishwasher moves mid-journey",
             THEN("the waiter ends its journey at the dishwasher's new position"){
                 const bool finished = game.tick_until([&]{
                     return game.get_waiter_dog(waiter_id).get_state_name() == "idle"
-                        && game.num_clearing_jobs() == 0;
+                        and game.num_clearing_jobs() == 0;
                 }, 6000);
                 REQUIRE(finished);
                 const float distance = Vector2Distance(

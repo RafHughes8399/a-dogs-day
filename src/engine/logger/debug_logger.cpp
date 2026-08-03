@@ -27,11 +27,11 @@ void debug::logger::active::render(logger& logger){
 void debug::logger::update(float delta){
     (void) delta;
     bool wants_toggle = IsKeyPressed(debug_logger_config::toggle_key)
-        && (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT));
+        and (IsKeyDown(KEY_LEFT_SHIFT) or IsKeyDown(KEY_RIGHT_SHIFT));
     if(wants_toggle){
         toggle();
     }
-    if(subscribed_ && IsKeyPressed(debug_logger_config::pause_key)){
+    if(subscribed_ and IsKeyPressed(debug_logger_config::pause_key)){
         toggle_pause();
     }
 }
@@ -52,7 +52,7 @@ void debug::logger::toggle(){
 }
 
 void debug::logger::toggle_pause(){
-    paused_ = ! paused_;
+    paused_ = not paused_;
 }
 
 void debug::logger::on_debug_log_event(const events::debug_log& event){
@@ -71,7 +71,7 @@ void debug::logger::subscribe(){
 }
 
 void debug::logger::unsubscribe(){
-    if(! subscribed_){
+    if(not subscribed_){
         return;
     }
     event_interface::unsubscribe<events::debug_log>(debug_log_handler_);

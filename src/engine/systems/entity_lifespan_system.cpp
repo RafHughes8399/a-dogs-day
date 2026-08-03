@@ -19,3 +19,8 @@ void systems::entity_lifespan_system::remove(size_t entity_id){
     component_helpers::unregister_all_components(entity_id);
     recycled_ids_.push(entity_id);
 }
+
+// TODO stub - the loop calls this every frame, nothing to do yet
+void systems::entity_lifespan_system::update(float delta){
+    (void) delta;
+}

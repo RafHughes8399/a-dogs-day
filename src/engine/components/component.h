@@ -18,10 +18,15 @@ namespace components {
 
 // * components carry no id of their own - the manager's map key IS the owning
 // * entity, so anything iterating components already has it.
+// * where a thing is, and nothing else. every system asks this - spatial,
+// * collision, rendering - including entities that never move, so it stays the
+// * cheapest possible component.
+// TODO direction_scalar_ moves to movement_component and this drops to a single
+// TODO Vector2 - see the note above ecs_entities::build_cursor for the why
 class position_component {
 public:
     ~position_component() = default;
-    // TODO set default value for direction scalar 
+    // TODO set default value for direction scalar
     position_component(Vector2 position, Vector2 direction_scalar)
         : position_(position), direction_scalar_(direction_scalar) {}
     position_component(const position_component& other) = default;
@@ -36,6 +41,21 @@ private:
     Vector2 position_;
     Vector2 direction_scalar_;
 };
+// * the two halves of a velocity plus the route it is following. direction
+// * belongs here rather than in position because it is only ever read as a
+// * multiplier on move_speed_ (position + move_speed * direction * delta) and
+// * because it is derived - recomputed from position -> next waypoint each time
+// * the waypoint changes. an entity with no movement_component has no direction,
+// * which is exactly right for tables, counters and the cursor.
+// * direction's one non-movement reader is sprite facing: the movement system
+// * writes the matching index into renderable_component rather than rendering
+// * reaching for a direction on position.
+// * no strategy member here - "how does this thing decide where to go" is
+// * answered by which components an entity has (movement + path vs controls),
+// * not by polymorphism inside one component. see the note above
+// * ecs_entities::build_cursor.
+// TODO add direction_scalar_ (and the facing index) once position_component
+// TODO gives it up
 class movement_component {
 
 public:

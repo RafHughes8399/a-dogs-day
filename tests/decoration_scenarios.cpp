@@ -72,7 +72,7 @@ SCENARIO("a station computes flanking interaction positions from its position",
             REQUIRE(interaction.left.y == position.y);
             REQUIRE(interaction.right.x == position.x + (2.0f * level_config::edge_weight));
             REQUIRE(interaction.right.y == position.y);
-            REQUIRE_FALSE((interaction.left.x == 0.0f && interaction.left.y == 0.0f));
+            REQUIRE_FALSE((interaction.left.x == 0.0f and interaction.left.y == 0.0f));
         }
     }
 }

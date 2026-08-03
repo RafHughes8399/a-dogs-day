@@ -37,7 +37,7 @@ void render_layer::layer::remove_entities(std::vector<int> entity_ids){
             
             }
         }
-        if(! removed){
+        if(not removed){
             ++it;
             }
     }

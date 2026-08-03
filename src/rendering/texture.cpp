@@ -14,7 +14,7 @@ bool textures::textures_map::check_texture(int texture_id){
     return loaded_textures_[texture_id] ? true : false;
 }
 Texture2D textures::textures_map::get_texture(int texture_id, const char * texture_path){
-    if(! check_texture(texture_id)){
+    if(not check_texture(texture_id)){
         load_texture(texture_id, LoadTexture(texture_path));
     }
 

@@ -40,12 +40,12 @@ namespace entities{
             // completed_path, so a queued next leg leaves current_path_ non-empty.
             bool has_arrived(int status) const {
                 return (status & status_codes::completed_path)
-                    && current_path_.empty() && move_paths_.empty();
+                    and current_path_.empty() and move_paths_.empty();
             }
             // Anything left to walk. A dog whose path_to failed reads false here
             // without needing a flag to remember the failure.
             bool has_path() const {
-                return ! current_path_.empty() || ! move_paths_.empty();
+                return not current_path_.empty() or not move_paths_.empty();
             }
             void render(Vector2 draw_position, int frame) override;
             virtual void set_path(const std::vector<Vector2>& path);
@@ -227,7 +227,7 @@ namespace entities{
             // answers "what happens now". Note that by the time a state sees
             // completed_path the dog has already started the next queued leg
             // (dog::update_path calls start_next_path before returning), so
-            // "the whole journey is over" is current_path_.empty() &&
+            // "the whole journey is over" is current_path_.empty() and
             // move_paths_.empty(), not completed_path on its own.
             virtual int update(customer_dog& dog, float delta, int frame, int status) = 0;
     };
