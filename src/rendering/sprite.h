@@ -7,6 +7,7 @@
 #define SPRITE_H
 
 #include "animation.h"
+#include <raylib.h>
 #include <vector>
 
 namespace sprite{
@@ -80,5 +81,9 @@ namespace sprite{
 
     // perhaps a sprite builder could be of use
     // sprite_builder::build_background();
+}
+namespace sprite_builders{
+    sprite::sprite build_sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations);
+    sprite::sprite build_cursor_sprite();
 }
 #endif

@@ -20,7 +20,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_gargoyle(Vecto
         entity_config::gargoyle_decoration_attributes[entity_config::attributes::animations]
     );
 
-    auto hitbox = hitbox::h_builder_.build_gargoyle_hitbox(position);
+    auto hitbox = hitbox_builders::build_gargoyle_hitbox(position);
 
     std::vector<sprite::sprite> sprites = {gargoyle_void, gargoyle_sick_of_it};
     std::vector<hitbox::hitbox> hitboxes = {hitbox, hitbox};
@@ -39,7 +39,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_test_decoratio
         entity_config::test_decoration_attributes[entity_config::attributes::frames],
         entity_config::test_decoration_attributes[entity_config::attributes::animations]
     );
-    auto hitbox = hitbox::h_builder_.build_test_decoration_hitbox(position);
+    auto hitbox = hitbox_builders::build_test_decoration_hitbox(position);
     std::vector<sprite::sprite> sprites = {sprite};
     std::vector<hitbox::hitbox> hitboxes = {hitbox};
     auto body = body::body(hitboxes, sprites);

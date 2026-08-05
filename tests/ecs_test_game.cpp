@@ -56,6 +56,12 @@ namespace testing{
         }, level_config::draw_layers::hud);
     }
 
+    size_t ecs_test_game::create_cursor(size_t layer){
+        return lifespan_.create([](size_t id){
+            ecs_entities::build_cursor(id);
+        }, layer);
+    }
+
     void ecs_test_game::remove(size_t entity_id){
         lifespan_.remove(entity_id);
     }
@@ -86,6 +92,18 @@ namespace testing{
         return component_managers::control_manager_.get_component(entity_id) != nullptr;
     }
 
+    bool ecs_test_game::has_collision(size_t entity_id){
+        return component_managers::collision_manager_.get_component(entity_id) != nullptr;
+    }
+
+    bool ecs_test_game::has_mouse_input(size_t entity_id){
+        return component_managers::mouse_input_manager_.get_component(entity_id) != nullptr;
+    }
+
+    bool ecs_test_game::has_movement(size_t entity_id){
+        return component_managers::movment_manager_.get_component(entity_id) != nullptr;
+    }
+
     size_t ecs_test_game::total_components(){
         return component_managers::positional_manager_.size()
              + component_managers::movment_manager_.size()
@@ -93,6 +111,7 @@ namespace testing{
              + component_managers::collision_manager_.size()
              + component_managers::interaction_manager_.size()
              + component_managers::control_manager_.size()
+             + component_managers::mouse_input_manager_.size()
              + component_managers::state_machine_manager_.size()
              + component_managers::food_manager_.size();
     }

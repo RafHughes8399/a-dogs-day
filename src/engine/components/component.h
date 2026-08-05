@@ -11,9 +11,11 @@
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
+#include "hitbox.h"
 #include "raylib.h"
 #include "raymath.h"
 #include "sprite.h"
+#include "hitbox.h"
 namespace components {
 
 // * components carry no id of their own - the manager's map key IS the owning
@@ -118,18 +120,43 @@ private:
   std::vector<sprite_component> sprites_;
 
 };
-// TODO at a later point, we aren't up to collision and interaction yet even
-// currently
+// * shaped like renderable_component. hitbox slot k and sprite slot k are the
+// * same facing, so set_index on either alone desyncs them - use
+// * component_helpers::set_facing_index.
 class collision_component {
-  // defines collision behaviour
 public:
+  class hitbox_component {
+  public:
+    ~hitbox_component() = default;
+    hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index = 0)
+        : hitboxes_(hitboxes), hitbox_index_(index) {}
+    hitbox_component(const hitbox_component& other) = default;
+    hitbox_component(hitbox_component&& other) = default;
+
+    hitbox_component& operator=(const hitbox_component& other) = default;
+    hitbox_component& operator=(hitbox_component&& other) = default;
+
+    hitbox::hitbox& get_hitbox();
+    size_t get_hitbox_index() const;
+    void set_index(size_t index);
+
+  private:
+    std::vector<hitbox::hitbox> hitboxes_;
+    size_t hitbox_index_;
+  };
+
   ~collision_component() = default;
-  collision_component() = default;
+  collision_component(std::vector<hitbox_component> hitboxes = {})
+      : hitboxes_(std::move(hitboxes)) {}
   collision_component(const collision_component& other) = default;
   collision_component(collision_component&& other) = default;
 
   collision_component& operator=(const collision_component& other) = default;
   collision_component& operator=(collision_component&& other) = default;
+
+  std::vector<hitbox_component>& get_hitboxes();
+private:
+  std::vector<hitbox_component> hitboxes_;
 };
 
 
@@ -311,8 +338,10 @@ namespace component_builders{
     components::renderable_component build_renderable_component(
         std::vector<components::renderable_component::sprite_component>& sprite_components);
 
-    components::collision_component build_collision_component();
-    
+    components::collision_component::hitbox_component build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
+    components::collision_component build_collision_component(
+        std::vector<components::collision_component::hitbox_component>& hitbox_components);
+
     components::interaction_component build_interaction_component();
     components::key_input_component build_key_input_component(std::vector<game_config::control>& controls);
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::mouse_input>& inputs);
@@ -349,6 +378,19 @@ namespace component_helpers{
     }
     inline void register_food_component(size_t entity_id, components::food_component component){
         component_managers::food_manager_.register_component(entity_id, std::move(component));
+    }
+    // writes sprite and hitbox indices together. missing either component is fine
+    inline void set_facing_index(size_t entity_id, size_t index){
+        if(auto* renderable = component_managers::renderable_manager_.get_component(entity_id)){
+            for(auto& sprite_component : renderable->get_sprites()){
+                sprite_component.set_index(index);
+            }
+        }
+        if(auto* collision = component_managers::collision_manager_.get_component(entity_id)){
+            for(auto& hitbox_component : collision->get_hitboxes()){
+                hitbox_component.set_index(index);
+            }
+        }
     }
 
     inline void unregister_positional_component(size_t entity_id){

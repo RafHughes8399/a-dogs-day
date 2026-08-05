@@ -1,6 +1,7 @@
 #include "component.h"
 #include "config.h"
 #include "entity.h"
+#include "sprite.h"
 #include <raylib.h>
 
 // qualified with ecs_entities:: so a name that doesn't match a declaration in
@@ -82,7 +83,13 @@ void ecs_entities::build_cursor(size_t id){
         component_builders::build_positional_component(GetMousePosition()));
     component_helpers::register_mouse_input_component(id,
         component_builders::build_mouse_input_component(game_config::cursor_controls));
-    // TODO renderable - the cursor sprite, once cursor_builder's sprites move over
+    std::vector<sprite::sprite> sprites = {sprite_builders::build_cursor_sprite()};
+    std::vector<components::renderable_component::sprite_component> sprite_components = {component_builders::build_sprite_component(sprites, 0)};
+    component_helpers::register_renderable_component(id, component_builders::build_renderable_component(sprite_components));
+
+    std::vector<hitbox::hitbox> hitboxes = {hitbox_builders::build_cursor_hitbox(GetMousePosition())};
+    std::vector<components::collision_component::hitbox_component> hitbox_components = {component_builders::build_hitbox_component(hitboxes, 0)};
+    component_helpers::register_collision_component(id, component_builders::build_collision_component(hitbox_components));
 }
 
 void ecs_entities::build_decoration(size_t id){

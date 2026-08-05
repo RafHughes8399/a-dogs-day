@@ -146,6 +146,128 @@ SCENARIO("removing an entity clears its components and drops it from the layers"
     }
 }
 
+SCENARIO("building the cursor registers its components", "[ecs][components][cursor]"){
+    GIVEN("a fresh ecs world"){
+        testing::ecs_test_game game;
+
+        WHEN("the cursor is built"){
+            auto cursor_id = game.create_cursor();
+
+            THEN("it carries exactly the four its builder registers"){
+                REQUIRE(game.has_position(cursor_id));
+                REQUIRE(game.has_mouse_input(cursor_id));
+                REQUIRE(game.has_renderable(cursor_id));
+                REQUIRE(game.has_collision(cursor_id));
+                REQUIRE(game.num_components(cursor_id) == 4);
+            }
+            THEN("it takes no movement and no keyboard controls"){
+                REQUIRE_FALSE(game.has_movement(cursor_id));
+                REQUIRE_FALSE(game.has_controls(cursor_id));
+            }
+            THEN("it lands on the cursor layer"){
+                REQUIRE(game.layer_contains(level_config::draw_layers::cursor, cursor_id));
+            }
+            THEN("its sprite and hitbox are one slot each, both at index 0"){
+                auto* renderable = component_managers::renderable_manager_.get_component(cursor_id);
+                REQUIRE(renderable != nullptr);
+                REQUIRE(renderable->get_sprites().size() == 1);
+                REQUIRE(renderable->get_sprites()[0].get_sprite_index() == 0);
+
+                auto* collision = component_managers::collision_manager_.get_component(cursor_id);
+                REQUIRE(collision != nullptr);
+                REQUIRE(collision->get_hitboxes().size() == 1);
+                REQUIRE(collision->get_hitboxes()[0].get_hitbox_index() == 0);
+            }
+            THEN("its hitbox is the size cursor_attributes asks for"){
+                auto* collision = component_managers::collision_manager_.get_component(cursor_id);
+                auto box = collision->get_hitboxes()[0].get_hitbox().get_box();
+                REQUIRE(box.width == entity_config::cursor_attributes[entity_config::attributes::frame_width]);
+                REQUIRE(box.height == entity_config::cursor_attributes[entity_config::attributes::frame_height]);
+            }
+            THEN("it binds both mouse buttons"){
+                auto* mouse = component_managers::mouse_input_manager_.get_component(cursor_id);
+                REQUIRE(mouse != nullptr);
+                REQUIRE(mouse->get_inputs().size() == game_config::cursor_controls.size());
+            }
+        }
+    }
+
+    GIVEN("a world where the player built the cursor"){
+        testing::ecs_test_game game;
+        auto cursor_id = game.create_empty(level_config::draw_layers::cursor);
+        auto player_id = game.create_player(cursor_id);
+
+        THEN("the cursor got its components through the player builder"){
+            REQUIRE(cursor_id != player_id);
+            REQUIRE(game.num_components(cursor_id) == 4);
+            REQUIRE(game.has_mouse_input(cursor_id));
+        }
+        THEN("the keyboard controls went to the player, not the cursor"){
+            REQUIRE(game.has_controls(player_id));
+            REQUIRE_FALSE(game.has_controls(cursor_id));
+        }
+    }
+}
+
+SCENARIO("removing the cursor unregisters every component it held", "[ecs][lifespan][cursor]"){
+    GIVEN("a world with a cursor"){
+        testing::ecs_test_game game;
+        auto cursor_id = game.create_cursor();
+
+        REQUIRE(game.num_components(cursor_id) == 4);
+        REQUIRE(game.total_components() == 4);
+
+        WHEN("it is removed"){
+            game.remove(cursor_id);
+
+            THEN("all four managers dropped it"){
+                REQUIRE_FALSE(game.has_position(cursor_id));
+                REQUIRE_FALSE(game.has_mouse_input(cursor_id));
+                REQUIRE_FALSE(game.has_renderable(cursor_id));
+                REQUIRE_FALSE(game.has_collision(cursor_id));
+                REQUIRE(game.num_components(cursor_id) == 0);
+                REQUIRE(game.total_components() == 0);
+            }
+            THEN("it leaves the cursor layer"){
+                REQUIRE_FALSE(game.layer_contains(level_config::draw_layers::cursor, cursor_id));
+                REQUIRE(game.layer_size(level_config::draw_layers::cursor) == 0);
+            }
+        }
+    }
+
+    GIVEN("a world with a cursor and another entity"){
+        testing::ecs_test_game game;
+        auto cursor_id = game.create_cursor();
+        auto other_id = game.create_renderable(level_config::draw_layers::decoration);
+
+        WHEN("the cursor is removed"){
+            game.remove(cursor_id);
+
+            THEN("only the cursor's components go"){
+                REQUIRE(game.num_components(cursor_id) == 0);
+                REQUIRE(game.num_components(other_id) == 2);
+                REQUIRE(game.total_components() == 2);
+            }
+        }
+    }
+
+    GIVEN("a world where the cursor's id has been recycled"){
+        testing::ecs_test_game game;
+        auto cursor_id = game.create_cursor();
+        game.remove(cursor_id);
+
+        WHEN("a bare entity takes the freed id"){
+            auto reused_id = game.create_empty(level_config::draw_layers::dogs);
+
+            THEN("it inherits none of the cursor's components"){
+                REQUIRE(reused_id == cursor_id);
+                REQUIRE(game.num_components(reused_id) == 0);
+                REQUIRE(game.total_components() == 0);
+            }
+        }
+    }
+}
+
 SCENARIO("the ecs world starts clean for every scenario", "[ecs][harness]"){
     GIVEN("a world that had entities in a previous scenario"){
         testing::ecs_test_game game;

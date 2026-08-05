@@ -124,7 +124,7 @@ link_libraries(systems)
 add_library(animation src/rendering/animation.cpp)
 link_libraries(animation)
 
-add_library(sprite src/rendering/sprite.cpp)
+add_library(sprite src/rendering/sprite.cpp src/rendering/sprite_builders.cpp)
 link_libraries(sprite)
 
 add_library(item src/entities/items.cpp)
@@ -136,7 +136,7 @@ link_libraries(menu)
 add_library(hud src/interfaces/hud.cpp)
 link_libraries(hud)
 
-add_library(hitbox src/entities/hitbox.cpp)
+add_library(hitbox src/entities/hitbox.cpp src/entities/hitbox_builders.cpp)
 link_libraries(hitbox)
 
 add_library(body src/rendering/body.cpp)

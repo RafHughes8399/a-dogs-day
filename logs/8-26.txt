@@ -103,3 +103,8 @@ curor outline,
         iterate through quadtree, find entity, if still in the bounds then dont move
         otherwise remove and reinsert
     }
+
+-> cursor building
+-> update render setup
+-> spatial system and render system
+-> control system

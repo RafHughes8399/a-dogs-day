@@ -43,17 +43,22 @@ namespace testing{
             // the render layer needs to draw it
             size_t create_renderable(size_t layer, Vector2 position = Vector2{0.0f, 0.0f});
             size_t create_player(size_t cursor_id);
+            // the real ecs_entities::build_cursor, not a stand-in
+            size_t create_cursor(size_t layer = level_config::draw_layers::cursor);
 
             void remove(size_t entity_id);
 
             // ---------------- inspection accessors ----------------
             size_t layer_size(size_t layer);
             bool layer_contains(size_t layer, size_t entity_id);
-            // how many of the eight managers hold a component for this entity
+            // how many of the nine managers hold a component for this entity
             size_t num_components(size_t entity_id);
             bool has_position(size_t entity_id);
             bool has_renderable(size_t entity_id);
             bool has_controls(size_t entity_id);
+            bool has_collision(size_t entity_id);
+            bool has_mouse_input(size_t entity_id);
+            bool has_movement(size_t entity_id);
             // total across every manager, for asserting a clean world
             size_t total_components();
 

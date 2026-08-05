@@ -36,7 +36,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
         entity_config::khiri_across_attributes[entity_config::attributes::animations]);
 
 
-    auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
+    auto across_hitbox = hitbox_builders::build_player_dog_across_hitbox(position);
 
     // ! up down left right
     std::vector<sprite::sprite> khiri_sprites;
@@ -115,7 +115,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
         static_cast<int>(entity_config::mack_across_attributes[entity_config::attributes::frames]),
         static_cast<int>(entity_config::mack_across_attributes[entity_config::attributes::animations]));
 
-    auto across_hitbox = hitbox::h_builder_.build_player_dog_across_hitbox(position);
+    auto across_hitbox = hitbox_builders::build_player_dog_across_hitbox(position);
 
     // ! up down left right
     std::vector<sprite::sprite> mack_sprites;

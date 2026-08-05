@@ -12,7 +12,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_table(Vector2 
         entity_config::table_attributes[entity_config::attributes::animations]
     );
 
-    auto hitbox = hitbox::h_builder_.build_table_hitbox(position);
+    auto hitbox = hitbox_builders::build_table_hitbox(position);
     std::vector<sprite::sprite> sprites = {table_sprite};
     std::vector<hitbox::hitbox> hitboxes = {hitbox};
     auto body = body::body(hitboxes, sprites);
