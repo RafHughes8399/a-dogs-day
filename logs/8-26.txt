@@ -108,3 +108,57 @@ curor outline,
 -> update render setup
 -> spatial system and render system
 -> control system
+
+
+quadtree refactor [entity -> id]
+the tree already works, this is a type change plus shedding two responsibilities
+it should never have had. node objects_ becomes vector<size_t>
+
+what leaves the quadtree entirely:
+-> the per object update loop, the graveyard, to_remove
+   entities dont update themselves anymore, the systems drive that and the
+   lifespan system already handles removal
+-> the interact() calls in perform_interactions and identify_collisions.
+   polymorphic dispatch on entity type isnt possible from an id, and it isnt the
+   tree's job. identify_collisions returns candidate pairs, the collision /
+   interaction system resolves them
+-> next_ids_ / next_id_. entity_lifespan_system already owns id allocation and
+   recycling, two allocators is one too many
+
+what stays, just needs a bounds lookup where the entity used to carry its own
+geometry. one bounds_for(id) off the collision component covers all of them:
+-> insert
+-> is_there_collision
+-> perform_interactions
+-> the left-its-node check in update
+-> identify_collisions
+
+mechanical, logic identical, just stop dereferencing:
+-> erase, extract, clear, size, is_empty, get_entity
+-> copy_tree gets trivial, tree becomes cheaply copyable
+
+steps:
+1. migrate the quadtree type from entity to id
+2. strip update / interact / id management out
+3. migrate the quadtree to be managed by the spatial system
+4. wire events for insertion, deletion and movement across nodes
+5. spatial system helpers wrapping quadtree functions
+6. spatial system + quadtree test suite
+
+notes:
+-> update_position is the only legal write path. sets the position, updates the
+   hitbox rect, then emits move_entity. tree stores no cached bounds so it has
+   no way to notice if something writes around it
+-> keep on_move_event as is. the unconditional extract and reinsert already
+   sinks to the deepest fitting node. do NOT add the "still in bounds so dont
+   move" short circuit, an entity parked high never sinks again and the upper
+   nodes silently accumulate
+-> broad phase only has to be conservative. extras are fine, misses are not
+-> WORLD_BOX macro is dead, references config:: which is not a namespace
+-> unsubscribe is keyed on event type not handler identity, so two systems
+   listening to one event share a fate. rendering and spatial both want
+   create_entity / remove_entity
+-> open question: does the cursor belong in the tree at all. if clicks are a
+   point query then the cursor position IS the query, not an occupant. same for
+   anything screen space. would mean spatial membership is a builder decision
+   rather than automatic on create_entity

@@ -3,6 +3,7 @@
 #include "component.h"
 #include "entity.h"
 #include "events.h"
+#include "quadtree.h"
 #include "events_interface.h"
 #include "render_layer.h"
 
@@ -27,6 +28,7 @@ namespace systems{
             movement_system& operator=(movement_system&& other) = delete;
 
             void update(float delta);
+            void update_position(size_t id, Vector2 position);
     };
     class rendering_system{
         // rendering layers
@@ -60,7 +62,7 @@ namespace systems{
             }
 #endif
         private:
-            bool is_entity_in_frame(size_t id, Rectangle view_frame_);
+            bool is_entity_in_frame(size_t id, Rectangle view_frame);
             
             events::event_handler<events::create_entity> create_entity_handler_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
@@ -78,8 +80,21 @@ namespace systems{
         // checks can be performed at O(n log n) instead of
 
         public:
-            ~spatial_system() = default;
-            spatial_system() = default;
+            ~spatial_system(){
+                event_interface::unsubscribe<events::create_entity>(create_entity_handler_);
+                event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
+                event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+            }
+            spatial_system(raglib::bounding_box_2 world_bounds = raglib::bounding_box_2{
+                Vector2{0.0f, 0.0f}, Vector2{level_config::world_x, level_config::world_y}})
+                : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
+                move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
+                remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+                entities_(world_bounds){
+                    event_interface::subscribe<events::create_entity>(create_entity_handler_);
+                    event_interface::subscribe<events::move_entity>(move_entity_handler_);
+                    event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+                }
             spatial_system(const spatial_system& other) = delete;
             spatial_system(spatial_system&& other) = delete;
 
@@ -87,6 +102,31 @@ namespace systems{
             spatial_system& operator=(spatial_system&& other) = delete;
 
             void update(float delta);
+            void on_created_entity(const events::create_entity& event);
+            void on_moved_entity(const events::move_entity& event);
+            void on_destroyed_entity(const events::remove_entity& event);
+
+            bool is_tracked(size_t entity_id){
+                return entities_.contains(entity_id);
+            }
+            size_t tracked_count(){
+                return entities_.size();
+            }
+            int node_depth_of(size_t entity_id){
+                return entities_.depth_of(entity_id);
+            }
+            bool node_bounds_of(size_t entity_id, raglib::bounding_box_2& bounds){
+                return entities_.node_bounds_of(entity_id, bounds);
+            }
+        private:
+            // an entity with no collision component has no bounds and is not indexed
+            hitbox::hitbox* bounds_for(size_t entity_id);
+
+            events::event_handler<events::create_entity> create_entity_handler_;
+            events::event_handler<events::move_entity> move_entity_handler_;
+            events::event_handler<events::remove_entity> remove_entity_handler_;
+
+            tree::ecs_quadtree entities_;
     };
     class entity_lifespan_system{
         // responsible for managing entity creation and destruction

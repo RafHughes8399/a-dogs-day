@@ -66,6 +66,10 @@ namespace testing{
         lifespan_.remove(entity_id);
     }
 
+    void ecs_test_game::move_entity(size_t entity_id, Vector2 position){
+        movement_.update_position(entity_id, position);
+    }
+
     // ---------------- inspection accessors ----------------
 
     size_t ecs_test_game::layer_size(size_t layer){
@@ -102,6 +106,27 @@ namespace testing{
 
     bool ecs_test_game::has_movement(size_t entity_id){
         return component_managers::movment_manager_.get_component(entity_id) != nullptr;
+    }
+
+    bool ecs_test_game::is_tracked(size_t entity_id){
+        return spatial_.is_tracked(entity_id);
+    }
+
+    size_t ecs_test_game::tracked_count(){
+        return spatial_.tracked_count();
+    }
+
+    int ecs_test_game::node_depth_of(size_t entity_id){
+        return spatial_.node_depth_of(entity_id);
+    }
+
+    bool ecs_test_game::node_bounds_of(size_t entity_id, raglib::bounding_box_2& bounds){
+        return spatial_.node_bounds_of(entity_id, bounds);
+    }
+
+    Rectangle ecs_test_game::hitbox_of(size_t entity_id){
+        auto* collision = component_managers::collision_manager_.get_component(entity_id);
+        return collision->get_hitbox_component().get_hitbox().get_box();
     }
 
     size_t ecs_test_game::total_components(){

@@ -47,6 +47,8 @@ namespace testing{
             size_t create_cursor(size_t layer = level_config::draw_layers::cursor);
 
             void remove(size_t entity_id);
+            // the single legal position write - moves the hitbox and reindexes
+            void move_entity(size_t entity_id, Vector2 position);
 
             // ---------------- inspection accessors ----------------
             size_t layer_size(size_t layer);
@@ -62,9 +64,18 @@ namespace testing{
             // total across every manager, for asserting a clean world
             size_t total_components();
 
+            // ---------------- spatial accessors ----------------
+            bool is_tracked(size_t entity_id);
+            size_t tracked_count();
+            int node_depth_of(size_t entity_id);
+            bool node_bounds_of(size_t entity_id, raglib::bounding_box_2& bounds);
+            Rectangle hitbox_of(size_t entity_id);
+
         private:
             systems::entity_lifespan_system lifespan_;
             systems::rendering_system rendering_;
+            systems::spatial_system spatial_;
+            systems::movement_system movement_;
     };
 
 } // namespace testing

@@ -5,7 +5,7 @@
 #define EVENTS_ENTITY_EVENTS_H
 
 #include "event_core.h"
-
+#include "hitbox.h"
 namespace events{
 	// when an entity moves, main listener is the quad tree to move entities into the correct node
 	class move_entity : public event{

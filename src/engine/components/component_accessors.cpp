@@ -5,6 +5,9 @@
 Vector2 components::position_component::get_position(){
     return position_;
 }
+void components::position_component::set_position(Vector2 position){
+    position_ = position;
+}
 type_config::path components::movement_component::get_current_path(){
     return paths_.empty() ? type_config::path{} : paths_.front();
 }

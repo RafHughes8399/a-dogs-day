@@ -3,19 +3,12 @@
 
 
 bool systems::rendering_system::is_entity_in_frame(size_t id, Rectangle view_frame){
-    auto hitbox_component = component_managers::collision_manager_.get_component(id);
-    // ! check if component exists, currentoly assume it does
-    if(hitbox_component){
-        auto entity_box = hitbox_component->get_hitbox_component().get_hitbox().get_box();
+    auto* collision = component_managers::collision_manager_.get_component(id);
+    // nothing to cull against - draw it rather than hide it
+    if(collision == nullptr){ return true; }
 
-    return view_frame_.x <= entity_box.x and view_frame_.y <= entity_box.y and
-           (view_frame_.x + view_frame_.width) >=
-               (entity_box.x + entity_box.width) and
-           (view_frame_.y + view_frame_.height) >=
-               (entity_box.y + entity_box.height);
-    }else{
-        return false;
-    }
+    auto entity_box = collision->get_hitbox_component().get_hitbox().get_box();
+    return CheckCollisionRecs(view_frame, entity_box);
 }
 void systems::rendering_system::on_created_entity(const events::create_entity& event){
     auto layer = event.get_layer();
@@ -36,7 +29,6 @@ void systems::rendering_system::render(int frame){
     // TODO cull against the view frame once hitbox bounds land in
     // collision_component
     auto render_predicate = [this](size_t entity_id) -> bool {
-        (void) entity_id;
         return is_entity_in_frame(entity_id, view_frame_);
     };
 

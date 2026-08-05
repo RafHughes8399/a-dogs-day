@@ -34,6 +34,9 @@ public:
     position_component& operator=(position_component&& other) = default;
 
     Vector2 get_position();
+    // only movement_system::update_position should call this - it is what keeps
+    // the hitbox and the spatial index in step with the position
+    void set_position(Vector2 position);
 private:
     Vector2 position_;
 };

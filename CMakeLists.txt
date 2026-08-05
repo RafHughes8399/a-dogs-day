@@ -255,6 +255,7 @@ add_executable(tests
   tests/test_game.cpp
   tests/ecs_test_game.cpp
   tests/ecs_scenarios.cpp
+  tests/spatial_scenarios.cpp
   tests/harness_scenarios.cpp
   tests/player_scenarios.cpp
   tests/decoration_scenarios.cpp
