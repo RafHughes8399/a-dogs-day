@@ -15,7 +15,6 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "sprite.h"
-#include "hitbox.h"
 namespace components {
 
 // * components carry no id of their own - the manager's map key IS the owning
@@ -120,8 +119,8 @@ private:
   std::vector<sprite_component> sprites_;
 
 };
-// * shaped like renderable_component. hitbox slot k and sprite slot k are the
-// * same facing, so set_index on either alone desyncs them - use
+// * one hitbox_component per entity. its variants run parallel to the base
+// * sprite list, so the two indices are one facing - use
 // * component_helpers::set_facing_index.
 class collision_component {
 public:
@@ -136,6 +135,7 @@ public:
     hitbox_component& operator=(const hitbox_component& other) = default;
     hitbox_component& operator=(hitbox_component&& other) = default;
 
+    std::vector<hitbox::hitbox>& get_hitboxes();
     hitbox::hitbox& get_hitbox();
     size_t get_hitbox_index() const;
     void set_index(size_t index);
@@ -146,17 +146,18 @@ public:
   };
 
   ~collision_component() = default;
-  collision_component(std::vector<hitbox_component> hitboxes = {})
-      : hitboxes_(std::move(hitboxes)) {}
+  collision_component(hitbox_component hitbox)
+      : hitbox_component_(std::move(hitbox)) {}
   collision_component(const collision_component& other) = default;
   collision_component(collision_component&& other) = default;
 
   collision_component& operator=(const collision_component& other) = default;
   collision_component& operator=(collision_component&& other) = default;
 
-  std::vector<hitbox_component>& get_hitboxes();
+  hitbox_component& get_hitbox_component();
+
 private:
-  std::vector<hitbox_component> hitboxes_;
+  hitbox_component hitbox_component_;
 };
 
 
@@ -340,7 +341,7 @@ namespace component_builders{
 
     components::collision_component::hitbox_component build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
     components::collision_component build_collision_component(
-        std::vector<components::collision_component::hitbox_component>& hitbox_components);
+        components::collision_component::hitbox_component hitbox);
 
     components::interaction_component build_interaction_component();
     components::key_input_component build_key_input_component(std::vector<game_config::control>& controls);
@@ -387,9 +388,7 @@ namespace component_helpers{
             }
         }
         if(auto* collision = component_managers::collision_manager_.get_component(entity_id)){
-            for(auto& hitbox_component : collision->get_hitboxes()){
-                hitbox_component.set_index(index);
-            }
+            collision->get_hitbox_component().set_index(index);
         }
     }
 

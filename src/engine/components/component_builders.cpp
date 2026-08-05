@@ -18,8 +18,8 @@ components::renderable_component component_builders::build_renderable_component(
 components::collision_component::hitbox_component component_builders::build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index){
     return components::collision_component::hitbox_component(hitboxes, index);
 }
-components::collision_component component_builders::build_collision_component(std::vector<components::collision_component::hitbox_component>& hitbox_components){
-    return components::collision_component(hitbox_components);
+components::collision_component component_builders::build_collision_component(components::collision_component::hitbox_component hitboxes){
+    return components::collision_component(std::move(hitboxes));
 }
 components::interaction_component component_builders::build_interaction_component(){
     return components::interaction_component();

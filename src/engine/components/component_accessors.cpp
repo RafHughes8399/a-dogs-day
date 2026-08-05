@@ -36,6 +36,9 @@ std::vector<components::renderable_component::sprite_component>& components::ren
     return sprites_;
 }
 
+std::vector<hitbox::hitbox>& components::collision_component::hitbox_component::get_hitboxes(){
+    return hitboxes_;
+}
 hitbox::hitbox& components::collision_component::hitbox_component::get_hitbox(){
     return hitboxes_[hitbox_index_];
 }
@@ -46,6 +49,6 @@ void components::collision_component::hitbox_component::set_index(size_t index){
     hitbox_index_ = index;
 }
 
-std::vector<components::collision_component::hitbox_component>& components::collision_component::get_hitboxes(){
-    return hitboxes_;
+components::collision_component::hitbox_component& components::collision_component::get_hitbox_component(){
+    return hitbox_component_;
 }

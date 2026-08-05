@@ -60,11 +60,14 @@ namespace systems{
             }
 #endif
         private:
+            bool is_entity_in_frame(size_t id, Rectangle view_frame_);
+            
             events::event_handler<events::create_entity> create_entity_handler_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
 
             // the render layer is a 2d list layering the entities  so you can draw in layers
             // refferencing like [j][k] is drawing entity k on layer j
+
             sprite::sprite background_;
             Rectangle view_frame_;
             render_layer::ecs_layer render_layers_[level_config::draw_layers::size];

@@ -167,7 +167,7 @@ SCENARIO("building the cursor registers its components", "[ecs][components][curs
             THEN("it lands on the cursor layer"){
                 REQUIRE(game.layer_contains(level_config::draw_layers::cursor, cursor_id));
             }
-            THEN("its sprite and hitbox are one slot each, both at index 0"){
+            THEN("it has one sprite slot and one hitbox variant, both at index 0"){
                 auto* renderable = component_managers::renderable_manager_.get_component(cursor_id);
                 REQUIRE(renderable != nullptr);
                 REQUIRE(renderable->get_sprites().size() == 1);
@@ -175,12 +175,12 @@ SCENARIO("building the cursor registers its components", "[ecs][components][curs
 
                 auto* collision = component_managers::collision_manager_.get_component(cursor_id);
                 REQUIRE(collision != nullptr);
-                REQUIRE(collision->get_hitboxes().size() == 1);
-                REQUIRE(collision->get_hitboxes()[0].get_hitbox_index() == 0);
+                REQUIRE(collision->get_hitbox_component().get_hitboxes().size() == 1);
+                REQUIRE(collision->get_hitbox_component().get_hitbox_index() == 0);
             }
             THEN("its hitbox is the size cursor_attributes asks for"){
                 auto* collision = component_managers::collision_manager_.get_component(cursor_id);
-                auto box = collision->get_hitboxes()[0].get_hitbox().get_box();
+                auto box = collision->get_hitbox_component().get_hitbox().get_box();
                 REQUIRE(box.width == entity_config::cursor_attributes[entity_config::attributes::frame_width]);
                 REQUIRE(box.height == entity_config::cursor_attributes[entity_config::attributes::frame_height]);
             }

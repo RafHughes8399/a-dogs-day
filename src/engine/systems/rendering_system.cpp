@@ -1,5 +1,22 @@
+#include "component.h"
 #include "system.h"
 
+
+bool systems::rendering_system::is_entity_in_frame(size_t id, Rectangle view_frame){
+    auto hitbox_component = component_managers::collision_manager_.get_component(id);
+    // ! check if component exists, currentoly assume it does
+    if(hitbox_component){
+        auto entity_box = hitbox_component->get_hitbox_component().get_hitbox().get_box();
+
+    return view_frame_.x <= entity_box.x and view_frame_.y <= entity_box.y and
+           (view_frame_.x + view_frame_.width) >=
+               (entity_box.x + entity_box.width) and
+           (view_frame_.y + view_frame_.height) >=
+               (entity_box.y + entity_box.height);
+    }else{
+        return false;
+    }
+}
 void systems::rendering_system::on_created_entity(const events::create_entity& event){
     auto layer = event.get_layer();
     if(layer >= level_config::draw_layers::size){ return; }
@@ -18,9 +35,9 @@ void systems::rendering_system::render(int frame){
 
     // TODO cull against the view frame once hitbox bounds land in
     // collision_component
-    auto render_predicate = [](size_t entity_id) -> bool {
+    auto render_predicate = [this](size_t entity_id) -> bool {
         (void) entity_id;
-        return true;
+        return is_entity_in_frame(entity_id, view_frame_);
     };
 
     for(size_t layer = 0; layer < level_config::draw_layers::size; ++layer){

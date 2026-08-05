@@ -88,8 +88,8 @@ void ecs_entities::build_cursor(size_t id){
     component_helpers::register_renderable_component(id, component_builders::build_renderable_component(sprite_components));
 
     std::vector<hitbox::hitbox> hitboxes = {hitbox_builders::build_cursor_hitbox(GetMousePosition())};
-    std::vector<components::collision_component::hitbox_component> hitbox_components = {component_builders::build_hitbox_component(hitboxes, 0)};
-    component_helpers::register_collision_component(id, component_builders::build_collision_component(hitbox_components));
+    component_helpers::register_collision_component(id,
+        component_builders::build_collision_component(component_builders::build_hitbox_component(hitboxes, 0)));
 }
 
 void ecs_entities::build_decoration(size_t id){
