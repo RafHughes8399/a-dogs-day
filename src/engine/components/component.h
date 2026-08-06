@@ -1,6 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
+#include <algorithm>
 #include <concepts>
 #include <queue>
 #include <stddef.h>
@@ -302,6 +303,10 @@ public:
         auto component_it = components_.find(entity);
         return component_it != components_.end() ? &component_it->second : nullptr;
    }
+   auto begin(){return components_.begin();}
+   auto end(){return components_.end();}
+   auto cbegin() const {return components_.cbegin();}
+   auto cend() const {return components_.cend();}
    size_t size() const{
         return components_.size();
    }

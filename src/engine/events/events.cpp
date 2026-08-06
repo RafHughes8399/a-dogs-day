@@ -18,13 +18,17 @@ void events::event_dispatcher::subscribe(int event_key, std::unique_ptr<event_ha
     }
     return;
 }
-void events::event_dispatcher::unsubscribe(int event_key, const int handler_value){
-    
-    // remove the handler from the event
-    auto & handlers = subscriber_map_.at(event_key);
-    auto new_end = std::remove_if(handlers.begin(), handlers.end(), 
-                    [handler_value](auto & h) -> bool {
-                        return handler_value == h->get_type();
+void events::event_dispatcher::unsubscribe(int event_key, size_t handler_id){
+    // matched on handler identity - matching on get_type() removed every
+    // listener for the event, not just this one
+    auto subscribers = subscriber_map_.find(event_key);
+    if(subscribers == subscriber_map_.end()){
+        return;
+    }
+    auto & handlers = subscribers->second;
+    auto new_end = std::remove_if(handlers.begin(), handlers.end(),
+                    [handler_id](auto & h) -> bool {
+                        return handler_id == h->get_handler_id();
                     });
     handlers.erase(new_end, handlers.end());
     return;

@@ -118,7 +118,13 @@ void ecs_entities::build_station(size_t id){
         // void build_stove();
     */
 
+// position and renderable only - no hitbox, so it is never in the spatial index
+// and is_entity_in_frame never culls it
 void ecs_entities::build_background(size_t id){
-    (void) id;
-    // the background is just a sprite right ?, att a draw level
+    component_helpers::register_positional_component(id,
+        component_builders::build_positional_component(Vector2{0.0f, 0.0f}));
+
+    std::vector<sprite::sprite> sprites = {sprite_builders::build_background_sprite()};
+    std::vector<components::renderable_component::sprite_component> sprite_components = {component_builders::build_sprite_component(sprites, 0)};
+    component_helpers::register_renderable_component(id, component_builders::build_renderable_component(sprite_components));
 }

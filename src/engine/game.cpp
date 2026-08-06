@@ -49,13 +49,16 @@ void game::game::debug(float delta){
 
 // ----------------------------------------- ecs_game ----------------------- //
 void game::ecs_game::init(){
+    // the background is an entity now - position and renderable only, drawn by
+    // the background layer like anything else. created first so it is bottom of
+    // its layer's insertion order.
+    lifespan_.create(&ecs_entities::build_background, level_config::background);
+
     // the player and its cursor - two entities, so two creates
     auto cursor_id = lifespan_.create(&ecs_entities::build_cursor, level_config::cursor);
     lifespan_.create([cursor_id](size_t id){
         ecs_entities::build_player(id, cursor_id);
     }, level_config::hud);
-
-    lifespan_.create(&ecs_entities::build_background, level_config::background);
 
     // TODO starting entities - khiri and mack, the starting stations
     // ecs_entities::build_khiri(...); ecs_entities::build_mack(...);

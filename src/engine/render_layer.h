@@ -57,6 +57,9 @@ namespace render_layer{
             void add_entity(size_t entity_id);
             void remove_entity(size_t entity_id);
             void remove_entities(const std::vector<size_t>& entity_ids);
+            void clear(){
+                entities_.clear();
+            }
 
             template<typename UnaryPred>
             void draw(UnaryPred p, Vector2 frame_position, int frame){

@@ -6,6 +6,7 @@
 #include "quadtree.h"
 #include "events_interface.h"
 #include "render_layer.h"
+#include <functional>
 
 // this should replace most of the logic required by the level and render layers
 namespace systems{
@@ -19,13 +20,19 @@ namespace systems{
     class movement_system{
         // the level graph and pathfinding
         public:
+            static movement_system& get_instance(){
+                static movement_system instance;
+                return instance;
+            }
             ~movement_system() = default;
-            movement_system() = default;
             movement_system(const movement_system& other) = delete;
             movement_system(movement_system&& other) = delete;
 
             movement_system& operator=(const movement_system& other) = delete;
             movement_system& operator=(movement_system&& other) = delete;
+        private:
+            movement_system() = default;
+        public:
 
             void update(float delta);
             void update_position(size_t id, Vector2 position);
@@ -35,18 +42,14 @@ namespace systems{
         // the backdrop
         // and the viewframe
         public:
+            static rendering_system& get_instance(){
+                static rendering_system instance;
+                return instance;
+            }
             ~rendering_system(){
                 event_interface::unsubscribe<events::create_entity>(create_entity_handler_);
                 event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
             }
-            // no default ctor - sprite::sprite has none
-            rendering_system(sprite::sprite background, Rectangle view_frame)
-                : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
-                remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
-                background_(background), view_frame_(view_frame), render_layers_(){
-                    event_interface::subscribe<events::create_entity>(create_entity_handler_);
-                    event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
-                }
             rendering_system(const rendering_system& other) = delete;
             rendering_system(rendering_system&& other) = delete;
 
@@ -56,21 +59,33 @@ namespace systems{
             void render(int frame);
             void on_created_entity(const events::create_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
+            // teardown between test scenarios - the singleton outlives them
+            void clear();
 #ifdef DOG_DAYS_TESTING
             render_layer::ecs_layer& get_layer(size_t layer){
                 return render_layers_[layer];
             }
 #endif
         private:
+            // the background is an entity on the background layer now, so nothing
+            // here needs raylib running at construction
+            rendering_system()
+                : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
+                remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+                view_frame_(Rectangle{0.0f, 0.0f, level_config::screen_width, level_config::screen_height}),
+                render_layers_(){
+                    event_interface::subscribe<events::create_entity>(create_entity_handler_);
+                    event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+                }
+
             bool is_entity_in_frame(size_t id, Rectangle view_frame);
-            
+
             events::event_handler<events::create_entity> create_entity_handler_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
 
             // the render layer is a 2d list layering the entities  so you can draw in layers
             // refferencing like [j][k] is drawing entity k on layer j
 
-            sprite::sprite background_;
             Rectangle view_frame_;
             render_layer::ecs_layer render_layers_[level_config::draw_layers::size];
     };
@@ -80,11 +95,16 @@ namespace systems{
         // checks can be performed at O(n log n) instead of
 
         public:
+            static spatial_system& get_instance(){
+                static spatial_system instance;
+                return instance;
+            }
             ~spatial_system(){
                 event_interface::unsubscribe<events::create_entity>(create_entity_handler_);
                 event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
                 event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
             }
+        private:
             spatial_system(raglib::bounding_box_2 world_bounds = raglib::bounding_box_2{
                 Vector2{0.0f, 0.0f}, Vector2{level_config::world_x, level_config::world_y}})
                 : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
@@ -95,6 +115,7 @@ namespace systems{
                     event_interface::subscribe<events::move_entity>(move_entity_handler_);
                     event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
                 }
+        public:
             spatial_system(const spatial_system& other) = delete;
             spatial_system(spatial_system&& other) = delete;
 
@@ -118,6 +139,10 @@ namespace systems{
             bool node_bounds_of(size_t entity_id, raglib::bounding_box_2& bounds){
                 return entities_.node_bounds_of(entity_id, bounds);
             }
+            // teardown between test scenarios - the singleton outlives them
+            void clear(){
+                entities_.clear();
+            }
         private:
             // an entity with no collision component has no bounds and is not indexed
             hitbox::hitbox* bounds_for(size_t entity_id);
@@ -131,13 +156,19 @@ namespace systems{
     class entity_lifespan_system{
         // responsible for managing entity creation and destruction
         public:
+            static entity_lifespan_system& get_instance(){
+                static entity_lifespan_system instance;
+                return instance;
+            }
             ~entity_lifespan_system() = default;
-            entity_lifespan_system() = default;
             entity_lifespan_system(const entity_lifespan_system& other) = delete;
             entity_lifespan_system(entity_lifespan_system&& other) = delete;
 
             entity_lifespan_system& operator=(const entity_lifespan_system& other) = delete;
             entity_lifespan_system& operator=(entity_lifespan_system&& other) = delete;
+        private:
+            entity_lifespan_system() = default;
+        public:
 
             // allocate -> build -> announce, so nothing can be built without
             // reaching the spatial index and a render layer
@@ -152,6 +183,11 @@ namespace systems{
             }
             void remove(size_t entity_id);
             void update(float delta);
+            // teardown between test scenarios - the singleton outlives them
+            void clear(){
+                recycled_ids_ = {};
+                fresh_id_ = 0;
+            }
         private:
             size_t next_id();
             std::queue<size_t> recycled_ids_;
@@ -160,26 +196,38 @@ namespace systems{
     class collision_system{
         // for physics based collisions
         public:
+            static collision_system& get_instance(){
+                static collision_system instance;
+                return instance;
+            }
             ~collision_system() = default;
-            collision_system() = default;
             collision_system(const collision_system& other) = delete;
             collision_system(collision_system&& other) = delete;
 
             collision_system& operator=(const collision_system& other) = delete;
             collision_system& operator=(collision_system&& other) = delete;
+        private:
+            collision_system() = default;
+        public:
 
             void update(float delta);
     };
     class interaction_system{
         // for behavioural interactions
         public:
+            static interaction_system& get_instance(){
+                static interaction_system instance;
+                return instance;
+            }
             ~interaction_system() = default;
-            interaction_system() = default;
             interaction_system(const interaction_system& other) = delete;
             interaction_system(interaction_system&& other) = delete;
 
             interaction_system& operator=(const interaction_system& other) = delete;
             interaction_system& operator=(interaction_system&& other) = delete;
+        private:
+            interaction_system() = default;
+        public:
 
             void update(float delta);
     };
@@ -197,9 +245,11 @@ namespace systems{
         // TODO keyboard pass dispatches key bindings. blocked on component_manager
         // TODO gaining iteration and movement_system gaining move_to.
         public:
-            
+            static control_input_system& get_instance(){
+                static control_input_system instance;
+                return instance;
+            }
             ~control_input_system() = default;
-            control_input_system() = default;
             control_input_system(const control_input_system& other) = delete;
             control_input_system(control_input_system&& other) = delete;
 
@@ -207,22 +257,42 @@ namespace systems{
             control_input_system& operator=(control_input_system&& other) = delete;
 
             void update(float delta);
+        private:
+            control_input_system()
+            : control_function_map_({}){
+            }
+
+            std::map<int, std::function<void(int)>> control_function_map_;
     };
     class npc_system{
         // uses the expediter and the maitre d to orchestrate
         // customer arrivals and departures
         // and waiter serving and clearing
         public:
+            static npc_system& get_instance(){
+                static npc_system instance;
+                return instance;
+            }
             ~npc_system() = default;
-            npc_system() = default;
             npc_system(const npc_system& other) = delete;
             npc_system(npc_system&& other) = delete;
 
             npc_system& operator=(const npc_system& other) = delete;
             npc_system& operator=(npc_system&& other) = delete;
+        private:
+            npc_system() = default;
+        public:
 
             void update(float delta);
     };
+
+    // singletons outlive a test scenario, so their own storage has to be wiped
+    // alongside the component managers
+    inline void clear_all_systems(){
+        entity_lifespan_system::get_instance().clear();
+        spatial_system::get_instance().clear();
+        rendering_system::get_instance().clear();
+    }
 
     // hold a refernece to the glboal managers that they need to process things
     // and the events that they need ot process 

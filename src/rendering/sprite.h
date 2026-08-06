@@ -85,5 +85,6 @@ namespace sprite{
 namespace sprite_builders{
     sprite::sprite build_sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations);
     sprite::sprite build_cursor_sprite();
+    sprite::sprite build_background_sprite();
 }
 #endif

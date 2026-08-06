@@ -55,10 +55,18 @@ namespace game{
     class ecs_game {
         public:
             ~ecs_game() = default;
-            ecs_game(sprite::sprite background, Rectangle view_frame)
-                : frame_count_(0), lifespan_(), input_(), npc_(), movement_(),
-                spatial_(), collision_(), interaction_(),
-                rendering_(background, view_frame){}
+            // resolving every singleton here is what stands them up - and therefore
+            // subscribes them - before init() creates the first entity
+            ecs_game()
+                : frame_count_(0),
+                lifespan_(systems::entity_lifespan_system::get_instance()),
+                input_(systems::control_input_system::get_instance()),
+                npc_(systems::npc_system::get_instance()),
+                movement_(systems::movement_system::get_instance()),
+                spatial_(systems::spatial_system::get_instance()),
+                collision_(systems::collision_system::get_instance()),
+                interaction_(systems::interaction_system::get_instance()),
+                rendering_(systems::rendering_system::get_instance()){}
             // systems subscribe handlers in their constructors, so they are
             // non-copyable and non-movable - and so is anything holding them.
             ecs_game(const ecs_game& other) = delete;
@@ -77,14 +85,14 @@ namespace game{
         private:
             int frame_count_;
 
-            systems::entity_lifespan_system lifespan_;
-            systems::control_input_system input_;
-            systems::npc_system npc_;
-            systems::movement_system movement_;
-            systems::spatial_system spatial_;
-            systems::collision_system collision_;
-            systems::interaction_system interaction_;
-            systems::rendering_system rendering_;
+            systems::entity_lifespan_system& lifespan_;
+            systems::control_input_system& input_;
+            systems::npc_system& npc_;
+            systems::movement_system& movement_;
+            systems::spatial_system& spatial_;
+            systems::collision_system& collision_;
+            systems::interaction_system& interaction_;
+            systems::rendering_system& rendering_;
     };
 }
 #endif

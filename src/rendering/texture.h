@@ -43,7 +43,8 @@ namespace textures{
         // npc_dog_right = 21,
         // npc_dog_head_left = 22,
         // npc_dog_head_right = 23,
-        size = 16
+        background = 16,
+        size = 17
         // and so on
     };
     class texture{

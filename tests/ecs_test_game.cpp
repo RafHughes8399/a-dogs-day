@@ -5,21 +5,11 @@
 
 namespace testing{
 
-    namespace{
-        sprite::sprite test_background(){
-            return sprite::sprite(
-                LoadTexture(entity_config::background_path),
-                entity_config::background_attributes[entity_config::attributes::frame_width],
-                entity_config::background_attributes[entity_config::attributes::frame_height],
-                entity_config::background_attributes[entity_config::attributes::frames],
-                entity_config::background_attributes[entity_config::attributes::animations]);
-        }
-    }
-
     ecs_test_game::ecs_test_game()
-    : lifespan_(),
-      rendering_(test_background(),
-                 Rectangle{0.0f, 0.0f, level_config::screen_width, level_config::screen_height}){
+    : lifespan_(systems::entity_lifespan_system::get_instance()),
+      rendering_(systems::rendering_system::get_instance()),
+      spatial_(systems::spatial_system::get_instance()),
+      movement_(systems::movement_system::get_instance()){
         // one hidden window for the whole run, same as test_game - the builders
         // LoadTexture and the shared cache has to stay valid across scenarios
         if(not IsWindowReady()){
@@ -27,12 +17,13 @@ namespace testing{
             InitWindow(1, 1, "dog-days ecs tests");
         }
         component_helpers::clear_all_components();
+        systems::clear_all_systems();
     }
 
     ecs_test_game::~ecs_test_game(){
         events::global_dispatcher_.process_events(0.0f);
         component_helpers::clear_all_components();
-        // rendering_ unsubscribes via RAII as this finishes destructing
+        systems::clear_all_systems();
     }
 
     // ---------------- build actions ----------------

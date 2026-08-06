@@ -72,10 +72,12 @@ namespace testing{
             Rectangle hitbox_of(size_t entity_id);
 
         private:
-            systems::entity_lifespan_system lifespan_;
-            systems::rendering_system rendering_;
-            systems::spatial_system spatial_;
-            systems::movement_system movement_;
+            // the systems are singletons that outlive every scenario - the ctor
+            // and dtor wipe their storage instead of relying on RAII
+            systems::entity_lifespan_system& lifespan_;
+            systems::rendering_system& rendering_;
+            systems::spatial_system& spatial_;
+            systems::movement_system& movement_;
     };
 
 } // namespace testing

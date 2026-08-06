@@ -15,7 +15,7 @@ namespace event_interface{
     
     template<typename E> // e for event
     inline void unsubscribe(const events::event_handler<E>& handler){
-        events::global_dispatcher_.unsubscribe(E::get_static_type(), handler.get_type());
+        events::global_dispatcher_.unsubscribe(E::get_static_type(), handler.get_handler_id());
     } 
     
     

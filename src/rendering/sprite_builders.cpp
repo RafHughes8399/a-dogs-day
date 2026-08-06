@@ -10,3 +10,11 @@ sprite::sprite sprite_builders::build_cursor_sprite(){
         entity_config::cursor_attributes[entity_config::attributes::frames],
         entity_config::cursor_attributes[entity_config::attributes::animations]);
 }
+sprite::sprite sprite_builders::build_background_sprite(){
+    auto background_texture = textures::textures_.get_texture(textures::background, entity_config::background_path);
+    return build_sprite(background_texture,
+        entity_config::background_attributes[entity_config::attributes::frame_width],
+        entity_config::background_attributes[entity_config::attributes::frame_height],
+        entity_config::background_attributes[entity_config::attributes::frames],
+        entity_config::background_attributes[entity_config::attributes::animations]);
+}

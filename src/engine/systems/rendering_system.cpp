@@ -24,8 +24,6 @@ void systems::rendering_system::on_destroyed_entity(const events::remove_entity&
 }
 
 void systems::rendering_system::render(int frame){
-    DrawTextureRec(background_.get_texture(), view_frame_, Vector2{0.0f, 0.0f}, WHITE);
-
     // TODO cull against the view frame once hitbox bounds land in
     // collision_component
     auto render_predicate = [this](size_t entity_id) -> bool {
@@ -35,5 +33,11 @@ void systems::rendering_system::render(int frame){
     for(size_t layer = 0; layer < level_config::draw_layers::size; ++layer){
         render_layers_[layer].draw(render_predicate,
             Vector2{view_frame_.x, view_frame_.y}, frame);
+    }
+}
+
+void systems::rendering_system::clear(){
+    for(size_t layer = 0; layer < level_config::draw_layers::size; ++layer){
+        render_layers_[layer].clear();
     }
 }

@@ -162,3 +162,17 @@ notes:
    point query then the cursor position IS the query, not an occupant. same for
    anything screen space. would mean spatial membership is a builder decision
    rather than automatic on create_entity
+
+
+   -> control system
+   -> test arrow scree moving 
+   -> buld player dogs, check switching between them
+   -> player dog pathfinding to position when clicked
+   -> buidling decorations and statinos
+   -> then customer and waiter /
+   -> then you're back to where you were 
+
+   -> control input system to check compoennts for input. then perform the actions
+   -> how exactly we hadnle, std::functoin map like hte current system ? 
+   -> it could owrk i think 
+   - they are void functions ,adn then the function can just perfrm some behaviour. can limit paramters as best as possible. i.e arrow key movement is constnat soiit ouwld not need to be. passed in
