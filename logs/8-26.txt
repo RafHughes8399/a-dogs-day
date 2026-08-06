@@ -176,3 +176,8 @@ notes:
    -> how exactly we hadnle, std::functoin map like hte current system ? 
    -> it could owrk i think 
    - they are void functions ,adn then the function can just perfrm some behaviour. can limit paramters as best as possible. i.e arrow key movement is constnat soiit ouwld not need to be. passed in
+
+
+-> complete control input processing for key and mouse inputs
+-> define the control key - function map 
+-> check compoennts based on hteir action and call the function 
