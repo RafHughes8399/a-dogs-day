@@ -96,7 +96,7 @@ namespace testing{
     }
 
     bool ecs_test_game::has_movement(size_t entity_id){
-        return component_managers::movment_manager_.get_component(entity_id) != nullptr;
+        return component_managers::movement_manager_.get_component(entity_id) != nullptr;
     }
 
     bool ecs_test_game::is_tracked(size_t entity_id){
@@ -122,7 +122,7 @@ namespace testing{
 
     size_t ecs_test_game::total_components(){
         return component_managers::positional_manager_.size()
-             + component_managers::movment_manager_.size()
+             + component_managers::movement_manager_.size()
              + component_managers::renderable_manager_.size()
              + component_managers::collision_manager_.size()
              + component_managers::interaction_manager_.size()

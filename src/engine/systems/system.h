@@ -257,12 +257,60 @@ namespace systems{
             control_input_system& operator=(control_input_system&& other) = delete;
 
             void update(float delta);
+            // teardown between test scenarios - the singleton outlives them
+            void clear(){
+                selected_dog_ = level_config::mack_id;
+            }
+#ifdef DOG_DAYS_TESTING
+            // * raylib 5.5 has no way to inject key or button state - IsKeyPressed
+            // * and friends read state only PollInputEvents writes - so the tests
+            // * enter one step below the device. this is exactly what check_inputs
+            // * calls once a binding has fired, so the lookup and the action are
+            // * the real path; only the "did the device do it" question is faked.
+            void simulate_input(const game_config::input& input, size_t id, float delta = 0.0f){
+                dispatch(input.key_, input.action_, id, delta);
+            }
+            bool is_bound(int key, int action){
+                return control_function_map_.find({key, action}) != control_function_map_.end();
+            }
+            size_t bound_count(){
+                return control_function_map_.size();
+            }
+            size_t get_selected_dog(){
+                return selected_dog_;
+            }
+#endif
         private:
             control_input_system()
-            : control_function_map_({}){
+            : control_function_map_({}), selected_dog_(level_config::mack_id){
+                build_control_map();
             }
 
-            std::map<int, std::function<void(int)>> control_function_map_;
+            void build_control_map();
+            void check_inputs(size_t id, std::vector<game_config::input>& controls, float delta);
+            void dispatch(int key, int action, size_t id, float delta);
+
+            // the actions, mirroring player::controls' default scheme
+            void back();
+            void left_click();
+            void move_view_frame(Vector2 direction_scalar, float delta);
+            void open_inventory();
+            void open_map();
+            void open_menu();
+            void open_quests();
+            void open_shop();
+            void queue_key_press(int key);
+            void right_click();
+            void select_dog();
+            void switch_dog();
+
+            // * keyed on {key_, action_}, not the key alone - KEY_E is both
+            // * key_hold_actions::edit_mode and key_press_actions::exit_edit, and
+            // * MOUSE_BUTTON_LEFT is 0, which is also a legal KEY_* value, so a
+            // * lookup on the raw int would alias all three.
+            std::map<std::pair<int, int>, std::function<void(size_t, float)>> control_function_map_;
+            // mirrors player::selected_dog_ - switch_dog flips it, right_click carries it
+            size_t selected_dog_;
     };
     class npc_system{
         // uses the expediter and the maitre d to orchestrate
@@ -292,6 +340,7 @@ namespace systems{
         entity_lifespan_system::get_instance().clear();
         spatial_system::get_instance().clear();
         rendering_system::get_instance().clear();
+        control_input_system::get_instance().clear();
     }
 
     // hold a refernece to the glboal managers that they need to process things

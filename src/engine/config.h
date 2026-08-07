@@ -23,13 +23,14 @@ namespace game_config {
     // * a legal value that nothing would catch.
     enum control_action{
         key_press = 0,
-        key_hold = 1
+        key_hold = 1,
+        key_release = 2
     };
     enum mouse_action{
-        mouse_press = 0,
-        mouse_hold = 1,
-        mouse_released = 2,
-        mouse_up = 3
+        mouse_press = 3,
+        mouse_hold = 4,
+        mouse_released = 5,
+        mouse_up = 6
     };
     enum control_input{
         dog_switch = KEY_F,
@@ -44,15 +45,11 @@ namespace game_config {
         move_left = KEY_LEFT,
         move_right = KEY_RIGHT
     };
-    struct control{
+    struct input{
         int key_;
         int action_;
     };
-    struct mouse_input{
-        int button_;
-        int action_;
-    };
-    inline std::vector<control> player_controls = {
+    inline std::vector<input> player_controls = {
         {KEY_LEFT, key_hold},
         {KEY_RIGHT, key_hold},
         {KEY_DOWN, key_hold},
@@ -61,7 +58,7 @@ namespace game_config {
     // * the cursor's bindings. Note there is no entry for pointer movement -
     // * that is not a binding, it is ambient device state, and holding a
     // * mouse_input_component at all is what makes an entity mouse-positioned.
-    inline std::vector<mouse_input> cursor_controls = {
+    inline std::vector<input> cursor_controls = {
         {MOUSE_BUTTON_LEFT, mouse_press},
         {MOUSE_BUTTON_RIGHT, mouse_press}
     };

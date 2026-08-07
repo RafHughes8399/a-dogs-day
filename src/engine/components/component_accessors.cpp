@@ -18,10 +18,10 @@ Vector2 components::movement_component::get_direction_scalar(){
     return direction_scalar_;
 }
 
-std::vector<game_config::control>& components::key_input_component::get_controls(){
+std::vector<game_config::input>& components::key_input_component::get_inputs(){
     return controls_;
 }
-std::vector<game_config::mouse_input>& components::mouse_input_component::get_inputs(){
+std::vector<game_config::input>& components::mouse_input_component::get_inputs(){
     return inputs_;
 }
 

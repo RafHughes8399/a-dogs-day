@@ -13,7 +13,7 @@
 // is not available, so a namespace block is the only way to scope these
 namespace component_managers {
 component_manager<components::position_component> positional_manager_;
-component_manager<components::movement_component> movment_manager_;
+component_manager<components::movement_component> movement_manager_;
 component_manager<components::renderable_component> renderable_manager_;
 component_manager<components::collision_component> collision_manager_;
 component_manager<components::interaction_component> interaction_manager_;

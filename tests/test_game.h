@@ -112,6 +112,8 @@ namespace testing{
             entities::entity* find_entity(int id);
             // Total entities currently in the level (public level API passthrough).
             int num_entities();
+            // The level's view frame - the thing move_view_frame actually moves.
+            Rectangle view_frame();
             // Cafe-system tracking counts (passthroughs to expediter_/maitre_d_),
             // for asserting registration and removal in scenarios.
             int num_waiters();

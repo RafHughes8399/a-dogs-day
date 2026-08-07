@@ -2,10 +2,53 @@
 #include "config.h"
 #include "entity.h"
 #include "sprite.h"
+#include "texture.h"
 #include <raylib.h>
 
 // qualified with ecs_entities:: so a name that doesn't match a declaration in
 // entity.h is a compile error here, not an undefined symbol at link time
+
+namespace {
+    // the same spawns level_builder::build_main_level places them at
+    const Vector2 mack_start = Vector2{level_config::edge_weight * 7.0f,
+                                       level_config::edge_weight * 4.0f};
+    const Vector2 khiri_start = Vector2{level_config::edge_weight * 4.0f,
+                                        level_config::edge_weight * 3.5f};
+
+    // every dog sprite is the same four attribute lookups off a cached texture
+    sprite::sprite build_dog_sprite(int texture_key, const char* path,
+        const float attributes[entity_config::attributes::size]){
+        return sprite_builders::build_sprite(
+            textures::textures_.get_texture(texture_key, path),
+            attributes[entity_config::attributes::frame_width],
+            attributes[entity_config::attributes::frame_height],
+            attributes[entity_config::attributes::frames],
+            attributes[entity_config::attributes::animations]);
+    }
+
+    // * what khiri and mack share: a position, one sprite_component holding the
+    // * direction-indexed body sprites, and a hitbox per facing running parallel
+    // * to them - so the two indices are one facing, as collision_component's
+    // * note requires. both start facing right, matching movement_component's
+    // * default direction.
+    void build_player_dog_components(size_t id, Vector2 position,
+        std::vector<sprite::sprite> sprites){
+        component_helpers::register_positional_component(id,
+            component_builders::build_positional_component(position));
+
+        std::vector<components::renderable_component::sprite_component> sprite_components = {
+            component_builders::build_sprite_component(sprites, level_config::directions::right)};
+        component_helpers::register_renderable_component(id,
+            component_builders::build_renderable_component(sprite_components));
+
+        auto across_hitbox = hitbox_builders::build_player_dog_across_hitbox(position);
+        std::vector<hitbox::hitbox> hitboxes = {across_hitbox, across_hitbox};
+        component_helpers::register_collision_component(id,
+            component_builders::build_collision_component(
+                component_builders::build_hitbox_component(hitboxes,
+                    level_config::directions::right)));
+    }
+} // namespace
 
 void ecs_entities::build_player(size_t player_id, size_t cursor_id){
     // build control components, start with the array keys, 
@@ -19,11 +62,32 @@ void ecs_entities::build_player(size_t player_id, size_t cursor_id){
 void ecs_entities::build_player_dog(size_t id){
     (void) id;
 }
+    // * only the across sprites are ported. the old builder also carried outline
+    // * sprites and an empty head body: the outlines are selection cosmetics that
+    // * ecs_layer::draw would render unconditionally, since every sprite_component
+    // * on an entity draws every frame and nothing in the ECS knows which dog is
+    // * selected yet. they land with the state machine component.
+    // TODO no movement_component yet - these dogs hold a position but no speed,
+    // TODO direction or path queue, so nothing can move them.
     void ecs_entities::build_khiri(size_t id){
-        (void) id;
+        // ! left right, parallel to level_config::directions
+        std::vector<sprite::sprite> sprites;
+        sprites.push_back(build_dog_sprite(textures::khiri_left,
+            entity_config::khiri_left_path, entity_config::khiri_across_attributes));
+        sprites.push_back(build_dog_sprite(textures::khiri_right,
+            entity_config::khiri_right_path, entity_config::khiri_across_attributes));
+
+        build_player_dog_components(id, khiri_start, std::move(sprites));
     }
     void ecs_entities::build_mack(size_t id){
-        (void) id;
+        // ! left right, parallel to level_config::directions
+        std::vector<sprite::sprite> sprites;
+        sprites.push_back(build_dog_sprite(textures::mack_left,
+            entity_config::mack_left_path, entity_config::mack_across_attributes));
+        sprites.push_back(build_dog_sprite(textures::mack_right,
+            entity_config::mack_right_path, entity_config::mack_across_attributes));
+
+        build_player_dog_components(id, mack_start, std::move(sprites));
     }
 
 void ecs_entities::build_customer_dog(size_t id){
@@ -79,6 +143,7 @@ void ecs_entities::build_waiter_dog(size_t id){
 // * direction-indexed arrays, and position_to_node snaps it identically to
 // * right.)
 void ecs_entities::build_cursor(size_t id){
+    // positional component
     component_helpers::register_positional_component(id,
         component_builders::build_positional_component(GetMousePosition()));
     component_helpers::register_mouse_input_component(id,

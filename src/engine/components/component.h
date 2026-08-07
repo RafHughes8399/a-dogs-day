@@ -184,7 +184,7 @@ public:
 class key_input_component{
     public:
         ~key_input_component() = default;
-        key_input_component(std::vector<game_config::control> controls)
+        key_input_component(std::vector<game_config::input> controls)
         :controls_(controls){}
         key_input_component(const key_input_component& other) = default;
         key_input_component(key_input_component&& other) = default;
@@ -192,9 +192,9 @@ class key_input_component{
         key_input_component& operator=(const key_input_component& other) = default;
         key_input_component& operator=(key_input_component&& other) = default;
 
-        std::vector<game_config::control>& get_controls();
+        std::vector<game_config::input>& get_inputs();
     private:
-        std::vector<game_config::control> controls_;
+        std::vector<game_config::input> controls_;
 };
 
 // * mouse input component - the button bindings for a mouse-driven entity.
@@ -214,7 +214,7 @@ class key_input_component{
 class mouse_input_component{
     public:
         ~mouse_input_component() = default;
-        mouse_input_component(std::vector<game_config::mouse_input> inputs)
+        mouse_input_component(std::vector<game_config::input> inputs)
         :inputs_(inputs){}
         mouse_input_component(const mouse_input_component& other) = default;
         mouse_input_component(mouse_input_component&& other) = default;
@@ -222,9 +222,9 @@ class mouse_input_component{
         mouse_input_component& operator=(const mouse_input_component& other) = default;
         mouse_input_component& operator=(mouse_input_component&& other) = default;
 
-        std::vector<game_config::mouse_input>& get_inputs();
+        std::vector<game_config::input>& get_inputs();
     private:
-        std::vector<game_config::mouse_input> inputs_;
+        std::vector<game_config::input> inputs_;
 };
 
 // ! A STATE MACHINE IS A SET OF STATE COMPONENTS
@@ -328,7 +328,7 @@ private:
 // * component_managers::renderable_manager_ rather than components::renderable_manager_,
 // * which would blur the storage layer into the data layer.
 extern component_manager<components::position_component> positional_manager_;
-extern component_manager<components::movement_component> movment_manager_;
+extern component_manager<components::movement_component> movement_manager_;
 extern component_manager<components::renderable_component> renderable_manager_;
 extern component_manager<components::collision_component> collision_manager_;
 extern component_manager<components::interaction_component> interaction_manager_;
@@ -352,8 +352,8 @@ namespace component_builders{
         components::collision_component::hitbox_component hitbox);
 
     components::interaction_component build_interaction_component();
-    components::key_input_component build_key_input_component(std::vector<game_config::control>& controls);
-    components::mouse_input_component build_mouse_input_component(std::vector<game_config::mouse_input>& inputs);
+    components::key_input_component build_key_input_component(std::vector<game_config::input>& controls);
+    components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
     components::state_machine_component::state_component build_state();
     components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
     components::food_component build_food_component();
@@ -365,7 +365,7 @@ namespace component_helpers{
         component_managers::positional_manager_.register_component(entity_id, std::move(component));
     }
     inline void register_movement_component(size_t entity_id, components::movement_component component){
-        component_managers::movment_manager_.register_component(entity_id, std::move(component));
+        component_managers::movement_manager_.register_component(entity_id, std::move(component));
     }
     inline void register_renderable_component(size_t entity_id, components::renderable_component component){
         component_managers::renderable_manager_.register_component(entity_id, std::move(component));
@@ -404,7 +404,7 @@ namespace component_helpers{
         component_managers::positional_manager_.unregister_component(entity_id);
     }
     inline void unregister_movement_component(size_t entity_id){
-        component_managers::movment_manager_.unregister_component(entity_id);
+        component_managers::movement_manager_.unregister_component(entity_id);
     }
     inline void unregister_renderable_component(size_t entity_id){
         component_managers::renderable_manager_.unregister_component(entity_id);
@@ -446,7 +446,7 @@ namespace component_helpers{
     inline size_t num_registered_components(size_t entity_id){
         size_t count = 0;
         count += component_managers::positional_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::movment_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::movement_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::renderable_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::collision_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::interaction_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
@@ -460,7 +460,7 @@ namespace component_helpers{
     // wipes every manager - for the test harness between scenarios
     inline void clear_all_components(){
         component_managers::positional_manager_.clear();
-        component_managers::movment_manager_.clear();
+        component_managers::movement_manager_.clear();
         component_managers::renderable_manager_.clear();
         component_managers::collision_manager_.clear();
         component_managers::interaction_manager_.clear();

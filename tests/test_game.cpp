@@ -185,6 +185,10 @@ namespace testing{
         return level_->num_entities();
     }
 
+    Rectangle test_game::view_frame(){
+        return level_->get_view_frame();
+    }
+
     int test_game::num_waiters(){
         return static_cast<int>(expediter_.num_waiters());
     }

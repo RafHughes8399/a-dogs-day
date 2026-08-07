@@ -97,6 +97,11 @@ namespace level{
             void on_dog_reached_station_event(const events::dog_reached_station& event);
             void render(int frame);
             void update(float delta, int frame);
+#ifdef DOG_DAYS_TESTING
+            Rectangle get_view_frame() const {
+                return view_frame_;
+            }
+#endif
         private :
             struct void_entity_record{
                 std::unique_ptr<entities::entity> entity;

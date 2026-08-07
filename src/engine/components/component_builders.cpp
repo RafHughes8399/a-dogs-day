@@ -24,10 +24,10 @@ components::collision_component component_builders::build_collision_component(co
 components::interaction_component component_builders::build_interaction_component(){
     return components::interaction_component();
 }
-components::key_input_component component_builders::build_key_input_component(std::vector<game_config::control>& controls){
+components::key_input_component component_builders::build_key_input_component(std::vector<game_config::input>& controls){
     return components::key_input_component(controls);
 }
-components::mouse_input_component component_builders::build_mouse_input_component(std::vector<game_config::mouse_input>& inputs){
+components::mouse_input_component component_builders::build_mouse_input_component(std::vector<game_config::input>& inputs){
     return components::mouse_input_component(inputs);
 }
 components::state_machine_component::state_component component_builders::build_state(){

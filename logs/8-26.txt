@@ -179,5 +179,28 @@ notes:
 
 
 -> complete control input processing for key and mouse inputs
--> define the control key - function map 
--> check compoennts based on hteir action and call the function 
+-> define the control key - function map
+-> check compoennts based on hteir action and call the function
+
+
+control input is done.
+-> the key - function map is keyed on {key, action} not just the key, because KEY_E is
+   both edit_mode as a hold and exit_edit as a press, and MOUSE_BUTTON_LEFT is 0 which
+   is a legal key value. one map covers keyboard and mouse
+-> check_inputs asks the device per binding and calls through the map, actions mirror
+   the old player::controls default scheme and emit the same events
+-> arrow keys move the view frame, menu keys navigate the menu graph, both under test
+-> khiri and mack build as ecs entities now - positional, renderable, collision
+
+next: movement and state machine components
+-> movement first, everything else is stuck behind it. direction lives in movement,
+   and the dogs already carry sprites and hitboxes indexed by facing with nothing
+   to write that index
+-> path queue + move speed, movement system integrates position along the path and
+   writes the facing index into renderable and collision so they stay in step
+-> then the state machine component
+-> the outline sprites and dog selection come back with it. outlines are a
+   selected / unselected thing, and ecs_layer::draw renders every sprite_component
+   on an entity every frame, so there is nowhere to hang them until states exist
+-> editing waits on this too - swapping control schemes now means swapping the
+   bindings on the component, not indexing a second map
