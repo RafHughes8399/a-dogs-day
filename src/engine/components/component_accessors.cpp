@@ -2,12 +2,15 @@
 
 // definitions for the accessors declared on each component in component.h
 
+// ---------------- position_component ----------------
 Vector2 components::position_component::get_position(){
     return position_;
 }
 void components::position_component::set_position(Vector2 position){
     position_ = position;
 }
+
+// ---------------- movement_component ----------------
 type_config::path components::movement_component::get_current_path(){
     return paths_.empty() ? type_config::path{} : paths_.front();
 }
@@ -18,6 +21,7 @@ Vector2 components::movement_component::get_direction_scalar(){
     return direction_scalar_;
 }
 
+// ---------------- input components ----------------
 std::vector<game_config::input>& components::key_input_component::get_inputs(){
     return controls_;
 }
@@ -25,6 +29,7 @@ std::vector<game_config::input>& components::mouse_input_component::get_inputs()
     return inputs_;
 }
 
+// ---------------- renderable_component ----------------
 sprite::sprite& components::renderable_component::sprite_component::get_sprite(){
     return sprites_[sprite_index_];
 }
@@ -39,6 +44,7 @@ std::vector<components::renderable_component::sprite_component>& components::ren
     return sprites_;
 }
 
+// ---------------- collision_component ----------------
 std::vector<hitbox::hitbox>& components::collision_component::hitbox_component::get_hitboxes(){
     return hitboxes_;
 }

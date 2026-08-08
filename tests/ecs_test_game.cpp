@@ -53,6 +53,18 @@ namespace testing{
         }, layer);
     }
 
+    size_t ecs_test_game::create_khiri(size_t layer){
+        return lifespan_.create([](size_t id){
+            ecs_entities::build_khiri(id);
+        }, layer);
+    }
+
+    size_t ecs_test_game::create_mack(size_t layer){
+        return lifespan_.create([](size_t id){
+            ecs_entities::build_mack(id);
+        }, layer);
+    }
+
     void ecs_test_game::remove(size_t entity_id){
         lifespan_.remove(entity_id);
     }
@@ -118,6 +130,25 @@ namespace testing{
     Rectangle ecs_test_game::hitbox_of(size_t entity_id){
         auto* collision = component_managers::collision_manager_.get_component(entity_id);
         return collision->get_hitbox_component().get_hitbox().get_box();
+    }
+
+    int ecs_test_game::graph_occupant_at(Vector2 position){
+        return movement_.graph_occupant_at(position);
+    }
+
+    size_t ecs_test_game::graph_occupied_node_count(){
+        return movement_.graph_occupied_node_count();
+    }
+
+    bool ecs_test_game::graph_marks(size_t entity_id, Rectangle footprint){
+        for(auto col = footprint.x; col < footprint.x + footprint.width; col += level_config::edge_weight){
+            for(auto row = footprint.y; row < footprint.y + footprint.height; row += level_config::edge_weight){
+                if(graph_occupant_at(Vector2{col, row}) != static_cast<int>(entity_id)){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     size_t ecs_test_game::total_components(){

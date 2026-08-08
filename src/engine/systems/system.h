@@ -27,7 +27,11 @@ namespace systems{
                 static movement_system instance;
                 return instance;
             }
-            ~movement_system() = default;
+            ~movement_system(){
+                event_interface::unsubscribe<events::create_entity>(create_entity_handler_);
+                event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
+                event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+            }
             movement_system(const movement_system& other) = delete;
             movement_system(movement_system&& other) = delete;
 
@@ -36,6 +40,21 @@ namespace systems{
             void update(float delta);
             void update_position(size_t id, Vector2 position);
 
+
+            void on_created_entity(const events::create_entity& event);
+            void on_moved_entity(const events::move_entity& event);
+            void on_destroyed_entity(const events::remove_entity& event);
+            void clear(){
+                graph_.reset();
+            }
+#ifdef DOG_DAYS_TESTING
+            int graph_occupant_at(Vector2 position){
+                return graph_.occupant_at(position);
+            }
+            size_t graph_occupied_node_count(){
+                return graph_.occupied_node_count();
+            }
+#endif
             // set a path for an entity
             // queue a path for an entity
             // within update, process movement [can use the existing dog logic]
@@ -44,7 +63,19 @@ namespace systems{
             // update the graph nodes
         private:
             movement_system()
-            :graph_(level_config::world_x, level_config::world_y){};
+            : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
+            move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
+            remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+            graph_(level_config::world_x, level_config::world_y){
+                event_interface::subscribe<events::create_entity>(create_entity_handler_);
+                event_interface::subscribe<events::move_entity>(move_entity_handler_);
+                event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+            }
+
+            events::event_handler<events::create_entity> create_entity_handler_;
+            events::event_handler<events::move_entity> move_entity_handler_;
+            events::event_handler<events::remove_entity> remove_entity_handler_;
+
             graph::level_graph graph_;
     };
     class rendering_system{
@@ -350,6 +381,7 @@ namespace systems{
         entity_lifespan_system::get_instance().clear();
         spatial_system::get_instance().clear();
         rendering_system::get_instance().clear();
+        movement_system::get_instance().clear();
         control_input_system::get_instance().clear();
     }
 

@@ -2,6 +2,7 @@
 #include "system.h"
 
 
+// ---------------- helpers ----------------
 bool systems::rendering_system::is_entity_in_frame(size_t id, Rectangle view_frame){
     auto* collision = component_managers::collision_manager_.get_component(id);
     // nothing to cull against - draw it rather than hide it
@@ -10,6 +11,8 @@ bool systems::rendering_system::is_entity_in_frame(size_t id, Rectangle view_fra
     auto entity_box = collision->get_hitbox_component().get_hitbox().get_box();
     return CheckCollisionRecs(view_frame, entity_box);
 }
+
+// ---------------- event handlers ----------------
 void systems::rendering_system::on_created_entity(const events::create_entity& event){
     auto layer = event.get_layer();
     if(layer >= level_config::draw_layers::size){ return; }
@@ -23,6 +26,7 @@ void systems::rendering_system::on_destroyed_entity(const events::remove_entity&
     }
 }
 
+// ---------------- render and teardown ----------------
 void systems::rendering_system::render(int frame){
     // TODO cull against the view frame once hitbox bounds land in
     // collision_component

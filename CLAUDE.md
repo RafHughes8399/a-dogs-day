@@ -38,6 +38,7 @@ Test sources live in `tests/*.cpp` and are registered explicitly in `CMakeLists.
 ## Code style
 
 - Prefer `class` over `struct` unless explicitly told otherwise, including for component-style types (e.g. the in-progress ECS work in `src/systems/components/`) — these are expected to carry member functions and encapsulated state, not stay plain data aggregates.
+- **Do not write comments unless explicitly asked to.** Write the code and nothing else. This applies everywhere — implementation, headers, and test files alike. The existing `// *` blocks throughout the codebase (`component.h`, `ecs_builders.cpp`, `system.h`) are the author's own design notes recording decisions they reasoned through; they are not a density to match, and adding to them buries the notes that matter. If something genuinely can't be understood from the code, say so in your response instead of committing a comment about it.
 
 ## Architecture
 

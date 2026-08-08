@@ -258,6 +258,7 @@ add_executable(tests
   tests/ecs_scenarios.cpp
   tests/control_input_scenarios.cpp
   tests/spatial_scenarios.cpp
+  tests/graph_scenarios.cpp
   tests/harness_scenarios.cpp
   tests/player_scenarios.cpp
   tests/decoration_scenarios.cpp

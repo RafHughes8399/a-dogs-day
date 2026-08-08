@@ -45,6 +45,8 @@ namespace testing{
             size_t create_player(size_t cursor_id);
             // the real ecs_entities::build_cursor, not a stand-in
             size_t create_cursor(size_t layer = level_config::draw_layers::cursor);
+            size_t create_khiri(size_t layer = level_config::draw_layers::dogs);
+            size_t create_mack(size_t layer = level_config::draw_layers::dogs);
 
             void remove(size_t entity_id);
             // the single legal position write - moves the hitbox and reindexes
@@ -70,6 +72,11 @@ namespace testing{
             int node_depth_of(size_t entity_id);
             bool node_bounds_of(size_t entity_id, raglib::bounding_box_2& bounds);
             Rectangle hitbox_of(size_t entity_id);
+
+            // ---------------- graph accessors ----------------
+            int graph_occupant_at(Vector2 position);
+            size_t graph_occupied_node_count();
+            bool graph_marks(size_t entity_id, Rectangle footprint);
 
         private:
             // the systems are singletons that outlive every scenario - the ctor

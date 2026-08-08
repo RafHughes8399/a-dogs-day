@@ -5,6 +5,7 @@
 
 // TODO stub - the loop calls this every frame, nothing to do yet
 
+// ---------------- input dispatch ----------------
 void systems::control_input_system::check_inputs(size_t id, std::vector<game_config::input>& controls, float delta){
     for(auto it = controls.begin(); it != controls.end(); ++it){
         auto input = (*it).key_;
@@ -78,6 +79,7 @@ void systems::control_input_system::update(float delta){
 
 // ------------------------------- control map ------------------------------- //
 
+// ---------------- control map ----------------
 // * the ECS twin of player::controls::build_default_controls_state - same
 // * bindings, same calls. it is one map rather than the three parallel ones the
 // * player keeps because the {key_, action_} key already says which of press /
@@ -125,6 +127,7 @@ void systems::control_input_system::build_control_map(){
 
 // ------------------------------- the actions ------------------------------- //
 
+// ---------------- actions ----------------
 // the menu-opening actions differ only by which action they announce
 void systems::control_input_system::queue_key_press(int key){
     std::unique_ptr<events::event> key_press = std::make_unique<events::key_press>(key);

@@ -371,6 +371,9 @@ namespace component_helpers{
     inline void register_food_component(size_t entity_id, components::food_component component){
         component_managers::food_manager_.register_component(entity_id, std::move(component));
     }
+    inline bool is_mouse_positioned(size_t entity_id){
+        return component_managers::mouse_input_manager_.get_component(entity_id) != nullptr;
+    }
     // writes sprite and hitbox indices together. missing either component is fine
     inline void set_facing_index(size_t entity_id, size_t index){
         if(auto* renderable = component_managers::renderable_manager_.get_component(entity_id)){

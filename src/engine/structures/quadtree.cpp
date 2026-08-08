@@ -5,6 +5,8 @@ enum positions{
     bottom_left = 2,
     bottom_right = 3
 };
+
+// ---------------- quadtree - node geometry ----------------
 // containment checks
 bool tree::quadtree::node_contains_object(raglib::bounding_box_2& node, const Rectangle& object){
     // compare the bounding box of the node and the object
@@ -83,6 +85,7 @@ void tree::quadtree::build_children(std::unique_ptr<node>& tree){
     tree->children_.push_back(std::move(bottom_right));
 }
 
+// ---------------- quadtree - insertion and removal ----------------
 // insertion
 void tree::quadtree::insert(std::unique_ptr<node>& tree, std::unique_ptr<entities::entity> object){
 	auto & object_bounds = object->get_hitbox();
@@ -211,6 +214,7 @@ void tree::quadtree::notify_removals(const std::vector<entities::entity*>& remov
     }
 }
 
+// ---------------- quadtree - inspection ----------------
 int tree::quadtree::height(std::unique_ptr<node>& tree) {
     if (not tree) {
         return -1;
@@ -271,6 +275,8 @@ bool tree::quadtree::is_empty(std::unique_ptr<node>& tree) {
 bool tree::quadtree::is_root(std::unique_ptr<node>& tree){
     return tree->depth_ == 0  ? true : false;
 }
+
+// ---------------- quadtree - collision and interaction ----------------
 bool tree::quadtree::is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, int id){
     // starts with the whole if node case
     if(not tree) {
@@ -348,6 +354,7 @@ void tree::quadtree::perform_interactions(std::unique_ptr<node>& tree, entities:
 // i suspect some issues with this, i think it is resetting the pointer 
 // but then the parent is now holding onto a null pointer
 
+// ---------------- quadtree - maintenance ----------------
 // i need to remove it from the parent's children list
 void tree::quadtree::prune_leaves(std::unique_ptr<node>& tree, double delta) {
     // you're thinking about it wrong i think 
@@ -494,6 +501,7 @@ void tree::quadtree::identify_collisions(std::unique_ptr<node>& tree , std::vect
 
 // ----------------------- ecs_quadtree ----------------------- //
 
+// ---------------- ecs_quadtree - node geometry ----------------
 hitbox::hitbox* tree::ecs_quadtree::bounds_for(size_t entity_id){
     auto* collision = component_managers::collision_manager_.get_component(entity_id);
     if(collision == nullptr){ return nullptr; }
@@ -565,6 +573,7 @@ void tree::ecs_quadtree::build_children(std::unique_ptr<node>& tree){
     tree->children_.push_back(std::move(bottom_right));
 }
 
+// ---------------- ecs_quadtree - insertion and removal ----------------
 void tree::ecs_quadtree::insert(std::unique_ptr<node>& tree, size_t entity_id, hitbox::hitbox& bounds){
     if(not node_contains_object(tree->bounds_, bounds.get_box())){
         return;
@@ -621,6 +630,7 @@ void tree::ecs_quadtree::clear(std::unique_ptr<node>& tree){
     }
 }
 
+// ---------------- ecs_quadtree - inspection ----------------
 int tree::ecs_quadtree::height(std::unique_ptr<node>& tree) {
     if (not tree) {
         return -1;
@@ -685,6 +695,7 @@ bool tree::ecs_quadtree::is_leaf(std::unique_ptr<node>& tree) {
     return tree->children_.size() == 0 ? true : false;
 }
 
+// ---------------- ecs_quadtree - collision ----------------
 bool tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, size_t id){
     if(not tree) {
         return false;
@@ -728,6 +739,7 @@ bool tree::ecs_quadtree::get_colliding_entity(std::unique_ptr<node>& tree, hitbo
     return false;
 }
 
+// ---------------- ecs_quadtree - maintenance ----------------
 void tree::ecs_quadtree::prune_leaves(std::unique_ptr<node>& tree, double delta) {
     if (is_leaf(tree) and not is_root(tree)
         and is_empty(tree)) {

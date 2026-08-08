@@ -1,16 +1,18 @@
 #include "level.h"
 
 // ----------------------------------------- level graph ----------------------------------------- //
-bool level::level_graph::can_place_decoration(const queries::can_place_decoration& query){
+// ---------------- query handlers ----------------
+bool graph::level_graph::can_place_decoration(const queries::can_place_decoration& query){
     auto query_rectangle = query.get_decoration_rectangle();
     return  not check_for_decoration(query_rectangle, query.get_decoration_id()); // is there no decoration
 }
 
-std::vector<Vector2> level::level_graph::get_path(const queries::path_query& query){
+std::vector<Vector2> graph::level_graph::get_path(const queries::path_query& query){
     return find_path(query.get_source(), query.get_destination(), query.get_direction());
 }
 
-bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id){
+// ---------------- node predicates and lookup ----------------
+bool graph::level_graph::is_node_closer(int current_id, int next_id, int end_id){
     Vector2 current_position = id_to_node(current_id)->position_;
     Vector2 next_position = id_to_node(next_id)->position_;
     Vector2 end_position = id_to_node(end_id)->position_;
@@ -20,15 +22,15 @@ bool level::level_graph::is_node_closer(int current_id, int next_id, int end_id)
     return next_end_distance <= current_end_distance;
 }
 
-bool level::level_graph::is_node_empty(int node_id){
+bool graph::level_graph::is_node_empty(int node_id){
     auto node_decoration = id_to_node(node_id)->decoration_;
-    return node_decoration == level_config::empty_node;
+    return node_decoration == graph_config::empty_node;
 }
 // true if occupued, false if not, differs from empty by the use case 
 // empty is used for dog pathfinding, occupied is used for decoration placement
-bool level::level_graph::is_node_occupied(int node_id, int decoration_id){
+bool graph::level_graph::is_node_occupied(int node_id, int decoration_id){
     auto node_decoration = id_to_node(node_id)->decoration_;
-    bool empty = node_decoration == level_config::empty_node;
+    bool empty = node_decoration == graph_config::empty_node;
 
     bool self = node_decoration == decoration_id;
 
@@ -36,11 +38,13 @@ bool level::level_graph::is_node_occupied(int node_id, int decoration_id){
     return not empty and not self;
 }
 
-level::level_graph::node* level::level_graph::id_to_node(int id){
+graph::level_graph::node* graph::level_graph::id_to_node(int id){
     // is it just as simple as 
     return &graph_[static_cast<size_t>(id)].first;
 }
-std::vector<int> level::level_graph::bfs(int start_id, int end_id){
+
+// ---------------- pathfinding ----------------
+std::vector<int> graph::level_graph::bfs(int start_id, int end_id){
     size_t visited_size = graph_.size();
     auto visited = std::vector<int>(visited_size, -1);
     // init all with -1 
@@ -73,7 +77,7 @@ std::vector<int> level::level_graph::bfs(int start_id, int end_id){
     }
     return visited;
 }
-std::vector<Vector2> level::level_graph::make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id){
+std::vector<Vector2> graph::level_graph::make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id){
     if(visited[end_id] == -1 and end_id != start_id){
         return {};
     }
@@ -92,7 +96,7 @@ std::vector<Vector2> level::level_graph::make_position_path(std::vector<Vector2>
 
     return path;
 }
-std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end, Vector2 direction){
+std::vector<Vector2> graph::level_graph::find_path(Vector2 start, Vector2 end, Vector2 direction){
     int start_node = position_to_node(start, direction);
     int end_node = position_to_node(end, direction);
 
@@ -104,7 +108,8 @@ std::vector<Vector2> level::level_graph::find_path(Vector2 start, Vector2 end, V
     return position_path;
 } 
 
-int level::level_graph::categorise_node(int row, int column){
+// ---------------- position and node mapping ----------------
+int graph::level_graph::categorise_node(int row, int column){
     bool top_row = row == 0; // or row == max_row;
     bool bottom_row = row == num_rows_ - 1;
     bool first_column = column == 0;
@@ -119,7 +124,7 @@ int level::level_graph::categorise_node(int row, int column){
 
 // similar to the function below, but assumes that the position is 
 // a clean multiple of edge weight
-int level::level_graph::position_to_node(Vector2 position){
+int graph::level_graph::position_to_node(Vector2 position){
     int row = static_cast<int>(position.y / level_config::edge_weight);
     int col= static_cast<int>(position.x / level_config::edge_weight);
 
@@ -127,7 +132,7 @@ int level::level_graph::position_to_node(Vector2 position){
 }
 // snaps to the nearest node based on the direction being travelled 
 // assumes that the position is not a clean multiple of level_config::edge_weight
-int level::level_graph::position_to_node(Vector2 position, Vector2 direction){
+int graph::level_graph::position_to_node(Vector2 position, Vector2 direction){
     
     float row_f = position.y / level_config::edge_weight;
     float column_f = position.x / level_config::edge_weight; 
@@ -146,7 +151,8 @@ int level::level_graph::position_to_node(Vector2 position, Vector2 direction){
     return index;
 }
 
-std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int row, int column){
+// ---------------- construction ----------------
+std::vector<graph::level_graph::edge> graph::level_graph::build_corner_edges(int row, int column){
     // check top or bottom, first or last
     bool top_row = row == 0;
     bool bottom_row = row == num_rows_ -1;
@@ -216,7 +222,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_corner_edges(int
     } // bottom right corner
     return edges;
 }
-std::vector<level::level_graph::edge> level::level_graph::build_interior_edges(int row, int column){
+std::vector<graph::level_graph::edge> graph::level_graph::build_interior_edges(int row, int column){
     std::vector<edge> edges = {};
     // index = (row * row_length) + column
     int source_index = (row * row_length_) + column; // index of the current node
@@ -262,7 +268,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_interior_edges(i
 
     return edges;   
 }
-std::vector<level::level_graph::edge> level::level_graph::build_perimeter_edges(int row, int column){
+std::vector<graph::level_graph::edge> graph::level_graph::build_perimeter_edges(int row, int column){
     bool top_row = row == 0;
     bool bottom_row = row == num_rows_ -1;
     bool left_column = column == 0;
@@ -366,7 +372,7 @@ std::vector<level::level_graph::edge> level::level_graph::build_perimeter_edges(
     return edges;
 }
 
-void level::level_graph::build_edges(){
+void graph::level_graph::build_edges(){
     // auto is a std::pair<node, std::vector<edge>>
     for(auto & node : graph_){
         auto & n = node.first;
@@ -395,7 +401,7 @@ void level::level_graph::build_edges(){
     }
     return;
 }
-void level::level_graph::build_nodes(int level_x, int level_y){
+void graph::level_graph::build_nodes(int level_x, int level_y){
     // goes across the row, and then down the column so you. a node can be found by
     // ! (row * row_length) + column
     int num_nodes = 0;
@@ -407,21 +413,23 @@ void level::level_graph::build_nodes(int level_x, int level_y){
         }
     }
 }
-void level::level_graph::insert_node(int id, Vector2 position){
+void graph::level_graph::insert_node(int id, Vector2 position){
     // node is built with a number and at position 
-    graph_.push_back(std::make_pair(node{id, position, level_config::empty_node}, std::vector<edge>{}));
+    graph_.push_back(std::make_pair(node{id, position, graph_config::empty_node}, std::vector<edge>{}));
     return;
 }
-void level::level_graph::insert_edge(int source_num, node& destination, float weight){
+void graph::level_graph::insert_edge(int source_num, node& destination, float weight){
     (void) source_num;
     (void) destination;
     (void) weight;
     return;
 }
+
+// ---------------- occupancy ----------------
 // returns true if there is a decoration there, that is not the id one
 // returns false otherwise, (to place down, this must be false)
-bool level::level_graph::check_for_decoration(Rectangle rectangle, int id){
-    // Exclusive bounds, matching update_decoration (see note there).
+bool graph::level_graph::check_for_decoration(Rectangle rectangle, int id){
+    // Exclusive bounds, matching update_entity (see note there).
     for(auto col = rectangle.x; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
         for(auto row = rectangle.y; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
@@ -435,7 +443,7 @@ bool level::level_graph::check_for_decoration(Rectangle rectangle, int id){
     }
     return false;
 }
-void level::level_graph::update_decoration(Rectangle rectangle, int id){
+void graph::level_graph::update_entity(Rectangle rectangle, int id){
     // Mark exactly the cells the decoration covers: [x, x+width) x [y, y+height).
     // The bound is exclusive - an inclusive `<=` marks one extra column/row on the
     // +x/+y side, wrongly blocking the cell just past the decoration (e.g. a table's
@@ -449,21 +457,44 @@ void level::level_graph::update_decoration(Rectangle rectangle, int id){
         }
     }
 }
+int graph::level_graph::occupant_at(Vector2 position){
+    int node_index = position_to_node(position);
+    if(node_index < 0 or static_cast<size_t>(node_index) >= graph_.size()){
+        return graph_config::empty_node;
+    }
+    return graph_[static_cast<size_t>(node_index)].first.decoration_;
+}
+size_t graph::level_graph::occupied_node_count(){
+    size_t occupied = 0;
+    for(auto& entry : graph_){
+        if(entry.first.decoration_ != graph_config::empty_node){ ++occupied; }
+    }
+    return occupied;
+}
+void graph::level_graph::reset(){
+    for(auto& entry : graph_){
+        entry.first.decoration_ = graph_config::empty_node;
+    }
+}
+
+// ---------------- event handlers ----------------
 // for these two functions the following assumptions are
 // the decoration is placed at positions that are multiples of edge weights
 // and so too are their dimensions (width and height)
-void level::level_graph::on_moved_decoration(const events::moved_decoration& event){
+void graph::level_graph::on_moved_decoration(const events::moved_decoration& event){
 
 
-    update_decoration(event.get_pre_move());
+    update_entity(event.get_pre_move());
 
-    update_decoration(event.get_post_move(), event.get_id());
+    update_entity(event.get_post_move(), event.get_id());
 }
-void level::level_graph::on_placed_decoration(const events::placed_decoration& event){
+void graph::level_graph::on_placed_decoration(const events::placed_decoration& event){
 
-    update_decoration(event.get_rectangle(), static_cast<int>(event.get_id()));
+    update_entity(event.get_rectangle(), static_cast<int>(event.get_id()));
 }
-void level::level_graph::render(Rectangle frame){
+
+// ---------------- debug render ----------------
+void graph::level_graph::render(Rectangle frame){
     for(auto x = frame.x; x <= frame.x + frame.width; x += level_config::edge_weight){
         for(auto y = frame.y; y <= frame.y + frame.height; y += level_config::edge_weight){
             // (row * row_length) + col
@@ -472,7 +503,7 @@ void level::level_graph::render(Rectangle frame){
             int col = static_cast<int>(x / level_config::edge_weight);
             int index = (row * row_length) + col;
             auto position = graph_[static_cast<size_t>(index)].first.position_;
-            if(graph_[static_cast<size_t>(index)].first.decoration_ == level_config::empty_node){
+            if(graph_[static_cast<size_t>(index)].first.decoration_ == graph_config::empty_node){
                 DrawCircle(static_cast<int>(position.x), static_cast<int>(position.y), 15, DARKGREEN);
             }
             else{

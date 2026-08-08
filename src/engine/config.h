@@ -90,7 +90,6 @@ namespace level_config{
     inline const int screen_edges_x = static_cast<int>(screen_width / edge_weight);
     inline const int screen_edges_y = static_cast<int>(screen_height / edge_weight);
 
-    inline const int empty_node = -1;
     inline const size_t mack_id = 0;
     inline const size_t khiri_id = 1;
 
@@ -132,6 +131,9 @@ namespace level_config{
         Vector2{1,1}    // all   (index 4) - see TODO above, no sprite for this
     };
 
+}
+namespace graph_config{
+    inline const int empty_node = -1;
 }
 namespace cafe_config{
     enum queue_sides{

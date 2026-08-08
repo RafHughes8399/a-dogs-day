@@ -1,5 +1,6 @@
 #include "system.h"
 
+// ---------------- id allocation ----------------
 size_t systems::entity_lifespan_system::next_id(){
     if(recycled_ids_.empty()){
         return fresh_id_++;
@@ -11,6 +12,7 @@ size_t systems::entity_lifespan_system::next_id(){
 
 // create() is a template - defined in system.h.
 
+// ---------------- lifecycle ----------------
 void systems::entity_lifespan_system::remove(size_t entity_id){
     // executed before the components go, so listeners can still read them
     events::remove_entity removed{entity_id};

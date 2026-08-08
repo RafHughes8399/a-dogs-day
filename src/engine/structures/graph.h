@@ -42,7 +42,7 @@ namespace graph{
             struct edge{
                 node* destination_;
                 float weight_;
-                int decoration_ = level_config::empty_node; // -1 means empty, there is no decoration, any other number refers to the id of the decoration stored within
+                int decoration_ = graph_config::empty_node; // -1 means empty, there is no decoration, any other number refers to the id of the decoration stored within
                 bool operator==(const edge& other){
                     return destination_ == other.destination_ and std::fabs(weight_ - other.weight_) <= 0.0001f;
                 }
@@ -61,21 +61,20 @@ namespace graph{
 
             void build_nodes(int level_x, int level_y);
             void build_edges();
-            void update_decoration(Rectangle rectangle, int id = level_config::empty_node);
             std::vector<int> bfs(int start_id, int end_id);
             std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id);
-
+            
             // fields
             events::event_handler<events::moved_decoration> moved_decoration_handler_;
             events::event_handler<events::placed_decoration> placed_decoration_handler_;
             int num_rows_;
             int row_length_;
-
+            
             queries::query_handler<queries::can_place_decoration, bool> can_place_decoration_handler_;
             queries::query_handler<queries::path_query, std::vector<Vector2>> path_query_handler_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
-
-        public:
+            
+            public:
             ~level_graph(){
                 event_interface::unsubscribe<events::moved_decoration>(moved_decoration_handler_);
                 event_interface::unsubscribe<events::placed_decoration>(placed_decoration_handler_);
@@ -100,23 +99,27 @@ namespace graph{
             }
             level_graph(const level_graph& other) = default;
             level_graph(level_graph&& other) = default;
-
-
+            
+            
             level_graph& operator=(const level_graph& other) = delete;
             level_graph& operator=(level_graph&& other) = delete;
-
+            
             bool can_place_decoration(const queries::can_place_decoration& query);
             std::vector<Vector2> get_path(const queries::path_query& query);
-
+            
             int position_to_node(Vector2 position);
             int position_to_node(Vector2 position, Vector2 direction);
-
+            
             node* id_to_node(int id);
-
+            
             std::vector<Vector2> find_path(Vector2 start, Vector2 end, Vector2 direction);
-
+            
             void insert_node(int id, Vector2 position);
             void insert_edge(int source_num, node& destination, float weight);
+            void update_entity(Rectangle rectangle, int id = graph_config::empty_node);
+            int occupant_at(Vector2 position);
+            size_t occupied_node_count();
+            void reset();
             void on_moved_decoration(const events::moved_decoration& event);
             void on_placed_decoration(const events::placed_decoration& event);
             void render(Rectangle frame);
