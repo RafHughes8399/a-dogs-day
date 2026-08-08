@@ -17,7 +17,7 @@
 #include "query_interface.h"
 #include "raylib.h"
 
-namespace level{
+namespace graph{
     class level_graph{
         private:
             // node types

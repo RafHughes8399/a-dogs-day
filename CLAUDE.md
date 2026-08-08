@@ -97,7 +97,7 @@ All tunable constants live in `config.h`, grouped by domain namespace rather tha
 
 ### Other systems worth knowing about
 
-- **`level::level_graph`** (`src/engine/graph.h`): the walkable node/edge grid backing pathfinding and decoration placement. It's itself both an event listener (`moved_decoration`, `placed_decoration` update walkability) and a query handler (`can_place_decoration`, `path` via BFS) — same dual role appears on `tree::quadtree` (listens to `move_entity`/`interact_entity`, answers `is_colliding_query`).
+- **`level::level_graph`** (`src/engine/structures/graph.h`): the walkable node/edge grid backing pathfinding and decoration placement. It's itself both an event listener (`moved_decoration`, `placed_decoration` update walkability) and a query handler (`can_place_decoration`, `path` via BFS) — same dual role appears on `tree::quadtree` (listens to `move_entity`/`interact_entity`, answers `is_colliding_query`).
 - **`maitre_d::dog_queue`**: models the two physical waiting lines (left/right) as `queue_lane`s of `queued_dog`, independent of the maitre_d's table-assignment logic.
 - **Debug logging**: `debug::log(message)` (`debug_log_interface.h`) is a free function used throughout for structured trace logging; it queues an `events::debug_log` event that `debug::logger` (a Meyers singleton, toggled with `/` and pause with `P`) renders as an overlay.
 - **Skills in `skills/`**: this repo carries its own Claude Code skills (`design-check`, `event-wire`, `map`, `state-of-play`) that encode project-specific collaboration workflows — check `skills/*/SKILL.md` before assuming generic behavior for design review, event wiring, code mapping, or branch status reporting.

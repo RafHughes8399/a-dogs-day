@@ -1,14 +1,14 @@
 #ifndef SYSTEMS_H
 #define SYSTEMS_H
 #include "component.h"
+#include "config.h"
 #include "entity.h"
 #include "events.h"
 #include "quadtree.h"
 #include "events_interface.h"
 #include "render_layer.h"
 #include <functional>
-
-// this should replace most of the logic required by the level and render layers
+#include "graph.h"
 namespace systems{
     // storage system [quadtree managemet]
     // moovemnet sytem [ posiitons, pathfinding logic etc]
@@ -17,6 +17,9 @@ namespace systems{
     // hud system ? 
     // systems are non-copyable and non-movable - they subscribe handlers in the
     // constructor and unsubscribe in the destructor, so a copy double-subscribes
+
+    // -> movement system assigning, calculating, processing and updating paths
+    // -> the movment system is where the level_graph should be stored so it can in house process and check paths
     class movement_system{
         // the level graph and pathfinding
         public:
@@ -30,12 +33,19 @@ namespace systems{
 
             movement_system& operator=(const movement_system& other) = delete;
             movement_system& operator=(movement_system&& other) = delete;
-        private:
-            movement_system() = default;
-        public:
-
             void update(float delta);
             void update_position(size_t id, Vector2 position);
+
+            // set a path for an entity
+            // queue a path for an entity
+            // within update, process movement [can use the existing dog logic]
+
+            // should listen for when an entity is created, moved and destroyed so it can 
+            // update the graph nodes
+        private:
+            movement_system()
+            :graph_(level_config::world_x, level_config::world_y){};
+            graph::level_graph graph_;
     };
     class rendering_system{
         // rendering layers

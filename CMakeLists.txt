@@ -188,10 +188,10 @@ link_libraries(food)
 add_library(render_layer src/engine/render_layer.cpp)
 link_libraries(render_layer)
 
-add_library(quadtree src/engine/quadtree.cpp)
+add_library(quadtree src/engine/structures/quadtree.cpp)
 link_libraries(quadtree)
 
-add_library(graph src/engine/graph.cpp)
+add_library(graph src/engine/structures/graph.cpp)
 link_libraries(graph)
 
 add_library(level src/engine/level.cpp)
@@ -239,6 +239,7 @@ foreach(target IN LISTS PROJECT_TARGETS)
     src/engine/logger
     src/engine/orchestrators
     src/engine/queries
+    src/engine/structures
     src/engine/systems
     src/interfaces
   )
@@ -286,6 +287,7 @@ target_include_directories(tests PRIVATE
   src/engine/logger
   src/engine/orchestrators
   src/engine/queries
+  src/engine/structures
   src/engine/systems
   src/interfaces
 )

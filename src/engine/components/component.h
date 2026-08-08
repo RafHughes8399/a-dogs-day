@@ -76,10 +76,8 @@ public:
     Vector2 get_direction_scalar();
 private:
     std::queue<type_config::path> paths_;
-    // not const - a const member deletes both assignment operators
     Vector2 move_speed_;
     Vector2 direction_scalar_;
-
 };
 
 // * an entity gets ONE renderable_component holding however many sprites it
@@ -196,21 +194,6 @@ class key_input_component{
     private:
         std::vector<game_config::input> controls_;
 };
-
-// * mouse input component - the button bindings for a mouse-driven entity.
-// * Kept apart from key_input_component for two reasons:
-// *  1. a key binding and a button binding are different shapes. With one enum
-// *     and one struct, {KEY_F, mouse_press} was expressible and nothing caught
-// *     it; with two, it will not compile.
-// *  2. holding one of these IS what makes an entity mouse-positioned. The
-// *     control system syncs position from the device for everything in this
-// *     manager, which is why the cursor needs no movement_component and no
-// *     direction of its own - pointer movement is ambient device state, not a
-// *     binding, so there is nothing here to bind it to.
-// * Deliberately no raylib calls on this type: it says which buttons mean what,
-// * and the control system is the only thing that touches the device. A
-// * component that reads GetMouseDelta() cannot be built or reasoned about
-// * without a window open.
 class mouse_input_component{
     public:
         ~mouse_input_component() = default;

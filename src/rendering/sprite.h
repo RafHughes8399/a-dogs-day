@@ -7,6 +7,7 @@
 #define SPRITE_H
 
 #include "animation.h"
+#include "config.h"
 #include <raylib.h>
 #include <vector>
 
@@ -86,5 +87,8 @@ namespace sprite_builders{
     sprite::sprite build_sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations);
     sprite::sprite build_cursor_sprite();
     sprite::sprite build_background_sprite();
+    // every dog sprite is the same four attribute lookups off a cached texture
+    sprite::sprite build_dog_sprite(int texture_key, const char* path,
+        const float attributes[entity_config::attributes::size]);
 }
 #endif

@@ -204,3 +204,12 @@ next: movement and state machine components
    on an entity every frame, so there is nowhere to hang them until states exist
 -> editing waits on this too - swapping control schemes now means swapping the
    bindings on the component, not indexing a second map
+
+
+-> movement component [ or rather should be renamed pathfinding component ? ] requires the following:
+-> component construction and destruction for entiites  
+-> movement system assigning, calculating, processing and updating paths
+-> the movment system is where the level_graph should be stored so it can in house process and check paths
+
+
+-> the npc system is 

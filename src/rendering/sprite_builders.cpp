@@ -10,6 +10,14 @@ sprite::sprite sprite_builders::build_cursor_sprite(){
         entity_config::cursor_attributes[entity_config::attributes::frames],
         entity_config::cursor_attributes[entity_config::attributes::animations]);
 }
+sprite::sprite sprite_builders::build_dog_sprite(int texture_key, const char* path,
+    const float attributes[entity_config::attributes::size]){
+    return build_sprite(textures::textures_.get_texture(texture_key, path),
+        attributes[entity_config::attributes::frame_width],
+        attributes[entity_config::attributes::frame_height],
+        attributes[entity_config::attributes::frames],
+        attributes[entity_config::attributes::animations]);
+}
 sprite::sprite sprite_builders::build_background_sprite(){
     auto background_texture = textures::textures_.get_texture(textures::background, entity_config::background_path);
     return build_sprite(background_texture,
