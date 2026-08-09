@@ -67,7 +67,7 @@ namespace systems{
             : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
             remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
-            graph_(level_config::world_x, level_config::world_y){
+            graph_(static_cast<int>(level_config::world_x), static_cast<int>(level_config::world_y)){
                 event_interface::subscribe<events::create_entity>(create_entity_handler_);
                 event_interface::subscribe<events::move_entity>(move_entity_handler_);
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);

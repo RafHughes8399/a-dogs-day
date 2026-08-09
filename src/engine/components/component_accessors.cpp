@@ -11,8 +11,8 @@ void components::position_component::set_position(Vector2 position){
 }
 
 // ---------------- movement_component ----------------
-type_config::path components::movement_component::get_current_path(){
-    return paths_.empty() ? type_config::path{} : paths_.front();
+path::path& components::movement_component::get_current_path(){
+    return paths_.empty() ? path::empty_path : paths_.front();
 }
 Vector2 components::movement_component::get_move_speed(){
     return move_speed_;
@@ -20,7 +20,29 @@ Vector2 components::movement_component::get_move_speed(){
 Vector2 components::movement_component::get_direction_scalar(){
     return direction_scalar_;
 }
-
+std::queue<path::path>& components::movement_component::get_paths(){
+    return paths_;
+}
+void components::movement_component::append_path(path::path path){
+    paths_.push(path);
+    return;
+}
+void components::movement_component::set_path(path::path path){
+    if(paths_.empty()){
+        append_path(path);
+    }
+    else{
+        // override the current path
+        clear_paths();
+        paths_.push(path);
+    }
+}
+void components::movement_component::clear_paths(){
+    paths_ = {};
+}
+void components::movement_component::finish_path(){
+    paths_.pop();
+}
 // ---------------- input components ----------------
 std::vector<game_config::input>& components::key_input_component::get_inputs(){
     return controls_;

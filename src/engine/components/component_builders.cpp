@@ -6,7 +6,7 @@ components::position_component component_builders::build_positional_component(Ve
 }
 
 // * direction defaults to right, paths default to empty list {}
-components::movement_component component_builders::build_movement_component(Vector2 move_speed, Vector2 direction_scalar, std::queue<type_config::path> paths){
+components::movement_component component_builders::build_movement_component(Vector2 move_speed, Vector2 direction_scalar, std::queue<path::path> paths){
     return components::movement_component(move_speed, direction_scalar, paths);
 }
 components::renderable_component::sprite_component component_builders::build_sprite_component(std::vector<sprite::sprite>& sprites, size_t index){

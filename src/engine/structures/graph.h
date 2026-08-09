@@ -84,8 +84,8 @@ namespace graph{
             level_graph(int level_x, int level_y)
             : moved_decoration_handler_([this](const events::moved_decoration& event) -> void{on_moved_decoration(event);}),
             placed_decoration_handler_([this](const events::placed_decoration& event) -> void{on_placed_decoration(event);}),
-            num_rows_(static_cast<int>(level_y / level_config::edge_weight)),
-            row_length_(static_cast<int>(level_x / level_config::edge_weight)),
+            num_rows_(static_cast<int>(static_cast<float>(level_y) / level_config::edge_weight)),
+            row_length_(static_cast<int>(static_cast<float>(level_x) / level_config::edge_weight)),
             can_place_decoration_handler_([this](const queries::can_place_decoration& query) -> bool {return can_place_decoration(query);}),
             path_query_handler_([this](const queries::path_query& query) -> std::vector<Vector2> {return get_path(query);}),
             graph_({}){

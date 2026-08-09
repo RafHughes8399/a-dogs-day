@@ -59,7 +59,12 @@ public:
     movement_component& operator=(const movement_component& other) = default;
     movement_component& operator=(movement_component&& other) = default;
 
-    type_config::path get_current_path();
+    path::path& get_current_path();
+    std::queue<path::path>& get_paths();
+    void append_path(path::path path);
+    void set_path(path::path path);
+    void clear_paths();
+    void finish_path();
     Vector2 get_move_speed();
     Vector2 get_direction_scalar();
 private:
@@ -310,7 +315,7 @@ namespace component_builders{
     components::position_component build_positional_component(Vector2 position);
     components::movement_component build_movement_component(Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
-        std::queue<type_config::path> paths = {});
+        std::queue<path::path> paths = {});
     components::renderable_component::sprite_component build_sprite_component(std::vector<sprite::sprite>& sprites, size_t index);
     components::renderable_component build_renderable_component(
         std::vector<components::renderable_component::sprite_component>& sprite_components);

@@ -224,9 +224,9 @@ void level::level::on_move_view_frame_event(
     const events::move_view_frame &event) {
   auto delta = event.get_delta();
   view_frame_.x = Clamp(view_frame_.x + delta.x, 0.0,
-                        level_config::world_x - GetScreenWidth());
+                        level_config::world_x - static_cast<float>(GetScreenWidth()));
   view_frame_.y = Clamp(view_frame_.y + delta.y, 0.0,
-                        level_config::world_y - GetScreenHeight());
+                        level_config::world_y - static_cast<float>(GetScreenHeight()));
 }
 void level::level::on_right_mouse_event(
     const events::right_mouse_click &event) {

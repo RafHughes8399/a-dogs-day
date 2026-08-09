@@ -51,7 +51,7 @@ namespace textures{
         public:
             ~texture() = default;
             texture(Texture2D texture)
-            : is_loaded_(true), texture_(texture) {}
+            : texture_(texture) {}
             texture(const texture& other) = default;
             texture(texture&& other) = default;
 
@@ -61,7 +61,6 @@ namespace textures{
             Texture2D get_texture();
 
         private:
-            bool is_loaded_;
             Texture2D texture_;
     };
 
