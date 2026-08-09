@@ -68,6 +68,7 @@ public:
     void finish_path();
     Vector2 get_move_speed();
     Vector2 get_direction_scalar();
+    void set_direction_scalar(Vector2 direction_scalar);
 private:
     std::queue<path::path> paths_;
     Vector2 move_speed_;

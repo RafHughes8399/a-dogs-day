@@ -220,6 +220,40 @@ next: movement and state machine components
 
 
 -> processing movement for a path
--> updating paths when decorations move, decorations only, or alternatively. if an entity is along a path and it comes across a blocked node, it then recalculates to the destination ? 
--> but then need some way to recalc the destination 
--> depends on a component that the decoration would have ? 
+-> updating paths when decorations move, decorations only, or alternatively. if an entity is along a path and it comes across a blocked node, it then recalculates to the destination ?
+-> but then need some way to recalc the destination
+-> depends on a component that the decoration would have ?
+
+
+movement system status
+-> path class exists. holds source, destination, the waypoint list and an optional destination entity.
+   destination is kept separately on purpose, find_path returns grid snapped node positions and the
+   destination is the exact requested point, they are not the same value. source is probably dead
+   weight, nothing reads it
+-> movement component holds a queue of paths. set_path replaces the whole queue, append_path adds a
+   leg. has_reached_position is the tolerance check ported off dog::reached_position, minus the snap
+   because the component cannot write position
+-> create_path is private, takes source/direction/destination and returns optional<path>. nullopt
+   when find_path comes back empty, so unreachable has no valid representation and the caller cannot
+   forget to check
+-> create_path_to event is a placeholder command, carries id, destination, assignment mode and the
+   optional destination entity. handler resolves the source by mode, current position for replace,
+   the last queued leg's destination for append, then routes properly from there instead of the old
+   trick of overwriting the queued leg's first waypoint
+-> update() is the port of dog::update_path. snapshot the ids first, the move_entity execute inside
+   update_position could erase a component mid iteration. snap onto the waypoint, advance, on
+   completion pop the leg and re-aim at the next one, no move step on the completing frame
+-> determine_direction ported off dog::determine_direction, writes the scalar on the component and
+   the facing index through component_helpers::set_facing_index
+
+what is left
+-> nothing emits create_path_to yet. the wire is live and inert. need the events that trigger path
+   generation for dogs, the ecs versions of send_dog_to_position / send_dog_to_station
+-> dog_completed_path emission is commented out in update(). unsure the ecs wants the same per leg
+   fact the entity system emitted, decide when the consumers get ported. maitre_d matched on the
+   final snapped waypoint not the exact destination, keep that if it comes back
+-> no path_failed fact. unreachable is currently a silent early return, orchestrators learn nothing
+-> set_path still installs an empty path, old dog::set_path bailed on that
+-> blocked node recheck on waypoint transition, per the note above. lazy, no reverse index
+-> two wires write walkability into the same graph now, movement_system::on_moved_entity and
+   level_graph's own decoration subscriptions. decide which one owns it

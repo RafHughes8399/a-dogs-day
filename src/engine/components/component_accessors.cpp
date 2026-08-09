@@ -27,6 +27,9 @@ Vector2 components::movement_component::get_move_speed(){
 Vector2 components::movement_component::get_direction_scalar(){
     return direction_scalar_;
 }
+void components::movement_component::set_direction_scalar(Vector2 direction_scalar){
+    direction_scalar_ = direction_scalar;
+}
 std::queue<path::path>& components::movement_component::get_paths(){
     return paths_;
 }
@@ -48,6 +51,7 @@ void components::movement_component::clear_paths(){
     paths_ = {};
 }
 void components::movement_component::finish_path(){
+    if(paths_.empty()){ return; }
     paths_.pop();
 }
 // ---------------- input components ----------------

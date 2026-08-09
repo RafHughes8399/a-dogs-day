@@ -26,7 +26,7 @@ namespace graph{
                 perimeter = 2,
                 interior = 3
             };
-            // node and dege definitions
+            // node and edge definitions
             struct node{
                 int id_;
                 Vector2 position_;

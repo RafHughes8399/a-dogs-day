@@ -32,6 +32,7 @@ namespace systems{
                 event_interface::unsubscribe<events::create_entity>(create_entity_handler_);
                 event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
                 event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+                event_interface::unsubscribe<events::create_path_to>(create_path_to_handler_);
             }
             movement_system(const movement_system& other) = delete;
             movement_system(movement_system&& other) = delete;
@@ -45,6 +46,7 @@ namespace systems{
             void on_created_entity(const events::create_entity& event);
             void on_moved_entity(const events::move_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
+            void on_create_path_to_event(const events::create_path_to& event);
             void clear(){
                 graph_.reset();
             }
@@ -67,15 +69,23 @@ namespace systems{
             : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
             remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+            create_path_to_handler_([this](const events::create_path_to& event) -> void{on_create_path_to_event(event);}),
             graph_(static_cast<int>(level_config::world_x), static_cast<int>(level_config::world_y)){
                 event_interface::subscribe<events::create_entity>(create_entity_handler_);
                 event_interface::subscribe<events::move_entity>(move_entity_handler_);
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+                event_interface::subscribe<events::create_path_to>(create_path_to_handler_);
             }
+
+            std::optional<path::path> create_path(Vector2 source, Vector2 direction, Vector2 destination,
+                std::optional<size_t> destination_entity = std::nullopt);
+            void determine_direction(size_t id, components::movement_component& movement,
+                Vector2 position, Vector2 target);
 
             events::event_handler<events::create_entity> create_entity_handler_;
             events::event_handler<events::move_entity> move_entity_handler_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
+            events::event_handler<events::create_path_to> create_path_to_handler_;
 
             graph::level_graph graph_;
     };
