@@ -213,3 +213,13 @@ next: movement and state machine components
 
 
 -> the npc system is 
+
+
+-> path assignment, movement along the path
+-> path assignment is either set or enqueue. depends on the context of the path setting
+
+
+-> processing movement for a path
+-> updating paths when decorations move, decorations only, or alternatively. if an entity is along a path and it comes across a blocked node, it then recalculates to the destination ? 
+-> but then need some way to recalc the destination 
+-> depends on a component that the decoration would have ? 

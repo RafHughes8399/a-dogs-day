@@ -13,6 +13,7 @@
 #include "events.h"
 #include "events_interface.h"
 #include "hitbox.h"
+#include "path.h"
 #include "raylib.h"
 #include "raymath.h"
 #include "sprite.h"
@@ -41,21 +42,8 @@ public:
 private:
     Vector2 position_;
 };
-// * the two halves of a velocity plus the route it is following. direction
-// * belongs here rather than in position because it is only ever read as a
-// * multiplier on move_speed_ (position + move_speed * direction * delta) and
-// * because it is derived - recomputed from position -> next waypoint each time
-// * the waypoint changes. an entity with no movement_component has no direction,
-// * which is exactly right for tables, counters and the cursor.
-// * direction's one non-movement reader is sprite facing: the movement system
-// * writes the matching index into renderable_component rather than rendering
-// * reaching for a direction on position.
-// * no strategy member here - "how does this thing decide where to go" is
-// * answered by which components an entity has (movement + path vs controls),
-// * not by polymorphism inside one component. see the note above
-// * ecs_entities::build_cursor.
-class movement_component {
 
+class movement_component {
 public:
     ~movement_component() = default;
     // direction defaults to facing right - it is recomputed from
@@ -63,7 +51,7 @@ public:
     // initial value only shows before the entity is given one
     movement_component(Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
-        std::queue<type_config::path> paths = {})
+        std::queue<path::path> paths = {})
         : paths_(paths), move_speed_(move_speed), direction_scalar_(direction_scalar) {}
     movement_component(const movement_component& other) = default;
     movement_component(movement_component&& other) = default;
@@ -75,15 +63,12 @@ public:
     Vector2 get_move_speed();
     Vector2 get_direction_scalar();
 private:
-    std::queue<type_config::path> paths_;
+    std::queue<path::path> paths_;
     Vector2 move_speed_;
     Vector2 direction_scalar_;
 };
 
-// * an entity gets ONE renderable_component holding however many sprites it
-// * needs - body, outlines and cosmetics all sit in the same list. The
-// * multiplicity lives here rather than in the manager, so the manager stays
-// * one entity to one component.
+
 class renderable_component {
 public:
   class sprite_component {

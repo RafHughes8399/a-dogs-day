@@ -191,7 +191,7 @@ link_libraries(render_layer)
 add_library(quadtree src/engine/structures/quadtree.cpp)
 link_libraries(quadtree)
 
-add_library(graph src/engine/structures/graph.cpp)
+add_library(graph src/engine/structures/graph.cpp src/engine/structures/path.cpp)
 link_libraries(graph)
 
 add_library(level src/engine/level.cpp)
