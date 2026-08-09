@@ -59,6 +59,7 @@ public:
     movement_component& operator=(const movement_component& other) = default;
     movement_component& operator=(movement_component&& other) = default;
 
+    bool has_reached_position(Vector2 position);
     path::path& get_current_path();
     std::queue<path::path>& get_paths();
     void append_path(path::path path);

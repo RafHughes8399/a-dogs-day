@@ -11,6 +11,13 @@ void components::position_component::set_position(Vector2 position){
 }
 
 // ---------------- movement_component ----------------
+bool components::movement_component::has_reached_position(Vector2 position){
+    if(paths_.empty()){
+        return false;
+    }
+    float position_to_target = Vector2Distance(position, paths_.front().get_next_position());
+    return position_to_target <= level_config::edge_weight * 0.05f;
+}
 path::path& components::movement_component::get_current_path(){
     return paths_.empty() ? path::empty_path : paths_.front();
 }
