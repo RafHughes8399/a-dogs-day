@@ -13,13 +13,8 @@ void systems::movement_system::update(float delta){
     // decoration or some other entity is moved, as that would trigger possibly many unnecessary recalculations
 
     // definitely should recalc when the destination entity is moved though
-    auto ids = std::vector<size_t>();
-    ids.reserve(component_managers::movement_manager_.size());
     for(auto it = component_managers::movement_manager_.begin(); it != component_managers::movement_manager_.end(); ++it){
-        ids.push_back(it->first);
-    }
-
-    for(auto id : ids){
+        size_t id = it->first;
         auto* movement = component_managers::movement_manager_.get_component(id);
         auto* position = component_managers::positional_manager_.get_component(id);
         if(movement == nullptr or position == nullptr){ continue; }
