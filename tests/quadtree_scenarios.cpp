@@ -372,3 +372,75 @@ SCENARIO("a box collision check reports the entity a rectangle overlaps",
         }
     }
 }
+
+SCENARIO("a collision check never reports the entity doing the asking",
+        "[quadtree][ecs][collision]"){
+    GIVEN("two collidable entities stacked on the same spot"){
+        collision_component_guard components;
+        tree::ecs_quadtree tree(test_world(), 1);
+
+        const size_t asker_id = 1;
+        const size_t target_id = 2;
+        insert_collidable(tree, asker_id, Vector2{300.0f, 300.0f});
+        insert_collidable(tree, target_id, Vector2{300.0f, 300.0f});
+
+        REQUIRE(tree.size() == 2);
+
+        WHEN("the asker checks a position inside its own hitbox"){
+            auto found = tree.check_collision(asker_id, Vector2{308.0f, 308.0f});
+
+            THEN("it gets the other entity, not itself"){
+                REQUIRE(found == static_cast<int>(target_id));
+            }
+        }
+
+        WHEN("the asker checks a box overlapping its own hitbox"){
+            auto found = tree.check_collision(asker_id,
+                Rectangle{295.0f, 295.0f, k_entity_size, k_entity_size});
+
+            THEN("it gets the other entity, not itself"){
+                REQUIRE(found == static_cast<int>(target_id));
+            }
+        }
+    }
+
+    GIVEN("a single collidable entity alone in the tree"){
+        collision_component_guard components;
+        tree::ecs_quadtree tree(test_world(), 1);
+
+        const size_t asker_id = 1;
+        insert_collidable(tree, asker_id, Vector2{300.0f, 300.0f});
+
+        WHEN("it checks a position inside its own hitbox"){
+            auto found = tree.check_collision(asker_id, Vector2{308.0f, 308.0f});
+
+            THEN("nothing is reported"){
+                REQUIRE(found == game_config::empty_entity);
+            }
+        }
+    }
+}
+
+SCENARIO("a box straddling a quadrant split still finds what it overlaps",
+        "[quadtree][ecs][collision]"){
+    GIVEN("an entity sitting just inside the top-right quadrant"){
+        collision_component_guard components;
+        tree::ecs_quadtree tree(test_world(), 1);
+
+        const size_t asker_id = 1;
+        const size_t target_id = 2;
+        insert_collidable(tree, asker_id, Vector2{50.0f, 50.0f});
+        insert_collidable(tree, target_id, Vector2{205.0f, 205.0f});
+
+        WHEN("a box crossing the centre split overlaps it"){
+            // spans [195,215) on both axes - fits in no single child, so a
+            // containment-gated descent would never look inside one
+            auto found = tree.check_collision(asker_id,
+                Rectangle{195.0f, 195.0f, 20.0f, 20.0f});
+
+            THEN("the target is still found"){
+                REQUIRE(found == static_cast<int>(target_id));
+            }
+        }
+    }
+}
