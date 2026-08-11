@@ -266,12 +266,13 @@ what is left
 -> implement collision checks on the quadtree x  
 
 -> test player dog selection and path sending
-    -> need to build player dogs
+    -> need to build player dogs x 
+
 -> implement the rest of the control system 
 
 -> test the rest of the control system
 
--> building decorations and stations
+-> building decorations and stations and npc dogsx 
 
 -> testing selection of decorations and stations 
 
