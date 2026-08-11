@@ -84,11 +84,21 @@ namespace sprite{
     // sprite_builder::build_background();
 }
 namespace sprite_builders{
-    sprite::sprite build_sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations);
+    sprite::sprite build_sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations,
+        Vector2 draw_position_offset = Vector2Zero(), Color tint = WHITE);
     sprite::sprite build_cursor_sprite();
     sprite::sprite build_background_sprite();
     // every dog sprite is the same four attribute lookups off a cached texture
     sprite::sprite build_dog_sprite(int texture_key, const char* path,
         const float attributes[entity_config::attributes::size]);
+    // decorations, stations and food all draw off the test_decoration sheet and
+    // differ only by their attribute block and tint
+    sprite::sprite build_decoration_sprite(const float attributes[entity_config::attributes::size],
+        Color tint = WHITE);
+    sprite::sprite build_test_decoration_sprite();
+    sprite::sprite build_table_sprite();
+    sprite::sprite build_food_counter_sprite();
+    sprite::sprite build_dishwasher_sprite();
+    sprite::sprite build_food_sprite();
 }
 #endif

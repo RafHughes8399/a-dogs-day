@@ -339,3 +339,155 @@ SCENARIO("a facing with no matching sprite variant is ignored", "[ecs][component
         }
     }
 }
+
+SCENARIO("npc dogs build with the same components as a player dog", "[ecs][components][dogs]"){
+    GIVEN("a fresh ecs world"){
+        testing::ecs_test_game game;
+        Vector2 spawn{level_config::edge_weight * 10.0f, level_config::edge_weight * 10.0f};
+
+        WHEN("a customer dog is built"){
+            auto customer_id = game.create_customer_dog(spawn);
+
+            THEN("it carries the player dog's five components"){
+                REQUIRE(game.has_position(customer_id));
+                REQUIRE(game.has_renderable(customer_id));
+                REQUIRE(game.has_collision(customer_id));
+                REQUIRE(game.has_movement(customer_id));
+                REQUIRE(game.has_selectable(customer_id));
+                REQUIRE(game.num_components(customer_id) == 5);
+            }
+            THEN("its kind separates it from a player dog"){
+                REQUIRE(game.selectable_kind_of(customer_id)
+                    == entity_config::selectable_kinds::customer_dog_kind);
+            }
+            THEN("it stands where it was built"){
+                auto* position = component_managers::positional_manager_.get_component(customer_id);
+                REQUIRE(position->get_position().x == spawn.x);
+                REQUIRE(position->get_position().y == spawn.y);
+            }
+        }
+
+        WHEN("a waiter dog is built"){
+            auto waiter_id = game.create_waiter_dog(spawn);
+
+            THEN("it carries the same five components"){
+                REQUIRE(game.num_components(waiter_id) == 5);
+                REQUIRE(game.has_movement(waiter_id));
+            }
+            THEN("its kind separates it from a customer"){
+                REQUIRE(game.selectable_kind_of(waiter_id)
+                    == entity_config::selectable_kinds::waiter_dog_kind);
+            }
+        }
+
+        WHEN("a player dog and an npc dog share the world"){
+            auto mack_id = game.create_mack();
+            auto customer_id = game.create_customer_dog(spawn);
+
+            THEN("they hold the same component set"){
+                REQUIRE(game.num_components(mack_id) == game.num_components(customer_id));
+            }
+            THEN("only the player dog answers to the player dog kind"){
+                REQUIRE(game.selectable_kind_of(mack_id)
+                    == entity_config::selectable_kinds::player_dog_kind);
+                REQUIRE(game.selectable_kind_of(customer_id)
+                    != entity_config::selectable_kinds::player_dog_kind);
+            }
+        }
+    }
+}
+
+SCENARIO("decorations, stations and food build their component sets", "[ecs][components][decoration][station]"){
+    GIVEN("a fresh ecs world"){
+        testing::ecs_test_game game;
+        Vector2 spot{level_config::edge_weight * 12.0f, level_config::edge_weight * 12.0f};
+
+        WHEN("a decoration is built"){
+            auto decoration_id = game.create_test_decoration(spot);
+
+            THEN("it holds a position, a renderable, a collision and a selectable"){
+                REQUIRE(game.has_position(decoration_id));
+                REQUIRE(game.has_renderable(decoration_id));
+                REQUIRE(game.has_collision(decoration_id));
+                REQUIRE(game.has_selectable(decoration_id));
+                REQUIRE(game.num_components(decoration_id) == 4);
+            }
+            THEN("it answers to the decoration kind"){
+                REQUIRE(game.selectable_kind_of(decoration_id)
+                    == entity_config::selectable_kinds::decoration_kind);
+            }
+            THEN("it does not interact - that is what makes it not a station"){
+                REQUIRE_FALSE(game.has_interaction(decoration_id));
+            }
+            THEN("having a hitbox puts it in the spatial index and the graph"){
+                REQUIRE(game.is_tracked(decoration_id));
+                REQUIRE(game.graph_marks(decoration_id, game.hitbox_of(decoration_id)));
+            }
+        }
+
+        WHEN("a table is built"){
+            auto table_id = game.create_table(spot);
+
+            THEN("it is a decoration plus an interaction"){
+                REQUIRE(game.has_position(table_id));
+                REQUIRE(game.has_renderable(table_id));
+                REQUIRE(game.has_collision(table_id));
+                REQUIRE(game.has_selectable(table_id));
+                REQUIRE(game.has_interaction(table_id));
+                REQUIRE(game.num_components(table_id) == 5);
+            }
+            THEN("it answers to the station kind, not the decoration kind"){
+                REQUIRE(game.selectable_kind_of(table_id)
+                    == entity_config::selectable_kinds::station_kind);
+            }
+        }
+
+        WHEN("a food counter is built"){
+            auto counter_id = game.create_food_counter(spot);
+
+            THEN("it carries the station component set"){
+                REQUIRE(game.has_interaction(counter_id));
+                REQUIRE(game.has_selectable(counter_id));
+                REQUIRE(game.num_components(counter_id) == 5);
+            }
+        }
+
+        WHEN("a dishwasher is built"){
+            auto dishwasher_id = game.create_dishwasher(spot);
+
+            THEN("it carries the station component set"){
+                REQUIRE(game.has_interaction(dishwasher_id));
+                REQUIRE(game.has_selectable(dishwasher_id));
+                REQUIRE(game.num_components(dishwasher_id) == 5);
+            }
+        }
+
+        WHEN("food is built"){
+            auto food_id = game.create_food(spot);
+
+            THEN("it is placed, drawn and collidable, but not selectable"){
+                REQUIRE(game.has_position(food_id));
+                REQUIRE(game.has_renderable(food_id));
+                REQUIRE(game.has_collision(food_id));
+                REQUIRE_FALSE(game.has_selectable(food_id));
+                REQUIRE(game.num_components(food_id) == 3);
+            }
+        }
+
+        WHEN("a station is removed"){
+            auto table_id = game.create_table(spot);
+            auto footprint = game.hitbox_of(table_id);
+            game.remove(table_id);
+
+            THEN("every one of its components goes with it"){
+                REQUIRE(game.num_components(table_id) == 0);
+                REQUIRE_FALSE(game.has_interaction(table_id));
+            }
+            THEN("it releases its nodes and leaves the spatial index"){
+                REQUIRE(game.graph_occupant_at(Vector2{footprint.x, footprint.y})
+                    == graph_config::empty_node);
+                REQUIRE_FALSE(game.is_tracked(table_id));
+            }
+        }
+    }
+}

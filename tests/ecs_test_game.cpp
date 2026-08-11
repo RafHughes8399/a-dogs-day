@@ -65,6 +65,53 @@ namespace testing{
         }, layer);
     }
 
+    size_t ecs_test_game::create_customer_dog(Vector2 position, size_t layer){
+        return lifespan_.create([position](size_t id){
+            ecs_entities::build_customer_dog(id, position);
+        }, layer);
+    }
+
+    size_t ecs_test_game::create_waiter_dog(Vector2 position, size_t layer){
+        return lifespan_.create([position](size_t id){
+            ecs_entities::build_waiter_dog(id, position);
+        }, layer);
+    }
+
+    size_t ecs_test_game::create_test_decoration(Vector2 position, size_t layer){
+        return lifespan_.create([position](size_t id){
+            ecs_entities::build_test_decoration(id, position);
+        }, layer);
+    }
+
+    size_t ecs_test_game::create_table(Vector2 position, size_t layer){
+        return lifespan_.create([position](size_t id){
+            ecs_entities::build_table(id, position);
+        }, layer);
+    }
+
+    size_t ecs_test_game::create_food_counter(Vector2 position, size_t layer){
+        return lifespan_.create([position](size_t id){
+            ecs_entities::build_counter(id, position);
+        }, layer);
+    }
+
+    size_t ecs_test_game::create_dishwasher(Vector2 position, size_t layer){
+        return lifespan_.create([position](size_t id){
+            ecs_entities::build_dishwasher(id, position);
+        }, layer);
+    }
+
+    size_t ecs_test_game::create_food(Vector2 position, size_t layer){
+        return lifespan_.create([position](size_t id){
+            ecs_entities::build_food(id, position);
+        }, layer);
+    }
+
+    void ecs_test_game::tick(float delta){
+        events::global_dispatcher_.process_events(delta);
+        movement_.update(delta);
+    }
+
     void ecs_test_game::remove(size_t entity_id){
         lifespan_.remove(entity_id);
     }
@@ -109,6 +156,18 @@ namespace testing{
 
     bool ecs_test_game::has_movement(size_t entity_id){
         return component_managers::movement_manager_.get_component(entity_id) != nullptr;
+    }
+
+    bool ecs_test_game::has_interaction(size_t entity_id){
+        return component_managers::interaction_manager_.get_component(entity_id) != nullptr;
+    }
+
+    bool ecs_test_game::has_selectable(size_t entity_id){
+        return component_managers::selectable_manager_.get_component(entity_id) != nullptr;
+    }
+
+    size_t ecs_test_game::selectable_kind_of(size_t entity_id){
+        return component_managers::selectable_manager_.get_component(entity_id)->get_kind();
     }
 
     bool ecs_test_game::is_tracked(size_t entity_id){
@@ -160,7 +219,8 @@ namespace testing{
              + component_managers::control_manager_.size()
              + component_managers::mouse_input_manager_.size()
              + component_managers::state_machine_manager_.size()
-             + component_managers::food_manager_.size();
+             + component_managers::food_manager_.size()
+             + component_managers::selectable_manager_.size();
     }
 
 } // namespace testing

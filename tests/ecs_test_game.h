@@ -47,7 +47,15 @@ namespace testing{
             size_t create_cursor(size_t layer = level_config::draw_layers::cursor);
             size_t create_khiri(size_t layer = level_config::draw_layers::dogs);
             size_t create_mack(size_t layer = level_config::draw_layers::dogs);
+            size_t create_customer_dog(Vector2 position, size_t layer = level_config::draw_layers::dogs);
+            size_t create_waiter_dog(Vector2 position, size_t layer = level_config::draw_layers::dogs);
+            size_t create_test_decoration(Vector2 position, size_t layer = level_config::draw_layers::decoration);
+            size_t create_table(Vector2 position, size_t layer = level_config::draw_layers::stations);
+            size_t create_food_counter(Vector2 position, size_t layer = level_config::draw_layers::stations);
+            size_t create_dishwasher(Vector2 position, size_t layer = level_config::draw_layers::stations);
+            size_t create_food(Vector2 position, size_t layer = level_config::draw_layers::decoration);
 
+            void tick(float delta);
             void remove(size_t entity_id);
             // the single legal position write - moves the hitbox and reindexes
             void move_entity(size_t entity_id, Vector2 position);
@@ -63,6 +71,9 @@ namespace testing{
             bool has_collision(size_t entity_id);
             bool has_mouse_input(size_t entity_id);
             bool has_movement(size_t entity_id);
+            bool has_interaction(size_t entity_id);
+            bool has_selectable(size_t entity_id);
+            size_t selectable_kind_of(size_t entity_id);
             // total across every manager, for asserting a clean world
             size_t total_components();
 

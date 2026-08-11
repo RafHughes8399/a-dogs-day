@@ -96,7 +96,7 @@ namespace ecs_entities {
         void build_khiri(size_t id);
         void build_mack(size_t id);
 
-    void build_customer_dog(size_t id);
+    void build_customer_dog(size_t id, Vector2 position);
         //**
 
         // .
@@ -105,7 +105,7 @@ namespace ecs_entities {
         // build duck_hunt_dog();
         //  */
 
-    void build_waiter_dog(size_t id);
+    void build_waiter_dog(size_t id, Vector2 position);
     //**
     // build_saba()
     // build text
@@ -114,18 +114,20 @@ namespace ecs_entities {
     void build_cursor(size_t id);
 
     void build_decoration(size_t id);
-        void build_test_decoration(size_t id);
+        void build_test_decoration(size_t id, Vector2 position);
         //**
         // void build_gargoyle();
         //  */
 
     void build_station(size_t id);
-        void build_counter(size_t id);
-        void build_table(size_t id);
-        void build_dishwasher(size_t id);
+        void build_counter(size_t id, Vector2 position);
+        void build_table(size_t id, Vector2 position);
+        void build_dishwasher(size_t id, Vector2 position);
         /**
             // void build_stove();
         */
+
+    void build_food(size_t id, Vector2 position);
 
     // the level backdrop - renderable only, no hitbox, no collision
     void build_background(size_t id);

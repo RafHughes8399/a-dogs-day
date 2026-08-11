@@ -477,22 +477,6 @@ void graph::level_graph::reset(){
     }
 }
 
-// ---------------- event handlers ----------------
-// for these two functions the following assumptions are
-// the decoration is placed at positions that are multiples of edge weights
-// and so too are their dimensions (width and height)
-void graph::level_graph::on_moved_decoration(const events::moved_decoration& event){
-
-
-    update_entity(event.get_pre_move());
-
-    update_entity(event.get_post_move(), event.get_id());
-}
-void graph::level_graph::on_placed_decoration(const events::placed_decoration& event){
-
-    update_entity(event.get_rectangle(), static_cast<int>(event.get_id()));
-}
-
 // ---------------- debug render ----------------
 void graph::level_graph::render(Rectangle frame){
     for(auto x = frame.x; x <= frame.x + frame.width; x += level_config::edge_weight){

@@ -9,8 +9,8 @@
 // entity.h is a compile error here, not an undefined symbol at link time
 
 namespace {
-    void build_player_dog_components(size_t id, Vector2 position,
-        std::vector<sprite::sprite> sprites){
+    void build_dog_components(size_t id, Vector2 position,
+        std::vector<sprite::sprite> sprites, size_t kind){
         component_helpers::register_positional_component(id,
             component_builders::build_positional_component(position));
 
@@ -26,14 +26,47 @@ namespace {
                 component_builders::build_hitbox_component(hitboxes,
                     level_config::directions::right)));
 
-        component_helpers:: register_movement_component(id,
+        component_helpers::register_movement_component(id,
             component_builders::build_movement_component(
                 dog_config::dog_move_speed, level_config::direction_scalars[level_config::directions::right]
             ));
 
         component_helpers::register_selectable_component(id,
+            component_builders::build_selectable_component(kind));
+    }
+    // ! left right, parallel to level_config::directions
+    std::vector<sprite::sprite> build_mack_sprites(){
+        std::vector<sprite::sprite> sprites;
+        sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_left,
+            entity_config::mack_left_path, entity_config::mack_across_attributes));
+        sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_right,
+            entity_config::mack_right_path, entity_config::mack_across_attributes));
+        return sprites;
+    }
+    void build_decoration_components(size_t id, Vector2 position,
+        sprite::sprite decoration_sprite, hitbox::hitbox decoration_hitbox){
+        component_helpers::register_positional_component(id,
+            component_builders::build_positional_component(position));
+
+        std::vector<sprite::sprite> sprites = {decoration_sprite};
+        std::vector<components::renderable_component::sprite_component> sprite_components = {
+            component_builders::build_sprite_component(sprites, 0)};
+        component_helpers::register_renderable_component(id,
+            component_builders::build_renderable_component(sprite_components));
+
+        std::vector<hitbox::hitbox> hitboxes = {decoration_hitbox};
+        component_helpers::register_collision_component(id,
+            component_builders::build_collision_component(
+                component_builders::build_hitbox_component(hitboxes, 0)));
+    }
+    void build_station_components(size_t id, Vector2 position,
+        sprite::sprite station_sprite, hitbox::hitbox station_hitbox){
+        build_decoration_components(id, position, station_sprite, station_hitbox);
+        component_helpers::register_interaction_component(id,
+            component_builders::build_interaction_component());
+        component_helpers::register_selectable_component(id,
             component_builders::build_selectable_component(
-                entity_config::selectable_kinds::player_dog_kind));
+                entity_config::selectable_kinds::station_kind));
     }
 } // namespace
 
@@ -58,22 +91,19 @@ void ecs_entities::build_player_dog(size_t id){
             entity_config::khiri_left_path, entity_config::khiri_across_attributes));
         sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_right,
             entity_config::khiri_right_path, entity_config::khiri_across_attributes));
-        
-        build_player_dog_components(id, level_config::khiri_start, std::move(sprites));
+
+        build_dog_components(id, level_config::khiri_start, std::move(sprites),
+            entity_config::selectable_kinds::player_dog_kind);
     }
     void ecs_entities::build_mack(size_t id){
-        // ! left right, parallel to level_config::directions
-        std::vector<sprite::sprite> sprites;
-        sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_left,
-            entity_config::mack_left_path, entity_config::mack_across_attributes));
-        sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_right,
-            entity_config::mack_right_path, entity_config::mack_across_attributes));
-
-        build_player_dog_components(id, level_config::mack_start, std::move(sprites));
+        build_dog_components(id, level_config::mack_start, build_mack_sprites(),
+            entity_config::selectable_kinds::player_dog_kind);
     }
 
-void ecs_entities::build_customer_dog(size_t id){
-    (void) id;
+// TODO mack's art stands in until npc dog sprites exist
+void ecs_entities::build_customer_dog(size_t id, Vector2 position){
+    build_dog_components(id, position, build_mack_sprites(),
+        entity_config::selectable_kinds::customer_dog_kind);
 }
     //**
 
@@ -83,8 +113,9 @@ void ecs_entities::build_customer_dog(size_t id){
     // build duck_hunt_dog();
     //  */
 
-void ecs_entities::build_waiter_dog(size_t id){
-    (void) id;
+void ecs_entities::build_waiter_dog(size_t id, Vector2 position){
+    build_dog_components(id, position, build_mack_sprites(),
+        entity_config::selectable_kinds::waiter_dog_kind);
 }
 //**
 // build_saba()
@@ -108,8 +139,13 @@ void ecs_entities::build_cursor(size_t id){
 void ecs_entities::build_decoration(size_t id){
     (void) id;
 }
-    void ecs_entities::build_test_decoration(size_t id){
-        (void) id;
+    void ecs_entities::build_test_decoration(size_t id, Vector2 position){
+        build_decoration_components(id, position,
+            sprite_builders::build_test_decoration_sprite(),
+            hitbox_builders::build_test_decoration_hitbox(position));
+        component_helpers::register_selectable_component(id,
+            component_builders::build_selectable_component(
+                entity_config::selectable_kinds::decoration_kind));
     }
     //**
     // void build_gargoyle();
@@ -118,18 +154,30 @@ void ecs_entities::build_decoration(size_t id){
 void ecs_entities::build_station(size_t id){
     (void) id;
 }
-    void ecs_entities::build_counter(size_t id){
-        (void) id;
+    void ecs_entities::build_counter(size_t id, Vector2 position){
+        build_station_components(id, position,
+            sprite_builders::build_food_counter_sprite(),
+            hitbox_builders::build_food_counter_hitbox(position));
     }
-    void ecs_entities::build_table(size_t id){
-        (void) id;
+    void ecs_entities::build_table(size_t id, Vector2 position){
+        build_station_components(id, position,
+            sprite_builders::build_table_sprite(),
+            hitbox_builders::build_table_hitbox(position));
     }
-    void ecs_entities::build_dishwasher(size_t id){
-        (void) id;
+    void ecs_entities::build_dishwasher(size_t id, Vector2 position){
+        build_station_components(id, position,
+            sprite_builders::build_dishwasher_sprite(),
+            hitbox_builders::build_dishwasher_hitbox(position));
     }
     /**
         // void build_stove();
     */
+
+void ecs_entities::build_food(size_t id, Vector2 position){
+    build_decoration_components(id, position,
+        sprite_builders::build_food_sprite(),
+        hitbox_builders::build_food_hitbox(position));
+}
 
 // position and renderable only - no hitbox, so it is never in the spatial index
 // and is_entity_in_frame never culls it

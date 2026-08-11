@@ -228,7 +228,9 @@ namespace entity_config{
         player_dog_kind = 0,
         decoration_kind = 1,
         station_kind = 2,
-        selectable_kinds_size = 3
+        customer_dog_kind = 3,
+        waiter_dog_kind = 4,
+        selectable_kinds_size = 5
     };
 
     // file paths

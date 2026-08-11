@@ -65,8 +65,6 @@ namespace graph{
             std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id);
             
             // fields
-            events::event_handler<events::moved_decoration> moved_decoration_handler_;
-            events::event_handler<events::placed_decoration> placed_decoration_handler_;
             int num_rows_;
             int row_length_;
             
@@ -76,15 +74,11 @@ namespace graph{
             
             public:
             ~level_graph(){
-                event_interface::unsubscribe<events::moved_decoration>(moved_decoration_handler_);
-                event_interface::unsubscribe<events::placed_decoration>(placed_decoration_handler_);
                 query_interface::unsubscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
                 query_interface::unsubscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
             }
             level_graph(int level_x, int level_y)
-            : moved_decoration_handler_([this](const events::moved_decoration& event) -> void{on_moved_decoration(event);}),
-            placed_decoration_handler_([this](const events::placed_decoration& event) -> void{on_placed_decoration(event);}),
-            num_rows_(static_cast<int>(static_cast<float>(level_y) / level_config::edge_weight)),
+            : num_rows_(static_cast<int>(static_cast<float>(level_y) / level_config::edge_weight)),
             row_length_(static_cast<int>(static_cast<float>(level_x) / level_config::edge_weight)),
             can_place_decoration_handler_([this](const queries::can_place_decoration& query) -> bool {return can_place_decoration(query);}),
             path_query_handler_([this](const queries::path_query& query) -> std::vector<Vector2> {return get_path(query);}),
@@ -92,8 +86,6 @@ namespace graph{
                 // ! columns is x, rows is y
                 build_nodes(level_x, level_y);
                 build_edges();
-                event_interface::subscribe<events::moved_decoration>(moved_decoration_handler_);
-                event_interface::subscribe<events::placed_decoration>(placed_decoration_handler_);
                 query_interface::subscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
                 query_interface::subscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
             }
@@ -120,8 +112,6 @@ namespace graph{
             int occupant_at(Vector2 position);
             size_t occupied_node_count();
             void reset();
-            void on_moved_decoration(const events::moved_decoration& event);
-            void on_placed_decoration(const events::placed_decoration& event);
             void render(Rectangle frame);
     };
 }
