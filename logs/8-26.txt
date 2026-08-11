@@ -257,3 +257,14 @@ what is left
 -> blocked node recheck on waypoint transition, per the note above. lazy, no reverse index
 -> two wires write walkability into the same graph now, movement_system::on_moved_entity and
    level_graph's own decoration subscriptions. decide which one owns it
+
+-> implment collision checks on the quadtree
+-> test player dog selection and path sending
+-> implement the rest of the control system 
+-> test the rest of the control system
+-> building decorations and stations
+-> testing selection of decorations and stations 
+-> testing sending player dogs to decorations and stations 
+
+
+-> then the npc system

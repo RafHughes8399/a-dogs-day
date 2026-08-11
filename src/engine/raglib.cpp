@@ -22,3 +22,10 @@ bool raglib::bounding_box_2::contains(const Rectangle& box) const{
     return contains(bounds);
 
 }
+bool raglib::bounding_box_2::contains(const Vector2& position) const{
+    // other is contained in this
+    bool x_in_range = min.x <= position.x and position.x <= max.x;
+    bool y_in_range = min.y <= position.y and position.y <= max.y;
+    return x_in_range and y_in_range;
+
+}

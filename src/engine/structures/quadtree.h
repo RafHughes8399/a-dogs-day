@@ -288,7 +288,7 @@ namespace tree{
         int is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id);
         int is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id);
         bool node_contains_object(raglib::bounding_box_2& node, const Rectangle& object);
-
+        bool node_contains_position(raglib::bounding_box_2& ndoe, const Vector2& position);
         bool get_colliding_entity(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, size_t id, size_t& found);
         bool contains(std::unique_ptr<node>& tree, size_t entity_id);
         bool node_bounds_of(std::unique_ptr<node>& tree, size_t entity_id, raglib::bounding_box_2& bounds);

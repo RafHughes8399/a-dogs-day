@@ -172,6 +172,8 @@ void systems::control_input_system::move_view_frame(Vector2 direction_scalar, fl
     event_interface::queue_event(move_view_frame_event);
 }
 
+// TODO touch up this function, it has ai smells
+// TODO when selecting, make sure the entity outline is drawn
 void systems::control_input_system::left_click(size_t id){
     auto click_position = GetMousePosition();
     std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(click_position,
@@ -186,6 +188,7 @@ void systems::control_input_system::left_click(size_t id){
     }
     selection_system::get_instance().select(static_cast<size_t>(hit));
 }
+// TODO clean up ai smells
 void systems::control_input_system::right_click(size_t id){
     auto click_position = GetMousePosition();
     std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(click_position,
