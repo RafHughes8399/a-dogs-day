@@ -66,7 +66,8 @@ namespace game{
                 spatial_(systems::spatial_system::get_instance()),
                 collision_(systems::collision_system::get_instance()),
                 interaction_(systems::interaction_system::get_instance()),
-                rendering_(systems::rendering_system::get_instance()){}
+                rendering_(systems::rendering_system::get_instance()),
+                selection_(systems::selection_system::get_instance()){}
             // systems subscribe handlers in their constructors, so they are
             // non-copyable and non-movable - and so is anything holding them.
             ecs_game(const ecs_game& other) = delete;
@@ -93,6 +94,7 @@ namespace game{
             systems::collision_system& collision_;
             systems::interaction_system& interaction_;
             systems::rendering_system& rendering_;
+            systems::selection_system& selection_;
     };
 }
 #endif

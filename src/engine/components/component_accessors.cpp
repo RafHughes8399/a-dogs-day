@@ -94,3 +94,17 @@ void components::collision_component::hitbox_component::set_index(size_t index){
 components::collision_component::hitbox_component& components::collision_component::get_hitbox_component(){
     return hitbox_component_;
 }
+
+// ---------------- selectable_component ----------------
+bool components::selectable_component::is_selected() const{
+    return is_selected_;
+}
+size_t components::selectable_component::get_kind() const{
+    return kind_;
+}
+void components::selectable_component::select(){
+    is_selected_ = true;
+}
+void components::selectable_component::unselect(){
+    is_selected_ = false;
+}

@@ -40,3 +40,6 @@ components::state_machine_component component_builders::build_state_machine_comp
 components::food_component component_builders::build_food_component(){
     return components::food_component();
 }
+components::selectable_component component_builders::build_selectable_component(size_t kind){
+    return components::selectable_component(kind);
+}

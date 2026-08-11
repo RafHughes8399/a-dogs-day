@@ -195,6 +195,8 @@ namespace systems{
             void clear(){
                 entities_.clear();
             }
+            int check_collision_with(size_t id, Vector2 position);
+            int check_collision_with(size_t id, Rectangle box);
         private:
             // an entity with no collision component has no bounds and is not indexed
             hitbox::hitbox* bounds_for(size_t entity_id);
@@ -258,11 +260,11 @@ namespace systems{
 
             collision_system& operator=(const collision_system& other) = delete;
             collision_system& operator=(collision_system&& other) = delete;
-        private:
-            collision_system() = default;
-        public:
 
             void update(float delta);
+        private:
+            collision_system() = default;
+
     };
     class interaction_system{
         // for behavioural interactions
@@ -285,17 +287,6 @@ namespace systems{
     };
     class control_input_system{
         // for player input and control, maps the control input to a function.
-        // * owns both input components - key_input_component (keyboard) and
-        // * mouse_input_component (buttons) - rather than splitting a mouse
-        // * system out, because they are two modalities of one job: turn device
-        // * state into world changes. it is also the only place that may call
-        // * raylib's input functions; the components hold bindings, not state.
-        // TODO update() runs two loops: the mouse pass syncs position from the
-        // TODO device for everything in mouse_input_manager_ (that is what makes
-        // TODO the cursor follow the pointer - see the note above
-        // TODO ecs_entities::build_cursor) then dispatches button bindings; the
-        // TODO keyboard pass dispatches key bindings. blocked on component_manager
-        // TODO gaining iteration and movement_system gaining move_to.
         public:
             static control_input_system& get_instance(){
                 static control_input_system instance;
@@ -344,7 +335,7 @@ namespace systems{
 
             // the actions, mirroring player::controls' default scheme
             void back();
-            void left_click();
+            void left_click(size_t id);
             void move_view_frame(Vector2 direction_scalar, float delta);
             void open_inventory();
             void open_map();
@@ -352,7 +343,7 @@ namespace systems{
             void open_quests();
             void open_shop();
             void queue_key_press(int key);
-            void right_click();
+            void right_click(size_t id);
             void select_dog();
             void switch_dog();
 
@@ -363,6 +354,45 @@ namespace systems{
             std::map<std::pair<int, int>, std::function<void(size_t, float)>> control_function_map_;
             // mirrors player::selected_dog_ - switch_dog flips it, right_click carries it
             size_t selected_dog_;
+    };
+    class selection_system{
+        // owns which entity is currently selected
+        public:
+            static selection_system& get_instance(){
+                static selection_system instance;
+                return instance;
+            }
+            ~selection_system(){
+                event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+            }
+        private:
+            selection_system()
+            : remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+            selected_(game_config::empty_entity){
+                event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+            }
+        public:
+            selection_system(const selection_system& other) = delete;
+            selection_system(selection_system&& other) = delete;
+
+            selection_system& operator=(const selection_system& other) = delete;
+            selection_system& operator=(selection_system&& other) = delete;
+
+            void update(float delta);
+            void on_destroyed_entity(const events::remove_entity& event);
+
+            void select(size_t entity_id);
+            void deselect();
+            int selected() const{
+                return selected_;
+            }
+            // teardown between test scenarios - the singleton outlives them
+            void clear(){
+                selected_ = game_config::empty_entity;
+            }
+        private:
+            events::event_handler<events::remove_entity> remove_entity_handler_;
+            int selected_;
     };
     class npc_system{
         // uses the expediter and the maitre d to orchestrate
@@ -394,6 +424,7 @@ namespace systems{
         rendering_system::get_instance().clear();
         movement_system::get_instance().clear();
         control_input_system::get_instance().clear();
+        selection_system::get_instance().clear();
     }
 
     // hold a refernece to the glboal managers that they need to process things

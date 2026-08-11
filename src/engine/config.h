@@ -69,6 +69,7 @@ namespace game_config {
     inline const int hold_duration = static_cast<int>(frames * 1.2f); // 1.2 seconds in frames
     /** Frames to ignore edit-hold after exiting edit (prevents instant re-enter). */
     inline const int edit_cooldown = static_cast<int>(frames * 0.5);
+    inline const int empty_entity = -1;
 }
 namespace player_config{
     inline const int max_bones = 999999;
@@ -215,6 +216,13 @@ namespace entity_config{
     inline const char* waiter_dog_debug_id_prefix = "wd_";
     inline const char* dishwasher_dog_debug_id_prefix = "dwd_";
     inline const char* dishwasher_debug_id_prefix = "dw_";
+
+    enum selectable_kinds{
+        player_dog_kind = 0,
+        decoration_kind = 1,
+        station_kind = 2,
+        selectable_kinds_size = 3
+    };
 
     // file paths
     inline const char* background_path = "../sprites/background.png" ;

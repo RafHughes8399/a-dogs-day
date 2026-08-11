@@ -696,27 +696,18 @@ bool tree::ecs_quadtree::is_leaf(std::unique_ptr<node>& tree) {
 }
 
 // ---------------- ecs_quadtree - collision ----------------
-bool tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, size_t id){
-    if(not tree) {
-        return false;
-    }
-    for(auto entity_id : tree->entities_){
-        if(id == entity_id){ continue; }
-        auto* other = bounds_for(entity_id);
-        if(other != nullptr and bounds.check_collision(*other)){
-            return true;
-        }
-    }
-    for(auto & child : tree->children_){
-        if(node_contains_object(child->bounds_, bounds.get_box())){
-            if(is_there_collision(child, bounds, id)){
-                return true;
-            }
-        }
-    }
-    return false;
+int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id){
+    (void) tree;
+    (void) position;
+    (void) id;
+    return 1;
 }
-
+int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id){
+    (void) tree;
+    (void) box;
+    (void) id;
+    return 1;
+}
 bool tree::ecs_quadtree::get_colliding_entity(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, size_t id, size_t& found){
     if(not tree) {
         return false;

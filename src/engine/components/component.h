@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <concepts>
+#include <optional>
 #include <queue>
 #include <stddef.h>
 #include <unordered_map>
@@ -248,8 +249,28 @@ class food_component {
   private:
 };
 
+class selectable_component {
+public:
+    ~selectable_component() = default;
+    selectable_component(size_t kind)
+    : kind_(kind), is_selected_(false){}
+    selectable_component(const selectable_component& other) = default;
+    selectable_component(selectable_component&& other) = default;
+
+    selectable_component& operator=(const selectable_component& other) = default;
+    selectable_component& operator=(selectable_component&& other) = default;
+
+    bool is_selected() const;
+    size_t get_kind() const;
+    void select();
+    void unselect();
+private:
+    size_t kind_;
+    bool is_selected_;
+};
+
 // menu component ?
-// hud component ? 
+// hud component ?
 
 } // namespace components
 
@@ -311,6 +332,7 @@ extern component_manager<components::key_input_component> control_manager_;
 extern component_manager<components::mouse_input_component> mouse_input_manager_;
 extern component_manager<components::state_machine_component> state_machine_manager_;
 extern component_manager<components::food_component> food_manager_;
+extern component_manager<components::selectable_component> selectable_manager_;
 } // namespace component_managers
 
 namespace component_builders{
@@ -332,6 +354,7 @@ namespace component_builders{
     components::state_machine_component::state_component build_state();
     components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
     components::food_component build_food_component();
+    components::selectable_component build_selectable_component(size_t kind);
 }
 // thin forwarders to the right manager. inline because this header lands in
 // several TUs
@@ -362,6 +385,9 @@ namespace component_helpers{
     }
     inline void register_food_component(size_t entity_id, components::food_component component){
         component_managers::food_manager_.register_component(entity_id, std::move(component));
+    }
+    inline void register_selectable_component(size_t entity_id, components::selectable_component component){
+        component_managers::selectable_manager_.register_component(entity_id, std::move(component));
     }
     inline bool is_mouse_positioned(size_t entity_id){
         return component_managers::mouse_input_manager_.get_component(entity_id) != nullptr;
@@ -405,6 +431,9 @@ namespace component_helpers{
     inline void unregister_food_component(size_t entity_id){
         component_managers::food_manager_.unregister_component(entity_id);
     }
+    inline void unregister_selectable_component(size_t entity_id){
+        component_managers::selectable_manager_.unregister_component(entity_id);
+    }
 
     // blanket teardown - erase on a missing key is a no-op, so this is correct
     // for every entity kind without tracking what a builder registered
@@ -418,6 +447,7 @@ namespace component_helpers{
         unregister_mouse_input_component(entity_id);
         unregister_state_machine_component(entity_id);
         unregister_food_component(entity_id);
+        unregister_selectable_component(entity_id);
     }
 
     // total components registered across every manager
@@ -432,6 +462,7 @@ namespace component_helpers{
         count += component_managers::mouse_input_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::state_machine_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::food_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::selectable_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         return count;
     }
 
@@ -446,6 +477,7 @@ namespace component_helpers{
         component_managers::mouse_input_manager_.clear();
         component_managers::state_machine_manager_.clear();
         component_managers::food_manager_.clear();
+        component_managers::selectable_manager_.clear();
     }
 }
 #endif

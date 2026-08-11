@@ -11,6 +11,7 @@
 
 #include "component.h"
 #include "config.h"
+#include "hitbox.h"
 #include "queries.h"
 #include "query_interface.h"
 #include "entities.h"
@@ -60,6 +61,8 @@ namespace tree{
         bool is_root(std::unique_ptr<node>& tree);
         bool is_empty(std::unique_ptr<node>& tree);
         bool is_leaf(std::unique_ptr<node>& tree);
+        bool is_there_collision(std::unique_ptr<node>& tree, Vector2 position, int id);
+        bool is_there_collision(std::unique_ptr<node>& tree, Rectangle box, int id);
         bool is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, int id);
         bool node_contains_object(raglib::bounding_box_2& node, const Rectangle& object);
         
@@ -282,6 +285,8 @@ namespace tree{
         bool is_empty(std::unique_ptr<node>& tree);
         bool is_leaf(std::unique_ptr<node>& tree);
         bool is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, size_t id);
+        int is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id);
+        int is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id);
         bool node_contains_object(raglib::bounding_box_2& node, const Rectangle& object);
 
         bool get_colliding_entity(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, size_t id, size_t& found);
@@ -377,7 +382,12 @@ namespace tree{
             erase(root_, entity_id);
             insert(root_, entity_id, bounds);
         }
-
+        int check_collision(size_t id, Vector2 position){
+            return is_there_collision(root_, position, id);
+        }
+        int check_collision(size_t id, Rectangle box){
+            return is_there_collision(root_, box,  id);
+        }
         bool on_is_colliding_query(const queries::is_colliding_query& query){
             auto bounds = query.get_bounds();
             auto id = query.get_id();

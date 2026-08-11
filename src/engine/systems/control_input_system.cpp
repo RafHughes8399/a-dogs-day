@@ -1,5 +1,9 @@
 #include "component.h"
+#include "config.h"
 #include "system.h"
+#include "system_events.h"
+#include <cstddef>
+#include <optional>
 #include <raylib.h>
 #include <raymath.h>
 
@@ -120,9 +124,9 @@ void systems::control_input_system::build_control_map(){
 
     // the two game_config::cursor_controls binds
     control_function_map_[{MOUSE_BUTTON_LEFT, game_config::mouse_press}] =
-        [this](size_t id, float delta) -> void {(void) id; (void) delta; left_click();};
+        [this](size_t id, float delta) -> void {(void) delta; left_click(id);};
     control_function_map_[{MOUSE_BUTTON_RIGHT, game_config::mouse_press}] =
-        [this](size_t id, float delta) -> void {(void) id; (void) delta; right_click();};
+        [this](size_t id, float delta) -> void {(void) delta; right_click(id);};
 }
 
 // ------------------------------- the actions ------------------------------- //
@@ -168,15 +172,39 @@ void systems::control_input_system::move_view_frame(Vector2 direction_scalar, fl
     event_interface::queue_event(move_view_frame_event);
 }
 
-void systems::control_input_system::left_click(){
-    std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(GetMousePosition(),
+void systems::control_input_system::left_click(size_t id){
+    auto click_position = GetMousePosition();
+    std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(click_position,
     entity_config::cursor_attributes[entity_config::attributes::frame_width],
     entity_config::cursor_attributes[entity_config::attributes::frame_height]);
     event_interface::queue_event(left_mouse_click_event);
+
+    int hit = spatial_system::get_instance().check_collision_with(id, click_position);
+    if(hit == game_config::empty_entity){
+        selection_system::get_instance().deselect();
+        return;
+    }
+    selection_system::get_instance().select(static_cast<size_t>(hit));
 }
-void systems::control_input_system::right_click(){
-    std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(GetMousePosition(),
+void systems::control_input_system::right_click(size_t id){
+    auto click_position = GetMousePosition();
+    std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(click_position,
     static_cast<int>(selected_dog_));
     event_interface::queue_event(right_mouse_click_event);
+
+    int selected = selection_system::get_instance().selected();
+    if(selected == game_config::empty_entity){ return; }
+    auto selected_id = static_cast<size_t>(selected);
+    auto* selectable = component_managers::selectable_manager_.get_component(selected_id);
+    if(selectable->get_kind() != entity_config::selectable_kinds::player_dog_kind){ return; }
+
+    int hit = spatial_system::get_instance().check_collision_with(id, click_position);
+    std::optional<size_t> destination_entity = hit == game_config::empty_entity
+        ? std::optional<size_t>{}
+        : std::make_optional<size_t>(hit);
+    std::unique_ptr<events::event> create_path_event = std::make_unique<events::create_path_to>(
+            selected_id, click_position, path::replace, destination_entity
+        );
+    event_interface::queue_event(create_path_event);
 }
 

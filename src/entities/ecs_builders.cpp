@@ -36,6 +36,10 @@ namespace {
             component_builders::build_collision_component(
                 component_builders::build_hitbox_component(hitboxes,
                     level_config::directions::right)));
+
+        component_helpers::register_selectable_component(id,
+            component_builders::build_selectable_component(
+                entity_config::selectable_kinds::player_dog_kind));
     }
 } // namespace
 

@@ -33,3 +33,10 @@ void systems::spatial_system::on_destroyed_entity(const events::remove_entity& e
 void systems::spatial_system::update(float delta){
     (void) delta;
 }
+// ---------------- collision checks ----------------
+int systems::spatial_system::check_collision_with(size_t id, Rectangle box){
+    return entities_.check_collision(id, box);
+}
+int systems::spatial_system::check_collision_with(size_t id, Vector2 position){
+    return entities_.check_collision(id, position);
+}
