@@ -280,3 +280,62 @@ SCENARIO("the ecs world starts clean for every scenario", "[ecs][harness]"){
         }
     }
 }
+
+SCENARIO("a facing with no matching sprite variant is ignored", "[ecs][components][facing]"){
+    GIVEN("a player dog, which carries left and right variants only"){
+        testing::ecs_test_game game;
+        auto khiri_id = game.create_khiri();
+
+        auto* renderable = component_managers::renderable_manager_.get_component(khiri_id);
+        auto* collision = component_managers::collision_manager_.get_component(khiri_id);
+        REQUIRE(renderable != nullptr);
+        REQUIRE(collision != nullptr);
+        REQUIRE(renderable->get_sprites().front().num_sprites() == 2);
+        REQUIRE(collision->get_hitbox_component().num_hitboxes() == 2);
+
+        component_helpers::set_facing_index(khiri_id, level_config::directions::left);
+        REQUIRE(renderable->get_sprites().front().get_sprite_index()
+            == level_config::directions::left);
+
+        WHEN("it is told to face up, which it has no sprite for"){
+            component_helpers::set_facing_index(khiri_id, level_config::directions::up);
+
+            THEN("the sprite index is left where it was"){
+                REQUIRE(renderable->get_sprites().front().get_sprite_index()
+                    == level_config::directions::left);
+            }
+            THEN("the hitbox index is left where it was"){
+                REQUIRE(collision->get_hitbox_component().get_hitbox_index()
+                    == level_config::directions::left);
+            }
+            THEN("reading the sprite and hitbox stays in range"){
+                REQUIRE(renderable->get_sprites().front().get_sprite_index()
+                    < renderable->get_sprites().front().num_sprites());
+                REQUIRE(collision->get_hitbox_component().get_hitbox_index()
+                    < collision->get_hitbox_component().num_hitboxes());
+            }
+        }
+
+        WHEN("it is told to face down, which it has no sprite for"){
+            component_helpers::set_facing_index(khiri_id, level_config::directions::down);
+
+            THEN("the facing is unchanged and still in range"){
+                REQUIRE(renderable->get_sprites().front().get_sprite_index()
+                    == level_config::directions::left);
+                REQUIRE(collision->get_hitbox_component().get_hitbox_index()
+                    == level_config::directions::left);
+            }
+        }
+
+        WHEN("it is told to face right, which it does have"){
+            component_helpers::set_facing_index(khiri_id, level_config::directions::right);
+
+            THEN("the facing changes"){
+                REQUIRE(renderable->get_sprites().front().get_sprite_index()
+                    == level_config::directions::right);
+                REQUIRE(collision->get_hitbox_component().get_hitbox_index()
+                    == level_config::directions::right);
+            }
+        }
+    }
+}

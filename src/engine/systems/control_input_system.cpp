@@ -1,6 +1,8 @@
 #include "component.h"
 #include "config.h"
+#include "debug_log_interface.h"
 #include "debug_logger.h"
+#include "raglib.h"
 #include "system.h"
 #include "system_events.h"
 #include <cstddef>
@@ -181,33 +183,62 @@ void systems::control_input_system::move_view_frame(Vector2 direction_scalar, fl
 
 void systems::control_input_system::left_click(size_t id){
     auto click_position = GetMousePosition();
+    debug::log("[control_input_system::left_click, clicked] asked by: "
+        + std::to_string(id)
+        + ", position: " + raglib::vector_to_string(click_position));
+
     int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
     if(entity_id == game_config::empty_entity){
+        debug::log("[control_input_system::left_click, hit nothing] deselecting, was: "
+            + std::to_string(selection_system::get_instance().selected()));
         selection_system::get_instance().deselect();
         return;
     }
     else{
+        debug::log("[control_input_system::left_click, hit entity] selecting: "
+            + std::to_string(entity_id));
         selection_system::get_instance().select(static_cast<size_t>(entity_id));
+        debug::log("[control_input_system::left_click, selection settled] selected: "
+            + std::to_string(selection_system::get_instance().selected()));
     }
-    
+
 }
 // * right click tells the selected player dog entity where to go 
 // ? maybe extendable to waiters too ? if i wanted to change how the waiter interaction stuff goes
 void systems::control_input_system::right_click(size_t id){
     auto click_position = GetMousePosition();
+    debug::log("[control_input_system::right_click, clicked] asked by: "
+        + std::to_string(id)
+        + ", position: " + raglib::vector_to_string(click_position));
+
     int selected = selection_system::get_instance().selected();
-    if(selected == game_config::empty_entity){ return; }
+    if(selected == game_config::empty_entity){
+        debug::log("[control_input_system::right_click, nothing selected] no path requested");
+        return;
+    }
     auto selected_id = static_cast<size_t>(selected);
     auto* selectable = component_managers::selectable_manager_.get_component(selected_id);
-    if(selectable->get_kind() != entity_config::selectable_kinds::player_dog_kind){ return; }
+    if(selectable->get_kind() != entity_config::selectable_kinds::player_dog_kind){
+        debug::log("[control_input_system::right_click, selection is not a player dog] id: "
+            + std::to_string(selected_id)
+            + ", kind: " + std::to_string(selectable->get_kind()));
+        return;
+    }
 
-    int hit = spatial_system::get_instance().check_collision_with(id, click_position);
-    std::optional<size_t> destination_entity = hit == game_config::empty_entity
+    int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
+    std::optional<size_t> destination_entity = entity_id == game_config::empty_entity
         ? std::optional<size_t>{}
-        : std::make_optional<size_t>(hit);
+        : std::make_optional<size_t>(entity_id);
+    debug::log("[control_input_system::right_click, resolved destination] entity: "
+        + (destination_entity.has_value() ? std::to_string(destination_entity.value())
+                                          : std::string("none, bare position")));
+
     std::unique_ptr<events::event> create_path_event = std::make_unique<events::create_path_to>(
             selected_id, click_position, path::replace, destination_entity
         );
     event_interface::queue_event(create_path_event);
+    debug::log("[control_input_system::right_click, queued create_path_to] dog: "
+        + std::to_string(selected_id)
+        + ", destination: " + raglib::vector_to_string(click_position));
 }
 

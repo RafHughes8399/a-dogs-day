@@ -93,6 +93,7 @@ public:
     
       sprite::sprite& get_sprite();
       size_t get_sprite_index() const;
+      size_t num_sprites() const;
       void set_index(size_t index);
 
   private:
@@ -133,6 +134,7 @@ public:
     std::vector<hitbox::hitbox>& get_hitboxes();
     hitbox::hitbox& get_hitbox();
     size_t get_hitbox_index() const;
+    size_t num_hitboxes() const;
     void set_index(size_t index);
 
   private:
@@ -393,14 +395,25 @@ namespace component_helpers{
         return component_managers::mouse_input_manager_.get_component(entity_id) != nullptr;
     }
     // writes sprite and hitbox indices together. missing either component is fine
+    // * a facing with no matching variant is a no-op, not a write - the entity
+    // * keeps the facing it had. dogs carry left/right only while
+    // * movement_system::determine_direction resolves all four, so an unguarded
+    // * write indexes past the end. this is the port of dog::set_direction_index,
+    // * and each component is checked against its own count the way that checked
+    // * body_ and head_ separately.
     inline void set_facing_index(size_t entity_id, size_t index){
         if(auto* renderable = component_managers::renderable_manager_.get_component(entity_id)){
             for(auto& sprite_component : renderable->get_sprites()){
-                sprite_component.set_index(index);
+                if(index < sprite_component.num_sprites()){
+                    sprite_component.set_index(index);
+                }
             }
         }
         if(auto* collision = component_managers::collision_manager_.get_component(entity_id)){
-            collision->get_hitbox_component().set_index(index);
+            auto& hitboxes = collision->get_hitbox_component();
+            if(index < hitboxes.num_hitboxes()){
+                hitboxes.set_index(index);
+            }
         }
     }
 

@@ -69,6 +69,9 @@ sprite::sprite& components::renderable_component::sprite_component::get_sprite()
 size_t components::renderable_component::sprite_component::get_sprite_index() const{
     return sprite_index_;
 }
+size_t components::renderable_component::sprite_component::num_sprites() const{
+    return sprites_.size();
+}
 void components::renderable_component::sprite_component::set_index(size_t index){
     sprite_index_ = index;
 }
@@ -86,6 +89,9 @@ hitbox::hitbox& components::collision_component::hitbox_component::get_hitbox(){
 }
 size_t components::collision_component::hitbox_component::get_hitbox_index() const{
     return hitbox_index_;
+}
+size_t components::collision_component::hitbox_component::num_hitboxes() const{
+    return hitboxes_.size();
 }
 void components::collision_component::hitbox_component::set_index(size_t index){
     hitbox_index_ = index;
