@@ -61,9 +61,12 @@ void game::ecs_game::init(){
     }, level_config::hud);
 
     // TODO starting entities - khiri and mack, the starting stations
-    // ecs_entities::build_khiri(...); ecs_entities::build_mack(...);
-    // ecs_entities::build_table(...); ecs_entities::build_counter(...);
-
+    lifespan_.create([](size_t id) -> void{
+        ecs_entities::build_khiri(id);
+    }, level_config::dogs);
+    lifespan_.create([](size_t id) -> void{
+        ecs_entities::build_mack(id);
+    }, level_config::dogs);
     // TODO menus and hud
 
     return;

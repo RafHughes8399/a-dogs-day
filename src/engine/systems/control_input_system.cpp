@@ -172,29 +172,23 @@ void systems::control_input_system::move_view_frame(Vector2 direction_scalar, fl
     event_interface::queue_event(move_view_frame_event);
 }
 
-// TODO touch up this function, it has ai smells
-// TODO when selecting, make sure the entity outline is drawn
+
 void systems::control_input_system::left_click(size_t id){
     auto click_position = GetMousePosition();
-    std::unique_ptr<events::event> left_mouse_click_event = std::make_unique<events::left_mouse_click>(click_position,
-    entity_config::cursor_attributes[entity_config::attributes::frame_width],
-    entity_config::cursor_attributes[entity_config::attributes::frame_height]);
-    event_interface::queue_event(left_mouse_click_event);
-
-    int hit = spatial_system::get_instance().check_collision_with(id, click_position);
-    if(hit == game_config::empty_entity){
+    int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
+    if(entity_id == game_config::empty_entity){
         selection_system::get_instance().deselect();
         return;
     }
-    selection_system::get_instance().select(static_cast<size_t>(hit));
+    else{
+        selection_system::get_instance().select(static_cast<size_t>(entity_id));
+    }
+    
 }
-// TODO clean up ai smells
+// * right click tells the selected player dog entity where to go 
+// ? maybe extendable to waiters too ? if i wanted to change how the waiter interaction stuff goes
 void systems::control_input_system::right_click(size_t id){
     auto click_position = GetMousePosition();
-    std::unique_ptr<events::event> right_mouse_click_event = std::make_unique<events::right_mouse_click>(click_position,
-    static_cast<int>(selected_dog_));
-    event_interface::queue_event(right_mouse_click_event);
-
     int selected = selection_system::get_instance().selected();
     if(selected == game_config::empty_entity){ return; }
     auto selected_id = static_cast<size_t>(selected);

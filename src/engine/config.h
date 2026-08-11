@@ -94,6 +94,12 @@ namespace level_config{
     inline const size_t mack_id = 0;
     inline const size_t khiri_id = 1;
 
+    // the same spawns level_builder::build_main_level places them at
+    inline const Vector2 mack_start = Vector2{edge_weight * 7.0f,
+                                              edge_weight * 4.0f};
+    inline const Vector2 khiri_start = Vector2{edge_weight * 4.0f,
+                                               edge_weight * 3.5f};
+
     inline const Vector2 frame_move = Vector2{375, 375};
     inline const float void_move = edge_weight * 0.125;
     enum draw_layers{
@@ -300,10 +306,10 @@ namespace entity_config{
     // inline const float npc_dog_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // inline const Vector2 npc_dog_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 npc_dog_head_right_offset = Vector2{0.0f, 0.0f};
-    inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     inline const int dog_eating_duration = game_config::frames * 10;
 }
 namespace dog_config{
+    inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     enum waiter_dog_types{
         basic = 0,
         size = 1

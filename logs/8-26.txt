@@ -222,7 +222,7 @@ next: movement and state machine components
 -> processing movement for a path
 -> updating paths when decorations move, decorations only, or alternatively. if an entity is along a path and it comes across a blocked node, it then recalculates to the destination ?
 -> but then need some way to recalc the destination
--> depends on a component that the decoration would have ?
+-> depends on a component that the decoration would have ?ujkiwsenbfvckuioewbkljfewbouik;fvbewdsk;uifgbweo;uidfbuio;wehfidshbfahasBGF8uoewb uikfbi'owe fjukib
 
 
 movement system status
@@ -258,12 +258,23 @@ what is left
 -> two wires write walkability into the same graph now, movement_system::on_moved_entity and
    level_graph's own decoration subscriptions. decide which one owns it
 
--> implment collision checks on the quadtree
+
+
+
+11/8
+
+-> implement collision checks on the quadtree x  
+
 -> test player dog selection and path sending
+    -> need to build player dogs
 -> implement the rest of the control system 
+
 -> test the rest of the control system
+
 -> building decorations and stations
+
 -> testing selection of decorations and stations 
+
 -> testing sending player dogs to decorations and stations 
 
 

@@ -9,17 +9,6 @@
 // entity.h is a compile error here, not an undefined symbol at link time
 
 namespace {
-    // the same spawns level_builder::build_main_level places them at
-    const Vector2 mack_start = Vector2{level_config::edge_weight * 7.0f,
-                                       level_config::edge_weight * 4.0f};
-    const Vector2 khiri_start = Vector2{level_config::edge_weight * 4.0f,
-                                        level_config::edge_weight * 3.5f};
-
-    // * what khiri and mack share: a position, one sprite_component holding the
-    // * direction-indexed body sprites, and a hitbox per facing running parallel
-    // * to them - so the two indices are one facing, as collision_component's
-    // * note requires. both start facing right, matching movement_component's
-    // * default direction.
     void build_player_dog_components(size_t id, Vector2 position,
         std::vector<sprite::sprite> sprites){
         component_helpers::register_positional_component(id,
@@ -36,6 +25,11 @@ namespace {
             component_builders::build_collision_component(
                 component_builders::build_hitbox_component(hitboxes,
                     level_config::directions::right)));
+
+        component_helpers:: register_movement_component(id,
+            component_builders::build_movement_component(
+                dog_config::dog_move_speed, level_config::direction_scalars[level_config::directions::right]
+            ));
 
         component_helpers::register_selectable_component(id,
             component_builders::build_selectable_component(
@@ -55,11 +49,6 @@ void ecs_entities::build_player(size_t player_id, size_t cursor_id){
 void ecs_entities::build_player_dog(size_t id){
     (void) id;
 }
-    // * only the across sprites are ported. the old builder also carried outline
-    // * sprites and an empty head body: the outlines are selection cosmetics that
-    // * ecs_layer::draw would render unconditionally, since every sprite_component
-    // * on an entity draws every frame and nothing in the ECS knows which dog is
-    // * selected yet. they land with the state machine component.
     // TODO no movement_component yet - these dogs hold a position but no speed,
     // TODO direction or path queue, so nothing can move them.
     void ecs_entities::build_khiri(size_t id){
@@ -69,8 +58,8 @@ void ecs_entities::build_player_dog(size_t id){
             entity_config::khiri_left_path, entity_config::khiri_across_attributes));
         sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_right,
             entity_config::khiri_right_path, entity_config::khiri_across_attributes));
-
-        build_player_dog_components(id, khiri_start, std::move(sprites));
+        
+        build_player_dog_components(id, level_config::khiri_start, std::move(sprites));
     }
     void ecs_entities::build_mack(size_t id){
         // ! left right, parallel to level_config::directions
@@ -80,7 +69,7 @@ void ecs_entities::build_player_dog(size_t id){
         sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_right,
             entity_config::mack_right_path, entity_config::mack_across_attributes));
 
-        build_player_dog_components(id, mack_start, std::move(sprites));
+        build_player_dog_components(id, level_config::mack_start, std::move(sprites));
     }
 
 void ecs_entities::build_customer_dog(size_t id){

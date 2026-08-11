@@ -705,7 +705,7 @@ bool tree::ecs_quadtree::is_leaf(std::unique_ptr<node>& tree) {
 // ---------------- ecs_quadtree - collision ----------------
 // TODO actually implement these
 int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id){
-    if(not tree) {return -1;}
+    if(not tree) {return game_config::empty_entity;}
     for(size_t entity : tree->entities_){
         // get the entity bounds
         auto entity_collision_component = component_managers::collision_manager_.get_component(entity);
@@ -720,9 +720,10 @@ int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 
             return is_there_collision(child, position, id);
         }
     }
+    return game_config::empty_entity;
 }
 int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id){
-    if(not tree) {return -1;}
+    if(not tree) {return game_config::empty_entity;}
     for(size_t entity : tree->entities_){
         // get the entity bounds
         auto entity_collision_component = component_managers::collision_manager_.get_component(entity);
@@ -737,6 +738,7 @@ int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Rectangl
             return is_there_collision(child, box, id);
         }
     }
+    return game_config::empty_entity;
 }
 bool tree::ecs_quadtree::get_colliding_entity(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, size_t id, size_t& found){
     if(not tree) {

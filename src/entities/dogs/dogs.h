@@ -85,7 +85,7 @@ namespace entities{
             Vector2 direction_scalar_;
             body::body head_;
             std::queue<path> move_paths_;
-            const Vector2 move_speed_ = entity_config::dog_move_speed;
+            const Vector2 move_speed_ = dog_config::dog_move_speed;
     };
     class player_dog : public dog{
         public:
