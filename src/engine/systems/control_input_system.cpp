@@ -1,5 +1,6 @@
 #include "component.h"
 #include "config.h"
+#include "debug_logger.h"
 #include "system.h"
 #include "system_events.h"
 #include <cstddef>
@@ -107,6 +108,8 @@ void systems::control_input_system::build_control_map(){
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_map();};
     control_function_map_[{controls_config::key_press_actions::back, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; back();};
+    control_function_map_[{controls_config::key_press_actions::debug_toggle, game_config::key_press}] =
+        [this](size_t id, float delta) -> void {(void) id; (void) delta; toggle_debug_logger();};
 
     // the four game_config::player_controls binds
     control_function_map_[{controls_config::key_hold_actions::move_up, game_config::key_hold}] =
@@ -155,6 +158,9 @@ void systems::control_input_system::open_quests(){
 }
 void systems::control_input_system::open_shop(){
     queue_key_press(controls_config::key_press_actions::shop_open);
+}
+void systems::control_input_system::toggle_debug_logger(){
+    debug::logger::get_instance().toggle();
 }
 
 void systems::control_input_system::select_dog(){

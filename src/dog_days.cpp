@@ -30,6 +30,7 @@ int main() {
     BeginDrawing();
     game.update(delta);
     game.render(delta);
+    game.debug(delta);
     EndDrawing();
     if (IsKeyPressed(KEY_PERIOD) or WindowShouldClose()) {
       loop = false;

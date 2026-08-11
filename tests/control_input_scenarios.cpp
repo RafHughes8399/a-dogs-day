@@ -50,6 +50,10 @@ namespace {
         return systems::control_input_system::get_instance();
     }
 
+    systems::selection_system& selection(){
+        return systems::selection_system::get_instance();
+    }
+
     game_config::input key_press_of(int key){
         return game_config::input{key, game_config::key_press};
     }
@@ -243,56 +247,99 @@ SCENARIO("a held direction key moves the view frame that way", "[ecs][controls]"
     }
 }
 
-SCENARIO("a simulated mouse press clicks", "[ecs][controls]"){
-    GIVEN("a cursor entity and listeners on both clicks"){
+SCENARIO("a left click selects the entity under the cursor", "[ecs][controls][selection]"){
+    // left_click reads GetMousePosition() itself and the device cannot be
+    // driven from a test, so the dog is placed AT whatever the mouse reports
+    // rather than the mouse being moved onto the dog. the click is asked for by
+    // the cursor, which sits on that same position - the query has to see past
+    // itself to find the dog underneath
+    GIVEN("a player dog sitting under the cursor"){
         testing::ecs_test_game game;
         auto cursor_id = game.create_cursor();
+        auto khiri_id = game.create_khiri();
+        game.move_entity(khiri_id, GetMousePosition());
 
-        std::vector<Rectangle> left_clicks;
-        listener<events::left_mouse_click> left([&left_clicks](const events::left_mouse_click& event) -> void{
-            left_clicks.push_back(event.get_hitbox());
-        });
-
-        std::vector<int> right_clicks;
-        listener<events::right_mouse_click> right([&right_clicks](const events::right_mouse_click& event) -> void{
-            right_clicks.push_back(event.get_selected_dog());
-        });
+        REQUIRE(selection().selected() == game_config::empty_entity);
 
         WHEN("the left button is pressed"){
             controls().simulate_input(mouse_press_of(MOUSE_BUTTON_LEFT), cursor_id);
-            flush();
 
-            THEN("one left click is announced, sized to the cursor"){
-                REQUIRE(left_clicks.size() == 1);
-                REQUIRE(left_clicks[0].width == entity_config::cursor_attributes[entity_config::attributes::frame_width]);
-                REQUIRE(left_clicks[0].height == entity_config::cursor_attributes[entity_config::attributes::frame_height]);
+            THEN("the dog becomes the selected entity"){
+                REQUIRE(selection().selected() == static_cast<int>(khiri_id));
             }
-            THEN("the right click is left alone"){
-                REQUIRE(right_clicks.empty());
+            THEN("its selectable component agrees"){
+                auto* selectable = component_managers::selectable_manager_.get_component(khiri_id);
+                REQUIRE(selectable != nullptr);
+                REQUIRE(selectable->is_selected());
             }
         }
+    }
+
+    GIVEN("a selected dog and empty space under the cursor"){
+        testing::ecs_test_game game;
+        auto cursor_id = game.create_cursor();
+        auto khiri_id = game.create_khiri();
+        game.move_entity(khiri_id, GetMousePosition());
+        controls().simulate_input(mouse_press_of(MOUSE_BUTTON_LEFT), cursor_id);
+        REQUIRE(selection().selected() == static_cast<int>(khiri_id));
+
+        WHEN("the dog moves away and the left button is pressed again"){
+            game.move_entity(khiri_id, Vector2{level_config::edge_weight * 12,
+                                               level_config::edge_weight * 12});
+            controls().simulate_input(mouse_press_of(MOUSE_BUTTON_LEFT), cursor_id);
+
+            THEN("the selection is cleared"){
+                REQUIRE(selection().selected() == game_config::empty_entity);
+            }
+            THEN("the component is no longer selected"){
+                auto* selectable = component_managers::selectable_manager_.get_component(khiri_id);
+                REQUIRE(selectable != nullptr);
+                REQUIRE_FALSE(selectable->is_selected());
+            }
+        }
+    }
+}
+
+SCENARIO("a right click paths the selected player dog to the clicked position",
+         "[ecs][controls][movement]"){
+    GIVEN("a selected player dog and a listener on create_path_to"){
+        testing::ecs_test_game game;
+        auto cursor_id = game.create_cursor();
+        auto khiri_id = game.create_khiri();
+        game.move_entity(khiri_id, GetMousePosition());
+        controls().simulate_input(mouse_press_of(MOUSE_BUTTON_LEFT), cursor_id);
+        REQUIRE(selection().selected() == static_cast<int>(khiri_id));
+
+        std::vector<size_t> path_for;
+        std::vector<Vector2> path_to;
+        listener<events::create_path_to> paths([&](const events::create_path_to& event) -> void{
+            path_for.push_back(event.get_id());
+            path_to.push_back(event.get_destination());
+        });
 
         WHEN("the right button is pressed"){
             controls().simulate_input(mouse_press_of(MOUSE_BUTTON_RIGHT), cursor_id);
             flush();
 
-            THEN("the click carries the selected dog"){
-                REQUIRE(right_clicks.size() == 1);
-                REQUIRE(right_clicks[0] == static_cast<int>(level_config::mack_id));
+            THEN("one path is requested, for the selected dog"){
+                REQUIRE(path_for.size() == 1);
+                REQUIRE(path_for[0] == khiri_id);
             }
-            THEN("the left click is left alone"){
-                REQUIRE(left_clicks.empty());
+            THEN("it is aimed at the clicked position"){
+                REQUIRE(path_to.size() == 1);
+                REQUIRE(path_to[0].x == GetMousePosition().x);
+                REQUIRE(path_to[0].y == GetMousePosition().y);
             }
         }
 
-        WHEN("the dog is switched and then right clicked"){
-            controls().simulate_input(key_press_of(controls_config::key_press_actions::dog_switch), cursor_id);
+        WHEN("nothing is selected and the right button is pressed"){
+            selection().deselect();
+            REQUIRE(selection().selected() == game_config::empty_entity);
             controls().simulate_input(mouse_press_of(MOUSE_BUTTON_RIGHT), cursor_id);
             flush();
 
-            THEN("the click carries the dog that is now selected"){
-                REQUIRE(right_clicks.size() == 1);
-                REQUIRE(right_clicks[0] == static_cast<int>(level_config::khiri_id));
+            THEN("no path is requested"){
+                REQUIRE(path_for.empty());
             }
         }
 
@@ -300,9 +347,9 @@ SCENARIO("a simulated mouse press clicks", "[ecs][controls]"){
             controls().simulate_input(mouse_press_of(MOUSE_BUTTON_MIDDLE), cursor_id);
             flush();
 
-            THEN("neither click fires"){
-                REQUIRE(left_clicks.empty());
-                REQUIRE(right_clicks.empty());
+            THEN("no path is requested and the selection is untouched"){
+                REQUIRE(path_for.empty());
+                REQUIRE(selection().selected() == static_cast<int>(khiri_id));
             }
         }
     }

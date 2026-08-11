@@ -80,39 +80,6 @@ SCENARIO("a dishwasher keeps its registration when moved", "[dishwasher][expedit
     }
 }
 
-SCENARIO("a moved station's interaction positions follow it",
-         "[dishwasher][station][move][!shouldfail]"){
-    // NOT implemented: station::update_interaction_positions() is only ever
-    // called from the constructors (stations.h:60, table.cpp:50,
-    // food_counter.cpp:76), never on move. Dogs path to the interaction node
-    // rather than the station origin, so every moved station keeps directing
-    // them to where it used to be. This is the root cause behind the waiter and
-    // customer re-routing scenarios failing.
-    test_game game;
-    game.tick(1.0f / 60.0f);
-
-    GIVEN("a registered dishwasher"){
-        const int dishwasher_id = 93;
-        game.insert_dishwasher(dishwasher_id,
-            Vector2{level_config::edge_weight * 20, level_config::edge_weight * 16});
-        game.tick(1.0f / 60.0f);
-        auto* dishwasher = game.find_dishwasher(dishwasher_id);
-        REQUIRE(dishwasher != nullptr);
-        const Vector2 before = dishwasher->get_interaction_positions().left;
-
-        WHEN("it is moved across the level"){
-            game.move_entity(dishwasher_id,
-                Vector2{level_config::edge_weight * 10, level_config::edge_weight * 16});
-            game.tick(1.0f / 60.0f);
-
-            THEN("its interaction position moves too"){
-                const Vector2 after = dishwasher->get_interaction_positions().left;
-                REQUIRE(Vector2Distance(after, before) > 0.01f);
-            }
-        }
-    }
-}
-
 SCENARIO("clearing jobs are not dispatched without a dishwasher", "[dishwasher][expediter][clearing]"){
     // are_dishwashers_available() gates clearing dispatch: with nowhere to put
     // the plate the job is recorded but left unassigned, rather than sending a

@@ -346,6 +346,7 @@ namespace systems{
             void right_click(size_t id);
             void select_dog();
             void switch_dog();
+            void toggle_debug_logger();
 
             // * keyed on {key_, action_}, not the key alone - KEY_E is both
             // * key_hold_actions::edit_mode and key_press_actions::exit_edit, and

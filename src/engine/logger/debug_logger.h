@@ -4,9 +4,9 @@
 #include "events.h"
 #include "raylib.h"
 
+#include <deque>
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace debug{
     class logger{
@@ -46,6 +46,7 @@ namespace debug{
             void render();
             void toggle();
             void toggle_pause();
+            void set_frame(int frame);
             void on_debug_log_event(const events::debug_log& event);
 
         private:
@@ -55,12 +56,16 @@ namespace debug{
             void subscribe();
             void unsubscribe();
             void add_message(const std::string& message);
+            std::string timestamp();
             void render_backdrop();
             void render_messages();
 
             std::unique_ptr<state> state_;
             events::event_handler<events::debug_log> debug_log_handler_;
-            std::vector<std::string> messages_;
+            // a std::queue would model the push_back / pop_front use exactly but
+            // cannot be iterated, and every message is drawn every frame
+            std::deque<std::string> messages_;
+            int frame_;
             bool subscribed_;
             bool paused_;
     };
