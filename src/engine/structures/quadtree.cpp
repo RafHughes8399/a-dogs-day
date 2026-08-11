@@ -519,6 +519,12 @@ bool tree::ecs_quadtree::node_contains_position(raglib::bounding_box_2& node, co
     return node.contains(position);
 }
 
+bool tree::ecs_quadtree::node_overlaps_object(raglib::bounding_box_2& node, const Rectangle& object){
+    auto node_rect = Rectangle{node.min.x, node.min.y,
+        node.max.x - node.min.x, node.max.y - node.min.y};
+    return CheckCollisionRecs(object, node_rect);
+}
+
 int tree::ecs_quadtree::object_contained_by_child(raglib::bounding_box_2& node, Rectangle& object){
     auto centre = Vector2Add(node.max, node.min);
     centre = Vector2Scale(centre, 0.5f);
@@ -703,21 +709,28 @@ bool tree::ecs_quadtree::is_leaf(std::unique_ptr<node>& tree) {
 }
 
 // ---------------- ecs_quadtree - collision ----------------
-// TODO actually implement these
+// the querying entity is skipped - the cursor sits on its own click position
+// every frame, so without this a click never sees past it
 int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id){
     if(not tree) {return game_config::empty_entity;}
     for(size_t entity : tree->entities_){
-        // get the entity bounds
+        if(entity == id){ continue; }
         auto entity_collision_component = component_managers::collision_manager_.get_component(entity);
+        if(entity_collision_component == nullptr){ continue; }
         auto entity_bounds = entity_collision_component->get_hitbox_component().get_hitbox().get_box();
         if(CheckCollisionPointRec(position, entity_bounds)){
-            return entity;
+            return static_cast<int>(entity);
         }
     }
-    // then iterate through children that the position actually fits in, run a spatial checkf for hte recursion
+    // contains() is inclusive on both bounds, so a position on a split belongs to
+    // more than one child - carry on through the siblings rather than committing
+    // to the first
     for(auto& child : tree->children_){
         if(node_contains_position(child->bounds_, position)){
-            return is_there_collision(child, position, id);
+            int entity = is_there_collision(child, position, id);
+            if(entity != game_config::empty_entity){
+                return entity;
+            }
         }
     }
     return game_config::empty_entity;
@@ -725,17 +738,24 @@ int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 
 int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id){
     if(not tree) {return game_config::empty_entity;}
     for(size_t entity : tree->entities_){
-        // get the entity bounds
+        if(entity == id){ continue; }
         auto entity_collision_component = component_managers::collision_manager_.get_component(entity);
+        if(entity_collision_component == nullptr){ continue; }
         auto entity_bounds = entity_collision_component->get_hitbox_component().get_hitbox().get_box();
         if(CheckCollisionRecs(box, entity_bounds)){
-            return entity;
+            return static_cast<int>(entity);
         }
     }
-    // then iterate through children that the position actually fits in, run a spatial checkf for hte recursion
+    // node_contains_object demands full containment, so a box straddling a split
+    // matches no child at all and the descent stops here. a miss is not an
+    // acceptable broad-phase answer, so overlap - not containment - decides which
+    // children are worth searching
     for(auto& child : tree->children_){
-        if(node_contains_object(child->bounds_, box)){
-            return is_there_collision(child, box, id);
+        if(node_overlaps_object(child->bounds_, box)){
+            int entity = is_there_collision(child, box, id);
+            if(entity != game_config::empty_entity){
+                return entity;
+            }
         }
     }
     return game_config::empty_entity;
