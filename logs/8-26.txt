@@ -267,16 +267,31 @@ what is left
 
 -> test player dog selection and path sending
     -> need to build player dogs x 
-
 -> implement the rest of the control system 
 
 -> test the rest of the control system
 
--> building decorations and stations and npc dogsx 
+-> building decorations and stations and npc dogs x 
 
 -> testing selection of decorations and stations 
 
 -> testing sending player dogs to decorations and stations 
-
-
+    -> involves interaction components and systems
+    -> the question then becomes how will this work
+    -> an entity has an interaction component, or rather an interactable component
+    -> an interactable componetn defines interaction  posisiont [ like how stations do it presently]
+    -> when an entity fills that position, the station is being interacted with
+    -> an entity fills that position when it ends a path that arrives at that position ?
+    -> or an entity fills that position while its position matches ?
+    -> no
+    -> stations are interactable, allowing dogs to work them. 
+    -> maybe then here is what happens:
+        -> stations define their interaction hjitboxes too, like a buffer of maybe half an edge 
+        around the decoration. 
+        -> is a collision is detected 
+    -> maybe it is a two way street, a handshake. both have interactable components
+    -> the interactable compoennt stores the other entity that this entity is interacting with
+    -> if there is an interaction [i.e other is filled], some behaviour would be performed by the "other entity"
+    -> then it is easier to toggle the state. if a collision is detected between two entities and they both have interaction componetns,
+    then they interact  
 -> then the npc system
