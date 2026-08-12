@@ -158,10 +158,6 @@ namespace testing{
         return component_managers::movement_manager_.get_component(entity_id) != nullptr;
     }
 
-    bool ecs_test_game::has_interaction(size_t entity_id){
-        return component_managers::interaction_manager_.get_component(entity_id) != nullptr;
-    }
-
     bool ecs_test_game::has_selectable(size_t entity_id){
         return component_managers::selectable_manager_.get_component(entity_id) != nullptr;
     }
@@ -215,7 +211,8 @@ namespace testing{
              + component_managers::movement_manager_.size()
              + component_managers::renderable_manager_.size()
              + component_managers::collision_manager_.size()
-             + component_managers::interaction_manager_.size()
+             + component_managers::interactor_manager_.size()
+             + component_managers::interactable_manager_.size()
              + component_managers::control_manager_.size()
              + component_managers::mouse_input_manager_.size()
              + component_managers::state_machine_manager_.size()

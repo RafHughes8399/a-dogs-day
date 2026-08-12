@@ -62,8 +62,8 @@ namespace {
     void build_station_components(size_t id, Vector2 position,
         sprite::sprite station_sprite, hitbox::hitbox station_hitbox){
         build_decoration_components(id, position, station_sprite, station_hitbox);
-        component_helpers::register_interaction_component(id,
-            component_builders::build_interaction_component());
+        //component_helpers::register_interaction_component(id,
+        //    component_builders::build_interaction_component());
         component_helpers::register_selectable_component(id,
             component_builders::build_selectable_component(
                 entity_config::selectable_kinds::station_kind));

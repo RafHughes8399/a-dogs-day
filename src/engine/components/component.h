@@ -159,16 +159,37 @@ private:
 
 
 // for stations to allow for interactions with
-class interaction_component {
-  // supports interaction
-public:
-  ~interaction_component() = default;
-  interaction_component() = default;
-  interaction_component(const interaction_component& other) = default;
-  interaction_component(interaction_component&& other) = default;
 
-  interaction_component& operator=(const interaction_component& other) = default;
-  interaction_component& operator=(interaction_component&& other) = default;
+class interactable_component {
+public:
+
+    interactable_component() = default;
+    Rectangle get_interaction_box(Vector2 position) const;   // inflated by buffer_ based on associated collision component
+    bool has_free_slot() const;
+    bool is_occupied_by(size_t actor_id) const;
+    bool occupy(size_t actor_id);                            // false when full or duplicate
+    void release(size_t actor_id);
+    const std::vector<size_t>& get_occupants() const;
+    size_t get_capacity() const;
+private:
+    float buffer_; // the amount the hitbox is increased
+    size_t capacity_;
+    std::vector<size_t> occupants_;
+};
+
+// components::interactor_component  - actors do interaction
+class interactor_component {
+public:
+    interactor_component() = default;
+
+    Rectangle get_interaction_box(Vector2 position) const;   // the cell the actor stands in
+    bool is_interactor() const { return target_.has_value(); }
+    std::optional<size_t> get_target() const;
+    void bind(size_t target);
+    void unbind();
+private:
+    float reach_;
+    std::optional<size_t> target_;
 };
 
 
@@ -329,7 +350,8 @@ extern component_manager<components::position_component> positional_manager_;
 extern component_manager<components::movement_component> movement_manager_;
 extern component_manager<components::renderable_component> renderable_manager_;
 extern component_manager<components::collision_component> collision_manager_;
-extern component_manager<components::interaction_component> interaction_manager_;
+extern component_manager<components::interactor_component> interactor_manager_;
+extern component_manager<components::interactable_component> interactable_manager_;
 extern component_manager<components::key_input_component> control_manager_;
 extern component_manager<components::mouse_input_component> mouse_input_manager_;
 extern component_manager<components::state_machine_component> state_machine_manager_;
@@ -350,7 +372,8 @@ namespace component_builders{
     components::collision_component build_collision_component(
         components::collision_component::hitbox_component hitbox);
 
-    components::interaction_component build_interaction_component();
+    components::interactor_component build_interactor_component();
+    components::interactable_component build_interactable_component();
     components::key_input_component build_key_input_component(std::vector<game_config::input>& controls);
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
     components::state_machine_component::state_component build_state();
@@ -373,8 +396,11 @@ namespace component_helpers{
     inline void register_collision_component(size_t entity_id, components::collision_component component){
         component_managers::collision_manager_.register_component(entity_id, std::move(component));
     }
-    inline void register_interaction_component(size_t entity_id, components::interaction_component component){
-        component_managers::interaction_manager_.register_component(entity_id, std::move(component));
+    inline void register_interactor_component(size_t entity_id, components::interactor_component component){
+        component_managers::interactor_manager_.register_component(entity_id, std::move(component));
+    }
+    inline void register_interactable_compoennt(size_t entity_id, components::interactable_component component){
+        component_managers::interactable_manager_.register_component(entity_id, std::move(component));
     }
     inline void register_key_input_component(size_t entity_id, components::key_input_component component){
         component_managers::control_manager_.register_component(entity_id, std::move(component));
@@ -395,12 +421,7 @@ namespace component_helpers{
         return component_managers::mouse_input_manager_.get_component(entity_id) != nullptr;
     }
     // writes sprite and hitbox indices together. missing either component is fine
-    // * a facing with no matching variant is a no-op, not a write - the entity
-    // * keeps the facing it had. dogs carry left/right only while
-    // * movement_system::determine_direction resolves all four, so an unguarded
-    // * write indexes past the end. this is the port of dog::set_direction_index,
-    // * and each component is checked against its own count the way that checked
-    // * body_ and head_ separately.
+
     inline void set_facing_index(size_t entity_id, size_t index){
         if(auto* renderable = component_managers::renderable_manager_.get_component(entity_id)){
             for(auto& sprite_component : renderable->get_sprites()){
@@ -429,8 +450,11 @@ namespace component_helpers{
     inline void unregister_collision_component(size_t entity_id){
         component_managers::collision_manager_.unregister_component(entity_id);
     }
-    inline void unregister_interaction_component(size_t entity_id){
-        component_managers::interaction_manager_.unregister_component(entity_id);
+    inline void unregister_interactor_component(size_t entity_id){
+        component_managers::interactor_manager_.unregister_component(entity_id);
+    }
+    inline void unregister_interactable_component(size_t entity_id){
+        component_managers::interactable_manager_.unregister_component(entity_id);
     }
     inline void unregister_key_input_component(size_t entity_id){
         component_managers::control_manager_.unregister_component(entity_id);
@@ -455,7 +479,8 @@ namespace component_helpers{
         unregister_movement_component(entity_id);
         unregister_renderable_component(entity_id);
         unregister_collision_component(entity_id);
-        unregister_interaction_component(entity_id);
+        unregister_interactor_component(entity_id);
+        unregister_interactable_component(entity_id);
         unregister_key_input_component(entity_id);
         unregister_mouse_input_component(entity_id);
         unregister_state_machine_component(entity_id);
@@ -470,7 +495,8 @@ namespace component_helpers{
         count += component_managers::movement_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::renderable_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::collision_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::interaction_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::interactor_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+        count += component_managers::interactable_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::control_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::mouse_input_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
         count += component_managers::state_machine_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
@@ -485,7 +511,8 @@ namespace component_helpers{
         component_managers::movement_manager_.clear();
         component_managers::renderable_manager_.clear();
         component_managers::collision_manager_.clear();
-        component_managers::interaction_manager_.clear();
+        component_managers::interactor_manager_.clear();
+        component_managers::interactable_manager_.clear();
         component_managers::control_manager_.clear();
         component_managers::mouse_input_manager_.clear();
         component_managers::state_machine_manager_.clear();

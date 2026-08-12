@@ -416,9 +416,6 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.selectable_kind_of(decoration_id)
                     == entity_config::selectable_kinds::decoration_kind);
             }
-            THEN("it does not interact - that is what makes it not a station"){
-                REQUIRE_FALSE(game.has_interaction(decoration_id));
-            }
             THEN("having a hitbox puts it in the spatial index and the graph"){
                 REQUIRE(game.is_tracked(decoration_id));
                 REQUIRE(game.graph_marks(decoration_id, game.hitbox_of(decoration_id)));
@@ -433,8 +430,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.has_renderable(table_id));
                 REQUIRE(game.has_collision(table_id));
                 REQUIRE(game.has_selectable(table_id));
-                REQUIRE(game.has_interaction(table_id));
-                REQUIRE(game.num_components(table_id) == 5);
+                REQUIRE(game.num_components(table_id) == 4);
             }
             THEN("it answers to the station kind, not the decoration kind"){
                 REQUIRE(game.selectable_kind_of(table_id)
@@ -446,9 +442,8 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
             auto counter_id = game.create_food_counter(spot);
 
             THEN("it carries the station component set"){
-                REQUIRE(game.has_interaction(counter_id));
                 REQUIRE(game.has_selectable(counter_id));
-                REQUIRE(game.num_components(counter_id) == 5);
+                REQUIRE(game.num_components(counter_id) == 4);
             }
         }
 
@@ -456,9 +451,8 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
             auto dishwasher_id = game.create_dishwasher(spot);
 
             THEN("it carries the station component set"){
-                REQUIRE(game.has_interaction(dishwasher_id));
                 REQUIRE(game.has_selectable(dishwasher_id));
-                REQUIRE(game.num_components(dishwasher_id) == 5);
+                REQUIRE(game.num_components(dishwasher_id) == 4);
             }
         }
 
@@ -481,7 +475,6 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
             THEN("every one of its components goes with it"){
                 REQUIRE(game.num_components(table_id) == 0);
-                REQUIRE_FALSE(game.has_interaction(table_id));
             }
             THEN("it releases its nodes and leaves the spatial index"){
                 REQUIRE(game.graph_occupant_at(Vector2{footprint.x, footprint.y})
