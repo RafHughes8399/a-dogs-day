@@ -1,5 +1,6 @@
 #include "component.h"
 #include "system.h"
+#include <algorithm>
 
 
 // ---------------- helpers ----------------
@@ -44,4 +45,13 @@ void systems::rendering_system::clear(){
     for(size_t layer = 0; layer < level_config::draw_layers::size; ++layer){
         render_layers_[layer].clear();
     }
+}
+
+// ---------------- accessors  and modifiers ----------------
+void systems::rendering_system::move_frame(Vector2 move_delta){
+    double min = 0.0;
+    double max_x = level_config::world_x;
+    double max_y = level_config::world_y;
+    view_frame_.x = std::max(std::min(static_cast<double>(view_frame_.x + move_delta.x), max_x), min);
+    view_frame_.y = std::max(std::min(static_cast<double>(view_frame_.y + move_delta.y), max_y), min);
 }

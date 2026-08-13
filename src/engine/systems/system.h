@@ -8,6 +8,7 @@
 #include "events_interface.h"
 #include "render_layer.h"
 #include <functional>
+#include <raylib.h>
 #include "graph.h"
 #include "path.h"
 namespace systems{
@@ -281,6 +282,7 @@ namespace systems{
             void render(int frame);
             void on_created_entity(const events::create_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
+            void move_frame(Vector2 move_delta);
             // teardown between test scenarios - the singleton outlives them
             void clear();
 #ifdef DOG_DAYS_TESTING
