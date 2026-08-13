@@ -36,7 +36,7 @@ void systems::rendering_system::render(int frame){
 
     for(size_t layer = 0; layer < level_config::draw_layers::size; ++layer){
         render_layers_[layer].draw(render_predicate,
-            Vector2{view_frame_.x, view_frame_.y}, frame);
+            Vector2{view_frame_.x, view_frame_.y}, frame, true);
     }
 }
 

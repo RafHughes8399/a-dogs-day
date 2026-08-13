@@ -2,6 +2,8 @@
 #define RENDER_LAYER_H
 
 #include <algorithm>
+#include <raylib.h>
+#include <raymath.h>
 #include <vector>
 #include "component.h"
 #include "entities.h"
@@ -62,7 +64,7 @@ namespace render_layer{
             }
 
             template<typename UnaryPred>
-            void draw(UnaryPred p, Vector2 frame_position, int frame){
+            void draw(UnaryPred p, Vector2 frame_position, int frame, bool hitbox_debug = false){
                 for(auto entity_id : entities_){
                     auto* renderable = component_managers::renderable_manager_.get_component(entity_id);
                     auto* position = component_managers::positional_manager_.get_component(entity_id);
@@ -73,6 +75,17 @@ namespace render_layer{
                     // body, outlines and cosmetics all draw at the same position
                     for(auto & sprite_component : renderable->get_sprites()){
                         sprite_component.get_sprite().render(draw_position, frame);
+                    }
+                    if(hitbox_debug){
+                        auto* hitbox = component_managers::collision_manager_.get_component(entity_id);
+                        // * auto* interactor = component_managers::interactor_manager_.get_component(entity_id);
+                        // * auto* interactable = component_managers::interactable_manager_.get_component(entity_id);
+                        if(hitbox) {
+                            auto box = hitbox->get_hitbox_component().get_hitbox().get_box();
+                            auto box_position = Vector2Subtract({box.x, box.y}, frame_position);
+                            DrawRectangleLines(box_position.x, box_position.y, box.width, box.height, GREEN);
+                            // TODO : pending interactor/able component implementaiton also draw these boxes
+                        }
                     }
                 }
             }

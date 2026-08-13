@@ -174,10 +174,13 @@ void systems::control_input_system::switch_dog(){
     select_dog();
 }
 
+// TODO the arrow keys have to actually move the view frame. This queues
 void systems::control_input_system::move_view_frame(Vector2 direction_scalar, float delta){
     auto move_vector = Vector2Scale(Vector2Multiply(level_config::frame_move, direction_scalar), delta);
     std::unique_ptr<events::event> move_view_frame_event = std::make_unique<events::move_view_frame>(move_vector);
     event_interface::queue_event(move_view_frame_event);
+
+    // TODO override this legacy implementation
 }
 
 

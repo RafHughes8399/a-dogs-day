@@ -269,12 +269,15 @@ what is left
     -> need to build player dogs x 
 -> implement the rest of the control system 
 
--> test the rest of the control system
 
 -> building decorations and stations and npc dogs x 
 
--> testing selection of decorations and stations 
--> hitbox and interaction box rendering for visual debugging
+-> test the rest of the control system
+-> interact[or/able] component defintions
+-> hitbox and interaction box rendering for visual debugging x /2 
+
+-> testing selection of decorations and stations [left and right clicking ]
+
 -> testing sending player dogs to decorations and stations 
     -> involves interaction components and systems
     -> the question then becomes how will this work
