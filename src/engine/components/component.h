@@ -22,99 +22,6 @@ namespace components {
 
 // * components carry no id of their own - the manager's map key IS the owning
 // * entity, so anything iterating components already has it.
-// * where a thing is, and nothing else. every system asks this - spatial,
-// * collision, rendering - including entities that never move, so it stays the
-// * cheapest possible component.
-class position_component {
-public:
-    ~position_component() = default;
-    position_component(Vector2 position)
-        : position_(position) {}
-    position_component(const position_component& other) = default;
-    position_component(position_component&& other) = default;
-
-    position_component& operator=(const position_component& other) = default;
-    position_component& operator=(position_component&& other) = default;
-
-    Vector2 get_position();
-    // only movement_system::update_position should call this - it is what keeps
-    // the hitbox and the spatial index in step with the position
-    void set_position(Vector2 position);
-private:
-    Vector2 position_;
-};
-
-class movement_component {
-public:
-    ~movement_component() = default;
-    // direction defaults to facing right - it is recomputed from
-    // position -> next waypoint as soon as there is a path to walk, so the
-    // initial value only shows before the entity is given one
-    movement_component(Vector2 move_speed,
-        Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
-        std::queue<path::path> paths = {})
-        : paths_(paths), move_speed_(move_speed), direction_scalar_(direction_scalar) {}
-    movement_component(const movement_component& other) = default;
-    movement_component(movement_component&& other) = default;
-
-    movement_component& operator=(const movement_component& other) = default;
-    movement_component& operator=(movement_component&& other) = default;
-
-    bool has_reached_position(Vector2 position);
-    path::path& get_current_path();
-    std::queue<path::path>& get_paths();
-    void append_path(path::path path);
-    void set_path(path::path path);
-    void clear_paths();
-    void finish_path();
-    Vector2 get_move_speed();
-    Vector2 get_direction_scalar();
-    void set_direction_scalar(Vector2 direction_scalar);
-private:
-    std::queue<path::path> paths_;
-    Vector2 move_speed_;
-    Vector2 direction_scalar_;
-};
-
-
-class renderable_component {
-public:
-  class sprite_component {
-  public:
-    ~sprite_component() = default;
-    // TODO fix magic number what is 0
-    sprite_component(std::vector<sprite::sprite> &sprites, size_t index = 0)
-        : sprites_(sprites), sprite_index_(index) {}
-    sprite_component(const sprite_component& other) = default;
-    sprite_component(sprite_component&& other) = default;
-
-    sprite_component& operator=(const sprite_component& other) = default;
-    sprite_component& operator=(sprite_component&& other) = default;
-    
-      sprite::sprite& get_sprite();
-      size_t get_sprite_index() const;
-      size_t num_sprites() const;
-      void set_index(size_t index);
-
-  private:
-    std::vector<sprite::sprite> sprites_;
-    size_t sprite_index_;
-  };
-
-  ~renderable_component() = default;
-  renderable_component(std::vector<sprite_component> sprites = {})
-      : sprites_(std::move(sprites)) {}
-  renderable_component(const renderable_component& other) = default;
-  renderable_component(renderable_component&& other) = default;
-
-  renderable_component& operator=(const renderable_component& other) = default;
-  renderable_component& operator=(renderable_component&& other) = default;
-
-  std::vector<sprite_component>& get_sprites();
-private:
-  std::vector<sprite_component> sprites_;
-
-};
 // * one hitbox_component per entity. its variants run parallel to the base
 // * sprite list, so the two indices are one facing - use
 // * component_helpers::set_facing_index.
@@ -157,6 +64,22 @@ private:
   hitbox_component hitbox_component_;
 };
 
+
+// for the table, the waiter, and the counter and the kitchen station
+class food_component {
+  // ? current idea for the storage component is for stations to store food,
+  // ? tables to store foood
+  // ? and dishwasher to store plates
+  public:
+    ~food_component() = default;
+    food_component() = default;
+    food_component(const food_component& other) = default;
+    food_component(food_component&& other) = default;
+
+    food_component& operator=(const food_component& other) = default;
+    food_component& operator=(food_component&& other) = default;
+  private:
+};
 
 // for stations to allow for interactions with
 
@@ -226,9 +149,122 @@ class mouse_input_component{
         std::vector<game_config::input> inputs_;
 };
 
+class movement_component {
+public:
+    ~movement_component() = default;
+    // direction defaults to facing right - it is recomputed from
+    // position -> next waypoint as soon as there is a path to walk, so the
+    // initial value only shows before the entity is given one
+    movement_component(Vector2 move_speed,
+        Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
+        std::queue<path::path> paths = {})
+        : paths_(paths), move_speed_(move_speed), direction_scalar_(direction_scalar) {}
+    movement_component(const movement_component& other) = default;
+    movement_component(movement_component&& other) = default;
+
+    movement_component& operator=(const movement_component& other) = default;
+    movement_component& operator=(movement_component&& other) = default;
+
+    bool has_reached_position(Vector2 position);
+    path::path& get_current_path();
+    std::queue<path::path>& get_paths();
+    void append_path(path::path path);
+    void set_path(path::path path);
+    void clear_paths();
+    void finish_path();
+    Vector2 get_move_speed();
+    Vector2 get_direction_scalar();
+    void set_direction_scalar(Vector2 direction_scalar);
+private:
+    std::queue<path::path> paths_;
+    Vector2 move_speed_;
+    Vector2 direction_scalar_;
+};
+
+// * where a thing is, and nothing else. every system asks this - spatial,
+// * collision, rendering - including entities that never move, so it stays the
+// * cheapest possible component.
+class position_component {
+public:
+    ~position_component() = default;
+    position_component(Vector2 position)
+        : position_(position) {}
+    position_component(const position_component& other) = default;
+    position_component(position_component&& other) = default;
+
+    position_component& operator=(const position_component& other) = default;
+    position_component& operator=(position_component&& other) = default;
+
+    Vector2 get_position();
+    // only movement_system::update_position should call this - it is what keeps
+    // the hitbox and the spatial index in step with the position
+    void set_position(Vector2 position);
+private:
+    Vector2 position_;
+};
+
+class renderable_component {
+public:
+  class sprite_component {
+  public:
+    ~sprite_component() = default;
+    // TODO fix magic number what is 0
+    sprite_component(std::vector<sprite::sprite> &sprites, size_t index = 0)
+        : sprites_(sprites), sprite_index_(index) {}
+    sprite_component(const sprite_component& other) = default;
+    sprite_component(sprite_component&& other) = default;
+
+    sprite_component& operator=(const sprite_component& other) = default;
+    sprite_component& operator=(sprite_component&& other) = default;
+
+      sprite::sprite& get_sprite();
+      size_t get_sprite_index() const;
+      size_t num_sprites() const;
+      void set_index(size_t index);
+
+  private:
+    std::vector<sprite::sprite> sprites_;
+    size_t sprite_index_;
+  };
+
+  ~renderable_component() = default;
+  renderable_component(std::vector<sprite_component> sprites = {})
+      : sprites_(std::move(sprites)) {}
+  renderable_component(const renderable_component& other) = default;
+  renderable_component(renderable_component&& other) = default;
+
+  renderable_component& operator=(const renderable_component& other) = default;
+  renderable_component& operator=(renderable_component&& other) = default;
+
+  std::vector<sprite_component>& get_sprites();
+private:
+  std::vector<sprite_component> sprites_;
+
+};
+
+class selectable_component {
+public:
+    ~selectable_component() = default;
+    selectable_component(size_t kind)
+    : kind_(kind), is_selected_(false){}
+    selectable_component(const selectable_component& other) = default;
+    selectable_component(selectable_component&& other) = default;
+
+    selectable_component& operator=(const selectable_component& other) = default;
+    selectable_component& operator=(selectable_component&& other) = default;
+
+    bool is_selected() const;
+    size_t get_kind() const;
+    void select();
+    void unselect();
+private:
+    size_t kind_;
+    bool is_selected_;
+};
+
 // ! A STATE MACHINE IS A SET OF STATE COMPONENTS
 // ! a STATE MACHINE COMPONENT IS A SET OF STATE COMPONENTS
-// A STATE MACHINE DEFFINES TRANSITIONS BETWEEN STATES 
+// A STATE MACHINE DEFFINES TRANSITIONS BETWEEN STATES
     // THE CONDITION TO TRANISITION
     // THE BEHAVIOUR OF TRANSITIONING
     // AND THE NEXT STATE
@@ -255,41 +291,6 @@ public:
     state_machine_component& operator=(state_machine_component&& other) = default;
 
     //std::vector<state_component>
-};
-// for the table, the waiter, and the counter and the kitchen station
-class food_component {
-  // ? current idea for the storage component is for stations to store food,
-  // ? tables to store foood
-  // ? and dishwasher to store plates
-  public:
-    ~food_component() = default;
-    food_component() = default;
-    food_component(const food_component& other) = default;
-    food_component(food_component&& other) = default;
-
-    food_component& operator=(const food_component& other) = default;
-    food_component& operator=(food_component&& other) = default;
-  private:
-};
-
-class selectable_component {
-public:
-    ~selectable_component() = default;
-    selectable_component(size_t kind)
-    : kind_(kind), is_selected_(false){}
-    selectable_component(const selectable_component& other) = default;
-    selectable_component(selectable_component&& other) = default;
-
-    selectable_component& operator=(const selectable_component& other) = default;
-    selectable_component& operator=(selectable_component&& other) = default;
-
-    bool is_selected() const;
-    size_t get_kind() const;
-    void select();
-    void unselect();
-private:
-    size_t kind_;
-    bool is_selected_;
 };
 
 // menu component ?
@@ -346,17 +347,17 @@ private:
 // * these live in their own namespace so call sites read
 // * component_managers::renderable_manager_ rather than components::renderable_manager_,
 // * which would blur the storage layer into the data layer.
-extern component_manager<components::position_component> positional_manager_;
-extern component_manager<components::movement_component> movement_manager_;
-extern component_manager<components::renderable_component> renderable_manager_;
 extern component_manager<components::collision_component> collision_manager_;
-extern component_manager<components::interactor_component> interactor_manager_;
-extern component_manager<components::interactable_component> interactable_manager_;
 extern component_manager<components::key_input_component> control_manager_;
-extern component_manager<components::mouse_input_component> mouse_input_manager_;
-extern component_manager<components::state_machine_component> state_machine_manager_;
 extern component_manager<components::food_component> food_manager_;
+extern component_manager<components::interactable_component> interactable_manager_;
+extern component_manager<components::interactor_component> interactor_manager_;
+extern component_manager<components::mouse_input_component> mouse_input_manager_;
+extern component_manager<components::movement_component> movement_manager_;
+extern component_manager<components::position_component> positional_manager_;
+extern component_manager<components::renderable_component> renderable_manager_;
 extern component_manager<components::selectable_component> selectable_manager_;
+extern component_manager<components::state_machine_component> state_machine_manager_;
 } // namespace component_managers
 
 namespace component_builders{

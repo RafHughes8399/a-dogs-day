@@ -274,7 +274,7 @@ what is left
 -> building decorations and stations and npc dogs x 
 
 -> testing selection of decorations and stations 
-
+-> hitbox and interaction box rendering for visual debugging
 -> testing sending player dogs to decorations and stations 
     -> involves interaction components and systems
     -> the question then becomes how will this work
@@ -293,5 +293,6 @@ what is left
     -> the interactable compoennt stores the other entity that this entity is interacting with
     -> if there is an interaction [i.e other is filled], some behaviour would be performed by the "other entity"
     -> then it is easier to toggle the state. if a collision is detected between two entities and they both have interaction componetns,
-    then they interact  
+    then they interact
+     
 -> then the npc system

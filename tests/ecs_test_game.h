@@ -71,7 +71,6 @@ namespace testing{
             bool has_collision(size_t entity_id);
             bool has_mouse_input(size_t entity_id);
             bool has_movement(size_t entity_id);
-            bool has_interaction(size_t entity_id);
             bool has_selectable(size_t entity_id);
             size_t selectable_kind_of(size_t entity_id);
             // total across every manager, for asserting a clean world

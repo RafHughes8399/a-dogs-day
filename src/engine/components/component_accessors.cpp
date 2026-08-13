@@ -2,12 +2,33 @@
 
 // definitions for the accessors declared on each component in component.h
 
-// ---------------- position_component ----------------
-Vector2 components::position_component::get_position(){
-    return position_;
+// ---------------- collision_component ----------------
+std::vector<hitbox::hitbox>& components::collision_component::hitbox_component::get_hitboxes(){
+    return hitboxes_;
 }
-void components::position_component::set_position(Vector2 position){
-    position_ = position;
+hitbox::hitbox& components::collision_component::hitbox_component::get_hitbox(){
+    return hitboxes_[hitbox_index_];
+}
+size_t components::collision_component::hitbox_component::get_hitbox_index() const{
+    return hitbox_index_;
+}
+size_t components::collision_component::hitbox_component::num_hitboxes() const{
+    return hitboxes_.size();
+}
+void components::collision_component::hitbox_component::set_index(size_t index){
+    hitbox_index_ = index;
+}
+
+components::collision_component::hitbox_component& components::collision_component::get_hitbox_component(){
+    return hitbox_component_;
+}
+
+// ---------------- input components ----------------
+std::vector<game_config::input>& components::key_input_component::get_inputs(){
+    return controls_;
+}
+std::vector<game_config::input>& components::mouse_input_component::get_inputs(){
+    return inputs_;
 }
 
 // ---------------- movement_component ----------------
@@ -54,12 +75,13 @@ void components::movement_component::finish_path(){
     if(paths_.empty()){ return; }
     paths_.pop();
 }
-// ---------------- input components ----------------
-std::vector<game_config::input>& components::key_input_component::get_inputs(){
-    return controls_;
+
+// ---------------- position_component ----------------
+Vector2 components::position_component::get_position(){
+    return position_;
 }
-std::vector<game_config::input>& components::mouse_input_component::get_inputs(){
-    return inputs_;
+void components::position_component::set_position(Vector2 position){
+    position_ = position;
 }
 
 // ---------------- renderable_component ----------------
@@ -78,27 +100,6 @@ void components::renderable_component::sprite_component::set_index(size_t index)
 
 std::vector<components::renderable_component::sprite_component>& components::renderable_component::get_sprites(){
     return sprites_;
-}
-
-// ---------------- collision_component ----------------
-std::vector<hitbox::hitbox>& components::collision_component::hitbox_component::get_hitboxes(){
-    return hitboxes_;
-}
-hitbox::hitbox& components::collision_component::hitbox_component::get_hitbox(){
-    return hitboxes_[hitbox_index_];
-}
-size_t components::collision_component::hitbox_component::get_hitbox_index() const{
-    return hitbox_index_;
-}
-size_t components::collision_component::hitbox_component::num_hitboxes() const{
-    return hitboxes_.size();
-}
-void components::collision_component::hitbox_component::set_index(size_t index){
-    hitbox_index_ = index;
-}
-
-components::collision_component::hitbox_component& components::collision_component::get_hitbox_component(){
-    return hitbox_component_;
 }
 
 // ---------------- selectable_component ----------------
