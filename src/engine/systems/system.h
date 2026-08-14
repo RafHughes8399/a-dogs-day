@@ -289,6 +289,9 @@ namespace systems{
             render_layer::ecs_layer& get_layer(size_t layer){
                 return render_layers_[layer];
             }
+            Rectangle get_view_frame(){
+                return view_frame_;
+            }
 #endif
         private:
             // the background is an entity on the background layer now, so nothing

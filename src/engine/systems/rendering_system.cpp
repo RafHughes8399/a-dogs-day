@@ -45,13 +45,14 @@ void systems::rendering_system::clear(){
     for(size_t layer = 0; layer < level_config::draw_layers::size; ++layer){
         render_layers_[layer].clear();
     }
+    view_frame_ = Rectangle{0.0f, 0.0f, level_config::screen_width, level_config::screen_height};
 }
 
 // ---------------- accessors  and modifiers ----------------
 void systems::rendering_system::move_frame(Vector2 move_delta){
-    double min = 0.0;
-    double max_x = level_config::world_x;
-    double max_y = level_config::world_y;
-    view_frame_.x = std::max(std::min(static_cast<double>(view_frame_.x + move_delta.x), max_x), min);
-    view_frame_.y = std::max(std::min(static_cast<double>(view_frame_.y + move_delta.y), max_y), min);
+    float min = 0.0f;
+    float max_x = std::max(level_config::world_x - view_frame_.width, min);
+    float max_y = std::max(level_config::world_y - view_frame_.height, min);
+    view_frame_.x = std::max(std::min(view_frame_.x + move_delta.x, max_x), min);
+    view_frame_.y = std::max(std::min(view_frame_.y + move_delta.y, max_y), min);
 }

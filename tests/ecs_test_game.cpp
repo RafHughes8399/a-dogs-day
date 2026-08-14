@@ -2,6 +2,8 @@
 
 #include "component.h"
 #include "events.h"
+#include "events_interface.h"
+#include "system_events.h"
 
 namespace testing{
 
@@ -112,6 +114,21 @@ namespace testing{
         movement_.update(delta);
     }
 
+    bool ecs_test_game::tick_until(std::function<bool()> predicate, int max_frames, float delta){
+        for(int frame = 0; frame < max_frames; ++frame){
+            if(predicate()){ return true; }
+            tick(delta);
+        }
+        return predicate();
+    }
+
+    void ecs_test_game::path_to(size_t entity_id, Vector2 destination){
+        std::unique_ptr<events::event> request =
+            std::make_unique<events::create_path_to>(entity_id, destination);
+        event_interface::queue_event(request);
+        tick(0.0f);
+    }
+
     void ecs_test_game::remove(size_t entity_id){
         lifespan_.remove(entity_id);
     }
@@ -128,6 +145,10 @@ namespace testing{
 
     bool ecs_test_game::layer_contains(size_t layer, size_t entity_id){
         return rendering_.get_layer(layer).contains(entity_id);
+    }
+
+    Rectangle ecs_test_game::view_frame(){
+        return rendering_.get_view_frame();
     }
 
     size_t ecs_test_game::num_components(size_t entity_id){
@@ -156,6 +177,16 @@ namespace testing{
 
     bool ecs_test_game::has_movement(size_t entity_id){
         return component_managers::movement_manager_.get_component(entity_id) != nullptr;
+    }
+
+    bool ecs_test_game::has_path(size_t entity_id){
+        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        return movement != nullptr and not movement->get_paths().empty();
+    }
+
+    float ecs_test_game::facing_x_of(size_t entity_id){
+        return component_managers::movement_manager_.get_component(entity_id)
+            ->get_direction_scalar().x;
     }
 
     bool ecs_test_game::has_selectable(size_t entity_id){

@@ -48,10 +48,15 @@ namespace graph{
                 }
             };
             // builder
+            bool cell_at(Vector2 position, int& node_index);
             bool check_for_decoration(Rectangle rectanlge, int id);
             bool is_node_closer(int current_id, int next_id, int end_id);
             bool is_node_empty(int node_id);
             bool is_node_occupied(int node_id, int decoration_id);
+            bool is_on_map(Vector2 position);
+            bool nearest_node(Vector2 position, int& node_index);
+            bool path_node_for(Vector2 position, Vector2 heading, int& node_index);
+            bool to_index(int row, int column, int& node_index);
             std::vector<edge> build_corner_edges(int row, int column);
             std::vector<edge> build_interior_edges(int row, int column);
             std::vector<edge> build_perimeter_edges(int row, int column);
@@ -98,9 +103,6 @@ namespace graph{
             
             bool can_place_decoration(const queries::can_place_decoration& query);
             std::vector<Vector2> get_path(const queries::path_query& query);
-            
-            int position_to_node(Vector2 position);
-            int position_to_node(Vector2 position, Vector2 direction);
             
             node* id_to_node(int id);
             

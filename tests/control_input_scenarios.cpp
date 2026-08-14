@@ -1,7 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "ecs_test_game.h"
-#include "test_game.h"
 #include "component.h"
 #include "events.h"
 #include "events_interface.h"
@@ -54,6 +53,21 @@ namespace {
         return systems::selection_system::get_instance();
     }
 
+    systems::rendering_system& frame(){
+        return systems::rendering_system::get_instance();
+    }
+
+    float frame_span_x(){
+        return level_config::world_x - level_config::screen_width;
+    }
+    float frame_span_y(){
+        return level_config::world_y - level_config::screen_height;
+    }
+
+    float half_span_hold(float span, float speed){
+        return (span * 0.5f) / speed;
+    }
+
     game_config::input key_press_of(int key){
         return game_config::input{key, game_config::key_press};
     }
@@ -62,6 +76,13 @@ namespace {
     }
     game_config::input mouse_press_of(int button){
         return game_config::input{button, game_config::mouse_press};
+    }
+
+    void hold_until_clamped(int key, size_t id, float span, float speed){
+        int holds = static_cast<int>(span / speed) + 2;
+        for(int hold = 0; hold < holds; ++hold){
+            controls().simulate_input(key_hold_of(key), id, 1.0f);
+        }
     }
 
     // menus::menu_graph::menu_ids is private, so the ids are mirrored here. if
@@ -199,54 +220,6 @@ SCENARIO("switching dogs flips the selection and announces it", "[ecs][controls]
     }
 }
 
-SCENARIO("a held direction key moves the view frame that way", "[ecs][controls]"){
-    GIVEN("a player entity and a listener on move_view_frame"){
-        testing::ecs_test_game game;
-        auto cursor_id = game.create_cursor();
-        auto player_id = game.create_player(cursor_id);
-
-        std::vector<Vector2> moves;
-        listener<events::move_view_frame> frame([&moves](const events::move_view_frame& event) -> void{
-            moves.push_back(event.get_delta());
-        });
-
-        WHEN("up is held for a frame"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, 1.0f);
-            flush();
-
-            THEN("the frame is asked to move up by a full second of travel"){
-                REQUIRE(moves.size() == 1);
-                REQUIRE(moves[0].x == 0.0f);
-                REQUIRE(moves[0].y == -level_config::frame_move.y);
-            }
-        }
-
-        WHEN("each direction is held"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_left), player_id, 1.0f);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), player_id, 1.0f);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
-            flush();
-
-            THEN("each moves along its own axis, in its own direction"){
-                REQUIRE(moves.size() == 3);
-                REQUIRE(moves[0].x == -level_config::frame_move.x);
-                REQUIRE(moves[1].x == level_config::frame_move.x);
-                REQUIRE(moves[2].y == level_config::frame_move.y);
-            }
-        }
-
-        WHEN("the same key is held for half a frame"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), player_id, 0.5f);
-            flush();
-
-            THEN("the move is scaled by delta"){
-                REQUIRE(moves.size() == 1);
-                REQUIRE(moves[0].x == level_config::frame_move.x * 0.5f);
-            }
-        }
-    }
-}
-
 SCENARIO("a left click selects the entity under the cursor", "[ecs][controls][selection]"){
     // left_click reads GetMousePosition() itself and the device cannot be
     // driven from a test, so the dog is placed AT whatever the mouse reports
@@ -375,79 +348,88 @@ SCENARIO("the selection does not leak between scenarios", "[ecs][controls]"){
     }
 }
 
-// -----------------------------------------------------------------------------
-// arrow keys -> the level's view frame.
-//
-// These use test_game rather than ecs_test_game because level::level is what
-// consumes move_view_frame. The ECS rendering_system holds a view_frame_ of its
-// own but subscribes to nothing, so there is no ECS-side frame to assert on yet.
-//
-// The test window is 1x1, so the clamp in level::on_move_view_frame_event allows
-// travel right up to world_x - 1 / world_y - 1.
-// -----------------------------------------------------------------------------
+SCENARIO("a held arrow key moves the view frame within the world", "[ecs][controls][view_frame]"){
+    GIVEN("a fresh ecs world with a player to hold the bindings"){
+        testing::ecs_test_game game;
+        auto cursor_id = game.create_cursor();
+        auto player_id = game.create_player(cursor_id);
 
-SCENARIO("a held arrow key moves the level's view frame by the delta", "[controls][view_frame]"){
-    GIVEN("a level with the frame at the origin"){
-        testing::test_game game;
-
-        THEN("it starts at the origin"){
+        THEN("the frame starts at the origin, screen-sized"){
             REQUIRE(game.view_frame().x == 0.0f);
             REQUIRE(game.view_frame().y == 0.0f);
+            REQUIRE(game.view_frame().width == level_config::screen_width);
+            REQUIRE(game.view_frame().height == level_config::screen_height);
         }
 
-        WHEN("right is held for a full second"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), 0, 1.0f);
-            flush();
+        WHEN("right is held for a hold that lands short of the far edge"){
+            float delta = half_span_hold(frame_span_x(), level_config::frame_move.x);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), player_id, delta);
 
-            THEN("the frame has travelled one second of frame_move, on x only"){
-                REQUIRE(game.view_frame().x == level_config::frame_move.x);
+            THEN("the frame travels one hold of frame_move, on x only"){
+                REQUIRE(game.view_frame().x == level_config::frame_move.x * delta);
+                REQUIRE(game.view_frame().y == 0.0f);
+            }
+            THEN("the frame's far edge is still inside the world"){
+                REQUIRE(game.view_frame().x + game.view_frame().width <= level_config::world_x);
+            }
+        }
+
+        WHEN("down is held for a hold that lands short of the far edge"){
+            float delta = half_span_hold(frame_span_y(), level_config::frame_move.y);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, delta);
+
+            THEN("the frame travels on y only"){
+                REQUIRE(game.view_frame().y == level_config::frame_move.y * delta);
+                REQUIRE(game.view_frame().x == 0.0f);
+            }
+            THEN("the frame's bottom edge is still inside the world"){
+                REQUIRE(game.view_frame().y + game.view_frame().height <= level_config::world_y);
+            }
+        }
+
+        WHEN("down is held over several frames"){
+            float delta = half_span_hold(frame_span_y(), level_config::frame_move.y) * 0.5f;
+            for(int frame = 0; frame < 2; ++frame){
+                controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, delta);
+            }
+
+            THEN("the travel accumulates"){
+                float step = level_config::frame_move.y * delta;
+                REQUIRE(game.view_frame().y == step + step);
+            }
+        }
+
+        WHEN("down then up are held for the same duration"){
+            float delta = half_span_hold(frame_span_y(), level_config::frame_move.y);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, delta);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, delta);
+
+            THEN("the frame is back where it started"){
                 REQUIRE(game.view_frame().y == 0.0f);
             }
         }
 
-        WHEN("down is held for a full second"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), 0, 1.0f);
-            flush();
+        WHEN("each direction is held in turn from a mid-world position"){
+            float delta = half_span_hold(frame_span_y(), level_config::frame_move.y);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, delta);
+            float mid = game.view_frame().y;
 
-            THEN("the frame has travelled on y only"){
-                REQUIRE(game.view_frame().y == level_config::frame_move.y);
-                REQUIRE(game.view_frame().x == 0.0f);
+            THEN("up subtracts what down added"){
+                controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, delta * 0.5f);
+                REQUIRE(game.view_frame().y == mid - (level_config::frame_move.y * (delta * 0.5f)));
             }
         }
+    }
+}
 
-        WHEN("right is held for half a second"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), 0, 0.5f);
-            flush();
-
-            THEN("the frame travels half as far"){
-                REQUIRE(game.view_frame().x == level_config::frame_move.x * 0.5f);
-            }
-        }
-
-        WHEN("right is held over several frames"){
-            for(int frame = 0; frame < 3; ++frame){
-                controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), 0, 0.5f);
-            }
-            flush();
-
-            THEN("the travel accumulates"){
-                REQUIRE(game.view_frame().x == level_config::frame_move.x * 1.5f);
-            }
-        }
-
-        WHEN("right then left are held for the same duration"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), 0, 1.0f);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_left), 0, 1.0f);
-            flush();
-
-            THEN("the frame is back where it started"){
-                REQUIRE(game.view_frame().x == 0.0f);
-            }
-        }
+SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][view_frame]"){
+    GIVEN("a fresh ecs world with a player to hold the bindings"){
+        testing::ecs_test_game game;
+        auto cursor_id = game.create_cursor();
+        auto player_id = game.create_player(cursor_id);
 
         WHEN("left is held at the origin"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_left), 0, 1.0f);
-            flush();
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_left), player_id, 1.0f);
 
             THEN("the frame clamps rather than going negative"){
                 REQUIRE(game.view_frame().x == 0.0f);
@@ -455,32 +437,87 @@ SCENARIO("a held arrow key moves the level's view frame by the delta", "[control
         }
 
         WHEN("up is held at the origin"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), 0, 1.0f);
-            flush();
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, 1.0f);
 
             THEN("the frame clamps rather than going negative"){
                 REQUIRE(game.view_frame().y == 0.0f);
             }
         }
 
-        WHEN("up is held after moving down"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), 0, 2.0f);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), 0, 1.0f);
-            flush();
+        WHEN("right is held long past the far edge"){
+            hold_until_clamped(controls_config::key_hold_actions::move_right, player_id,
+                frame_span_x(), level_config::frame_move.x);
 
-            THEN("it comes back by exactly one second of travel"){
-                REQUIRE(game.view_frame().y == level_config::frame_move.y);
+            THEN("it clamps to the world's width less the frame's own width"){
+                REQUIRE(game.view_frame().x == frame_span_x());
+            }
+            THEN("the frame's far edge sits exactly on the world's"){
+                REQUIRE(game.view_frame().x + game.view_frame().width == level_config::world_x);
+            }
+            THEN("y was never touched"){
+                REQUIRE(game.view_frame().y == 0.0f);
             }
         }
 
-        WHEN("the frame is driven past the far edge of the world"){
-            for(int frame = 0; frame < 100; ++frame){
-                controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), 0, 1.0f);
-            }
-            flush();
+        WHEN("down is held long past the bottom edge"){
+            hold_until_clamped(controls_config::key_hold_actions::move_down, player_id,
+                frame_span_y(), level_config::frame_move.y);
 
-            THEN("it clamps to the world's width less the screen"){
-                REQUIRE(game.view_frame().x == level_config::world_x - GetScreenWidth());
+            THEN("it clamps to the world's height less the frame's own height"){
+                REQUIRE(game.view_frame().y == frame_span_y());
+            }
+            THEN("the frame's bottom edge sits exactly on the world's"){
+                REQUIRE(game.view_frame().y + game.view_frame().height == level_config::world_y);
+            }
+        }
+
+        WHEN("a single enormous move is asked for"){
+            frame().move_frame(Vector2{level_config::world_x * 10.0f, level_config::world_y * 10.0f});
+
+            THEN("both axes clamp to the far edge"){
+                REQUIRE(game.view_frame().x == frame_span_x());
+                REQUIRE(game.view_frame().y == frame_span_y());
+            }
+        }
+
+        WHEN("a single enormous negative move is asked for"){
+            frame().move_frame(Vector2{-level_config::world_x * 10.0f, -level_config::world_y * 10.0f});
+
+            THEN("both axes clamp to the origin"){
+                REQUIRE(game.view_frame().x == 0.0f);
+                REQUIRE(game.view_frame().y == 0.0f);
+            }
+        }
+
+        WHEN("the frame is driven onto the far edge and then back"){
+            hold_until_clamped(controls_config::key_hold_actions::move_down, player_id,
+                frame_span_y(), level_config::frame_move.y);
+            REQUIRE(game.view_frame().y == frame_span_y());
+
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, 1.0f);
+
+            THEN("it comes off the edge by exactly one second of travel"){
+                REQUIRE(game.view_frame().y == frame_span_y() - level_config::frame_move.y);
+            }
+        }
+    }
+}
+
+SCENARIO("the view frame does not leak between scenarios", "[ecs][controls][view_frame]"){
+    GIVEN("a world where the frame was driven off the origin"){
+        {
+            testing::ecs_test_game game;
+            hold_until_clamped(controls_config::key_hold_actions::move_down, 0,
+                frame_span_y(), level_config::frame_move.y);
+            REQUIRE(game.view_frame().y == frame_span_y());
+        }
+
+        WHEN("a new world is built"){
+            testing::ecs_test_game game;
+
+            THEN("the frame is back at the origin"){
+                REQUIRE(game.view_frame().x == 0.0f);
+                REQUIRE(game.view_frame().y == 0.0f);
             }
         }
     }

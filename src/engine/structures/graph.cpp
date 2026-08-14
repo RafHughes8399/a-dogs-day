@@ -97,8 +97,10 @@ std::vector<Vector2> graph::level_graph::make_position_path(std::vector<Vector2>
     return path;
 }
 std::vector<Vector2> graph::level_graph::find_path(Vector2 start, Vector2 end, Vector2 direction){
-    int start_node = position_to_node(start, direction);
-    int end_node = position_to_node(end, direction);
+    int start_node = 0;
+    int end_node = 0;
+    if(not path_node_for(start, direction, start_node)){ return {}; }
+    if(not nearest_node(end, end_node)){ return {}; }
 
     auto node_path = bfs(start_node, end_node);
 
@@ -122,33 +124,48 @@ int graph::level_graph::categorise_node(int row, int column){
     else {return nodes::interior;}
 }
 
-// similar to the function below, but assumes that the position is 
-// a clean multiple of edge weight
-int graph::level_graph::position_to_node(Vector2 position){
-    int row = static_cast<int>(position.y / level_config::edge_weight);
-    int col= static_cast<int>(position.x / level_config::edge_weight);
-
-    return (row * row_length_ ) + col;
+bool graph::level_graph::to_index(int row, int column, int& node_index){
+    if(column < 0 or column >= row_length_){ return false; }
+    if(row < 0 or row >= num_rows_){ return false; }
+    node_index = (row * row_length_) + column;
+    return true;
 }
-// snaps to the nearest node based on the direction being travelled 
-// assumes that the position is not a clean multiple of level_config::edge_weight
-int graph::level_graph::position_to_node(Vector2 position, Vector2 direction){
-    
+
+bool graph::level_graph::is_on_map(Vector2 position){
+    return position.x >= 0.0f and position.x < level_config::world_x
+       and position.y >= 0.0f and position.y < level_config::world_y;
+}
+
+bool graph::level_graph::cell_at(Vector2 position, int& node_index){
+    int column = static_cast<int>(std::floor(position.x / level_config::edge_weight));
+    int row = static_cast<int>(std::floor(position.y / level_config::edge_weight));
+    return to_index(row, column, node_index);
+}
+
+bool graph::level_graph::nearest_node(Vector2 position, int& node_index){
+    if(not is_on_map(position)){ return false; }
+
+    int column = std::min(static_cast<int>(std::round(position.x / level_config::edge_weight)),
+        row_length_ - 1);
+    int row = std::min(static_cast<int>(std::round(position.y / level_config::edge_weight)),
+        num_rows_ - 1);
+
+    return to_index(row, column, node_index);
+}
+
+bool graph::level_graph::path_node_for(Vector2 position, Vector2 heading, int& node_index){
+    if(not is_on_map(position)){ return false; }
+
+    float column_f = position.x / level_config::edge_weight;
     float row_f = position.y / level_config::edge_weight;
-    float column_f = position.x / level_config::edge_weight; 
-    int row, column;
-    
-    // Always snap forward in direction of travel
-    if(direction.x >= 0) {column = static_cast<int>(std::ceil(column_f));} 
-    else{column = static_cast<int>(std::floor(column_f));} 
-    if(direction.y >= 0) {row = static_cast<int>(std::ceil(row_f));} 
-    else{row = static_cast<int>(std::floor(row_f));} 
-    // clamp
-    column = std::max(0, std::min(column, row_length_ - 1));
-    row = std::max(0, std::min(row, num_rows_ - 1));
-    
-    int index = (row * row_length_) + column;
-    return index;
+
+    int column = static_cast<int>(heading.x > 0.0f ? std::ceil(column_f) : std::floor(column_f));
+    int row = static_cast<int>(heading.y > 0.0f ? std::ceil(row_f) : std::floor(row_f));
+
+    column = std::min(column, row_length_ - 1);
+    row = std::min(row, num_rows_ - 1);
+
+    return to_index(row, column, node_index);
 }
 
 // ---------------- construction ----------------
@@ -434,7 +451,8 @@ bool graph::level_graph::check_for_decoration(Rectangle rectangle, int id){
         for(auto row = rectangle.y; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
 
-            int node_index = position_to_node(position);
+            int node_index = 0;
+            if(not cell_at(position, node_index)){ return true; }
 
             if(is_node_occupied(node_index, id) ){
                 return true;
@@ -451,17 +469,16 @@ void graph::level_graph::update_entity(Rectangle rectangle, int id){
     for(auto col = rectangle.x; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
         for(auto row = rectangle.y; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
-            int node_index = position_to_node(position);
+            int node_index = 0;
+            if(not cell_at(position, node_index)){ continue; }
 
             graph_[static_cast<size_t>(node_index)].first.decoration_ = id;
         }
     }
 }
 int graph::level_graph::occupant_at(Vector2 position){
-    int node_index = position_to_node(position);
-    if(node_index < 0 or static_cast<size_t>(node_index) >= graph_.size()){
-        return graph_config::empty_node;
-    }
+    int node_index = 0;
+    if(not cell_at(position, node_index)){ return graph_config::empty_node; }
     return graph_[static_cast<size_t>(node_index)].first.decoration_;
 }
 size_t graph::level_graph::occupied_node_count(){
@@ -481,11 +498,8 @@ void graph::level_graph::reset(){
 void graph::level_graph::render(Rectangle frame){
     for(auto x = frame.x; x <= frame.x + frame.width; x += level_config::edge_weight){
         for(auto y = frame.y; y <= frame.y + frame.height; y += level_config::edge_weight){
-            // (row * row_length) + col
-            int row = static_cast<int>(y / level_config::edge_weight);
-            int row_length = static_cast<int>(level_config::world_x / level_config::edge_weight);
-            int col = static_cast<int>(x / level_config::edge_weight);
-            int index = (row * row_length) + col;
+            int index = 0;
+            if(not cell_at(Vector2{x, y}, index)){ continue; }
             auto position = graph_[static_cast<size_t>(index)].first.position_;
             if(graph_[static_cast<size_t>(index)].first.decoration_ == graph_config::empty_node){
                 DrawCircle(static_cast<int>(position.x), static_cast<int>(position.y), 15, DARKGREEN);

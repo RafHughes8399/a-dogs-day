@@ -56,6 +56,8 @@ namespace testing{
             size_t create_food(Vector2 position, size_t layer = level_config::draw_layers::decoration);
 
             void tick(float delta);
+            bool tick_until(std::function<bool()> predicate, int max_frames, float delta = 0.016f);
+            void path_to(size_t entity_id, Vector2 destination);
             void remove(size_t entity_id);
             // the single legal position write - moves the hitbox and reindexes
             void move_entity(size_t entity_id, Vector2 position);
@@ -63,6 +65,7 @@ namespace testing{
             // ---------------- inspection accessors ----------------
             size_t layer_size(size_t layer);
             bool layer_contains(size_t layer, size_t entity_id);
+            Rectangle view_frame();
             // how many of the nine managers hold a component for this entity
             size_t num_components(size_t entity_id);
             bool has_position(size_t entity_id);
@@ -71,6 +74,8 @@ namespace testing{
             bool has_collision(size_t entity_id);
             bool has_mouse_input(size_t entity_id);
             bool has_movement(size_t entity_id);
+            bool has_path(size_t entity_id);
+            float facing_x_of(size_t entity_id);
             bool has_selectable(size_t entity_id);
             size_t selectable_kind_of(size_t entity_id);
             // total across every manager, for asserting a clean world

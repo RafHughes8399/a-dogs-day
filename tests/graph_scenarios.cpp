@@ -171,3 +171,124 @@ SCENARIO("clear_all_systems empties the graph between scenarios", "[ecs][graph][
         }
     }
 }
+
+SCENARIO("the graph rejects positions outside the world", "[ecs][graph][movement]"){
+    GIVEN("a world with one dog"){
+        testing::ecs_test_game game;
+        auto dog_id = game.create_mack();
+        REQUIRE(game.graph_occupied_node_count() == 2);
+
+        WHEN("the dog is moved clear of the right edge"){
+            game.move_entity(dog_id, Vector2{level_config::world_x, 0.0f});
+
+            THEN("it marks nothing"){
+                REQUIRE(game.graph_occupied_node_count() == 0);
+            }
+            THEN("its column does not fold into the next row down"){
+                REQUIRE(game.graph_occupant_at(Vector2{0.0f, level_config::edge_weight})
+                    == graph_config::empty_node);
+                REQUIRE(game.graph_occupant_at(Vector2{level_config::edge_weight, level_config::edge_weight})
+                    == graph_config::empty_node);
+            }
+        }
+
+        WHEN("the dog straddles the right edge"){
+            game.move_entity(dog_id, Vector2{level_config::world_x - level_config::edge_weight, 0.0f});
+
+            THEN("only the cell still on the map is marked"){
+                REQUIRE(game.graph_occupied_node_count() == 1);
+                REQUIRE(game.graph_occupant_at(Vector2{level_config::world_x - level_config::edge_weight, 0.0f})
+                    == static_cast<int>(dog_id));
+            }
+        }
+
+        WHEN("the dog is moved clear of the bottom edge"){
+            game.move_entity(dog_id, Vector2{0.0f, level_config::world_y});
+
+            THEN("it marks nothing"){
+                REQUIRE(game.graph_occupied_node_count() == 0);
+            }
+        }
+
+        WHEN("the dog is moved to a negative position"){
+            game.move_entity(dog_id, Vector2{-level_config::edge_weight * 4.0f,
+                                             -level_config::edge_weight * 4.0f});
+
+            THEN("it marks nothing rather than folding onto the origin"){
+                REQUIRE(game.graph_occupied_node_count() == 0);
+                REQUIRE(game.graph_occupant_at(Vector2{0.0f, 0.0f}) == graph_config::empty_node);
+            }
+        }
+    }
+}
+
+SCENARIO("a path destination resolves to the nearest node", "[ecs][graph][movement]"){
+    GIVEN("a dog and an off-grid destination nearer the row above"){
+        testing::ecs_test_game game;
+        auto dog_id = game.create_mack();
+
+        Vector2 destination{level_config::edge_weight * 10.2f, level_config::edge_weight * 3.4f};
+        Vector2 nearest{level_config::edge_weight * 10.0f, level_config::edge_weight * 3.0f};
+
+        WHEN("a right-facing dog is sent there"){
+            game.path_to(dog_id, destination);
+            REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 4000));
+
+            THEN("it finishes on the nearest node, not the cell corner"){
+                REQUIRE(game.hitbox_of(dog_id).x == nearest.x);
+                REQUIRE(game.hitbox_of(dog_id).y == nearest.y);
+            }
+        }
+
+        WHEN("a left-facing dog is sent there"){
+            game.path_to(dog_id, Vector2{0.0f, 0.0f});
+            REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 4000));
+            REQUIRE(game.facing_x_of(dog_id) < 0.0f);
+
+            game.path_to(dog_id, destination);
+            REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 4000));
+
+            THEN("it finishes on the same node - facing no longer moves the target"){
+                REQUIRE(game.hitbox_of(dog_id).x == nearest.x);
+                REQUIRE(game.hitbox_of(dog_id).y == nearest.y);
+            }
+        }
+    }
+
+    GIVEN("a dog and a destination exactly between two rows"){
+        testing::ecs_test_game game;
+        auto dog_id = game.create_mack();
+
+        WHEN("it is sent to a position on the tie"){
+            game.path_to(dog_id, Vector2{level_config::edge_weight * 10.0f,
+                                         level_config::edge_weight * 3.5f});
+            REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 4000));
+
+            THEN("the tie breaks away from zero, onto the row below"){
+                REQUIRE(game.hitbox_of(dog_id).y == level_config::edge_weight * 4.0f);
+            }
+        }
+    }
+
+    GIVEN("a dog and a destination in the last half cell of the world"){
+        testing::ecs_test_game game;
+        auto dog_id = game.create_mack();
+
+        WHEN("it is sent to a position that rounds past the far edge"){
+            game.path_to(dog_id, Vector2{level_config::world_x - 1.0f, level_config::edge_weight * 4.0f});
+            REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 8000));
+
+            THEN("the round is clamped back onto the map rather than rejected"){
+                REQUIRE(game.hitbox_of(dog_id).x == level_config::world_x - level_config::edge_weight);
+            }
+        }
+
+        WHEN("it is sent to a position genuinely off the map"){
+            game.path_to(dog_id, Vector2{level_config::world_x * 2.0f, 0.0f});
+
+            THEN("no path is created"){
+                REQUIRE_FALSE(game.has_path(dog_id));
+            }
+        }
+    }
+}
