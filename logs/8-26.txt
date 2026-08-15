@@ -297,5 +297,9 @@ what is left
     -> if there is an interaction [i.e other is filled], some behaviour would be performed by the "other entity"
     -> then it is easier to toggle the state. if a collision is detected between two entities and they both have interaction componetns,
     then they interact
-     
--> then the npc system
+
+-> fix up the ai graph pathfinding code
+-> build the ability to check for interactions
+-> build test stations, then test checking for interactions 
+-> then the npc system [this port should be simple enough]
+-> then processing interactions

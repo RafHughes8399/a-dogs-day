@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <concepts>
 #include <optional>
+#include <pplwin.h>
 #include <queue>
 #include <stddef.h>
 #include <unordered_map>
@@ -86,30 +87,45 @@ class food_component {
 class interactable_component {
 public:
 
-    interactable_component() = default;
-    Rectangle get_interaction_box(Vector2 position) const;   // inflated by buffer_ based on associated collision component
+    ~interactable_component() = default;
+    interactable_component(float reach, size_t capacity)
+    :reach_(reach), capacity_(capacity), interactors_(){}
+    interactable_component(const interactable_component& other) = default;
+    interactable_component(interactable_component&& other) = default;
+
+    interactable_component& operator=(const interactable_component& other) = default;
+    interactable_component& operator=(interactable_component&& other) = default;
+
+    Rectangle get_interaction_box(Rectangle box) const;
     bool has_free_slot() const;
-    bool is_occupied_by(size_t actor_id) const;
-    bool occupy(size_t actor_id);                            // false when full or duplicate
-    void release(size_t actor_id);
-    const std::vector<size_t>& get_occupants() const;
+    bool has_interactor(size_t entity_id) const;
+    bool add_interactor(size_t entity_id);                            // false when full or duplicate
+    void remove_interactor(size_t entity_id);
+    const std::vector<size_t>& get_interactors() const;
     size_t get_capacity() const;
 private:
-    float buffer_; // the amount the hitbox is increased
-    size_t capacity_;
-    std::vector<size_t> occupants_;
+    float reach_; // the amount the hitbox is increased
+    size_t capacity_; // * how many interactors the interactable component supports
+    std::vector<size_t> interactors_; // * the entities that are interacting with this component
 };
 
 // components::interactor_component  - actors do interaction
 class interactor_component {
 public:
-    interactor_component() = default;
+    ~interactor_component() = default;
+    interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt)
+    : reach_(reach), target_(entity_id){}
+    interactor_component(const interactor_component& other) = default;
+    interactor_component(interactor_component&& other) = default;
 
-    Rectangle get_interaction_box(Vector2 position) const;   // the cell the actor stands in
-    bool is_interactor() const { return target_.has_value(); }
+    interactor_component& operator=(const interactor_component& other) = default;
+    interactor_component& operator=(interactor_component&& other) = default;
+
+    Rectangle get_interaction_box(Rectangle box) const;
+    bool is_interacting() const { return target_.has_value(); }
     std::optional<size_t> get_target() const;
-    void bind(size_t target);
-    void unbind();
+    void interact_with(size_t entity_id);
+    void stop_interacting();
 private:
     float reach_;
     std::optional<size_t> target_;
@@ -373,8 +389,8 @@ namespace component_builders{
     components::collision_component build_collision_component(
         components::collision_component::hitbox_component hitbox);
 
-    components::interactor_component build_interactor_component();
-    components::interactable_component build_interactable_component();
+    components::interactor_component build_interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt);
+    components::interactable_component build_interactable_component(float reach, size_t capacity);
     components::key_input_component build_key_input_component(std::vector<game_config::input>& controls);
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
     components::state_machine_component::state_component build_state();

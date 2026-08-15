@@ -31,6 +31,45 @@ std::vector<game_config::input>& components::mouse_input_component::get_inputs()
     return inputs_;
 }
 
+// ---------------- interactable components ----------------
+Rectangle components::interactable_component::get_interaction_box(Rectangle box) const{
+    return Rectangle{box.x - reach_,
+                     box.y - reach_,
+                     box.width + 2.0f * reach_,
+                     box.height + 2.0f * reach_};
+}
+bool components::interactable_component::has_free_slot() const{
+    return interactors_.size() < capacity_;
+}
+bool components::interactable_component::add_interactor(size_t entity_id){
+    if(has_free_slot()){
+        interactors_.push_back(entity_id);
+        return true;
+    }
+    else{return false;}
+}
+void components::interactable_component::remove_interactor(size_t entity_id){
+    std::erase_if(interactors_, [entity_id](size_t entity) -> bool {
+        return entity_id == entity;
+    });
+    
+}
+// ---------------- interactor components ----------------
+Rectangle components::interactor_component::get_interaction_box(Rectangle box) const{
+    return Rectangle{box.x - reach_,
+                     box.y - reach_,
+                     box.width + 2.0f * reach_,
+                     box.height + 2.0f * reach_};
+}
+std::optional<size_t> components::interactor_component::get_target() const{
+    return target_;
+}
+void components::interactor_component::interact_with(size_t entity_id){
+    target_ = entity_id;
+}
+void components::interactor_component::stop_interacting(){
+    target_ = std::nullopt;
+}
 // ---------------- movement_component ----------------
 bool components::movement_component::has_reached_position(Vector2 position){
     if(paths_.empty()){

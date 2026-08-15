@@ -21,11 +21,11 @@ components::collision_component::hitbox_component component_builders::build_hitb
 components::collision_component component_builders::build_collision_component(components::collision_component::hitbox_component hitboxes){
     return components::collision_component(std::move(hitboxes));
 }
-components::interactor_component component_builders::build_interactor_component(){
-    return components::interactor_component();
+components::interactor_component component_builders::build_interactor_component(float reach, std::optional<size_t> entity_id){
+    return components::interactor_component(reach, entity_id);
 }
-components::interactable_component component_builders::build_interactable_component(){
-    return components::interactable_component();
+components::interactable_component component_builders::build_interactable_component(float reach, size_t capacity){
+    return components::interactable_component(reach, capacity);
 }
 components::key_input_component component_builders::build_key_input_component(std::vector<game_config::input>& controls){
     return components::key_input_component(controls);
