@@ -299,7 +299,15 @@ what is left
     then they interact
 
 -> fix up the ai graph pathfinding code
--> build the ability to check for interactions
+-> implement interaction components x 
+-> add to necessary entity builders x 
+-> define builders for stations [counter, stove, table for now] x 
+-> fix builder he lprs, ai slopped it  x 
+-> build the ability to check for interactions [the interaction system]
+   -> checking for interactions
+   -> changing the components
+   -> processing actual interactions [ this is where we got up to with the prior system]
+   
 -> build test stations, then test checking for interactions 
 -> then the npc system [this port should be simple enough]
 -> then processing interactions

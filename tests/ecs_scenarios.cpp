@@ -348,13 +348,14 @@ SCENARIO("npc dogs build with the same components as a player dog", "[ecs][compo
         WHEN("a customer dog is built"){
             auto customer_id = game.create_customer_dog(spawn);
 
-            THEN("it carries the player dog's five components"){
+            THEN("it carries the player dog's six components"){
                 REQUIRE(game.has_position(customer_id));
                 REQUIRE(game.has_renderable(customer_id));
                 REQUIRE(game.has_collision(customer_id));
                 REQUIRE(game.has_movement(customer_id));
                 REQUIRE(game.has_selectable(customer_id));
-                REQUIRE(game.num_components(customer_id) == 5);
+                REQUIRE(game.has_interactor(customer_id));
+                REQUIRE(game.num_components(customer_id) == 6);
             }
             THEN("its kind separates it from a player dog"){
                 REQUIRE(game.selectable_kind_of(customer_id)
@@ -370,9 +371,10 @@ SCENARIO("npc dogs build with the same components as a player dog", "[ecs][compo
         WHEN("a waiter dog is built"){
             auto waiter_id = game.create_waiter_dog(spawn);
 
-            THEN("it carries the same five components"){
-                REQUIRE(game.num_components(waiter_id) == 5);
+            THEN("it carries the same six components"){
+                REQUIRE(game.num_components(waiter_id) == 6);
                 REQUIRE(game.has_movement(waiter_id));
+                REQUIRE(game.has_interactor(waiter_id));
             }
             THEN("its kind separates it from a customer"){
                 REQUIRE(game.selectable_kind_of(waiter_id)
@@ -430,7 +432,8 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.has_renderable(table_id));
                 REQUIRE(game.has_collision(table_id));
                 REQUIRE(game.has_selectable(table_id));
-                REQUIRE(game.num_components(table_id) == 4);
+                REQUIRE(game.has_interactable(table_id));
+                REQUIRE(game.num_components(table_id) == 5);
             }
             THEN("it answers to the station kind, not the decoration kind"){
                 REQUIRE(game.selectable_kind_of(table_id)
@@ -443,7 +446,8 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
             THEN("it carries the station component set"){
                 REQUIRE(game.has_selectable(counter_id));
-                REQUIRE(game.num_components(counter_id) == 4);
+                REQUIRE(game.has_interactable(counter_id));
+                REQUIRE(game.num_components(counter_id) == 5);
             }
         }
 
@@ -452,7 +456,8 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
             THEN("it carries the station component set"){
                 REQUIRE(game.has_selectable(dishwasher_id));
-                REQUIRE(game.num_components(dishwasher_id) == 4);
+                REQUIRE(game.has_interactable(dishwasher_id));
+                REQUIRE(game.num_components(dishwasher_id) == 5);
             }
         }
 

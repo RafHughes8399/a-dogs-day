@@ -92,7 +92,8 @@ namespace ecs_entities {
     // * food  */
     // ! dog builders and destroyers
     void build_player(size_t player_id, size_t cursor_id);
-    void build_player_dog(size_t id);
+    void build_player_dog(size_t id, Vector2 position,
+        std::vector<sprite::sprite> sprites, size_t kind, float reach);
         void build_khiri(size_t id);
         void build_mack(size_t id);
 
@@ -113,18 +114,21 @@ namespace ecs_entities {
 
     void build_cursor(size_t id);
 
-    void build_decoration(size_t id);
+    void build_decoration(size_t id, Vector2 position,
+        sprite::sprite decoration_sprite, hitbox::hitbox decoration_hitbox);
         void build_test_decoration(size_t id, Vector2 position);
         //**
         // void build_gargoyle();
         //  */
 
-    void build_station(size_t id);
+    void build_station(size_t id, Vector2 position,
+        sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
+        float station_reach, size_t station_capacity);
         void build_counter(size_t id, Vector2 position);
         void build_table(size_t id, Vector2 position);
         void build_dishwasher(size_t id, Vector2 position);
+        void build_stove(size_t id, Vector2 position);
         /**
-            // void build_stove();
         */
 
     void build_food(size_t id, Vector2 position);

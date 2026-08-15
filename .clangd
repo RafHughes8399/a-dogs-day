@@ -26,5 +26,6 @@ CompileFlags:
     - -Isrc/engine/logger
     - -Isrc/engine/orchestrators
     - -Isrc/engine/queries
+    - -Isrc/engine/structures
     - -Isrc/engine/systems
     - -Isrc/interfaces

@@ -416,7 +416,7 @@ namespace component_helpers{
     inline void register_interactor_component(size_t entity_id, components::interactor_component component){
         component_managers::interactor_manager_.register_component(entity_id, std::move(component));
     }
-    inline void register_interactable_compoennt(size_t entity_id, components::interactable_component component){
+    inline void register_interactable_component(size_t entity_id, components::interactable_component component){
         component_managers::interactable_manager_.register_component(entity_id, std::move(component));
     }
     inline void register_key_input_component(size_t entity_id, components::key_input_component component){
@@ -434,6 +434,56 @@ namespace component_helpers{
     inline void register_selectable_component(size_t entity_id, components::selectable_component component){
         component_managers::selectable_manager_.register_component(entity_id, std::move(component));
     }
+    inline void add_positional_component(size_t entity_id, Vector2 position){
+        register_positional_component(entity_id,
+            component_builders::build_positional_component(position));
+    }
+    inline void add_movement_component(size_t entity_id, Vector2 move_speed,
+        Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
+        std::queue<path::path> paths = {}){
+        register_movement_component(entity_id,
+            component_builders::build_movement_component(move_speed, direction_scalar, std::move(paths)));
+    }
+    inline void add_renderable_component(size_t entity_id,
+        std::vector<components::renderable_component::sprite_component>& sprite_components){
+        register_renderable_component(entity_id,
+            component_builders::build_renderable_component(sprite_components));
+    }
+    inline void add_collision_component(size_t entity_id,
+        components::collision_component::hitbox_component hitbox){
+        register_collision_component(entity_id,
+            component_builders::build_collision_component(std::move(hitbox)));
+    }
+    inline void add_interactor_component(size_t entity_id, float reach,
+        std::optional<size_t> target_entity_id = std::nullopt){
+        register_interactor_component(entity_id,
+            component_builders::build_interactor_component(reach, target_entity_id));
+    }
+    inline void add_interactable_component(size_t entity_id, float reach, size_t capacity){
+        register_interactable_component(entity_id,
+            component_builders::build_interactable_component(reach, capacity));
+    }
+    inline void add_key_input_component(size_t entity_id, std::vector<game_config::input>& controls){
+        register_key_input_component(entity_id,
+            component_builders::build_key_input_component(controls));
+    }
+    inline void add_mouse_input_component(size_t entity_id, std::vector<game_config::input>& inputs){
+        register_mouse_input_component(entity_id,
+            component_builders::build_mouse_input_component(inputs));
+    }
+    inline void add_state_machine_component(size_t entity_id,
+        std::vector<components::state_machine_component::state_component>& state_components){
+        register_state_machine_component(entity_id,
+            component_builders::build_state_machine_component(state_components));
+    }
+    inline void add_food_component(size_t entity_id){
+        register_food_component(entity_id, component_builders::build_food_component());
+    }
+    inline void add_selectable_component(size_t entity_id, size_t kind){
+        register_selectable_component(entity_id,
+            component_builders::build_selectable_component(kind));
+    }
+
     inline bool is_mouse_positioned(size_t entity_id){
         return component_managers::mouse_input_manager_.get_component(entity_id) != nullptr;
     }

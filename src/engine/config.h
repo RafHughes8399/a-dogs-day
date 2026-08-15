@@ -304,6 +304,9 @@ namespace entity_config{
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // how many food a single counter can hold, and where stored food is drawn relative to the counter origin.
     inline const size_t food_counter_capacity = 3;
+    inline const size_t table_capacity = 4;
+    inline const size_t dishwasher_capacity = 1;
+    inline const float station_reach = level_config::edge_weight * 0.5f;
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
     // inline const float npc_dog_across_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
     // inline const float npc_dog_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
@@ -313,6 +316,7 @@ namespace entity_config{
 }
 namespace dog_config{
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
+    inline const float dog_reach = level_config::edge_weight * 0.5f;
     enum waiter_dog_types{
         basic = 0,
         size = 1

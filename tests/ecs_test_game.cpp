@@ -192,6 +192,12 @@ namespace testing{
     bool ecs_test_game::has_selectable(size_t entity_id){
         return component_managers::selectable_manager_.get_component(entity_id) != nullptr;
     }
+    bool ecs_test_game::has_interactor(size_t entity_id){
+        return component_managers::interactor_manager_.get_component(entity_id) != nullptr;
+    }
+    bool ecs_test_game::has_interactable(size_t entity_id){
+        return component_managers::interactable_manager_.get_component(entity_id) != nullptr;
+    }
 
     size_t ecs_test_game::selectable_kind_of(size_t entity_id){
         return component_managers::selectable_manager_.get_component(entity_id)->get_kind();
