@@ -78,13 +78,22 @@ namespace render_layer{
                     }
                     if(hitbox_debug){
                         auto* hitbox = component_managers::collision_manager_.get_component(entity_id);
-                        // * auto* interactor = component_managers::interactor_manager_.get_component(entity_id);
-                        // * auto* interactable = component_managers::interactable_manager_.get_component(entity_id);
+                        auto* interactor = component_managers::interactor_manager_.get_component(entity_id);
+                        auto* interactable = component_managers::interactable_manager_.get_component(entity_id);
                         if(hitbox) {
                             auto box = hitbox->get_hitbox_component().get_hitbox().get_box();
                             auto box_position = Vector2Subtract({box.x, box.y}, frame_position);
                             DrawRectangleLines(box_position.x, box_position.y, box.width, box.height, GREEN);
-                            // TODO : pending interactor/able component implementaiton also draw these boxes
+                            if(interactor){
+                                auto interaction_box = interactor->get_interaction_box(box);
+                                auto interaction_box_position = Vector2Subtract({interaction_box.x, interaction_box.y}, frame_position);
+                                DrawRectangleLines(interaction_box_position.x, interaction_box_position.y, interaction_box.width, interaction_box.height, ORANGE);
+                            }
+                            if(interactable){
+                                auto interaction_box = interactable->get_interaction_box(box);
+                                auto interaction_box_position = Vector2Subtract({interaction_box.x, interaction_box.y}, frame_position);
+                                DrawRectangleLines(interaction_box_position.x, interaction_box_position.y, interaction_box.width, interaction_box.height, ORANGE);
+                            }
                         }
                     }
                 }

@@ -1,4 +1,6 @@
 #include "game.h"
+#include "config.h"
+#include "entity.h"
 // #include <iostream>
 void game::game::update(float delta){
     // ---------------- debug behaviours ----------------
@@ -82,6 +84,16 @@ void game::ecs_game::init(){
         ecs_entities::build_mack(id);
     }, level_config::dogs);
     debug::log("[ecs_game::init, built mack] id " + std::to_string(mack_id));
+
+    auto counter_id = lifespan_.create([](size_t id) -> void {
+        ecs_entities::build_counter(id, Vector2 {level_config::edge_weight * 12, level_config::edge_weight * 4});
+    }, level_config::draw_layers::decoration);
+    auto table_id = lifespan_.create([](size_t id) -> void {
+        ecs_entities::build_table(id, Vector2 {level_config::edge_weight * 6, level_config::edge_weight * 6});
+    }, level_config::draw_layers::decoration);
+    auto stove_id = lifespan_.create([](size_t id) -> void {
+        ecs_entities::build_stove(id, Vector2 {level_config::edge_weight * 16, level_config::edge_weight * 7});
+    }, level_config::draw_layers::decoration);
     // TODO menus and hud
 
     debug::log("[ecs_game::init, done] built "

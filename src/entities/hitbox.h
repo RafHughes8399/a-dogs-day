@@ -52,6 +52,7 @@ namespace hitbox_builders{
     hitbox::hitbox build_table_hitbox(Vector2 position);
     hitbox::hitbox build_food_counter_hitbox(Vector2 position);
     hitbox::hitbox build_dishwasher_hitbox(Vector2 position);
+    hitbox::hitbox build_stove_hitbox(Vector2 position);
     hitbox::hitbox build_food_hitbox(Vector2 position);
 } // namespace hitbox_builders
 

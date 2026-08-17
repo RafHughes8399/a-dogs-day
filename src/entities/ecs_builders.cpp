@@ -153,9 +153,10 @@ void ecs_entities::build_station(size_t id, Vector2 position,
             entity_config::station_reach, entity_config::dishwasher_capacity);
     }
     void ecs_entities::build_stove(size_t id, Vector2 position){
-        (void) id;
-        (void) position;
-        return;
+        build_station(id, position,
+            sprite_builders::build_stove_sprite(),
+            hitbox_builders::build_stove_hitbox(position),
+            entity_config::station_reach, entity_config::stove_capacity);
     }
     /**
         // void build_stove();

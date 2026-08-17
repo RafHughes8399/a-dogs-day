@@ -40,6 +40,9 @@ sprite::sprite sprite_builders::build_food_counter_sprite(){
 sprite::sprite sprite_builders::build_dishwasher_sprite(){
     return build_decoration_sprite(entity_config::dishwasher_attributes, PURPLE);
 }
+sprite::sprite sprite_builders::build_stove_sprite(){
+    return build_decoration_sprite(entity_config::stove_attributes, ORANGE);
+}
 sprite::sprite sprite_builders::build_food_sprite(){
     return build_decoration_sprite(entity_config::test_food_attributes, RED);
 }

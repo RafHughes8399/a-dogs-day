@@ -304,10 +304,32 @@ what is left
 -> define builders for stations [counter, stove, table for now] x 
 -> fix builder he lprs, ai slopped it  x 
 -> build the ability to check for interactions [the interaction system]
-   -> checking for interactions
-   -> changing the components
-   -> processing actual interactions [ this is where we got up to with the prior system]
-   
+   -> checking for interactions 
+   -> changing the components 
 -> build test stations, then test checking for interactions 
 -> then the npc system [this port should be simple enough]
--> then processing interactions
+   -> porting over the matire'd and expediter
+   -> need to change how the queuing is defiend, , the dogs should come from -x  and -y, from the top of the screen
+   -> state machines and event listening it seems would drive this
+      -> the state decides what events need to be listened to
+      -> for example: 
+         -> the waiter receives the command to serve the table, it is given the counter and the table, it makes 
+         both paths
+         -> it has a regular idle state that acts as its default
+         -> it has a state for walking-to-counter, which then decides the interaction behaviour upon that path ending
+         -> then when that path and interaction ends, the state swaps for the next path
+         -> so the state determines essentially the animation and interaction on_path_end, yes, good
+         -> then upon serving it returns to idle []
+         
+         -> for the customer, it receives direction to sit at a table, 
+         -> it listens for a food served event 
+         [emitted by the waiter completing its path in that state, and heard by, the table ? or the matire_d ? 
+         ], then the state switches to eating 
+         -> i think it is clean for the maitre_d and expediter to talk to each other
+         -> perhaps then it is cleaner for a serving system and a clearing system, one system per behaviour. 
+         -> once eating completes it switches to a leaving state
+
+         -> when the customer leave it notifies the clearing system to select a waiter
+         -> i think the serving and clearing system port is the way to go, they can manage the assignment to jobs, the updates to jibs and 
+         -> trigger state changes 
+-> then processing interactions [that is where we are up to and can come in a later branch ?]
