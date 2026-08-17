@@ -24,8 +24,9 @@ components::collision_component component_builders::build_collision_component(co
 components::interactor_component component_builders::build_interactor_component(float reach, std::optional<size_t> entity_id){
     return components::interactor_component(reach, entity_id);
 }
-components::interactable_component component_builders::build_interactable_component(float reach, size_t capacity){
-    return components::interactable_component(reach, capacity);
+components::interactable_component component_builders::build_interactable_component(float reach,
+    const std::vector<Vector2>& slot_offsets){
+    return components::interactable_component(reach, slot_offsets);
 }
 components::key_input_component component_builders::build_key_input_component(std::vector<game_config::input>& controls){
     return components::key_input_component(controls);

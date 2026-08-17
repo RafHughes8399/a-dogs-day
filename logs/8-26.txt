@@ -303,10 +303,13 @@ what is left
 -> add to necessary entity builders x 
 -> define builders for stations [counter, stove, table for now] x 
 -> fix builder he lprs, ai slopped it  x 
--> build the ability to check for interactions [the interaction system]
+-> build the ability to check for interactions [the interaction system] x 
    -> checking for interactions 
    -> changing the components 
--> build test stations, then test checking for interactions 
+-> build test stations, then test checking for interactions  x x
+   -> there is a bug with right clikcing on a station and having a path generate. it does not work
+   -> reintroduce interaction positions [ need to handle the case where a position is blocked by a station / decoration, 
+   or gate picking that position with a check that it is a free position in the graph]
 -> then the npc system [this port should be simple enough]
    -> porting over the matire'd and expediter
    -> need to change how the queuing is defiend, , the dogs should come from -x  and -y, from the top of the screen

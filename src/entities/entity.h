@@ -123,7 +123,7 @@ namespace ecs_entities {
 
     void build_station(size_t id, Vector2 position,
         sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
-        float station_reach, size_t station_capacity);
+        float station_reach, const std::vector<Vector2>& slot_offsets);
         void build_counter(size_t id, Vector2 position);
         void build_table(size_t id, Vector2 position);
         void build_dishwasher(size_t id, Vector2 position);

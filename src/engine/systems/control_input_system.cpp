@@ -225,6 +225,14 @@ void systems::control_input_system::right_click(size_t id){
     }
 
     int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
+    // ! i think there is something wrong with this check here 
+    // ! the path to a destination entity is not correct.
+    // ! the click resovles the detination entity correctly and the position but something lese 
+    // ! is missing
+    
+    // ! no the problem is that it cannot resolve a path to an occupied node. so need to adjust
+    // ! the position that we send the dog to when going to a entity
+    // ? perhaps need to revive the idea of interaction positions, based on the hitbox ? 
     std::optional<size_t> destination_entity = entity_id == game_config::empty_entity
         ? std::optional<size_t>{}
         : std::make_optional<size_t>(entity_id);
@@ -238,6 +246,6 @@ void systems::control_input_system::right_click(size_t id){
     event_interface::queue_event(create_path_event);
     debug::log("[control_input_system::right_click, queued create_path_to] dog: "
         + std::to_string(selected_id)
-        + ", destination: " + raglib::vector_to_string(click_position));
+        + ", destination: " + raglib::vector_to_string(click_position)); 
 }
 

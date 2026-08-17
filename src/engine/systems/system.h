@@ -197,13 +197,19 @@ namespace systems{
             void on_moved_entity(const events::move_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
             void on_create_path_to_event(const events::create_path_to& event);
+            // * the graph is private to this system, so walkability questions come
+            // * through here - slot selection needs it in shipped builds, not only
+            // * under DOG_DAYS_TESTING
+            int graph_occupant_at(Vector2 position){
+                return graph_.occupant_at(position);
+            }
+            bool is_walkable(Vector2 position){
+                return graph_.occupant_at(position) == graph_config::empty_node;
+            }
             void clear(){
                 graph_.reset();
             }
 #ifdef DOG_DAYS_TESTING
-            int graph_occupant_at(Vector2 position){
-                return graph_.occupant_at(position);
-            }
             size_t graph_occupied_node_count(){
                 return graph_.occupied_node_count();
             }

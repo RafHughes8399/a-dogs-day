@@ -306,12 +306,23 @@ namespace entity_config{
     inline const float stove_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
-    // how many food a single counter can hold, and where stored food is drawn relative to the counter origin.
+    // * legacy entities::station capacity. the ECS stations size their capacity
+    // * off the slot offset lists below instead.
     inline const size_t food_counter_capacity = 3;
-    inline const size_t table_capacity = 4;
-    inline const size_t dishwasher_capacity = 1;
-    inline const size_t stove_capacity = 1;
-    inline const float station_reach = level_config::edge_weight * 0.5f;
+
+    inline const Vector2 station_slot_left  = Vector2{-level_config::edge_weight, 0.0f};
+    inline const Vector2 station_slot_right = Vector2{level_config::edge_weight * 2.0f, 0.0f};
+    inline const Vector2 station_slot_up    = Vector2{0.0f, -level_config::edge_weight};
+    inline const Vector2 station_slot_down  = Vector2{0.0f, level_config::edge_weight * 2.0f};
+
+    inline const std::vector<Vector2> table_slot_offsets = {
+        station_slot_left, station_slot_right};
+    inline const std::vector<Vector2> food_counter_slot_offsets = {
+        station_slot_left, station_slot_right, station_slot_up, station_slot_down};
+    inline const std::vector<Vector2> dishwasher_slot_offsets = {station_slot_left};
+    inline const std::vector<Vector2> stove_slot_offsets = {station_slot_left};
+    inline const float station_reach = level_config::edge_weight * 0.25f;
+    // where stored food is drawn relative to the counter origin.
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
     // inline const float npc_dog_across_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
     // inline const float npc_dog_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
@@ -321,7 +332,7 @@ namespace entity_config{
 }
 namespace dog_config{
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
-    inline const float dog_reach = level_config::edge_weight * 0.5f;
+    inline const float dog_reach = level_config::edge_weight * 0.3f;
     enum waiter_dog_types{
         basic = 0,
         size = 1

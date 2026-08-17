@@ -74,7 +74,6 @@ void game::ecs_game::init(){
     debug::log("[ecs_game::init, built player] id " + std::to_string(player_id)
         + " holding cursor " + std::to_string(cursor_id));
 
-    // TODO starting entities - khiri and mack, the starting stations
     auto khiri_id = lifespan_.create([](size_t id) -> void{
         ecs_entities::build_khiri(id);
     }, level_config::dogs);
@@ -94,6 +93,7 @@ void game::ecs_game::init(){
     auto stove_id = lifespan_.create([](size_t id) -> void {
         ecs_entities::build_stove(id, Vector2 {level_config::edge_weight * 16, level_config::edge_weight * 7});
     }, level_config::draw_layers::decoration);
+    
     // TODO menus and hud
 
     debug::log("[ecs_game::init, done] built "

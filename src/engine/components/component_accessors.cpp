@@ -1,4 +1,5 @@
 #include "component.h"
+#include "config.h"
 
 // definitions for the accessors declared on each component in component.h
 
@@ -38,21 +39,63 @@ Rectangle components::interactable_component::get_interaction_box(Rectangle box)
                      box.width + 2.0f * reach_,
                      box.height + 2.0f * reach_};
 }
-bool components::interactable_component::has_free_slot() const{
-    return interactors_.size() < capacity_;
+Vector2 components::interactable_component::interaction_slot::get_offset() const{
+    return offset_;
 }
-bool components::interactable_component::add_interactor(size_t entity_id){
-    if(has_free_slot()){
-        interactors_.push_back(entity_id);
-        return true;
+Vector2 components::interactable_component::interaction_slot::get_position(Vector2 position) const{
+    return Vector2Add(position, offset_);
+}
+size_t components::interactable_component::interaction_slot::get_entity() const{
+    return entity_id_;
+}
+bool components::interactable_component::interaction_slot::is_free() const{
+    return entity_id_ == game_config::empty_entity;
+}
+bool components::interactable_component::interaction_slot::is_held_by(size_t entity_id) const{
+    return entity_id_ == entity_id;
+}
+void components::interactable_component::interaction_slot::claim(size_t entity_id){
+    entity_id_ = entity_id;
+}
+void components::interactable_component::interaction_slot::release(){
+    entity_id_ = game_config::empty_entity;
+}
+Vector2 components::interactable_component::get_slot_position(size_t slot_index, Vector2 position) const{
+    return slots_[slot_index].get_position(position);
+}
+std::optional<size_t> components::interactable_component::get_slot_of(size_t entity_id) const{
+    for(size_t index = 0; index < slots_.size(); ++index){
+        if(slots_[index].is_held_by(entity_id)){ return index; }
     }
-    else{return false;}
+    return std::nullopt;
 }
-void components::interactable_component::remove_interactor(size_t entity_id){
-    std::erase_if(interactors_, [entity_id](size_t entity) -> bool {
-        return entity_id == entity;
-    });
-    
+bool components::interactable_component::has_free_slot() const{
+    return std::any_of(slots_.begin(), slots_.end(),
+        [](const interaction_slot& slot) -> bool {
+            return slot.is_free();
+        });
+}
+bool components::interactable_component::has_interactor(size_t entity_id) const{
+    return get_slot_of(entity_id).has_value();
+}
+bool components::interactable_component::claim_slot(size_t slot_index, size_t entity_id){
+    if(slot_index >= slots_.size()){ return false; }
+    if(not slots_[slot_index].is_free()){ return false; }
+    if(has_interactor(entity_id)){ return false; }
+    slots_[slot_index].claim(entity_id);
+    return true;
+}
+void components::interactable_component::release_slot(size_t entity_id){
+    for(auto& slot : slots_){
+        if(slot.is_held_by(entity_id)){ slot.release(); }
+    }
+}
+const std::vector<components::interactable_component::interaction_slot>&
+components::interactable_component::get_slots() const{
+    return slots_;
+}
+size_t components::interactable_component::get_capacity() const{
+    return slots_.size();
 }
 // ---------------- interactor components ----------------
 Rectangle components::interactor_component::get_interaction_box(Rectangle box) const{
