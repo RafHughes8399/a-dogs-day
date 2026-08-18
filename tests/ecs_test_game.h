@@ -53,11 +53,13 @@ namespace testing{
             size_t create_table(Vector2 position, size_t layer = level_config::draw_layers::stations);
             size_t create_food_counter(Vector2 position, size_t layer = level_config::draw_layers::stations);
             size_t create_dishwasher(Vector2 position, size_t layer = level_config::draw_layers::stations);
+            size_t create_stove(Vector2 position, size_t layer = level_config::draw_layers::stations);
             size_t create_food(Vector2 position, size_t layer = level_config::draw_layers::decoration);
 
             void tick(float delta);
             bool tick_until(std::function<bool()> predicate, int max_frames, float delta = 0.016f);
-            void path_to(size_t entity_id, Vector2 destination);
+            void path_to(size_t entity_id, Vector2 destination,
+                std::optional<size_t> destination_entity = std::nullopt);
             void remove(size_t entity_id);
             // the single legal position write - moves the hitbox and reindexes
             void move_entity(size_t entity_id, Vector2 position);

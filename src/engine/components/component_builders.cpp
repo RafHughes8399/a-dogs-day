@@ -25,7 +25,7 @@ components::interactor_component component_builders::build_interactor_component(
     return components::interactor_component(reach, entity_id);
 }
 components::interactable_component component_builders::build_interactable_component(float reach,
-    const std::vector<Vector2>& slot_offsets){
+    const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets){
     return components::interactable_component(reach, slot_offsets);
 }
 components::key_input_component component_builders::build_key_input_component(std::vector<game_config::input>& controls){

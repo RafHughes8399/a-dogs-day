@@ -39,6 +39,7 @@ void systems::rendering_system::render(int frame){
         render_layers_[layer].draw(render_predicate,
             Vector2{view_frame_.x, view_frame_.y}, frame, true);
     }
+    movement_system::get_instance().render_graph(view_frame_);
 }
 
 void systems::rendering_system::clear(){

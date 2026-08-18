@@ -1,6 +1,7 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
+#include <array>
 #include <algorithm>
 #include <concepts>
 #include <optional>
@@ -21,6 +22,8 @@
 #include "sprite.h"
 namespace components {
 
+
+#define DIRECTIONS 4
 // * components carry no id of their own - the manager's map key IS the owning
 // * entity, so anything iterating components already has it.
 // * one hitbox_component per entity. its variants run parallel to the base
@@ -83,41 +86,14 @@ class food_component {
 };
 class interactable_component {
 public:
-    // * one physical standing spot. the offset is from the station origin, not
-    // * a world position: a station can be moved, and a derived position has no
-    // * sync path to get wrong.
-    class interaction_slot {
-    public:
-        ~interaction_slot() = default;
-        interaction_slot(Vector2 offset, size_t entity_id = game_config::empty_entity)
-            : offset_(offset), entity_id_(entity_id) {}
-        interaction_slot(const interaction_slot& other) = default;
-        interaction_slot(interaction_slot&& other) = default;
-
-        interaction_slot& operator=(const interaction_slot& other) = default;
-        interaction_slot& operator=(interaction_slot&& other) = default;
-
-        Vector2 get_offset() const;
-        Vector2 get_position(Vector2 position) const;
-        size_t get_entity() const;
-        bool is_free() const;
-        bool is_held_by(size_t entity_id) const;
-        void claim(size_t entity_id);
-        void release();
-
-    private:
-        Vector2 offset_;
-        size_t entity_id_;
-    };
-
+    // to solve the problem where an entity is sent to a station but cannot pathfind
+    // becuase the raw click input is a blocked node on the graph. instead, we resolve
+    // an interaction offset against the station's own live position at query time -
+    // the offset is from the station origin, not a world position: a station can be
+    // moved, and a derived position has no sync path to get wrong.
     ~interactable_component() = default;
-    interactable_component(float reach, const std::vector<Vector2>& slot_offsets)
-    : reach_(reach), slots_(){
-        slots_.reserve(slot_offsets.size());
-        for(const auto& offset : slot_offsets){
-            slots_.emplace_back(offset);
-        }
-    }
+    interactable_component(float reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets)
+    : reach_(reach), slot_offsets_(slot_offsets) {}
     interactable_component(const interactable_component& other) = default;
     interactable_component(interactable_component&& other) = default;
 
@@ -125,17 +101,20 @@ public:
     interactable_component& operator=(interactable_component&& other) = default;
 
     Rectangle get_interaction_box(Rectangle box) const;
-    Vector2 get_slot_position(size_t slot_index, Vector2 position) const;
-    std::optional<size_t> get_slot_of(size_t entity_id) const;
-    bool has_free_slot() const;
-    bool has_interactor(size_t entity_id) const;
-    bool claim_slot(size_t slot_index, size_t entity_id);
-    void release_slot(size_t entity_id);
-    const std::vector<interaction_slot>& get_slots() const;
-    size_t get_capacity() const;
+    std::optional<Vector2> get_interaction_offset(Vector2 source, Vector2 own_position) const;
+#ifdef DOG_DAYS_TESTING
+    std::optional<Vector2> get_slot_offset(size_t direction) const{
+        return slot_offsets_[direction];
+    }
+#endif
 private:
     float reach_;
-    std::vector<interaction_slot> slots_;
+    // order is as defined in the config enum
+    // * 0. left
+    // * 1. right
+    // * 2. up
+    // * 3. down
+    std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets_;
 };
 
 // components::interactor_component  - actors do interaction
@@ -420,7 +399,7 @@ namespace component_builders{
 
     components::interactor_component build_interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt);
     components::interactable_component build_interactable_component(float reach,
-        const std::vector<Vector2>& slot_offsets);
+        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets);
     components::key_input_component build_key_input_component(std::vector<game_config::input>& controls);
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
     components::state_machine_component::state_component build_state();
@@ -490,7 +469,7 @@ namespace component_helpers{
             component_builders::build_interactor_component(reach, target_entity_id));
     }
     inline void add_interactable_component(size_t entity_id, float reach,
-        const std::vector<Vector2>& slot_offsets){
+        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets){
         register_interactable_component(entity_id,
             component_builders::build_interactable_component(reach, slot_offsets));
     }

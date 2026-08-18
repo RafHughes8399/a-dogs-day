@@ -315,12 +315,6 @@ namespace entity_config{
     inline const Vector2 station_slot_up    = Vector2{0.0f, -level_config::edge_weight};
     inline const Vector2 station_slot_down  = Vector2{0.0f, level_config::edge_weight * 2.0f};
 
-    inline const std::vector<Vector2> table_slot_offsets = {
-        station_slot_left, station_slot_right};
-    inline const std::vector<Vector2> food_counter_slot_offsets = {
-        station_slot_left, station_slot_right, station_slot_up, station_slot_down};
-    inline const std::vector<Vector2> dishwasher_slot_offsets = {station_slot_left};
-    inline const std::vector<Vector2> stove_slot_offsets = {station_slot_left};
     inline const float station_reach = level_config::edge_weight * 0.25f;
     // where stored food is drawn relative to the counter origin.
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};

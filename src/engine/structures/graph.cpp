@@ -13,9 +13,9 @@ std::vector<Vector2> graph::level_graph::get_path(const queries::path_query& que
 
 // ---------------- node predicates and lookup ----------------
 bool graph::level_graph::is_node_closer(int current_id, int next_id, int end_id){
-    Vector2 current_position = id_to_node(current_id)->position_;
-    Vector2 next_position = id_to_node(next_id)->position_;
-    Vector2 end_position = id_to_node(end_id)->position_;
+    Vector2 current_position = get_node(current_id)->position_;
+    Vector2 next_position = get_node(next_id)->position_;
+    Vector2 end_position = get_node(end_id)->position_;
 
     auto current_end_distance = Vector2Distance(current_position, end_position);
     auto next_end_distance = Vector2Distance(next_position, end_position);
@@ -23,24 +23,22 @@ bool graph::level_graph::is_node_closer(int current_id, int next_id, int end_id)
 }
 
 bool graph::level_graph::is_node_empty(int node_id){
-    auto node_decoration = id_to_node(node_id)->decoration_;
-    return node_decoration == graph_config::empty_node;
+    return get_node(node_id)->entities_.empty();
 }
-// true if occupued, false if not, differs from empty by the use case 
+// true if occupued, false if not, differs from empty by the use case
 // empty is used for dog pathfinding, occupied is used for decoration placement
 bool graph::level_graph::is_node_occupied(int node_id, int decoration_id){
-    auto node_decoration = id_to_node(node_id)->decoration_;
-    bool empty = node_decoration == graph_config::empty_node;
-
-    bool self = node_decoration == decoration_id;
-
-    // is occupied if not empty and not the self 
-    return not empty and not self;
+    auto& occupants = get_node(node_id)->entities_;
+    // occupied if anything other than the querying decoration itself is present
+    for(auto occupant : occupants){
+        if(occupant != decoration_id){ return true; }
+    }
+    return false;
 }
 
-graph::level_graph::node* graph::level_graph::id_to_node(int id){
+graph::level_graph::node* graph::level_graph::get_node(size_t node_id){
     // is it just as simple as 
-    return &graph_[static_cast<size_t>(id)].first;
+    return &graph_[static_cast<size_t>(node_id)].first;
 }
 
 // ---------------- pathfinding ----------------
@@ -431,8 +429,8 @@ void graph::level_graph::build_nodes(int level_x, int level_y){
     }
 }
 void graph::level_graph::insert_node(int id, Vector2 position){
-    // node is built with a number and at position 
-    graph_.push_back(std::make_pair(node{id, position, graph_config::empty_node}, std::vector<edge>{}));
+    // node is built with a number and at position
+    graph_.push_back(std::make_pair(node{id, position, {}}, std::vector<edge>{}));
     return;
 }
 void graph::level_graph::insert_edge(int source_num, node& destination, float weight){
@@ -472,25 +470,45 @@ void graph::level_graph::update_entity(Rectangle rectangle, int id){
             int node_index = 0;
             if(not cell_at(position, node_index)){ continue; }
 
-            graph_[static_cast<size_t>(node_index)].first.decoration_ = id;
+            graph_[static_cast<size_t>(node_index)].first.entities_.insert(id);
+        }
+    }
+}
+void graph::level_graph::remove_entity(Rectangle rectangle, int id){
+    // Same bounds as update_entity - only erase this entity's own claim on a cell,
+    // so another occupant registered on the same cell (e.g. a station under a dog
+    // passing through) is left untouched.
+    for(auto col = rectangle.x; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
+        for(auto row = rectangle.y; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
+            auto position = Vector2{col, row};
+            int node_index = 0;
+            if(not cell_at(position, node_index)){ continue; }
+
+            graph_[static_cast<size_t>(node_index)].first.entities_.erase(id);
         }
     }
 }
 int graph::level_graph::occupant_at(Vector2 position){
     int node_index = 0;
     if(not cell_at(position, node_index)){ return graph_config::empty_node; }
-    return graph_[static_cast<size_t>(node_index)].first.decoration_;
+    auto& occupants = graph_[static_cast<size_t>(node_index)].first.entities_;
+    return occupants.empty() ? graph_config::empty_node : *occupants.begin();
+}
+graph::level_graph::node* graph::level_graph::node_at(Vector2 position){
+    int node_index = 0;
+    if(not cell_at(position, node_index)){ return nullptr; }
+    return get_node(static_cast<size_t>(node_index));
 }
 size_t graph::level_graph::occupied_node_count(){
     size_t occupied = 0;
     for(auto& entry : graph_){
-        if(entry.first.decoration_ != graph_config::empty_node){ ++occupied; }
+        if(not entry.first.entities_.empty()){ ++occupied; }
     }
     return occupied;
 }
 void graph::level_graph::reset(){
     for(auto& entry : graph_){
-        entry.first.decoration_ = graph_config::empty_node;
+        entry.first.entities_.clear();
     }
 }
 
@@ -501,7 +519,7 @@ void graph::level_graph::render(Rectangle frame){
             int index = 0;
             if(not cell_at(Vector2{x, y}, index)){ continue; }
             auto position = graph_[static_cast<size_t>(index)].first.position_;
-            if(graph_[static_cast<size_t>(index)].first.decoration_ == graph_config::empty_node){
+            if(graph_[static_cast<size_t>(index)].first.entities_.empty()){
                 DrawCircle(static_cast<int>(position.x), static_cast<int>(position.y), 15, DARKGREEN);
             }
             else{

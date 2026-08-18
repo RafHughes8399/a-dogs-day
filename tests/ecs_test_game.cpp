@@ -103,6 +103,12 @@ namespace testing{
         }, layer);
     }
 
+    size_t ecs_test_game::create_stove(Vector2 position, size_t layer){
+        return lifespan_.create([position](size_t id){
+            ecs_entities::build_stove(id, position);
+        }, layer);
+    }
+
     size_t ecs_test_game::create_food(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
             ecs_entities::build_food(id, position);
@@ -122,9 +128,10 @@ namespace testing{
         return predicate();
     }
 
-    void ecs_test_game::path_to(size_t entity_id, Vector2 destination){
+    void ecs_test_game::path_to(size_t entity_id, Vector2 destination,
+        std::optional<size_t> destination_entity){
         std::unique_ptr<events::event> request =
-            std::make_unique<events::create_path_to>(entity_id, destination);
+            std::make_unique<events::create_path_to>(entity_id, destination, path::replace, destination_entity);
         event_interface::queue_event(request);
         tick(0.0f);
     }

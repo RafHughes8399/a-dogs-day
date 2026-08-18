@@ -4,3 +4,6 @@
 void systems::interaction_system::update(float delta){
     (void) delta;
 }
+
+// TODO on moved entity
+// update teh

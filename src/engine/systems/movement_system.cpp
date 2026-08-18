@@ -1,7 +1,9 @@
 #include "component.h"
+#include "debug_log_interface.h"
 #include "entity_events.h"
 #include "events_interface.h"
 #include "hitbox.h"
+#include "raglib.h"
 #include "system.h"
 #include <raylib.h>
 
@@ -69,7 +71,7 @@ void systems::movement_system::on_created_entity(const events::create_entity& ev
 }
 void systems::movement_system::on_moved_entity(const events::move_entity& event){
     if(component_helpers::is_mouse_positioned(event.get_id())){ return; }
-    graph_.update_entity(event.get_pre_move(), graph_config::empty_node);
+    graph_.remove_entity(event.get_pre_move(), static_cast<int>(event.get_id()));
     graph_.update_entity(event.get_post_move(), static_cast<int>(event.get_id()));
 }
 void systems::movement_system::on_create_path_to_event(const events::create_path_to& event){
@@ -81,10 +83,41 @@ void systems::movement_system::on_create_path_to_event(const events::create_path
     auto source = (mode == path::append and not movement->get_paths().empty())
         ? movement->get_paths().back().get_destination()
         : position->get_position();
-
+    auto destination = event.get_destination();
+    debug::log("[movement_system::on_create_path_to_event] dog: " + std::to_string(event.get_id())
+        + ", source: " + raglib::vector_to_string(source)
+        + ", event destination (click position): " + raglib::vector_to_string(destination)
+        + ", destination_entity: " + (event.get_destination_entity().has_value()
+            ? std::to_string(event.get_destination_entity().value()) : std::string("none")));
+    if(event.get_destination_entity().has_value()){
+        auto destination_entity_id = event.get_destination_entity().value();
+        auto interactable = component_managers::interactable_manager_.get_component(destination_entity_id);
+        if(interactable){
+            auto* destination_position = component_managers::positional_manager_.get_component(destination_entity_id);
+            debug::log("[movement_system::on_create_path_to_event] destination entity actual position: "
+                + (destination_position != nullptr
+                    ? raglib::vector_to_string(destination_position->get_position())
+                    : std::string("no position component")));
+            if(destination_position != nullptr){
+                destination = destination_position->get_position();
+                auto interaction_offset = interactable->get_interaction_offset(source, destination);
+                if(interaction_offset.has_value()){
+                    destination = Vector2Add(destination, interaction_offset.value());
+                }
+            }
+        }
+    }
+    debug::log("[movement_system::on_create_path_to_event] final destination used for pathing: "
+        + raglib::vector_to_string(destination));
     auto new_path = create_path(source, movement->get_direction_scalar(),
-        event.get_destination(), event.get_destination_entity());
-    if(not new_path.has_value()){ return; }
+        destination, event.get_destination_entity());
+    if(not new_path.has_value()){
+        debug::log("[movement_system::on_create_path_to_event] create_path FAILED - no path found from "
+            + raglib::vector_to_string(source) + " to " + raglib::vector_to_string(destination));
+        return;
+    }
+    debug::log("[movement_system::on_create_path_to_event] create_path SUCCEEDED, first waypoint: "
+        + raglib::vector_to_string(new_path.value().get_next_position()));
 
     switch(mode){
         case path::replace:
@@ -104,8 +137,8 @@ void systems::movement_system::on_create_path_to_event(const events::create_path
 void systems::movement_system::on_destroyed_entity(const events::remove_entity& event){
     if(component_helpers::is_mouse_positioned(event.get_id())){ return; }
     if(auto* collision = component_managers::collision_manager_.get_component(event.get_id()); collision != nullptr){
-        graph_.update_entity(collision->get_hitbox_component().get_hitbox().get_box(),
-            graph_config::empty_node);
+        graph_.remove_entity(collision->get_hitbox_component().get_hitbox().get_box(),
+            static_cast<int>(event.get_id()));
     }
 }
 

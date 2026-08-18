@@ -128,7 +128,7 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
 
 void ecs_entities::build_station(size_t id, Vector2 position,
     sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
-    float station_reach, const std::vector<Vector2>& slot_offsets){
+    float station_reach, const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets){
     build_decoration(id, position, station_sprite, station_hitbox);
     component_helpers::add_selectable_component(id,
         entity_config::selectable_kinds::station_kind);
@@ -138,25 +138,32 @@ void ecs_entities::build_station(size_t id, Vector2 position,
         build_station(id, position,
             sprite_builders::build_food_counter_sprite(),
             hitbox_builders::build_food_counter_hitbox(position),
-            entity_config::station_reach, entity_config::food_counter_slot_offsets);
+            entity_config::station_reach,
+            {entity_config::station_slot_left, entity_config::station_slot_right,
+             entity_config::station_slot_up, entity_config::station_slot_down});
     }
     void ecs_entities::build_table(size_t id, Vector2 position){
         build_station(id, position,
             sprite_builders::build_table_sprite(),
             hitbox_builders::build_table_hitbox(position),
-            entity_config::station_reach, entity_config::table_slot_offsets);
+            entity_config::station_reach,
+            {entity_config::station_slot_left, entity_config::station_slot_right,
+             std::nullopt, std::nullopt});
     }
     void ecs_entities::build_dishwasher(size_t id, Vector2 position){
         build_station(id, position,
             sprite_builders::build_dishwasher_sprite(),
             hitbox_builders::build_dishwasher_hitbox(position),
-            entity_config::station_reach, entity_config::dishwasher_slot_offsets);
+            entity_config::station_reach,
+            {entity_config::station_slot_left, std::nullopt, std::nullopt, std::nullopt});
     }
     void ecs_entities::build_stove(size_t id, Vector2 position){
         build_station(id, position,
             sprite_builders::build_stove_sprite(),
             hitbox_builders::build_stove_hitbox(position),
-            entity_config::station_reach, entity_config::stove_slot_offsets);
+            entity_config::station_reach,
+            {entity_config::station_slot_left, entity_config::station_slot_right,
+             entity_config::station_slot_up, entity_config::station_slot_down});
     }
     /**
         // void build_stove();

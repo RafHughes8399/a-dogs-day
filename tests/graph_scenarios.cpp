@@ -292,3 +292,41 @@ SCENARIO("a path destination resolves to the nearest node", "[ecs][graph][moveme
         }
     }
 }
+
+SCENARIO("a path created with a destination entity resolves to one of its interaction offsets",
+        "[ecs][graph][movement][interaction]"){
+    GIVEN("a dog approaching a table from the left"){
+        testing::ecs_test_game game;
+        Vector2 table_position{level_config::edge_weight * 12.0f, level_config::edge_weight * 12.0f};
+        auto table_id = game.create_table(table_position);
+        auto dog_id = game.create_mack(); // mack_start is left of the table on x
+
+        WHEN("the dog is sent to the table by entity id"){
+            game.path_to(dog_id, table_position, table_id);
+            REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 4000));
+
+            THEN("it finishes on the table's left interaction offset, not the table's own position"){
+                auto final_footprint = game.hitbox_of(dog_id);
+                auto left = Vector2Add(table_position, entity_config::station_slot_left);
+                REQUIRE(final_footprint.x == left.x);
+                REQUIRE(final_footprint.y == left.y);
+            }
+        }
+    }
+
+    GIVEN("a dog and a destination entity with no interactable component"){
+        testing::ecs_test_game game;
+        Vector2 decoration_position{level_config::edge_weight * 12.0f, level_config::edge_weight * 12.0f};
+        auto decoration_id = game.create_test_decoration(decoration_position);
+        auto dog_id = game.create_mack();
+
+        WHEN("the dog is sent to it by entity id"){
+            game.path_to(dog_id, decoration_position, decoration_id);
+
+            THEN("no path is created - the decoration's own footprint blocks the destination node, "
+                 "and it offers no offset to route around it"){
+                REQUIRE_FALSE(game.has_path(dog_id));
+            }
+        }
+    }
+}

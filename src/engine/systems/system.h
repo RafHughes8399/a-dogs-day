@@ -206,8 +206,14 @@ namespace systems{
             bool is_walkable(Vector2 position){
                 return graph_.occupant_at(position) == graph_config::empty_node;
             }
+            graph::level_graph::node* node_at(Vector2 position){
+                return graph_.node_at(position);
+            }
             void clear(){
                 graph_.reset();
+            }
+            void render_graph(Rectangle frame){
+                graph_.render(frame);
             }
 #ifdef DOG_DAYS_TESTING
             size_t graph_occupied_node_count(){

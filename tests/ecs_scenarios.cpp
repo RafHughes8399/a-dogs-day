@@ -439,6 +439,23 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.selectable_kind_of(table_id)
                     == entity_config::selectable_kinds::station_kind);
             }
+            THEN("it offers left and right interaction slots only"){
+                auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+                REQUIRE(interactable != nullptr);
+
+                auto left = interactable->get_slot_offset(level_config::directions::left);
+                REQUIRE(left.has_value());
+                REQUIRE(left->x == entity_config::station_slot_left.x);
+                REQUIRE(left->y == entity_config::station_slot_left.y);
+
+                auto right = interactable->get_slot_offset(level_config::directions::right);
+                REQUIRE(right.has_value());
+                REQUIRE(right->x == entity_config::station_slot_right.x);
+                REQUIRE(right->y == entity_config::station_slot_right.y);
+
+                REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());
+                REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::down).has_value());
+            }
         }
 
         WHEN("a food counter is built"){
@@ -448,6 +465,64 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.has_selectable(counter_id));
                 REQUIRE(game.has_interactable(counter_id));
                 REQUIRE(game.num_components(counter_id) == 5);
+            }
+            THEN("it offers all four interaction slots"){
+                auto* interactable = component_managers::interactable_manager_.get_component(counter_id);
+                REQUIRE(interactable != nullptr);
+
+                auto left = interactable->get_slot_offset(level_config::directions::left);
+                REQUIRE(left.has_value());
+                REQUIRE(left->x == entity_config::station_slot_left.x);
+                REQUIRE(left->y == entity_config::station_slot_left.y);
+
+                auto right = interactable->get_slot_offset(level_config::directions::right);
+                REQUIRE(right.has_value());
+                REQUIRE(right->x == entity_config::station_slot_right.x);
+                REQUIRE(right->y == entity_config::station_slot_right.y);
+
+                auto up = interactable->get_slot_offset(level_config::directions::up);
+                REQUIRE(up.has_value());
+                REQUIRE(up->x == entity_config::station_slot_up.x);
+                REQUIRE(up->y == entity_config::station_slot_up.y);
+
+                auto down = interactable->get_slot_offset(level_config::directions::down);
+                REQUIRE(down.has_value());
+                REQUIRE(down->x == entity_config::station_slot_down.x);
+                REQUIRE(down->y == entity_config::station_slot_down.y);
+            }
+        }
+
+        WHEN("a stove is built"){
+            auto stove_id = game.create_stove(spot);
+
+            THEN("it carries the station component set"){
+                REQUIRE(game.has_selectable(stove_id));
+                REQUIRE(game.has_interactable(stove_id));
+                REQUIRE(game.num_components(stove_id) == 5);
+            }
+            THEN("it offers all four interaction slots"){
+                auto* interactable = component_managers::interactable_manager_.get_component(stove_id);
+                REQUIRE(interactable != nullptr);
+
+                auto left = interactable->get_slot_offset(level_config::directions::left);
+                REQUIRE(left.has_value());
+                REQUIRE(left->x == entity_config::station_slot_left.x);
+                REQUIRE(left->y == entity_config::station_slot_left.y);
+
+                auto right = interactable->get_slot_offset(level_config::directions::right);
+                REQUIRE(right.has_value());
+                REQUIRE(right->x == entity_config::station_slot_right.x);
+                REQUIRE(right->y == entity_config::station_slot_right.y);
+
+                auto up = interactable->get_slot_offset(level_config::directions::up);
+                REQUIRE(up.has_value());
+                REQUIRE(up->x == entity_config::station_slot_up.x);
+                REQUIRE(up->y == entity_config::station_slot_up.y);
+
+                auto down = interactable->get_slot_offset(level_config::directions::down);
+                REQUIRE(down.has_value());
+                REQUIRE(down->x == entity_config::station_slot_down.x);
+                REQUIRE(down->y == entity_config::station_slot_down.y);
             }
         }
 
@@ -485,6 +560,50 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.graph_occupant_at(Vector2{footprint.x, footprint.y})
                     == graph_config::empty_node);
                 REQUIRE_FALSE(game.is_tracked(table_id));
+            }
+        }
+    }
+}
+
+SCENARIO("a station's graph footprint and interaction offsets follow it when it moves",
+        "[ecs][station][interaction][movement]"){
+    GIVEN("a table built at one position"){
+        testing::ecs_test_game game;
+        Vector2 original_position{level_config::edge_weight * 12.0f, level_config::edge_weight * 12.0f};
+        auto table_id = game.create_table(original_position);
+        REQUIRE(game.graph_marks(table_id, game.hitbox_of(table_id)));
+
+        WHEN("the table is moved to a new position"){
+            Vector2 new_position{level_config::edge_weight * 6.0f, level_config::edge_weight * 6.0f};
+            game.move_entity(table_id, new_position);
+
+            THEN("its old nodes are released and its new footprint is marked"){
+                REQUIRE(game.graph_occupant_at(original_position) == graph_config::empty_node);
+                REQUIRE(game.graph_marks(table_id, game.hitbox_of(table_id)));
+            }
+
+            AND_WHEN("a dog is sent to the table by entity id, using its current position"){
+                auto dog_id = game.create_mack();
+                game.path_to(dog_id, new_position, table_id);
+                REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 4000));
+
+                THEN("it walks to an interaction offset of the new position"){
+                    auto final_footprint = game.hitbox_of(dog_id);
+                    auto new_left = Vector2Add(new_position, entity_config::station_slot_left);
+                    auto new_right = Vector2Add(new_position, entity_config::station_slot_right);
+                    bool at_new_left = final_footprint.x == new_left.x and final_footprint.y == new_left.y;
+                    bool at_new_right = final_footprint.x == new_right.x and final_footprint.y == new_right.y;
+                    REQUIRE((at_new_left or at_new_right));
+                }
+                THEN("it does not walk to an offset of the table's original position"){
+                    auto final_footprint = game.hitbox_of(dog_id);
+                    auto stale_left = Vector2Add(original_position, entity_config::station_slot_left);
+                    auto stale_right = Vector2Add(original_position, entity_config::station_slot_right);
+                    bool at_stale_left = final_footprint.x == stale_left.x and final_footprint.y == stale_left.y;
+                    bool at_stale_right = final_footprint.x == stale_right.x and final_footprint.y == stale_right.y;
+                    REQUIRE_FALSE(at_stale_left);
+                    REQUIRE_FALSE(at_stale_right);
+                }
             }
         }
     }

@@ -1,5 +1,8 @@
 #include "component.h"
 #include "config.h"
+#include "debug_log_interface.h"
+#include "raglib.h"
+#include "system.h"
 
 // definitions for the accessors declared on each component in component.h
 
@@ -39,64 +42,6 @@ Rectangle components::interactable_component::get_interaction_box(Rectangle box)
                      box.width + 2.0f * reach_,
                      box.height + 2.0f * reach_};
 }
-Vector2 components::interactable_component::interaction_slot::get_offset() const{
-    return offset_;
-}
-Vector2 components::interactable_component::interaction_slot::get_position(Vector2 position) const{
-    return Vector2Add(position, offset_);
-}
-size_t components::interactable_component::interaction_slot::get_entity() const{
-    return entity_id_;
-}
-bool components::interactable_component::interaction_slot::is_free() const{
-    return entity_id_ == game_config::empty_entity;
-}
-bool components::interactable_component::interaction_slot::is_held_by(size_t entity_id) const{
-    return entity_id_ == entity_id;
-}
-void components::interactable_component::interaction_slot::claim(size_t entity_id){
-    entity_id_ = entity_id;
-}
-void components::interactable_component::interaction_slot::release(){
-    entity_id_ = game_config::empty_entity;
-}
-Vector2 components::interactable_component::get_slot_position(size_t slot_index, Vector2 position) const{
-    return slots_[slot_index].get_position(position);
-}
-std::optional<size_t> components::interactable_component::get_slot_of(size_t entity_id) const{
-    for(size_t index = 0; index < slots_.size(); ++index){
-        if(slots_[index].is_held_by(entity_id)){ return index; }
-    }
-    return std::nullopt;
-}
-bool components::interactable_component::has_free_slot() const{
-    return std::any_of(slots_.begin(), slots_.end(),
-        [](const interaction_slot& slot) -> bool {
-            return slot.is_free();
-        });
-}
-bool components::interactable_component::has_interactor(size_t entity_id) const{
-    return get_slot_of(entity_id).has_value();
-}
-bool components::interactable_component::claim_slot(size_t slot_index, size_t entity_id){
-    if(slot_index >= slots_.size()){ return false; }
-    if(not slots_[slot_index].is_free()){ return false; }
-    if(has_interactor(entity_id)){ return false; }
-    slots_[slot_index].claim(entity_id);
-    return true;
-}
-void components::interactable_component::release_slot(size_t entity_id){
-    for(auto& slot : slots_){
-        if(slot.is_held_by(entity_id)){ slot.release(); }
-    }
-}
-const std::vector<components::interactable_component::interaction_slot>&
-components::interactable_component::get_slots() const{
-    return slots_;
-}
-size_t components::interactable_component::get_capacity() const{
-    return slots_.size();
-}
 // ---------------- interactor components ----------------
 Rectangle components::interactor_component::get_interaction_box(Rectangle box) const{
     return Rectangle{box.x - reach_,
@@ -104,6 +49,50 @@ Rectangle components::interactor_component::get_interaction_box(Rectangle box) c
                      box.width + 2.0f * reach_,
                      box.height + 2.0f * reach_};
 }
+std::optional<Vector2> components::interactable_component::get_interaction_offset(Vector2 source, Vector2 own_position) const{
+    static const char* direction_names[DIRECTIONS] = {"left", "right", "up", "down"};
+    std::optional<size_t> closest_index = std::nullopt;
+    float closest_distance = 0.0f;
+    for(size_t i = 0; i < slot_offsets_.size(); ++i){
+        if(not slot_offsets_[i].has_value()){ continue; }
+        auto offset = slot_offsets_[i].value();
+        auto position = Vector2Add(own_position, offset);
+        auto* node = systems::movement_system::get_instance().node_at(position);
+        if(node == nullptr){
+            debug::log("[interactable_component::get_interaction_offset] direction: "
+                + std::string(direction_names[i]) + ", position: " + raglib::vector_to_string(position)
+                + ", REJECTED - off the walkable grid");
+            continue;
+        }
+        if(not node->entities_.empty()){
+            std::string occupants;
+            for(auto occupant : node->entities_){
+                occupants += (occupants.empty() ? "" : ", ") + std::to_string(occupant);
+            }
+            debug::log("[interactable_component::get_interaction_offset] direction: "
+                + std::string(direction_names[i]) + ", position: " + raglib::vector_to_string(position)
+                + ", node_id: " + std::to_string(node->id_) + ", REJECTED - occupied by entity "
+                + occupants);
+            continue;
+        }
+        auto distance = Vector2Distance(source, position);
+        debug::log("[interactable_component::get_interaction_offset] direction: "
+            + std::string(direction_names[i]) + ", position: " + raglib::vector_to_string(position)
+            + ", node_id: " + std::to_string(node->id_) + ", distance_from_source: " + std::to_string(distance));
+        if(not closest_index.has_value() or distance < closest_distance){
+            closest_index = i;
+            closest_distance = distance;
+        }
+    }
+    std::optional<Vector2> closest_offset = closest_index.has_value()
+        ? slot_offsets_[closest_index.value()]
+        : std::nullopt;
+    debug::log(closest_offset.has_value()
+        ? "[interactable_component::get_interaction_offset] chosen offset: " + raglib::vector_to_string(closest_offset.value())
+        : "[interactable_component::get_interaction_offset] no free interaction slot found");
+    return closest_offset;
+}
+
 std::optional<size_t> components::interactor_component::get_target() const{
     return target_;
 }

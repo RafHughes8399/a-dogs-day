@@ -7,6 +7,7 @@
 #define GRAPH_H
 
 #include <cmath>
+#include <set>
 #include <utility>
 #include <vector>
 
@@ -19,6 +20,28 @@
 
 namespace graph{
     class level_graph{
+            public:
+                // node and edge definitions
+                struct node{
+                    int id_;
+                    Vector2 position_;
+                    std::set<int> entities_; // ids of the entities currently occupying this node - empty means unoccupied
+                    bool operator==(const node& other) const {
+                        return id_ == other.id_;
+                    }
+                    bool operator<(const node& other) const {
+                        return id_ < other.id_;
+                    }
+                };
+
+                struct edge{
+                    node* destination_;
+                    float weight_;
+                    int decoration_ = graph_config::empty_node; // -1 means empty, there is no decoration, any other number refers to the id of the decoration stored within
+                    bool operator==(const edge& other){
+                        return destination_ == other.destination_ and std::fabs(weight_ - other.weight_) <= 0.0001f;
+                    }
+                };
         private:
             // node types
             enum nodes{
@@ -26,30 +49,10 @@ namespace graph{
                 perimeter = 2,
                 interior = 3
             };
-            // node and edge definitions
-            struct node{
-                int id_;
-                Vector2 position_;
-                int decoration_; // indicates the presence of a decoration at the current node, -1 means there is no decoration
-                bool operator==(const node& other) const {
-                    return id_ == other.id_;
-                }
-                bool operator<(const node& other) const {
-                    return id_ < other.id_;
-                }
-            };
 
-            struct edge{
-                node* destination_;
-                float weight_;
-                int decoration_ = graph_config::empty_node; // -1 means empty, there is no decoration, any other number refers to the id of the decoration stored within
-                bool operator==(const edge& other){
-                    return destination_ == other.destination_ and std::fabs(weight_ - other.weight_) <= 0.0001f;
-                }
-            };
             // builder
             bool cell_at(Vector2 position, int& node_index);
-            bool check_for_decoration(Rectangle rectanlge, int id);
+            bool check_for_decoration(Rectangle rectangle, int id);
             bool is_node_closer(int current_id, int next_id, int end_id);
             bool is_node_empty(int node_id);
             bool is_node_occupied(int node_id, int decoration_id);
@@ -104,13 +107,15 @@ namespace graph{
             bool can_place_decoration(const queries::can_place_decoration& query);
             std::vector<Vector2> get_path(const queries::path_query& query);
             
-            node* id_to_node(int id);
-            
+            node* get_node(size_t node_id);
+            node* node_at(Vector2 position);
+
             std::vector<Vector2> find_path(Vector2 start, Vector2 end, Vector2 direction);
-            
+                
             void insert_node(int id, Vector2 position);
             void insert_edge(int source_num, node& destination, float weight);
-            void update_entity(Rectangle rectangle, int id = graph_config::empty_node);
+            void update_entity(Rectangle rectangle, int id);
+            void remove_entity(Rectangle rectangle, int id);
             int occupant_at(Vector2 position);
             size_t occupied_node_count();
             void reset();

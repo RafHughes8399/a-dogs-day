@@ -310,6 +310,12 @@ what is left
    -> there is a bug with right clikcing on a station and having a path generate. it does not work
    -> reintroduce interaction positions [ need to handle the case where a position is blocked by a station / decoration, 
    or gate picking that position with a check that it is a free position in the graph]
+
+   -> -im thkning this needs somewhat of an overhaul
+   -> you clikc the station, dog cannot pathfind because the raw destination evaluates to a blocked node in the graph
+   -> so the solution is to resolve a position that allows the dog to interact with a station, an interaction position
+   -> can define the optional offsets for a left, right, up and down position, which should resolve to nodes in the graph
+   -> then when deciding to pathfind, one of those is picked based on distance and direction, and whether occupied or not
 -> then the npc system [this port should be simple enough]
    -> porting over the matire'd and expediter
    -> need to change how the queuing is defiend, , the dogs should come from -x  and -y, from the top of the screen
