@@ -330,3 +330,32 @@ SCENARIO("a path created with a destination entity resolves to one of its intera
         }
     }
 }
+
+SCENARIO("cell_at and nearest_node resolve the same position to the same node",
+        "[ecs][graph]"){
+    GIVEN("a fresh ecs world"){
+        testing::ecs_test_game game;
+
+        THEN("a grid-aligned position agrees"){
+            Vector2 position{level_config::edge_weight * 5.0f, level_config::edge_weight * 3.0f};
+            auto cell_index = game.graph_cell_at_index(position);
+            REQUIRE(cell_index != graph_config::empty_node);
+            REQUIRE(cell_index == game.graph_nearest_node_index(position));
+        }
+
+        THEN("a position exactly on a half-tile boundary agrees - "
+             "this is the tie an interaction offset (0.5 * edge_weight past a station's edge) always lands on"){
+            Vector2 position{level_config::edge_weight * 5.5f, level_config::edge_weight * 3.5f};
+            auto cell_index = game.graph_cell_at_index(position);
+            REQUIRE(cell_index != graph_config::empty_node);
+            REQUIRE(cell_index == game.graph_nearest_node_index(position));
+        }
+
+        THEN("an arbitrary interior position agrees"){
+            Vector2 position{level_config::edge_weight * 5.25f, level_config::edge_weight * 3.75f};
+            auto cell_index = game.graph_cell_at_index(position);
+            REQUIRE(cell_index != graph_config::empty_node);
+            REQUIRE(cell_index == game.graph_nearest_node_index(position));
+        }
+    }
+}

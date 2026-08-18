@@ -109,6 +109,18 @@ namespace graph{
             
             node* get_node(size_t node_id);
             node* node_at(Vector2 position);
+#ifdef DOG_DAYS_TESTING
+            int cell_at_index(Vector2 position){
+                int node_index = graph_config::empty_node;
+                if(not cell_at(position, node_index)){ return graph_config::empty_node; }
+                return node_index;
+            }
+            int nearest_node_index(Vector2 position){
+                int node_index = graph_config::empty_node;
+                if(not nearest_node(position, node_index)){ return graph_config::empty_node; }
+                return node_index;
+            }
+#endif
 
             std::vector<Vector2> find_path(Vector2 start, Vector2 end, Vector2 direction);
                 

@@ -128,11 +128,14 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
 
 void ecs_entities::build_station(size_t id, Vector2 position,
     sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
-    float station_reach, const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets){
+    float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> offsets){
     build_decoration(id, position, station_sprite, station_hitbox);
     component_helpers::add_selectable_component(id,
         entity_config::selectable_kinds::station_kind);
-    component_helpers::add_interactable_component(id, station_reach, slot_offsets);
+    auto hitbox = component_managers::collision_manager_.get_component(id);
+    Rectangle box = hitbox->get_hitbox_component().get_hitbox().get_box();
+    component_helpers::create_offset_position_list(box, offsets);
+    component_helpers::add_interactable_component(id, station_reach, offsets);
 }
     void ecs_entities::build_counter(size_t id, Vector2 position){
         build_station(id, position,

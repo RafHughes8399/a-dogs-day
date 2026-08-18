@@ -445,13 +445,13 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
                 auto left = interactable->get_slot_offset(level_config::directions::left);
                 REQUIRE(left.has_value());
-                REQUIRE(left->x == entity_config::station_slot_left.x);
-                REQUIRE(left->y == entity_config::station_slot_left.y);
+                REQUIRE(left->x == level_config::edge_weight * -0.5f);
+                REQUIRE(left->y == level_config::edge_weight);
 
                 auto right = interactable->get_slot_offset(level_config::directions::right);
                 REQUIRE(right.has_value());
-                REQUIRE(right->x == entity_config::station_slot_right.x);
-                REQUIRE(right->y == entity_config::station_slot_right.y);
+                REQUIRE(right->x == level_config::edge_weight * 2.5f);
+                REQUIRE(right->y == level_config::edge_weight);
 
                 REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());
                 REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::down).has_value());
@@ -472,23 +472,23 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
                 auto left = interactable->get_slot_offset(level_config::directions::left);
                 REQUIRE(left.has_value());
-                REQUIRE(left->x == entity_config::station_slot_left.x);
-                REQUIRE(left->y == entity_config::station_slot_left.y);
+                REQUIRE(left->x == level_config::edge_weight * -0.5f);
+                REQUIRE(left->y == level_config::edge_weight);
 
                 auto right = interactable->get_slot_offset(level_config::directions::right);
                 REQUIRE(right.has_value());
-                REQUIRE(right->x == entity_config::station_slot_right.x);
-                REQUIRE(right->y == entity_config::station_slot_right.y);
+                REQUIRE(right->x == level_config::edge_weight * 2.5f);
+                REQUIRE(right->y == level_config::edge_weight);
 
                 auto up = interactable->get_slot_offset(level_config::directions::up);
                 REQUIRE(up.has_value());
-                REQUIRE(up->x == entity_config::station_slot_up.x);
-                REQUIRE(up->y == entity_config::station_slot_up.y);
+                REQUIRE(up->x == level_config::edge_weight);
+                REQUIRE(up->y == level_config::edge_weight * -0.5f);
 
                 auto down = interactable->get_slot_offset(level_config::directions::down);
                 REQUIRE(down.has_value());
-                REQUIRE(down->x == entity_config::station_slot_down.x);
-                REQUIRE(down->y == entity_config::station_slot_down.y);
+                REQUIRE(down->x == level_config::edge_weight);
+                REQUIRE(down->y == level_config::edge_weight * 2.5f);
             }
         }
 
@@ -506,23 +506,23 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
                 auto left = interactable->get_slot_offset(level_config::directions::left);
                 REQUIRE(left.has_value());
-                REQUIRE(left->x == entity_config::station_slot_left.x);
-                REQUIRE(left->y == entity_config::station_slot_left.y);
+                REQUIRE(left->x == level_config::edge_weight * -0.5f);
+                REQUIRE(left->y == level_config::edge_weight);
 
                 auto right = interactable->get_slot_offset(level_config::directions::right);
                 REQUIRE(right.has_value());
-                REQUIRE(right->x == entity_config::station_slot_right.x);
-                REQUIRE(right->y == entity_config::station_slot_right.y);
+                REQUIRE(right->x == level_config::edge_weight * 2.5f);
+                REQUIRE(right->y == level_config::edge_weight);
 
                 auto up = interactable->get_slot_offset(level_config::directions::up);
                 REQUIRE(up.has_value());
-                REQUIRE(up->x == entity_config::station_slot_up.x);
-                REQUIRE(up->y == entity_config::station_slot_up.y);
+                REQUIRE(up->x == level_config::edge_weight);
+                REQUIRE(up->y == level_config::edge_weight * -0.5f);
 
                 auto down = interactable->get_slot_offset(level_config::directions::down);
                 REQUIRE(down.has_value());
-                REQUIRE(down->x == entity_config::station_slot_down.x);
-                REQUIRE(down->y == entity_config::station_slot_down.y);
+                REQUIRE(down->x == level_config::edge_weight);
+                REQUIRE(down->y == level_config::edge_weight * 2.5f);
             }
         }
 

@@ -309,11 +309,10 @@ namespace entity_config{
     // * legacy entities::station capacity. the ECS stations size their capacity
     // * off the slot offset lists below instead.
     inline const size_t food_counter_capacity = 3;
-
-    inline const Vector2 station_slot_left  = Vector2{-level_config::edge_weight, 0.0f};
-    inline const Vector2 station_slot_right = Vector2{level_config::edge_weight * 2.0f, 0.0f};
-    inline const Vector2 station_slot_up    = Vector2{0.0f, -level_config::edge_weight};
-    inline const Vector2 station_slot_down  = Vector2{0.0f, level_config::edge_weight * 2.0f};
+    inline const Vector2 station_slot_left  = Vector2Zero();
+    inline const Vector2 station_slot_right = Vector2Zero(); 
+    inline const Vector2 station_slot_up    = Vector2Zero();
+    inline const Vector2 station_slot_down  = Vector2Zero(); 
 
     inline const float station_reach = level_config::edge_weight * 0.25f;
     // where stored food is drawn relative to the counter origin.

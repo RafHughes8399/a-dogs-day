@@ -91,9 +91,16 @@ public:
     // an interaction offset against the station's own live position at query time -
     // the offset is from the station origin, not a world position: a station can be
     // moved, and a derived position has no sync path to get wrong.
+
+    // * the interaction positions require the existance of a collision component 
+    // * hence, the offsets arrays are simply Vector2Zeros() when passed in as the arrya
+    // * this consttructor's precondtion is an existing collision component and thus
+    // * performs the offset calcualtions in its body
     ~interactable_component() = default;
-    interactable_component(float reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets)
-    : reach_(reach), slot_offsets_(slot_offsets) {}
+    interactable_component(float reach, std::array<std::optional<Vector2>, DIRECTIONS> positions)
+    : reach_(reach), positions_(positions){
+        
+    }
     interactable_component(const interactable_component& other) = default;
     interactable_component(interactable_component&& other) = default;
 
@@ -104,7 +111,7 @@ public:
     std::optional<Vector2> get_interaction_offset(Vector2 source, Vector2 own_position) const;
 #ifdef DOG_DAYS_TESTING
     std::optional<Vector2> get_slot_offset(size_t direction) const{
-        return slot_offsets_[direction];
+        return positions_[direction];
     }
 #endif
 private:
@@ -114,7 +121,7 @@ private:
     // * 1. right
     // * 2. up
     // * 3. down
-    std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets_;
+    std::array<std::optional<Vector2>, DIRECTIONS> positions_;
 };
 
 // components::interactor_component  - actors do interaction
@@ -407,194 +414,57 @@ namespace component_builders{
     components::food_component build_food_component();
     components::selectable_component build_selectable_component(size_t kind);
 }
-// thin forwarders to the right manager. inline because this header lands in
-// several TUs
+// thin forwarders to the right manager; defined in component_helpers.cpp
 namespace component_helpers{
-    inline void register_positional_component(size_t entity_id, components::position_component component){
-        component_managers::positional_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void register_movement_component(size_t entity_id, components::movement_component component){
-        component_managers::movement_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void register_renderable_component(size_t entity_id, components::renderable_component component){
-        component_managers::renderable_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void register_collision_component(size_t entity_id, components::collision_component component){
-        component_managers::collision_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void register_interactor_component(size_t entity_id, components::interactor_component component){
-        component_managers::interactor_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void register_interactable_component(size_t entity_id, components::interactable_component component){
-        component_managers::interactable_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void register_key_input_component(size_t entity_id, components::key_input_component component){
-        component_managers::control_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void register_mouse_input_component(size_t entity_id, components::mouse_input_component component){
-        component_managers::mouse_input_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void register_state_machine_component(size_t entity_id, components::state_machine_component component){
-        component_managers::state_machine_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void register_food_component(size_t entity_id, components::food_component component){
-        component_managers::food_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void register_selectable_component(size_t entity_id, components::selectable_component component){
-        component_managers::selectable_manager_.register_component(entity_id, std::move(component));
-    }
-    inline void add_positional_component(size_t entity_id, Vector2 position){
-        register_positional_component(entity_id,
-            component_builders::build_positional_component(position));
-    }
-    inline void add_movement_component(size_t entity_id, Vector2 move_speed,
+    void register_positional_component(size_t entity_id, components::position_component component);
+    void register_movement_component(size_t entity_id, components::movement_component component);
+    void register_renderable_component(size_t entity_id, components::renderable_component component);
+    void register_collision_component(size_t entity_id, components::collision_component component);
+    void register_interactor_component(size_t entity_id, components::interactor_component component);
+    void register_interactable_component(size_t entity_id, components::interactable_component component);
+    void register_key_input_component(size_t entity_id, components::key_input_component component);
+    void register_mouse_input_component(size_t entity_id, components::mouse_input_component component);
+    void register_state_machine_component(size_t entity_id, components::state_machine_component component);
+    void register_food_component(size_t entity_id, components::food_component component);
+    void register_selectable_component(size_t entity_id, components::selectable_component component);
+
+    void add_positional_component(size_t entity_id, Vector2 position);
+    void add_movement_component(size_t entity_id, Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
-        std::queue<path::path> paths = {}){
-        register_movement_component(entity_id,
-            component_builders::build_movement_component(move_speed, direction_scalar, std::move(paths)));
-    }
-    inline void add_renderable_component(size_t entity_id,
-        std::vector<components::renderable_component::sprite_component>& sprite_components){
-        register_renderable_component(entity_id,
-            component_builders::build_renderable_component(sprite_components));
-    }
-    inline void add_collision_component(size_t entity_id,
-        components::collision_component::hitbox_component hitbox){
-        register_collision_component(entity_id,
-            component_builders::build_collision_component(std::move(hitbox)));
-    }
-    inline void add_interactor_component(size_t entity_id, float reach,
-        std::optional<size_t> target_entity_id = std::nullopt){
-        register_interactor_component(entity_id,
-            component_builders::build_interactor_component(reach, target_entity_id));
-    }
-    inline void add_interactable_component(size_t entity_id, float reach,
-        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets){
-        register_interactable_component(entity_id,
-            component_builders::build_interactable_component(reach, slot_offsets));
-    }
-    inline void add_key_input_component(size_t entity_id, std::vector<game_config::input>& controls){
-        register_key_input_component(entity_id,
-            component_builders::build_key_input_component(controls));
-    }
-    inline void add_mouse_input_component(size_t entity_id, std::vector<game_config::input>& inputs){
-        register_mouse_input_component(entity_id,
-            component_builders::build_mouse_input_component(inputs));
-    }
-    inline void add_state_machine_component(size_t entity_id,
-        std::vector<components::state_machine_component::state_component>& state_components){
-        register_state_machine_component(entity_id,
-            component_builders::build_state_machine_component(state_components));
-    }
-    inline void add_food_component(size_t entity_id){
-        register_food_component(entity_id, component_builders::build_food_component());
-    }
-    inline void add_selectable_component(size_t entity_id, size_t kind){
-        register_selectable_component(entity_id,
-            component_builders::build_selectable_component(kind));
-    }
+        std::queue<path::path> paths = {});
+    void add_renderable_component(size_t entity_id,
+        std::vector<components::renderable_component::sprite_component>& sprite_components);
+    void add_collision_component(size_t entity_id,
+        components::collision_component::hitbox_component hitbox);
+    void add_interactor_component(size_t entity_id, float reach,
+        std::optional<size_t> target_entity_id = std::nullopt);
+    void add_interactable_component(size_t entity_id, float reach,
+        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets);
+    void add_key_input_component(size_t entity_id, std::vector<game_config::input>& controls);
+    void add_mouse_input_component(size_t entity_id, std::vector<game_config::input>& inputs);
+    void add_state_machine_component(size_t entity_id,
+        std::vector<components::state_machine_component::state_component>& state_components);
+    void add_food_component(size_t entity_id);
+    void add_selectable_component(size_t entity_id, size_t kind);
 
-    inline bool is_mouse_positioned(size_t entity_id){
-        return component_managers::mouse_input_manager_.get_component(entity_id) != nullptr;
-    }
-    // writes sprite and hitbox indices together. missing either component is fine
+    void create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions);
+    bool is_mouse_positioned(size_t entity_id);
+    void set_facing_index(size_t entity_id, size_t index);
 
-    inline void set_facing_index(size_t entity_id, size_t index){
-        if(auto* renderable = component_managers::renderable_manager_.get_component(entity_id)){
-            for(auto& sprite_component : renderable->get_sprites()){
-                if(index < sprite_component.num_sprites()){
-                    sprite_component.set_index(index);
-                }
-            }
-        }
-        if(auto* collision = component_managers::collision_manager_.get_component(entity_id)){
-            auto& hitboxes = collision->get_hitbox_component();
-            if(index < hitboxes.num_hitboxes()){
-                hitboxes.set_index(index);
-            }
-        }
-    }
+    void unregister_positional_component(size_t entity_id);
+    void unregister_movement_component(size_t entity_id);
+    void unregister_renderable_component(size_t entity_id);
+    void unregister_collision_component(size_t entity_id);
+    void unregister_interactor_component(size_t entity_id);
+    void unregister_interactable_component(size_t entity_id);
+    void unregister_key_input_component(size_t entity_id);
+    void unregister_mouse_input_component(size_t entity_id);
+    void unregister_state_machine_component(size_t entity_id);
+    void unregister_food_component(size_t entity_id);
+    void unregister_selectable_component(size_t entity_id);
+    void unregister_all_components(size_t entity_id);
 
-    inline void unregister_positional_component(size_t entity_id){
-        component_managers::positional_manager_.unregister_component(entity_id);
-    }
-    inline void unregister_movement_component(size_t entity_id){
-        component_managers::movement_manager_.unregister_component(entity_id);
-    }
-    inline void unregister_renderable_component(size_t entity_id){
-        component_managers::renderable_manager_.unregister_component(entity_id);
-    }
-    inline void unregister_collision_component(size_t entity_id){
-        component_managers::collision_manager_.unregister_component(entity_id);
-    }
-    inline void unregister_interactor_component(size_t entity_id){
-        component_managers::interactor_manager_.unregister_component(entity_id);
-    }
-    inline void unregister_interactable_component(size_t entity_id){
-        component_managers::interactable_manager_.unregister_component(entity_id);
-    }
-    inline void unregister_key_input_component(size_t entity_id){
-        component_managers::control_manager_.unregister_component(entity_id);
-    }
-    inline void unregister_mouse_input_component(size_t entity_id){
-        component_managers::mouse_input_manager_.unregister_component(entity_id);
-    }
-    inline void unregister_state_machine_component(size_t entity_id){
-        component_managers::state_machine_manager_.unregister_component(entity_id);
-    }
-    inline void unregister_food_component(size_t entity_id){
-        component_managers::food_manager_.unregister_component(entity_id);
-    }
-    inline void unregister_selectable_component(size_t entity_id){
-        component_managers::selectable_manager_.unregister_component(entity_id);
-    }
-
-    // blanket teardown - erase on a missing key is a no-op, so this is correct
-    // for every entity kind without tracking what a builder registered
-    inline void unregister_all_components(size_t entity_id){
-        unregister_positional_component(entity_id);
-        unregister_movement_component(entity_id);
-        unregister_renderable_component(entity_id);
-        unregister_collision_component(entity_id);
-        unregister_interactor_component(entity_id);
-        unregister_interactable_component(entity_id);
-        unregister_key_input_component(entity_id);
-        unregister_mouse_input_component(entity_id);
-        unregister_state_machine_component(entity_id);
-        unregister_food_component(entity_id);
-        unregister_selectable_component(entity_id);
-    }
-
-    // total components registered across every manager
-    inline size_t num_registered_components(size_t entity_id){
-        size_t count = 0;
-        count += component_managers::positional_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::movement_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::renderable_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::collision_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::interactor_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::interactable_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::control_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::mouse_input_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::state_machine_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::food_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        count += component_managers::selectable_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
-        return count;
-    }
-
-    // wipes every manager - for the test harness between scenarios
-    inline void clear_all_components(){
-        component_managers::positional_manager_.clear();
-        component_managers::movement_manager_.clear();
-        component_managers::renderable_manager_.clear();
-        component_managers::collision_manager_.clear();
-        component_managers::interactor_manager_.clear();
-        component_managers::interactable_manager_.clear();
-        component_managers::control_manager_.clear();
-        component_managers::mouse_input_manager_.clear();
-        component_managers::state_machine_manager_.clear();
-        component_managers::food_manager_.clear();
-        component_managers::selectable_manager_.clear();
-    }
+    size_t num_registered_components(size_t entity_id);
+    void clear_all_components();
 }
 #endif

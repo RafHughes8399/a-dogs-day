@@ -316,6 +316,9 @@ what is left
    -> so the solution is to resolve a position that allows the dog to interact with a station, an interaction position
    -> can define the optional offsets for a left, right, up and down position, which should resolve to nodes in the graph
    -> then when deciding to pathfind, one of those is picked based on distance and direction, and whether occupied or not
+
+    -> need to adjust values for the interaction posistions, some offsets are not like others, 
+    -> the right needs to be -x a bit more and + y
 -> then the npc system [this port should be simple enough]
    -> porting over the matire'd and expediter
    -> need to change how the queuing is defiend, , the dogs should come from -x  and -y, from the top of the screen

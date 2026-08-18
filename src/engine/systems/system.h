@@ -219,6 +219,12 @@ namespace systems{
             size_t graph_occupied_node_count(){
                 return graph_.occupied_node_count();
             }
+            int graph_cell_at_index(Vector2 position){
+                return graph_.cell_at_index(position);
+            }
+            int graph_nearest_node_index(Vector2 position){
+                return graph_.nearest_node_index(position);
+            }
 #endif
             // set a path for an entity
             // queue a path for an entity

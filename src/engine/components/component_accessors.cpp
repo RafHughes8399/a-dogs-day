@@ -53,9 +53,9 @@ std::optional<Vector2> components::interactable_component::get_interaction_offse
     static const char* direction_names[DIRECTIONS] = {"left", "right", "up", "down"};
     std::optional<size_t> closest_index = std::nullopt;
     float closest_distance = 0.0f;
-    for(size_t i = 0; i < slot_offsets_.size(); ++i){
-        if(not slot_offsets_[i].has_value()){ continue; }
-        auto offset = slot_offsets_[i].value();
+    for(size_t i = 0; i < positions_.size(); ++i){
+        if(not positions_[i].has_value()){ continue; }
+        auto offset = positions_[i].value();
         auto position = Vector2Add(own_position, offset);
         auto* node = systems::movement_system::get_instance().node_at(position);
         if(node == nullptr){
@@ -85,7 +85,7 @@ std::optional<Vector2> components::interactable_component::get_interaction_offse
         }
     }
     std::optional<Vector2> closest_offset = closest_index.has_value()
-        ? slot_offsets_[closest_index.value()]
+        ? positions_[closest_index.value()]
         : std::nullopt;
     debug::log(closest_offset.has_value()
         ? "[interactable_component::get_interaction_offset] chosen offset: " + raglib::vector_to_string(closest_offset.value())

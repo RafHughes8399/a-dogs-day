@@ -135,8 +135,8 @@ bool graph::level_graph::is_on_map(Vector2 position){
 }
 
 bool graph::level_graph::cell_at(Vector2 position, int& node_index){
-    int column = static_cast<int>(std::floor(position.x / level_config::edge_weight));
-    int row = static_cast<int>(std::floor(position.y / level_config::edge_weight));
+    int column = static_cast<int>(std::round(position.x / level_config::edge_weight));
+    int row = static_cast<int>(std::round(position.y / level_config::edge_weight));
     return to_index(row, column, node_index);
 }
 

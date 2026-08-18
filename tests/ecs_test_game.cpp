@@ -239,6 +239,14 @@ namespace testing{
         return movement_.graph_occupied_node_count();
     }
 
+    int ecs_test_game::graph_cell_at_index(Vector2 position){
+        return movement_.graph_cell_at_index(position);
+    }
+
+    int ecs_test_game::graph_nearest_node_index(Vector2 position){
+        return movement_.graph_nearest_node_index(position);
+    }
+
     bool ecs_test_game::graph_marks(size_t entity_id, Rectangle footprint){
         for(auto col = footprint.x; col < footprint.x + footprint.width; col += level_config::edge_weight){
             for(auto row = footprint.y; row < footprint.y + footprint.height; row += level_config::edge_weight){
