@@ -319,6 +319,7 @@ what is left
 
     -> need to adjust values for the interaction posistions, some offsets are not like others, 
     -> the right needs to be -x a bit more and + y
+    -> better, but need more testing, i thing it changes based on their direction [ that's ok it can be tided up later, move on ]
 -> then the npc system [this port should be simple enough]
    -> porting over the matire'd and expediter
    -> need to change how the queuing is defiend, , the dogs should come from -x  and -y, from the top of the screen

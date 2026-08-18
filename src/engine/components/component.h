@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <concepts>
 #include <optional>
-#include <pplwin.h>
 #include <queue>
 #include <stddef.h>
 #include <unordered_map>
