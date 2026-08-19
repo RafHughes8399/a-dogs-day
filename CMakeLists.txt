@@ -98,16 +98,35 @@ link_libraries(raylib)
 add_library(raglib src/engine/raglib.cpp)
 link_libraries(raglib)
 
-add_library(events src/systems/events.cpp)
+add_library(events src/engine/events/events.cpp)
 link_libraries(events)
 
-add_library(queries src/systems/queries.cpp)
+add_library(queries src/engine/queries/queries.cpp)
 link_libraries(queries)
+
+add_library(components
+  src/engine/components/component_managers.cpp
+  src/engine/components/component_builders.cpp
+  src/engine/components/component_accessors.cpp
+  src/engine/components/component_helpers.cpp)
+link_libraries(components)
+
+add_library(systems
+  src/engine/systems/movement_system.cpp
+  src/engine/systems/rendering_system.cpp
+  src/engine/systems/spatial_system.cpp
+  src/engine/systems/collision_system.cpp
+  src/engine/systems/interaction_system.cpp
+  src/engine/systems/control_input_system.cpp
+  src/engine/systems/entity_lifespan_system.cpp
+  src/engine/systems/npc_system.cpp
+  src/engine/systems/selection_system.cpp)
+link_libraries(systems)
 
 add_library(animation src/rendering/animation.cpp)
 link_libraries(animation)
 
-add_library(sprite src/rendering/sprite.cpp)
+add_library(sprite src/rendering/sprite.cpp src/rendering/sprite_builders.cpp)
 link_libraries(sprite)
 
 add_library(item src/entities/items.cpp)
@@ -119,7 +138,7 @@ link_libraries(menu)
 add_library(hud src/interfaces/hud.cpp)
 link_libraries(hud)
 
-add_library(hitbox src/entities/hitbox.cpp)
+add_library(hitbox src/entities/hitbox.cpp src/entities/hitbox_builders.cpp)
 link_libraries(hitbox)
 
 add_library(body src/rendering/body.cpp)
@@ -134,7 +153,7 @@ link_libraries(player)
 add_library(controls src/interfaces/controls.cpp)
 link_libraries(controls)
 
-add_library(entities src/entities/entity.cpp src/entities/entity_builder.cpp)
+add_library(entities src/entities/entity.cpp src/entities/entity_builder.cpp src/entities/ecs_builders.cpp)
 link_libraries(entities)
 
 add_library(cursor src/entities/cursor.cpp src/entities/cursor_builder.cpp)
@@ -171,28 +190,28 @@ link_libraries(food)
 add_library(render_layer src/engine/render_layer.cpp)
 link_libraries(render_layer)
 
-add_library(quadtree src/engine/quadtree.cpp)
+add_library(quadtree src/engine/structures/quadtree.cpp)
 link_libraries(quadtree)
 
-add_library(graph src/engine/graph.cpp)
+add_library(graph src/engine/structures/graph.cpp src/engine/structures/path.cpp)
 link_libraries(graph)
 
 add_library(level src/engine/level.cpp)
 link_libraries(level)
 
-add_library(dog_actions src/systems/dog_actions.cpp)
+add_library(dog_actions src/engine/orchestrators/dog_actions.cpp)
 link_libraries(dog_actions)
 
-add_library(maitre_d src/systems/maitre_d.cpp src/systems/dog_queue.cpp)
+add_library(maitre_d src/engine/orchestrators/maitre_d.cpp src/engine/orchestrators/dog_queue.cpp)
 link_libraries(maitre_d)
 
-add_library(expediter src/systems/expediter.cpp)
+add_library(expediter src/engine/orchestrators/expediter.cpp)
 link_libraries(expediter)
 
-add_library(debug_log_interface src/systems/debug_log_interface.cpp)
+add_library(debug_log_interface src/engine/logger/debug_log_interface.cpp)
 link_libraries(debug_log_interface)
 
-add_library(debug_logger src/systems/debug_logger.cpp)
+add_library(debug_logger src/engine/logger/debug_logger.cpp)
 link_libraries(debug_logger)
 
 add_library(game src/engine/game.cpp)
@@ -203,9 +222,9 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
-  raglib events queries animation sprite item menu hud hitbox body texture
+  raglib events queries components systems animation sprite item menu hud hitbox body texture
   player controls entities cursor dogs decorations stations food render_layer quadtree
-  graph level maitre_d expediter debug_log_interface debug_logger game ${PROJECT_NAME}
+  graph level maitre_d expediter dog_actions debug_log_interface debug_logger game ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})
@@ -216,8 +235,14 @@ foreach(target IN LISTS PROJECT_TARGETS)
     src/entities/decorations
     src/entities/stations
     src/entities/food
-    src/systems
     src/engine
+    src/engine/components
+    src/engine/events
+    src/engine/logger
+    src/engine/orchestrators
+    src/engine/queries
+    src/engine/structures
+    src/engine/systems
     src/interfaces
   )
   target_include_directories(${target} SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)
@@ -231,6 +256,11 @@ endforeach()
 add_executable(tests
   tests/smoke_test.cpp
   tests/test_game.cpp
+  tests/ecs_test_game.cpp
+  tests/ecs_scenarios.cpp
+  tests/control_input_scenarios.cpp
+  tests/spatial_scenarios.cpp
+  tests/graph_scenarios.cpp
   tests/harness_scenarios.cpp
   tests/player_scenarios.cpp
   tests/decoration_scenarios.cpp
@@ -254,8 +284,14 @@ target_include_directories(tests PRIVATE
   src/entities/decorations
   src/entities/stations
   src/entities/food
-  src/systems
   src/engine
+  src/engine/components
+  src/engine/events
+  src/engine/logger
+  src/engine/orchestrators
+  src/engine/queries
+  src/engine/structures
+  src/engine/systems
   src/interfaces
 )
 target_include_directories(tests SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)

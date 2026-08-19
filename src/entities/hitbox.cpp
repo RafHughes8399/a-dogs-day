@@ -1,9 +1,6 @@
 #include "hitbox.h"
 #include "config.h"
 #include <algorithm>
-// ----------------------- global declaration ----------------------- //
-hitbox::hitbox_builder hitbox::h_builder_;
-
 // ----------------------- hitbox ----------------------- //
 bool hitbox::hitbox::check_collision_box_sub_boxes(const Rectangle& box, const std::vector<Rectangle>& other_boxes){
     for(auto & other_box : other_boxes){
@@ -28,13 +25,13 @@ bool hitbox::hitbox::check_collision(const hitbox& other){
     if(CheckCollisionRecs(box_, other.box_)){
         bool this_empty = sub_boxes_.empty();
         bool other_empty = other.sub_boxes_.empty();
-        if(this_empty && other_empty){
+        if(this_empty and other_empty){
             return true;
         }
-        else if(this_empty && ! other_empty){
+        else if(this_empty and not other_empty){
             return check_collision_box_sub_boxes(box_, other.sub_boxes_);
         }
-        else if(! this_empty && other_empty){
+        else if(not this_empty and other_empty){
             return check_collision_box_sub_boxes(other.box_, sub_boxes_);
         }
         else{
@@ -65,40 +62,4 @@ void hitbox::hitbox::update(Vector2 new_position){
         sub_box.x = new_position.x;
         sub_box.y = new_position.y;
     });
-}
-// ----------------------- hitbox builder ----------------------- //
-hitbox::hitbox hitbox::hitbox_builder::build_cursor_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, entity_config::cursor_attributes[entity_config::attributes::frame_width], entity_config::cursor_attributes[entity_config::attributes::frame_height]});
-}
-hitbox::hitbox hitbox::hitbox_builder::build_paw_mark_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, entity_config::paw_mark_attributes[entity_config::attributes::frame_width], entity_config::paw_mark_attributes[entity_config::attributes::frame_height]});
-}
-
-hitbox::hitbox hitbox::hitbox_builder::build_player_dog_across_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, entity_config::khiri_across_attributes[entity_config::attributes::frame_width], entity_config::khiri_across_attributes[entity_config::attributes::frame_height]});
-}
-hitbox::hitbox hitbox::hitbox_builder::build_player_dog_down_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, entity_config::khiri_down_attributes[entity_config::attributes::frame_width], entity_config::khiri_down_attributes[entity_config::attributes::frame_height]});
-}
-
-hitbox::hitbox hitbox::hitbox_builder::build_test_decoration_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, entity_config::test_decoration_attributes[entity_config::attributes::frame_width], entity_config::test_decoration_attributes[entity_config::attributes::frame_height]});
-}
-hitbox::hitbox hitbox::hitbox_builder::build_gargoyle_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, entity_config::gargoyle_decoration_attributes[entity_config::attributes::frame_width], entity_config::gargoyle_decoration_attributes[entity_config::attributes::frame_height]});
-}
-hitbox::hitbox hitbox::hitbox_builder::build_table_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, entity_config::table_attributes[entity_config::attributes::frame_width], entity_config::table_attributes[entity_config::attributes::frame_height]});
-}
-
-hitbox::hitbox hitbox::hitbox_builder::build_food_counter_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, entity_config::food_counter_attributes[entity_config::attributes::frame_width], entity_config::food_counter_attributes[entity_config::attributes::frame_height]});
-}
-
-hitbox::hitbox hitbox::hitbox_builder::build_dishwasher_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, entity_config::dishwasher_attributes[entity_config::attributes::frame_width], entity_config::dishwasher_attributes[entity_config::attributes::frame_height]});
-}
-
-hitbox::hitbox hitbox::hitbox_builder::build_food_hitbox(Vector2 position){
-    return hitbox(Rectangle{position.x, position.y, entity_config::test_food_attributes[entity_config::attributes::frame_width], entity_config::test_food_attributes[entity_config::attributes::frame_height]});
 }

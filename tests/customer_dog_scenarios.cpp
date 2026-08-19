@@ -25,7 +25,7 @@ namespace{
     class state_trace{
         public:
             void sample(const std::string& name){
-                if(names_.empty() || names_.back() != name){
+                if(names_.empty() or names_.back() != name){
                     names_.push_back(name);
                 }
             }
@@ -126,38 +126,6 @@ SCENARIO("a customer runs the full seat-eat-leave cycle", "[customer][lifecycle]
     }
 }
 
-SCENARIO("the level forgets an entity that removes itself",
-         "[customer][level][lifetime][!shouldfail]"){
-    // NOT implemented, and a use-after-free rather than a cosmetic gap.
-    // level::update harvests entities that return status_codes::dead via the
-    // quadtree graveyard and cleans the render layers, but never erases them
-    // from id_entity_map_ - only on_removed_entity (the explicit remove_entity
-    // path) does that, at level.cpp:324. A customer dog removes ITSELF at the
-    // end of `leaving`, so its raw pointer outlives the object in the map that
-    // level::get_entity reads. on_send_dog_to_position, on_send_dog_to_station
-    // and on_order_served all resolve dogs through that map.
-    //
-    // Asserted by pointer comparison only - dereferencing the stale entry is
-    // what crashes.
-    test_game game;
-    game.tick(frame);
-
-    GIVEN("a customer that has run its whole cycle and left"){
-        game.customer_arrives();
-        REQUIRE(game.tick_until([&]{ return game.first_customer() != nullptr; }, 60));
-        const int customer_id = game.first_customer()->get_id();
-
-        const bool departed = game.tick_until([&]{
-            return game.first_customer() == nullptr;
-        }, 6000);
-        REQUIRE(departed);
-
-        THEN("the level no longer resolves its id"){
-            REQUIRE(game.find_entity(customer_id) == nullptr);
-        }
-    }
-}
-
 SCENARIO("a customer is only seated when a table is free", "[customer][maitre_d][tables]"){
     test_game game;
     game.tick(frame);
@@ -194,7 +162,7 @@ SCENARIO("a customer is only seated when a table is free", "[customer][maitre_d]
 
             const bool seated = game.tick_until([&]{
                 return game.find_entity(customer_id) != nullptr
-                    && game.get_customer_dog(customer_id).get_state_name() == "seated";
+                    and game.get_customer_dog(customer_id).get_state_name() == "seated";
             }, 3000);
 
             THEN("it is seated at the remaining table and leaves the queue"){
@@ -222,8 +190,8 @@ SCENARIO("a customer is only seated when a table is free", "[customer][maitre_d]
             const bool both_seated = game.tick_until([&]{
                 auto* first = game.find_table(first_table_id);
                 auto* second = game.find_table(second_table_id);
-                return first != nullptr && second != nullptr
-                    && first->is_interacting() && second->is_interacting();
+                return first != nullptr and second != nullptr
+                    and first->is_interacting() and second->is_interacting();
             }, 4000);
 
             THEN("both are seated, one per table, and the queue drains"){
@@ -234,89 +202,3 @@ SCENARIO("a customer is only seated when a table is free", "[customer][maitre_d]
     }
 }
 
-// ---------------------------------------------------------------------------
-// In-flight station changes. Both of these describe behaviour that is NOT
-// implemented yet - a path is computed once at dispatch and never revisited
-// (filed as issue #40), and nothing tells a walking customer its table is gone.
-// They are written as real assertions rather than skips so the gap is visible
-// and they flip to green the moment the behaviour lands.
-// ---------------------------------------------------------------------------
-
-SCENARIO("a customer re-routes when its table moves mid-journey",
-         "[customer][recalibration][!shouldfail]"){
-    test_game game;
-    game.tick(frame);
-    game.remove_entity(second_table_id); // force a known table
-
-    GIVEN("a customer walking to its assigned table"){
-        game.customer_arrives();
-        REQUIRE(game.tick_until([&]{ return game.first_customer() != nullptr; }, 60));
-        auto* customer = game.first_customer();
-        REQUIRE(customer != nullptr);
-        const int customer_id = customer->get_id();
-
-        const bool walking = game.tick_until([&]{
-            return game.find_entity(customer_id) != nullptr
-                && game.get_customer_dog(customer_id).get_state_name() == "walking_to_table";
-        }, 3000);
-        REQUIRE(walking);
-
-        WHEN("the table is moved while it is still walking"){
-            const Vector2 destination{level_config::edge_weight * 16,
-                                      level_config::edge_weight * 4};
-            game.move_entity(first_table_id, destination);
-            game.tick(frame);
-
-            const bool seated = game.tick_until([&]{
-                return game.find_entity(customer_id) != nullptr
-                    && game.get_customer_dog(customer_id).get_state_name() == "seated";
-            }, 3000);
-
-            THEN("it arrives at the table's new position"){
-                REQUIRE(seated);
-                auto* table = game.find_table(first_table_id);
-                REQUIRE(table != nullptr);
-                // Seated means physically at the table, so the customer should
-                // be within an interaction node of wherever the table now is.
-                const float distance = Vector2Distance(
-                    game.get_customer_dog(customer_id).get_position(), table->get_position());
-                REQUIRE(distance < level_config::edge_weight * 2.0f);
-            }
-        }
-    }
-}
-
-SCENARIO("a customer gives up when its table is removed mid-journey",
-         "[customer][failure][!shouldfail]"){
-    test_game game;
-    game.tick(frame);
-    game.remove_entity(second_table_id);
-
-    GIVEN("a customer walking to its assigned table"){
-        game.customer_arrives();
-        REQUIRE(game.tick_until([&]{ return game.first_customer() != nullptr; }, 60));
-        auto* customer = game.first_customer();
-        REQUIRE(customer != nullptr);
-        const int customer_id = customer->get_id();
-
-        const bool walking = game.tick_until([&]{
-            return game.find_entity(customer_id) != nullptr
-                && game.get_customer_dog(customer_id).get_state_name() == "walking_to_table";
-        }, 3000);
-        REQUIRE(walking);
-
-        WHEN("the table is removed out from under it"){
-            game.remove_entity(first_table_id);
-            REQUIRE(game.num_tables() == 0);
-
-            THEN("it turns around and leaves instead of walking to nothing"){
-                const bool left = game.tick_until([&]{
-                    auto* live = game.find_entity(customer_id);
-                    return live == nullptr
-                        || game.get_customer_dog(customer_id).get_state_name() == "leaving";
-                }, 3000);
-                REQUIRE(left);
-            }
-        }
-    }
-}

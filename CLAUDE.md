@@ -35,6 +35,11 @@ cmake --build build --target tests
 
 Test sources live in `tests/*.cpp` and are registered explicitly in `CMakeLists.txt`'s `tests` executable — a new scenario file must be added there to be compiled in. Tests link Catch2 and the game's static libs, and compile with `DOG_DAYS_TESTING` defined (see "Testing accessors" below), but deliberately skip `MY_COMPILE_OPTIONS` so the strict warnings don't fire inside Catch2/raylib headers.
 
+## Code style
+
+- Prefer `class` over `struct` unless explicitly told otherwise, including for component-style types (e.g. the in-progress ECS work in `src/systems/components/`) — these are expected to carry member functions and encapsulated state, not stay plain data aggregates.
+- **Do not write comments unless explicitly asked to.** Write the code and nothing else. This applies everywhere — implementation, headers, and test files alike. The existing `// *` blocks throughout the codebase (`component.h`, `ecs_builders.cpp`, `system.h`) are the author's own design notes recording decisions they reasoned through; they are not a density to match, and adding to them buries the notes that matter. If something genuinely can't be understood from the code, say so in your response instead of committing a comment about it.
+
 ## Architecture
 
 ### Layering
@@ -93,7 +98,7 @@ All tunable constants live in `config.h`, grouped by domain namespace rather tha
 
 ### Other systems worth knowing about
 
-- **`level::level_graph`** (`src/engine/graph.h`): the walkable node/edge grid backing pathfinding and decoration placement. It's itself both an event listener (`moved_decoration`, `placed_decoration` update walkability) and a query handler (`can_place_decoration`, `path` via BFS) — same dual role appears on `tree::quadtree` (listens to `move_entity`/`interact_entity`, answers `is_colliding_query`).
+- **`level::level_graph`** (`src/engine/structures/graph.h`): the walkable node/edge grid backing pathfinding and decoration placement. It's itself both an event listener (`moved_decoration`, `placed_decoration` update walkability) and a query handler (`can_place_decoration`, `path` via BFS) — same dual role appears on `tree::quadtree` (listens to `move_entity`/`interact_entity`, answers `is_colliding_query`).
 - **`maitre_d::dog_queue`**: models the two physical waiting lines (left/right) as `queue_lane`s of `queued_dog`, independent of the maitre_d's table-assignment logic.
 - **Debug logging**: `debug::log(message)` (`debug_log_interface.h`) is a free function used throughout for structured trace logging; it queues an `events::debug_log` event that `debug::logger` (a Meyers singleton, toggled with `/` and pause with `P`) renders as an overlay.
 - **Skills in `skills/`**: this repo carries its own Claude Code skills (`design-check`, `event-wire`, `map`, `state-of-play`) that encode project-specific collaboration workflows — check `skills/*/SKILL.md` before assuming generic behavior for design review, event wiring, code mapping, or branch status reporting.

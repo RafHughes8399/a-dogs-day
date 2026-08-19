@@ -96,7 +96,7 @@ SCENARIO("the expediter only processes an order when a waiter and counter are bo
     WHEN("a waiter is free but the counter is empty"){
         auto* counter = game.first_counter();
         REQUIRE(counter != nullptr);
-        while(!counter->is_empty()){ counter->take(); }
+        while(not counter->is_empty()){ counter->take(); }
         game.request_order(customer_id, table_id, table_position);
         game.tick(1.0f / 60.0f);
         THEN("the order stays unprocessed (created)"){
@@ -120,7 +120,7 @@ SCENARIO("the expediter only processes an order when a waiter and counter are bo
         REQUIRE(waiter != nullptr);
         REQUIRE(counter != nullptr);
         waiter->set_serving(table_position);
-        while(!counter->is_empty()){ counter->take(); }
+        while(not counter->is_empty()){ counter->take(); }
         game.request_order(customer_id, table_id, table_position);
         game.tick(1.0f / 60.0f);
         THEN("the order stays unprocessed (created)"){
@@ -264,7 +264,7 @@ SCENARIO("seating a customer creates a serving job", "[expediter][serving][integ
         WHEN("it reaches its table"){
             const bool seated = game.tick_until([&]{
                 return game.find_entity(customer_id) != nullptr
-                    && game.get_customer_dog(customer_id).get_state_name() == "seated";
+                    and game.get_customer_dog(customer_id).get_state_name() == "seated";
             }, 3000);
             REQUIRE(seated);
 
@@ -294,7 +294,7 @@ SCENARIO("a departing customer creates a clearing job", "[expediter][clearing][i
             const bool leaving = game.tick_until([&]{
                 auto* live = game.find_entity(customer_id);
                 return live == nullptr
-                    || game.get_customer_dog(customer_id).get_state_name() == "leaving";
+                    or game.get_customer_dog(customer_id).get_state_name() == "leaving";
             }, 6000);
             REQUIRE(leaving);
 

@@ -14,7 +14,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_food_counter(V
         BLUE
     );
 
-    auto hitbox = hitbox::h_builder_.build_food_counter_hitbox(position);
+    auto hitbox = hitbox_builders::build_food_counter_hitbox(position);
     std::vector<sprite::sprite> sprites = {food_counter_sprite};
     std::vector<hitbox::hitbox> hitboxes = {hitbox};
     auto body = body::body(hitboxes, sprites);

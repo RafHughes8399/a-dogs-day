@@ -23,7 +23,7 @@ int entities::customer_dog::default_state::update(customer_dog& dog, float delta
 int entities::customer_dog::walking_to_table::update(customer_dog& dog, float delta, int frame, int status){
     (void) delta;
     (void) frame;
-    if(! dog.has_arrived(status)){
+    if(not dog.has_arrived(status)){
         return status_codes::nothing;
     }
     std::unique_ptr<events::event> dog_reached_station = std::make_unique<events::dog_reached_station>(
@@ -91,7 +91,7 @@ int entities::customer_dog::leaving::update(customer_dog& dog, float delta, int 
     // the table. Signalling dead propagates through customer_dog::update() to
     // the quadtree, which harvests dead entities (quadtree.cpp status_codes
     // switch).
-    if(dog.current_path_.empty() && dog.move_paths_.empty()){
+    if(dog.current_path_.empty() and dog.move_paths_.empty()){
         return status_codes::dead;
     }
     return status_codes::nothing;
@@ -110,7 +110,7 @@ void entities::customer_dog::set_path(const std::vector<Vector2>& path, int stat
     // the state directly here instead of round-tripping through an event, or
     // through a set_path hook on the state (which every state implemented
     // identically anyway).
-    if(! path.empty()){
+    if(not path.empty()){
         set_walking_to_table(static_cast<size_t>(station_id), station_position);
     }
     dog::set_path(path);

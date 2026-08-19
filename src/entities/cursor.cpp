@@ -146,7 +146,7 @@ int entities::cursor::update(float delta, int frame){
     auto old_position = position_;
     position_ =  GetMousePosition();
 
-    if(! Vector2Equals(old_position, position_)) {
+    if(not Vector2Equals(old_position, position_)) {
         body_.get_hitbox().update(position_);
         create_move_event();
 

@@ -16,7 +16,7 @@ void level::level::update(float delta, int frame) {
   std::vector<std::unique_ptr<entities::entity>> graveyard;
   auto to_remove = level_entities_.update(delta, frame, graveyard);
 
-  if (!to_remove.empty()) {
+  if (not to_remove.empty()) {
     for (auto &layer : render_layers_) {
       layer.remove_entities(to_remove);
     }
@@ -43,9 +43,9 @@ void level::level::render(int frame) {
     auto position = entity->get_position();
     (void)position;
 
-    return view_frame_.x <= entity_box.x && view_frame_.y <= entity_box.y &&
+    return view_frame_.x <= entity_box.x and view_frame_.y <= entity_box.y and
            (view_frame_.x + view_frame_.width) >=
-               (entity_box.x + entity_box.width) &&
+               (entity_box.x + entity_box.width) and
            (view_frame_.y + view_frame_.height) >=
                (entity_box.y + entity_box.height);
 
@@ -150,8 +150,8 @@ void level::level::update_void_entities(float delta, int frame) {
 
 bool level::level::is_inside_screen(entities::entity &entity) const {
   const auto &box = entity.get_hitbox().get_box();
-  return box.x >= 0.0f && box.y >= 0.0f &&
-         (box.x + box.width) <= level_config::screen_width &&
+  return box.x >= 0.0f and box.y >= 0.0f and
+         (box.x + box.width) <= level_config::screen_width and
          (box.y + box.height) <= level_config::screen_height;
 }
 
@@ -224,9 +224,9 @@ void level::level::on_move_view_frame_event(
     const events::move_view_frame &event) {
   auto delta = event.get_delta();
   view_frame_.x = Clamp(view_frame_.x + delta.x, 0.0,
-                        level_config::world_x - GetScreenWidth());
+                        level_config::world_x - static_cast<float>(GetScreenWidth()));
   view_frame_.y = Clamp(view_frame_.y + delta.y, 0.0,
-                        level_config::world_y - GetScreenHeight());
+                        level_config::world_y - static_cast<float>(GetScreenHeight()));
 }
 void level::level::on_right_mouse_event(
     const events::right_mouse_click &event) {

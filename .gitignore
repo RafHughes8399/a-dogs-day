@@ -8,3 +8,4 @@ build/*
 # macOS and local tool caches
 .DS_Store
 .cache/
+.clangd

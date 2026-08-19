@@ -152,7 +152,7 @@ void maitre_d::maitre_d::update_dog_position(size_t id, Vector2 position){
 void maitre_d::maitre_d::assign_tables(){
     // if head not empty and reach and free tables
     // try the left and try the right
-    if(! are_tables_free()){
+    if(not are_tables_free()){
         return;
     }
 
@@ -212,16 +212,16 @@ entities::table* maitre_d::maitre_d::pick_table(){
     float nearest_distance = 0.0f;
     for(auto& entry : tables_){
         auto* table = entry.second;
-        if(! table->can_accept_dog()){
+        if(not table->can_accept_dog()){
             continue;
         }
         auto distance = Vector2Distance(table->get_position(), entrance_);
-        if(nearest == nullptr || distance < nearest_distance){
+        if(nearest == nullptr or distance < nearest_distance){
             nearest = table;
             nearest_distance = distance;
         }
     }
-    assert(nearest != nullptr && "pick_table called with no free tables");
+    assert(nearest != nullptr and "pick_table called with no free tables");
     return nearest;
 }
 Vector2 maitre_d::maitre_d::pick_interaction_position(entities::table* table, Vector2 dog_position) const{
@@ -232,7 +232,7 @@ Vector2 maitre_d::maitre_d::pick_interaction_position(entities::table* table, Ve
     return interaction_positions.right;
 }
 void maitre_d::maitre_d::check_customer_arrivals(float delta){
-    if(! feature_flag_config::automatic_arrivals){
+    if(not feature_flag_config::automatic_arrivals){
         return;
     }
     seconds_since_customer_arrived_ += delta;
@@ -244,18 +244,18 @@ void maitre_d::maitre_d::check_customer_arrivals(float delta){
 
     auto should_seed_queue = customer_queue_.empty();
     auto should_add_customer = seconds_since_customer_arrived_ >= cafe_config::queue_arrival_s
-        || dogs_left_in_window_ >= cafe_config::queue_left_trigger;
-    if((should_seed_queue || should_add_customer) && can_request_customer_arrival()){
+        or dogs_left_in_window_ >= cafe_config::queue_left_trigger;
+    if((should_seed_queue or should_add_customer) and can_request_customer_arrival()){
         request_customer_arrival();
     }
 }
 
 bool maitre_d::maitre_d::can_request_customer_arrival() const{
-    return ! customer_queue_.full();
+    return not customer_queue_.full();
 }
 
 void maitre_d::maitre_d::request_customer_arrival(){
-    if(! can_request_customer_arrival()){
+    if(not can_request_customer_arrival()){
         debug::log(
             "[maitre_d::request_customer_arrival, blocked request] "
             "queue_full: " + std::to_string(customer_queue_.full()));
@@ -359,7 +359,7 @@ void maitre_d::maitre_d::on_dog_reached_station_event(const events::dog_reached_
         return;
     }
     if(table->get_state() != entities::table::table_state::reserved
-       || table->get_assigned_dog_id() != dog_id){
+       or table->get_assigned_dog_id() != dog_id){
         return;
     }
     debug::log(

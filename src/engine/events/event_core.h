@@ -93,7 +93,9 @@ namespace events{
 		waiter_collected_food_id = 51,
 		waiter_served_order_id = 52,
 		waiter_abandoned_serving_id = 53,
-		size = 54
+		create = 21,
+		create_path_to_id = 54,
+		size = 55
 	};
 	class event{
 
@@ -163,6 +165,9 @@ namespace events{
 			call_event(e);
 		}
 		virtual int get_type() const = 0;
+		// identity, not type - unsubscribing one handler must not take out every
+		// other listener for the same event
+		virtual size_t get_handler_id() const = 0;
 		private:
 		virtual void call_event(const event& e) = 0;
 
@@ -173,7 +178,7 @@ namespace events{
 	public:
 		~event_handler() override = default;
 		event_handler(std::function<void(const E& e)> handle)
-			: handler_(handle), handler_type_(E::get_static_type()){
+			: handler_(handle), handler_type_(E::get_static_type()), handler_id_(next_handler_id_++){
 			}
 
 		event_handler(const event_handler& other) = default;
@@ -194,12 +199,20 @@ namespace events{
 		int get_type() const override{
 			return handler_type_;
 		}
+		// copies keep the id - subscribe() stores a copy, and unsubscribe has to
+		// be able to find that copy from the original
+		size_t get_handler_id() const override{
+			return handler_id_;
+		}
 		bool operator==(const event_handler& other){
 			return handler_type_ == other.handler_type_;
 		}
 	private:
+		inline static size_t next_handler_id_ = 0;
+
 		std::function<void(const E& e)> handler_;
 		const int handler_type_; // this should be an id i think
+		size_t handler_id_;
 	};
 	// the event
 	// the event handler - tempalted for any event, based on an interface
@@ -207,7 +220,7 @@ namespace events{
 	class event_dispatcher {
 	public:
 		void subscribe(int event_key, std::unique_ptr<event_handler_interface>& handler_value);
-		void unsubscribe(int event_key, const int handler_value);
+		void unsubscribe(int event_key, size_t handler_id);
 		void execute_event(const event& event);
 		void queue_event(std::unique_ptr<event>& event);
 		void add_delayed_event(std::unique_ptr<event>& event);

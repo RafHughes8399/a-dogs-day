@@ -55,7 +55,7 @@ namespace level{
 		            order_served_handler_([this](const events::order_served& event) -> void{on_order_served_event(event);}),
 		            removed_entity_handler_([this](const events::remove_entity& event) -> void{on_removed_entity(event);}),
 		            dog_reached_station_handler_([this](const events::dog_reached_station& event) -> void{on_dog_reached_station_event(event);}),
-		            graph_(level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
+		            graph_(graph::level_graph(static_cast<int>(dimensions.x), static_cast<int>(dimensions.y))),
             view_frame_(frame), background_(sprite), id_entity_map_({}),
             next_entity_id_(0),
             level_entities_(tree::quadtree(raglib::bounding_box_2{Vector2Zero(), dimensions}))
@@ -97,6 +97,11 @@ namespace level{
             void on_dog_reached_station_event(const events::dog_reached_station& event);
             void render(int frame);
             void update(float delta, int frame);
+#ifdef DOG_DAYS_TESTING
+            Rectangle get_view_frame() const {
+                return view_frame_;
+            }
+#endif
         private :
             struct void_entity_record{
                 std::unique_ptr<entities::entity> entity;
@@ -122,7 +127,7 @@ namespace level{
             events::event_handler<events::remove_entity> removed_entity_handler_;
             events::event_handler<events::dog_reached_station> dog_reached_station_handler_;
 
-            level_graph graph_;
+            graph::level_graph graph_;
             
             Rectangle view_frame_;
             sprite::sprite background_;

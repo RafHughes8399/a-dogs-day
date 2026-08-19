@@ -163,7 +163,7 @@ namespace hud{
             virtual ~hud_element() = default;
             hud_element(Rectangle outline, std::unique_ptr<draw_strategy> draw_strat, std::unique_ptr<event_strategy> event_strat)
             : outline_(outline), draw_strategy_(std::move(draw_strat)), event_handler_strategy_(std::move(event_strat)) {
-                if(event_handler_strategy_ && draw_strategy_){
+                if(event_handler_strategy_ and draw_strategy_){
                 }
             }
 

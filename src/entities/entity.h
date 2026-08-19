@@ -23,6 +23,8 @@
 #include <vector>
 #include <queue>
 
+#include "component.h"
+
 namespace entities{
     // Flags, not alternatives - one update can report several. Test with &.
     enum status_codes{
@@ -78,5 +80,60 @@ namespace entities{
             Vector2 position_;
 
     };
+}
+// TODO: RENAME AFFTER REFACTOR IS COMPLETE, THIS IS TEMPOARARY WHILE THE REFFACTOR IS BEING INTERGRATED
+namespace ecs_entities {
+    //**
+    // need builders for the following
+    // * player dogs [khiri and mack]
+    // * npc dogs [customers and waiters]
+    // * the cursor [cursor and paw mark]
+    // * decorations [tables, counters, stations]
+    // * food  */
+    // ! dog builders and destroyers
+    void build_player(size_t player_id, size_t cursor_id);
+    void build_player_dog(size_t id, Vector2 position,
+        std::vector<sprite::sprite> sprites, size_t kind, float reach);
+        void build_khiri(size_t id);
+        void build_mack(size_t id);
+
+    void build_customer_dog(size_t id, Vector2 position);
+        //**
+
+        // .
+        // .
+        // .
+        // build duck_hunt_dog();
+        //  */
+
+    void build_waiter_dog(size_t id, Vector2 position);
+    //**
+    // build_saba()
+    // build text
+    //  */
+
+    void build_cursor(size_t id);
+
+    void build_decoration(size_t id, Vector2 position,
+        sprite::sprite decoration_sprite, hitbox::hitbox decoration_hitbox);
+        void build_test_decoration(size_t id, Vector2 position);
+        //**
+        // void build_gargoyle();
+        //  */
+
+    void build_station(size_t id, Vector2 position,
+        sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
+        float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets);
+        void build_counter(size_t id, Vector2 position);
+        void build_table(size_t id, Vector2 position);
+        void build_dishwasher(size_t id, Vector2 position);
+        void build_stove(size_t id, Vector2 position);
+        /**
+        */
+
+    void build_food(size_t id, Vector2 position);
+
+    // the level backdrop - renderable only, no hitbox, no collision
+    void build_background(size_t id);
 }
 #endif

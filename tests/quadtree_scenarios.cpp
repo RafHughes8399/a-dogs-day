@@ -20,6 +20,8 @@
 // verify placement and post-move behaviour without it.
 #include <catch2/catch_test_macros.hpp>
 
+#include "component.h"
+#include "config.h"
 #include "entities.h"
 #include "events.h"
 #include "events_interface.h"
@@ -89,6 +91,27 @@ namespace{
     }
     raglib::bounding_box_2 top_right_quadrant(){
         return raglib::bounding_box_2{Vector2{200.0f, 200.0f}, Vector2{400.0f, 400.0f}};
+    }
+
+    class collision_component_guard{
+        public:
+            collision_component_guard(){ component_helpers::clear_all_components(); }
+            ~collision_component_guard(){ component_helpers::clear_all_components(); }
+            collision_component_guard(const collision_component_guard&) = delete;
+            collision_component_guard(collision_component_guard&&) = delete;
+            collision_component_guard& operator=(const collision_component_guard&) = delete;
+            collision_component_guard& operator=(collision_component_guard&&) = delete;
+    };
+
+    void insert_collidable(tree::ecs_quadtree& tree, size_t entity_id, Vector2 position){
+        std::vector<hitbox::hitbox> hitboxes{
+            hitbox::hitbox(Rectangle{position.x, position.y, k_entity_size, k_entity_size})};
+        component_helpers::register_collision_component(entity_id,
+            component_builders::build_collision_component(
+                component_builders::build_hitbox_component(hitboxes, 0)));
+
+        auto* collision = component_managers::collision_manager_.get_component(entity_id);
+        tree.insert(entity_id, collision->get_hitbox_component().get_hitbox());
     }
 }
 
@@ -262,6 +285,161 @@ SCENARIO("explicit move() relocates an entity via the move_entity event, like on
                 auto bottom_left = bottom_left_quadrant();
                 REQUIRE(tree.object_in_node(top_right, obj_rect));
                 REQUIRE_FALSE(tree.object_in_node(bottom_left, obj_rect));
+            }
+        }
+    }
+}
+
+SCENARIO("a point collision check reports the entity sitting under a position",
+        "[quadtree][ecs][collision]"){
+    GIVEN("two collidable entities in opposite quadrants of a 400x400 world"){
+        collision_component_guard components;
+        tree::ecs_quadtree tree(test_world(), 1);
+
+        const size_t asker_id = 1;
+        const size_t target_id = 2;
+        insert_collidable(tree, asker_id, Vector2{50.0f, 50.0f});
+        insert_collidable(tree, target_id, Vector2{300.0f, 300.0f});
+
+        REQUIRE(tree.size() == 2);
+        REQUIRE(tree.depth_of(asker_id) == 1);
+        REQUIRE(tree.depth_of(target_id) == 1);
+
+        WHEN("a position inside the target's hitbox is checked"){
+            auto hit = tree.check_collision(asker_id, Vector2{308.0f, 308.0f});
+
+            THEN("the target's id comes back"){
+                REQUIRE(hit == static_cast<int>(target_id));
+            }
+        }
+
+        WHEN("a position in an occupied quadrant but clear of every hitbox is checked"){
+            auto hit = tree.check_collision(asker_id, Vector2{10.0f, 10.0f});
+
+            THEN("nothing is reported"){
+                REQUIRE(hit == game_config::empty_entity);
+            }
+        }
+
+        WHEN("a position in an empty quadrant is checked"){
+            auto hit = tree.check_collision(asker_id, Vector2{50.0f, 300.0f});
+
+            THEN("nothing is reported"){
+                REQUIRE(hit == game_config::empty_entity);
+            }
+        }
+    }
+}
+
+SCENARIO("a box collision check reports the entity a rectangle overlaps",
+        "[quadtree][ecs][collision]"){
+    GIVEN("two collidable entities in opposite quadrants of a 400x400 world"){
+        collision_component_guard components;
+        tree::ecs_quadtree tree(test_world(), 1);
+
+        const size_t asker_id = 1;
+        const size_t target_id = 2;
+        insert_collidable(tree, asker_id, Vector2{50.0f, 50.0f});
+        insert_collidable(tree, target_id, Vector2{300.0f, 300.0f});
+
+        REQUIRE(tree.size() == 2);
+
+        WHEN("a box partially overlapping the target's hitbox is checked"){
+            auto hit = tree.check_collision(asker_id,
+                Rectangle{295.0f, 295.0f, k_entity_size, k_entity_size});
+
+            THEN("the target's id comes back"){
+                REQUIRE(hit == static_cast<int>(target_id));
+            }
+        }
+
+        WHEN("a box in an occupied quadrant but clear of every hitbox is checked"){
+            auto hit = tree.check_collision(asker_id,
+                Rectangle{100.0f, 100.0f, k_entity_size, k_entity_size});
+
+            THEN("nothing is reported"){
+                REQUIRE(hit == game_config::empty_entity);
+            }
+        }
+
+        WHEN("a box in an empty quadrant is checked"){
+            auto hit = tree.check_collision(asker_id,
+                Rectangle{50.0f, 300.0f, k_entity_size, k_entity_size});
+
+            THEN("nothing is reported"){
+                REQUIRE(hit == game_config::empty_entity);
+            }
+        }
+    }
+}
+
+SCENARIO("a collision check never reports the entity doing the asking",
+        "[quadtree][ecs][collision]"){
+    GIVEN("two collidable entities stacked on the same spot"){
+        collision_component_guard components;
+        tree::ecs_quadtree tree(test_world(), 1);
+
+        const size_t asker_id = 1;
+        const size_t target_id = 2;
+        insert_collidable(tree, asker_id, Vector2{300.0f, 300.0f});
+        insert_collidable(tree, target_id, Vector2{300.0f, 300.0f});
+
+        REQUIRE(tree.size() == 2);
+
+        WHEN("the asker checks a position inside its own hitbox"){
+            auto found = tree.check_collision(asker_id, Vector2{308.0f, 308.0f});
+
+            THEN("it gets the other entity, not itself"){
+                REQUIRE(found == static_cast<int>(target_id));
+            }
+        }
+
+        WHEN("the asker checks a box overlapping its own hitbox"){
+            auto found = tree.check_collision(asker_id,
+                Rectangle{295.0f, 295.0f, k_entity_size, k_entity_size});
+
+            THEN("it gets the other entity, not itself"){
+                REQUIRE(found == static_cast<int>(target_id));
+            }
+        }
+    }
+
+    GIVEN("a single collidable entity alone in the tree"){
+        collision_component_guard components;
+        tree::ecs_quadtree tree(test_world(), 1);
+
+        const size_t asker_id = 1;
+        insert_collidable(tree, asker_id, Vector2{300.0f, 300.0f});
+
+        WHEN("it checks a position inside its own hitbox"){
+            auto found = tree.check_collision(asker_id, Vector2{308.0f, 308.0f});
+
+            THEN("nothing is reported"){
+                REQUIRE(found == game_config::empty_entity);
+            }
+        }
+    }
+}
+
+SCENARIO("a box straddling a quadrant split still finds what it overlaps",
+        "[quadtree][ecs][collision]"){
+    GIVEN("an entity sitting just inside the top-right quadrant"){
+        collision_component_guard components;
+        tree::ecs_quadtree tree(test_world(), 1);
+
+        const size_t asker_id = 1;
+        const size_t target_id = 2;
+        insert_collidable(tree, asker_id, Vector2{50.0f, 50.0f});
+        insert_collidable(tree, target_id, Vector2{205.0f, 205.0f});
+
+        WHEN("a box crossing the centre split overlaps it"){
+            // spans [195,215) on both axes - fits in no single child, so a
+            // containment-gated descent would never look inside one
+            auto found = tree.check_collision(asker_id,
+                Rectangle{195.0f, 195.0f, 20.0f, 20.0f});
+
+            THEN("the target is still found"){
+                REQUIRE(found == static_cast<int>(target_id));
             }
         }
     }

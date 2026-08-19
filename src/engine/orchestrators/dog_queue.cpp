@@ -20,7 +20,7 @@ namespace{
 }
 
 maitre_d::queued_dog maitre_d::dog_queue::enqueue(size_t dog_id, int side){
-    if(full() || contains(dog_id)){
+    if(full() or contains(dog_id)){
         debug::log(
             "[dog_queue::enqueue, blocked insert] "
             "dog_id: " + std::to_string(dog_id)
@@ -89,7 +89,7 @@ void maitre_d::dog_queue::update_dog_position(size_t dog_id, Vector2 position){
         auto was_at_queue_position = dog->reached_queue_position;
         dog->dog_position = position;
         dog->reached_queue_position = Vector2Distance(position, dog->queue_position) <= level_config::edge_weight * 0.05f;
-        if(! was_at_queue_position && dog->reached_queue_position && dog == dogs.begin()){
+        if(not was_at_queue_position and dog->reached_queue_position and dog == dogs.begin()){
             debug::log(
                 "[dog_queue::update_dog_position, dog reached head of queue] "
                 "dog_id: " + std::to_string(dog_id)
@@ -110,9 +110,9 @@ bool maitre_d::dog_queue::dog_has_reached_queue_position(size_t dog_id) const{
             [dog_id](const queued_dog& record) -> bool {
                 return static_cast<size_t>(record.dog_id) == dog_id;
             });
-        return dog != dogs.end() && dog->reached_queue_position;
+        return dog != dogs.end() and dog->reached_queue_position;
     };
-    return check_dog(left_queue_.dogs) || check_dog(right_queue_.dogs);
+    return check_dog(left_queue_.dogs) or check_dog(right_queue_.dogs);
 }
 
 bool maitre_d::dog_queue::contains(size_t dog_id) const{
@@ -122,17 +122,17 @@ bool maitre_d::dog_queue::contains(size_t dog_id) const{
             return static_cast<size_t>(dog.dog_id) == dog_id;
         });
     };
-    return contains_dog(left_queue_.dogs) || contains_dog(right_queue_.dogs);
+    return contains_dog(left_queue_.dogs) or contains_dog(right_queue_.dogs);
 }
 
 bool maitre_d::dog_queue::empty() const{
-    return left_queue_.dogs.empty() && right_queue_.dogs.empty();
+    return left_queue_.dogs.empty() and right_queue_.dogs.empty();
 }
 
 bool maitre_d::dog_queue::full() const{
     auto capacity = static_cast<size_t>(cafe_config::queue_capacity);
     return left_queue_.dogs.size() >= capacity
-        && right_queue_.dogs.size() >= capacity;
+        and right_queue_.dogs.size() >= capacity;
 }
 
 size_t maitre_d::dog_queue::size() const{

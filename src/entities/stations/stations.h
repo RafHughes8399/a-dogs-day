@@ -109,7 +109,7 @@ namespace entities{
         public:
 
             table(body::body body, Vector2 position, int id, std::string debug_id)
-            : station(body, position, id, std::move(debug_id)){}; // default constructed with capacity = 1
+            : station(body, position, id, std::move(debug_id)){} // default constructed with capacity = 1
             table(const table& other) = delete; // station is non-copyable
             table(table&& other) = default;
 

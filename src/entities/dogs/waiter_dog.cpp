@@ -57,7 +57,7 @@ int entities::waiter_dog::serving_counter::update(waiter_dog &dog, float delta,
     return status_codes::nothing;
   }
   // After arrival, never before - see clearing_table.
-  if (!dog.has_path()) {
+  if (not dog.has_path()) {
     dog.set_state(std::make_unique<abandoned_serving>());
   }
   return status_codes::nothing;
@@ -84,7 +84,7 @@ int entities::waiter_dog::walking_to_table::update(waiter_dog &dog, float delta,
         std::make_unique<finished_serving>()));
     return status_codes::nothing;
   }
-  if (!dog.has_path()) {
+  if (not dog.has_path()) {
     dog.set_state(std::make_unique<abandoned_serving>());
   }
   return status_codes::nothing;
@@ -145,7 +145,7 @@ int entities::waiter_dog::clearing_table::update(waiter_dog &dog, float delta,
   // Checked after arrival, never before - an arriving dog also has no path
   // left. process_clearing_job dispatches this leg synchronously, so the path
   // exists before the first update; nothing to walk means an unreachable table.
-  if (!dog.has_path()) {
+  if (not dog.has_path()) {
     dog.set_state(std::make_unique<finished_clearing>());
   }
   return status_codes::nothing;
@@ -173,7 +173,7 @@ int entities::waiter_dog::walking_to_dishwasher::update(waiter_dog &dog,
   }
   // Checked after arrival, never before - an arriving dog also has no path
   // left. Reaching here with nothing to walk means on_enter's path_to failed.
-  if (!dog.has_path()) {
+  if (not dog.has_path()) {
     dog.set_state(std::make_unique<finished_clearing>());
   }
   return status_codes::nothing;

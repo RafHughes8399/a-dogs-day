@@ -23,7 +23,7 @@ std::vector<sprite::sprite> body::body::get_sprites(){
 }
 
 void body::body::render(Vector2 position, int frame){
-    if(index_ >= sprites_.size() || index_ >= hitboxes_.size()) return;
+    if(index_ >= sprites_.size() or index_ >= hitboxes_.size()) return;
     sprites_[index_].render(position, frame);
 
     // temp for debug purposes

@@ -1,0 +1,350 @@
+goal for the weekend is this ECS refactor, or at least the main chunk of it. this should be done in parallel to the current archetiecture so I have a tangible before and after
+refactor steps include:
+1. define the component architecutre, the ocmponent the managers, etc.
+2. then piecewise implemntation for each component, start basic with positional and rendering, then eventually work your way up to state machine
+
+sounds simple, but probably wont be , will require big changes to prettuy much everything
+order should be like. in essence a compoent should map to a field or characteristic that an entity has
+-> positional [position]
+-> renderable [sprite]
+-> collision [hitbox]
+-> event handling [event handlers]
+-> movement [paths]
+-> state machine [state machine]
+-> interaction 
+
+-> first setup the architecutre for components and entities
+-> and refactor their construction and placement in the world (quadtree would need only know about the collision one then)
+-> will change how the level class operates, and the game class, and pretty much everything, now we can just pass entities around
+bcecause all they are is an id essentially, and then lookups their components
+
+
+
+after this refactor order is as follows:
+-> logger refactor
+-> the reamining pathfinding work
+-> items, levelling and currency,
+-> inventory
+
+
+stage for components:
+-> define
+-> builder [ can keep entities as a process of building certain components and assinging]
+-> manager [how the manager will process component behaivour and update them]
+-> systems to execute the behviour (movement system, rendering system, state machine system, event system )
+-> scrap the event component is the system that listens for events, accesses the compoentns through the manager and performs behaviour
+
+compoents hold the data individually
+managers hold them and tie them to an entity
+systems define the behaviour to interact and manipualte them
+
+
+finish work on comppnnetn manager, 
+basic implmentation for moving and rendering and storage systems [essentially migrate over current quad tree nad rendering form level to these systems]
+
+then continue refactor in the order of
+-> building, inserting and rendering entities
+-> entity files will transition from their current defs to begin essentially builders
+-> key and mouse input
+-> player dog selection and movement
+-> decoration placement 
+-> then the customer and waiter dog stuff
+
+
+-> wil come back to editing later 
+
+immediate todo:
+-> define basic entity building 
+-> build up the systems
+-> integrate into the game
+
+-> built the player and the cursor
+-> setting up the rendering system so it can process rendering components-> need to setup the control system to 
+interpret and actuall perform controls
+_. setting up the lifecycle sysmte to manage entity inseration and remoaval, and emit t osother systems, adn other 
+systems react with on_entity_add
+
+-> finish building the cusror with a renderable and positional component
+-> input component to check mouse delta ? 
+-> maybe an update component ? 
+-> then finish arrow key input to move around the screen
+
+// TODO 
+-> direction should exist in movmeent 
+-> movement should have a movement strategy, either path based, or otherwise (cursor uses getmouse delta), can easily define those function
+-> because direction is used to select the sprite, so it shuld be a thing that movemnet and renderable use to discuss amongst each other
+
+
+curor outline,
+-> define mouse moving as a control component
+-> the control section will check for mouse movement, and then update the position component, which will then trigger the event that the spatial 
+
+-> control system.update(
+    check control components{
+        for each control componet{
+            swtich action
+                case mouse move:
+                    If(getmousedelta != 0) {
+                        // call postion_manager.update_position(component id, mouseposition +  getMouseDelta)
+                    }
+
+                 
+        }
+    }
+)
+-> position_manager.update_position(id, new position){
+   component =  get position compoent (id)
+    component.position = new position
+    create an dexecute moved_entity event
+}
+
+-> spatial system
+    on_moved_entity{
+        iterate through quadtree, find entity, if still in the bounds then dont move
+        otherwise remove and reinsert
+    }
+
+-> cursor building
+-> update render setup
+-> spatial system and render system
+-> control system
+
+
+quadtree refactor [entity -> id]
+the tree already works, this is a type change plus shedding two responsibilities
+it should never have had. node objects_ becomes vector<size_t>
+
+what leaves the quadtree entirely:
+-> the per object update loop, the graveyard, to_remove
+   entities dont update themselves anymore, the systems drive that and the
+   lifespan system already handles removal
+-> the interact() calls in perform_interactions and identify_collisions.
+   polymorphic dispatch on entity type isnt possible from an id, and it isnt the
+   tree's job. identify_collisions returns candidate pairs, the collision /
+   interaction system resolves them
+-> next_ids_ / next_id_. entity_lifespan_system already owns id allocation and
+   recycling, two allocators is one too many
+
+what stays, just needs a bounds lookup where the entity used to carry its own
+geometry. one bounds_for(id) off the collision component covers all of them:
+-> insert
+-> is_there_collision
+-> perform_interactions
+-> the left-its-node check in update
+-> identify_collisions
+
+mechanical, logic identical, just stop dereferencing:
+-> erase, extract, clear, size, is_empty, get_entity
+-> copy_tree gets trivial, tree becomes cheaply copyable
+
+steps:
+1. migrate the quadtree type from entity to id
+2. strip update / interact / id management out
+3. migrate the quadtree to be managed by the spatial system
+4. wire events for insertion, deletion and movement across nodes
+5. spatial system helpers wrapping quadtree functions
+6. spatial system + quadtree test suite
+
+notes:
+-> update_position is the only legal write path. sets the position, updates the
+   hitbox rect, then emits move_entity. tree stores no cached bounds so it has
+   no way to notice if something writes around it
+-> keep on_move_event as is. the unconditional extract and reinsert already
+   sinks to the deepest fitting node. do NOT add the "still in bounds so dont
+   move" short circuit, an entity parked high never sinks again and the upper
+   nodes silently accumulate
+-> broad phase only has to be conservative. extras are fine, misses are not
+-> WORLD_BOX macro is dead, references config:: which is not a namespace
+-> unsubscribe is keyed on event type not handler identity, so two systems
+   listening to one event share a fate. rendering and spatial both want
+   create_entity / remove_entity
+-> open question: does the cursor belong in the tree at all. if clicks are a
+   point query then the cursor position IS the query, not an occupant. same for
+   anything screen space. would mean spatial membership is a builder decision
+   rather than automatic on create_entity
+
+
+   -> control system
+   -> test arrow scree moving 
+   -> buld player dogs, check switching between them
+   -> player dog pathfinding to position when clicked
+   -> buidling decorations and statinos
+   -> then customer and waiter /
+   -> then you're back to where you were 
+
+   -> control input system to check compoennts for input. then perform the actions
+   -> how exactly we hadnle, std::functoin map like hte current system ? 
+   -> it could owrk i think 
+   - they are void functions ,adn then the function can just perfrm some behaviour. can limit paramters as best as possible. i.e arrow key movement is constnat soiit ouwld not need to be. passed in
+
+
+-> complete control input processing for key and mouse inputs
+-> define the control key - function map
+-> check compoennts based on hteir action and call the function
+
+
+control input is done.
+-> the key - function map is keyed on {key, action} not just the key, because KEY_E is
+   both edit_mode as a hold and exit_edit as a press, and MOUSE_BUTTON_LEFT is 0 which
+   is a legal key value. one map covers keyboard and mouse
+-> check_inputs asks the device per binding and calls through the map, actions mirror
+   the old player::controls default scheme and emit the same events
+-> arrow keys move the view frame, menu keys navigate the menu graph, both under test
+-> khiri and mack build as ecs entities now - positional, renderable, collision
+
+next: movement and state machine components
+-> movement first, everything else is stuck behind it. direction lives in movement,
+   and the dogs already carry sprites and hitboxes indexed by facing with nothing
+   to write that index
+-> path queue + move speed, movement system integrates position along the path and
+   writes the facing index into renderable and collision so they stay in step
+-> then the state machine component
+-> the outline sprites and dog selection come back with it. outlines are a
+   selected / unselected thing, and ecs_layer::draw renders every sprite_component
+   on an entity every frame, so there is nowhere to hang them until states exist
+-> editing waits on this too - swapping control schemes now means swapping the
+   bindings on the component, not indexing a second map
+
+
+-> movement component [ or rather should be renamed pathfinding component ? ] requires the following:
+-> component construction and destruction for entiites  
+-> movement system assigning, calculating, processing and updating paths
+-> the movment system is where the level_graph should be stored so it can in house process and check paths
+
+
+-> the npc system is 
+
+
+-> path assignment, movement along the path
+-> path assignment is either set or enqueue. depends on the context of the path setting
+
+
+-> processing movement for a path
+-> updating paths when decorations move, decorations only, or alternatively. if an entity is along a path and it comes across a blocked node, it then recalculates to the destination ?
+-> but then need some way to recalc the destination
+-> depends on a component that the decoration would have ?ujkiwsenbfvckuioewbkljfewbouik;fvbewdsk;uifgbweo;uidfbuio;wehfidshbfahasBGF8uoewb uikfbi'owe fjukib
+
+
+movement system status
+-> path class exists. holds source, destination, the waypoint list and an optional destination entity.
+   destination is kept separately on purpose, find_path returns grid snapped node positions and the
+   destination is the exact requested point, they are not the same value. source is probably dead
+   weight, nothing reads it
+-> movement component holds a queue of paths. set_path replaces the whole queue, append_path adds a
+   leg. has_reached_position is the tolerance check ported off dog::reached_position, minus the snap
+   because the component cannot write position
+-> create_path is private, takes source/direction/destination and returns optional<path>. nullopt
+   when find_path comes back empty, so unreachable has no valid representation and the caller cannot
+   forget to check
+-> create_path_to event is a placeholder command, carries id, destination, assignment mode and the
+   optional destination entity. handler resolves the source by mode, current position for replace,
+   the last queued leg's destination for append, then routes properly from there instead of the old
+   trick of overwriting the queued leg's first waypoint
+-> update() is the port of dog::update_path. snapshot the ids first, the move_entity execute inside
+   update_position could erase a component mid iteration. snap onto the waypoint, advance, on
+   completion pop the leg and re-aim at the next one, no move step on the completing frame
+-> determine_direction ported off dog::determine_direction, writes the scalar on the component and
+   the facing index through component_helpers::set_facing_index
+
+what is left
+-> nothing emits create_path_to yet. the wire is live and inert. need the events that trigger path
+   generation for dogs, the ecs versions of send_dog_to_position / send_dog_to_station
+-> dog_completed_path emission is commented out in update(). unsure the ecs wants the same per leg
+   fact the entity system emitted, decide when the consumers get ported. maitre_d matched on the
+   final snapped waypoint not the exact destination, keep that if it comes back
+-> no path_failed fact. unreachable is currently a silent early return, orchestrators learn nothing
+-> set_path still installs an empty path, old dog::set_path bailed on that
+-> blocked node recheck on waypoint transition, per the note above. lazy, no reverse index
+-> two wires write walkability into the same graph now, movement_system::on_moved_entity and
+   level_graph's own decoration subscriptions. decide which one owns it
+
+
+
+
+11/8
+
+-> implement collision checks on the quadtree x  
+
+-> test player dog selection and path sending
+    -> need to build player dogs x 
+-> implement the rest of the control system 
+
+
+-> building decorations and stations and npc dogs x 
+
+-> test the rest of the control system
+-> interact[or/able] component defintions
+-> hitbox and interaction box rendering for visual debugging x /2 
+
+-> testing selection of decorations and stations [left and right clicking ]
+
+-> testing sending player dogs to decorations and stations 
+    -> involves interaction components and systems
+    -> the question then becomes how will this work
+    -> an entity has an interaction component, or rather an interactable component
+    -> an interactable componetn defines interaction  posisiont [ like how stations do it presently]
+    -> when an entity fills that position, the station is being interacted with
+    -> an entity fills that position when it ends a path that arrives at that position ?
+    -> or an entity fills that position while its position matches ?
+    -> no
+    -> stations are interactable, allowing dogs to work them. 
+    -> maybe then here is what happens:
+        -> stations define their interaction hjitboxes too, like a buffer of maybe half an edge 
+        around the decoration. 
+        -> is a collision is detected 
+    -> maybe it is a two way street, a handshake. both have interactable components
+    -> the interactable compoennt stores the other entity that this entity is interacting with
+    -> if there is an interaction [i.e other is filled], some behaviour would be performed by the "other entity"
+    -> then it is easier to toggle the state. if a collision is detected between two entities and they both have interaction componetns,
+    then they interact
+
+-> fix up the ai graph pathfinding code
+-> implement interaction components x 
+-> add to necessary entity builders x 
+-> define builders for stations [counter, stove, table for now] x 
+-> fix builder he lprs, ai slopped it  x 
+-> build the ability to check for interactions [the interaction system] x 
+   -> checking for interactions 
+   -> changing the components 
+-> build test stations, then test checking for interactions  x x
+   -> there is a bug with right clikcing on a station and having a path generate. it does not work
+   -> reintroduce interaction positions [ need to handle the case where a position is blocked by a station / decoration, 
+   or gate picking that position with a check that it is a free position in the graph]
+
+   -> -im thkning this needs somewhat of an overhaul
+   -> you clikc the station, dog cannot pathfind because the raw destination evaluates to a blocked node in the graph
+   -> so the solution is to resolve a position that allows the dog to interact with a station, an interaction position
+   -> can define the optional offsets for a left, right, up and down position, which should resolve to nodes in the graph
+   -> then when deciding to pathfind, one of those is picked based on distance and direction, and whether occupied or not
+
+    -> need to adjust values for the interaction posistions, some offsets are not like others, 
+    -> the right needs to be -x a bit more and + y
+    -> better, but need more testing, i thing it changes based on their direction [ that's ok it can be tided up later, move on ]
+    -> [ must we set it to a strict node for the destination ? could be a half multiple instead or like a quarter edge off. still a clean number but doesnt have 
+    to be so rigid ?]
+-> then the npc system [this port should be simple enough]
+   -> porting over the matire'd and expediter
+   -> need to change how the queuing is defiend, , the dogs should come from -x  and -y, from the top of the screen
+   -> state machines and event listening it seems would drive this
+      -> the state decides what events need to be listened to
+      -> for example: 
+         -> the waiter receives the command to serve the table, it is given the counter and the table, it makes 
+         both paths
+         -> it has a regular idle state that acts as its default
+         -> it has a state for walking-to-counter, which then decides the interaction behaviour upon that path ending
+         -> then when that path and interaction ends, the state swaps for the next path
+         -> so the state determines essentially the animation and interaction on_path_end, yes, good
+         -> then upon serving it returns to idle []
+         
+         -> for the customer, it receives direction to sit at a table, 
+         -> it listens for a food served event 
+         [emitted by the waiter completing its path in that state, and heard by, the table ? or the matire_d ? 
+         ], then the state switches to eating 
+         -> i think it is clean for the maitre_d and expediter to talk to each other
+         -> perhaps then it is cleaner for a serving system and a clearing system, one system per behaviour. 
+         -> once eating completes it switches to a leaving state
+
+         -> when the customer leave it notifies the clearing system to select a waiter
+         -> i think the serving and clearing system port is the way to go, they can manage the assignment to jobs, the updates to jibs and 
+         -> trigger state changes 
+-> then processing interactions [that is where we are up to and can come in a later branch ?]
