@@ -1,6 +1,8 @@
 #include "component.h"
+#include "config.h"
 #include "system.h"
 #include <algorithm>
+#include <raylib.h>
 
 
 // ---------------- helpers ----------------
@@ -29,8 +31,9 @@ void systems::rendering_system::on_destroyed_entity(const events::remove_entity&
 
 // ---------------- render and teardown ----------------
 void systems::rendering_system::render(int frame){
-    // TODO cull against the view frame once hitbox bounds land in
-    // collision_component
+
+
+    // * the predicate allows for partial rendering already it seems
     auto render_predicate = [this](size_t entity_id) -> bool {
         return is_entity_in_frame(entity_id, view_frame_);
     };
@@ -39,7 +42,9 @@ void systems::rendering_system::render(int frame){
         render_layers_[layer].draw(render_predicate,
             Vector2{view_frame_.x, view_frame_.y}, frame, true);
     }
-    movement_system::get_instance().render_graph(view_frame_);
+    //movement_system::get_instance().render_graph(view_frame_);
+    Rectangle queue = {0, -2* level_config::edge_weight, level_config::edge_weight * 4.5f, level_config::world_y + (4 * level_config::edge_weight)};
+    DrawRectangleLines(queue.x, queue.y, queue.width, queue.height, RED);
 }
 
 void systems::rendering_system::clear(){

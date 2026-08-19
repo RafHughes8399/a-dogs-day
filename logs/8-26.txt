@@ -325,6 +325,36 @@ what is left
 -> then the npc system [this port should be simple enough]
    -> porting over the matire'd and expediter
    -> need to change how the queuing is defiend, , the dogs should come from -x  and -y, from the top of the screen
+      -> give the queue a width of 3 - 4 edges, enough that the dogs can walk side by side
+      -> queue extends from y - 2 * edge weight, to world.height + (2* edge weight)
+         -> reqiures an extension to the world boundaries 
+         -> cafe entrance is defined as world. height / 2 and spans two edges [becomes a 2 x 2 box]
+      -> customers are spawned off screen and then walk onto the screen,
+      -> not every customer that walks by will enter, those that enter depends on the state of the cafe 
+
+      -> actionable todo:
+         -> extend the world to account for the technically OOB space x 
+         -> and then limit the pathfinding to the actual walkable section x 
+         -> a separate queue graph ? [could work ?], then when entering they are inserted into the level properly, so the level bounds need to be adjusted
+         -> no, one graph, we just define different bounds for the two areas, the quadtree only represents the cafe bounds
+
+         -> actually no it needs to be two graphs
+            -> adjust the graph constructor to take in a rectangle
+            -> have overlap at the entrace so that the dog can be taken out of the footpath and placed into the cafe easily
+            -> two graphs is messy, it muddles the respoonsiblity between the movement system and other systems, subgraphs could work though 
+         -> we could keep one graph and then pass in a bounds argument to the pathfinding that restricts where the dog can go
+         -> or the level graph can define sub graphs for the footpath and the cafe ? and then you pick a graph to check
+            -> thats a lot of checking
+            -> have the level graph define sub graphs that overlap and the entrace, then that gives you clean transitioning
+            -> and then when you create a path, you pick an optional subgraph to create the path within
+         -> adjust rendering to partially redner the portion that is in frame x 
+         
+         -> entity factory for customers [ to decide their positioning and their sprite]
+         -> 
+         -> scaffolding the serving system 
+            -> arrival condtional logic [depends on the most recent arrival and free tables]
+            -> assigning a customer to a table
+
    -> state machines and event listening it seems would drive this
       -> the state decides what events need to be listened to
       -> for example: 

@@ -83,11 +83,26 @@ namespace level_config{
     // world dimensions
     inline const float screen_width = static_cast<float>(game_config::window_width);
     inline const float screen_height = static_cast<float>(game_config::window_height);
-    inline float world_x = 2048.0f;
+    inline const float edge_weight = 64.0f; // placeholder
+    
+    inline float world_x = 3072.0f;
     inline float world_y = 2048.0f;
     
-    // for the main level graph
-    inline const float edge_weight = 64.0f; // placeholder
+    inline float graph_x = 0.0f;
+    inline float graph_y = -3 * edge_weight;
+    inline float graph_width = world_x;
+    inline float graph_height = world_y + (3 * edge_weight);
+    
+    // footpath bounds
+    inline float footpath_x = 0.0f;
+    inline float footpath_y = graph_y;
+    inline float footpath_width = 4.5 * edge_weight;
+    inline float footpath_height = graph_height;
+    // cafe_bounds 
+    inline float cafe_x = footpath_x + footpath_width;
+    inline float cafe_y = 0.0f;
+    inline float cafe_width = world_x - footpath_width;
+    inline float cafe_height = world_y;
 
     inline const int screen_edges_x = static_cast<int>(screen_width / edge_weight);
     inline const int screen_edges_y = static_cast<int>(screen_height / edge_weight);

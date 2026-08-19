@@ -238,6 +238,7 @@ namespace systems{
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
             remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
             create_path_to_handler_([this](const events::create_path_to& event) -> void{on_create_path_to_event(event);}),
+            // TODO adjust values for the footpath queue ?
             graph_(static_cast<int>(level_config::world_x), static_cast<int>(level_config::world_y)){
                 event_interface::subscribe<events::create_entity>(create_entity_handler_);
                 event_interface::subscribe<events::move_entity>(move_entity_handler_);
@@ -261,6 +262,35 @@ namespace systems{
         // uses the expediter and the maitre d to orchestrate
         // customer arrivals and departures
         // and waiter serving and clearing
+        // comprised of teh following subsystmes
+                // * customer arrival - manages the footpath and picking dogs to actually enter the cafe
+                // * table_allocation_ - managers assigning customers to tables and general table availability
+                // * serving system - manages serving food to customers
+                // * clearing system  - managers clearing tables after customers have left
+            class customer_arrival_system{
+                public:
+                    // create_dog
+                    // destroy_dog
+
+                    // check dog enter cafe
+                    // 
+                private:
+                    // footpath_ footpath-:
+                    // const Rectangle cafe_entrace_;
+                    // 
+            };
+            class table_allocation_system{
+                public:
+                private:
+            };
+            class serving_system{
+                public:
+                private:
+            };
+            class clearing_system{
+                public:
+                private:
+            };
         public:
             static npc_system& get_instance(){
                 static npc_system instance;
@@ -390,7 +420,7 @@ namespace systems{
             }
         private:
             spatial_system(raglib::bounding_box_2 world_bounds = raglib::bounding_box_2{
-                Vector2{0.0f, 0.0f}, Vector2{level_config::world_x, level_config::world_y}})
+                Vector2{level_config::cafe_x, level_config::cafe_y}, Vector2{level_config::cafe_x + level_config::cafe_width, level_config::cafe_y + level_config::cafe_height}})
                 : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
                 move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
                 remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),

@@ -85,6 +85,7 @@ namespace graph{
                 query_interface::unsubscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
                 query_interface::unsubscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
             }
+            // TODO have the graph take in a rectangle, not just a width and a height
             level_graph(int level_x, int level_y)
             : num_rows_(static_cast<int>(static_cast<float>(level_y) / level_config::edge_weight)),
             row_length_(static_cast<int>(static_cast<float>(level_x) / level_config::edge_weight)),
