@@ -96,12 +96,13 @@ namespace level_config{
     // footpath bounds
     inline float footpath_x = 0.0f;
     inline float footpath_y = graph_y;
-    inline float footpath_width = 4.5 * edge_weight;
+    inline float footpath_width = 5.0f * edge_weight;
     inline float footpath_height = graph_height;
     // cafe_bounds 
-    inline float cafe_x = footpath_x + footpath_width;
+    inline float zone_overlap = 1.0f * edge_weight;
+    inline float cafe_x = footpath_x + footpath_width - zone_overlap;
     inline float cafe_y = 0.0f;
-    inline float cafe_width = world_x - footpath_width;
+    inline float cafe_width = world_x - cafe_x;
     inline float cafe_height = world_y;
 
     inline const int screen_edges_x = static_cast<int>(screen_width / edge_weight);

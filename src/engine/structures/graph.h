@@ -67,7 +67,7 @@ namespace graph{
 
             int categorise_node(int row, int column);
 
-            void build_nodes(int level_x, int level_y);
+            void build_nodes();
             void build_edges();
             std::vector<int> bfs(int start_id, int end_id);
             std::vector<Vector2> make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id);
@@ -75,41 +75,54 @@ namespace graph{
             // fields
             int num_rows_;
             int row_length_;
-            
+            Rectangle area_;
+            bool answers_queries_;
             queries::query_handler<queries::can_place_decoration, bool> can_place_decoration_handler_;
             queries::query_handler<queries::path_query, std::vector<Vector2>> path_query_handler_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
             
             public:
             ~level_graph(){
+                if(not answers_queries_){ return; }
                 query_interface::unsubscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
                 query_interface::unsubscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
             }
-            // TODO have the graph take in a rectangle, not just a width and a height
-            level_graph(int level_x, int level_y)
-            : num_rows_(static_cast<int>(static_cast<float>(level_y) / level_config::edge_weight)),
-            row_length_(static_cast<int>(static_cast<float>(level_x) / level_config::edge_weight)),
+            level_graph(int width, int height)
+            : level_graph(Rectangle{0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)}, true){}
+
+            level_graph(Rectangle area, bool answer_queries)
+            : num_rows_(static_cast<int>(std::ceil(area.height / level_config::edge_weight))),
+            row_length_(static_cast<int>(std::ceil(area.width / level_config::edge_weight))),
+            area_(area),
+            answers_queries_(answer_queries),
             can_place_decoration_handler_([this](const queries::can_place_decoration& query) -> bool {return can_place_decoration(query);}),
             path_query_handler_([this](const queries::path_query& query) -> std::vector<Vector2> {return get_path(query);}),
             graph_({}){
                 // ! columns is x, rows is y
-                build_nodes(level_x, level_y);
+                build_nodes();
                 build_edges();
+                if(not answers_queries_){ return; }
                 query_interface::subscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
                 query_interface::subscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
             }
-            level_graph(const level_graph& other) = default;
-            level_graph(level_graph&& other) = default;
-            
-            
+
+            level_graph(const level_graph& other) = delete;
+            level_graph(level_graph&& other) = delete;
+
+
             level_graph& operator=(const level_graph& other) = delete;
             level_graph& operator=(level_graph&& other) = delete;
-            
+            friend bool operator==(const level_graph& a, const level_graph& b){
+                return &a == &b;
+            }
             bool can_place_decoration(const queries::can_place_decoration& query);
             std::vector<Vector2> get_path(const queries::path_query& query);
             
             node* get_node(size_t node_id);
             node* node_at(Vector2 position);
+            Rectangle get_area() const;
+            bool position_in_area(Vector2 position);
+            bool box_in_area(Rectangle box);
 #ifdef DOG_DAYS_TESTING
             int cell_at_index(Vector2 position){
                 int node_index = graph_config::empty_node;
@@ -120,6 +133,13 @@ namespace graph{
                 int node_index = graph_config::empty_node;
                 if(not nearest_node(position, node_index)){ return graph_config::empty_node; }
                 return node_index;
+            }
+            std::vector<Vector2> occupied_node_positions(){
+                std::vector<Vector2> positions;
+                for(auto& entry : graph_){
+                    if(not entry.first.entities_.empty()){ positions.push_back(entry.first.position_); }
+                }
+                return positions;
             }
 #endif
 

@@ -241,7 +241,7 @@ SCENARIO("a path destination resolves to the nearest node", "[ecs][graph][moveme
         }
 
         WHEN("a left-facing dog is sent there"){
-            game.path_to(dog_id, Vector2{0.0f, 0.0f});
+            game.path_to(dog_id, Vector2{level_config::cafe_x, level_config::edge_weight * 4.0f});
             REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 4000));
             REQUIRE(game.facing_x_of(dog_id) < 0.0f);
 

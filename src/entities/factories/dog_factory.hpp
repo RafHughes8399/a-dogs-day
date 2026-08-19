@@ -1,6 +1,9 @@
 #ifndef DOG_FACTORY_H
 #define DOG_FACTORY_H
 namespace dog_factory{
+    class dog_picker{
+        
+    };
     class dog_factory{
         public:
         private:

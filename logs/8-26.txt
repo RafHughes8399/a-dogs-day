@@ -347,6 +347,9 @@ what is left
             -> thats a lot of checking
             -> have the level graph define sub graphs that overlap and the entrace, then that gives you clean transitioning
             -> and then when you create a path, you pick an optional subgraph to create the path within
+            -> just define the two within the movment_system, adn then do a bounds check if in zone
+        -> dogs need to be able to bridge the gap at the entrace, a two-leg path
+            -> when they reach a position that is in both
          -> adjust rendering to partially redner the portion that is in frame x 
          
          -> entity factory for customers [ to decide their positioning and their sprite]

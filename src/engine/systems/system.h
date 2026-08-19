@@ -7,7 +7,10 @@
 #include "quadtree.h"
 #include "events_interface.h"
 #include "render_layer.h"
+#include <array>
 #include <functional>
+#include <set>
+#include <utility>
 #include <raylib.h>
 #include "graph.h"
 #include "path.h"
@@ -201,29 +204,37 @@ namespace systems{
             // * through here - slot selection needs it in shipped builds, not only
             // * under DOG_DAYS_TESTING
             int graph_occupant_at(Vector2 position){
-                return graph_.occupant_at(position);
+                return resolve_graph(position).occupant_at(position);
             }
             bool is_walkable(Vector2 position){
-                return graph_.occupant_at(position) == graph_config::empty_node;
+                return resolve_graph(position).occupant_at(position) == graph_config::empty_node;
             }
             graph::level_graph::node* node_at(Vector2 position){
-                return graph_.node_at(position);
+                return resolve_graph(position).node_at(position);
             }
             void clear(){
-                graph_.reset();
+                cafe_.reset();
+                footpath_.reset();
             }
             void render_graph(Rectangle frame){
-                graph_.render(frame);
+                cafe_.render(frame);
+                footpath_.render(frame);
             }
 #ifdef DOG_DAYS_TESTING
             size_t graph_occupied_node_count(){
-                return graph_.occupied_node_count();
+                std::set<std::pair<float, float>> cells;
+                for(auto* graph : graphs()){
+                    for(auto position : graph->occupied_node_positions()){
+                        cells.insert({position.x, position.y});
+                    }
+                }
+                return cells.size();
             }
             int graph_cell_at_index(Vector2 position){
-                return graph_.cell_at_index(position);
+                return resolve_graph(position).cell_at_index(position);
             }
             int graph_nearest_node_index(Vector2 position){
-                return graph_.nearest_node_index(position);
+                return resolve_graph(position).nearest_node_index(position);
             }
 #endif
             // set a path for an entity
@@ -238,8 +249,10 @@ namespace systems{
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
             remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
             create_path_to_handler_([this](const events::create_path_to& event) -> void{on_create_path_to_event(event);}),
-            // TODO adjust values for the footpath queue ?
-            graph_(static_cast<int>(level_config::world_x), static_cast<int>(level_config::world_y)){
+
+            cafe_(Rectangle{level_config::cafe_x, level_config::cafe_y, level_config::cafe_width, level_config::cafe_height}, false),
+            footpath_(Rectangle{level_config::footpath_x, level_config::footpath_y, level_config::footpath_width, level_config::footpath_height}, false){
+
                 event_interface::subscribe<events::create_entity>(create_entity_handler_);
                 event_interface::subscribe<events::move_entity>(move_entity_handler_);
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
@@ -250,13 +263,17 @@ namespace systems{
                 std::optional<size_t> destination_entity = std::nullopt);
             void determine_direction(size_t id, components::movement_component& movement,
                 Vector2 position, Vector2 target);
+            
 
+            graph::level_graph& resolve_graph(Vector2 position);
+            std::array<graph::level_graph*, 2> graphs();
             events::event_handler<events::create_entity> create_entity_handler_;
             events::event_handler<events::move_entity> move_entity_handler_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
             events::event_handler<events::create_path_to> create_path_to_handler_;
 
-            graph::level_graph graph_;
+            graph::level_graph cafe_;
+            graph::level_graph footpath_;
     };
     class npc_system{
         // uses the expediter and the maitre d to orchestrate
@@ -420,7 +437,9 @@ namespace systems{
             }
         private:
             spatial_system(raglib::bounding_box_2 world_bounds = raglib::bounding_box_2{
-                Vector2{level_config::cafe_x, level_config::cafe_y}, Vector2{level_config::cafe_x + level_config::cafe_width, level_config::cafe_y + level_config::cafe_height}})
+                Vector2{level_config::graph_x, level_config::graph_y},
+                Vector2{level_config::graph_x + level_config::graph_width,
+                    level_config::graph_y + level_config::graph_height}})
                 : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
                 move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
                 remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),

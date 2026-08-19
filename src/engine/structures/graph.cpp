@@ -40,7 +40,17 @@ graph::level_graph::node* graph::level_graph::get_node(size_t node_id){
     // is it just as simple as 
     return &graph_[static_cast<size_t>(node_id)].first;
 }
+Rectangle graph::level_graph::get_area() const{
+    return area_;
+}
 
+bool graph::level_graph::position_in_area(Vector2 position){
+    return area_.x <= position.x and position.x < area_.x + area_.width
+    and area_.y <= position.y and position.y < area_.y + area_.height;
+}
+bool graph::level_graph::box_in_area(Rectangle box){
+    return position_in_area({box.x, box.y}) and position_in_area({box.x + box.width, box.y + box.height});
+}
 // ---------------- pathfinding ----------------
 std::vector<int> graph::level_graph::bfs(int start_id, int end_id){
     size_t visited_size = graph_.size();
@@ -132,22 +142,21 @@ bool graph::level_graph::to_index(int row, int column, int& node_index){
 }
 
 bool graph::level_graph::is_on_map(Vector2 position){
-    return position.x >= 0.0f and position.x < level_config::world_x
-       and position.y >= 0.0f and position.y < level_config::world_y;
+    return position_in_area(position);
 }
 
 bool graph::level_graph::cell_at(Vector2 position, int& node_index){
-    int column = static_cast<int>(std::floor(position.x / level_config::edge_weight));
-    int row = static_cast<int>(std::floor(position.y / level_config::edge_weight));
+    int column = static_cast<int>(std::floor((position.x - area_.x) / level_config::edge_weight));
+    int row = static_cast<int>(std::floor((position.y - area_.y) / level_config::edge_weight));
     return to_index(row, column, node_index);
 }
 
 bool graph::level_graph::nearest_node(Vector2 position, int& node_index){
     if(not is_on_map(position)){ return false; }
 
-    int column = std::min(static_cast<int>(std::round(position.x / level_config::edge_weight)),
+    int column = std::min(static_cast<int>(std::round((position.x - area_.x) / level_config::edge_weight)),
         row_length_ - 1);
-    int row = std::min(static_cast<int>(std::round(position.y / level_config::edge_weight)),
+    int row = std::min(static_cast<int>(std::round((position.y - area_.y) / level_config::edge_weight)),
         num_rows_ - 1);
 
     return to_index(row, column, node_index);
@@ -156,8 +165,8 @@ bool graph::level_graph::nearest_node(Vector2 position, int& node_index){
 bool graph::level_graph::path_node_for(Vector2 position, Vector2 heading, int& node_index){
     if(not is_on_map(position)){ return false; }
 
-    float column_f = position.x / level_config::edge_weight;
-    float row_f = position.y / level_config::edge_weight;
+    float column_f = (position.x - area_.x) / level_config::edge_weight;
+    float row_f = (position.y - area_.y) / level_config::edge_weight;
 
     int column = static_cast<int>(heading.x > 0.0f ? std::ceil(column_f) : std::floor(column_f));
     int row = static_cast<int>(heading.y > 0.0f ? std::ceil(row_f) : std::floor(row_f));
@@ -395,8 +404,8 @@ void graph::level_graph::build_edges(){
         auto & n = node.first;
         auto & edges = node.second;
         // determine node, based on its row and its column
-        int node_row = static_cast<int>(n.position_.y / level_config::edge_weight);
-        int node_column = static_cast<int>(n.position_.x / level_config::edge_weight);
+        int node_row = static_cast<int>((n.position_.y - area_.y) / level_config::edge_weight);
+        int node_column = static_cast<int>((n.position_.x - area_.x) / level_config::edge_weight);
         // enum the node tpyes and do a switch
         auto node_type = categorise_node(node_row, node_column);
         auto node_edges = std::vector<edge>{};
@@ -418,13 +427,15 @@ void graph::level_graph::build_edges(){
     }
     return;
 }
-void graph::level_graph::build_nodes(int level_x, int level_y){
+void graph::level_graph::build_nodes(){
     // goes across the row, and then down the column so you. a node can be found by
     // ! (row * row_length) + column
     int num_nodes = 0;
-    for(int y = 0; y < level_y; y += static_cast<int>(level_config::edge_weight)){
-        for(int x = 0; x < level_x; x += static_cast<int>(level_config::edge_weight)){
-            Vector2 node_position = Vector2 {static_cast<float>(x),static_cast<float>(y)};
+    for(int row = 0; row < num_rows_; ++row){
+        for(int column = 0; column < row_length_; ++column){
+            Vector2 node_position = Vector2 {
+                area_.x + static_cast<float>(column) * level_config::edge_weight,
+                area_.y + static_cast<float>(row) * level_config::edge_weight};
             insert_node(num_nodes, node_position);
             num_nodes++;
         }

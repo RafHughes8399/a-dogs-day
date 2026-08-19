@@ -65,14 +65,18 @@ void systems::movement_system::on_created_entity(const events::create_entity& ev
     size_t entity_id = event.get_id();
     if(component_helpers::is_mouse_positioned(entity_id)){ return; }
     if(auto* collision = component_managers::collision_manager_.get_component(entity_id); collision != nullptr){
-        graph_.update_entity(collision->get_hitbox_component().get_hitbox().get_box(),
-            static_cast<int>(entity_id));
+        auto box = collision->get_hitbox_component().get_hitbox().get_box();
+        for(auto* graph : graphs()){
+            graph->update_entity(box, static_cast<int>(entity_id));
+        }
     }
 }
 void systems::movement_system::on_moved_entity(const events::move_entity& event){
     if(component_helpers::is_mouse_positioned(event.get_id())){ return; }
-    graph_.remove_entity(event.get_pre_move(), static_cast<int>(event.get_id()));
-    graph_.update_entity(event.get_post_move(), static_cast<int>(event.get_id()));
+    for(auto* graph : graphs()){
+        graph->remove_entity(event.get_pre_move(), static_cast<int>(event.get_id()));
+        graph->update_entity(event.get_post_move(), static_cast<int>(event.get_id()));
+    }
 }
 void systems::movement_system::on_create_path_to_event(const events::create_path_to& event){
     auto* movement = component_managers::movement_manager_.get_component(event.get_id());
@@ -84,6 +88,10 @@ void systems::movement_system::on_create_path_to_event(const events::create_path
         ? movement->get_paths().back().get_destination()
         : position->get_position();
     auto destination = event.get_destination();
+    auto& source_graph = resolve_graph(source);
+    auto& destination_graph = resolve_graph(destination);
+    if(source_graph != destination_graph) {return;}
+
     debug::log("[movement_system::on_create_path_to_event] dog: " + std::to_string(event.get_id())
         + ", source: " + raglib::vector_to_string(source)
         + ", event destination (click position): " + raglib::vector_to_string(destination)
@@ -103,7 +111,7 @@ void systems::movement_system::on_create_path_to_event(const events::create_path
                 auto interaction_offset = interactable->get_interaction_offset(source, destination);
                 if(interaction_offset.has_value()){
                     destination = Vector2Add(destination, interaction_offset.value());
-                    if(auto* slot_node = graph_.node_at(destination); slot_node != nullptr){
+                    if(auto* slot_node = destination_graph.node_at(destination); slot_node != nullptr and destination_graph.position_in_area(slot_node->position_)){
                         destination = slot_node->position_;
                     }
                 }
@@ -140,15 +148,20 @@ void systems::movement_system::on_create_path_to_event(const events::create_path
 void systems::movement_system::on_destroyed_entity(const events::remove_entity& event){
     if(component_helpers::is_mouse_positioned(event.get_id())){ return; }
     if(auto* collision = component_managers::collision_manager_.get_component(event.get_id()); collision != nullptr){
-        graph_.remove_entity(collision->get_hitbox_component().get_hitbox().get_box(),
-            static_cast<int>(event.get_id()));
+        auto box = collision->get_hitbox_component().get_hitbox().get_box();
+        for(auto* graph : graphs()){
+            graph->remove_entity(box, static_cast<int>(event.get_id()));
+        }
     }
 }
 
 // ---------------- path features  -----------------
 std::optional<path::path> systems::movement_system::create_path(Vector2 source, Vector2 direction,
     Vector2 destination, std::optional<size_t> destination_entity){
-    auto positions = graph_.find_path(source, destination, direction);
+    auto& source_graph = resolve_graph(source);
+    auto& destination_graph = resolve_graph(destination);
+    if(source_graph != destination_graph) {return std::nullopt;}
+    auto positions = source_graph.find_path(source, destination, direction);
     if(positions.empty()){ return std::nullopt; }
     return path::build_path(source, destination, positions, destination_entity);
 }
@@ -173,4 +186,12 @@ void systems::movement_system::update_position(size_t id, Vector2 new_position){
     // executed, not queued - the spatial index must not lag the position by a frame
     events::move_entity moved{id, pre_move, post_move};
     event_interface::execute_event(moved);
+}
+
+// ---------------- graph resolver ----------------
+graph::level_graph& systems::movement_system::resolve_graph(Vector2 position){
+    return cafe_.position_in_area(position) ? cafe_ : footpath_;
+}
+std::array<graph::level_graph*, 2> systems::movement_system::graphs(){
+    return {&cafe_, &footpath_};
 }
