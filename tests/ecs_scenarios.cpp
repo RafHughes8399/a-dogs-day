@@ -583,22 +583,33 @@ SCENARIO("a station's graph footprint and interaction offsets follow it when it 
             }
 
             AND_WHEN("a dog is sent to the table by entity id, using its current position"){
+                auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+                REQUIRE(interactable != nullptr);
+                auto left_offset = interactable->get_slot_offset(level_config::directions::left);
+                auto right_offset = interactable->get_slot_offset(level_config::directions::right);
+                REQUIRE(left_offset.has_value());
+                REQUIRE(right_offset.has_value());
+
                 auto dog_id = game.create_mack();
                 game.path_to(dog_id, new_position, table_id);
                 REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 4000));
 
                 THEN("it walks to an interaction offset of the new position"){
                     auto final_footprint = game.hitbox_of(dog_id);
-                    auto new_left = Vector2Add(new_position, entity_config::station_slot_left);
-                    auto new_right = Vector2Add(new_position, entity_config::station_slot_right);
+                    auto new_left = game.graph_node_position_at(
+                        Vector2Add(new_position, left_offset.value()));
+                    auto new_right = game.graph_node_position_at(
+                        Vector2Add(new_position, right_offset.value()));
                     bool at_new_left = final_footprint.x == new_left.x and final_footprint.y == new_left.y;
                     bool at_new_right = final_footprint.x == new_right.x and final_footprint.y == new_right.y;
                     REQUIRE((at_new_left or at_new_right));
                 }
                 THEN("it does not walk to an offset of the table's original position"){
                     auto final_footprint = game.hitbox_of(dog_id);
-                    auto stale_left = Vector2Add(original_position, entity_config::station_slot_left);
-                    auto stale_right = Vector2Add(original_position, entity_config::station_slot_right);
+                    auto stale_left = game.graph_node_position_at(
+                        Vector2Add(original_position, left_offset.value()));
+                    auto stale_right = game.graph_node_position_at(
+                        Vector2Add(original_position, right_offset.value()));
                     bool at_stale_left = final_footprint.x == stale_left.x and final_footprint.y == stale_left.y;
                     bool at_stale_right = final_footprint.x == stale_right.x and final_footprint.y == stale_right.y;
                     REQUIRE_FALSE(at_stale_left);

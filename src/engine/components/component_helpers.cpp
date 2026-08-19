@@ -85,6 +85,9 @@ void component_helpers::add_selectable_component(size_t entity_id, size_t kind){
 }
 
 void component_helpers::create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions){
+    // * a half edgeweight step lands on the centre of the neighbouring cell, the
+    // * point furthest from either boundary - cell_at floors, so it resolves there
+    // * with no tie to break
     // * left is - 0.5 edgeweight x, height / 2 y
     if(positions[level_config::directions::left].has_value()){
         positions[level_config::directions::left]->x = level_config::edge_weight * -0.5;

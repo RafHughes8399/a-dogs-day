@@ -302,12 +302,18 @@ SCENARIO("a path created with a destination entity resolves to one of its intera
         auto dog_id = game.create_mack(); // mack_start is left of the table on x
 
         WHEN("the dog is sent to the table by entity id"){
+            auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+            REQUIRE(interactable != nullptr);
+            auto left_offset = interactable->get_slot_offset(level_config::directions::left);
+            REQUIRE(left_offset.has_value());
+
             game.path_to(dog_id, table_position, table_id);
             REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 4000));
 
             THEN("it finishes on the table's left interaction offset, not the table's own position"){
                 auto final_footprint = game.hitbox_of(dog_id);
-                auto left = Vector2Add(table_position, entity_config::station_slot_left);
+                auto left = game.graph_node_position_at(
+                    Vector2Add(table_position, left_offset.value()));
                 REQUIRE(final_footprint.x == left.x);
                 REQUIRE(final_footprint.y == left.y);
             }
@@ -331,31 +337,32 @@ SCENARIO("a path created with a destination entity resolves to one of its intera
     }
 }
 
-SCENARIO("cell_at and nearest_node resolve the same position to the same node",
+SCENARIO("cell_at gives the containing cell, nearest_node the closest node",
         "[ecs][graph]"){
     GIVEN("a fresh ecs world"){
         testing::ecs_test_game game;
 
-        THEN("a grid-aligned position agrees"){
+        THEN("a grid-aligned position agrees - it is its own cell and its own nearest node"){
             Vector2 position{level_config::edge_weight * 5.0f, level_config::edge_weight * 3.0f};
             auto cell_index = game.graph_cell_at_index(position);
             REQUIRE(cell_index != graph_config::empty_node);
             REQUIRE(cell_index == game.graph_nearest_node_index(position));
+            REQUIRE(game.graph_node_position_at(position).x == position.x);
+            REQUIRE(game.graph_node_position_at(position).y == position.y);
         }
 
-        THEN("a position exactly on a half-tile boundary agrees - "
-             "this is the tie an interaction offset (0.5 * edge_weight past a station's edge) always lands on"){
+        THEN("a position in the far half of a cell belongs to that cell but is nearer the next node"){
+            Vector2 position{level_config::edge_weight * 5.75f, level_config::edge_weight * 3.75f};
+            REQUIRE(game.graph_node_position_at(position).x == level_config::edge_weight * 5.0f);
+            REQUIRE(game.graph_node_position_at(position).y == level_config::edge_weight * 3.0f);
+            REQUIRE(game.graph_cell_at_index(position) != game.graph_nearest_node_index(position));
+        }
+
+        THEN("a half-tile position - where every interaction offset lands - resolves to the cell "
+             "it sits in the centre of, with no tie to break"){
             Vector2 position{level_config::edge_weight * 5.5f, level_config::edge_weight * 3.5f};
-            auto cell_index = game.graph_cell_at_index(position);
-            REQUIRE(cell_index != graph_config::empty_node);
-            REQUIRE(cell_index == game.graph_nearest_node_index(position));
-        }
-
-        THEN("an arbitrary interior position agrees"){
-            Vector2 position{level_config::edge_weight * 5.25f, level_config::edge_weight * 3.75f};
-            auto cell_index = game.graph_cell_at_index(position);
-            REQUIRE(cell_index != graph_config::empty_node);
-            REQUIRE(cell_index == game.graph_nearest_node_index(position));
+            REQUIRE(game.graph_node_position_at(position).x == level_config::edge_weight * 5.0f);
+            REQUIRE(game.graph_node_position_at(position).y == level_config::edge_weight * 3.0f);
         }
     }
 }

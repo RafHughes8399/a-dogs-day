@@ -98,6 +98,7 @@ namespace testing{
             bool graph_marks(size_t entity_id, Rectangle footprint);
             int graph_cell_at_index(Vector2 position);
             int graph_nearest_node_index(Vector2 position);
+            Vector2 graph_node_position_at(Vector2 position);
 
         private:
             // the systems are singletons that outlive every scenario - the ctor

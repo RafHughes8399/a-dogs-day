@@ -247,6 +247,11 @@ namespace testing{
         return movement_.graph_nearest_node_index(position);
     }
 
+    Vector2 ecs_test_game::graph_node_position_at(Vector2 position){
+        auto* node = movement_.node_at(position);
+        return node == nullptr ? Vector2{-1.0f, -1.0f} : node->position_;
+    }
+
     bool ecs_test_game::graph_marks(size_t entity_id, Rectangle footprint){
         for(auto col = footprint.x; col < footprint.x + footprint.width; col += level_config::edge_weight){
             for(auto row = footprint.y; row < footprint.y + footprint.height; row += level_config::edge_weight){

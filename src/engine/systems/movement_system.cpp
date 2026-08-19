@@ -103,6 +103,9 @@ void systems::movement_system::on_create_path_to_event(const events::create_path
                 auto interaction_offset = interactable->get_interaction_offset(source, destination);
                 if(interaction_offset.has_value()){
                     destination = Vector2Add(destination, interaction_offset.value());
+                    if(auto* slot_node = graph_.node_at(destination); slot_node != nullptr){
+                        destination = slot_node->position_;
+                    }
                 }
             }
         }
