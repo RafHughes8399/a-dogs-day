@@ -15,12 +15,12 @@ hitbox::hitbox hitbox_builders::build_paw_mark_hitbox(Vector2 position){
         entity_config::paw_mark_attributes[entity_config::attributes::frame_width],
         entity_config::paw_mark_attributes[entity_config::attributes::frame_height]);
 }
-hitbox::hitbox hitbox_builders::build_player_dog_across_hitbox(Vector2 position){
+hitbox::hitbox hitbox_builders::build_dog_across_hitbox(Vector2 position){
     return build_hitbox(position,
         entity_config::khiri_across_attributes[entity_config::attributes::frame_width],
         entity_config::khiri_across_attributes[entity_config::attributes::frame_height]);
 }
-hitbox::hitbox hitbox_builders::build_player_dog_down_hitbox(Vector2 position){
+hitbox::hitbox hitbox_builders::build_dog_down_hitbox(Vector2 position){
     return build_hitbox(position,
         entity_config::khiri_down_attributes[entity_config::attributes::frame_width],
         entity_config::khiri_down_attributes[entity_config::attributes::frame_height]);

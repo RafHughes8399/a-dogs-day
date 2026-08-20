@@ -1,6 +1,16 @@
 #include "dog_factory.hpp"
+#include "events.h"
+#include "events_interface.h"
 #include <random>
 #include <algorithm>
+Vector2 dog_factory::dog_factory::pick_spawn(){
+    // TODO make it a proper random thing
+    return spawn_positions_[0];
+}
+Vector2 dog_factory::dog_factory::pick_destination(){
+    // TODO make it a proper random thing
+    return destination_positions_[0];
+}
 int dog_factory::dog_factory::pick_dog(){
     if(index_ == dogs_.size() - 1){
         refresh_dogs();
@@ -30,9 +40,15 @@ void dog_factory::dog_factory::refresh_dogs(){
 }
 
 // it does need an id and a position 
-void dog_factory::dog_factory::build_dog(size_t id, Vector2 position){
+void dog_factory::dog_factory::build_customer_dog(size_t id){
     auto dog = pick_dog();
+    auto spawn =  pick_spawn();
+    auto destination = pick_destination();
     auto builder = builders_[dog];
-    builder(id, position);
+    builder(id, spawn);
+
+    std::unique_ptr<events::event> create_path_event = std::make_unique<events::create_path_to>(id, destination, path::replace);
+    event_interface::queue_event(create_path_event);
+
     return;
 }

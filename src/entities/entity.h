@@ -92,24 +92,26 @@ namespace ecs_entities {
     // * food  */
     // ! dog builders and destroyers
     void build_player(size_t player_id, size_t cursor_id);
-    void build_player_dog(size_t id, Vector2 position,
+    void build_dog(size_t id, Vector2 position,
         std::vector<sprite::sprite> sprites, size_t kind, float reach);
         void build_khiri(size_t id);
         void build_mack(size_t id);
 
-    void build_customer_dog(size_t id, Vector2 position);
+    void build_customer_dog(size_t id, Vector2 position,
+    std::vector<sprite::sprite> sprites, size_t kind, float reach);
+        void build_tex(size_t id, Vector2 position);
         //**
 
         // .
         // .
         // .
         // build duck_hunt_dog();
+
         //  */
 
     void build_waiter_dog(size_t id, Vector2 position);
     //**
     // build_saba()
-    // build text
     //  */
 
     void build_cursor(size_t id);

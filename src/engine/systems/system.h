@@ -142,6 +142,7 @@ namespace systems{
                 event_interface::execute_event(created);
                 return entity_id;
             }
+            size_t create_customer_dog();
             void remove(size_t entity_id);
             void update(float delta);
             // teardown between test scenarios - the singleton outlives them
@@ -155,6 +156,7 @@ namespace systems{
             size_t fresh_id_ = 0;
 
             dog_factory::dog_factory dog_factory_;
+            float time_since_dog_;
     };
     class interaction_system{
         // for behavioural interactions

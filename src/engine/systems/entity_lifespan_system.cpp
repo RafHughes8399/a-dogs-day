@@ -24,5 +24,20 @@ void systems::entity_lifespan_system::remove(size_t entity_id){
 
 // TODO stub - the loop calls this every frame, nothing to do yet
 void systems::entity_lifespan_system::update(float delta){
-    (void) delta;
+    time_since_dog_ += delta;
+    if(time_since_dog_ >= dog_config::customer_spawn_interval){
+        create_customer_dog();
+        time_since_dog_ = 0.0f;
+    }
+}
+size_t systems::entity_lifespan_system::create_customer_dog(){
+    size_t id = next_id();
+    dog_factory_.build_customer_dog(id);
+    events::create_entity created{id, level_config::draw_layers::dogs};
+    event_interface::execute_event(created);
+    
+     // set the path to the entrance of the cafe
+
+
+    return id;
 }
