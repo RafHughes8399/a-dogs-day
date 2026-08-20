@@ -349,6 +349,9 @@ what is left
             -> and then when you create a path, you pick an optional subgraph to create the path within
             -> just define the two within the movment_system, adn then do a bounds check if in zone
         -> dogs need to be able to bridge the gap at the entrace, a two-leg path
+         -> send from the footpath to a node within the entrance
+         -> and then send from the entrance to the cafe
+         -> should be simple enough
             -> when they reach a position that is in both
          -> adjust rendering to partially redner the portion that is in frame x 
          

@@ -1,14 +1,50 @@
 #ifndef DOG_FACTORY_H
 #define DOG_FACTORY_H
+#include <vector>
+#define CUSTOMERS 6
+#define SPECIAL_CUSTOMERS 1
+
+#include <algorithm>
+#include <array>
+#include <random>
+#include "entities.h"
 namespace dog_factory{
-    class dog_picker{
-        
+    enum customers{
+        tex = 0,
+        saba = 1,
+        customers_size
+    };
+    enum special_customers{
+        garfield = customers_size,
+        cumulative_customers_size
     };
     class dog_factory{
         public:
-        private:
-        // define the customer marble bag as per that video
+            static dog_factory& get_instance(){
+                static dog_factory instance;
+                return instance;
+            }
+            ~dog_factory();
+            dog_factory(const dog_factory& other) = default;
+            dog_factory(dog_factory&& other) = default;
+            dog_factory& operator=(const dog_factory& other) = default;
+            dog_factory& operator=(dog_factory&& other) = default;
             
+            void build_dog(size_t id, Vector2 position);
+
+        private:
+            dog_factory()
+            :dogs_({}){
+                refresh_dogs();
+            }
+            // define the customer marble bag as per that video
+            int pick_dog();
+            void refresh_dogs();
+            // * parallel array in a sense to the dogs enum, the dog type is an index, 
+            // * and the value at the index is the number that dog left and the function to build that dog
+            std::vector<int> dogs_;
+            std::array<std::function<void(size_t, Vector2)>, cumulative_customers_size> builders_;
+
     };
 }
 #endif
