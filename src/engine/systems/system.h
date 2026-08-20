@@ -4,6 +4,7 @@
 #include "config.h"
 #include "entity.h"
 #include "events.h"
+#include "dog_factory.hpp"
 #include "quadtree.h"
 #include "events_interface.h"
 #include "render_layer.h"
@@ -152,6 +153,8 @@ namespace systems{
             size_t next_id();
             std::queue<size_t> recycled_ids_;
             size_t fresh_id_ = 0;
+
+            dog_factory::dog_factory dog_factory_;
     };
     class interaction_system{
         // for behavioural interactions

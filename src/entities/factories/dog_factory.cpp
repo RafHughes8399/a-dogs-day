@@ -1,9 +1,14 @@
 #include "dog_factory.hpp"
-
+#include <random>
+#include <algorithm>
 int dog_factory::dog_factory::pick_dog(){
-    dogs_.front();
-    dogs_.
-    return 0;
+    if(index_ == dogs_.size() - 1){
+        refresh_dogs();
+        
+    }
+    size_t dog = dogs_[index_];
+    ++index_;
+    return dog; 
 }
 
 void dog_factory::dog_factory::refresh_dogs(){
@@ -20,11 +25,14 @@ void dog_factory::dog_factory::refresh_dogs(){
     std::random_device rd;
     std::mt19937 g(rd());
     std::shuffle(dogs_.begin(), dogs_.end(), g);
+
+    index_ = 0;
 }
 
 // it does need an id and a position 
 void dog_factory::dog_factory::build_dog(size_t id, Vector2 position){
-    (void) id;
-    (void) position;
+    auto dog = pick_dog();
+    auto builder = builders_[dog];
+    builder(id, position);
     return;
 }
