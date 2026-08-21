@@ -4,13 +4,13 @@
 #include "component.h"
 #include "raymath.h"
 
-// the world spans the whole pathing graph - [0,-192] to [3072,2048] - over
-// MAX_DEPTH 4, so the nodes holding a 25x25 cursor hitbox are 192x140, and the
-// root centre is (1536,928). positions below are chosen against that grid:
-//   (100,100) -> depth 4, node [0,88]-[192,228]
-//   (102,102) -> same node, no reindex needed
-//   (150,50)  -> depth 4, node [0,-52]-[192,88]    sibling
-//   (180,100) -> depth 3, node [0,88]-[384,368]    straddles x=192
+// the world spans the whole pathing graph - [0,-192] to [3072,2240] - over
+// MAX_DEPTH 4, so the nodes holding a 25x25 cursor hitbox are 192x152, and the
+// root centre is (1536,1024). positions below are chosen against that grid:
+//   (100,150) -> depth 4, node [0,112]-[192,264]
+//   (102,152) -> same node, no reindex needed
+//   (150,50)  -> depth 4, node [0,-40]-[192,112]   sibling
+//   (180,150) -> depth 3, node [0,112]-[384,416]   straddles x=192
 //   centre-10 -> depth 0, straddles the world centre in both axes
 namespace {
     bool same_node(const raglib::bounding_box_2& a, const raglib::bounding_box_2& b){
@@ -18,7 +18,7 @@ namespace {
     }
     Vector2 world_centre_straddle(){
         return Vector2{level_config::graph_x + (level_config::graph_width * 0.5f) - 10.0f,
-            level_config::graph_y + (level_config::graph_height * 0.5f) - 10.0f};
+            level_config::footpath_y + (level_config::footpath_height * 0.5f) - 10.0f};
     }
     raglib::bounding_box_2 node_of(testing::ecs_test_game& game, size_t entity_id){
         raglib::bounding_box_2 bounds{};
@@ -105,16 +105,16 @@ SCENARIO("update_position carries the hitbox with the position", "[ecs][spatial]
 }
 
 SCENARIO("a move keeps the entity in one node, reindexing only when it must", "[ecs][spatial]"){
-    GIVEN("a cursor sitting in the [0,88]-[192,228] node at depth 4"){
+    GIVEN("a cursor sitting in the [0,112]-[192,264] node at depth 4"){
         testing::ecs_test_game game;
         auto cursor_id = game.create_cursor();
-        game.move_entity(cursor_id, Vector2{100.0f, 100.0f});
+        game.move_entity(cursor_id, Vector2{100.0f, 150.0f});
 
         REQUIRE(game.node_depth_of(cursor_id) == 4);
         auto start_node = node_of(game, cursor_id);
 
         WHEN("it moves but stays inside the same node"){
-            game.move_entity(cursor_id, Vector2{102.0f, 102.0f});
+            game.move_entity(cursor_id, Vector2{102.0f, 152.0f});
 
             THEN("it did not change node"){
                 REQUIRE(game.node_depth_of(cursor_id) == 4);
@@ -138,7 +138,7 @@ SCENARIO("a move keeps the entity in one node, reindexing only when it must", "[
         }
 
         WHEN("it moves onto a node boundary it now straddles"){
-            game.move_entity(cursor_id, Vector2{180.0f, 100.0f});
+            game.move_entity(cursor_id, Vector2{180.0f, 150.0f});
 
             THEN("it is promoted to the shallower node that still contains it"){
                 REQUIRE(game.node_depth_of(cursor_id) == 3);
@@ -162,12 +162,12 @@ SCENARIO("a move keeps the entity in one node, reindexing only when it must", "[
     GIVEN("a cursor promoted to depth 3 by straddling a boundary"){
         testing::ecs_test_game game;
         auto cursor_id = game.create_cursor();
-        game.move_entity(cursor_id, Vector2{180.0f, 100.0f});
+        game.move_entity(cursor_id, Vector2{180.0f, 150.0f});
 
         REQUIRE(game.node_depth_of(cursor_id) == 3);
 
         WHEN("it moves clear of the boundary"){
-            game.move_entity(cursor_id, Vector2{100.0f, 100.0f});
+            game.move_entity(cursor_id, Vector2{100.0f, 150.0f});
 
             THEN("it sinks to the deepest node that contains it"){
                 REQUIRE(game.node_depth_of(cursor_id) == 4);

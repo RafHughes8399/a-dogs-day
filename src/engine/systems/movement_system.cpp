@@ -158,6 +158,8 @@ void systems::movement_system::on_destroyed_entity(const events::remove_entity& 
 // ---------------- path features  -----------------
 std::optional<path::path> systems::movement_system::create_path(Vector2 source, Vector2 direction,
     Vector2 destination, std::optional<size_t> destination_entity){
+    if(not cafe_.position_in_area(source) and not footpath_.position_in_area(source)){ return std::nullopt; }
+    if(not cafe_.position_in_area(destination) and not footpath_.position_in_area(destination)){ return std::nullopt; }
     auto& source_graph = resolve_graph(source);
     auto& destination_graph = resolve_graph(destination);
     if(source_graph != destination_graph) {return std::nullopt;}

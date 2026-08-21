@@ -203,7 +203,8 @@ SCENARIO("the graph rejects positions outside the world", "[ecs][graph][movement
         }
 
         WHEN("the dog is moved clear of the bottom edge"){
-            game.move_entity(dog_id, Vector2{0.0f, level_config::world_y});
+            game.move_entity(dog_id, Vector2{0.0f,
+                level_config::footpath_y + level_config::footpath_height});
 
             THEN("it marks nothing"){
                 REQUIRE(game.graph_occupied_node_count() == 0);

@@ -384,3 +384,31 @@ what is left
          -> i think the serving and clearing system port is the way to go, they can manage the assignment to jobs, the updates to jibs and 
          -> trigger state changes 
 -> then processing interactions [that is where we are up to and can come in a later branch ?]
+
+21/8
+
+customer arrival system + customer destroying
+
+-> the customer_arrival_system scaffold is still empty, create_dog / destroy_dog are comments.
+   the factory builds the dog and issues its path, nothing owns the other end of its life
+-> nothing removes a customer once it finishes walking the footpath. it parks on the destination
+   node and that node stays occupied forever
+-> consequence: only the FIRST customer ever walks. dog 0 rests at (64,2176), graph_occupant_at
+   that node then returns 0, and every later customer gets no path and stands at the spawn point
+   -> probed it. 3 spawns, no despawn -> path=1, path=0, path=0
+   -> same probe with lifespan.remove(id) on arrival -> 5 spawns, all path and complete
+-> made worse by pick_route() hard returning 0, so every customer targets the identical exit node.
+   randomising the route only spreads it across two nodes, it does not fix it
+-> so despawn is the actual blocker for the feature, not the pathing
+
+-> open question, where the departure lives:
+   -> movement_system despawning when a path completes at a destination node is the cheap version,
+      but that makes the movement system decide when a customer's life ends, which is orchestration
+   -> customer_arrival_system owning both ends [spawn a dog, hear it reach the footpath exit,
+      destroy it] matches the world-ownership vs business-logic split and is where the scaffold
+      already says it should go
+   -> needs a "customer reached the footpath exit" fact to hang off. there is no path_failed and no
+      per leg completed fact in the ecs yet [see the movement system status notes above], so this is
+      probably the moment to decide whether dog_completed_path comes back
+-> also still open: nothing decides which passing customers actually enter the cafe. that arrival
+   condition depends on free tables and the most recent arrival, per the queuing notes above

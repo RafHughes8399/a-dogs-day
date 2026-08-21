@@ -48,26 +48,6 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
 
     component_helpers::add_interactor_component(id, reach);
 }
-void ecs_entities::build_customer_dog(size_t id, Vector2 position,
-    std::vector<sprite::sprite> sprites, size_t kind, float reach){
-    component_helpers::add_positional_component(id, position);
-
-    std::vector<components::renderable_component::sprite_component> sprite_components = {
-        component_builders::build_sprite_component(sprites, level_config::directions::right)};
-    component_helpers::add_renderable_component(id, sprite_components);
-
-    auto across_hitbox = hitbox_builders::build_dog_across_hitbox(position);
-    std::vector<hitbox::hitbox> hitboxes = {across_hitbox, across_hitbox};
-    component_helpers::add_collision_component(id,
-        component_builders::build_hitbox_component(hitboxes,
-            level_config::directions::right));
-    component_helpers::add_movement_component(id, dog_config::dog_move_speed,
-        level_config::direction_scalars[level_config::directions::right]);
-
-    component_helpers::add_selectable_component(id, kind);
-
-    component_helpers::add_interactor_component(id, reach);
-}
     void ecs_entities::build_khiri(size_t id){
         // ! left right, parallel to level_config::directions
         std::vector<sprite::sprite> sprites;
@@ -116,7 +96,15 @@ void ecs_entities::build_tex(size_t id, Vector2 position){
             entity_config::mack_left_path, entity_config::mack_across_attributes));
         sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_right,
             entity_config::mack_right_path, entity_config::mack_across_attributes));
-    build_dog(id, position, sprites, entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
+    build_dog(id, position, std::move(sprites), entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
+}
+void ecs_entities::build_garfield(size_t id, Vector2 position){
+        std::vector<sprite::sprite> sprites;
+        sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_left,
+            entity_config::khiri_left_path, entity_config::khiri_across_attributes));
+        sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_right,
+            entity_config::khiri_right_path, entity_config::khiri_across_attributes));
+    build_dog(id, position, std::move(sprites), entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
 }
 
 

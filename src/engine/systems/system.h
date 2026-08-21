@@ -156,7 +156,6 @@ namespace systems{
             size_t fresh_id_ = 0;
 
             dog_factory::dog_factory dog_factory_;
-            float time_since_dog_;
     };
     class interaction_system{
         // for behavioural interactions
@@ -281,6 +280,7 @@ namespace systems{
             graph::level_graph footpath_;
     };
     class npc_system{
+        public:
         // uses the expediter and the maitre d to orchestrate
         // customer arrivals and departures
         // and waiter serving and clearing
@@ -291,15 +291,33 @@ namespace systems{
                 // * clearing system  - managers clearing tables after customers have left
             class customer_arrival_system{
                 public:
+                    ~customer_arrival_system() = default;
+                    customer_arrival_system() = default;
+
+                    customer_arrival_system(const customer_arrival_system& other) = default;
+                    customer_arrival_system(customer_arrival_system&& other) = default;
+
+                    customer_arrival_system& operator=(const customer_arrival_system& other) = default;
+                    customer_arrival_system& operator=(customer_arrival_system&& other) = default;
+                    
                     // create_dog
                     // destroy_dog
+                    void update(float delta);
+                    void create_customer_dog();
+                    void destroy_customer_dog(size_t id);
 
+                    void register_customer(size_t id);
+                    // teardown between test scenarios - the singleton outlives them
+                    void clear(){
+                        customers_.clear();
+                        time_since_dog_ = 0.0f;
+                    }
                     // check dog enter cafe
-                    // 
+                    //
                 private:
-                    // footpath_ footpath-:
                     // const Rectangle cafe_entrace_;
-                    // 
+                    float time_since_dog_ = 0.0f;
+                    std::vector<size_t> customers_;
             };
             class table_allocation_system{
                 public:
@@ -324,10 +342,15 @@ namespace systems{
 
             npc_system& operator=(const npc_system& other) = delete;
             npc_system& operator=(npc_system&& other) = delete;
+
+            void register_customer(size_t id);
+            void clear(){
+                customer_arrival_.clear();
+            }
         private:
             npc_system() = default;
+            customer_arrival_system customer_arrival_;
         public:
-
             void update(float delta);
     };
     class rendering_system{
@@ -444,7 +467,7 @@ namespace systems{
             spatial_system(raglib::bounding_box_2 world_bounds = raglib::bounding_box_2{
                 Vector2{level_config::graph_x, level_config::graph_y},
                 Vector2{level_config::graph_x + level_config::graph_width,
-                    level_config::graph_y + level_config::graph_height}})
+                    level_config::footpath_y + level_config::footpath_height}})
                 : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
                 move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
                 remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
@@ -503,6 +526,7 @@ namespace systems{
         movement_system::get_instance().clear();
         control_input_system::get_instance().clear();
         selection_system::get_instance().clear();
+        npc_system::get_instance().clear();
     }
 
     // hold a refernece to the glboal managers that they need to process things

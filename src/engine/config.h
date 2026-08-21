@@ -89,15 +89,16 @@ namespace level_config{
     inline float world_y = 2048.0f;
     
     inline float graph_x = 0.0f;
-    inline float graph_y = -3 * edge_weight;
+    inline float footpath_overhang = 3 * edge_weight;
+    inline float graph_y = -footpath_overhang;
     inline float graph_width = world_x;
-    inline float graph_height = world_y + (3 * edge_weight);
+    inline float graph_height = world_y + footpath_overhang;
     
     // footpath bounds
     inline float footpath_x = 0.0f;
     inline float footpath_y = graph_y;
     inline float footpath_width = 5.0f * edge_weight;
-    inline float footpath_height = graph_height;
+    inline float footpath_height = graph_height + footpath_overhang;
     // cafe_bounds 
     inline float zone_overlap = 1.0f * edge_weight;
     inline float cafe_x = footpath_x + footpath_width - zone_overlap;
@@ -341,7 +342,7 @@ namespace entity_config{
 }
 namespace dog_config{
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
-    inline const float customer_spawn_interval = 8.0f;
+    inline const float customer_spawn_interval = 90.0f;
     inline const float dog_reach = level_config::edge_weight * 0.3f;
     enum waiter_dog_types{
         basic = 0,

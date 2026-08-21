@@ -22,13 +22,18 @@ namespace dog_factory{
             ~dog_factory() = default;
             dog_factory()
             :dogs_({}), builders_({
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_tex(id, position);}
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_tex(id, position);},
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_garfield(id, position);}
             }), spawn_positions_({
-                Vector2{level_config::edge_weight, -2 * level_config::edge_weight  },
-                Vector2{level_config::edge_weight * 3, (level_config::cafe_y + level_config::cafe_height) + 2 * level_config::edge_weight}
+                Vector2{level_config::edge_weight,
+                    level_config::footpath_y + level_config::edge_weight},
+                Vector2{level_config::edge_weight * 3,
+                    level_config::footpath_y + level_config::footpath_height - level_config::edge_weight}
             }), destination_positions_({
-                Vector2{level_config::edge_weight,(level_config::cafe_y + level_config::cafe_height) + 2 * level_config::edge_weight},
-                Vector2{level_config::edge_weight * 3, -2 * level_config::edge_weight}, 
+                Vector2{level_config::edge_weight,
+                    level_config::footpath_y + level_config::footpath_height - level_config::edge_weight},
+                Vector2{level_config::edge_weight * 3,
+                    level_config::footpath_y + level_config::edge_weight}
             }){
                 refresh_dogs();
             }
@@ -41,14 +46,13 @@ namespace dog_factory{
 
         private:
             // define the customer marble bag as per that video
-            int pick_dog();
-            Vector2 pick_spawn();
-            Vector2 pick_destination();
+            size_t pick_dog();
+            size_t pick_route();
             void refresh_dogs();
             // * parallel array in a sense to the dogs enum, the dog type is an index, 
             // * and the value at the index is the number that dog left and the function to build that dog
-            std::vector<int> dogs_;
-            int index_ = 0;
+            std::vector<size_t> dogs_;
+            size_t index_ = 0;
             std::array<std::function<void(size_t, Vector2)>, cumulative_customers_size> builders_;
 
             // need spawn
