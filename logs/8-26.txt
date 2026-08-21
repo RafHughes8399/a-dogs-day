@@ -355,12 +355,18 @@ what is left
             -> when they reach a position that is in both
          -> adjust rendering to partially redner the portion that is in frame x 
          
-         -> entity factory for customers [ to decide their positioning and their sprite]
+         -> entity factory for customers [ to decide their positioning and their sprite] x
          -> 
          -> scaffolding the serving system 
             -> arrival condtional logic [depends on the most recent arrival and free tables]
             -> assigning a customer to a table
 
+         -> customers can be built and destroyed and walk along the path
+         -> tidy upon spawn and walking values
+            -> time since dog can be reduced
+         -> logic for entering the cafe
+            -> who and when [ is there a free table will suffice for now]
+            -> bridging the graph gap
    -> state machines and event listening it seems would drive this
       -> the state decides what events need to be listened to
       -> for example: 
