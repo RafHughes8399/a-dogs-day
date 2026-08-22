@@ -372,6 +372,11 @@ what is left
          -> then setup logic for getting a customer into the cafe
             -> define the entrance
             -> define the logic to actually send the dog [free table check]
+                -> finish steup of table unregsiter and register
+                -> test table reigstering and table picking 
+                -> then define the cafe entrance
+                -> then setup the two legged path
+                
             -> send to entrance, then queue a path from entrance to the table
             
    -> state machines and event listening it seems would drive this

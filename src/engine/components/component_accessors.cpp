@@ -36,6 +36,15 @@ std::vector<game_config::input>& components::mouse_input_component::get_inputs()
 }
 
 // ---------------- interactable components ----------------
+bool components::interactable_component::can_accept_interactor(size_t id){
+    auto collision = component_managers::collision_manager_.get_component(id);
+    if(collision){
+        auto box = collision->get_hitbox_component().get_hitbox().get_box();
+        auto interactor = systems::spatial_system::get_instance().check_interactions_with(id, get_interaction_box(box));
+        return interactor == game_config::empty_entity ? true : false;
+    }
+    return false;
+}
 Rectangle components::interactable_component::get_interaction_box(Rectangle box) const{
     return Rectangle{box.x - reach_,
                      box.y - reach_,

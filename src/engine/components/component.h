@@ -108,6 +108,7 @@ public:
 
     Rectangle get_interaction_box(Rectangle box) const;
     std::optional<Vector2> get_interaction_offset(Vector2 source, Vector2 own_position) const;
+    bool can_accept_interactor(size_t id);
 #ifdef DOG_DAYS_TESTING
     std::optional<Vector2> get_slot_offset(size_t direction) const{
         return positions_[direction];
@@ -121,6 +122,7 @@ private:
     // * 2. up
     // * 3. down
     std::array<std::optional<Vector2>, DIRECTIONS> positions_;
+    
 };
 
 // components::interactor_component  - actors do interaction

@@ -291,6 +291,8 @@ namespace systems{
                 // * clearing system  - managers clearing tables after customers have left
             class customer_arrival_system{
                 public:
+                    // TODO must listen to table construction and deletion, can create a new event for it and update teh builders 
+                    // TODO and destroyers to emit those events 
                     ~customer_arrival_system() = default;
                     customer_arrival_system() = default;
 
@@ -311,7 +313,7 @@ namespace systems{
                     void unregister_table(size_t id);
                     
                     bool free_tables();
-                    size_t pick_table();
+                    int pick_table();
                     // teardown between test scenarios - the singleton outlives them
                     void clear(){
                         customers_.clear();
@@ -512,6 +514,7 @@ namespace systems{
             }
             int check_collision_with(size_t id, Vector2 position);
             int check_collision_with(size_t id, Rectangle box);
+            int check_interactions_with(size_t id, Rectangle box);
         private:
             // an entity with no collision component has no bounds and is not indexed
             hitbox::hitbox* bounds_for(size_t entity_id);

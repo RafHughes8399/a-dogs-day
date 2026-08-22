@@ -15,16 +15,25 @@ namespace {
 }
 
 void systems::npc_system::customer_arrival_system::register_table(size_t id){
-    (void) id;
+    tables_.push_back(id);
 }
 void systems::npc_system::customer_arrival_system::unregister_table(size_t id){
     (void) id;
 }             
 bool systems::npc_system::customer_arrival_system::free_tables(){
+    return pick_table() != game_config::empty_entity;
     return true;
 }
-size_t systems::npc_system::customer_arrival_system::pick_table(){
-    return 1;
+int systems::npc_system::customer_arrival_system::pick_table(){
+    for(auto table : tables_){
+        // get the interactable component
+        // check its status
+        auto interactable = component_managers::interactable_manager_.get_component(table);
+        if(interactable and interactable->can_accept_interactor(table)){
+            return table;
+        }
+    }
+    return game_config::empty_entity;
 }
 
 void systems::npc_system::customer_arrival_system::register_customer(size_t id){
@@ -46,14 +55,23 @@ void systems::npc_system::customer_arrival_system::destroy_customer_dog(size_t i
     entity_lifespan_system::get_instance().remove(id);
     std::erase_if(customers_,  [id](auto customer) -> bool {return customer == id;});
 }
+
+// TODO refactor: extract update behaviours into their own function
 void systems::npc_system::customer_arrival_system::update(float delta){
     time_since_dog_ += delta;
-    // check for creating customers
+    // * check for creating customers
     if(time_since_dog_ >= dog_config::customer_spawn_interval){
         create_customer_dog();
         time_since_dog_ = 0.0f;
     }
-    // check existing customers
+    // * check to send a customer to a table 
+    if(not customers_.empty()){
+        auto table = pick_table();
+        if(table != game_config::empty_entity){
+            // * send customer to table
+        }
+    }
+    // * clean up customers
     std::vector<size_t> departed;
     for(auto customer : customers_){
         auto movement = component_managers::movement_manager_.get_component(customer);
@@ -64,6 +82,7 @@ void systems::npc_system::customer_arrival_system::update(float delta){
     for(auto id : departed){
         destroy_customer_dog(id);
     }
+
 }
 
 void systems::npc_system::update(float delta){
