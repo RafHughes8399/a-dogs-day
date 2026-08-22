@@ -36,14 +36,37 @@ std::vector<game_config::input>& components::mouse_input_component::get_inputs()
 }
 
 // ---------------- interactable components ----------------
-bool components::interactable_component::can_accept_interactor(size_t id){
-    auto collision = component_managers::collision_manager_.get_component(id);
-    if(collision){
-        auto box = collision->get_hitbox_component().get_hitbox().get_box();
-        auto interactor = systems::spatial_system::get_instance().check_interactions_with(id, get_interaction_box(box));
-        return interactor == game_config::empty_entity ? true : false;
+bool components::interactable_component::can_accept_interactor() const{
+    for(size_t i = 0; i < positions_.size(); ++i){
+        if(positions_[i].has_value() and not interactors_[i].has_value()){
+            return true;
+        }
     }
     return false;
+}
+bool components::interactable_component::claim(size_t interactor_id){
+    for(auto& interactor : interactors_){
+        if(interactor.has_value() and interactor.value() == interactor_id){
+            return false;
+        }
+    }
+    for(size_t i = 0; i < positions_.size(); ++i){
+        if(positions_[i].has_value() and not interactors_[i].has_value()){
+            interactors_[i] = interactor_id;
+            return true;
+        }
+    }
+    return false;
+}
+void components::interactable_component::release(size_t interactor_id){
+    for(auto& interactor : interactors_){
+        if(interactor.has_value() and interactor.value() == interactor_id){
+            interactor.reset();
+        }
+    }
+}
+const std::array<std::optional<size_t>, DIRECTIONS>& components::interactable_component::get_interactors() const{
+    return interactors_;
 }
 Rectangle components::interactable_component::get_interaction_box(Rectangle box) const{
     return Rectangle{box.x - reach_,

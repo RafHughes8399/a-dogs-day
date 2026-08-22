@@ -41,7 +41,7 @@ int systems::npc_system::customer_arrival_system::pick_table(){
         // get the interactable component
         // check its status
         auto interactable = component_managers::interactable_manager_.get_component(table);
-        if(interactable and interactable->can_accept_interactor(table)){
+        if(interactable and interactable->can_accept_interactor()){
             return table;
         }
     }

@@ -141,10 +141,29 @@ void component_helpers::unregister_renderable_component(size_t entity_id){
 void component_helpers::unregister_collision_component(size_t entity_id){
     component_managers::collision_manager_.unregister_component(entity_id);
 }
+// * the interactor/interactable claim is a two-way handshake, so tearing either
+// * side down has to undo the other half first - the link lives inside the
+// * component about to be erased. neither direction can recurse: release only
+// * writes interactors_, stop_interacting only writes target_
 void component_helpers::unregister_interactor_component(size_t entity_id){
+    if(auto* interactor = component_managers::interactor_manager_.get_component(entity_id)){
+        if(auto target = interactor->get_target(); target.has_value()){
+            if(auto* interactable = component_managers::interactable_manager_.get_component(target.value())){
+                interactable->release(entity_id);
+            }
+        }
+    }
     component_managers::interactor_manager_.unregister_component(entity_id);
 }
 void component_helpers::unregister_interactable_component(size_t entity_id){
+    if(auto* interactable = component_managers::interactable_manager_.get_component(entity_id)){
+        for(auto slot : interactable->get_interactors()){
+            if(not slot.has_value()){ continue; }
+            if(auto* interactor = component_managers::interactor_manager_.get_component(slot.value())){
+                interactor->stop_interacting();
+            }
+        }
+    }
     component_managers::interactable_manager_.unregister_component(entity_id);
 }
 void component_helpers::unregister_key_input_component(size_t entity_id){

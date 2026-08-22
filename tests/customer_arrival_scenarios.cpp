@@ -9,13 +9,9 @@
 #include "system.h"
 
 namespace{
-    // A table's hitbox is 128x128 (entity_config::table_attributes) and
-    // entity_config::station_reach is 16, so its interaction box spans 160x160
-    // from (x-16, y-16). A dog occupies a table when its own interaction box
-    // overlaps that; k_clear_gap puts one far enough away that it does not.
     constexpr float k_clear_gap = 400.0f;
-    // close enough that the two tables' interaction boxes overlap - which no
-    // longer means anything, and that is the point of the scenario using it
+    // close enough that the two stations' interaction boxes overlap, which no
+    // longer means anything - that is the point of the scenario using it
     constexpr float k_neighbour_gap = 100.0f;
 
     Vector2 in_cafe(float x, float y){
@@ -24,6 +20,36 @@ namespace{
 
     bool tracks(const std::vector<size_t>& ids, size_t id){
         return std::find(ids.begin(), ids.end(), id) != ids.end();
+    }
+
+    // both halves of the handshake, the way a real claim would land
+    void seat(size_t dog_id, size_t table_id){
+        auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+        auto* interactor = component_managers::interactor_manager_.get_component(dog_id);
+        REQUIRE(interactable != nullptr);
+        REQUIRE(interactor != nullptr);
+        REQUIRE(interactable->claim(dog_id));
+        interactor->interact_with(table_id);
+    }
+
+    // build_table opens a left and a right slot, so a table seats two
+    void fill(testing::ecs_test_game& game, size_t table_id){
+        seat(game.create_customer_dog(in_cafe(2000.0f, 2000.0f)), table_id);
+        seat(game.create_customer_dog(in_cafe(2000.0f, 2000.0f)), table_id);
+    }
+
+    bool claimed_by(size_t table_id, size_t dog_id){
+        auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+        if(interactable == nullptr){ return false; }
+        for(auto slot : interactable->get_interactors()){
+            if(slot.has_value() and slot.value() == dog_id){ return true; }
+        }
+        return false;
+    }
+
+    std::optional<size_t> target_of(size_t dog_id){
+        auto* interactor = component_managers::interactor_manager_.get_component(dog_id);
+        return interactor == nullptr ? std::nullopt : interactor->get_target();
     }
 }
 
@@ -201,6 +227,64 @@ SCENARIO("clearing the arrival system drops both registers", "[ecs][npc][custome
     }
 }
 
+SCENARIO("a table takes two claims to fill", "[ecs][npc][customer_arrival][pick_table]"){
+    GIVEN("one registered table"){
+        testing::ecs_test_game game;
+        systems::npc_system::customer_arrival_system arrival;
+
+        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
+        arrival.register_table(table_id);
+        auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+
+        THEN("build_table opened a left and a right slot and nothing else"){
+            REQUIRE(interactable->get_slot_offset(level_config::directions::left).has_value());
+            REQUIRE(interactable->get_slot_offset(level_config::directions::right).has_value());
+            REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());
+            REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::down).has_value());
+        }
+
+        WHEN("one dog claims it"){
+            auto first_id = game.create_customer_dog(in_cafe(320.0f, 320.0f + k_clear_gap));
+            seat(first_id, table_id);
+
+            THEN("the second slot is still open"){
+                REQUIRE(interactable->can_accept_interactor());
+                REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
+            }
+
+            AND_WHEN("a second dog claims it"){
+                auto second_id = game.create_customer_dog(in_cafe(320.0f, 320.0f + k_clear_gap));
+                seat(second_id, table_id);
+
+                THEN("the table is full"){
+                    REQUIRE_FALSE(interactable->can_accept_interactor());
+                    REQUIRE(arrival.pick_table() == game_config::empty_entity);
+                }
+                THEN("a third dog is turned away"){
+                    auto third_id = game.create_customer_dog(in_cafe(320.0f, 320.0f + k_clear_gap));
+                    REQUIRE_FALSE(interactable->claim(third_id));
+                }
+            }
+
+            AND_WHEN("the same dog claims again"){
+                THEN("the duplicate is rejected and no second slot is spent"){
+                    REQUIRE_FALSE(interactable->claim(first_id));
+                    REQUIRE(interactable->can_accept_interactor());
+                }
+            }
+
+            AND_WHEN("it releases"){
+                interactable->release(first_id);
+
+                THEN("the slot comes back"){
+                    REQUIRE_FALSE(claimed_by(table_id, first_id));
+                    REQUIRE(interactable->can_accept_interactor());
+                }
+            }
+        }
+    }
+}
+
 SCENARIO("picking a table with a single registered table", "[ecs][npc][customer_arrival][pick_table]"){
     GIVEN("a fresh ecs world and an arrival system"){
         testing::ecs_test_game game;
@@ -213,7 +297,7 @@ SCENARIO("picking a table with a single registered table", "[ecs][npc][customer_
             }
         }
 
-        WHEN("the one registered table has no dog near it"){
+        WHEN("the one registered table is unclaimed"){
             auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
             arrival.register_table(table_id);
 
@@ -223,10 +307,10 @@ SCENARIO("picking a table with a single registered table", "[ecs][npc][customer_
             }
         }
 
-        WHEN("a dog stands inside the one registered table's interaction box"){
+        WHEN("both of the one registered table's slots are claimed"){
             auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-            game.create_customer_dog(in_cafe(320.0f, 320.0f));
             arrival.register_table(table_id);
+            fill(game, table_id);
 
             THEN("nothing is picked"){
                 REQUIRE(arrival.pick_table() == game_config::empty_entity);
@@ -234,12 +318,12 @@ SCENARIO("picking a table with a single registered table", "[ecs][npc][customer_
             }
         }
 
-        WHEN("a dog stands well clear of the one registered table"){
+        WHEN("a dog stands on the one registered table without claiming it"){
             auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-            game.create_customer_dog(in_cafe(320.0f, 320.0f + k_clear_gap));
+            game.create_customer_dog(in_cafe(320.0f, 320.0f));
             arrival.register_table(table_id);
 
-            THEN("it is still picked"){
+            THEN("it is still picked - occupancy is a claim, not proximity"){
                 REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
                 REQUIRE(arrival.free_tables());
             }
@@ -274,7 +358,7 @@ SCENARIO("picking a table with several registered tables", "[ecs][npc][customer_
         testing::ecs_test_game game;
         systems::npc_system::customer_arrival_system arrival;
 
-        WHEN("no registered table has a dog near it"){
+        WHEN("no registered table is claimed"){
             auto first_id = game.create_table(in_cafe(320.0f, 320.0f));
             auto second_id = game.create_table(in_cafe(320.0f, 320.0f + k_clear_gap));
             auto third_id = game.create_table(in_cafe(320.0f, 320.0f + 2.0f * k_clear_gap));
@@ -296,16 +380,16 @@ SCENARIO("picking a table with several registered tables", "[ecs][npc][customer_
             }
         }
 
-        WHEN("every registered table has a dog on it"){
+        WHEN("every registered table is full"){
             auto first_id = game.create_table(in_cafe(320.0f, 320.0f));
             auto second_id = game.create_table(in_cafe(320.0f, 320.0f + k_clear_gap));
             auto third_id = game.create_table(in_cafe(320.0f, 320.0f + 2.0f * k_clear_gap));
-            game.create_customer_dog(in_cafe(320.0f, 320.0f));
-            game.create_customer_dog(in_cafe(320.0f, 320.0f + k_clear_gap));
-            game.create_customer_dog(in_cafe(320.0f, 320.0f + 2.0f * k_clear_gap));
             arrival.register_table(first_id);
             arrival.register_table(second_id);
             arrival.register_table(third_id);
+            fill(game, first_id);
+            fill(game, second_id);
+            fill(game, third_id);
 
             THEN("nothing is picked"){
                 REQUIRE(arrival.pick_table() == game_config::empty_entity);
@@ -313,23 +397,23 @@ SCENARIO("picking a table with several registered tables", "[ecs][npc][customer_
             }
         }
 
-        WHEN("exactly one registered table is clear and it was registered last"){
+        WHEN("exactly one registered table has room and it was registered last"){
             auto first_id = game.create_table(in_cafe(320.0f, 320.0f));
             auto second_id = game.create_table(in_cafe(320.0f, 320.0f + k_clear_gap));
-            auto clear_id = game.create_table(in_cafe(320.0f, 320.0f + 2.0f * k_clear_gap));
-            game.create_customer_dog(in_cafe(320.0f, 320.0f));
-            game.create_customer_dog(in_cafe(320.0f, 320.0f + k_clear_gap));
+            auto free_id = game.create_table(in_cafe(320.0f, 320.0f + 2.0f * k_clear_gap));
             arrival.register_table(first_id);
             arrival.register_table(second_id);
-            arrival.register_table(clear_id);
+            arrival.register_table(free_id);
+            fill(game, first_id);
+            fill(game, second_id);
 
-            THEN("the occupied pair is skipped and the clear table is picked"){
-                REQUIRE(arrival.pick_table() == static_cast<int>(clear_id));
+            THEN("the full pair is skipped and the free table is picked"){
+                REQUIRE(arrival.pick_table() == static_cast<int>(free_id));
                 REQUIRE(arrival.free_tables());
             }
 
-            AND_WHEN("the clear table is unregistered too"){
-                arrival.unregister_table(clear_id);
+            AND_WHEN("the free table is unregistered too"){
+                arrival.unregister_table(free_id);
 
                 THEN("nothing is left to pick"){
                     REQUIRE(arrival.pick_table() == game_config::empty_entity);
@@ -338,58 +422,80 @@ SCENARIO("picking a table with several registered tables", "[ecs][npc][customer_
             }
         }
 
-        WHEN("an occupying dog is removed from the world"){
+        WHEN("a claiming dog walks away without releasing"){
             auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-            auto dog_id = game.create_customer_dog(in_cafe(320.0f, 320.0f));
             arrival.register_table(table_id);
+            auto first_id = game.create_customer_dog(in_cafe(320.0f, 320.0f));
+            auto second_id = game.create_customer_dog(in_cafe(320.0f, 320.0f));
+            seat(first_id, table_id);
+            seat(second_id, table_id);
             REQUIRE(arrival.pick_table() == game_config::empty_entity);
 
-            game.remove(dog_id);
+            game.move_entity(first_id, in_cafe(320.0f, 320.0f + 2.0f * k_clear_gap));
 
-            THEN("the table becomes pickable again"){
-                REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
-                REQUIRE(arrival.free_tables());
-            }
-        }
-
-        WHEN("an occupying dog walks out of the table's interaction box"){
-            auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-            auto dog_id = game.create_customer_dog(in_cafe(320.0f, 320.0f));
-            arrival.register_table(table_id);
-            REQUIRE(arrival.pick_table() == game_config::empty_entity);
-
-            game.move_entity(dog_id, in_cafe(320.0f, 320.0f + k_clear_gap));
-
-            THEN("the table frees up"){
-                REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
-                REQUIRE(arrival.free_tables());
+            THEN("the table stays taken - this is what reservation means"){
+                REQUIRE(arrival.pick_table() == game_config::empty_entity);
+                REQUIRE(claimed_by(table_id, first_id));
             }
         }
     }
 }
 
-SCENARIO("any dog occupies a table, not just a customer", "[ecs][npc][customer_arrival][pick_table]"){
-    GIVEN("one registered table with a waiter dog standing on it"){
+SCENARIO("removing an entity undoes both halves of the claim",
+        "[ecs][npc][customer_arrival][lifespan]"){
+    GIVEN("a full table with both seats claimed"){
         testing::ecs_test_game game;
         systems::npc_system::customer_arrival_system arrival;
 
         auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-        auto waiter_id = game.create_waiter_dog(in_cafe(320.0f, 320.0f));
         arrival.register_table(table_id);
+        auto first_id = game.create_customer_dog(in_cafe(320.0f, 320.0f + k_clear_gap));
+        auto second_id = game.create_customer_dog(in_cafe(320.0f, 320.0f + k_clear_gap));
+        seat(first_id, table_id);
+        seat(second_id, table_id);
 
-        THEN("both entities are in the spatial index"){
-            REQUIRE(game.is_tracked(table_id));
-            REQUIRE(game.is_tracked(waiter_id));
+        REQUIRE(arrival.pick_table() == game_config::empty_entity);
+        REQUIRE(claimed_by(table_id, first_id));
+        REQUIRE(target_of(first_id) == table_id);
+
+        WHEN("one of the dogs is removed"){
+            game.remove(first_id);
+
+            THEN("its slot is released and the table opens up again"){
+                REQUIRE_FALSE(claimed_by(table_id, first_id));
+                REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
+            }
+            THEN("the other dog keeps its own claim"){
+                REQUIRE(claimed_by(table_id, second_id));
+                REQUIRE(target_of(second_id) == table_id);
+            }
         }
-        THEN("the waiter carries an interactor, not an interactable"){
-            REQUIRE(game.has_interactor(waiter_id));
-            REQUIRE_FALSE(game.has_interactable(waiter_id));
+
+        WHEN("both dogs are removed"){
+            game.remove(first_id);
+            game.remove(second_id);
+
+            THEN("the table is empty"){
+                auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+                for(auto slot : interactable->get_interactors()){
+                    REQUIRE_FALSE(slot.has_value());
+                }
+                REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
+            }
         }
-        // occupancy is spatial and blind to why the dog is there - a waiter
-        // serving the table reads the same as a customer sitting at it
-        THEN("the table is not picked"){
-            REQUIRE(arrival.pick_table() == game_config::empty_entity);
-            REQUIRE_FALSE(arrival.free_tables());
+
+        WHEN("the table is removed instead"){
+            game.remove(table_id);
+
+            THEN("neither dog is left pointing at a dead id"){
+                REQUIRE_FALSE(target_of(first_id).has_value());
+                REQUIRE_FALSE(target_of(second_id).has_value());
+            }
+            THEN("the dogs themselves survive"){
+                REQUIRE(game.is_tracked(first_id));
+                REQUIRE(game.is_tracked(second_id));
+                REQUIRE(game.has_interactor(first_id));
+            }
         }
     }
 }

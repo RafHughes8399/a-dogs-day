@@ -97,8 +97,8 @@ public:
     // * performs the offset calcualtions in its body
     ~interactable_component() = default;
     interactable_component(float reach, std::array<std::optional<Vector2>, DIRECTIONS> positions)
-    : reach_(reach), positions_(positions){
-        
+    : reach_(reach), positions_(positions), interactors_(){
+
     }
     interactable_component(const interactable_component& other) = default;
     interactable_component(interactable_component&& other) = default;
@@ -108,7 +108,16 @@ public:
 
     Rectangle get_interaction_box(Rectangle box) const;
     std::optional<Vector2> get_interaction_offset(Vector2 source, Vector2 own_position) const;
-    bool can_accept_interactor(size_t id);
+    // * occupancy is a claim, not a proximity test - a table promised to a
+    // * customer still walking over reads as taken, which a spatial check
+    // * cannot express. claim/release are the only writers of interactors_,
+    // * and their counterparts on interactor_component are interact_with/
+    // * stop_interacting - the two sides are paired only in
+    // * component_helpers::unregister_interact*_component
+    bool can_accept_interactor() const;
+    bool claim(size_t interactor_id);
+    void release(size_t interactor_id);
+    const std::array<std::optional<size_t>, DIRECTIONS>& get_interactors() const;
 #ifdef DOG_DAYS_TESTING
     std::optional<Vector2> get_slot_offset(size_t direction) const{
         return positions_[direction];
@@ -122,7 +131,8 @@ private:
     // * 2. up
     // * 3. down
     std::array<std::optional<Vector2>, DIRECTIONS> positions_;
-    
+    // parallel to positions_ - interactors_[i] holds whoever claimed slot i
+    std::array<std::optional<size_t>, DIRECTIONS> interactors_;
 };
 
 // components::interactor_component  - actors do interaction
