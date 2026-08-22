@@ -14,6 +14,19 @@ namespace {
     }
 }
 
+void systems::npc_system::customer_arrival_system::register_table(size_t id){
+    (void) id;
+}
+void systems::npc_system::customer_arrival_system::unregister_table(size_t id){
+    (void) id;
+}             
+bool systems::npc_system::customer_arrival_system::free_tables(){
+    return true;
+}
+size_t systems::npc_system::customer_arrival_system::pick_table(){
+    return 1;
+}
+
 void systems::npc_system::customer_arrival_system::register_customer(size_t id){
     customers_.push_back(id);
 }

@@ -342,7 +342,7 @@ namespace entity_config{
 }
 namespace dog_config{
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
-    inline const float customer_spawn_interval = 90.0f;
+    inline const float customer_spawn_interval = 20.0f;
     inline const float dog_reach = level_config::edge_weight * 0.3f;
     enum waiter_dog_types{
         basic = 0,

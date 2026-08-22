@@ -348,6 +348,9 @@ what is left
             -> have the level graph define sub graphs that overlap and the entrace, then that gives you clean transitioning
             -> and then when you create a path, you pick an optional subgraph to create the path within
             -> just define the two within the movment_system, adn then do a bounds check if in zone
+
+
+
         -> dogs need to be able to bridge the gap at the entrace, a two-leg path
          -> send from the footpath to a node within the entrance
          -> and then send from the entrance to the cafe
@@ -361,12 +364,16 @@ what is left
             -> arrival condtional logic [depends on the most recent arrival and free tables]
             -> assigning a customer to a table
 
-         -> customers can be built and destroyed and walk along the path
-         -> tidy upon spawn and walking values
-            -> time since dog can be reduced
-         -> logic for entering the cafe
-            -> who and when [ is there a free table will suffice for now]
-            -> bridging the graph gap
+---------------------
+         -> adjust spawning values
+            -> update the graph representation so that a dog currently in flight does not block the creation of the path 
+            -> should be separate representaations for statison and dogs
+            -> randomise the spawn index and adjust the numbers
+         -> then setup logic for getting a customer into the cafe
+            -> define the entrance
+            -> define the logic to actually send the dog [free table check]
+            -> send to entrance, then queue a path from entrance to the table
+            
    -> state machines and event listening it seems would drive this
       -> the state decides what events need to be listened to
       -> for example: 

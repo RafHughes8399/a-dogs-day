@@ -41,7 +41,8 @@ void dog_factory::dog_factory::build_customer_dog(size_t id){
     auto route = pick_route();
     auto builder = builders_[dog];
     builder(id, spawn_positions_[route]);
-
+    debug::log("[dog_factory::build_customer_dog, built customer] id: "
+        + std::to_string(id));
     events::create_path_to create_path_event{id, destination_positions_[route], path::replace};
     event_interface::execute_event(create_path_event);
 

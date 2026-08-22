@@ -307,6 +307,11 @@ namespace systems{
                     void destroy_customer_dog(size_t id);
 
                     void register_customer(size_t id);
+                    void register_table(size_t id);
+                    void unregister_table(size_t id);
+                    
+                    bool free_tables();
+                    size_t pick_table();
                     // teardown between test scenarios - the singleton outlives them
                     void clear(){
                         customers_.clear();
@@ -318,6 +323,7 @@ namespace systems{
                     // const Rectangle cafe_entrace_;
                     float time_since_dog_ = 0.0f;
                     std::vector<size_t> customers_;
+                    std::vector<size_t> tables_;
             };
             class table_allocation_system{
                 public:
