@@ -207,6 +207,8 @@ namespace systems{
             // * the graph is private to this system, so walkability questions come
             // * through here - slot selection needs it in shipped builds, not only
             // * under DOG_DAYS_TESTING
+
+            void create_path();
             int graph_occupant_at(Vector2 position){
                 return resolve_graph(position).occupant_at(position);
             }
@@ -265,6 +267,20 @@ namespace systems{
 
             std::optional<path::path> create_path(Vector2 source, Vector2 direction, Vector2 destination,
                 std::optional<size_t> destination_entity = std::nullopt);
+            // * planning against a named graph is what lets a leg end in the
+            // * overlap band - resolve_graph always answers cafe there, so a
+            // * leg that re-derived its graph could never cross out of the footpath
+            std::optional<path::path> create_path(graph::level_graph& graph, Vector2 source,
+                Vector2 direction, Vector2 destination,
+                std::optional<size_t> destination_entity = std::nullopt);
+            void create_path_to(size_t entity_id, Vector2 destination,
+                const std::vector<Vector2>& checkpoints, path::assignment mode,
+                std::optional<size_t> destination_entity);
+            bool build_legs(Vector2 source, Vector2 direction, Vector2 destination,
+                std::optional<size_t> destination_entity,
+                std::vector<path::path>& legs, int depth = 0);
+            std::optional<Vector2> zone_crossing(graph::level_graph& from,
+                graph::level_graph& to, Vector2 source);
             void determine_direction(size_t id, components::movement_component& movement,
                 Vector2 position, Vector2 target);
             

@@ -31,8 +31,11 @@ bool systems::npc_system::customer_arrival_system::free_tables(){
     return pick_table() != game_config::empty_entity;
 }
 int systems::npc_system::customer_arrival_system::pick_customer(){
-    for(auto customer: customers_){
-
+    for(auto customer : customers_){
+        auto interactor = component_managers::interactor_manager_.get_component(customer);
+        if(interactor and not interactor->is_interacting()){
+            return static_cast<int>(customer);
+        }
     }
     return game_config::empty_entity;
 }
@@ -71,25 +74,46 @@ void systems::npc_system::customer_arrival_system::destroy_customer_dog(size_t i
 void systems::npc_system::customer_arrival_system::send_customer_to_table(){
     auto table = pick_table();
     auto customer = pick_customer();
-    if(table != game_config::empty_entity){
-        // * send customer to table,
-        Vector2 entrance;
-        // path to the entrance
-        // TODO need to flesh out a pathfinding system ? 
-        // TODO i need a helper that can create paths with checkpoints
-        //create_paths(customer, table, entrance);
-        events::create_path_to create_path_event = events::create_path_to(customer, entrance, path::replace);
-        event_interface::execute_event(create_path_event);
+    if(table == game_config::empty_entity or customer == game_config::empty_entity){ return; }
 
-        // path from the entrance to the table
-        
+    auto table_id = static_cast<size_t>(table);
+    auto customer_id = static_cast<size_t>(customer);
 
-    }
+    // * the claim goes in before the walk, not on arrival - the customer is
+    // * crossing the whole cafe and the table has to read as taken for every
+    // * frame of it, or the next pick hands the same table to the next customer
+    auto interactable = component_managers::interactable_manager_.get_component(table_id);
+    auto interactor = component_managers::interactor_manager_.get_component(customer_id);
+    if(interactable == nullptr or interactor == nullptr){ return; }
+    if(not interactable->claim(customer_id)){ return; }
+    interactor->interact_with(table_id);
+
+    auto table_position = component_managers::positional_manager_.get_component(table_id);
+    auto destination = table_position != nullptr
+        ? table_position->get_position()
+        : cafe_config::cafe_entrance;
+
+    debug::log("[customer_arrival_system::send_customer_to_table] customer: "
+        + std::to_string(customer_id)
+        + ", table: " + std::to_string(table_id)
+        + ", via entrance: " + raglib::vector_to_string(cafe_config::cafe_entrance));
+
+    // * the entrance is a checkpoint, so the route is footpath -> entrance,
+    // * entrance -> table. the movement system would find the seam itself, but
+    // * naming the door keeps customers walking through it rather than the
+    // * nearest crossing to wherever they happen to be standing
+    events::create_path_to create_path_event{customer_id, destination, path::replace,
+        table_id, std::vector<Vector2>{cafe_config::cafe_entrance}};
+    event_interface::execute_event(create_path_event);
 }
 
 void systems::npc_system::customer_arrival_system::customer_cleanup(){
     std::vector<size_t> departed;
     for(auto customer : customers_){
+        // * a customer holding a table has arrived somewhere on purpose - an
+        // * empty path queue means seated, not finished
+        auto interactor = component_managers::interactor_manager_.get_component(customer);
+        if(interactor and interactor->is_interacting()){ continue; }
         auto movement = component_managers::movement_manager_.get_component(customer);
         if(movement and movement->get_paths().empty()){
             departed.push_back(customer);

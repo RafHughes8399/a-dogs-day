@@ -223,8 +223,15 @@ namespace cafe_config{
         queue_width,
         queue_height
     };
-    inline const Vector2 cafe_entrance = Vector2Zero();  // TODO placeholder, input actual value 
-    inline const Vector2 cafe_exit = Vector2Zero();  // TODO placeholder, input actual value 
+    // * halfway up the cafe, on the seam the two zones share - x in
+    // * [cafe_x, footpath_x + footpath_width) sits inside both areas, and
+    // * level_config::cafe_x is the one grid column both graphs hold a node
+    // * for, so a path can end here from the footpath and start here into the cafe
+    inline const Vector2 cafe_entrance = Vector2{
+        level_config::cafe_x,
+        level_config::cafe_y + level_config::cafe_height * 0.5f
+    };
+    inline const Vector2 cafe_exit = Vector2Zero();  // TODO placeholder, input actual value
     
 }
 namespace station_config{

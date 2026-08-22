@@ -6,6 +6,7 @@
 #include "config.h"
 #include "ecs_test_game.h"
 #include "raylib.h"
+#include "raymath.h"
 #include "system.h"
 
 namespace{
@@ -495,6 +496,139 @@ SCENARIO("removing an entity undoes both halves of the claim",
                 REQUIRE(game.is_tracked(first_id));
                 REQUIRE(game.is_tracked(second_id));
                 REQUIRE(game.has_interactor(first_id));
+            }
+        }
+    }
+}
+
+SCENARIO("the cafe entrance sits on the seam both graphs share",
+        "[ecs][npc][customer_arrival][entrance]"){
+    GIVEN("the configured entrance"){
+        THEN("it is halfway up the cafe"){
+            REQUIRE(cafe_config::cafe_entrance.y
+                == level_config::cafe_y + level_config::cafe_height * 0.5f);
+        }
+        THEN("it is inside the overlap band, so both zones can reach it"){
+            REQUIRE(cafe_config::cafe_entrance.x >= level_config::cafe_x);
+            REQUIRE(cafe_config::cafe_entrance.x
+                < level_config::footpath_x + level_config::footpath_width);
+        }
+    }
+}
+
+SCENARIO("sending a customer to a table routes it through the entrance",
+        "[ecs][npc][customer_arrival][entrance]"){
+    GIVEN("a customer on the footpath and a free table in the cafe"){
+        testing::ecs_test_game game;
+        systems::npc_system::customer_arrival_system arrival;
+
+        auto customer_id = game.create_customer_dog(Vector2{96.0f, 512.0f});
+        auto table_id = game.create_table(Vector2{1600.0f, 1024.0f});
+        arrival.register_customer(customer_id);
+        arrival.register_table(table_id);
+
+        WHEN("it is sent to a table"){
+            arrival.send_customer_to_table();
+
+            THEN("the table is claimed before the walk starts"){
+                REQUIRE(claimed_by(table_id, customer_id));
+                REQUIRE(target_of(customer_id) == table_id);
+            }
+            THEN("the route is two legs - the entrance checkpoint is the crossing, so no extra split"){
+                REQUIRE(game.queued_path_count(customer_id) == 2);
+            }
+            THEN("the first leg ends at the entrance"){
+                auto destinations = game.path_destinations(customer_id);
+                REQUIRE(Vector2Equals(destinations.front(), cafe_config::cafe_entrance));
+            }
+            THEN("the last leg ends at an interaction slot, not the table centre"){
+                auto destinations = game.path_destinations(customer_id);
+                REQUIRE_FALSE(Vector2Equals(destinations.back(), Vector2{1600.0f, 1024.0f}));
+                REQUIRE(destinations.back().x >= level_config::cafe_x);
+            }
+        }
+
+        WHEN("a second customer is sent while the first holds a slot"){
+            arrival.send_customer_to_table();
+            auto second_id = game.create_customer_dog(Vector2{96.0f, 640.0f});
+            arrival.register_customer(second_id);
+            arrival.send_customer_to_table();
+
+            THEN("it takes the table's other slot, not the first one"){
+                REQUIRE(claimed_by(table_id, second_id));
+                REQUIRE(claimed_by(table_id, customer_id));
+                REQUIRE(target_of(second_id) == table_id);
+            }
+            THEN("the table is now full"){
+                REQUIRE(arrival.pick_table() == game_config::empty_entity);
+            }
+
+            AND_WHEN("a third customer is sent"){
+                auto third_id = game.create_customer_dog(Vector2{96.0f, 768.0f});
+                arrival.register_customer(third_id);
+                arrival.send_customer_to_table();
+
+                THEN("it gets nothing - no table left to claim"){
+                    REQUIRE_FALSE(target_of(third_id).has_value());
+                    REQUIRE(game.queued_path_count(third_id) == 0);
+                }
+            }
+        }
+
+        WHEN("a customer already holding a table is passed over"){
+            arrival.send_customer_to_table();
+            auto second_table = game.create_table(Vector2{1600.0f, 400.0f});
+            arrival.register_table(second_table);
+            arrival.send_customer_to_table();
+
+            THEN("the seated customer is not re-sent"){
+                REQUIRE(target_of(customer_id) == table_id);
+                REQUIRE_FALSE(claimed_by(second_table, customer_id));
+            }
+        }
+    }
+}
+
+SCENARIO("a seated customer survives the departure sweep",
+        "[ecs][npc][customer_arrival][entrance]"){
+    GIVEN("a customer that has walked to its table"){
+        testing::ecs_test_game game;
+        systems::npc_system::customer_arrival_system arrival;
+
+        auto customer_id = game.create_customer_dog(Vector2{96.0f, 512.0f});
+        auto table_id = game.create_table(Vector2{1600.0f, 1024.0f});
+        arrival.register_customer(customer_id);
+        arrival.register_table(table_id);
+        arrival.send_customer_to_table();
+
+        REQUIRE(game.tick_until([&](){
+            return game.queued_path_count(customer_id) == 0;
+        }, 8000));
+
+        WHEN("the cleanup sweep runs with its path queue empty"){
+            arrival.customer_cleanup();
+
+            THEN("it is not destroyed - an empty queue means seated, not finished"){
+                REQUIRE(tracks(arrival.get_customers(), customer_id));
+                REQUIRE(game.is_tracked(customer_id));
+                REQUIRE(claimed_by(table_id, customer_id));
+            }
+        }
+    }
+
+    GIVEN("a customer holding no table with an empty path queue"){
+        testing::ecs_test_game game;
+        systems::npc_system::customer_arrival_system arrival;
+
+        auto customer_id = game.create_customer_dog(Vector2{96.0f, 512.0f});
+        arrival.register_customer(customer_id);
+
+        WHEN("the cleanup sweep runs"){
+            arrival.customer_cleanup();
+
+            THEN("it is destroyed as a departure"){
+                REQUIRE(arrival.get_customers().empty());
+                REQUIRE_FALSE(game.is_tracked(customer_id));
             }
         }
     }

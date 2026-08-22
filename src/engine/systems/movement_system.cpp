@@ -5,7 +5,14 @@
 #include "hitbox.h"
 #include "raglib.h"
 #include "system.h"
+#include <algorithm>
 #include <raylib.h>
+
+namespace{
+    // * two zones exist, so one hop always suffices - the cap guards a crossing
+    // * that fails to change zone, not an expected depth
+    constexpr int max_zone_hops = 2;
+}
 
 // ---------------- frame update ----------------
 // TODO stub - the loop calls this every frame, nothing to do yet
@@ -79,30 +86,34 @@ void systems::movement_system::on_moved_entity(const events::move_entity& event)
     }
 }
 void systems::movement_system::on_create_path_to_event(const events::create_path_to& event){
-    auto* movement = component_managers::movement_manager_.get_component(event.get_id());
-    auto* position = component_managers::positional_manager_.get_component(event.get_id());
+    create_path_to(event.get_id(), event.get_destination(), event.get_checkpoints(),
+        event.get_assignment(), event.get_destination_entity());
+}
+
+void systems::movement_system::create_path_to(size_t entity_id, Vector2 destination,
+    const std::vector<Vector2>& checkpoints, path::assignment mode,
+    std::optional<size_t> destination_entity){
+    auto* movement = component_managers::movement_manager_.get_component(entity_id);
+    auto* position = component_managers::positional_manager_.get_component(entity_id);
     if(movement == nullptr or position == nullptr){ return; }
 
-    auto mode = event.get_assignment();
     auto source = (mode == path::append and not movement->get_paths().empty())
         ? movement->get_paths().back().get_destination()
         : position->get_position();
-    auto destination = event.get_destination();
-    auto& source_graph = resolve_graph(source);
-    auto& destination_graph = resolve_graph(destination);
-    if(source_graph != destination_graph) {return;}
 
-    debug::log("[movement_system::on_create_path_to_event] dog: " + std::to_string(event.get_id())
+    debug::log("[movement_system::create_path_to] dog: " + std::to_string(entity_id)
         + ", source: " + raglib::vector_to_string(source)
         + ", event destination (click position): " + raglib::vector_to_string(destination)
-        + ", destination_entity: " + (event.get_destination_entity().has_value()
-            ? std::to_string(event.get_destination_entity().value()) : std::string("none")));
-    if(event.get_destination_entity().has_value()){
-        auto destination_entity_id = event.get_destination_entity().value();
+        + ", checkpoints: " + std::to_string(checkpoints.size())
+        + ", destination_entity: " + (destination_entity.has_value()
+            ? std::to_string(destination_entity.value()) : std::string("none")));
+    if(destination_entity.has_value()){
+        auto destination_entity_id = destination_entity.value();
+        auto& destination_graph = resolve_graph(destination);
         auto interactable = component_managers::interactable_manager_.get_component(destination_entity_id);
         if(interactable){
             auto* destination_position = component_managers::positional_manager_.get_component(destination_entity_id);
-            debug::log("[movement_system::on_create_path_to_event] destination entity actual position: "
+            debug::log("[movement_system::create_path_to] destination entity actual position: "
                 + (destination_position != nullptr
                     ? raglib::vector_to_string(destination_position->get_position())
                     : std::string("no position component")));
@@ -118,32 +129,102 @@ void systems::movement_system::on_create_path_to_event(const events::create_path
             }
         }
     }
-    debug::log("[movement_system::on_create_path_to_event] final destination used for pathing: "
+    debug::log("[movement_system::create_path_to] final destination used for pathing: "
         + raglib::vector_to_string(destination));
-    auto new_path = create_path(source, movement->get_direction_scalar(),
-        destination, event.get_destination_entity());
-    if(not new_path.has_value()){
-        debug::log("[movement_system::on_create_path_to_event] create_path FAILED - no path found from "
-            + raglib::vector_to_string(source) + " to " + raglib::vector_to_string(destination));
+
+    // * every leg is built before any of it is committed - a route that failed
+    // * halfway would strand the dog at a checkpoint with no way on
+    std::vector<path::path> legs;
+    auto leg_source = source;
+    for(auto checkpoint : checkpoints){
+        if(not build_legs(leg_source, movement->get_direction_scalar(), checkpoint,
+            std::nullopt, legs)){
+            debug::log("[movement_system::create_path_to] checkpoint leg FAILED from "
+                + raglib::vector_to_string(leg_source) + " to "
+                + raglib::vector_to_string(checkpoint) + " - whole route abandoned");
+            return;
+        }
+        leg_source = checkpoint;
+    }
+    // * only the last leg carries the destination entity - it is what tells
+    // * arrival which entity was reached, and a checkpoint reaches nothing
+    if(not build_legs(leg_source, movement->get_direction_scalar(), destination,
+        destination_entity, legs)){
+        debug::log("[movement_system::create_path_to] final leg FAILED from "
+            + raglib::vector_to_string(leg_source) + " to "
+            + raglib::vector_to_string(destination) + " - whole route abandoned");
         return;
     }
-    debug::log("[movement_system::on_create_path_to_event] create_path SUCCEEDED, first waypoint: "
-        + raglib::vector_to_string(new_path.value().get_next_position()));
+    debug::log("[movement_system::create_path_to] route built, legs: "
+        + std::to_string(legs.size()) + ", first waypoint: "
+        + raglib::vector_to_string(legs.front().get_next_position()));
 
-    switch(mode){
-        case path::replace:
-            movement->set_path(std::move(new_path.value()));
-            determine_direction(event.get_id(), *movement, position->get_position(),
-                movement->get_current_path().get_next_position());
-            break;
-        case path::append:
-            movement->append_path(std::move(new_path.value()));
-            if(movement->get_paths().size() == 1){
-                determine_direction(event.get_id(), *movement, position->get_position(),
-                    movement->get_current_path().get_next_position());
-            }
-            break;
+    // * the mode applies to the route, not to each leg - legs after the first
+    // * always append, or each would wipe the one before it
+    if(mode == path::replace){ movement->clear_paths(); }
+    const bool start_from_idle = movement->get_paths().empty();
+    for(auto& leg : legs){ movement->append_path(std::move(leg)); }
+    if(start_from_idle){
+        determine_direction(entity_id, *movement, position->get_position(),
+            movement->get_current_path().get_next_position());
     }
+}
+
+bool systems::movement_system::build_legs(Vector2 source, Vector2 direction, Vector2 destination,
+    std::optional<size_t> destination_entity, std::vector<path::path>& legs, int depth){
+    // * whichever graph holds both ends plans the leg. asking resolve_graph
+    // * would not do - it always answers cafe for a position in the overlap
+    // * band, so a leg leaving the band for the footpath could never be planned
+    for(auto* candidate : graphs()){
+        if(not candidate->position_in_area(source)){ continue; }
+        if(not candidate->position_in_area(destination)){ continue; }
+        auto leg = create_path(*candidate, source, direction, destination, destination_entity);
+        if(not leg.has_value()){ continue; }
+        legs.push_back(std::move(leg.value()));
+        return true;
+    }
+    auto& source_graph = resolve_graph(source);
+    auto& destination_graph = resolve_graph(destination);
+    // * nothing to split when both ends are already in one zone - the route is
+    // * simply unwalkable, and a crossing search over a single zone would scan
+    // * the whole grid to produce a nonsense detour
+    if(source_graph == destination_graph){ return false; }
+    if(depth >= max_zone_hops){ return false; }
+    auto crossing = zone_crossing(source_graph, destination_graph, source);
+    if(not crossing.has_value()){ return false; }
+    debug::log("[movement_system::build_legs] splitting at zone crossing "
+        + raglib::vector_to_string(crossing.value()));
+    return build_legs(source, direction, crossing.value(), std::nullopt, legs, depth + 1)
+       and build_legs(crossing.value(), direction, destination, destination_entity, legs, depth + 1);
+}
+
+std::optional<Vector2> systems::movement_system::zone_crossing(graph::level_graph& from,
+    graph::level_graph& to, Vector2 source){
+    auto a = from.get_area();
+    auto b = to.get_area();
+    auto left = std::max(a.x, b.x);
+    auto right = std::min(a.x + a.width, b.x + b.width);
+    auto top = std::max(a.y, b.y);
+    auto bottom = std::min(a.y + a.height, b.y + b.height);
+    if(left >= right or top >= bottom){ return std::nullopt; }
+
+    std::optional<Vector2> closest = std::nullopt;
+    float closest_distance = 0.0f;
+    for(auto x = left; x < right; x += level_config::edge_weight){
+        for(auto y = top; y < bottom; y += level_config::edge_weight){
+            Vector2 candidate{x, y};
+            auto* from_node = from.node_at(candidate);
+            auto* to_node = to.node_at(candidate);
+            if(from_node == nullptr or to_node == nullptr){ continue; }
+            if(not from_node->entities_.empty() or not to_node->entities_.empty()){ continue; }
+            auto distance = Vector2Distance(source, candidate);
+            if(not closest.has_value() or distance < closest_distance){
+                closest = candidate;
+                closest_distance = distance;
+            }
+        }
+    }
+    return closest;
 }
 void systems::movement_system::on_destroyed_entity(const events::remove_entity& event){
     if(component_helpers::is_mouse_positioned(event.get_id())){ return; }
@@ -156,16 +237,20 @@ void systems::movement_system::on_destroyed_entity(const events::remove_entity& 
 }
 
 // ---------------- path features  -----------------
-std::optional<path::path> systems::movement_system::create_path(Vector2 source, Vector2 direction,
-    Vector2 destination, std::optional<size_t> destination_entity){
-    if(not cafe_.position_in_area(source) and not footpath_.position_in_area(source)){ return std::nullopt; }
-    if(not cafe_.position_in_area(destination) and not footpath_.position_in_area(destination)){ return std::nullopt; }
-    auto& source_graph = resolve_graph(source);
-    auto& destination_graph = resolve_graph(destination);
-    if(source_graph != destination_graph) {return std::nullopt;}
-    auto positions = source_graph.find_path(source, destination, direction);
+std::optional<path::path> systems::movement_system::create_path(graph::level_graph& graph,
+    Vector2 source, Vector2 direction, Vector2 destination,
+    std::optional<size_t> destination_entity){
+    if(not graph.position_in_area(source)){ return std::nullopt; }
+    if(not graph.position_in_area(destination)){ return std::nullopt; }
+    auto positions = graph.find_path(source, destination, direction);
     if(positions.empty()){ return std::nullopt; }
     return path::build_path(source, destination, positions, destination_entity);
+}
+std::optional<path::path> systems::movement_system::create_path(Vector2 source, Vector2 direction,
+    Vector2 destination, std::optional<size_t> destination_entity){
+    auto& source_graph = resolve_graph(source);
+    if(not source_graph.position_in_area(source)){ return std::nullopt; }
+    return create_path(source_graph, source, direction, destination, destination_entity);
 }
 // ---------------- position writes ----------------
 void systems::movement_system::update_position(size_t id, Vector2 new_position){

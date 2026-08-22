@@ -366,17 +366,17 @@ what is left
 
 ---------------------
          -> adjust spawning values
-            -> update the graph representation so that a dog currently in flight does not block the creation of the path 
-            -> should be separate representaations for statison and dogs
+            -> update the graph representation so that a dog currently in flight does not block the creation of the path  x 
+            -> should be separate representaations for statison and dogs 
             -> randomise the spawn index and adjust the numbers
          -> then setup logic for getting a customer into the cafe
             -> define the entrance
             -> define the logic to actually send the dog [free table check]
-                -> finish steup of table unregsiter and register
-                -> test table reigstering and table picking 
+                -> finish steup of table unregsiter and register x 
+                -> test table reigstering and table picking  x 
                 -> then define the cafe entrance
                 -> then setup the two legged path
-                
+
             -> send to entrance, then queue a path from entrance to the table
             
    -> state machines and event listening it seems would drive this
@@ -430,3 +430,46 @@ customer arrival system + customer destroying
       probably the moment to decide whether dog_completed_path comes back
 -> also still open: nothing decides which passing customers actually enter the cafe. that arrival
    condition depends on free tables and the most recent arrival, per the queuing notes above
+
+
+22/8
+
+customer arrival now walks to a table, via the entrance
+
+-> cafe_entrance is a real value at last. cafe_x, cafe_y + cafe_height / 2. that x is the seam
+   the two zones share [cafe x starts at 256, footpath runs to 320, zone_overlap is one edge],
+   and it is the one grid column both graphs hold a node for, so a path can end there from the
+   footpath and start there into the cafe
+-> create_path_to carries a checkpoint list now. src, dst, [c1, c2] queues src->c1, c1->c2,
+   c2->dst. only the last leg carries the destination entity, a checkpoint reaches nothing
+-> send_customer_to_table passes the entrance as the single checkpoint, so the route is two legs
+   and neither one needs splitting. the movement system would find a crossing on its own, naming
+   the door just keeps customers walking through it rather than the nearest seam cell to wherever
+   they happen to be standing
+-> the claim goes in before the walk, not on arrival. the customer is crossing the whole cafe and
+   the table has to read as taken for every frame of it or the next pick hands out the same table
+-> customer_cleanup skips a customer that holds a table. an empty path queue means seated, not
+   departed. that sweep would otherwise delete the customer the frame it sat down
+
+raw position paths [picks up the note at line 323 above]
+
+-> everything is snapped to whole nodes right now and it is too rigid in three separate places:
+   -> find_path returns node positions, so a path can only ever end on a node centre. path keeps
+      the exact requested destination separately precisely because the two do not match
+   -> create_path_to snaps a resolved interaction slot onto slot_node->position_, throwing away
+      the offset the interactable just computed
+   -> zone_crossing steps the seam by whole edge_weight, so the only candidate column is cafe_x
+-> want sub-node granularity. quarter and half multiples of edge weight, 0.25 * edge_weight and
+   friends. still clean numbers, still snapped to something, just not to the coarse grid
+-> the grid stays the thing bfs searches, this is only about what a waypoint is allowed to be.
+   walk the node path as now, then let the final position be an offset off that node
+-> would fix the interaction slots properly. the left and right offsets already want to be
+   different from each other [note at line 320 above], and forcing both onto a node centre is
+   what makes them look wrong
+-> two dogs at the same table currently aim at two node centres a whole edge apart, which is why
+   a table reads as much wider than its sprite
+-> open: does a sub-node waypoint break has_reached_position. the tolerance is edge_weight * 0.05
+   which is 3.2px, fine for a quarter-edge offset, but worth checking against the move speed so a
+   dog cannot step over the target between frames
+-> open: the graph occupancy marks whole nodes. two dogs a quarter edge apart inside one node
+   would both mark it, and the second would read the first as blocking
