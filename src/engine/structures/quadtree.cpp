@@ -511,12 +511,12 @@ hitbox::hitbox* tree::ecs_quadtree::bounds_for(size_t entity_id){
     if(collision == nullptr){ return nullptr; }
     return &collision->get_hitbox_component().get_hitbox();
 }
-std::optional<Rectangle> tree::ecs_quadtree::interaction_bounds_for(size_t entity_id){
-    auto* interactable = component_managers::interactable_manager_.get_component(entity_id);
+std::optional<Rectangle> tree::ecs_quadtree::interactor_bounds_for(size_t entity_id){
+    auto* interactor = component_managers::interactor_manager_.get_component(entity_id);
     auto hitbox = bounds_for(entity_id);
 
-    if(not hitbox or not interactable) {return std::nullopt; }
-    return interactable->get_interaction_box(hitbox->get_box());
+    if(not hitbox or not interactor) {return std::nullopt; }
+    return interactor->get_interaction_box(hitbox->get_box());
 }
 
 bool tree::ecs_quadtree::node_contains_object(raglib::bounding_box_2& node, const Rectangle& object){
@@ -773,7 +773,7 @@ int tree::ecs_quadtree::is_there_interaction(std::unique_ptr<node>& tree, Rectan
     }
     for(auto entity_id : tree->entities_){
         if(id == entity_id){ continue; }
-        auto other_box_opt = interaction_bounds_for(entity_id);
+        auto other_box_opt = interactor_bounds_for(entity_id);
         if(other_box_opt.has_value()){
             if(CheckCollisionRecs(box, other_box_opt.value())){
                 return static_cast<int>(entity_id);

@@ -279,7 +279,7 @@ namespace tree{
 
         // an entity with no collision component has no bounds and is not indexed
         hitbox::hitbox* bounds_for(size_t entity_id);
-        std::optional<Rectangle> interaction_bounds_for(size_t entity_id);
+        std::optional<Rectangle> interactor_bounds_for(size_t entity_id);
         bool is_child_built(std::unique_ptr<node>& tree, std::unique_ptr<node>& child);
         bool is_root(std::unique_ptr<node>& tree);
         bool is_empty(std::unique_ptr<node>& tree);

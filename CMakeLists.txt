@@ -276,6 +276,7 @@ add_executable(tests
   tests/customer_dog_scenarios.cpp
   tests/waiter_dog_scenarios.cpp
   tests/quadtree_scenarios.cpp
+  tests/customer_arrival_scenarios.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the
