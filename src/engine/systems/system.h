@@ -278,9 +278,9 @@ namespace systems{
                 std::optional<size_t> destination_entity);
             bool build_legs(Vector2 source, Vector2 direction, Vector2 destination,
                 std::optional<size_t> destination_entity,
-                std::vector<path::path>& legs, int depth = 0);
-            std::optional<Vector2> zone_crossing(graph::level_graph& from,
-                graph::level_graph& to, Vector2 source);
+                const std::vector<Vector2>& checkpoints, std::vector<path::path>& legs);
+            bool build_leg(Vector2 source, Vector2 direction, Vector2 destination,
+                std::optional<size_t> destination_entity, std::vector<path::path>& legs);
             void determine_direction(size_t id, components::movement_component& movement,
                 Vector2 position, Vector2 target);
             

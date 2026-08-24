@@ -370,8 +370,8 @@ SCENARIO("cell_at gives the containing cell, nearest_node the closest node",
 }
 
 // the two zones overlap by one cell - footpath spans x[0,320), cafe x[256,3072),
-// so x[256,320) sits in both graphs and both hold real nodes there. that band is
-// where a footpath-to-cafe route splits.
+// so x[256,320) sits in both graphs and both hold real nodes there. a route
+// crossing zones has to name a position in that band as a checkpoint.
 namespace{
     Vector2 deep_in_footpath(){ return Vector2{96.0f, 512.0f}; }
     Vector2 in_the_band(){ return Vector2{288.0f, 512.0f}; }
@@ -426,7 +426,7 @@ SCENARIO("checkpoints become legs of their own", "[ecs][graph][movement][route]"
     }
 }
 
-SCENARIO("a route from the footpath into the cafe splits at the zone crossing",
+SCENARIO("a route from the footpath into the cafe needs a checkpoint in the band",
         "[ecs][graph][movement][route]"){
     GIVEN("a dog standing on the footpath"){
         testing::ecs_test_game game;
@@ -435,15 +435,8 @@ SCENARIO("a route from the footpath into the cafe splits at the zone crossing",
         WHEN("it is sent to a position deep in the cafe with no checkpoints"){
             game.path_to(dog_id, deep_in_cafe());
 
-            THEN("the route split itself in two"){
-                REQUIRE(game.queued_path_count(dog_id) == 2);
-            }
-            THEN("the first leg ends in the overlap band and the second at the destination"){
-                auto destinations = game.path_destinations(dog_id);
-                REQUIRE(destinations.size() == 2);
-                REQUIRE(destinations[0].x >= level_config::cafe_x);
-                REQUIRE(destinations[0].x < level_config::footpath_x + level_config::footpath_width);
-                REQUIRE(Vector2Equals(destinations[1], deep_in_cafe()));
+            THEN("nothing is queued - no single graph holds both ends"){
+                REQUIRE(game.queued_path_count(dog_id) == 0);
             }
         }
 
@@ -469,11 +462,13 @@ SCENARIO("a route from the footpath into the cafe splits at the zone crossing",
         }
 
         WHEN("it is sent back out of the cafe onto the footpath"){
-            game.path_to(dog_id, deep_in_cafe());
+            game.path_to(dog_id, deep_in_cafe(), std::nullopt,
+                std::vector<Vector2>{in_the_band()});
             REQUIRE(game.tick_until([&](){ return game.queued_path_count(dog_id) == 0; }, 4000));
-            game.path_to(dog_id, deep_in_footpath());
+            game.path_to(dog_id, deep_in_footpath(), std::nullopt,
+                std::vector<Vector2>{in_the_band()});
 
-            THEN("the crossing works in the other direction too"){
+            THEN("the checkpoint works in the other direction too"){
                 REQUIRE(game.queued_path_count(dog_id) >= 1);
                 REQUIRE(Vector2Equals(game.path_destinations(dog_id).back(), deep_in_footpath()));
             }
@@ -481,17 +476,18 @@ SCENARIO("a route from the footpath into the cafe splits at the zone crossing",
     }
 }
 
-SCENARIO("a split route still carries its destination entity on the last leg only",
+SCENARIO("a checkpointed route still carries its destination entity on the last leg only",
         "[ecs][graph][movement][route]"){
     GIVEN("a dog on the footpath and a table in the cafe"){
         testing::ecs_test_game game;
         auto dog_id = game.create_customer_dog(deep_in_footpath());
         auto table_id = game.create_table(far_in_cafe());
 
-        WHEN("it is sent to the table"){
-            game.path_to(dog_id, far_in_cafe(), table_id);
+        WHEN("it is sent to the table through the band"){
+            game.path_to(dog_id, far_in_cafe(), table_id,
+                std::vector<Vector2>{in_the_band()});
 
-            THEN("the route split and ends at one of the table's interaction slots"){
+            THEN("the route has two legs and ends at one of the table's interaction slots"){
                 REQUIRE(game.queued_path_count(dog_id) == 2);
                 auto destinations = game.path_destinations(dog_id);
                 REQUIRE_FALSE(Vector2Equals(destinations.back(), far_in_cafe()));

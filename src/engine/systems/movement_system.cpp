@@ -11,7 +11,6 @@
 namespace{
     // * two zones exist, so one hop always suffices - the cap guards a crossing
     // * that fails to change zone, not an expected depth
-    constexpr int max_zone_hops = 2;
 }
 
 // ---------------- frame update ----------------
@@ -135,23 +134,10 @@ void systems::movement_system::create_path_to(size_t entity_id, Vector2 destinat
     // * every leg is built before any of it is committed - a route that failed
     // * halfway would strand the dog at a checkpoint with no way on
     std::vector<path::path> legs;
-    auto leg_source = source;
-    for(auto checkpoint : checkpoints){
-        if(not build_legs(leg_source, movement->get_direction_scalar(), checkpoint,
-            std::nullopt, legs)){
-            debug::log("[movement_system::create_path_to] checkpoint leg FAILED from "
-                + raglib::vector_to_string(leg_source) + " to "
-                + raglib::vector_to_string(checkpoint) + " - whole route abandoned");
-            return;
-        }
-        leg_source = checkpoint;
-    }
-    // * only the last leg carries the destination entity - it is what tells
-    // * arrival which entity was reached, and a checkpoint reaches nothing
-    if(not build_legs(leg_source, movement->get_direction_scalar(), destination,
-        destination_entity, legs)){
-        debug::log("[movement_system::create_path_to] final leg FAILED from "
-            + raglib::vector_to_string(leg_source) + " to "
+    if(not build_legs(source, movement->get_direction_scalar(), destination,
+        destination_entity, checkpoints, legs)){
+        debug::log("[movement_system::create_path_to] route FAILED from "
+            + raglib::vector_to_string(source) + " to "
             + raglib::vector_to_string(destination) + " - whole route abandoned");
         return;
     }
@@ -171,7 +157,26 @@ void systems::movement_system::create_path_to(size_t entity_id, Vector2 destinat
 }
 
 bool systems::movement_system::build_legs(Vector2 source, Vector2 direction, Vector2 destination,
-    std::optional<size_t> destination_entity, std::vector<path::path>& legs, int depth){
+    std::optional<size_t> destination_entity, const std::vector<Vector2>& checkpoints,
+    std::vector<path::path>& legs){
+    auto leg_source = source;
+    for(auto checkpoint : checkpoints){
+        if(not build_leg(leg_source, direction, checkpoint, std::nullopt, legs)){
+            debug::log("[movement_system::build_legs] checkpoint leg FAILED from "
+                + raglib::vector_to_string(leg_source) + " to "
+                + raglib::vector_to_string(checkpoint));
+            return false;
+        }
+        leg_source = checkpoint;
+    }
+    // * only the leg left after the checkpoints run out carries the destination
+    // * entity - it is what tells arrival which entity was reached, and a
+    // * checkpoint reaches nothing
+    return build_leg(leg_source, direction, destination, destination_entity, legs);
+}
+
+bool systems::movement_system::build_leg(Vector2 source, Vector2 direction, Vector2 destination,
+    std::optional<size_t> destination_entity, std::vector<path::path>& legs){
     // * whichever graph holds both ends plans the leg. asking resolve_graph
     // * would not do - it always answers cafe for a position in the overlap
     // * band, so a leg leaving the band for the footpath could never be planned
@@ -183,49 +188,9 @@ bool systems::movement_system::build_legs(Vector2 source, Vector2 direction, Vec
         legs.push_back(std::move(leg.value()));
         return true;
     }
-    auto& source_graph = resolve_graph(source);
-    auto& destination_graph = resolve_graph(destination);
-    // * nothing to split when both ends are already in one zone - the route is
-    // * simply unwalkable, and a crossing search over a single zone would scan
-    // * the whole grid to produce a nonsense detour
-    if(source_graph == destination_graph){ return false; }
-    if(depth >= max_zone_hops){ return false; }
-    auto crossing = zone_crossing(source_graph, destination_graph, source);
-    if(not crossing.has_value()){ return false; }
-    debug::log("[movement_system::build_legs] splitting at zone crossing "
-        + raglib::vector_to_string(crossing.value()));
-    return build_legs(source, direction, crossing.value(), std::nullopt, legs, depth + 1)
-       and build_legs(crossing.value(), direction, destination, destination_entity, legs, depth + 1);
+    return false;
 }
 
-std::optional<Vector2> systems::movement_system::zone_crossing(graph::level_graph& from,
-    graph::level_graph& to, Vector2 source){
-    auto a = from.get_area();
-    auto b = to.get_area();
-    auto left = std::max(a.x, b.x);
-    auto right = std::min(a.x + a.width, b.x + b.width);
-    auto top = std::max(a.y, b.y);
-    auto bottom = std::min(a.y + a.height, b.y + b.height);
-    if(left >= right or top >= bottom){ return std::nullopt; }
-
-    std::optional<Vector2> closest = std::nullopt;
-    float closest_distance = 0.0f;
-    for(auto x = left; x < right; x += level_config::edge_weight){
-        for(auto y = top; y < bottom; y += level_config::edge_weight){
-            Vector2 candidate{x, y};
-            auto* from_node = from.node_at(candidate);
-            auto* to_node = to.node_at(candidate);
-            if(from_node == nullptr or to_node == nullptr){ continue; }
-            if(not from_node->entities_.empty() or not to_node->entities_.empty()){ continue; }
-            auto distance = Vector2Distance(source, candidate);
-            if(not closest.has_value() or distance < closest_distance){
-                closest = candidate;
-                closest_distance = distance;
-            }
-        }
-    }
-    return closest;
-}
 void systems::movement_system::on_destroyed_entity(const events::remove_entity& event){
     if(component_helpers::is_mouse_positioned(event.get_id())){ return; }
     if(auto* collision = component_managers::collision_manager_.get_component(event.get_id()); collision != nullptr){
