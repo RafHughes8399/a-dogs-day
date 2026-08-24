@@ -378,7 +378,11 @@ what is left
                 -> then setup the two legged path
 
             -> send to entrance, then queue a path from entrance to the table
-            
+-------------------------
+   TODO
+      -> proper spawn point picking
+      -> test customer pathing and table assignment
+      -> and customer leaving       
    -> state machines and event listening it seems would drive this
       -> the state decides what events need to be listened to
       -> for example: 
