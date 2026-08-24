@@ -291,6 +291,11 @@ SCENARIO("a right click paths the selected player dog to the clicked position",
         });
 
         WHEN("the right button is pressed"){
+            // * khiri only sat on the click point so the left click above could
+            // * select it - moving off it before the right click means the
+            // * click hits empty ground, not khiri itself, so this exercises
+            // * the bare-position path rather than self-targeting
+            game.move_entity(khiri_id, Vector2Add(GetMousePosition(), Vector2{500.0f, 500.0f}));
             controls().simulate_input(mouse_press_of(MOUSE_BUTTON_RIGHT), cursor_id);
             flush();
 

@@ -190,6 +190,7 @@ namespace systems{
                 event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
                 event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
                 event_interface::unsubscribe<events::create_path_to>(create_path_to_handler_);
+                event_interface::unsubscribe<events::create_path_to_entity>(create_path_to_entity_handler_);
             }
             movement_system(const movement_system& other) = delete;
             movement_system(movement_system&& other) = delete;
@@ -204,6 +205,7 @@ namespace systems{
             void on_moved_entity(const events::move_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
             void on_create_path_to_event(const events::create_path_to& event);
+            void on_create_path_to_entity_event(const events::create_path_to_entity& event);
             // * the graph is private to this system, so walkability questions come
             // * through here - slot selection needs it in shipped builds, not only
             // * under DOG_DAYS_TESTING
@@ -255,6 +257,7 @@ namespace systems{
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
             remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
             create_path_to_handler_([this](const events::create_path_to& event) -> void{on_create_path_to_event(event);}),
+            create_path_to_entity_handler_([this](const events::create_path_to_entity& event) -> void{on_create_path_to_entity_event(event);}),
 
             cafe_(Rectangle{level_config::cafe_x, level_config::cafe_y, level_config::cafe_width, level_config::cafe_height}, false),
             footpath_(Rectangle{level_config::footpath_x, level_config::footpath_y, level_config::footpath_width, level_config::footpath_height}, false){
@@ -263,6 +266,7 @@ namespace systems{
                 event_interface::subscribe<events::move_entity>(move_entity_handler_);
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
                 event_interface::subscribe<events::create_path_to>(create_path_to_handler_);
+                event_interface::subscribe<events::create_path_to_entity>(create_path_to_entity_handler_);
             }
 
             std::optional<path::path> create_path(Vector2 source, Vector2 direction, Vector2 destination,
@@ -274,16 +278,20 @@ namespace systems{
                 Vector2 direction, Vector2 destination,
                 std::optional<size_t> destination_entity = std::nullopt);
             void create_path_to(size_t entity_id, Vector2 destination,
-                const std::vector<Vector2>& checkpoints, path::assignment mode,
-                std::optional<size_t> destination_entity);
+                const std::vector<Vector2>& checkpoints, path::assignment mode);
+            void create_path_to_entity(size_t entity_id, size_t destination_entity,
+                const std::vector<Vector2>& checkpoints, path::assignment mode);
             bool build_legs(Vector2 source, Vector2 direction, Vector2 destination,
                 std::optional<size_t> destination_entity,
                 const std::vector<Vector2>& checkpoints, std::vector<path::path>& legs);
             bool build_leg(Vector2 source, Vector2 direction, Vector2 destination,
                 std::optional<size_t> destination_entity, std::vector<path::path>& legs);
+            void commit_route(size_t entity_id, components::movement_component& movement,
+                components::position_component& position, path::assignment mode,
+                std::vector<path::path> legs);
             void determine_direction(size_t id, components::movement_component& movement,
                 Vector2 position, Vector2 target);
-            
+
 
             graph::level_graph& resolve_graph(Vector2 position);
             std::array<graph::level_graph*, 2> graphs();
@@ -291,6 +299,7 @@ namespace systems{
             events::event_handler<events::move_entity> move_entity_handler_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
             events::event_handler<events::create_path_to> create_path_to_handler_;
+            events::event_handler<events::create_path_to_entity> create_path_to_entity_handler_;
 
             graph::level_graph cafe_;
             graph::level_graph footpath_;

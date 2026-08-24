@@ -88,11 +88,6 @@ void systems::npc_system::customer_arrival_system::send_customer_to_table(){
     if(not interactable->claim(customer_id)){ return; }
     interactor->interact_with(table_id);
 
-    auto table_position = component_managers::positional_manager_.get_component(table_id);
-    auto destination = table_position != nullptr
-        ? table_position->get_position()
-        : cafe_config::cafe_entrance;
-
     debug::log("[customer_arrival_system::send_customer_to_table] customer: "
         + std::to_string(customer_id)
         + ", table: " + std::to_string(table_id)
@@ -102,8 +97,8 @@ void systems::npc_system::customer_arrival_system::send_customer_to_table(){
     // * entrance -> table. the movement system would find the seam itself, but
     // * naming the door keeps customers walking through it rather than the
     // * nearest crossing to wherever they happen to be standing
-    events::create_path_to create_path_event{customer_id, destination, path::replace,
-        table_id, std::vector<Vector2>{cafe_config::cafe_entrance}};
+    events::create_path_to_entity create_path_event{customer_id, table_id, path::replace,
+        std::vector<Vector2>{cafe_config::cafe_entrance}};
     event_interface::execute_event(create_path_event);
 }
 

@@ -95,7 +95,8 @@ namespace events{
 		waiter_abandoned_serving_id = 53,
 		create = 21,
 		create_path_to_id = 54,
-		size = 55
+		create_path_to_entity_id = 55,
+		size = 56
 	};
 	class event{
 

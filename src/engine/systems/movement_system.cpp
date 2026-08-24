@@ -8,11 +8,6 @@
 #include <algorithm>
 #include <raylib.h>
 
-namespace{
-    // * two zones exist, so one hop always suffices - the cap guards a crossing
-    // * that fails to change zone, not an expected depth
-}
-
 // ---------------- frame update ----------------
 // TODO stub - the loop calls this every frame, nothing to do yet
 void systems::movement_system::update(float delta){
@@ -86,12 +81,15 @@ void systems::movement_system::on_moved_entity(const events::move_entity& event)
 }
 void systems::movement_system::on_create_path_to_event(const events::create_path_to& event){
     create_path_to(event.get_id(), event.get_destination(), event.get_checkpoints(),
-        event.get_assignment(), event.get_destination_entity());
+        event.get_assignment());
+}
+void systems::movement_system::on_create_path_to_entity_event(const events::create_path_to_entity& event){
+    create_path_to_entity(event.get_id(), event.get_destination_entity(),
+        event.get_checkpoints(), event.get_assignment());
 }
 
 void systems::movement_system::create_path_to(size_t entity_id, Vector2 destination,
-    const std::vector<Vector2>& checkpoints, path::assignment mode,
-    std::optional<size_t> destination_entity){
+    const std::vector<Vector2>& checkpoints, path::assignment mode){
     auto* movement = component_managers::movement_manager_.get_component(entity_id);
     auto* position = component_managers::positional_manager_.get_component(entity_id);
     if(movement == nullptr or position == nullptr){ return; }
@@ -102,57 +100,82 @@ void systems::movement_system::create_path_to(size_t entity_id, Vector2 destinat
 
     debug::log("[movement_system::create_path_to] dog: " + std::to_string(entity_id)
         + ", source: " + raglib::vector_to_string(source)
-        + ", event destination (click position): " + raglib::vector_to_string(destination)
-        + ", checkpoints: " + std::to_string(checkpoints.size())
-        + ", destination_entity: " + (destination_entity.has_value()
-            ? std::to_string(destination_entity.value()) : std::string("none")));
-    if(destination_entity.has_value()){
-        auto destination_entity_id = destination_entity.value();
-        auto& destination_graph = resolve_graph(destination);
-        auto interactable = component_managers::interactable_manager_.get_component(destination_entity_id);
-        if(interactable){
-            auto* destination_position = component_managers::positional_manager_.get_component(destination_entity_id);
-            debug::log("[movement_system::create_path_to] destination entity actual position: "
-                + (destination_position != nullptr
-                    ? raglib::vector_to_string(destination_position->get_position())
-                    : std::string("no position component")));
-            if(destination_position != nullptr){
-                destination = destination_position->get_position();
-                auto interaction_offset = interactable->get_interaction_offset(source, destination);
-                if(interaction_offset.has_value()){
-                    destination = Vector2Add(destination, interaction_offset.value());
-                    if(auto* slot_node = destination_graph.node_at(destination); slot_node != nullptr and destination_graph.position_in_area(slot_node->position_)){
-                        destination = slot_node->position_;
-                    }
-                }
-            }
-        }
-    }
-    debug::log("[movement_system::create_path_to] final destination used for pathing: "
-        + raglib::vector_to_string(destination));
+        + ", destination: " + raglib::vector_to_string(destination)
+        + ", checkpoints: " + std::to_string(checkpoints.size()));
 
     // * every leg is built before any of it is committed - a route that failed
     // * halfway would strand the dog at a checkpoint with no way on
     std::vector<path::path> legs;
     if(not build_legs(source, movement->get_direction_scalar(), destination,
-        destination_entity, checkpoints, legs)){
+        std::nullopt, checkpoints, legs)){
         debug::log("[movement_system::create_path_to] route FAILED from "
             + raglib::vector_to_string(source) + " to "
             + raglib::vector_to_string(destination) + " - whole route abandoned");
         return;
     }
-    debug::log("[movement_system::create_path_to] route built, legs: "
-        + std::to_string(legs.size()) + ", first waypoint: "
-        + raglib::vector_to_string(legs.front().get_next_position()));
+    commit_route(entity_id, *movement, *position, mode, std::move(legs));
+}
 
+void systems::movement_system::create_path_to_entity(size_t entity_id, size_t destination_entity,
+    const std::vector<Vector2>& checkpoints, path::assignment mode){
+    auto* movement = component_managers::movement_manager_.get_component(entity_id);
+    auto* position = component_managers::positional_manager_.get_component(entity_id);
+    if(movement == nullptr or position == nullptr){ return; }
+
+    auto source = (mode == path::append and not movement->get_paths().empty())
+        ? movement->get_paths().back().get_destination()
+        : position->get_position();
+
+    auto* destination_position = component_managers::positional_manager_.get_component(destination_entity);
+    if(destination_position == nullptr){
+        debug::log("[movement_system::create_path_to_entity] destination entity has no position, entity: "
+            + std::to_string(destination_entity) + " - route abandoned");
+        return;
+    }
+    auto destination = destination_position->get_position();
+
+    // * the interaction offset moves the destination to a free slot around the
+    // * entity, not onto the entity itself - a dog pathing to the table's own
+    // * position would be pathing into an occupied, unwalkable node
+    auto interactable = component_managers::interactable_manager_.get_component(destination_entity);
+    if(interactable){
+        auto interaction_offset = interactable->get_interaction_offset(source, destination);
+        if(interaction_offset.has_value()){
+            destination = Vector2Add(destination, interaction_offset.value());
+            auto& destination_graph = resolve_graph(destination);
+            if(auto* slot_node = destination_graph.node_at(destination);
+                slot_node != nullptr and destination_graph.position_in_area(slot_node->position_)){
+                destination = slot_node->position_;
+            }
+        }
+    }
+    debug::log("[movement_system::create_path_to_entity] dog: " + std::to_string(entity_id)
+        + ", source: " + raglib::vector_to_string(source)
+        + ", destination entity: " + std::to_string(destination_entity)
+        + ", resolved destination: " + raglib::vector_to_string(destination)
+        + ", checkpoints: " + std::to_string(checkpoints.size()));
+
+    std::vector<path::path> legs;
+    if(not build_legs(source, movement->get_direction_scalar(), destination,
+        destination_entity, checkpoints, legs)){
+        debug::log("[movement_system::create_path_to_entity] route FAILED from "
+            + raglib::vector_to_string(source) + " to "
+            + raglib::vector_to_string(destination) + " - whole route abandoned");
+        return;
+    }
+    commit_route(entity_id, *movement, *position, mode, std::move(legs));
+}
+
+void systems::movement_system::commit_route(size_t entity_id, components::movement_component& movement,
+    components::position_component& position, path::assignment mode, std::vector<path::path> legs){
     // * the mode applies to the route, not to each leg - legs after the first
     // * always append, or each would wipe the one before it
-    if(mode == path::replace){ movement->clear_paths(); }
-    const bool start_from_idle = movement->get_paths().empty();
-    for(auto& leg : legs){ movement->append_path(std::move(leg)); }
+    if(mode == path::replace){ movement.clear_paths(); }
+    const bool start_from_idle = movement.get_paths().empty();
+    for(auto& leg : legs){ movement.append_path(std::move(leg)); }
     if(start_from_idle){
-        determine_direction(entity_id, *movement, position->get_position(),
-            movement->get_current_path().get_next_position());
+        determine_direction(entity_id, movement, position.get_position(),
+            movement.get_current_path().get_next_position());
     }
 }
 

@@ -130,9 +130,15 @@ namespace testing{
 
     void ecs_test_game::path_to(size_t entity_id, Vector2 destination,
         std::optional<size_t> destination_entity, std::vector<Vector2> checkpoints){
-        std::unique_ptr<events::event> request =
-            std::make_unique<events::create_path_to>(entity_id, destination, path::replace,
-                destination_entity, std::move(checkpoints));
+        std::unique_ptr<events::event> request;
+        if(destination_entity.has_value()){
+            request = std::make_unique<events::create_path_to_entity>(entity_id,
+                destination_entity.value(), path::replace, std::move(checkpoints));
+        }
+        else{
+            request = std::make_unique<events::create_path_to>(entity_id, destination,
+                path::replace, std::move(checkpoints));
+        }
         event_interface::queue_event(request);
         tick(0.0f);
     }

@@ -225,27 +225,29 @@ void systems::control_input_system::right_click(size_t id){
     }
 
     int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
-    // ! i think there is something wrong with this check here 
+    // ! i think there is something wrong with this check here
     // ! the path to a destination entity is not correct.
-    // ! the click resovles the detination entity correctly and the position but something lese 
+    // ! the click resovles the detination entity correctly and the position but something lese
     // ! is missing
-    
+
     // ! no the problem is that it cannot resolve a path to an occupied node. so need to adjust
     // ! the position that we send the dog to when going to a entity
-    // ? perhaps need to revive the idea of interaction positions, based on the hitbox ? 
-    std::optional<size_t> destination_entity = entity_id == game_config::empty_entity
-        ? std::optional<size_t>{}
-        : std::make_optional<size_t>(entity_id);
+    // ? perhaps need to revive the idea of interaction positions, based on the hitbox ?
     debug::log("[control_input_system::right_click, resolved destination] entity: "
-        + (destination_entity.has_value() ? std::to_string(destination_entity.value())
-                                          : std::string("none, bare position")));
+        + (entity_id == game_config::empty_entity ? std::string("none, bare position")
+                                                   : std::to_string(entity_id)));
 
-    std::unique_ptr<events::event> create_path_event = std::make_unique<events::create_path_to>(
-            selected_id, click_position, path::replace, destination_entity
-        );
+    std::unique_ptr<events::event> create_path_event;
+    if(entity_id == game_config::empty_entity){
+        create_path_event = std::make_unique<events::create_path_to>(selected_id, click_position, path::replace);
+    }
+    else{
+        create_path_event = std::make_unique<events::create_path_to_entity>(
+            selected_id, static_cast<size_t>(entity_id), path::replace);
+    }
     event_interface::queue_event(create_path_event);
-    debug::log("[control_input_system::right_click, queued create_path_to] dog: "
+    debug::log("[control_input_system::right_click, queued path request] dog: "
         + std::to_string(selected_id)
-        + ", destination: " + raglib::vector_to_string(click_position)); 
+        + ", destination: " + raglib::vector_to_string(click_position));
 }
 
