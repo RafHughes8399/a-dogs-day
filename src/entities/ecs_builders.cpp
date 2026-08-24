@@ -135,13 +135,28 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
 }
     void ecs_entities::build_test_decoration(size_t id, Vector2 position){
         build_decoration(id, position,
-            sprite_builders::build_test_decoration_sprite(),
+            sprite_builders::build_test_decoration_sprite(entity_config::test_decoration_attributes),
             hitbox_builders::build_test_decoration_hitbox(position));
         component_helpers::add_selectable_component(id,
             entity_config::selectable_kinds::decoration_kind);
     }
     //**
-    // void build_gargoyle();
+    void ecs_entities::build_gargoyle(size_t id, Vector2 position){
+        build_decoration(id, position,
+            sprite_builders::build_gargoyle(),
+            hitbox_builders::build_gargoyle_hitbox(position));
+        // a clickable component perhaps ? 
+    }
+    void ecs_entities::build_poker_table(size_t id, Vector2 position){
+        build_decoration(id, position, 
+            sprite_builders::build_poker_table(), 
+        hitbox_builders::build_poker_table_hitbox(position));
+    }
+    void ecs_entities::build_dog_painting(size_t id, Vector2 position){
+        build_decoration(id, position,
+        sprite_builders::build_dog_painting(),
+        hitbox_builders::build_dog_painting_hitbox(position));
+    }
     //  */
 
 void ecs_entities::build_station(size_t id, Vector2 position,

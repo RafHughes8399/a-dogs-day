@@ -93,9 +93,12 @@ namespace sprite_builders{
         const float attributes[entity_config::attributes::size]);
     // decorations, stations and food all draw off the test_decoration sheet and
     // differ only by their attribute block and tint
-    sprite::sprite build_decoration_sprite(const float attributes[entity_config::attributes::size],
+    sprite::sprite build_test_decoration_sprite(const float attributes[entity_config::attributes::size],
         Color tint = WHITE);
-    sprite::sprite build_test_decoration_sprite();
+    sprite::sprite build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size]);
+    sprite::sprite build_poker_table();
+    sprite::sprite build_dog_painting();
+    sprite::sprite build_gargoyle();
     sprite::sprite build_table_sprite();
     sprite::sprite build_food_counter_sprite();
     sprite::sprite build_dishwasher_sprite();

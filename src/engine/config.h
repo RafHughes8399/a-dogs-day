@@ -293,8 +293,10 @@ namespace entity_config{
     inline const char* mack_down_outline_path = "../sprites/mack_down_outline.png";
 
     inline const char* test_decoration_path ="../sprites/test_decoration.png";
-    inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle_void.png";
+    inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle-void.png";
     inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
+    inline const char* poker_table_decoration_path = "../sprites/dog-poker.png";
+    inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
     // NPC dog sprite art pending.
     // inline const char* npc_dog_left_path = "../sprites/npc_dog_left.png";
     // inline const char* npc_dog_right_path = "../sprites/npc_dog_right.png";
@@ -323,7 +325,9 @@ namespace entity_config{
     // inline const Vector2 mack_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 mack_head_right_offset = Vector2{0.0f, 0.0f};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (3/02)
-    inline const float gargoyle_decoration_attributes[attributes::size] = {level_config::edge_weight * 0.75f, level_config::edge_weight * 1.75f, 1.0f, 1.0f};
+    inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
+    inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
+    inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float table_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     inline const float food_counter_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     inline const float dishwasher_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
