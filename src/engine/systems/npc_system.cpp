@@ -67,7 +67,7 @@ void systems::npc_system::customer_arrival_system::destroy_customer_dog(size_t i
         + std::to_string(id)
         + ", last position: " + position_of(id)
         + ", tracked customers: " + std::to_string(customers_.size()));
-    entity_lifespan_system::get_instance().remove(id);
+    entity_lifespan_system::get_instance().destroy_customer_dog(id);
     std::erase_if(customers_,  [id](auto customer) -> bool {return customer == id;});
 }
 
@@ -140,4 +140,10 @@ void systems::npc_system::register_customer(size_t id){
 }
 void systems::npc_system::unregister_customer(size_t id){
     customer_arrival_.unregister_customer(id);
+}
+void systems::npc_system::register_table(size_t id){
+    customer_arrival_.register_table(id);
+}
+void systems::npc_system::unregister_table(size_t id){
+    customer_arrival_.unregister_table(id);
 }

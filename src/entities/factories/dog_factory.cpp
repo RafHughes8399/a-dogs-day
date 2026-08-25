@@ -1,13 +1,13 @@
-#include "dog_factory.hpp"
+#include "factories.hpp"
 #include "events.h"
 #include "events_interface.h"
 #include <random>
 #include <algorithm>
-size_t dog_factory::dog_factory::pick_route(){
+size_t factories::dog_factory::pick_route(){
     // TODO make it a proper random thing
     return 0;
 }
-size_t dog_factory::dog_factory::pick_dog(){
+size_t factories::dog_factory::pick_dog(){
     if(index_ >= dogs_.size()){
         refresh_dogs();
     }
@@ -16,7 +16,7 @@ size_t dog_factory::dog_factory::pick_dog(){
     return dog; 
 }
 
-void dog_factory::dog_factory::refresh_dogs(){
+void factories::dog_factory::refresh_dogs(){
     dogs_.clear();
     for(int d = customers::tex; d < customers::customers_size; d++){
         for(int c = 0; c < CUSTOMERS; c++){
@@ -36,7 +36,7 @@ void dog_factory::dog_factory::refresh_dogs(){
 }
 
 // it does need an id and a position 
-void dog_factory::dog_factory::build_customer_dog(size_t id){
+void factories::dog_factory::build_customer_dog(size_t id){
     auto dog = pick_dog();
     auto route = pick_route();
     auto builder = builders_[dog];
@@ -45,6 +45,5 @@ void dog_factory::dog_factory::build_customer_dog(size_t id){
         + std::to_string(id));
     events::create_path_to create_path_event{id, destination_positions_[route], path::replace};
     event_interface::execute_event(create_path_event);
-
     return;
 }

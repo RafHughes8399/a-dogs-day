@@ -88,7 +88,8 @@ void game::ecs_game::init(){
         ecs_entities::build_counter(id, Vector2 {level_config::edge_weight * 12, level_config::edge_weight * 4});
     }, level_config::draw_layers::decoration);
     auto table_id = lifespan_.create([](size_t id) -> void {
-        ecs_entities::build_table(id, Vector2 {level_config::edge_weight * 6, level_config::edge_weight * 6});
+        ecs_entities::build_table(id, Vector2 {level_config::edge_weight * 6, level_config::edge_weight * 6},
+            sprite_builders::build_dining_table_sprite());
     }, level_config::draw_layers::decoration);
     auto stove_id = lifespan_.create([](size_t id) -> void {
         ecs_entities::build_stove(id, Vector2 {level_config::edge_weight * 16, level_config::edge_weight * 7});

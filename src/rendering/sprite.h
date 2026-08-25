@@ -95,11 +95,16 @@ namespace sprite_builders{
     // differ only by their attribute block and tint
     sprite::sprite build_test_decoration_sprite(const float attributes[entity_config::attributes::size],
         Color tint = WHITE);
+    
+    // *-------------------- deocration sprites --------------------* //
     sprite::sprite build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size]);
     sprite::sprite build_poker_table();
     sprite::sprite build_dog_painting();
     sprite::sprite build_gargoyle();
+
+    // *-------------------- station sprites --------------------* //
     sprite::sprite build_table_sprite();
+    sprite::sprite build_dining_table_sprite();
     sprite::sprite build_food_counter_sprite();
     sprite::sprite build_dishwasher_sprite();
     sprite::sprite build_stove_sprite();

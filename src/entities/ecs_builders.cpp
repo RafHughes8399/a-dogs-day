@@ -73,8 +73,7 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
 // TODO mack's art stands in until npc dog sprites exist
 void ecs_entities::build_customer_dog(size_t id, Vector2 position){
     build_dog(id, position, build_mack_sprites(),
-        entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
-}
+        entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);}
     //**
 
     // .
@@ -178,14 +177,18 @@ void ecs_entities::build_station(size_t id, Vector2 position,
             {entity_config::station_slot_left, entity_config::station_slot_right,
              entity_config::station_slot_up, entity_config::station_slot_down});
     }
-    void ecs_entities::build_table(size_t id, Vector2 position){
+    void ecs_entities::build_table(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,
-            sprite_builders::build_table_sprite(),
+            sprite,
             hitbox_builders::build_table_hitbox(position),
             entity_config::station_reach,
             {entity_config::station_slot_left, entity_config::station_slot_right,
              std::nullopt, std::nullopt});
     }
+        void ecs_entities::build_dining_table(size_t id, Vector2 position){
+            build_table(id, position, sprite_builders::build_dining_table_sprite());
+        }
+        
     void ecs_entities::build_dishwasher(size_t id, Vector2 position){
         build_station(id, position,
             sprite_builders::build_dishwasher_sprite(),

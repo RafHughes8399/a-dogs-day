@@ -297,6 +297,8 @@ namespace entity_config{
     inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
     inline const char* poker_table_decoration_path = "../sprites/dog-poker.png";
     inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
+
+    inline const char* dining_table_station_path = "../sprtes/dining-table.png";
     // NPC dog sprite art pending.
     // inline const char* npc_dog_left_path = "../sprites/npc_dog_left.png";
     // inline const char* npc_dog_right_path = "../sprites/npc_dog_right.png";
@@ -328,7 +330,10 @@ namespace entity_config{
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
+    
     inline const float table_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
+    inline const float dining_table_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 1.5f, 1.0f, 1.0f};
+
     inline const float food_counter_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     inline const float dishwasher_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     inline const float stove_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};

@@ -381,8 +381,10 @@ what is left
 -------------------------
    TODO
       -> proper spawn point picking
+      -> station factory and table building
+      -> table registering and unregistering
       -> test customer pathing and table assignment
-      -> and customer leaving       
+      
    -> state machines and event listening it seems would drive this
       -> the state decides what events need to be listened to
       -> for example: 

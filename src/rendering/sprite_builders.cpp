@@ -1,3 +1,4 @@
+#include "config.h"
 #include "sprite.h"
 #include "texture.h"
 sprite::sprite sprite_builders::build_sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations,
@@ -47,6 +48,9 @@ sprite::sprite sprite_builders::build_gargoyle(){
 sprite::sprite sprite_builders::build_table_sprite(){
     return build_test_decoration_sprite(entity_config::table_attributes, RED);
 }
+    sprite::sprite sprite_builders::build_dining_table_sprite(){
+        return build_decoration_sprite(textures::dining_table, entity_config::dining_table_station_path, entity_config::dining_table_attributes);
+    }
 sprite::sprite sprite_builders::build_food_counter_sprite(){
     return build_test_decoration_sprite(entity_config::food_counter_attributes, BLUE);
 }

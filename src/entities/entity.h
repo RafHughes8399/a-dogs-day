@@ -130,7 +130,8 @@ namespace ecs_entities {
         sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
         float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets);
         void build_counter(size_t id, Vector2 position);
-        void build_table(size_t id, Vector2 position);
+        void build_table(size_t id, Vector2 position, sprite::sprite table_sprite);
+            void build_dining_table(size_t id, Vector2 position);
         void build_dishwasher(size_t id, Vector2 position);
         void build_stove(size_t id, Vector2 position);
         /**

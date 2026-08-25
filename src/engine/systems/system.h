@@ -4,7 +4,7 @@
 #include "config.h"
 #include "entity.h"
 #include "events.h"
-#include "dog_factory.hpp"
+#include "factories.hpp"
 #include "quadtree.h"
 #include "events_interface.h"
 #include "render_layer.h"
@@ -114,6 +114,15 @@ namespace systems{
             // mirrors player::selected_dog_ - switch_dog flips it, right_click carries it
             size_t selected_dog_;
     };
+    /**
+    // * something of a dense comment here to explain the build relationships
+    // * entity lifespan is how the game triggers building and destroying of entities, it is the entry point.
+    // ! it is where the registration and unregistration happens for other systems as it is guarnateed that those systems will be accessible 
+    // ! the general create and destroy functions emit the events for other systems like collision and spatial to listen to and update their 
+    // ! internal representation accordingly 
+    // * the lifespan system holds factories which have the builders that are passed in as its create function
+    // * the factories manage and call the entity_builders, they pick which entity to build 
+    // */
     class entity_lifespan_system{
         // responsible for managing entity creation and destruction
         public:
@@ -133,17 +142,40 @@ namespace systems{
 
             // allocate -> build -> announce, so nothing can be built without
             // reaching the spatial index and a render layer
-            template<typename Builder>
-            size_t create(Builder build, size_t layer){
-                auto entity_id = next_id();
-                build(entity_id);
+            // ! think  we overload with differnet paramters
+                // ! one for just entity id 
+                // ! one for entity id and position
+                // ! one for entity id, position and the type for the factory's builder 
+            size_t create(std::function<void(size_t)> build, size_t layer){
+                auto id = next_id();
+                build(id);
                 // executed, never queued - listeners must see the entity this frame
-                events::create_entity created{entity_id, layer};
+                events::create_entity created{id, layer};
                 event_interface::execute_event(created);
-                return entity_id;
+                return id;
+            }
+            size_t create(std::function<void(size_t, Vector2)> build, Vector2 position, size_t layer){
+                auto id = next_id();
+                build(id, position);
+                // executed, never queued - listeners must see the entity this frame
+                events::create_entity created{id, layer};
+                event_interface::execute_event(created);
+                return id;
+            }
+            size_t create(std::function<void(size_t, size_t, Vector2)> build, size_t entity, Vector2 position, size_t layer){
+                auto id = next_id();
+                build(entity, id, position);
+                // executed, never queued - listeners must see the entity this frame
+                events::create_entity created{id, layer};
+                event_interface::execute_event(created);
+                return id;
             }
             size_t create_customer_dog();
-            void remove(size_t entity_id);
+            void destroy_customer_dog(size_t id);
+
+            size_t create_table(size_t table, Vector2 position);
+            void destroy_table(size_t id);
+            void destroy(size_t entity_id);
             void update(float delta);
             // teardown between test scenarios - the singleton outlives them
             void clear(){
@@ -155,7 +187,8 @@ namespace systems{
             std::queue<size_t> recycled_ids_;
             size_t fresh_id_ = 0;
 
-            dog_factory::dog_factory dog_factory_;
+            factories::dog_factory dog_factory_;
+            factories::station_factory station_factory_;
     };
     class interaction_system{
         // for behavioural interactions
@@ -394,6 +427,9 @@ namespace systems{
 
             void register_customer(size_t id);
             void unregister_customer(size_t id);
+
+            void register_table(size_t id);
+            void unregister_table(size_t id);
             void clear(){
                 customer_arrival_.clear();
             }

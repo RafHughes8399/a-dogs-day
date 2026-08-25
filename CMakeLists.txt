@@ -104,7 +104,8 @@ link_libraries(events)
 add_library(queries src/engine/queries/queries.cpp)
 link_libraries(queries)
 add_library(factories
-            src/entities/factories/dog_factory.cpp)
+            src/entities/factories/dog_factory.cpp
+            src/entities/factories/station_factory.cpp)
 link_libraries(factories)
 add_library(components
   src/engine/components/component_managers.cpp
