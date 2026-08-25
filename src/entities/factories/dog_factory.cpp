@@ -18,12 +18,12 @@ size_t factories::dog_factory::pick_dog(){
 
 void factories::dog_factory::refresh_dogs(){
     dogs_.clear();
-    for(int d = customers::tex; d < customers::customers_size; d++){
+    for(int d = entity_config::customers::tex; d < entity_config::customers::customers_size; d++){
         for(int c = 0; c < CUSTOMERS; c++){
             dogs_.push_back(static_cast<size_t>(d));
         }
     }
-    for(int d = special_customers::garfield; d < special_customers::cumulative_customers_size; d++){
+    for(int d = entity_config::special_customers::garfield; d < entity_config::special_customers::cumulative_customers_size; d++){
         for(int c = 0; c < SPECIAL_CUSTOMERS; c++){
             dogs_.push_back(static_cast<size_t>(d));
         }

@@ -12,14 +12,6 @@ namespace factories{
 
     class dog_factory{
         public:
-            enum customers{
-                tex = 0,
-                customers_size = 1
-            };
-            enum special_customers{
-                garfield = customers_size,
-                cumulative_customers_size
-            };
             ~dog_factory() = default;
             dog_factory()
             :dogs_({}), builders_({
@@ -54,7 +46,7 @@ namespace factories{
             // * and the value at the index is the number that dog left and the function to build that dog
             std::vector<size_t> dogs_;
             size_t index_ = 0;
-            std::array<std::function<void(size_t, Vector2)>, cumulative_customers_size> builders_;
+            std::array<std::function<void(size_t, Vector2)>, entity_config::cumulative_customers_size> builders_;
 
             // need spawn
             std::array<Vector2, SPAWN_POSITIONS> spawn_positions_;
@@ -78,10 +70,6 @@ namespace factories{
     // * similar logic to the ecustomer dogs, but just not randomised
     class station_factory{
         public:
-            enum tables{
-                dining_table = 0,
-                tables_size = 1
-            };
             ~station_factory() = default;
             station_factory()
             :table_builders_({
@@ -98,7 +86,7 @@ namespace factories{
             void build_table(size_t table, size_t entity_id, Vector2 position);
             void build_stove(size_t id, Vector2 position);
         private:
-            std::array<std::function<void(size_t, Vector2)>, station_factory::tables_size> table_builders_;
+            std::array<std::function<void(size_t, Vector2)>, entity_config::tables_size> table_builders_;
     };
 }
 #endif

@@ -260,6 +260,19 @@ namespace entity_config{
         selectable_kinds_size = 5
     };
 
+    enum customers{
+        tex = 0,
+        customers_size = 1
+    };
+    enum special_customers{
+        garfield = customers_size,
+        cumulative_customers_size
+    };
+    enum tables{
+        dining_table = 0,
+        tables_size = 1
+    };
+
     // file paths
     inline const char* background_path = "../sprites/background.png" ;
     inline const char* cursor_path = "../sprites/cursor.png";

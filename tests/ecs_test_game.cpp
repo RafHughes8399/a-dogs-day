@@ -87,7 +87,7 @@ namespace testing{
 
     size_t ecs_test_game::create_table(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_table(id, position);
+            ecs_entities::build_dining_table(id, position);
         }, layer);
     }
 
@@ -161,7 +161,7 @@ namespace testing{
     }
 
     void ecs_test_game::remove(size_t entity_id){
-        lifespan_.remove(entity_id);
+        lifespan_.destroy(entity_id);
     }
 
     void ecs_test_game::move_entity(size_t entity_id, Vector2 position){
