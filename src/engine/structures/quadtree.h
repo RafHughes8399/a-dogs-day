@@ -253,7 +253,7 @@ namespace tree{
         }
     };
 
-    // TODO: RENAME AFTER REFACTOR IS COMPLETE - replaces quadtree once level is gone.
+    // TODO (25 / 8 / 26) RENAME AFTER REFACTOR IS COMPLETE - replaces quadtree once level is gone.
     // same structure, holding ids. no update loop and no interact dispatch -
     // the systems own those now - and no id allocation, that is
     // entity_lifespan_system's.

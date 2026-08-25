@@ -1,9 +1,9 @@
 #include "system.h"
 
-// TODO stub - the loop calls this every frame, nothing to do yet
+// TODO (25 / 8 / 26) stub - the loop calls this every frame, nothing to do yet
 void systems::interaction_system::update(float delta){
     (void) delta;
 }
 
-// TODO on moved entity
+// TODO (25 / 8 / 26) on moved entity
 // update teh

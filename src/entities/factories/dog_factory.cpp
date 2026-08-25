@@ -4,7 +4,7 @@
 #include <random>
 #include <algorithm>
 size_t factories::dog_factory::pick_route(){
-    // TODO make it a proper random thing
+    // TODO (25 / 8 / 26) make it a proper random thing
     return 0;
 }
 size_t factories::dog_factory::pick_dog(){

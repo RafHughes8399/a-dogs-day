@@ -161,7 +161,7 @@ void level::level::move_void_entity_toward_screen(entities::entity &entity,
   auto position = entity.get_position();
   const auto &box = entity.get_hitbox().get_box();
 
-  // TODO, dont love this logic, clean it up
+  // TODO (25 / 8 / 26) dont love this logic, clean it up
   if (box.x < 0.0f) {
     position.x += level_config::void_move;
   } else if ((box.x + box.width) > level_config::screen_width) {

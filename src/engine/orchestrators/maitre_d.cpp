@@ -316,7 +316,6 @@ void maitre_d::maitre_d::on_customer_dog_created_event(const events::customer_do
 }
 
 void maitre_d::maitre_d::on_customer_dog_left_event(const events::customer_dog_left& event){
-    // TODO drop the dog from the list
     dogs_left_in_window_++;
 
     // Resolve which table this customer occupied by id - no dog object

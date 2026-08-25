@@ -152,7 +152,7 @@ int entities::cursor::update(float delta, int frame){
 
         // create the query and execute it
 
-        // TODO change how this works to test your interaction theory  !
+        // TODO (25 / 8 / 26) change how this works to test your interaction theory  !
         std::unique_ptr<queries::query> colliding_query = std::make_unique<queries::is_colliding_query>(body_.get_hitbox(), id_);
         // the listener (singular) does something with the query and returns the information
         bool is_colliding = queries::bool_executor_.execute_query(*colliding_query);

@@ -100,7 +100,6 @@ void player::player::move(Vector2 direction_scalar, float delta){
     return;
 }
 
-// TODO implement all 
 void player::player::select_dog(){
     std::unique_ptr<events::event> select_dog_event = std::make_unique<events::selected_dog>(selected_dog_);
     event_interface::queue_event(select_dog_event);

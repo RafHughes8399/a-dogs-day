@@ -201,7 +201,7 @@ expediter::expediter::pick_food_counter(serving_job &job) {
 }
 
 entities::dishwasher *expediter::expediter::pick_dishwasher(clearing_job &job) {
-  // TODO: pick by capacity/proximity once the dishwasher station is real -
+  // TODO (25 / 8 / 26) pick by capacity/proximity once the dishwasher station is real -
   // for now first registered wins, the counterpart to pick_food_counter's
   // has_available_food() check.
   if (dishwashers_.empty()) {
@@ -281,7 +281,7 @@ void expediter::expediter::register_dishwasher(
 }
 
 void expediter::expediter::remove_dishwasher(size_t dishwasher_id) {
-  // TODO: no job routes to a dishwasher yet, so nothing to reconcile. Once
+  // TODO (25 / 8 / 26) no job routes to a dishwasher yet, so nothing to reconcile. Once
   // the second leg lands, a clearing_job whose dishwasher_id stops resolving
   // should reset to empty_id and be picked up again, the way process_serving_jobs()
   // handles a missing counter.
@@ -345,7 +345,7 @@ void expediter::expediter::process_clearing_job(clearing_job &job) {
   // jobs sets it just before calling here, and hands it the dishwasher for leg
   // 2); everything after this dispatch is driven by the waiter's own states.
   auto table = tables_.at(job.table_id);
-  // TODO: picking .left unconditionally - needs a helper that picks the
+  // TODO (25 / 8 / 26) picking .left unconditionally - needs a helper that picks the
   // nearer interaction position. process_serving_job() has the same problem.
   auto destination = table->get_interaction_positions().left;
   // Executed, not queued, so the path exists before clearing_table's first
@@ -386,7 +386,7 @@ void expediter::expediter::abandon_serving_job(serving_job &job) {
   // Exactly one of these applies: food already collected means the reservation
   // was consumed at pickup, food not collected means it is still outstanding.
   if (waiter != nullptr and waiter->is_carrying_food()) {
-    // TODO: return it to the counter once food-on-table is modelled.
+    // TODO (25 / 8 / 26) return it to the counter once food-on-table is modelled.
     waiter->release_food();
   } else if (waiter != nullptr) {
     auto *counter = find_counter(job.counter_id);

@@ -22,7 +22,7 @@ void systems::entity_lifespan_system::destroy(size_t entity_id){
     recycled_ids_.push(entity_id);
 }
 
-// TODO stub - the loop calls this every frame, nothing to do yet
+// TODO (25 / 8 / 26) stub - the loop calls this every frame, nothing to do yet
 void systems::entity_lifespan_system::update(float delta){
     (void) delta;
     return;

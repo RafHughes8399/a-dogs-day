@@ -17,7 +17,7 @@ namespace hud{
 
     // previously I did a event strategy pattern, I dont mind that idea
     // can have multiple strategies
-    // TODO event strategies
+    // TODO (25 / 8 / 26) event strategies
     
     class hud_element{
         public:

@@ -13,10 +13,10 @@
 namespace queries{
     enum ids{
         is_colliding = 0,
-        collision = 1,
-        place_decoration = 2,
-        path = 3,
-        size = 4
+        collision,
+        place_decoration,
+        path,
+        size
     };
 
     class query{

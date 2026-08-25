@@ -58,7 +58,7 @@ namespace entities{
             // Animation counterpart to set_direction_index - applies to body and
             // head together. Which sprite is showing is the direction axis;
             // which row inside it is the animation axis, so these don't fight.
-            // TODO: route this through body-level animation helpers instead of
+            // TODO (25 / 8 / 26) route this through body-level animation helpers instead of
             // reaching in via get_sprite().get_animation(), and use them to read
             // playback state rather than having callers time the duration.
             void play_animation(int animation);

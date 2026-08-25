@@ -43,7 +43,7 @@ namespace render_layer{
 
     };
 
-    // TODO: RENAME AFTER REFACTOR IS COMPLETE - replaces layer once level is gone.
+    // TODO (25 / 8 / 26) RENAME AFTER REFACTOR IS COMPLETE - replaces layer once level is gone.
     // same shape as layer, holding ids - a stale entry is skipped via a null
     // component lookup rather than dereferenced
     class ecs_layer{

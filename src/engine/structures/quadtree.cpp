@@ -194,7 +194,7 @@ void tree::quadtree::notify_removals(const std::vector<entities::entity*>& remov
         // afterwards. A queued removal would be handled a frame later, by which
         // point the handlers would dereference (via get_id()) a freed entity.
 
-        // TODO: fix this pattern - should not belong in the quadtree
+        // TODO (25 / 8 / 26) fix this pattern - should not belong in the quadtree
         if(debug_id.starts_with(entity_config::table_debug_id_prefix)){
             events::removed_table removed_table{id};
             event_interface::execute_event(removed_table);

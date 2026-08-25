@@ -9,7 +9,6 @@
 #include <raylib.h>
 
 // ---------------- frame update ----------------
-// TODO stub - the loop calls this every frame, nothing to do yet
 void systems::movement_system::update(float delta){
     // here is where all the paths are checked [recalculated iff need be and movement occurs ]
     // i think the path recalculation is better done on a "movement entity discovers its path is blocked check" rather than a

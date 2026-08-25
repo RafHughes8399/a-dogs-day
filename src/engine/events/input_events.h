@@ -65,7 +65,7 @@ namespace events{
 	class left_mouse_click : public event{
 		public:
 			left_mouse_click(Vector2 position, float box_width, float box_length)
-			:	event(ids::left_mouse), mouse_position_(position), collision_box_(Rectangle{position.x, position.y, box_width, box_length}){ // TODO fill in (16/12)
+			:	event(ids::left_mouse), mouse_position_(position), collision_box_(Rectangle{position.x, position.y, box_width, box_length}){
 			}
 			static int get_static_type(){
 				return ids::left_mouse;

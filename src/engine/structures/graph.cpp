@@ -104,8 +104,8 @@ std::vector<Vector2> graph::level_graph::make_position_path(std::vector<Vector2>
 
     return path;
 }
-// TODO refactor this so i can pathfind on less strict paths. like half multiples of edges. like as long as we remain on 
-// TODO one axis of change it is ok, but can be more free question mark, perhaps less rigid movement ? 
+// TODO (25 / 8 / 26) refactor this so i can pathfind on less strict paths. like half multiples of edges. like as long as we remain on
+// TODO one axis of change it is ok, but can be more free question mark, perhaps less rigid movement ?
 std::vector<Vector2> graph::level_graph::find_path(Vector2 start, Vector2 end, Vector2 direction){
     int start_node = 0;
     int end_node = 0;

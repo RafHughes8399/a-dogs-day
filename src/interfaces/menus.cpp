@@ -7,7 +7,7 @@ menus::menu_builder menus::m_builder_;
 
 // ------------------------------- menu --------------------------------------- //
 void menus::menu::render(){
-    // TODO
+    // TODO (25 / 8 / 26)
     DrawRectangle(static_cast<int>(box_.x), static_cast<int>(box_.y),
         static_cast<int>(box_.width), static_cast<int>(box_.height), YELLOW);
     //DrawText(text_.c_str(), box_.x + 32, box_.y + 32, 32, BLACK);
@@ -143,7 +143,6 @@ void menus::menu_graph::on_key_press_event(const events::key_press& event){
     }
     size_t new_current = current_;
 
-    // TODO unsub old current buttons, sub new current buttons
     graph_[old_current].first.menu_->unsubscribe_hud();
     graph_[new_current].first.menu_->subscribe_hud();
     // at this point current has changed

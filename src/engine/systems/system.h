@@ -349,8 +349,8 @@ namespace systems{
                 // * clearing system  - managers clearing tables after customers have left
             class customer_arrival_system{
                 public:
-                    // TODO must listen to table construction and deletion, can create a new event for it and update teh builders 
-                    // TODO and destroyers to emit those events 
+                    // TODO (25 / 8 / 26) must listen to table construction and deletion, can create a new event for it and update teh builders
+                    // TODO and destroyers to emit those events
                     ~customer_arrival_system() = default;
                     customer_arrival_system() = default;
 

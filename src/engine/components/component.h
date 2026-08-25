@@ -250,7 +250,7 @@ public:
   class sprite_component {
   public:
     ~sprite_component() = default;
-    // TODO fix magic number what is 0
+    // TODO (25 / 8 / 26) fix magic number what is 0
     sprite_component(std::vector<sprite::sprite> &sprites, size_t index = 0)
         : sprites_(sprites), sprite_index_(index) {}
     sprite_component(const sprite_component& other) = default;
