@@ -479,3 +479,42 @@ raw position paths [picks up the note at line 323 above]
    dog cannot step over the target between frames
 -> open: the graph occupancy marks whole nodes. two dogs a quarter edge apart inside one node
    would both mark it, and the second would read the first as blocking
+
+
+
+26 / 8 - Serving System 
+pre-requsities:
+-> counter building and destroying
+-> food [as an item stored by the counter and as an entity carried by a waiter]
+-> counter storage of food
+-> waiter building and destroying
+-> interaction detection [x], creation and processing
+
+
+-> when a customer sits at a table they make a request [they transition to a waiting state], and waits for up to 2 minutes
+   -> this is a state change and a ui indication to the player to respond
+
+-> within that time, the player must respond and serve the customer their request
+-> use the player / waiter dogs to serve the food 
+   -> must first navigate to the counter
+   -> upon going to the counter an interaction is performed to pick up the food
+      -> can detect the interaction through the handshake
+      -> processing the interaction in this case would do the following:
+         -> pop the food from the counter stack
+         -> create it as an entity at the dog food offset position, have it tied to the dog's movmenet
+      
+   -> the dog must then be directed to the table, upon reaching the table, they place the food down
+      -> maintain the food as an entity in the game,
+      -> it must be placed at the food_table_offset
+      -> once placed, the customer must be notified in some way to start eating, the table and its interactable component 
+      could be that link
+   -> so the dog interaction with a station depends on the following:
+      -> the type of dog and type of station
+      -> the state of the dog
+
+   -> when the food is placed, the customer eats for a set duration [10-20s]
+   -> after, they leave [ should map a cafe exit tunnel like the entrance]
+
+
+customer states [entering, waiting, eating, leaving]
+waiter states [idle, serving, clearing]
