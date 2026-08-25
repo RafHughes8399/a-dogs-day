@@ -74,7 +74,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_khiri(Vector2 
     // khiri_head_hitboxes.push_back(across_hitbox);
     // khiri_head_hitboxes.push_back(across_hitbox);
     // auto head = body::body(khiri_head_hitboxes, khiri_head_sprites);
-    auto head = body::body(); // TODO fill !
+    auto head = body::body(); // TODO (25 / 8 / 26) fill !
     return std::make_unique<entities::player_dog>(
         std::move(body),
         std::move(head),
@@ -153,7 +153,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_mack(Vector2 p
     // mack_head_hitboxes.push_back(across_hitbox);
     // mack_head_hitboxes.push_back(across_hitbox);
     // auto head = body::body(mack_head_hitboxes, mack_head_sprites);
-    auto head = body::body(); // TODO fill ! and build the head sprites and hitboxes
+    auto head = body::body(); // TODO (25 / 8 / 26) fill ! and build the head sprites and hitboxes
 
     // and build the head, pending
     return std::make_unique<entities::player_dog>(

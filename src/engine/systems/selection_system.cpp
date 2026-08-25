@@ -9,7 +9,7 @@ void systems::selection_system::on_destroyed_entity(const events::remove_entity&
 }
 
 // ---------------- frame update ----------------
-// TODO stub - selection is event driven, nothing to do per frame yet
+// TODO (25 / 8 / 26) stub - selection is event driven, nothing to do per frame yet
 void systems::selection_system::update(float delta){
     (void) delta;
 }

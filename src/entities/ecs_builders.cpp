@@ -21,7 +21,6 @@
 
 void ecs_entities::build_player(size_t player_id, size_t cursor_id){
     // build control components, start with the array keys,
-    // TODO  literals for now, witll deffine in enum when refactor is complete
     component_helpers::add_key_input_component(player_id, game_config::player_controls);
     // build the cursor,
     // ?  do we need an attachment compnent, a has_a_component ? that way we can manage destruction properly
@@ -70,7 +69,7 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
             entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach);
     }
 
-// TODO mack's art stands in until npc dog sprites exist
+// TODO (25 / 8 / 26) mack's art stands in until npc dog sprites exist
 void ecs_entities::build_customer_dog(size_t id, Vector2 position){
     build_dog(id, position, build_mack_sprites(),
         entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);}

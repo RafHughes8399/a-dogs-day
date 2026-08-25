@@ -23,14 +23,14 @@ namespace game_config {
     // * a legal value that nothing would catch.
     enum control_action{
         key_press = 0,
-        key_hold = 1,
-        key_release = 2
+        key_hold,
+        key_release
     };
     enum mouse_action{
         mouse_press = 3,
-        mouse_hold = 4,
-        mouse_released = 5,
-        mouse_up = 6
+        mouse_hold,
+        mouse_released,
+        mouse_up
     };
     enum control_input{
         dog_switch = KEY_F,
@@ -122,19 +122,19 @@ namespace level_config{
     inline const float void_move = edge_weight * 0.125;
     enum draw_layers{
         background = 0,
-        decoration = 1,
-        stations = 2,
-        dogs = 3,
-        hud = 4,
-        cursor = 5,
-        size = 6
+        decoration,
+        stations,
+        dogs,
+        hud,
+        cursor,
+        size
     };
 
     // these indices are shared with the direction-ordered sprite arrays
     // (dog::set_direction_index indexes body_/head_ with a directions value), so
     // an entry here without a matching sprite is a trap for whoever adds an
     // animation next.
-    // TODO drop 'all' - it was an attempt at an omnidirectional cursor
+    // TODO (25 / 8 / 26) drop 'all' - it was an attempt at an omnidirectional cursor
     // TODO direction, but {1,1} is not a unit vector so it moves ~1.41x too fast
     // TODO when multiplied by move_speed, it has no sprite, and level_graph::
     // TODO position_to_node snaps it identically to 'right'. an entity with no
@@ -142,11 +142,11 @@ namespace level_config{
     // TODO the note above ecs_entities::build_cursor.
     enum directions{
         left = 0,
-        right = 1,
-        up = 2,
-        down = 3,
-        all = 4,
-        directions_size = 5
+        right,
+        up,
+        down,
+        all,
+        directions_size
     };
     inline const Vector2 direction_scalars[directions::directions_size] = {
         Vector2{-1, 0}, // left  (index 0)
@@ -163,7 +163,7 @@ namespace graph_config{
 namespace cafe_config{
     enum queue_sides{
         left = 0,
-        right = 1
+        right
     };
     inline const int queue_width_edges = 3;
     inline const int queue_x_edges = 1;
@@ -231,7 +231,7 @@ namespace cafe_config{
         level_config::cafe_x,
         level_config::cafe_y + level_config::cafe_height * 0.5f
     };
-    inline const Vector2 cafe_exit = Vector2Zero();  // TODO placeholder, input actual value
+    inline const Vector2 cafe_exit = Vector2Zero();  // TODO (25 / 8 / 26) placeholder, input actual value
     
 }
 namespace station_config{
@@ -253,16 +253,16 @@ namespace entity_config{
 
     enum selectable_kinds{
         player_dog_kind = 0,
-        decoration_kind = 1,
-        station_kind = 2,
-        customer_dog_kind = 3,
-        waiter_dog_kind = 4,
-        selectable_kinds_size = 5
+        decoration_kind,
+        station_kind,
+        customer_dog_kind,
+        waiter_dog_kind,
+        selectable_kinds_size
     };
 
     enum customers{
         tex = 0,
-        customers_size = 1
+        customers_size
     };
     enum special_customers{
         garfield = customers_size,
@@ -270,7 +270,7 @@ namespace entity_config{
     };
     enum tables{
         dining_table = 0,
-        tables_size = 1
+        tables_size
     };
 
     // file paths
@@ -320,26 +320,26 @@ namespace entity_config{
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
     enum attributes{
         frame_width = 0,
-        frame_height = 1,
-        frames = 2,
-        animations = 3,
-        size = 4
+        frame_height,
+        frames,
+        animations,
+        size
     };
     
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
-    inline const float khiri_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (4/11)
-    inline const float khiri_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float khiri_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
+    inline const float khiri_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     // inline const float khiri_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // inline const Vector2 khiri_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 khiri_head_right_offset = Vector2{0.0f, 0.0f};
-    inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (4/11)
-    inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (4/11)
+    inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
+    inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     // inline const float mack_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // inline const Vector2 mack_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 mack_head_right_offset = Vector2{0.0f, 0.0f};
-    inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (3/02)
+    inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
@@ -375,11 +375,11 @@ namespace dog_config{
     inline const float dog_reach = level_config::edge_weight * 0.3f;
     enum waiter_dog_types{
         basic = 0,
-        size = 1
+        size
     };
     enum customer_dog_types{
         fred = 0,
-        john = 1
+        john
     };
 }
 namespace controls_config{
@@ -407,7 +407,7 @@ namespace controls_config{
     // ? resource collecting levels 
 }
 namespace hud_config{
-    // TODO change values pending test
+    // TODO (25 / 8 / 26) change values pending test
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
     inline Color red_decoration_highlight = Color {255, 255, 0, opacity};

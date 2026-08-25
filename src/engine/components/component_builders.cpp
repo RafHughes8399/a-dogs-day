@@ -1,6 +1,5 @@
 #include "component.h"
 
-// TODO implement all
 components::position_component component_builders::build_positional_component(Vector2 position){
     return components::position_component(position);
 }

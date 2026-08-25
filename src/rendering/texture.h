@@ -18,23 +18,23 @@ namespace textures{
     // if already loaded then the texture is returned, otherwise it is laoded and returned
     enum texture_keys{
         cursor = 0,
-        paw_mark = 1,
-        khiri_left = 2,
-        khiri_right = 3,
-        khiri_left_out = 4,
-        khiri_right_out = 5,
-        mack_left = 6,
-        mack_right = 7,
-        mack_up = 8,
-        mack_down = 9,
-        mack_left_out = 10,
-        mack_right_out = 11,
-        test_decoration = 12,
-        hud_edit_wheel = 13,
-        gargoyle_void = 14,
-        gargoyle_sick_of_it = 15,
-        poker_table = 16,
-        dog_painting = 17,
+        paw_mark,
+        khiri_left,
+        khiri_right,
+        khiri_left_out,
+        khiri_right_out,
+        mack_left,
+        mack_right,
+        mack_up,
+        mack_down,
+        mack_left_out,
+        mack_right_out,
+        test_decoration,
+        hud_edit_wheel,
+        gargoyle_void,
+        gargoyle_sick_of_it,
+        poker_table,
+        dog_painting,
         // Head sprite art pending.
         // khiri_head_left = 16,
         // khiri_head_right = 17,
@@ -45,9 +45,9 @@ namespace textures{
         // npc_dog_right = 21,
         // npc_dog_head_left = 22,
         // npc_dog_head_right = 23,
-        dining_table = 18,
-        background = 19,
-        size = 20
+        dining_table,
+        background,
+        size
         // and so on
     };
     class texture{

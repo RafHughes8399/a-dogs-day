@@ -10,8 +10,6 @@
 #include <raylib.h>
 #include <raymath.h>
 
-// TODO stub - the loop calls this every frame, nothing to do yet
-
 // ---------------- input dispatch ----------------
 void systems::control_input_system::check_inputs(size_t id, std::vector<game_config::input>& controls, float delta){
     for(auto it = controls.begin(); it != controls.end(); ++it){
@@ -91,7 +89,7 @@ void systems::control_input_system::update(float delta){
 // * bindings, same calls. it is one map rather than the three parallel ones the
 // * player keeps because the {key_, action_} key already says which of press /
 // * hold / mouse a binding is.
-// * TODO no editing scheme yet. the player swapped schemes by indexing a second
+// * TODO (25 / 8 / 26) no editing scheme yet. the player swapped schemes by indexing a second
 // * map; here which bindings an entity has is the entity's own data, so a scheme
 // * swap means swapping the component's bindings. edit_mode / exit_edit stay
 // * unbound until that is settled.

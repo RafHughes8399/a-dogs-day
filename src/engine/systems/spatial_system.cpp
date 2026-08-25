@@ -29,7 +29,7 @@ void systems::spatial_system::on_destroyed_entity(const events::remove_entity& e
 }
 
 // ---------------- frame update ----------------
-// TODO stub - the tree is event driven, nothing to do per frame yet
+// TODO (25 / 8 / 26) stub - the tree is event driven, nothing to do per frame yet
 void systems::spatial_system::update(float delta){
     (void) delta;
 }

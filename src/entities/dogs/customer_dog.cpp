@@ -52,7 +52,7 @@ int entities::customer_dog::eating::update(customer_dog& dog, float delta, int f
     (void) order_id_;
     (void) table_id_;
     (void) table_position_;
-    // TODO: play animation::picking_up_food on entry (food just arrived on
+    // TODO (25 / 8 / 26) play animation::picking_up_food on entry (food just arrived on
     // the table) and hold for its duration before the eating timer below
     // starts counting down.
     // Count down the eating timer; when it elapses the customer is done and
@@ -60,7 +60,7 @@ int entities::customer_dog::eating::update(customer_dog& dog, float delta, int f
     // follow-up; the state transition is what the loop and tests depend on.)
     elapsed_ += delta;
     if(elapsed_ >= cafe_config::eating_duration_s){
-        // TODO: play animation::placing_plate and hold for its duration
+        // TODO (25 / 8 / 26) play animation::placing_plate and hold for its duration
         // before calling dog.leave() below - the plate needs to visibly be
         // set down (see clear_table/expediter::process_clearing_job, which
         // assumes the plate is sitting on the table by the time a waiter

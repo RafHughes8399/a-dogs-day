@@ -262,8 +262,7 @@ public:
       const events::registered_dishwasher &event);
   void on_removed_dishwasher_event(const events::removed_dishwasher &event);
   void on_dog_reached_station_event(const events::dog_reached_station &event);
-  // TODO: delete once the waiter states self-handle both legs - see the
-  // matching TODO on the .cpp definition.
+  // TODO (25 / 8 / 26) delete once the waiter states self-handle both legs.
   void on_clear_table(const events::clear_table &event);
   void on_waiter_finished_clearing_event(
       const events::waiter_finished_clearing &event);
