@@ -92,24 +92,26 @@ namespace ecs_entities {
     // * food  */
     // ! dog builders and destroyers
     void build_player(size_t player_id, size_t cursor_id);
-    void build_player_dog(size_t id, Vector2 position,
+    void build_dog(size_t id, Vector2 position,
         std::vector<sprite::sprite> sprites, size_t kind, float reach);
         void build_khiri(size_t id);
         void build_mack(size_t id);
 
     void build_customer_dog(size_t id, Vector2 position);
+        void build_tex(size_t id, Vector2 position);
+        void build_garfield(size_t id, Vector2 position);
         //**
 
         // .
         // .
         // .
         // build duck_hunt_dog();
+
         //  */
 
     void build_waiter_dog(size_t id, Vector2 position);
     //**
     // build_saba()
-    // build text
     //  */
 
     void build_cursor(size_t id);
@@ -120,12 +122,16 @@ namespace ecs_entities {
         //**
         // void build_gargoyle();
         //  */
+        void build_gargoyle(size_t id, Vector2 position);
+        void build_poker_table(size_t id, Vector2 position);
+        void build_dog_painting(size_t id, Vector2 position);
 
     void build_station(size_t id, Vector2 position,
         sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
         float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets);
         void build_counter(size_t id, Vector2 position);
-        void build_table(size_t id, Vector2 position);
+        void build_table(size_t id, Vector2 position, sprite::sprite table_sprite);
+            void build_dining_table(size_t id, Vector2 position);
         void build_dishwasher(size_t id, Vector2 position);
         void build_stove(size_t id, Vector2 position);
         /**

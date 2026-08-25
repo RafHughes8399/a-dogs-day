@@ -2,6 +2,7 @@
 
 #include "ecs_test_game.h"
 #include "component.h"
+#include "raymath.h"
 
 SCENARIO("the level graph follows an entity's lifetime", "[ecs][graph][movement]"){
     GIVEN("a fresh ecs world"){
@@ -203,7 +204,8 @@ SCENARIO("the graph rejects positions outside the world", "[ecs][graph][movement
         }
 
         WHEN("the dog is moved clear of the bottom edge"){
-            game.move_entity(dog_id, Vector2{0.0f, level_config::world_y});
+            game.move_entity(dog_id, Vector2{0.0f,
+                level_config::footpath_y + level_config::footpath_height});
 
             THEN("it marks nothing"){
                 REQUIRE(game.graph_occupied_node_count() == 0);
@@ -241,7 +243,7 @@ SCENARIO("a path destination resolves to the nearest node", "[ecs][graph][moveme
         }
 
         WHEN("a left-facing dog is sent there"){
-            game.path_to(dog_id, Vector2{0.0f, 0.0f});
+            game.path_to(dog_id, Vector2{level_config::cafe_x, level_config::edge_weight * 4.0f});
             REQUIRE(game.tick_until([&]{ return not game.has_path(dog_id); }, 4000));
             REQUIRE(game.facing_x_of(dog_id) < 0.0f);
 
@@ -363,6 +365,134 @@ SCENARIO("cell_at gives the containing cell, nearest_node the closest node",
             Vector2 position{level_config::edge_weight * 5.5f, level_config::edge_weight * 3.5f};
             REQUIRE(game.graph_node_position_at(position).x == level_config::edge_weight * 5.0f);
             REQUIRE(game.graph_node_position_at(position).y == level_config::edge_weight * 3.0f);
+        }
+    }
+}
+
+// the two zones overlap by one cell - footpath spans x[0,320), cafe x[256,3072),
+// so x[256,320) sits in both graphs and both hold real nodes there. a route
+// crossing zones has to name a position in that band as a checkpoint.
+namespace{
+    Vector2 deep_in_footpath(){ return Vector2{96.0f, 512.0f}; }
+    Vector2 in_the_band(){ return Vector2{288.0f, 512.0f}; }
+    Vector2 deep_in_cafe(){ return Vector2{960.0f, 512.0f}; }
+    Vector2 far_in_cafe(){ return Vector2{1600.0f, 1024.0f}; }
+}
+
+SCENARIO("checkpoints become legs of their own", "[ecs][graph][movement][route]"){
+    GIVEN("a dog standing in the cafe"){
+        testing::ecs_test_game game;
+        auto dog_id = game.create_customer_dog(deep_in_cafe());
+
+        WHEN("it is sent somewhere with no checkpoints"){
+            game.path_to(dog_id, far_in_cafe());
+
+            THEN("one path is queued"){
+                REQUIRE(game.queued_path_count(dog_id) == 1);
+                REQUIRE(game.path_destinations(dog_id).size() == 1);
+            }
+        }
+
+        WHEN("it is sent through three checkpoints"){
+            auto first = Vector2{1088.0f, 512.0f};
+            auto second = Vector2{1088.0f, 1024.0f};
+            auto third = Vector2{1344.0f, 1024.0f};
+            game.path_to(dog_id, far_in_cafe(), std::nullopt,
+                std::vector<Vector2>{first, second, third});
+
+            THEN("four paths are queued, one per leg"){
+                REQUIRE(game.queued_path_count(dog_id) == 4);
+            }
+            THEN("they run src->c1, c1->c2, c2->c3, c3->dst in order"){
+                auto destinations = game.path_destinations(dog_id);
+                REQUIRE(destinations.size() == 4);
+                REQUIRE(Vector2Equals(destinations[0], first));
+                REQUIRE(Vector2Equals(destinations[1], second));
+                REQUIRE(Vector2Equals(destinations[2], third));
+                REQUIRE(Vector2Equals(destinations[3], far_in_cafe()));
+            }
+        }
+
+        WHEN("one checkpoint is unreachable"){
+            auto reachable = Vector2{1088.0f, 512.0f};
+            auto off_world = Vector2{-4096.0f, -4096.0f};
+            game.path_to(dog_id, far_in_cafe(), std::nullopt,
+                std::vector<Vector2>{reachable, off_world});
+
+            THEN("nothing is queued at all - no half-built route"){
+                REQUIRE(game.queued_path_count(dog_id) == 0);
+            }
+        }
+    }
+}
+
+SCENARIO("a route from the footpath into the cafe needs a checkpoint in the band",
+        "[ecs][graph][movement][route]"){
+    GIVEN("a dog standing on the footpath"){
+        testing::ecs_test_game game;
+        auto dog_id = game.create_customer_dog(deep_in_footpath());
+
+        WHEN("it is sent to a position deep in the cafe with no checkpoints"){
+            game.path_to(dog_id, deep_in_cafe());
+
+            THEN("nothing is queued - no single graph holds both ends"){
+                REQUIRE(game.queued_path_count(dog_id) == 0);
+            }
+        }
+
+        WHEN("it is sent to the band itself"){
+            game.path_to(dog_id, in_the_band());
+
+            THEN("no split is needed - the band is in the footpath graph too"){
+                REQUIRE(game.queued_path_count(dog_id) == 1);
+                REQUIRE(Vector2Equals(game.path_destinations(dog_id).front(), in_the_band()));
+            }
+        }
+
+        WHEN("the caller supplies the band crossing as a checkpoint"){
+            game.path_to(dog_id, deep_in_cafe(), std::nullopt,
+                std::vector<Vector2>{in_the_band()});
+
+            THEN("two legs are queued and neither needed splitting"){
+                REQUIRE(game.queued_path_count(dog_id) == 2);
+                auto destinations = game.path_destinations(dog_id);
+                REQUIRE(Vector2Equals(destinations[0], in_the_band()));
+                REQUIRE(Vector2Equals(destinations[1], deep_in_cafe()));
+            }
+        }
+
+        WHEN("it is sent back out of the cafe onto the footpath"){
+            game.path_to(dog_id, deep_in_cafe(), std::nullopt,
+                std::vector<Vector2>{in_the_band()});
+            REQUIRE(game.tick_until([&](){ return game.queued_path_count(dog_id) == 0; }, 4000));
+            game.path_to(dog_id, deep_in_footpath(), std::nullopt,
+                std::vector<Vector2>{in_the_band()});
+
+            THEN("the checkpoint works in the other direction too"){
+                REQUIRE(game.queued_path_count(dog_id) >= 1);
+                REQUIRE(Vector2Equals(game.path_destinations(dog_id).back(), deep_in_footpath()));
+            }
+        }
+    }
+}
+
+SCENARIO("a checkpointed route still carries its destination entity on the last leg only",
+        "[ecs][graph][movement][route]"){
+    GIVEN("a dog on the footpath and a table in the cafe"){
+        testing::ecs_test_game game;
+        auto dog_id = game.create_customer_dog(deep_in_footpath());
+        auto table_id = game.create_table(far_in_cafe());
+
+        WHEN("it is sent to the table through the band"){
+            game.path_to(dog_id, far_in_cafe(), table_id,
+                std::vector<Vector2>{in_the_band()});
+
+            THEN("the route has two legs and ends at one of the table's interaction slots"){
+                REQUIRE(game.queued_path_count(dog_id) == 2);
+                auto destinations = game.path_destinations(dog_id);
+                REQUIRE_FALSE(Vector2Equals(destinations.back(), far_in_cafe()));
+                REQUIRE(destinations.back().x >= level_config::cafe_x);
+            }
         }
     }
 }

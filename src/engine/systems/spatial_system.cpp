@@ -40,3 +40,8 @@ int systems::spatial_system::check_collision_with(size_t id, Rectangle box){
 int systems::spatial_system::check_collision_with(size_t id, Vector2 position){
     return entities_.check_collision(id, position);
 }
+
+
+int systems::spatial_system::check_interactions_with(size_t id, Rectangle box){
+    return entities_.check_interaction(id, box);
+}

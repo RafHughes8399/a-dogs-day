@@ -10,7 +10,9 @@ const Texture2D& sprite::sprite::get_texture(){
 
 void sprite::sprite::render(Vector2 position, int frame){
     sprite_animation_.advance(frame);
+
     DrawTextureRec(sprite_texture_, sprite_animation_.get_frame(), Vector2Add(position, draw_position_offset_), tint_);
+    // * partial rendering such that it is frame
 }
 
 

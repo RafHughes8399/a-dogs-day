@@ -29,7 +29,7 @@ std::unique_ptr<entities::entity> entities::entity_builder::build_customer_dog(i
         entity_config::mack_across_attributes[entity_config::attributes::frames],
         entity_config::mack_across_attributes[entity_config::attributes::animations]);
 
-    auto across_hitbox = hitbox_builders::build_player_dog_across_hitbox(position);
+    auto across_hitbox = hitbox_builders::build_dog_across_hitbox(position);
     std::vector<sprite::sprite> sprites;
     sprites.push_back(std::move(customer_left_sprite));
     sprites.push_back(std::move(customer_right_sprite));

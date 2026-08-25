@@ -44,11 +44,13 @@ namespace hitbox_builders{
 
     hitbox::hitbox build_cursor_hitbox(Vector2 position);
     hitbox::hitbox build_paw_mark_hitbox(Vector2 position);
-    hitbox::hitbox build_player_dog_across_hitbox(Vector2 position);
-    hitbox::hitbox build_player_dog_down_hitbox(Vector2 position);
+    hitbox::hitbox build_dog_across_hitbox(Vector2 position);
+    hitbox::hitbox build_dog_down_hitbox(Vector2 position);
 
     hitbox::hitbox build_test_decoration_hitbox(Vector2 position);
     hitbox::hitbox build_gargoyle_hitbox(Vector2 position);
+    hitbox::hitbox build_poker_table_hitbox(Vector2 position);
+    hitbox::hitbox build_dog_painting_hitbox(Vector2 position);
     hitbox::hitbox build_table_hitbox(Vector2 position);
     hitbox::hitbox build_food_counter_hitbox(Vector2 position);
     hitbox::hitbox build_dishwasher_hitbox(Vector2 position);

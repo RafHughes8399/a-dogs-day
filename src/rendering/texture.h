@@ -33,6 +33,8 @@ namespace textures{
         hud_edit_wheel = 13,
         gargoyle_void = 14,
         gargoyle_sick_of_it = 15,
+        poker_table = 16,
+        dog_painting = 17,
         // Head sprite art pending.
         // khiri_head_left = 16,
         // khiri_head_right = 17,
@@ -43,8 +45,9 @@ namespace textures{
         // npc_dog_right = 21,
         // npc_dog_head_left = 22,
         // npc_dog_head_right = 23,
-        background = 16,
-        size = 17
+        dining_table = 18,
+        background = 19,
+        size = 20
         // and so on
     };
     class texture{

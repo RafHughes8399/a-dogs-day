@@ -8,6 +8,7 @@
 #define EVENTS_SYSTEM_EVENTS_H
 
 #include <optional>
+#include <vector>
 
 #include "event_core.h"
 #include "path.h"
@@ -35,11 +36,15 @@ namespace events{
 	};
 	class create_path_to : public event{
 		public:
+			// * checkpoints become legs of their own - src, dst, [c1, c2] queues
+			// * src->c1, c1->c2, c2->dst. they are a route the caller wants
+			// * taken, not a requirement: a leg that still spans zones splits
+			// * again on its own
 			create_path_to(size_t id, Vector2 destination,
 				path::assignment mode = path::replace,
-				std::optional<size_t> destination_entity = std::nullopt)
+				std::vector<Vector2> checkpoints = {})
 			: event(ids::create_path_to_id), id_(id), destination_(destination),
-			mode_(mode), destination_entity_(destination_entity){}
+			mode_(mode), checkpoints_(std::move(checkpoints)){}
 
 			static int get_static_type(){
 				return ids::create_path_to_id;
@@ -53,14 +58,47 @@ namespace events{
 			path::assignment get_assignment() const{
 				return mode_;
 			}
-			std::optional<size_t> get_destination_entity() const{
-				return destination_entity_;
+			const std::vector<Vector2>& get_checkpoints() const{
+				return checkpoints_;
 			}
 		private:
 			const size_t id_;
 			const Vector2 destination_;
 			const path::assignment mode_;
-			const std::optional<size_t> destination_entity_;
+			const std::vector<Vector2> checkpoints_;
+	};
+	// destination is resolved from the target entity's own position (plus its
+	// interaction offset, if it has one) at handling time, not carried by the
+	// event - a caller here has no reason to know the entity's position itself
+	class create_path_to_entity : public event{
+		public:
+			create_path_to_entity(size_t id, size_t destination_entity,
+				path::assignment mode = path::replace,
+				std::vector<Vector2> checkpoints = {})
+			: event(ids::create_path_to_entity_id), id_(id),
+			destination_entity_(destination_entity),
+			mode_(mode), checkpoints_(std::move(checkpoints)){}
+
+			static int get_static_type(){
+				return ids::create_path_to_entity_id;
+			}
+			size_t get_id() const{
+				return id_;
+			}
+			size_t get_destination_entity() const{
+				return destination_entity_;
+			}
+			path::assignment get_assignment() const{
+				return mode_;
+			}
+			const std::vector<Vector2>& get_checkpoints() const{
+				return checkpoints_;
+			}
+		private:
+			const size_t id_;
+			const size_t destination_entity_;
+			const path::assignment mode_;
+			const std::vector<Vector2> checkpoints_;
 	};
 }
 

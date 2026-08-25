@@ -59,7 +59,10 @@ namespace testing{
             void tick(float delta);
             bool tick_until(std::function<bool()> predicate, int max_frames, float delta = 0.016f);
             void path_to(size_t entity_id, Vector2 destination,
-                std::optional<size_t> destination_entity = std::nullopt);
+                std::optional<size_t> destination_entity = std::nullopt,
+                std::vector<Vector2> checkpoints = {});
+            size_t queued_path_count(size_t entity_id);
+            std::vector<Vector2> path_destinations(size_t entity_id);
             void remove(size_t entity_id);
             // the single legal position write - moves the hitbox and reindexes
             void move_entity(size_t entity_id, Vector2 position);

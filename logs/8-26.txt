@@ -325,6 +325,66 @@ what is left
 -> then the npc system [this port should be simple enough]
    -> porting over the matire'd and expediter
    -> need to change how the queuing is defiend, , the dogs should come from -x  and -y, from the top of the screen
+      -> give the queue a width of 3 - 4 edges, enough that the dogs can walk side by side
+      -> queue extends from y - 2 * edge weight, to world.height + (2* edge weight)
+         -> reqiures an extension to the world boundaries 
+         -> cafe entrance is defined as world. height / 2 and spans two edges [becomes a 2 x 2 box]
+      -> customers are spawned off screen and then walk onto the screen,
+      -> not every customer that walks by will enter, those that enter depends on the state of the cafe 
+
+      -> actionable todo:
+         -> extend the world to account for the technically OOB space x 
+         -> and then limit the pathfinding to the actual walkable section x 
+         -> a separate queue graph ? [could work ?], then when entering they are inserted into the level properly, so the level bounds need to be adjusted
+         -> no, one graph, we just define different bounds for the two areas, the quadtree only represents the cafe bounds
+
+         -> actually no it needs to be two graphs
+            -> adjust the graph constructor to take in a rectangle
+            -> have overlap at the entrace so that the dog can be taken out of the footpath and placed into the cafe easily
+            -> two graphs is messy, it muddles the respoonsiblity between the movement system and other systems, subgraphs could work though 
+         -> we could keep one graph and then pass in a bounds argument to the pathfinding that restricts where the dog can go
+         -> or the level graph can define sub graphs for the footpath and the cafe ? and then you pick a graph to check
+            -> thats a lot of checking
+            -> have the level graph define sub graphs that overlap and the entrace, then that gives you clean transitioning
+            -> and then when you create a path, you pick an optional subgraph to create the path within
+            -> just define the two within the movment_system, adn then do a bounds check if in zone
+
+
+
+        -> dogs need to be able to bridge the gap at the entrace, a two-leg path
+         -> send from the footpath to a node within the entrance
+         -> and then send from the entrance to the cafe
+         -> should be simple enough
+            -> when they reach a position that is in both
+         -> adjust rendering to partially redner the portion that is in frame x 
+         
+         -> entity factory for customers [ to decide their positioning and their sprite] x
+         -> 
+         -> scaffolding the serving system 
+            -> arrival condtional logic [depends on the most recent arrival and free tables]
+            -> assigning a customer to a table
+
+---------------------
+         -> adjust spawning values
+            -> update the graph representation so that a dog currently in flight does not block the creation of the path  x 
+            -> should be separate representaations for statison and dogs 
+            -> randomise the spawn index and adjust the numbers
+         -> then setup logic for getting a customer into the cafe
+            -> define the entrance
+            -> define the logic to actually send the dog [free table check]
+                -> finish steup of table unregsiter and register x 
+                -> test table reigstering and table picking  x 
+                -> then define the cafe entrance
+                -> then setup the two legged path
+
+            -> send to entrance, then queue a path from entrance to the table
+-------------------------
+   TODO
+      -> proper spawn point picking
+      -> station factory and table building
+      -> table registering and unregistering
+      -> test customer pathing and table assignment
+      
    -> state machines and event listening it seems would drive this
       -> the state decides what events need to be listened to
       -> for example: 
@@ -348,3 +408,74 @@ what is left
          -> i think the serving and clearing system port is the way to go, they can manage the assignment to jobs, the updates to jibs and 
          -> trigger state changes 
 -> then processing interactions [that is where we are up to and can come in a later branch ?]
+
+21/8
+
+customer arrival system + customer destroying
+
+-> the customer_arrival_system scaffold is still empty, create_dog / destroy_dog are comments.
+   the factory builds the dog and issues its path, nothing owns the other end of its life
+-> nothing removes a customer once it finishes walking the footpath. it parks on the destination
+   node and that node stays occupied forever
+-> consequence: only the FIRST customer ever walks. dog 0 rests at (64,2176), graph_occupant_at
+   that node then returns 0, and every later customer gets no path and stands at the spawn point
+   -> probed it. 3 spawns, no despawn -> path=1, path=0, path=0
+   -> same probe with lifespan.remove(id) on arrival -> 5 spawns, all path and complete
+-> made worse by pick_route() hard returning 0, so every customer targets the identical exit node.
+   randomising the route only spreads it across two nodes, it does not fix it
+-> so despawn is the actual blocker for the feature, not the pathing
+
+-> open question, where the departure lives:
+   -> movement_system despawning when a path completes at a destination node is the cheap version,
+      but that makes the movement system decide when a customer's life ends, which is orchestration
+   -> customer_arrival_system owning both ends [spawn a dog, hear it reach the footpath exit,
+      destroy it] matches the world-ownership vs business-logic split and is where the scaffold
+      already says it should go
+   -> needs a "customer reached the footpath exit" fact to hang off. there is no path_failed and no
+      per leg completed fact in the ecs yet [see the movement system status notes above], so this is
+      probably the moment to decide whether dog_completed_path comes back
+-> also still open: nothing decides which passing customers actually enter the cafe. that arrival
+   condition depends on free tables and the most recent arrival, per the queuing notes above
+
+
+22/8
+
+customer arrival now walks to a table, via the entrance
+
+-> cafe_entrance is a real value at last. cafe_x, cafe_y + cafe_height / 2. that x is the seam
+   the two zones share [cafe x starts at 256, footpath runs to 320, zone_overlap is one edge],
+   and it is the one grid column both graphs hold a node for, so a path can end there from the
+   footpath and start there into the cafe
+-> create_path_to carries a checkpoint list now. src, dst, [c1, c2] queues src->c1, c1->c2,
+   c2->dst. only the last leg carries the destination entity, a checkpoint reaches nothing
+-> send_customer_to_table passes the entrance as the single checkpoint, so the route is two legs
+   and neither one needs splitting. the movement system would find a crossing on its own, naming
+   the door just keeps customers walking through it rather than the nearest seam cell to wherever
+   they happen to be standing
+-> the claim goes in before the walk, not on arrival. the customer is crossing the whole cafe and
+   the table has to read as taken for every frame of it or the next pick hands out the same table
+-> customer_cleanup skips a customer that holds a table. an empty path queue means seated, not
+   departed. that sweep would otherwise delete the customer the frame it sat down
+
+raw position paths [picks up the note at line 323 above]
+
+-> everything is snapped to whole nodes right now and it is too rigid in three separate places:
+   -> find_path returns node positions, so a path can only ever end on a node centre. path keeps
+      the exact requested destination separately precisely because the two do not match
+   -> create_path_to snaps a resolved interaction slot onto slot_node->position_, throwing away
+      the offset the interactable just computed
+   -> zone_crossing steps the seam by whole edge_weight, so the only candidate column is cafe_x
+-> want sub-node granularity. quarter and half multiples of edge weight, 0.25 * edge_weight and
+   friends. still clean numbers, still snapped to something, just not to the coarse grid
+-> the grid stays the thing bfs searches, this is only about what a waypoint is allowed to be.
+   walk the node path as now, then let the final position be an offset off that node
+-> would fix the interaction slots properly. the left and right offsets already want to be
+   different from each other [note at line 320 above], and forcing both onto a node centre is
+   what makes them look wrong
+-> two dogs at the same table currently aim at two node centres a whole edge apart, which is why
+   a table reads as much wider than its sprite
+-> open: does a sub-node waypoint break has_reached_position. the tolerance is edge_weight * 0.05
+   which is 3.2px, fine for a quarter-edge offset, but worth checking against the move speed so a
+   dog cannot step over the target between frames
+-> open: the graph occupancy marks whole nodes. two dogs a quarter edge apart inside one node
+   would both mark it, and the second would read the first as blocking

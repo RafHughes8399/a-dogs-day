@@ -83,11 +83,28 @@ namespace level_config{
     // world dimensions
     inline const float screen_width = static_cast<float>(game_config::window_width);
     inline const float screen_height = static_cast<float>(game_config::window_height);
-    inline float world_x = 2048.0f;
+    inline const float edge_weight = 64.0f; // placeholder
+    
+    inline float world_x = 3072.0f;
     inline float world_y = 2048.0f;
     
-    // for the main level graph
-    inline const float edge_weight = 64.0f; // placeholder
+    inline float graph_x = 0.0f;
+    inline float footpath_overhang = 3 * edge_weight;
+    inline float graph_y = -footpath_overhang;
+    inline float graph_width = world_x;
+    inline float graph_height = world_y + footpath_overhang;
+    
+    // footpath bounds
+    inline float footpath_x = 0.0f;
+    inline float footpath_y = graph_y;
+    inline float footpath_width = 5.0f * edge_weight;
+    inline float footpath_height = graph_height + footpath_overhang;
+    // cafe_bounds 
+    inline float zone_overlap = 1.0f * edge_weight;
+    inline float cafe_x = footpath_x + footpath_width - zone_overlap;
+    inline float cafe_y = 0.0f;
+    inline float cafe_width = world_x - cafe_x;
+    inline float cafe_height = world_y;
 
     inline const int screen_edges_x = static_cast<int>(screen_width / edge_weight);
     inline const int screen_edges_y = static_cast<int>(screen_height / edge_weight);
@@ -206,8 +223,15 @@ namespace cafe_config{
         queue_width,
         queue_height
     };
-    inline const Vector2 cafe_entrance = Vector2Zero();  // TODO placeholder, input actual value 
-    inline const Vector2 cafe_exit = Vector2Zero();  // TODO placeholder, input actual value 
+    // * halfway up the cafe, on the seam the two zones share - x in
+    // * [cafe_x, footpath_x + footpath_width) sits inside both areas, and
+    // * level_config::cafe_x is the one grid column both graphs hold a node
+    // * for, so a path can end here from the footpath and start here into the cafe
+    inline const Vector2 cafe_entrance = Vector2{
+        level_config::cafe_x,
+        level_config::cafe_y + level_config::cafe_height * 0.5f
+    };
+    inline const Vector2 cafe_exit = Vector2Zero();  // TODO placeholder, input actual value
     
 }
 namespace station_config{
@@ -234,6 +258,19 @@ namespace entity_config{
         customer_dog_kind = 3,
         waiter_dog_kind = 4,
         selectable_kinds_size = 5
+    };
+
+    enum customers{
+        tex = 0,
+        customers_size = 1
+    };
+    enum special_customers{
+        garfield = customers_size,
+        cumulative_customers_size
+    };
+    enum tables{
+        dining_table = 0,
+        tables_size = 1
     };
 
     // file paths
@@ -269,8 +306,12 @@ namespace entity_config{
     inline const char* mack_down_outline_path = "../sprites/mack_down_outline.png";
 
     inline const char* test_decoration_path ="../sprites/test_decoration.png";
-    inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle_void.png";
+    inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle-void.png";
     inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
+    inline const char* poker_table_decoration_path = "../sprites/dog-poker.png";
+    inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
+
+    inline const char* dining_table_station_path = "../sprtes/dining-table.png";
     // NPC dog sprite art pending.
     // inline const char* npc_dog_left_path = "../sprites/npc_dog_left.png";
     // inline const char* npc_dog_right_path = "../sprites/npc_dog_right.png";
@@ -299,8 +340,13 @@ namespace entity_config{
     // inline const Vector2 mack_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 mack_head_right_offset = Vector2{0.0f, 0.0f};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (3/02)
-    inline const float gargoyle_decoration_attributes[attributes::size] = {level_config::edge_weight * 0.75f, level_config::edge_weight * 1.75f, 1.0f, 1.0f};
+    inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
+    inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
+    inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
+    
     inline const float table_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
+    inline const float dining_table_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 1.5f, 1.0f, 1.0f};
+
     inline const float food_counter_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     inline const float dishwasher_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     inline const float stove_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
@@ -325,6 +371,7 @@ namespace entity_config{
 }
 namespace dog_config{
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
+    inline const float customer_spawn_interval = 20.0f;
     inline const float dog_reach = level_config::edge_weight * 0.3f;
     enum waiter_dog_types{
         basic = 0,

@@ -27,7 +27,7 @@ void ecs_entities::build_player(size_t player_id, size_t cursor_id){
     // ?  do we need an attachment compnent, a has_a_component ? that way we can manage destruction properly
     build_cursor(cursor_id);
 }
-void ecs_entities::build_player_dog(size_t id, Vector2 position,
+void ecs_entities::build_dog(size_t id, Vector2 position,
     std::vector<sprite::sprite> sprites, size_t kind, float reach){
     component_helpers::add_positional_component(id, position);
 
@@ -35,7 +35,7 @@ void ecs_entities::build_player_dog(size_t id, Vector2 position,
         component_builders::build_sprite_component(sprites, level_config::directions::right)};
     component_helpers::add_renderable_component(id, sprite_components);
 
-    auto across_hitbox = hitbox_builders::build_player_dog_across_hitbox(position);
+    auto across_hitbox = hitbox_builders::build_dog_across_hitbox(position);
     std::vector<hitbox::hitbox> hitboxes = {across_hitbox, across_hitbox};
     component_helpers::add_collision_component(id,
         component_builders::build_hitbox_component(hitboxes,
@@ -56,7 +56,7 @@ void ecs_entities::build_player_dog(size_t id, Vector2 position,
         sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_right,
             entity_config::khiri_right_path, entity_config::khiri_across_attributes));
 
-        build_player_dog(id, level_config::khiri_start, std::move(sprites),
+        build_dog(id, level_config::khiri_start, std::move(sprites),
             entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach);
     }
     void ecs_entities::build_mack(size_t id){
@@ -65,15 +65,15 @@ void ecs_entities::build_player_dog(size_t id, Vector2 position,
             entity_config::mack_left_path, entity_config::mack_across_attributes));
         sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_right,
             entity_config::mack_right_path, entity_config::mack_across_attributes));
-        build_player_dog(id, level_config::mack_start, std::move(sprites),
+
+        build_dog(id, level_config::mack_start, std::move(sprites),
             entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach);
     }
 
 // TODO mack's art stands in until npc dog sprites exist
 void ecs_entities::build_customer_dog(size_t id, Vector2 position){
-    build_player_dog(id, position, build_mack_sprites(),
-        entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
-}
+    build_dog(id, position, build_mack_sprites(),
+        entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);}
     //**
 
     // .
@@ -83,12 +83,29 @@ void ecs_entities::build_customer_dog(size_t id, Vector2 position){
     //  */
 
 void ecs_entities::build_waiter_dog(size_t id, Vector2 position){
-    build_player_dog(id, position, build_mack_sprites(),
+    build_dog(id, position, build_mack_sprites(),
         entity_config::selectable_kinds::waiter_dog_kind, dog_config::dog_reach);
 }
 //**
 // build_saba()
 // build tex()
+void ecs_entities::build_tex(size_t id, Vector2 position){
+        std::vector<sprite::sprite> sprites;
+        sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_left,
+            entity_config::mack_left_path, entity_config::mack_across_attributes));
+        sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_right,
+            entity_config::mack_right_path, entity_config::mack_across_attributes));
+    build_dog(id, position, std::move(sprites), entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
+}
+void ecs_entities::build_garfield(size_t id, Vector2 position){
+        std::vector<sprite::sprite> sprites;
+        sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_left,
+            entity_config::khiri_left_path, entity_config::khiri_across_attributes));
+        sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_right,
+            entity_config::khiri_right_path, entity_config::khiri_across_attributes));
+    build_dog(id, position, std::move(sprites), entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
+}
+
 
 void ecs_entities::build_cursor(size_t id){
     // positional component
@@ -117,13 +134,28 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
 }
     void ecs_entities::build_test_decoration(size_t id, Vector2 position){
         build_decoration(id, position,
-            sprite_builders::build_test_decoration_sprite(),
+            sprite_builders::build_test_decoration_sprite(entity_config::test_decoration_attributes),
             hitbox_builders::build_test_decoration_hitbox(position));
         component_helpers::add_selectable_component(id,
             entity_config::selectable_kinds::decoration_kind);
     }
     //**
-    // void build_gargoyle();
+    void ecs_entities::build_gargoyle(size_t id, Vector2 position){
+        build_decoration(id, position,
+            sprite_builders::build_gargoyle(),
+            hitbox_builders::build_gargoyle_hitbox(position));
+        // a clickable component perhaps ? 
+    }
+    void ecs_entities::build_poker_table(size_t id, Vector2 position){
+        build_decoration(id, position, 
+            sprite_builders::build_poker_table(), 
+        hitbox_builders::build_poker_table_hitbox(position));
+    }
+    void ecs_entities::build_dog_painting(size_t id, Vector2 position){
+        build_decoration(id, position,
+        sprite_builders::build_dog_painting(),
+        hitbox_builders::build_dog_painting_hitbox(position));
+    }
     //  */
 
 void ecs_entities::build_station(size_t id, Vector2 position,
@@ -145,14 +177,18 @@ void ecs_entities::build_station(size_t id, Vector2 position,
             {entity_config::station_slot_left, entity_config::station_slot_right,
              entity_config::station_slot_up, entity_config::station_slot_down});
     }
-    void ecs_entities::build_table(size_t id, Vector2 position){
+    void ecs_entities::build_table(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,
-            sprite_builders::build_table_sprite(),
+            sprite,
             hitbox_builders::build_table_hitbox(position),
             entity_config::station_reach,
             {entity_config::station_slot_left, entity_config::station_slot_right,
              std::nullopt, std::nullopt});
     }
+        void ecs_entities::build_dining_table(size_t id, Vector2 position){
+            build_table(id, position, sprite_builders::build_dining_table_sprite());
+        }
+        
     void ecs_entities::build_dishwasher(size_t id, Vector2 position){
         build_station(id, position,
             sprite_builders::build_dishwasher_sprite(),

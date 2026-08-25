@@ -103,7 +103,10 @@ link_libraries(events)
 
 add_library(queries src/engine/queries/queries.cpp)
 link_libraries(queries)
-
+add_library(factories
+            src/entities/factories/dog_factory.cpp
+            src/entities/factories/station_factory.cpp)
+link_libraries(factories)
 add_library(components
   src/engine/components/component_managers.cpp
   src/engine/components/component_builders.cpp
@@ -223,7 +226,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
   raglib events queries components systems animation sprite item menu hud hitbox body texture
-  player controls entities cursor dogs decorations stations food render_layer quadtree
+  player controls entities cursor dogs decorations stations food factories render_layer quadtree
   graph level maitre_d expediter dog_actions debug_log_interface debug_logger game ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
@@ -235,6 +238,7 @@ foreach(target IN LISTS PROJECT_TARGETS)
     src/entities/decorations
     src/entities/stations
     src/entities/food
+    src/entities/factories
     src/engine
     src/engine/components
     src/engine/events
@@ -273,6 +277,7 @@ add_executable(tests
   tests/customer_dog_scenarios.cpp
   tests/waiter_dog_scenarios.cpp
   tests/quadtree_scenarios.cpp
+  tests/customer_arrival_scenarios.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the
@@ -284,6 +289,7 @@ target_include_directories(tests PRIVATE
   src/entities/decorations
   src/entities/stations
   src/entities/food
+  src/entities/factories
   src/engine
   src/engine/components
   src/engine/events

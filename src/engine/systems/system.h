@@ -4,10 +4,14 @@
 #include "config.h"
 #include "entity.h"
 #include "events.h"
+#include "factories.hpp"
 #include "quadtree.h"
 #include "events_interface.h"
 #include "render_layer.h"
+#include <array>
 #include <functional>
+#include <set>
+#include <utility>
 #include <raylib.h>
 #include "graph.h"
 #include "path.h"
@@ -110,6 +114,15 @@ namespace systems{
             // mirrors player::selected_dog_ - switch_dog flips it, right_click carries it
             size_t selected_dog_;
     };
+    /**
+    // * something of a dense comment here to explain the build relationships
+    // * entity lifespan is how the game triggers building and destroying of entities, it is the entry point.
+    // ! it is where the registration and unregistration happens for other systems as it is guarnateed that those systems will be accessible 
+    // ! the general create and destroy functions emit the events for other systems like collision and spatial to listen to and update their 
+    // ! internal representation accordingly 
+    // * the lifespan system holds factories which have the builders that are passed in as its create function
+    // * the factories manage and call the entity_builders, they pick which entity to build 
+    // */
     class entity_lifespan_system{
         // responsible for managing entity creation and destruction
         public:
@@ -129,16 +142,40 @@ namespace systems{
 
             // allocate -> build -> announce, so nothing can be built without
             // reaching the spatial index and a render layer
-            template<typename Builder>
-            size_t create(Builder build, size_t layer){
-                auto entity_id = next_id();
-                build(entity_id);
+            // ! think  we overload with differnet paramters
+                // ! one for just entity id 
+                // ! one for entity id and position
+                // ! one for entity id, position and the type for the factory's builder 
+            size_t create(std::function<void(size_t)> build, size_t layer){
+                auto id = next_id();
+                build(id);
                 // executed, never queued - listeners must see the entity this frame
-                events::create_entity created{entity_id, layer};
+                events::create_entity created{id, layer};
                 event_interface::execute_event(created);
-                return entity_id;
+                return id;
             }
-            void remove(size_t entity_id);
+            size_t create(std::function<void(size_t, Vector2)> build, Vector2 position, size_t layer){
+                auto id = next_id();
+                build(id, position);
+                // executed, never queued - listeners must see the entity this frame
+                events::create_entity created{id, layer};
+                event_interface::execute_event(created);
+                return id;
+            }
+            size_t create(std::function<void(size_t, size_t, Vector2)> build, size_t entity, Vector2 position, size_t layer){
+                auto id = next_id();
+                build(entity, id, position);
+                // executed, never queued - listeners must see the entity this frame
+                events::create_entity created{id, layer};
+                event_interface::execute_event(created);
+                return id;
+            }
+            size_t create_customer_dog();
+            void destroy_customer_dog(size_t id);
+
+            size_t create_table(size_t table, Vector2 position);
+            void destroy_table(size_t id);
+            void destroy(size_t entity_id);
             void update(float delta);
             // teardown between test scenarios - the singleton outlives them
             void clear(){
@@ -149,6 +186,9 @@ namespace systems{
             size_t next_id();
             std::queue<size_t> recycled_ids_;
             size_t fresh_id_ = 0;
+
+            factories::dog_factory dog_factory_;
+            factories::station_factory station_factory_;
     };
     class interaction_system{
         // for behavioural interactions
@@ -183,6 +223,7 @@ namespace systems{
                 event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
                 event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
                 event_interface::unsubscribe<events::create_path_to>(create_path_to_handler_);
+                event_interface::unsubscribe<events::create_path_to_entity>(create_path_to_entity_handler_);
             }
             movement_system(const movement_system& other) = delete;
             movement_system(movement_system&& other) = delete;
@@ -197,33 +238,44 @@ namespace systems{
             void on_moved_entity(const events::move_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
             void on_create_path_to_event(const events::create_path_to& event);
+            void on_create_path_to_entity_event(const events::create_path_to_entity& event);
             // * the graph is private to this system, so walkability questions come
             // * through here - slot selection needs it in shipped builds, not only
             // * under DOG_DAYS_TESTING
+
+            void create_path();
             int graph_occupant_at(Vector2 position){
-                return graph_.occupant_at(position);
+                return resolve_graph(position).occupant_at(position);
             }
             bool is_walkable(Vector2 position){
-                return graph_.occupant_at(position) == graph_config::empty_node;
+                return resolve_graph(position).occupant_at(position) == graph_config::empty_node;
             }
             graph::level_graph::node* node_at(Vector2 position){
-                return graph_.node_at(position);
+                return resolve_graph(position).node_at(position);
             }
             void clear(){
-                graph_.reset();
+                cafe_.reset();
+                footpath_.reset();
             }
             void render_graph(Rectangle frame){
-                graph_.render(frame);
+                cafe_.render(frame);
+                footpath_.render(frame);
             }
 #ifdef DOG_DAYS_TESTING
             size_t graph_occupied_node_count(){
-                return graph_.occupied_node_count();
+                std::set<std::pair<float, float>> cells;
+                for(auto* graph : graphs()){
+                    for(auto position : graph->occupied_node_positions()){
+                        cells.insert({position.x, position.y});
+                    }
+                }
+                return cells.size();
             }
             int graph_cell_at_index(Vector2 position){
-                return graph_.cell_at_index(position);
+                return resolve_graph(position).cell_at_index(position);
             }
             int graph_nearest_node_index(Vector2 position){
-                return graph_.nearest_node_index(position);
+                return resolve_graph(position).nearest_node_index(position);
             }
 #endif
             // set a path for an entity
@@ -238,29 +290,129 @@ namespace systems{
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
             remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
             create_path_to_handler_([this](const events::create_path_to& event) -> void{on_create_path_to_event(event);}),
-            graph_(static_cast<int>(level_config::world_x), static_cast<int>(level_config::world_y)){
+            create_path_to_entity_handler_([this](const events::create_path_to_entity& event) -> void{on_create_path_to_entity_event(event);}),
+
+            cafe_(Rectangle{level_config::cafe_x, level_config::cafe_y, level_config::cafe_width, level_config::cafe_height}, false),
+            footpath_(Rectangle{level_config::footpath_x, level_config::footpath_y, level_config::footpath_width, level_config::footpath_height}, false){
+
                 event_interface::subscribe<events::create_entity>(create_entity_handler_);
                 event_interface::subscribe<events::move_entity>(move_entity_handler_);
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
                 event_interface::subscribe<events::create_path_to>(create_path_to_handler_);
+                event_interface::subscribe<events::create_path_to_entity>(create_path_to_entity_handler_);
             }
 
             std::optional<path::path> create_path(Vector2 source, Vector2 direction, Vector2 destination,
                 std::optional<size_t> destination_entity = std::nullopt);
+            // * planning against a named graph is what lets a leg end in the
+            // * overlap band - resolve_graph always answers cafe there, so a
+            // * leg that re-derived its graph could never cross out of the footpath
+            std::optional<path::path> create_path(graph::level_graph& graph, Vector2 source,
+                Vector2 direction, Vector2 destination,
+                std::optional<size_t> destination_entity = std::nullopt);
+            void create_path_to(size_t entity_id, Vector2 destination,
+                const std::vector<Vector2>& checkpoints, path::assignment mode);
+            void create_path_to_entity(size_t entity_id, size_t destination_entity,
+                const std::vector<Vector2>& checkpoints, path::assignment mode);
+            bool build_legs(Vector2 source, Vector2 direction, Vector2 destination,
+                std::optional<size_t> destination_entity,
+                const std::vector<Vector2>& checkpoints, std::vector<path::path>& legs);
+            bool build_leg(Vector2 source, Vector2 direction, Vector2 destination,
+                std::optional<size_t> destination_entity, std::vector<path::path>& legs);
+            void commit_route(size_t entity_id, components::movement_component& movement,
+                components::position_component& position, path::assignment mode,
+                std::vector<path::path> legs);
             void determine_direction(size_t id, components::movement_component& movement,
                 Vector2 position, Vector2 target);
 
+
+            graph::level_graph& resolve_graph(Vector2 position);
+            std::array<graph::level_graph*, 2> graphs();
             events::event_handler<events::create_entity> create_entity_handler_;
             events::event_handler<events::move_entity> move_entity_handler_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
             events::event_handler<events::create_path_to> create_path_to_handler_;
+            events::event_handler<events::create_path_to_entity> create_path_to_entity_handler_;
 
-            graph::level_graph graph_;
+            graph::level_graph cafe_;
+            graph::level_graph footpath_;
     };
     class npc_system{
+        public:
         // uses the expediter and the maitre d to orchestrate
         // customer arrivals and departures
         // and waiter serving and clearing
+        // comprised of teh following subsystmes
+                // * customer arrival - manages the footpath and picking dogs to actually enter the cafe
+                // * table_allocation_ - managers assigning customers to tables and general table availability
+                // * serving system - manages serving food to customers
+                // * clearing system  - managers clearing tables after customers have left
+            class customer_arrival_system{
+                public:
+                    // TODO must listen to table construction and deletion, can create a new event for it and update teh builders 
+                    // TODO and destroyers to emit those events 
+                    ~customer_arrival_system() = default;
+                    customer_arrival_system() = default;
+
+                    customer_arrival_system(const customer_arrival_system& other) = default;
+                    customer_arrival_system(customer_arrival_system&& other) = default;
+
+                    customer_arrival_system& operator=(const customer_arrival_system& other) = default;
+                    customer_arrival_system& operator=(customer_arrival_system&& other) = default;
+                    
+                    // create_dog
+                    // destroy_dog
+
+
+                    void update(float delta);
+                    void create_customer_dog();
+                    void destroy_customer_dog(size_t id);
+
+                    void register_customer(size_t id);
+                    void unregister_customer(size_t id);
+                    void register_table(size_t id);
+                    void unregister_table(size_t id);
+                    
+                    
+                    bool free_tables();
+                    int pick_table();
+                    int pick_customer();
+                    void customer_cleanup();
+                    void send_customer_to_table();
+#ifdef DOG_DAYS_TESTING
+                    const std::vector<size_t>& get_customers() const{
+                        return customers_;
+                    }
+                    const std::vector<size_t>& get_tables() const{
+                        return tables_;
+                    }
+#endif
+                    // teardown between test scenarios - the singleton outlives them
+                    void clear(){
+                        customers_.clear();
+                        tables_.clear();
+                        time_since_dog_ = 0.0f;
+                    }
+                    // check dog enter cafe
+                    //
+                private:
+                    // const Rectangle cafe_entrace_;
+                    float time_since_dog_ = 0.0f;
+                    std::vector<size_t> customers_;
+                    std::vector<size_t> tables_;
+            };
+            class table_allocation_system{
+                public:
+                private:
+            };
+            class serving_system{
+                public:
+                private:
+            };
+            class clearing_system{
+                public:
+                private:
+            };
         public:
             static npc_system& get_instance(){
                 static npc_system instance;
@@ -272,10 +424,19 @@ namespace systems{
 
             npc_system& operator=(const npc_system& other) = delete;
             npc_system& operator=(npc_system&& other) = delete;
+
+            void register_customer(size_t id);
+            void unregister_customer(size_t id);
+
+            void register_table(size_t id);
+            void unregister_table(size_t id);
+            void clear(){
+                customer_arrival_.clear();
+            }
         private:
             npc_system() = default;
+            customer_arrival_system customer_arrival_;
         public:
-
             void update(float delta);
     };
     class rendering_system{
@@ -390,7 +551,9 @@ namespace systems{
             }
         private:
             spatial_system(raglib::bounding_box_2 world_bounds = raglib::bounding_box_2{
-                Vector2{0.0f, 0.0f}, Vector2{level_config::world_x, level_config::world_y}})
+                Vector2{level_config::graph_x, level_config::graph_y},
+                Vector2{level_config::graph_x + level_config::graph_width,
+                    level_config::footpath_y + level_config::footpath_height}})
                 : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
                 move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
                 remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
@@ -429,6 +592,7 @@ namespace systems{
             }
             int check_collision_with(size_t id, Vector2 position);
             int check_collision_with(size_t id, Rectangle box);
+            int check_interactions_with(size_t id, Rectangle box);
         private:
             // an entity with no collision component has no bounds and is not indexed
             hitbox::hitbox* bounds_for(size_t entity_id);
@@ -449,6 +613,7 @@ namespace systems{
         movement_system::get_instance().clear();
         control_input_system::get_instance().clear();
         selection_system::get_instance().clear();
+        npc_system::get_instance().clear();
     }
 
     // hold a refernece to the glboal managers that they need to process things

@@ -279,7 +279,7 @@ namespace tree{
 
         // an entity with no collision component has no bounds and is not indexed
         hitbox::hitbox* bounds_for(size_t entity_id);
-
+        std::optional<Rectangle> interactor_bounds_for(size_t entity_id);
         bool is_child_built(std::unique_ptr<node>& tree, std::unique_ptr<node>& child);
         bool is_root(std::unique_ptr<node>& tree);
         bool is_empty(std::unique_ptr<node>& tree);
@@ -287,6 +287,7 @@ namespace tree{
         bool is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, size_t id);
         int is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id);
         int is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id);
+        int is_there_interaction(std::unique_ptr<node>& tree, Rectangle box, size_t id);
         bool node_contains_object(raglib::bounding_box_2& node, const Rectangle& object);
         bool node_contains_position(raglib::bounding_box_2& ndoe, const Vector2& position);
         bool node_overlaps_object(raglib::bounding_box_2& node, const Rectangle& object);
@@ -388,6 +389,9 @@ namespace tree{
         }
         int check_collision(size_t id, Rectangle box){
             return is_there_collision(root_, box,  id);
+        }
+        int check_interaction(size_t id, Rectangle box){
+            return is_there_interaction(root_, box, id);
         }
         bool on_is_colliding_query(const queries::is_colliding_query& query){
             auto bounds = query.get_bounds();

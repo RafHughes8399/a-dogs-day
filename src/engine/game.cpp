@@ -87,13 +87,22 @@ void game::ecs_game::init(){
     auto counter_id = lifespan_.create([](size_t id) -> void {
         ecs_entities::build_counter(id, Vector2 {level_config::edge_weight * 12, level_config::edge_weight * 4});
     }, level_config::draw_layers::decoration);
-    auto table_id = lifespan_.create([](size_t id) -> void {
-        ecs_entities::build_table(id, Vector2 {level_config::edge_weight * 6, level_config::edge_weight * 6});
-    }, level_config::draw_layers::decoration);
-    auto stove_id = lifespan_.create([](size_t id) -> void {
-        ecs_entities::build_stove(id, Vector2 {level_config::edge_weight * 16, level_config::edge_weight * 7});
-    }, level_config::draw_layers::decoration);
+    //* ----------------------------------------------------------------------------------------------------------------------
+    lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
+    //* ----------------------------------------------------------------------------------------------------------------------
     
+
+
+    // * and some decorations
+    auto gargoyle_id = lifespan_.create([](size_t id)-> void {
+        ecs_entities::build_gargoyle(id, Vector2{level_config::edge_weight * 7,level_config::edge_weight *2});
+    }, level_config::draw_layers::decoration);
+    auto poker_table_id = lifespan_.create([](size_t id)-> void {
+        ecs_entities::build_poker_table(id, Vector2{level_config::edge_weight * 10,level_config::edge_weight *20});
+    }, level_config::draw_layers::decoration);
+    auto dog_painting__id = lifespan_.create([](size_t id)-> void {
+        ecs_entities::build_dog_painting(id, Vector2{level_config::edge_weight * 9,level_config::edge_weight * 4});
+    }, level_config::draw_layers::decoration);
     // TODO menus and hud
 
     debug::log("[ecs_game::init, done] built "

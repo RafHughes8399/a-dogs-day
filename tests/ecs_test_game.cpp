@@ -87,7 +87,7 @@ namespace testing{
 
     size_t ecs_test_game::create_table(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_table(id, position);
+            ecs_entities::build_dining_table(id, position);
         }, layer);
     }
 
@@ -129,15 +129,39 @@ namespace testing{
     }
 
     void ecs_test_game::path_to(size_t entity_id, Vector2 destination,
-        std::optional<size_t> destination_entity){
-        std::unique_ptr<events::event> request =
-            std::make_unique<events::create_path_to>(entity_id, destination, path::replace, destination_entity);
+        std::optional<size_t> destination_entity, std::vector<Vector2> checkpoints){
+        std::unique_ptr<events::event> request;
+        if(destination_entity.has_value()){
+            request = std::make_unique<events::create_path_to_entity>(entity_id,
+                destination_entity.value(), path::replace, std::move(checkpoints));
+        }
+        else{
+            request = std::make_unique<events::create_path_to>(entity_id, destination,
+                path::replace, std::move(checkpoints));
+        }
         event_interface::queue_event(request);
         tick(0.0f);
     }
 
+    size_t ecs_test_game::queued_path_count(size_t entity_id){
+        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        return movement == nullptr ? 0 : movement->get_paths().size();
+    }
+
+    std::vector<Vector2> ecs_test_game::path_destinations(size_t entity_id){
+        std::vector<Vector2> destinations;
+        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        if(movement == nullptr){ return destinations; }
+        auto paths = movement->get_paths();
+        while(not paths.empty()){
+            destinations.push_back(paths.front().get_destination());
+            paths.pop();
+        }
+        return destinations;
+    }
+
     void ecs_test_game::remove(size_t entity_id){
-        lifespan_.remove(entity_id);
+        lifespan_.destroy(entity_id);
     }
 
     void ecs_test_game::move_entity(size_t entity_id, Vector2 position){
