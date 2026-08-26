@@ -484,8 +484,19 @@ raw position paths [picks up the note at line 323 above]
 
 26 / 8 - Serving System 
 pre-requsities:
--> counter building and destroying
+-> counter building and destroying x 
 -> food [as an item stored by the counter and as an entity carried by a waiter]
+   -> storing food on a counter through a storage component
+   -> food is stored as a list of entity ids,[ should not be entity ids, should be food ids instead]
+      -> or if we are keeping the rule of one type of food per counter then 
+      -> the coutner can just store the food_id it maintains, and then the number,
+      -> then we just render that one on top
+         -> even still, we dont have to restrict to just one food item per order, can define a struct {food, amount},
+         -> and then just render the top most struct, [it is the one that is given the positional and the renderable]
+         -> taking an itme removes a count of that structur, removing the final item pops the struct
+   -> perhaps we can register / unregister components on change of the head of the stack
+      -> so when popped it creates the food item as an entity then builds the positional and renderable component for the item on the top of the stack
+      -> when pushed the current head is un registered and the newly pushed one is registered
 -> counter storage of food
 -> waiter building and destroying
 -> interaction detection [x], creation and processing
