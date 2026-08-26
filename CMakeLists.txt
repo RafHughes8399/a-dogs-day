@@ -103,6 +103,7 @@ link_libraries(events)
 
 add_library(queries src/engine/queries/queries.cpp)
 link_libraries(queries)
+add_library(item_stack src/engine/structures/item_stack.cpp)
 add_library(factories
             src/entities/factories/dog_factory.cpp
             src/entities/factories/station_factory.cpp)
