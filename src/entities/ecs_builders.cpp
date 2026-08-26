@@ -168,14 +168,17 @@ void ecs_entities::build_station(size_t id, Vector2 position,
     component_helpers::create_offset_position_list(box, offsets);
     component_helpers::add_interactable_component(id, station_reach, offsets);
 }
-    void ecs_entities::build_counter(size_t id, Vector2 position){
+    void ecs_entities::build_counter(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,
-            sprite_builders::build_food_counter_sprite(),
+            sprite,
             hitbox_builders::build_food_counter_hitbox(position),
             entity_config::station_reach,
             {entity_config::station_slot_left, entity_config::station_slot_right,
              entity_config::station_slot_up, entity_config::station_slot_down});
     }
+        void ecs_entities::build_food_counter(size_t id, Vector2 position){
+            build_counter(id, position, sprite_builders::build_food_counter_sprite());
+        }
     void ecs_entities::build_table(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,
             sprite,

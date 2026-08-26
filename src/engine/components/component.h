@@ -69,19 +69,32 @@ private:
 
 
 // for the table, the waiter, and the counter and the kitchen station
-class food_component {
+class storage_component {
   // ? current idea for the storage component is for stations to store food,
   // ? tables to store foood
   // ? and dishwasher to store plates
   public:
-    ~food_component() = default;
-    food_component() = default;
-    food_component(const food_component& other) = default;
-    food_component(food_component&& other) = default;
+    ~storage_component() = default;
+    storage_component(size_t capacity)
+    : capacity_(capacity), item_ids_(){}
+    storage_component(const storage_component& other) = default;
+    storage_component(storage_component&& other) = default;
 
-    food_component& operator=(const food_component& other) = default;
-    food_component& operator=(food_component&& other) = default;
+    storage_component& operator=(const storage_component& other) = default;
+    storage_component& operator=(storage_component&& other) = default;
+
+    bool empty() const;
+    size_t size() const;
+    size_t capacity() const;
+    bool full() const;
+    size_t at(size_t index) const;
+    // the top of the stack - precondition: !empty()
+    size_t front() const;
+    // rejects (returns false) once size() == capacity_
+    bool push(size_t item_id);
   private:
+    size_t capacity_;
+    std::vector<size_t> item_ids_;
 };
 class interactable_component {
 public:
@@ -391,7 +404,6 @@ private:
 // * which would blur the storage layer into the data layer.
 extern component_manager<components::collision_component> collision_manager_;
 extern component_manager<components::key_input_component> control_manager_;
-extern component_manager<components::food_component> food_manager_;
 extern component_manager<components::interactable_component> interactable_manager_;
 extern component_manager<components::interactor_component> interactor_manager_;
 extern component_manager<components::mouse_input_component> mouse_input_manager_;
@@ -400,6 +412,7 @@ extern component_manager<components::position_component> positional_manager_;
 extern component_manager<components::renderable_component> renderable_manager_;
 extern component_manager<components::selectable_component> selectable_manager_;
 extern component_manager<components::state_machine_component> state_machine_manager_;
+extern component_manager<components::storage_component> storage_manager_;
 } // namespace component_managers
 
 namespace component_builders{
@@ -422,8 +435,8 @@ namespace component_builders{
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
     components::state_machine_component::state_component build_state();
     components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
-    components::food_component build_food_component();
     components::selectable_component build_selectable_component(size_t kind);
+    components::storage_component build_storage_component(size_t capacity);
 }
 // thin forwarders to the right manager; defined in component_helpers.cpp
 namespace component_helpers{
@@ -436,8 +449,8 @@ namespace component_helpers{
     void register_key_input_component(size_t entity_id, components::key_input_component component);
     void register_mouse_input_component(size_t entity_id, components::mouse_input_component component);
     void register_state_machine_component(size_t entity_id, components::state_machine_component component);
-    void register_food_component(size_t entity_id, components::food_component component);
     void register_selectable_component(size_t entity_id, components::selectable_component component);
+    void register_storage_component(size_t entity_id, components::storage_component component);
 
     void add_positional_component(size_t entity_id, Vector2 position);
     void add_movement_component(size_t entity_id, Vector2 move_speed,
@@ -455,8 +468,8 @@ namespace component_helpers{
     void add_mouse_input_component(size_t entity_id, std::vector<game_config::input>& inputs);
     void add_state_machine_component(size_t entity_id,
         std::vector<components::state_machine_component::state_component>& state_components);
-    void add_food_component(size_t entity_id);
     void add_selectable_component(size_t entity_id, size_t kind);
+    void add_storage_component(size_t entity_id, size_t capacity);
 
     void create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions);
     bool is_mouse_positioned(size_t entity_id);
@@ -471,8 +484,8 @@ namespace component_helpers{
     void unregister_key_input_component(size_t entity_id);
     void unregister_mouse_input_component(size_t entity_id);
     void unregister_state_machine_component(size_t entity_id);
-    void unregister_food_component(size_t entity_id);
     void unregister_selectable_component(size_t entity_id);
+    void unregister_storage_component(size_t entity_id);
     void unregister_all_components(size_t entity_id);
 
     size_t num_registered_components(size_t entity_id);

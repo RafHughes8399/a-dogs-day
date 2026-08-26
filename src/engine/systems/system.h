@@ -175,6 +175,9 @@ namespace systems{
 
             size_t create_table(size_t table, Vector2 position);
             void destroy_table(size_t id);
+
+            size_t create_counter(size_t counter, Vector2 position);
+            void destroy_counter(size_t id);
             void destroy(size_t entity_id);
             void update(float delta);
             // teardown between test scenarios - the singleton outlives them

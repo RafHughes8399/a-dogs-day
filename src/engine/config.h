@@ -272,6 +272,10 @@ namespace entity_config{
         dining_table = 0,
         tables_size
     };
+    enum counters{
+        food_counter = 0,
+        counters_size
+    };
 
     // file paths
     inline const char* background_path = "../sprites/background.png" ;
@@ -312,6 +316,7 @@ namespace entity_config{
     inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
 
     inline const char* dining_table_station_path = "../sprtes/dining-table.png";
+    inline const char* food_counter_station_path = "";
     // NPC dog sprite art pending.
     // inline const char* npc_dog_left_path = "../sprites/npc_dog_left.png";
     // inline const char* npc_dog_right_path = "../sprites/npc_dog_right.png";

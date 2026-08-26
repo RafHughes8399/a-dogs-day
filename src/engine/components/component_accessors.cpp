@@ -218,3 +218,30 @@ void components::selectable_component::select(){
 void components::selectable_component::unselect(){
     is_selected_ = false;
 }
+
+// ---------------- storage_component ----------------
+bool components::storage_component::empty() const{
+    return item_ids_.empty();
+}
+size_t components::storage_component::size() const{
+    return item_ids_.size();
+}
+size_t components::storage_component::capacity() const{
+    return capacity_;
+}
+bool components::storage_component::full() const{
+    return item_ids_.size() >= capacity_;
+}
+size_t components::storage_component::at(size_t index) const{
+    return item_ids_.at(index);
+}
+size_t components::storage_component::front() const{
+    return item_ids_.front();
+}
+bool components::storage_component::push(size_t item_id){
+    if(full()){
+        return false;
+    }
+    item_ids_.push_back(item_id);
+    return true;
+}

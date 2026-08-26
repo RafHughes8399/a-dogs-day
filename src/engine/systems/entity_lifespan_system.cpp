@@ -48,3 +48,12 @@ void systems::entity_lifespan_system::destroy_table(size_t id){
     destroy(id);
     npc_system::get_instance().unregister_table(id);
 }
+
+size_t systems::entity_lifespan_system::create_counter(size_t counter, Vector2 position){
+    auto id = create([this](size_t id, size_t counter, Vector2 position) -> void{ station_factory_.build_counter(id, counter, position); },
+        counter, position, level_config::draw_layers::stations);
+    return id;
+}
+void systems::entity_lifespan_system::destroy_counter(size_t id){
+    destroy(id);
+}

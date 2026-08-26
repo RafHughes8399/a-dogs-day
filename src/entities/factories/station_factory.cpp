@@ -8,6 +8,10 @@ void factories::station_factory::build_table(size_t table, size_t entity_id, Vec
     auto table_builder = table_builders_[table];
     table_builder(entity_id, position);
 }
+void factories::station_factory::build_counter(size_t counter, size_t entity_id, Vector2 position){
+    auto counter_builder = counter_builders_[counter];
+    counter_builder(entity_id, position);
+}
 void factories::station_factory::build_stove(size_t id, Vector2 position){
     (void) id;
     (void) position;

@@ -93,7 +93,7 @@ namespace testing{
 
     size_t ecs_test_game::create_food_counter(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_counter(id, position);
+            ecs_entities::build_food_counter(id, position);
         }, layer);
     }
 
@@ -297,8 +297,8 @@ namespace testing{
              + component_managers::control_manager_.size()
              + component_managers::mouse_input_manager_.size()
              + component_managers::state_machine_manager_.size()
-             + component_managers::food_manager_.size()
-             + component_managers::selectable_manager_.size();
+             + component_managers::selectable_manager_.size()
+             + component_managers::storage_manager_.size();
     }
 
 } // namespace testing

@@ -35,10 +35,8 @@ void game::game::init(){
     }, level_config::dogs);
     debug::log("[game::init, built mack] id " + std::to_string(mack_id));
 
-    auto counter_id = lifespan_.create([](size_t id) -> void {
-        ecs_entities::build_counter(id, Vector2 {level_config::edge_weight * 12, level_config::edge_weight * 4});
-    }, level_config::draw_layers::decoration);
     //* ----------------------------------------------------------------------------------------------------------------------
+    lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 12, level_config::edge_weight * 4});
     lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
     //* ----------------------------------------------------------------------------------------------------------------------
 

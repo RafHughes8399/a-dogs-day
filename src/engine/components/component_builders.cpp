@@ -40,9 +40,9 @@ components::state_machine_component component_builders::build_state_machine_comp
     (void) state_components;
     return components::state_machine_component();
 }
-components::food_component component_builders::build_food_component(){
-    return components::food_component();
-}
 components::selectable_component component_builders::build_selectable_component(size_t kind){
     return components::selectable_component(kind);
+}
+components::storage_component component_builders::build_storage_component(size_t capacity){
+    return components::storage_component(capacity);
 }

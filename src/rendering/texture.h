@@ -46,6 +46,7 @@ namespace textures{
         // npc_dog_head_left = 22,
         // npc_dog_head_right = 23,
         dining_table,
+        food_counter,
         background,
         size
         // and so on

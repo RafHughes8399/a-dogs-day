@@ -74,6 +74,8 @@ namespace factories{
             station_factory()
             :table_builders_({
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_dining_table(id, position);},
+            }), counter_builders_({
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_food_counter(id, position);},
             }){
 
             }
@@ -81,12 +83,14 @@ namespace factories{
             station_factory(station_factory&& other) = default;
             station_factory& operator=(const station_factory& other) = default;
             station_factory& operator=(station_factory&& other) = default;
-            
+
             void build_station(size_t id, Vector2 position);
             void build_table(size_t table, size_t entity_id, Vector2 position);
+            void build_counter(size_t counter, size_t entity_id, Vector2 position);
             void build_stove(size_t id, Vector2 position);
         private:
             std::array<std::function<void(size_t, Vector2)>, entity_config::tables_size> table_builders_;
+            std::array<std::function<void(size_t, Vector2)>, entity_config::counters_size> counter_builders_;
     };
 }
 #endif
