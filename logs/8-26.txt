@@ -497,9 +497,25 @@ pre-requsities:
    -> perhaps we can register / unregister components on change of the head of the stack
       -> so when popped it creates the food item as an entity then builds the positional and renderable component for the item on the top of the stack
       -> when pushed the current head is un registered and the newly pushed one is registered
--> counter storage of food
+-> counter storage of food x
+   -> define the item enums, the sprite builders
+   -> the compoennts for the head of the stack so it can render at a position 
 -> waiter building and destroying
--> interaction detection [x], creation and processing
+   -> same setup of the enum, the builders [in the dog facotyr]
+   -> waiter state machine [at least idling for now]
+   -> waiter selection and path sending like player dogs
+
+-> then items as entities
+   -> item factory and item builders
+   -> they should exist as entities when being carried by a waiter and when on a table 
+-> interaction detection [x], 
+   -> creation and processing, this is the big? one
+   -> on interaction (interactor id, interactable id) 
+      -> create an interaction object - explore this concept
+      -> store a list of interaction objects that list interactor types and interactee types
+      -> then when detecting an interaction you check the interactions that the interactor is a type of and the 
+      interactee is a type of
+      -> so we need like a type component or a handle as the video suggets
 
 
 -> when a customer sits at a table they make a request [they transition to a waiting state], and waits for up to 2 minutes
