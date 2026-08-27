@@ -68,20 +68,17 @@ namespace item_stack{
             item_stack& operator=(item_stack&& other) = default;
 
             // size is the number of item objects - does not consider count 
-            size_t size();
+            size_t size() const;
             // total is the number of total items - does consider count
-            size_t total();
-            bool empty();
+            size_t total() const;
+            bool empty() const;
             item& head();
             void pop();
-            void push(item item);
+            void push(size_t item_id);
 
             // * is a stack so these two only interact with the head of the list
-            void take();
-            void place(item item);
-
-            void increment(item item);
-            void decrement(item item);
+            size_t take();
+            void place(size_t item_id);
         private:
             std::vector<item> items_;
     };

@@ -15,6 +15,7 @@
 #include "events.h"
 #include "events_interface.h"
 #include "hitbox.h"
+#include "item_stack.hpp"
 #include "path.h"
 #include "raylib.h"
 #include "raymath.h"
@@ -75,8 +76,8 @@ class storage_component {
   // ? and dishwasher to store plates
   public:
     ~storage_component() = default;
-    storage_component(size_t capacity)
-    : capacity_(capacity), item_ids_(){}
+    storage_component(item_stack::item_stack items)
+    :items_(items){}
     storage_component(const storage_component& other) = default;
     storage_component(storage_component&& other) = default;
 
@@ -85,16 +86,11 @@ class storage_component {
 
     bool empty() const;
     size_t size() const;
-    size_t capacity() const;
-    bool full() const;
-    size_t at(size_t index) const;
-    // the top of the stack - precondition: !empty()
-    size_t front() const;
-    // rejects (returns false) once size() == capacity_
-    bool push(size_t item_id);
+    item_stack::item& head();
+    size_t take();
+    void place(size_t item_id);
   private:
-    size_t capacity_;
-    std::vector<size_t> item_ids_;
+    item_stack::item_stack items_;
 };
 class interactable_component {
 public:

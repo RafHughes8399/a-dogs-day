@@ -221,27 +221,23 @@ void components::selectable_component::unselect(){
 
 // ---------------- storage_component ----------------
 bool components::storage_component::empty() const{
-    return item_ids_.empty();
+    return items_.empty();
 }
 size_t components::storage_component::size() const{
-    return item_ids_.size();
+    return items_.size();
 }
-size_t components::storage_component::capacity() const{
-    return capacity_;
+item_stack::item& components::storage_component::head(){
+    return items_.head();
 }
-bool components::storage_component::full() const{
-    return item_ids_.size() >= capacity_;
-}
-size_t components::storage_component::at(size_t index) const{
-    return item_ids_.at(index);
-}
-size_t components::storage_component::front() const{
-    return item_ids_.front();
-}
-bool components::storage_component::push(size_t item_id){
-    if(full()){
-        return false;
+size_t components::storage_component::take(){
+    auto h = head();
+    auto h_id = h.get_id();
+    --h;
+    if(h.get_count() == 0){
+        items_.pop();
     }
-    item_ids_.push_back(item_id);
-    return true;
+    return h_id;
+}
+void components::storage_component::place(size_t item_id){
+    items_.push(item_id);
 }
