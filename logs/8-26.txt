@@ -497,6 +497,7 @@ pre-requsities:
    -> perhaps we can register / unregister components on change of the head of the stack
       -> so when popped it creates the food item as an entity then builds the positional and renderable component for the item on the top of the stack
       -> when pushed the current head is un registered and the newly pushed one is registered
+// * -------------------- HERE 28 / 8 ------------------- * //
 -> counter storage of food x
    -> define the item enums, the sprite builders
    -> the compoennts for the head of the stack so it can render at a position
