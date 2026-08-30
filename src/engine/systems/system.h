@@ -368,15 +368,20 @@ namespace systems{
 
             void register_customer(size_t id);
             void unregister_customer(size_t id);
+            
+            void register_waiter(size_t id);
+            void unregister_waiter(size_t id);
 
             void register_table(size_t id);
             void unregister_table(size_t id);
             void clear(){
                 customer_arrival_.clear();
+                waiter_idling_.clear();
             }
         private:
             npc_system() = default;
             dbs::customer_arrival_system customer_arrival_;
+            dbs::waiter_idling_system waiter_idling_;
         public:
             void update(float delta);
     };
