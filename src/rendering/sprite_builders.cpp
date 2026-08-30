@@ -20,6 +20,14 @@ sprite::sprite sprite_builders::build_dog_sprite(int texture_key, const char* pa
         attributes[entity_config::attributes::frames],
         attributes[entity_config::attributes::animations]);
 }
+std::vector<sprite::sprite> sprite_builders::build_gianluca_sprites(){
+    std::vector<sprite::sprite> sprites;
+    sprites.push_back(build_dog_sprite(textures::mack_left,
+        entity_config::mack_left_path, entity_config::mack_across_attributes));
+    sprites.push_back(build_dog_sprite(textures::mack_right,
+        entity_config::mack_right_path, entity_config::mack_across_attributes));
+    return sprites;
+}
 sprite::sprite sprite_builders::build_test_decoration_sprite(const float attributes[entity_config::attributes::size], Color tint){
     return build_sprite(textures::textures_.get_texture(textures::test_decoration, entity_config::test_decoration_path),
         attributes[entity_config::attributes::frame_width],
@@ -29,12 +37,14 @@ sprite::sprite sprite_builders::build_test_decoration_sprite(const float attribu
         Vector2Zero(),
         tint);
 }
-sprite::sprite sprite_builders::build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size]){
+sprite::sprite sprite_builders::build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size],
+    Vector2 draw_position_offset){
     return build_sprite(textures::textures_.get_texture(texture_id, decoration_path), 
     attributes[entity_config::attributes::frame_width],
     attributes[entity_config::attributes::frame_height],
     attributes[entity_config::attributes::frames],
-    attributes[entity_config::attributes::animations]);
+    attributes[entity_config::attributes::animations],
+    draw_position_offset);
 }
 sprite::sprite sprite_builders::build_poker_table(){
     return build_decoration_sprite(textures::poker_table, entity_config::poker_table_decoration_path, entity_config::poker_table_attributes);
@@ -62,6 +72,16 @@ sprite::sprite sprite_builders::build_stove_sprite(){
 }
 sprite::sprite sprite_builders::build_food_sprite(){
     return build_test_decoration_sprite(entity_config::test_food_attributes, RED);
+}
+std::vector<sprite::sprite> sprite_builders::build_food_sprites(){
+    std::vector<sprite::sprite> sprites;
+    sprites.push_back(build_decoration_sprite(textures::lasagna,
+        entity_config::lasagna_food_path, entity_config::lasagna_attributes,
+        entity_config::food_draw_offset));
+    sprites.push_back(build_decoration_sprite(textures::coffee,
+        entity_config::coffee_food_path, entity_config::coffee_attributes,
+        entity_config::food_draw_offset));
+    return sprites;
 }
 sprite::sprite sprite_builders::build_background_sprite(){
     auto background_texture = textures::textures_.get_texture(textures::background, entity_config::background_path);

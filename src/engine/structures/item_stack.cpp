@@ -27,9 +27,8 @@ item_stack::item& item_stack::item_stack::head(){
     return items_.back();
 }
 void item_stack::item_stack::pop(){
-    if(items_.begin() != items_.end()){
-        auto end = items_.end();
-        end = std::prev(items_.end(), 1);
+    if(not empty()){
+        items_.pop_back();
     }
 }
 void item_stack::item_stack::push(size_t item_id){
@@ -37,7 +36,7 @@ void item_stack::item_stack::push(size_t item_id){
         items_.push_back(item(item_id));
    }
    else{
-    auto h = head();
+    auto& h = head();
     if(h.get_id() == item_id and h.get_count() < STACK_LIMIT){
         ++h;
     }
@@ -47,7 +46,7 @@ void item_stack::item_stack::push(size_t item_id){
    }
 }
 size_t item_stack::item_stack::take(){
-    auto h = head();
+    auto& h = head();
     auto h_id = h.get_id();
     --h;
     if(h.get_count() == 0){

@@ -43,6 +43,6 @@ components::state_machine_component component_builders::build_state_machine_comp
 components::selectable_component component_builders::build_selectable_component(size_t kind){
     return components::selectable_component(kind);
 }
-components::storage_component component_builders::build_storage_component(size_t capacity){
-    return components::storage_component(capacity);
+components::storage_component component_builders::build_storage_component(){
+    return components::storage_component(item_stack::item_stack());
 }

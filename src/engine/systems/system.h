@@ -173,6 +173,9 @@ namespace systems{
             size_t create_customer_dog();
             void destroy_customer_dog(size_t id);
 
+            size_t create_waiter_dog(size_t waiter, Vector2 position);
+            void destroy_waiter_dog(size_t id);
+            
             size_t create_table(size_t table, Vector2 position);
             void destroy_table(size_t id);
 

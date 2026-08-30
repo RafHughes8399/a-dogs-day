@@ -7,6 +7,9 @@ animation::animation& sprite::sprite::get_animation(){
 const Texture2D& sprite::sprite::get_texture(){
     return sprite_texture_;
 }
+Vector2 sprite::sprite::get_draw_position_offset() const{
+    return draw_position_offset_;
+}
 
 void sprite::sprite::render(Vector2 position, int frame){
     sprite_animation_.advance(frame);

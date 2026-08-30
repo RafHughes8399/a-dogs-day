@@ -14,15 +14,18 @@ namespace factories{
         public:
             ~dog_factory() = default;
             dog_factory()
-            :dogs_({}), builders_({
+            :customer_dogs_({}), customer_builders_({
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_tex(id, position);},
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_garfield(id, position);}
-            }), spawn_positions_({
+            }), waiter_builders_({
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_gianluca(id, position);},
+            }),
+             customer_spawn_positions_({
                 Vector2{level_config::edge_weight,
                     level_config::footpath_y + level_config::edge_weight},
                 Vector2{level_config::edge_weight * 3,
                     level_config::footpath_y + level_config::footpath_height - level_config::edge_weight}
-            }), destination_positions_({
+            }), customer_destination_positions_({
                 Vector2{level_config::edge_weight,
                     level_config::footpath_y + level_config::footpath_height - level_config::edge_weight},
                 Vector2{level_config::edge_weight * 3,
@@ -36,7 +39,7 @@ namespace factories{
             dog_factory& operator=(dog_factory&& other) = default;
             
             void build_customer_dog(size_t id);
-
+            void build_waiter_dog(size_t waiter, size_t entity_id, Vector2 position);
         private:
             // define the customer marble bag as per that video
             size_t pick_dog();
@@ -44,13 +47,15 @@ namespace factories{
             void refresh_dogs();
             // * parallel array in a sense to the dogs enum, the dog type is an index, 
             // * and the value at the index is the number that dog left and the function to build that dog
-            std::vector<size_t> dogs_;
+            std::vector<size_t> customer_dogs_;
             size_t index_ = 0;
-            std::array<std::function<void(size_t, Vector2)>, entity_config::cumulative_customers_size> builders_;
 
-            // need spawn
-            std::array<Vector2, SPAWN_POSITIONS> spawn_positions_;
-            std::array<Vector2, DESTINATION_POSITIONS> destination_positions_;
+            std::array<std::function<void(size_t, Vector2)>, entity_config::cumulative_customers_size> customer_builders_;
+            std::array<std::function<void(size_t, Vector2)>, entity_config::waiters_size> waiter_builders_;
+            
+
+            std::array<Vector2, SPAWN_POSITIONS> customer_spawn_positions_;
+            std::array<Vector2, DESTINATION_POSITIONS> customer_destination_positions_;
 
     };
 

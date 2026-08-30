@@ -9,7 +9,7 @@
 namespace item_stack{
     class item{
         public:
-            ~item();
+            ~item() = default;
             item(size_t item_id, std::uint8_t count = 1)
             :item_id_(item_id), count_(count){};
 
@@ -22,7 +22,7 @@ namespace item_stack{
                 ++count_;
                 return *this;
             }
-            item& operator++(int){
+            item operator++(int){
                 auto temp = *this;
                 ++count_;
                 return temp;
@@ -31,14 +31,13 @@ namespace item_stack{
                 --count_;
                 return *this;
             }
-            item& operator--(int){
+            item operator--(int){
                 auto temp = *this;
                 --count_;
                 return temp;
             }
             friend bool operator==(const item& a, const item& b){
-                // TODO 26 / 08 actually implment
-                return true;
+                return a.item_id_ == b.item_id_ and a.count_ == b.count_;
             }
             size_t get_id();
             std::uint8_t get_count();
@@ -61,8 +60,8 @@ namespace item_stack{
                     items_.push_back(item(id));
                 }
             }
-            item_stack(const item_stack& other);
-            item_stack(item_stack&& other);
+            item_stack(const item_stack& other) = default;
+            item_stack(item_stack&& other) = default;
 
             item_stack& operator=(const item_stack& other) = default;
             item_stack& operator=(item_stack&& other) = default;

@@ -268,6 +268,10 @@ namespace entity_config{
         garfield = customers_size,
         cumulative_customers_size
     };
+    enum waiters{
+        gianluca = 0,
+        waiters_size
+    };
     enum tables{
         dining_table = 0,
         tables_size
@@ -275,6 +279,16 @@ namespace entity_config{
     enum counters{
         food_counter = 0,
         counters_size
+    };
+    enum foods{
+        lasagna = 0,
+        coffee,
+        foods_size
+    };
+    enum counter_sprite_slots{
+        counter_body = 0,
+        counter_food,
+        counter_sprite_slots_size
     };
 
     // file paths
@@ -315,6 +329,9 @@ namespace entity_config{
     inline const char* poker_table_decoration_path = "../sprites/dog-poker.png";
     inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
 
+    inline const char* lasagna_food_path = "../sprites/lasagna.png";
+    inline const char* coffee_food_path = "../sprites/coffee.png";
+
     inline const char* dining_table_station_path = "../sprtes/dining-table.png";
     inline const char* food_counter_station_path = "";
     // NPC dog sprite art pending.
@@ -344,6 +361,7 @@ namespace entity_config{
     // inline const float mack_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // inline const Vector2 mack_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 mack_head_right_offset = Vector2{0.0f, 0.0f};
+    inline const float gianluca_across_hitbox_attributes[attributes::size] =  {level_config::edge_weight * 2.25f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
@@ -357,6 +375,8 @@ namespace entity_config{
     inline const float stove_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    inline const float lasagna_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    inline const float coffee_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // * legacy entities::station capacity. the ECS stations size their capacity
     // * off the slot offset lists below instead.
     inline const size_t food_counter_capacity = 3;

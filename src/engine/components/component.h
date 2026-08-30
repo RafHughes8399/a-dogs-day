@@ -89,6 +89,7 @@ class storage_component {
     item_stack::item& head();
     size_t take();
     void place(size_t item_id);
+
   private:
     item_stack::item_stack items_;
 };
@@ -288,6 +289,11 @@ public:
   renderable_component& operator=(renderable_component&& other) = default;
 
   std::vector<sprite_component>& get_sprites();
+  sprite_component* get_sprite_component(size_t index);
+  size_t num_sprite_components() const;
+  void add_sprite_component(sprite_component sprite);
+  void remove_sprite_component(size_t index);
+  void set_sprite_component(size_t index, sprite_component sprite);
 private:
   std::vector<sprite_component> sprites_;
 
@@ -432,7 +438,7 @@ namespace component_builders{
     components::state_machine_component::state_component build_state();
     components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
     components::selectable_component build_selectable_component(size_t kind);
-    components::storage_component build_storage_component(size_t capacity);
+    components::storage_component build_storage_component();
 }
 // thin forwarders to the right manager; defined in component_helpers.cpp
 namespace component_helpers{
@@ -465,11 +471,15 @@ namespace component_helpers{
     void add_state_machine_component(size_t entity_id,
         std::vector<components::state_machine_component::state_component>& state_components);
     void add_selectable_component(size_t entity_id, size_t kind);
-    void add_storage_component(size_t entity_id, size_t capacity);
+    void add_storage_component(size_t entity_id);
+    void add_stored_item(size_t entity_id, size_t slot, size_t item_id);
+    std::optional<size_t> take_stored_item(size_t entity_id, size_t slot);
+    void update_item_sprite(size_t entity_id, size_t slot);
 
     void create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions);
     bool is_mouse_positioned(size_t entity_id);
     void set_facing_index(size_t entity_id, size_t index);
+    void set_sprite_index(size_t entity_id, size_t slot, size_t index);
 
     void unregister_positional_component(size_t entity_id);
     void unregister_movement_component(size_t entity_id);

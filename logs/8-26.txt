@@ -499,11 +499,22 @@ pre-requsities:
       -> when pushed the current head is un registered and the newly pushed one is registered
 -> counter storage of food x
    -> define the item enums, the sprite builders
-   -> the compoennts for the head of the stack so it can render at a position 
+   -> the compoennts for the head of the stack so it can render at a position
+    -> when pushing:
+        -> if the stack is empty, register the components
+        -> if the stack is not empty and the head is the same 
+        -> if the stack is not empty and the head is different
+    -> when popping:
+        -> if the stack is now empty
+        -> if the stack is not empty and the head is the same
+        -> if the stack is not empty and the head is a different item
+    -> can create an entity for it ? because the compoinetns will need to be stroed at an entity,
+    -> and then the storage componetn an hold that id, and then just update the position and the sprite when needed  
+    -> that or we expand compontent managers to store a list 
 -> waiter building and destroying
-   -> same setup of the enum, the builders [in the dog facotyr]
+   -> same setup of the enum, the builders [in the dog facotyr] x 
    -> waiter state machine [at least idling for now]
-   -> waiter selection and path sending like player dogs
+   -> waiter selection and path sending like player dogs x 
 
 -> then items as entities
    -> item factory and item builders
