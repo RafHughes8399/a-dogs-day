@@ -1,4 +1,5 @@
 #include "component.h"
+#include <utility>
 
 sprite::sprite& components::renderable_component::sprite_component::get_sprite(){
     return sprites_[sprite_index_];

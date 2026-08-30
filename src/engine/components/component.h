@@ -325,18 +325,29 @@ private:
     // THE CONDITION TO TRANISITION
     // THE BEHAVIOUR OF TRANSITIONING
     // AND THE NEXT STATE
+    // TODO 30 / 8 / 26 
+    // * states affect behaviour
+    // * state machines define the transitional logic [ akin to how the menu graph is setup]
+    // * best way to structure this logic:
+    // * i think sub states is good
+    // the entity needs state, and then the state machine assigns a behaviour to a state and performs it
+    // maps the state id to the state behaviour or characteristic ? 
 class state_machine_component{
 public:
-    // virtual dtor - concrete states are held through a base pointer
     class state_component {
     public:
-        virtual ~state_component() = default;
+        ~state_component() = default;
         state_component() = default;
         state_component(const state_component& other) = default;
         state_component(state_component&& other) = default;
 
         state_component& operator=(const state_component& other) = default;
         state_component& operator=(state_component&& other) = default;
+
+        
+    private:
+        size_t state_id_;
+        state_component * next_state_;
     };
 
     ~state_machine_component() = default;

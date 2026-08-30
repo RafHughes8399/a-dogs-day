@@ -519,6 +519,7 @@ pre-requsities:
 -> then items as entities
    -> item factory and item builders
    -> they should exist as entities when being carried by a waiter and when on a table 
+
 -> interaction detection [x], 
    -> creation and processing, this is the big? one
    -> on interaction (interactor id, interactable id) 
@@ -527,7 +528,10 @@ pre-requsities:
       -> then when detecting an interaction you check the interactions that the interactor is a type of and the 
       interactee is a type of
       -> so we need like a type component or a handle as the video suggets
-
+*------------------ WAITER STATES ----------------------------------------*
+-> waiter states and idling
+-> state to flip when selected and right clicked and then when finsihed doing that 
+-> waiter idling system to direct, command and guide idle waiters
 
 -> when a customer sits at a table they make a request [they transition to a waiting state], and waits for up to 2 minutes
    -> this is a state change and a ui indication to the player to respond

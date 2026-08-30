@@ -134,6 +134,8 @@ add_library(systems
   src/engine/systems/control_input_system.cpp
   src/engine/systems/entity_lifespan_system.cpp
   src/engine/systems/npc_system.cpp
+  src/engine/systems/customer_arrival_system.cpp
+  src/engine/systems/waiter_idling_system.cpp
   src/engine/systems/selection_system.cpp)
 link_libraries(systems)
 
