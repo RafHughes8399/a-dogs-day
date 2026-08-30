@@ -533,6 +533,10 @@ pre-requsities:
 -> state to flip when selected and right clicked and then when finsihed doing that 
 -> waiter idling system to direct, command and guide idle waiters
 
+// TODO (30/08):
+-> the waiter system functions are defined, they need to be filled in, the state component must be built and assigned
+-> the waiter must be allowed to be sent to stations
+
 -> when a customer sits at a table they make a request [they transition to a waiting state], and waits for up to 2 minutes
    -> this is a state change and a ui indication to the player to respond
 
