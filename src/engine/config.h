@@ -292,10 +292,12 @@ namespace entity_config{
     };
 
     // file paths
+    // * ------------------------ ENVIRONMENT AND CURSOR PATHS --------------------------------------- *//
     inline const char* background_path = "../sprites/background.png" ;
     inline const char* cursor_path = "../sprites/cursor.png";
     inline const char* paw_mark_path = "../sprites/paw_mark.png";
-
+    
+    // * ------------------------ PLAYER DOG PATHS  --------------------------------------- *//
     inline const char* khiri_left_path = "../sprites/khiri_left.png";
     inline const char* khiri_right_path = "../sprites/khiri_right.png";
     inline const char* khiri_up_path = "../sprites/khiri_up.png";
@@ -303,13 +305,13 @@ namespace entity_config{
     // Head sprite art pending.
     // inline const char* khiri_head_left_path = "../sprites/khiri_head_left.png";
     // inline const char* khiri_head_right_path = "../sprites/khiri_head_right.png";
-
+    
     inline const char* khiri_left_outline_path = "../sprites/khiri_left_outline.png";
     inline const char* khiri_right_outline_path = "../sprites/khiri_right_outline.png";
     inline const char* khiri_up_outline_path = "../sprites/khiri_up_outline.png";
     inline const char* khiri_down_outline_path = "../sprites/khiri_down_outline.png";
-
-
+    
+    
     inline const char* mack_left_path = "../sprites/mack_left.png";
     inline const char* mack_right_path = "../sprites/mack_right.png";
     inline const char* mack_up_path = "../sprites/mack_up.png";
@@ -317,23 +319,31 @@ namespace entity_config{
     // Head sprite art pending.
     // inline const char* mack_head_left_path = "../sprites/mack_head_left.png";
     // inline const char* mack_head_right_path = "../sprites/mack_head_right.png";
-
+    
     inline const char* mack_left_outline_path = "../sprites/mack_left_outline.png";
     inline const char* mack_right_outline_path = "../sprites/mack_right_outline.png";
     inline const char* mack_up_outline_path = "../sprites/mack_up_outline.png";
     inline const char* mack_down_outline_path = "../sprites/mack_down_outline.png";
-
-    inline const char* test_decoration_path ="../sprites/test_decoration.png";
+    // * ------------------------ WAITER DOG PATHS --------------------------------------- *//
+    inline const char* gianluca_left_path = "../sprites/gianluca-left.png";
+    inline const char* gianluca_right_path = "../sprites/gianluca-right.png";
+    // * ------------------------ DECORATION PATHS --------------------------------------- *//
+    
+    inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
     inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle-void.png";
     inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
     inline const char* poker_table_decoration_path = "../sprites/dog-poker.png";
-    inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
-
-    inline const char* lasagna_food_path = "../sprites/lasagna.png";
-    inline const char* coffee_food_path = "../sprites/coffee.png";
-
+    inline const char* test_decoration_path ="../sprites/test_decoration.png";
+    
+    // * ------------------------ STATION PATHS --------------------------------------- *//
     inline const char* dining_table_station_path = "../sprtes/dining-table.png";
     inline const char* food_counter_station_path = "";
+    
+    
+    // * ------------------------ FOOD PATHS --------------------------------------- *//
+    inline const char* lasagna_food_path = "../sprites/lasagna.png";
+    inline const char* coffee_food_path = "../sprites/coffee.png";
+    
     // NPC dog sprite art pending.
     // inline const char* npc_dog_left_path = "../sprites/npc_dog_left.png";
     // inline const char* npc_dog_right_path = "../sprites/npc_dog_right.png";
@@ -361,7 +371,7 @@ namespace entity_config{
     // inline const float mack_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // inline const Vector2 mack_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 mack_head_right_offset = Vector2{0.0f, 0.0f};
-    inline const float gianluca_across_hitbox_attributes[attributes::size] =  {level_config::edge_weight * 2.25f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
+    inline const float gianluca_across_hitbox_attributes[attributes::size] =  {level_config::edge_weight * 2.25f, level_config::edge_weight * 0.91f, 1.0f, 1.0f};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)

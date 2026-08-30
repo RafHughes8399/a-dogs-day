@@ -35,11 +35,11 @@ void game::game::init(){
     }, level_config::dogs);
     debug::log("[game::init, built mack] id " + std::to_string(mack_id));
 
-    //* ----------------------------------------------------------------------------------------------------------------------
+    //* -------------------------------------------------- STATION CREATE --------------------------------------------------------------------
     lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 12, level_config::edge_weight * 4});
     lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
-    //* ----------------------------------------------------------------------------------------------------------------------
-
+    //* ------------------------------------------------- WAITER CREATE---------------------------------------------------------------------
+    lifespan_.create_waiter_dog(entity_config::waiters::gianluca, Vector2 {level_config::edge_weight * 13, level_config::edge_weight * 6});
 
 
     // * and some decorations
