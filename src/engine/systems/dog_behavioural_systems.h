@@ -58,7 +58,7 @@ namespace dbs {
     class waiter_idling_system {
         public:
             ~waiter_idling_system() = default;
-            waiter_idling_system();
+            waiter_idling_system() = default;
             waiter_idling_system(const waiter_idling_system& other) = default;
             waiter_idling_system(waiter_idling_system&& other) = default;
         
@@ -71,20 +71,11 @@ namespace dbs {
 
 
             bool is_idle(size_t waiter);
-            Rectangle determine_idle_bounds(size_t waiter);
+            std::optional<Rectangle> determine_idle_bounds(size_t waiter);
             size_t pick_direction();
             void build_paths(size_t waiter, size_t direction, Rectangle bounds);
             void update(float delta);
             
-            /**
-            we must define the following 
-             get bounds for dog idle
-             pick starting direction
-             generate paths
-
-            
-            
-            */
         private:
             std::vector<size_t> waiters_;
     };
