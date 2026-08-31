@@ -3,6 +3,7 @@
 #include "events_interface.h"
 #include <random>
 #include <algorithm>
+#include <iostream>
 size_t factories::dog_factory::pick_route(){
     // TODO (25 / 8 / 26) make it a proper random thing
     return 0;
@@ -49,6 +50,30 @@ void factories::dog_factory::build_customer_dog(size_t id){
 }
 
 void factories::dog_factory::build_waiter_dog(size_t waiter, size_t entity_id, Vector2 position){
+    std::cout << "[dog_factory::build_waiter_dog] enter waiter=" << waiter
+        << " entity_id=" << entity_id
+        << " position=(" << position.x << "," << position.y << ")"
+        << " waiter_builders_.size()=" << waiter_builders_.size()
+        << " waiters_size=" << static_cast<size_t>(entity_config::waiters::waiters_size)
+        << std::endl;
+    if(waiter >= waiter_builders_.size()){
+        std::cout << "[dog_factory::build_waiter_dog] OUT OF BOUNDS index "
+            << waiter << " >= " << waiter_builders_.size()
+            << " - aborting build" << std::endl;
+        return;
+    }
     auto waiter_builder = waiter_builders_[waiter];
+    std::cout << "[dog_factory::build_waiter_dog] slot " << waiter
+        << " engaged=" << (waiter_builder ? "true" : "false") << std::endl;
+    if(!waiter_builder){
+        std::cout << "[dog_factory::build_waiter_dog] EMPTY std::function at slot "
+            << waiter << " - no builder registered in dog_factory ctor"
+            << " - aborting build" << std::endl;
+        return;
+    }
+    std::cout << "[dog_factory::build_waiter_dog] invoking builder for slot "
+        << waiter << std::endl;
     waiter_builder(entity_id, position);
+    std::cout << "[dog_factory::build_waiter_dog] built entity_id=" << entity_id
+        << std::endl;
 }

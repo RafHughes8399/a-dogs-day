@@ -270,6 +270,7 @@ namespace entity_config{
     };
     enum waiters{
         gianluca = 0,
+        lionel,
         waiters_size
     };
     enum tables{
@@ -327,6 +328,8 @@ namespace entity_config{
     // * ------------------------ WAITER DOG PATHS --------------------------------------- *//
     inline const char* gianluca_left_path = "../sprites/gianluca-left.png";
     inline const char* gianluca_right_path = "../sprites/gianluca-right.png";
+    inline const char* lionel_left_path = "../sprites/lionel-left.png";
+    inline const char* lionel_right_path = "../sprites/lionel-right.png";
     // * ------------------------ DECORATION PATHS --------------------------------------- *//
     
     inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
@@ -371,7 +374,8 @@ namespace entity_config{
     // inline const float mack_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // inline const Vector2 mack_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 mack_head_right_offset = Vector2{0.0f, 0.0f};
-    inline const float gianluca_across_hitbox_attributes[attributes::size] =  {level_config::edge_weight * 2.25f, level_config::edge_weight * 0.91f, 1.0f, 1.0f};
+    inline const float gianluca_attributes[attributes::size] =  {level_config::edge_weight * 2.25f, level_config::edge_weight * 0.91f, 1.0f, 1.0f};
+    inline const float lionel_attributes[attributes::size] =  {level_config::edge_weight * 1.75f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)

@@ -19,6 +19,7 @@ namespace factories{
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_garfield(id, position);}
             }), waiter_builders_({
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_gianluca(id, position);},
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_lionel(id, position);},
             }),
              customer_spawn_positions_({
                 Vector2{level_config::edge_weight,

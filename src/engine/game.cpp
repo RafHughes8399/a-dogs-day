@@ -40,7 +40,7 @@ void game::game::init(){
     lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
     //* ------------------------------------------------- WAITER CREATE---------------------------------------------------------------------
     lifespan_.create_waiter_dog(entity_config::waiters::gianluca, Vector2 {level_config::edge_weight * 13, level_config::edge_weight * 6});
-
+    lifespan_.create_waiter_dog(entity_config::waiters::lionel, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 9});
 
     // * and some decorations
     auto gargoyle_id = lifespan_.create([](size_t id)-> void {

@@ -23,9 +23,17 @@ sprite::sprite sprite_builders::build_dog_sprite(int texture_key, const char* pa
 std::vector<sprite::sprite> sprite_builders::build_gianluca_sprites(){
     std::vector<sprite::sprite> sprites;
     sprites.push_back(build_dog_sprite(textures::gianluca_left,
-        entity_config::gianluca_left_path, entity_config::gianluca_across_hitbox_attributes));
+        entity_config::gianluca_left_path, entity_config::gianluca_attributes));
     sprites.push_back(build_dog_sprite(textures::gianluca_right,
-        entity_config::gianluca_right_path, entity_config::gianluca_across_hitbox_attributes));
+        entity_config::gianluca_right_path, entity_config::gianluca_attributes));
+    return sprites;
+}
+std::vector<sprite::sprite> sprite_builders::build_lionel_sprites(){
+    std::vector<sprite::sprite> sprites;
+    sprites.push_back(build_dog_sprite(textures::lionel_left,
+        entity_config::lionel_left_path, entity_config::lionel_attributes));
+    sprites.push_back(build_dog_sprite(textures::lionel_right,
+        entity_config::lionel_right_path, entity_config::lionel_attributes));
     return sprites;
 }
 sprite::sprite sprite_builders::build_test_decoration_sprite(const float attributes[entity_config::attributes::size], Color tint){

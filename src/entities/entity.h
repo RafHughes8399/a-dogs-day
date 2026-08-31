@@ -116,6 +116,7 @@ namespace ecs_entities {
     // build_saba()
     //  */
         void build_gianluca(size_t id, Vector2 position);
+        void build_lionel(size_t id, Vector2 position);
     void build_cursor(size_t id);
 
     void build_decoration(size_t id, Vector2 position,

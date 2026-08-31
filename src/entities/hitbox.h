@@ -47,6 +47,7 @@ namespace hitbox_builders{
     hitbox::hitbox build_dog_across_hitbox(Vector2 position);
     hitbox::hitbox build_dog_down_hitbox(Vector2 position);
     hitbox::hitbox build_gianluca_hitbox(Vector2 position);
+    hitbox::hitbox build_lionel_hitbox(Vector2 position);
 
     hitbox::hitbox build_test_decoration_hitbox(Vector2 position);
     hitbox::hitbox build_gargoyle_hitbox(Vector2 position);

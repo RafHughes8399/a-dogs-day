@@ -4,6 +4,7 @@
 #include "config.h"
 #include "raylib.h"
 #include "raglib.h"
+#include <optional>
 namespace dbs {
     class customer_arrival_system{
         public:

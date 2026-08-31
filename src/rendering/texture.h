@@ -31,6 +31,8 @@ namespace textures{
         mack_right_out,
         gianluca_left,
         gianluca_right,
+        lionel_left,
+        lionel_right,
         test_decoration,
         hud_edit_wheel,
         gargoyle_void,

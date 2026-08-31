@@ -118,6 +118,10 @@ void ecs_entities::build_waiter_dog(size_t id, Vector2 position,
         build_waiter_dog(id, position, sprite_builders::build_gianluca_sprites(),
             hitbox_builders::build_gianluca_hitbox(position));
     }
+    void ecs_entities::build_lionel(size_t id, Vector2 position){
+        build_waiter_dog(id, position, sprite_builders::build_lionel_sprites(),
+            hitbox_builders::build_lionel_hitbox(position));
+    }
 //**
 // build_saba()
 // build tex()

@@ -93,6 +93,7 @@ namespace sprite_builders{
     sprite::sprite build_dog_sprite(int texture_key, const char* path,
         const float attributes[entity_config::attributes::size]);
     std::vector<sprite::sprite> build_gianluca_sprites();
+    std::vector<sprite::sprite> build_lionel_sprites();
     // decorations, stations and food all draw off the test_decoration sheet and
     // differ only by their attribute block and tint
     sprite::sprite build_test_decoration_sprite(const float attributes[entity_config::attributes::size],
