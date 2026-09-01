@@ -124,13 +124,18 @@ void dbs::waiter_idling_system::update(float delta){
 
     for(auto& waiter : waiters_){
         waiter.tick(delta);
-        if(not waiter.ready()){ continue; }
-        if(not is_idle(waiter.id())){ continue; }
+        // TODO pending state machine implmentatino, but here is where the states should be checked 
+        // to go from not idle -> idle
+        if(not waiter.ready()){ continue; 
+        }
+        if(not is_idle(waiter.id())){ continue;
+         }
 
         auto bounds = determine_idle_bounds(waiter.id());
         if(bounds.has_value()){
             build_paths(waiter.id(), point_count(rng_), bounds.value());
         }
+        // TODO: update state from not idle to idle
         waiter.start_cooldown(roll_cooldown());
     }
 }
