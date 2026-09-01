@@ -15,6 +15,7 @@
 #include "events.h"
 #include "events_interface.h"
 #include "hitbox.h"
+#include "item_stack.hpp"
 #include "path.h"
 #include "raylib.h"
 #include "raymath.h"
@@ -69,19 +70,28 @@ private:
 
 
 // for the table, the waiter, and the counter and the kitchen station
-class food_component {
+class storage_component {
   // ? current idea for the storage component is for stations to store food,
   // ? tables to store foood
   // ? and dishwasher to store plates
   public:
-    ~food_component() = default;
-    food_component() = default;
-    food_component(const food_component& other) = default;
-    food_component(food_component&& other) = default;
+    ~storage_component() = default;
+    storage_component(item_stack::item_stack items)
+    :items_(items){}
+    storage_component(const storage_component& other) = default;
+    storage_component(storage_component&& other) = default;
 
-    food_component& operator=(const food_component& other) = default;
-    food_component& operator=(food_component&& other) = default;
+    storage_component& operator=(const storage_component& other) = default;
+    storage_component& operator=(storage_component&& other) = default;
+
+    bool empty() const;
+    size_t size() const;
+    item_stack::item& head();
+    size_t take();
+    void place(size_t item_id);
+
   private:
+    item_stack::item_stack items_;
 };
 class interactable_component {
 public:
@@ -279,6 +289,11 @@ public:
   renderable_component& operator=(renderable_component&& other) = default;
 
   std::vector<sprite_component>& get_sprites();
+  sprite_component* get_sprite_component(size_t index);
+  size_t num_sprite_components() const;
+  void add_sprite_component(sprite_component sprite);
+  void remove_sprite_component(size_t index);
+  void set_sprite_component(size_t index, sprite_component sprite);
 private:
   std::vector<sprite_component> sprites_;
 
@@ -310,18 +325,29 @@ private:
     // THE CONDITION TO TRANISITION
     // THE BEHAVIOUR OF TRANSITIONING
     // AND THE NEXT STATE
+    // TODO 30 / 8 / 26 
+    // * states affect behaviour
+    // * state machines define the transitional logic [ akin to how the menu graph is setup]
+    // * best way to structure this logic:
+    // * i think sub states is good
+    // the entity needs state, and then the state machine assigns a behaviour to a state and performs it
+    // maps the state id to the state behaviour or characteristic ? 
 class state_machine_component{
 public:
-    // virtual dtor - concrete states are held through a base pointer
     class state_component {
     public:
-        virtual ~state_component() = default;
+        ~state_component() = default;
         state_component() = default;
         state_component(const state_component& other) = default;
         state_component(state_component&& other) = default;
 
         state_component& operator=(const state_component& other) = default;
         state_component& operator=(state_component&& other) = default;
+
+        
+    private:
+        size_t state_id_;
+        state_component * next_state_;
     };
 
     ~state_machine_component() = default;
@@ -391,7 +417,6 @@ private:
 // * which would blur the storage layer into the data layer.
 extern component_manager<components::collision_component> collision_manager_;
 extern component_manager<components::key_input_component> control_manager_;
-extern component_manager<components::food_component> food_manager_;
 extern component_manager<components::interactable_component> interactable_manager_;
 extern component_manager<components::interactor_component> interactor_manager_;
 extern component_manager<components::mouse_input_component> mouse_input_manager_;
@@ -400,6 +425,7 @@ extern component_manager<components::position_component> positional_manager_;
 extern component_manager<components::renderable_component> renderable_manager_;
 extern component_manager<components::selectable_component> selectable_manager_;
 extern component_manager<components::state_machine_component> state_machine_manager_;
+extern component_manager<components::storage_component> storage_manager_;
 } // namespace component_managers
 
 namespace component_builders{
@@ -422,8 +448,8 @@ namespace component_builders{
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
     components::state_machine_component::state_component build_state();
     components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
-    components::food_component build_food_component();
     components::selectable_component build_selectable_component(size_t kind);
+    components::storage_component build_storage_component();
 }
 // thin forwarders to the right manager; defined in component_helpers.cpp
 namespace component_helpers{
@@ -436,8 +462,8 @@ namespace component_helpers{
     void register_key_input_component(size_t entity_id, components::key_input_component component);
     void register_mouse_input_component(size_t entity_id, components::mouse_input_component component);
     void register_state_machine_component(size_t entity_id, components::state_machine_component component);
-    void register_food_component(size_t entity_id, components::food_component component);
     void register_selectable_component(size_t entity_id, components::selectable_component component);
+    void register_storage_component(size_t entity_id, components::storage_component component);
 
     void add_positional_component(size_t entity_id, Vector2 position);
     void add_movement_component(size_t entity_id, Vector2 move_speed,
@@ -455,12 +481,16 @@ namespace component_helpers{
     void add_mouse_input_component(size_t entity_id, std::vector<game_config::input>& inputs);
     void add_state_machine_component(size_t entity_id,
         std::vector<components::state_machine_component::state_component>& state_components);
-    void add_food_component(size_t entity_id);
     void add_selectable_component(size_t entity_id, size_t kind);
+    void add_storage_component(size_t entity_id);
+    void add_stored_item(size_t entity_id, size_t slot, size_t item_id);
+    std::optional<size_t> take_stored_item(size_t entity_id, size_t slot);
+    void update_item_sprite(size_t entity_id, size_t slot);
 
     void create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions);
     bool is_mouse_positioned(size_t entity_id);
     void set_facing_index(size_t entity_id, size_t index);
+    void set_sprite_index(size_t entity_id, size_t slot, size_t index);
 
     void unregister_positional_component(size_t entity_id);
     void unregister_movement_component(size_t entity_id);
@@ -471,8 +501,8 @@ namespace component_helpers{
     void unregister_key_input_component(size_t entity_id);
     void unregister_mouse_input_component(size_t entity_id);
     void unregister_state_machine_component(size_t entity_id);
-    void unregister_food_component(size_t entity_id);
     void unregister_selectable_component(size_t entity_id);
+    void unregister_storage_component(size_t entity_id);
     void unregister_all_components(size_t entity_id);
 
     size_t num_registered_components(size_t entity_id);

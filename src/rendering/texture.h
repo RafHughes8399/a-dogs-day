@@ -29,6 +29,10 @@ namespace textures{
         mack_down,
         mack_left_out,
         mack_right_out,
+        gianluca_left,
+        gianluca_right,
+        lionel_left,
+        lionel_right,
         test_decoration,
         hud_edit_wheel,
         gargoyle_void,
@@ -46,6 +50,9 @@ namespace textures{
         // npc_dog_head_left = 22,
         // npc_dog_head_right = 23,
         dining_table,
+        food_counter,
+        lasagna,
+        coffee,
         background,
         size
         // and so on

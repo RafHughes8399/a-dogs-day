@@ -75,7 +75,7 @@ namespace testing{
 
     size_t ecs_test_game::create_waiter_dog(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_waiter_dog(id, position);
+            ecs_entities::build_gianluca(id, position);
         }, layer);
     }
 
@@ -93,7 +93,7 @@ namespace testing{
 
     size_t ecs_test_game::create_food_counter(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_counter(id, position);
+            ecs_entities::build_food_counter(id, position);
         }, layer);
     }
 
@@ -226,6 +226,9 @@ namespace testing{
     bool ecs_test_game::has_interactor(size_t entity_id){
         return component_managers::interactor_manager_.get_component(entity_id) != nullptr;
     }
+    bool ecs_test_game::has_storage(size_t entity_id){
+        return component_managers::storage_manager_.get_component(entity_id) != nullptr;
+    }
     bool ecs_test_game::has_interactable(size_t entity_id){
         return component_managers::interactable_manager_.get_component(entity_id) != nullptr;
     }
@@ -297,8 +300,8 @@ namespace testing{
              + component_managers::control_manager_.size()
              + component_managers::mouse_input_manager_.size()
              + component_managers::state_machine_manager_.size()
-             + component_managers::food_manager_.size()
-             + component_managers::selectable_manager_.size();
+             + component_managers::selectable_manager_.size()
+             + component_managers::storage_manager_.size();
     }
 
 } // namespace testing

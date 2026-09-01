@@ -4,6 +4,7 @@
 #include "config.h"
 #include "entity.h"
 #include "events.h"
+#include "dog_behavioural_systems.h"
 #include "factories.hpp"
 #include "quadtree.h"
 #include "events_interface.h"
@@ -173,8 +174,14 @@ namespace systems{
             size_t create_customer_dog();
             void destroy_customer_dog(size_t id);
 
+            size_t create_waiter_dog(size_t waiter, Vector2 position);
+            void destroy_waiter_dog(size_t id);
+            
             size_t create_table(size_t table, Vector2 position);
             void destroy_table(size_t id);
+
+            size_t create_counter(size_t counter, Vector2 position);
+            void destroy_counter(size_t id);
             void destroy(size_t entity_id);
             void update(float delta);
             // teardown between test scenarios - the singleton outlives them
@@ -347,72 +354,6 @@ namespace systems{
                 // * table_allocation_ - managers assigning customers to tables and general table availability
                 // * serving system - manages serving food to customers
                 // * clearing system  - managers clearing tables after customers have left
-            class customer_arrival_system{
-                public:
-                    // TODO (25 / 8 / 26) must listen to table construction and deletion, can create a new event for it and update teh builders
-                    // TODO and destroyers to emit those events
-                    ~customer_arrival_system() = default;
-                    customer_arrival_system() = default;
-
-                    customer_arrival_system(const customer_arrival_system& other) = default;
-                    customer_arrival_system(customer_arrival_system&& other) = default;
-
-                    customer_arrival_system& operator=(const customer_arrival_system& other) = default;
-                    customer_arrival_system& operator=(customer_arrival_system&& other) = default;
-                    
-                    // create_dog
-                    // destroy_dog
-
-
-                    void update(float delta);
-                    void create_customer_dog();
-                    void destroy_customer_dog(size_t id);
-
-                    void register_customer(size_t id);
-                    void unregister_customer(size_t id);
-                    void register_table(size_t id);
-                    void unregister_table(size_t id);
-                    
-                    
-                    bool free_tables();
-                    int pick_table();
-                    int pick_customer();
-                    void customer_cleanup();
-                    void send_customer_to_table();
-#ifdef DOG_DAYS_TESTING
-                    const std::vector<size_t>& get_customers() const{
-                        return customers_;
-                    }
-                    const std::vector<size_t>& get_tables() const{
-                        return tables_;
-                    }
-#endif
-                    // teardown between test scenarios - the singleton outlives them
-                    void clear(){
-                        customers_.clear();
-                        tables_.clear();
-                        time_since_dog_ = 0.0f;
-                    }
-                    // check dog enter cafe
-                    //
-                private:
-                    // const Rectangle cafe_entrace_;
-                    float time_since_dog_ = 0.0f;
-                    std::vector<size_t> customers_;
-                    std::vector<size_t> tables_;
-            };
-            class table_allocation_system{
-                public:
-                private:
-            };
-            class serving_system{
-                public:
-                private:
-            };
-            class clearing_system{
-                public:
-                private:
-            };
         public:
             static npc_system& get_instance(){
                 static npc_system instance;
@@ -427,15 +368,20 @@ namespace systems{
 
             void register_customer(size_t id);
             void unregister_customer(size_t id);
+            
+            void register_waiter(size_t id);
+            void unregister_waiter(size_t id);
 
             void register_table(size_t id);
             void unregister_table(size_t id);
             void clear(){
                 customer_arrival_.clear();
+                waiter_idling_.clear();
             }
         private:
             npc_system() = default;
-            customer_arrival_system customer_arrival_;
+            dbs::customer_arrival_system customer_arrival_;
+            dbs::waiter_idling_system waiter_idling_;
         public:
             void update(float delta);
     };

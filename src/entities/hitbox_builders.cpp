@@ -26,6 +26,17 @@ hitbox::hitbox hitbox_builders::build_dog_down_hitbox(Vector2 position){
         entity_config::khiri_down_attributes[entity_config::attributes::frame_height]);
 }
 
+hitbox::hitbox hitbox_builders::build_gianluca_hitbox(Vector2 position){
+    return build_hitbox(position,
+        entity_config::gianluca_attributes[entity_config::attributes::frame_width],
+        entity_config::gianluca_attributes[entity_config::attributes::frame_height]);
+}
+hitbox::hitbox hitbox_builders::build_lionel_hitbox(Vector2 position){
+    return build_hitbox(position,
+        entity_config::lionel_attributes[entity_config::attributes::frame_width],
+        entity_config::lionel_attributes[entity_config::attributes::frame_height]);
+}
+
 hitbox::hitbox hitbox_builders::build_test_decoration_hitbox(Vector2 position){
     return build_hitbox(position,
         entity_config::test_decoration_attributes[entity_config::attributes::frame_width],

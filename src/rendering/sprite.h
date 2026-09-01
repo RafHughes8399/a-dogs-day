@@ -28,6 +28,7 @@ namespace sprite{
 
             animation::animation& get_animation();
             const Texture2D& get_texture();
+            Vector2 get_draw_position_offset() const;
             void render(Vector2 position, int frame);
         private:
             // has the texture 
@@ -91,13 +92,16 @@ namespace sprite_builders{
     // every dog sprite is the same four attribute lookups off a cached texture
     sprite::sprite build_dog_sprite(int texture_key, const char* path,
         const float attributes[entity_config::attributes::size]);
+    std::vector<sprite::sprite> build_gianluca_sprites();
+    std::vector<sprite::sprite> build_lionel_sprites();
     // decorations, stations and food all draw off the test_decoration sheet and
     // differ only by their attribute block and tint
     sprite::sprite build_test_decoration_sprite(const float attributes[entity_config::attributes::size],
         Color tint = WHITE);
     
     // *-------------------- deocration sprites --------------------* //
-    sprite::sprite build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size]);
+    sprite::sprite build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size],
+        Vector2 draw_position_offset = Vector2Zero());
     sprite::sprite build_poker_table();
     sprite::sprite build_dog_painting();
     sprite::sprite build_gargoyle();
@@ -109,5 +113,6 @@ namespace sprite_builders{
     sprite::sprite build_dishwasher_sprite();
     sprite::sprite build_stove_sprite();
     sprite::sprite build_food_sprite();
+    std::vector<sprite::sprite> build_food_sprites();
 }
 #endif

@@ -464,7 +464,8 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
             THEN("it carries the station component set"){
                 REQUIRE(game.has_selectable(counter_id));
                 REQUIRE(game.has_interactable(counter_id));
-                REQUIRE(game.num_components(counter_id) == 5);
+                REQUIRE(game.has_storage(counter_id));
+                REQUIRE(game.num_components(counter_id) == 6);
             }
             THEN("it offers all four interaction slots"){
                 auto* interactable = component_managers::interactable_manager_.get_component(counter_id);

@@ -3,34 +3,35 @@
 #include "events_interface.h"
 #include <random>
 #include <algorithm>
+#include <iostream>
 size_t factories::dog_factory::pick_route(){
     // TODO (25 / 8 / 26) make it a proper random thing
     return 0;
 }
 size_t factories::dog_factory::pick_dog(){
-    if(index_ >= dogs_.size()){
+    if(index_ >= customer_dogs_.size()){
         refresh_dogs();
     }
-    size_t dog = dogs_[index_];
+    size_t dog = customer_dogs_[index_];
     ++index_;
     return dog; 
 }
 
 void factories::dog_factory::refresh_dogs(){
-    dogs_.clear();
+    customer_dogs_.clear();
     for(int d = entity_config::customers::tex; d < entity_config::customers::customers_size; d++){
         for(int c = 0; c < CUSTOMERS; c++){
-            dogs_.push_back(static_cast<size_t>(d));
+            customer_dogs_.push_back(static_cast<size_t>(d));
         }
     }
     for(int d = entity_config::special_customers::garfield; d < entity_config::special_customers::cumulative_customers_size; d++){
         for(int c = 0; c < SPECIAL_CUSTOMERS; c++){
-            dogs_.push_back(static_cast<size_t>(d));
+            customer_dogs_.push_back(static_cast<size_t>(d));
         }
     }
     std::random_device rd;
     std::mt19937 g(rd());
-    std::shuffle(dogs_.begin(), dogs_.end(), g);
+    std::shuffle(customer_dogs_.begin(), customer_dogs_.end(), g);
 
     index_ = 0;
 }
@@ -39,11 +40,40 @@ void factories::dog_factory::refresh_dogs(){
 void factories::dog_factory::build_customer_dog(size_t id){
     auto dog = pick_dog();
     auto route = pick_route();
-    auto builder = builders_[dog];
-    builder(id, spawn_positions_[route]);
+    auto builder = customer_builders_[dog];
+    builder(id, customer_spawn_positions_[route]);
     debug::log("[dog_factory::build_customer_dog, built customer] id: "
         + std::to_string(id));
-    events::create_path_to create_path_event{id, destination_positions_[route], path::replace};
+    events::create_path_to create_path_event{id, customer_destination_positions_[route], path::replace};
     event_interface::execute_event(create_path_event);
     return;
+}
+
+void factories::dog_factory::build_waiter_dog(size_t waiter, size_t entity_id, Vector2 position){
+    std::cout << "[dog_factory::build_waiter_dog] enter waiter=" << waiter
+        << " entity_id=" << entity_id
+        << " position=(" << position.x << "," << position.y << ")"
+        << " waiter_builders_.size()=" << waiter_builders_.size()
+        << " waiters_size=" << static_cast<size_t>(entity_config::waiters::waiters_size)
+        << std::endl;
+    if(waiter >= waiter_builders_.size()){
+        std::cout << "[dog_factory::build_waiter_dog] OUT OF BOUNDS index "
+            << waiter << " >= " << waiter_builders_.size()
+            << " - aborting build" << std::endl;
+        return;
+    }
+    auto waiter_builder = waiter_builders_[waiter];
+    std::cout << "[dog_factory::build_waiter_dog] slot " << waiter
+        << " engaged=" << (waiter_builder ? "true" : "false") << std::endl;
+    if(!waiter_builder){
+        std::cout << "[dog_factory::build_waiter_dog] EMPTY std::function at slot "
+            << waiter << " - no builder registered in dog_factory ctor"
+            << " - aborting build" << std::endl;
+        return;
+    }
+    std::cout << "[dog_factory::build_waiter_dog] invoking builder for slot "
+        << waiter << std::endl;
+    waiter_builder(entity_id, position);
+    std::cout << "[dog_factory::build_waiter_dog] built entity_id=" << entity_id
+        << std::endl;
 }

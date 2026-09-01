@@ -84,6 +84,7 @@ namespace testing{
             bool has_selectable(size_t entity_id);
             bool has_interactor(size_t entity_id);
             bool has_interactable(size_t entity_id);
+            bool has_storage(size_t entity_id);
             size_t selectable_kind_of(size_t entity_id);
             // total across every manager, for asserting a clean world
             size_t total_components();

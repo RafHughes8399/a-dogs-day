@@ -58,7 +58,7 @@ SCENARIO("the customer arrival system tracks the customers registered with it",
         "[ecs][npc][customer_arrival]"){
     GIVEN("a fresh ecs world and an arrival system"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         THEN("it starts holding no customers"){
             REQUIRE(arrival.get_customers().empty());
@@ -117,7 +117,7 @@ SCENARIO("the customer arrival system tracks the tables registered with it",
         "[ecs][npc][customer_arrival]"){
     GIVEN("a fresh ecs world and an arrival system"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         THEN("it starts holding no tables"){
             REQUIRE(arrival.get_tables().empty());
@@ -207,7 +207,7 @@ SCENARIO("the customer arrival system tracks the tables registered with it",
 SCENARIO("clearing the arrival system drops both registers", "[ecs][npc][customer_arrival]"){
     GIVEN("an arrival system holding a customer and a table"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         auto customer_id = game.create_customer_dog(in_cafe(320.0f, 320.0f));
         auto table_id = game.create_table(in_cafe(320.0f, 320.0f + k_clear_gap));
@@ -231,7 +231,7 @@ SCENARIO("clearing the arrival system drops both registers", "[ecs][npc][custome
 SCENARIO("a table takes two claims to fill", "[ecs][npc][customer_arrival][pick_table]"){
     GIVEN("one registered table"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
         arrival.register_table(table_id);
@@ -289,7 +289,7 @@ SCENARIO("a table takes two claims to fill", "[ecs][npc][customer_arrival][pick_
 SCENARIO("picking a table with a single registered table", "[ecs][npc][customer_arrival][pick_table]"){
     GIVEN("a fresh ecs world and an arrival system"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         WHEN("no table is registered at all"){
             THEN("nothing is picked"){
@@ -357,7 +357,7 @@ SCENARIO("picking a table with a single registered table", "[ecs][npc][customer_
 SCENARIO("checking free tables with exactly two registered tables", "[ecs][npc][customer_arrival][pick_table]"){
     GIVEN("two registered tables"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         auto first_id = game.create_table(in_cafe(320.0f, 320.0f));
         auto second_id = game.create_table(in_cafe(320.0f, 320.0f + k_clear_gap));
@@ -415,7 +415,7 @@ SCENARIO("checking free tables with exactly two registered tables", "[ecs][npc][
 SCENARIO("picking a table with several registered tables", "[ecs][npc][customer_arrival][pick_table]"){
     GIVEN("a fresh ecs world and an arrival system"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         WHEN("no registered table is claimed"){
             auto first_id = game.create_table(in_cafe(320.0f, 320.0f));
@@ -504,7 +504,7 @@ SCENARIO("removing an entity undoes both halves of the claim",
         "[ecs][npc][customer_arrival][lifespan]"){
     GIVEN("a full table with both seats claimed"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
         arrival.register_table(table_id);
@@ -578,7 +578,7 @@ SCENARIO("sending a customer to a table routes it through the entrance",
         "[ecs][npc][customer_arrival][entrance]"){
     GIVEN("a customer on the footpath and a free table in the cafe"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         auto customer_id = game.create_customer_dog(Vector2{96.0f, 512.0f});
         auto table_id = game.create_table(Vector2{1600.0f, 1024.0f});
@@ -651,7 +651,7 @@ SCENARIO("sending a customer to a table respects table occupancy",
         "[ecs][npc][customer_arrival][send_customer_to_table]"){
     GIVEN("a customer waiting on the footpath"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         auto customer_id = game.create_customer_dog(Vector2{96.0f, 512.0f});
         arrival.register_customer(customer_id);
@@ -725,7 +725,7 @@ SCENARIO("a seated customer survives the departure sweep",
         "[ecs][npc][customer_arrival][entrance]"){
     GIVEN("a customer that has walked to its table"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         auto customer_id = game.create_customer_dog(Vector2{96.0f, 512.0f});
         auto table_id = game.create_table(Vector2{1600.0f, 1024.0f});
@@ -750,7 +750,7 @@ SCENARIO("a seated customer survives the departure sweep",
 
     GIVEN("a customer holding no table with an empty path queue"){
         testing::ecs_test_game game;
-        systems::npc_system::customer_arrival_system arrival;
+        dbs::customer_arrival_system arrival;
 
         auto customer_id = game.create_customer_dog(Vector2{96.0f, 512.0f});
         arrival.register_customer(customer_id);

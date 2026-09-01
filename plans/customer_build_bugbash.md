@@ -68,7 +68,7 @@ change in blocker 1. Deleting it fixes both.
 
 ### 3. The customer is given a destination outside every graph — it never gets a path
 
-`pick_destination()` hard-returns `destination_positions_[0]`
+`pick_destination()` hard-returns `customer_destination_positions_[0]`
 ([dog_factory.cpp:10](src/entities/factories/dog_factory.cpp:10)). Built the two real
 `level_graph`s from `level_config` and asked them directly:
 

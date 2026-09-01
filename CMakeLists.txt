@@ -103,6 +103,8 @@ link_libraries(events)
 
 add_library(queries src/engine/queries/queries.cpp)
 link_libraries(queries)
+add_library(item_stack src/engine/structures/item_stack.cpp)
+link_libraries(item_stack)
 add_library(factories
             src/entities/factories/dog_factory.cpp
             src/entities/factories/station_factory.cpp)
@@ -110,8 +112,17 @@ link_libraries(factories)
 add_library(components
   src/engine/components/component_managers.cpp
   src/engine/components/component_builders.cpp
-  src/engine/components/component_accessors.cpp
-  src/engine/components/component_helpers.cpp)
+  src/engine/components/component_helpers.cpp
+  src/engine/components/collision_component.cpp
+  src/engine/components/interactable_component.cpp
+  src/engine/components/interactor_component.cpp
+  src/engine/components/key_input_component.cpp
+  src/engine/components/mouse_input_component.cpp
+  src/engine/components/movement_component.cpp
+  src/engine/components/position_component.cpp
+  src/engine/components/renderable_component.cpp
+  src/engine/components/selectable_component.cpp
+  src/engine/components/storage_component.cpp)
 link_libraries(components)
 
 add_library(systems
@@ -123,6 +134,8 @@ add_library(systems
   src/engine/systems/control_input_system.cpp
   src/engine/systems/entity_lifespan_system.cpp
   src/engine/systems/npc_system.cpp
+  src/engine/systems/customer_arrival_system.cpp
+  src/engine/systems/waiter_idling_system.cpp
   src/engine/systems/selection_system.cpp)
 link_libraries(systems)
 
@@ -278,6 +291,8 @@ add_executable(tests
   tests/waiter_dog_scenarios.cpp
   tests/quadtree_scenarios.cpp
   tests/customer_arrival_scenarios.cpp
+  tests/counter_storage_scenarios.cpp
+  tests/waiter_idling_scenarios.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the

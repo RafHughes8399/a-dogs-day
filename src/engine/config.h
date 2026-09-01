@@ -268,16 +268,37 @@ namespace entity_config{
         garfield = customers_size,
         cumulative_customers_size
     };
+    enum waiters{
+        gianluca = 0,
+        lionel,
+        waiters_size
+    };
     enum tables{
         dining_table = 0,
         tables_size
     };
+    enum counters{
+        food_counter = 0,
+        counters_size
+    };
+    enum foods{
+        lasagna = 0,
+        coffee,
+        foods_size
+    };
+    enum counter_sprite_slots{
+        counter_body = 0,
+        counter_food,
+        counter_sprite_slots_size
+    };
 
     // file paths
+    // * ------------------------ ENVIRONMENT AND CURSOR PATHS --------------------------------------- *//
     inline const char* background_path = "../sprites/background.png" ;
     inline const char* cursor_path = "../sprites/cursor.png";
     inline const char* paw_mark_path = "../sprites/paw_mark.png";
-
+    
+    // * ------------------------ PLAYER DOG PATHS  --------------------------------------- *//
     inline const char* khiri_left_path = "../sprites/khiri_left.png";
     inline const char* khiri_right_path = "../sprites/khiri_right.png";
     inline const char* khiri_up_path = "../sprites/khiri_up.png";
@@ -285,13 +306,13 @@ namespace entity_config{
     // Head sprite art pending.
     // inline const char* khiri_head_left_path = "../sprites/khiri_head_left.png";
     // inline const char* khiri_head_right_path = "../sprites/khiri_head_right.png";
-
+    
     inline const char* khiri_left_outline_path = "../sprites/khiri_left_outline.png";
     inline const char* khiri_right_outline_path = "../sprites/khiri_right_outline.png";
     inline const char* khiri_up_outline_path = "../sprites/khiri_up_outline.png";
     inline const char* khiri_down_outline_path = "../sprites/khiri_down_outline.png";
-
-
+    
+    
     inline const char* mack_left_path = "../sprites/mack_left.png";
     inline const char* mack_right_path = "../sprites/mack_right.png";
     inline const char* mack_up_path = "../sprites/mack_up.png";
@@ -299,19 +320,33 @@ namespace entity_config{
     // Head sprite art pending.
     // inline const char* mack_head_left_path = "../sprites/mack_head_left.png";
     // inline const char* mack_head_right_path = "../sprites/mack_head_right.png";
-
+    
     inline const char* mack_left_outline_path = "../sprites/mack_left_outline.png";
     inline const char* mack_right_outline_path = "../sprites/mack_right_outline.png";
     inline const char* mack_up_outline_path = "../sprites/mack_up_outline.png";
     inline const char* mack_down_outline_path = "../sprites/mack_down_outline.png";
-
-    inline const char* test_decoration_path ="../sprites/test_decoration.png";
+    // * ------------------------ WAITER DOG PATHS --------------------------------------- *//
+    inline const char* gianluca_left_path = "../sprites/gianluca-left.png";
+    inline const char* gianluca_right_path = "../sprites/gianluca-right.png";
+    inline const char* lionel_left_path = "../sprites/lionel-left.png";
+    inline const char* lionel_right_path = "../sprites/lionel-right.png";
+    // * ------------------------ DECORATION PATHS --------------------------------------- *//
+    
+    inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
     inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle-void.png";
     inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
     inline const char* poker_table_decoration_path = "../sprites/dog-poker.png";
-    inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
-
+    inline const char* test_decoration_path ="../sprites/test_decoration.png";
+    
+    // * ------------------------ STATION PATHS --------------------------------------- *//
     inline const char* dining_table_station_path = "../sprtes/dining-table.png";
+    inline const char* food_counter_station_path = "";
+    
+    
+    // * ------------------------ FOOD PATHS --------------------------------------- *//
+    inline const char* lasagna_food_path = "../sprites/lasagna.png";
+    inline const char* coffee_food_path = "../sprites/coffee.png";
+    
     // NPC dog sprite art pending.
     // inline const char* npc_dog_left_path = "../sprites/npc_dog_left.png";
     // inline const char* npc_dog_right_path = "../sprites/npc_dog_right.png";
@@ -339,6 +374,8 @@ namespace entity_config{
     // inline const float mack_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // inline const Vector2 mack_head_left_offset = Vector2{0.0f, 0.0f};
     // inline const Vector2 mack_head_right_offset = Vector2{0.0f, 0.0f};
+    inline const float gianluca_attributes[attributes::size] =  {level_config::edge_weight * 2.25f, level_config::edge_weight * 0.91f, 1.0f, 1.0f};
+    inline const float lionel_attributes[attributes::size] =  {level_config::edge_weight * 1.75f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
@@ -352,6 +389,8 @@ namespace entity_config{
     inline const float stove_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    inline const float lasagna_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    inline const float coffee_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     // * legacy entities::station capacity. the ECS stations size their capacity
     // * off the slot offset lists below instead.
     inline const size_t food_counter_capacity = 3;
@@ -373,6 +412,14 @@ namespace dog_config{
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
     inline const float customer_spawn_interval = 20.0f;
     inline const float dog_reach = level_config::edge_weight * 0.3f;
+
+    inline const float waiter_idle_bounds_edges = 3.0f;
+    inline const size_t waiter_idle_min_points = 2;
+    inline const size_t waiter_idle_max_points = 4;
+    inline const float waiter_idle_cooldown_min = 4.0f;
+    inline const float waiter_idle_cooldown_max = 5.0f;
+    inline const size_t waiter_idle_max_attempts = 3;
+
     enum waiter_dog_types{
         basic = 0,
         size
