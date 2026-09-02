@@ -3,6 +3,8 @@ September TODO:
 -> table occupancy bug [not counting]
 -> waiter cooldown starts immediately after assigning paths, im assuming it always runs out leading to the ceaseless pathfinding
 -> the interaction class [as per that video]
+    -> interactors and interactables define 
+    -> an interaction object takes in an interactor and interactable types
 -> waiter serving
 -> animation speeds
 -> 9-sprite [basic right click hud on directions]
