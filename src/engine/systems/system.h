@@ -11,7 +11,6 @@
 #include "render_layer.h"
 #include <array>
 #include <functional>
-#include <set>
 #include <utility>
 #include <raylib.h>
 #include "graph.h"
@@ -200,6 +199,24 @@ namespace systems{
     class interaction_system{
         // for behavioural interactions
         public:
+            class interaction {
+            public:
+                ~interaction() = default;
+                interaction() = default;
+                interaction(const interaction& other) = default;
+                interaction(interaction&& other) = default;
+            
+                interaction& operator=(const interaction& other) = default;
+                interaction& operator=(interaction&& other) = default;
+                std::vector<size_t> get_performable_interactions();
+                size_t get_interactor();
+                size_t get_interactee();
+            private:
+                size_t interactor_;
+                size_t interactee_;
+                std::vector<size_t> performable_interactions_;
+            };
+        public:
             static interaction_system& get_instance(){
                 static interaction_system instance;
                 return instance;
@@ -210,10 +227,24 @@ namespace systems{
 
             interaction_system& operator=(const interaction_system& other) = delete;
             interaction_system& operator=(interaction_system&& other) = delete;
+            interaction create_interaction(size_t interactor, size_t interactee);
+            void add_interaction(interaction& interaction);
+            void remove_interaction(size_t entity_id);
+            
         private:
-            interaction_system() = default;
-        public:
+            interaction_system()
+            : defined_interactions_({
+                // * POPULATE THE INTERACTIONS
+                [](size_t interactor, size_t interactee, float delta)-> void{
+                    return;
+                }
+            }), interactions_to_process_(){}
+            std::array<std::function<void(size_t, size_t, float)>, interaction_config::size> defined_interactions_;
+            std::vector<interaction> interactions_to_process_;
 
+        public:
+            void process_interactions(float delta);
+            void process_interaction(interaction& interaction, float delta);
             void update(float delta);
     };
     // -> movement system assigning, calculating, processing and updating paths

@@ -1,4 +1,4 @@
-# Spike — processing an interaction once detected
+<!-- # Spike — processing an interaction once detected -->
 
 Research only. No implementation, no decision taken. Companion to
 [interaction_component_plan.md](plans/interaction_component_plan.md), which settles *detection*

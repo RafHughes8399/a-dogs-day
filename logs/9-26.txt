@@ -5,6 +5,14 @@ September TODO:
 -> the interaction class [as per that video]
     -> interactors and interactables define 
     -> an interaction object takes in an interactor and interactable types
+
+        -> interaction system:
+            -> define the interaction behaviours
+            -> define the interaciton class
+            -> create, process and destroy interactions
+
+        -> interactablke and interactor 
+            -> list of interactions that they can partake in    
 -> waiter serving
 -> animation speeds
 -> 9-sprite [basic right click hud on directions]
