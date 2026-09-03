@@ -9,6 +9,9 @@ Rectangle components::interactor_component::get_interaction_box(Rectangle box) c
 std::optional<size_t> components::interactor_component::get_target() const{
     return target_;
 }
+std::vector<size_t> components::interactor_component::get_interactions(){
+    return interactions_;
+}
 void components::interactor_component::interact_with(size_t entity_id){
     target_ = entity_id;
 }

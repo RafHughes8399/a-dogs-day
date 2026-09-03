@@ -202,7 +202,10 @@ namespace systems{
             class interaction {
             public:
                 ~interaction() = default;
-                interaction() = default;
+                interaction(size_t interactor, size_t interactee)
+                : interactee_(interactee), interactor_(interactor){
+                    performable_interactions_ = determine_performable_interactions();
+                }
                 interaction(const interaction& other) = default;
                 interaction(interaction&& other) = default;
             
@@ -215,6 +218,8 @@ namespace systems{
                 size_t interactor_;
                 size_t interactee_;
                 std::vector<size_t> performable_interactions_;
+
+                std::vector<size_t> determine_performable_interactions();
             };
         public:
             static interaction_system& get_instance(){

@@ -10,6 +10,22 @@ size_t systems::interaction_system::interaction::get_interactee(){
 std::vector<size_t> systems::interaction_system::interaction::get_performable_interactions(){
     return performable_interactions_;
 }
+std::vector<size_t> systems::interaction_system::interaction::determine_performable_interactions(){
+    std::vector<size_t> interactions = {};
+    auto interactor = component_managers::interactor_manager_.get_component(interactor_);
+    auto interactee = component_managers::interactable_manager_.get_component(interactee_);
+    if(interactor and interactee){
+        for(auto interactor_interaction : interactor->get_interactions()){
+            for(auto interactee_interaction : interactee->get_interactions()){
+               if(interactor_interaction == interactee_interaction){
+                    interactions.push_back(interactor_interaction);
+               } 
+            }
+        }
+    }
+    return interactions;
+}
+
 
 // TODO (25 / 8 / 26) stub - the loop calls this every frame, nothing to do yet
 void systems::interaction_system::update(float delta){
@@ -34,14 +50,14 @@ void systems::interaction_system::process_interaction(interaction& interaction, 
 
 // TODO (25 / 8 / 26) on moved entity
 systems::interaction_system::interaction systems::interaction_system::create_interaction(size_t interactor, size_t interactee){
-    return interaction();
+    return interaction(interactor, interactee);
 }
 void systems::interaction_system::add_interaction(interaction& interaction){
     interactions_to_process_.push_back(std::move(interaction));
 }
 void systems::interaction_system::remove_interaction(size_t entity_id){
-    // TODO: find an interaction where either the interactor or the interactee uses this 
-    // TODO enitty and then remove uit 
-
+    std::erase_if(interactions_to_process_, [entity_id](auto& interaction) -> bool {
+        return interaction.get_interactee() == entity_id or interaction.get_interactor() == entity_id;
+    });
     //* for cleanup upon entity removal
 }

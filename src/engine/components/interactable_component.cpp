@@ -10,6 +10,9 @@ Rectangle components::interactable_component::get_interaction_box(Rectangle box)
                      box.width + 2.0f * reach_,
                      box.height + 2.0f * reach_};
 }
+std::vector<size_t> components::interactable_component::get_interactions(){
+    return interactions_;
+}
 std::optional<Vector2> components::interactable_component::get_interaction_offset(Vector2 source, Vector2 own_position) const{
     static const char* direction_names[DIRECTIONS] = {"left", "right", "up", "down"};
     std::optional<size_t> closest_index = std::nullopt;

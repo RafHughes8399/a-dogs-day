@@ -20,3 +20,11 @@ September TODO:
 
 -> customer eating and leaving 
 -> waiter clearing
+
+
+-> remove interaciton
+-> list of interactions on the component
+-> building the list of the component
+-> wire interaction list into the building of the components
+-> define the actual interaction perform functions
+-> wire up actually creatiing nad enqueueing the interaction when detected
