@@ -29,11 +29,9 @@ namespace{
         };
     }
 
-    bool walk_to(testing::ecs_test_game& game, size_t dog_id, size_t station_id){
-        game.path_to(dog_id, Vector2Zero(), station_id);
-        return game.tick_until([&game, dog_id](){
-            return game.queued_path_count(dog_id) == 0;
-        }, 2000);
+    void nudge(testing::ecs_test_game& game, size_t entity_id){
+        auto box = game.hitbox_of(entity_id);
+        game.move_entity(entity_id, Vector2{box.x + 1.0f, box.y});
     }
 }
 
@@ -46,8 +44,8 @@ SCENARIO("an interaction pairs the ids it was built from",
         game.claim(customer_id, table_id);
 
         WHEN("an interaction is built for the pair"){
-            auto& system = systems::interaction_system::get_instance();
-            auto built = system.create_interaction(customer_id, table_id);
+            auto built = systems::interaction_system::get_instance()
+                .create_interaction(customer_id, table_id);
 
             THEN("it carries the interactor and the interactee the right way round"){
                 REQUIRE(built.get_interactor() == customer_id);
@@ -95,27 +93,22 @@ SCENARIO("an interaction pairs the ids it was built from",
     }
 }
 
-SCENARIO("a customer walking to its claimed table raises an interaction on overlap",
-        "[ecs][interaction][customer]"){
-    GIVEN("a claimed table and a customer standing well clear of it"){
+SCENARIO("moving a claimed interactor raises an interaction for it and its target",
+        "[ecs][interaction][detection]"){
+    GIVEN("a claimed table and a customer"){
         testing::ecs_test_game game;
         auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-        auto customer_id = game.create_customer_dog(in_cafe(1024.0f, 1024.0f));
+        auto customer_id = game.create_customer_dog(in_cafe(640.0f, 640.0f));
         game.claim(customer_id, table_id);
 
-        THEN("the boxes do not overlap yet and no interaction exists"){
-            REQUIRE_FALSE(game.interaction_boxes_overlap(customer_id, table_id));
-            game.tick(0.016f);
+        THEN("nothing is held before anything moves"){
             REQUIRE(game.interaction_count() == 0);
         }
 
-        WHEN("it walks to the table"){
-            REQUIRE(walk_to(game, customer_id, table_id));
+        WHEN("the customer moves"){
+            nudge(game, customer_id);
 
-            THEN("the interaction boxes overlap"){
-                REQUIRE(game.interaction_boxes_overlap(customer_id, table_id));
-            }
-            THEN("exactly one interaction is held, naming the two entities"){
+            THEN("one interaction is held, naming the customer and the table"){
                 REQUIRE(game.interaction_count() == 1);
                 REQUIRE(game.has_interaction(customer_id, table_id));
                 REQUIRE_FALSE(game.has_interaction(table_id, customer_id));
@@ -126,76 +119,18 @@ SCENARIO("a customer walking to its claimed table raises an interaction on overl
                 REQUIRE(performable.front()
                     == static_cast<size_t>(interaction_config::customer_table_sit));
             }
-            THEN("further frames do not raise a second interaction for the same pair"){
-                for(int frame = 0; frame < 10; ++frame){ game.tick(0.016f); }
-                REQUIRE(game.interaction_count() == 1);
-            }
-            THEN("further moves inside range do not raise a second interaction"){
-                auto seat = game.hitbox_of(customer_id);
-                for(int nudge = 0; nudge < 5; ++nudge){
-                    game.move_entity(customer_id, Vector2{seat.x + static_cast<float>(nudge),
-                        seat.y});
-                }
-                REQUIRE(game.interaction_boxes_overlap(customer_id, table_id));
-                REQUIRE(game.interaction_count() == 1);
-            }
         }
     }
-    GIVEN("a claimed table and a customer already standing on it"){
+    GIVEN("a claimed table and a waiter"){
         testing::ecs_test_game game;
         auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-        auto customer_id = game.create_customer_dog(in_cafe(320.0f, 320.0f));
-        game.claim(customer_id, table_id);
-
-        // * pairing hangs off move_entity, so a claim taken while both entities
-        // * are already stationary and overlapping raises nothing - the trigger
-        // * for that case is a started_interacting event that does not exist yet
-        THEN("the boxes overlap but no move has fired, so no interaction forms"){
-            REQUIRE(game.interaction_boxes_overlap(customer_id, table_id));
-            for(int frame = 0; frame < 10; ++frame){ game.tick(0.016f); }
-            REQUIRE(game.interaction_count() == 0);
-        }
-
-        WHEN("anything moves it, even by a pixel"){
-            auto box = game.hitbox_of(customer_id);
-            game.move_entity(customer_id, Vector2{box.x + 1.0f, box.y});
-
-            THEN("the pair is picked up"){
-                REQUIRE(game.interaction_count() == 1);
-                REQUIRE(game.has_interaction(customer_id, table_id));
-            }
-        }
-    }
-    GIVEN("a table the customer never claimed"){
-        testing::ecs_test_game game;
-        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-        auto customer_id = game.create_customer_dog(in_cafe(1024.0f, 1024.0f));
-
-        WHEN("it is moved on top of the table anyway"){
-            game.move_entity(customer_id, in_cafe(320.0f, 320.0f));
-            game.tick(0.016f);
-
-            THEN("the boxes overlap but no interaction forms"){
-                REQUIRE(game.interaction_boxes_overlap(customer_id, table_id));
-                REQUIRE(game.interaction_count() == 0);
-            }
-        }
-    }
-}
-
-SCENARIO("a waiter walking to its claimed table raises an interaction on overlap",
-        "[ecs][interaction][waiter]"){
-    GIVEN("a claimed table and a waiter standing well clear of it"){
-        testing::ecs_test_game game;
-        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-        auto waiter_id = game.create_waiter_dog(in_cafe(1024.0f, 1024.0f));
+        auto waiter_id = game.create_waiter_dog(in_cafe(640.0f, 640.0f));
         game.claim(waiter_id, table_id);
 
-        WHEN("it walks to the table"){
-            REQUIRE(walk_to(game, waiter_id, table_id));
+        WHEN("the waiter moves"){
+            nudge(game, waiter_id);
 
             THEN("one interaction is held, naming the waiter and the table"){
-                REQUIRE(game.interaction_boxes_overlap(waiter_id, table_id));
                 REQUIRE(game.interaction_count() == 1);
                 REQUIRE(game.has_interaction(waiter_id, table_id));
             }
@@ -207,19 +142,84 @@ SCENARIO("a waiter walking to its claimed table raises an interaction on overlap
             }
         }
     }
+    GIVEN("a customer that has claimed nothing"){
+        testing::ecs_test_game game;
+        game.create_table(in_cafe(320.0f, 320.0f));
+        auto customer_id = game.create_customer_dog(in_cafe(640.0f, 640.0f));
+
+        WHEN("it moves"){
+            nudge(game, customer_id);
+
+            THEN("no interaction is raised, the guard on the target holding"){
+                REQUIRE(game.interaction_count() == 0);
+            }
+        }
+    }
+    GIVEN("a customer targeting an entity with no interactable component"){
+        testing::ecs_test_game game;
+        auto decoration_id = game.create_test_decoration(in_cafe(320.0f, 320.0f));
+        auto customer_id = game.create_customer_dog(in_cafe(640.0f, 640.0f));
+        component_managers::interactor_manager_.get_component(customer_id)
+            ->interact_with(decoration_id);
+
+        WHEN("it moves"){
+            nudge(game, customer_id);
+
+            THEN("no interaction is raised, the guard on the interactable holding"){
+                REQUIRE(game.interaction_count() == 0);
+            }
+        }
+    }
+    GIVEN("an entity with no interactor component"){
+        testing::ecs_test_game game;
+        auto decoration_id = game.create_test_decoration(in_cafe(320.0f, 320.0f));
+
+        WHEN("it moves"){
+            nudge(game, decoration_id);
+
+            THEN("no interaction is raised, the guard on the interactor holding"){
+                REQUIRE(game.interaction_count() == 0);
+            }
+        }
+    }
+    GIVEN("a claimed table and a customer nowhere near it"){
+        testing::ecs_test_game game;
+        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
+        auto customer_id = game.create_customer_dog(in_cafe(2048.0f, 2048.0f));
+        game.claim(customer_id, table_id);
+
+        WHEN("the customer moves"){
+            nudge(game, customer_id);
+
+            THEN("an interaction is still raised - nothing tests the boxes yet"){
+                REQUIRE(game.interaction_count() == 1);
+                REQUIRE(game.has_interaction(customer_id, table_id));
+            }
+        }
+        WHEN("the customer moves repeatedly"){
+            nudge(game, customer_id);
+            nudge(game, customer_id);
+            nudge(game, customer_id);
+
+            THEN("one interaction is raised per move - nothing dedupes yet"){
+                REQUIRE(game.interaction_count() == 3);
+            }
+        }
+    }
 }
 
 SCENARIO("processing dispatches every performable index with the pair's ids and the frame delta",
         "[ecs][interaction][processing]"){
-    GIVEN("a seated customer and a recorder on both behaviours"){
-        testing::ecs_test_game game;
-        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-        auto customer_id = game.create_customer_dog(in_cafe(1024.0f, 1024.0f));
-        game.claim(customer_id, table_id);
-        REQUIRE(walk_to(game, customer_id, table_id));
-
+    GIVEN("a recorder on both behaviours and a customer holding a table"){
         recorder sit;
         recorder serve;
+        testing::ecs_test_game game;
+        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
+        auto customer_id = game.create_customer_dog(in_cafe(640.0f, 640.0f));
+        game.claim(customer_id, table_id);
+        nudge(game, customer_id);
+        REQUIRE(game.interaction_count() == 1);
+
         game.set_interaction_behaviour(interaction_config::customer_table_sit, record_into(sit));
         game.set_interaction_behaviour(interaction_config::waiter_table_serve, record_into(serve));
 
@@ -251,15 +251,15 @@ SCENARIO("processing dispatches every performable index with the pair's ids and 
             }
         }
     }
-    GIVEN("a seated waiter and a recorder on both behaviours"){
-        testing::ecs_test_game game;
-        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-        auto waiter_id = game.create_waiter_dog(in_cafe(1024.0f, 1024.0f));
-        game.claim(waiter_id, table_id);
-        REQUIRE(walk_to(game, waiter_id, table_id));
-
+    GIVEN("a recorder on both behaviours and a waiter holding a table"){
         recorder sit;
         recorder serve;
+        testing::ecs_test_game game;
+        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
+        auto waiter_id = game.create_waiter_dog(in_cafe(640.0f, 640.0f));
+        game.claim(waiter_id, table_id);
+        nudge(game, waiter_id);
+
         game.set_interaction_behaviour(interaction_config::customer_table_sit, record_into(sit));
         game.set_interaction_behaviour(interaction_config::waiter_table_serve, record_into(serve));
 
@@ -278,17 +278,17 @@ SCENARIO("processing dispatches every performable index with the pair's ids and 
         }
     }
     GIVEN("a customer and a waiter sharing one table"){
-        testing::ecs_test_game game;
-        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-        auto customer_id = game.create_customer_dog(in_cafe(1024.0f, 1024.0f));
-        auto waiter_id = game.create_waiter_dog(in_cafe(1024.0f, 1216.0f));
-        game.claim(customer_id, table_id);
-        game.claim(waiter_id, table_id);
-        REQUIRE(walk_to(game, customer_id, table_id));
-        REQUIRE(walk_to(game, waiter_id, table_id));
-
         recorder sit;
         recorder serve;
+        testing::ecs_test_game game;
+        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
+        auto customer_id = game.create_customer_dog(in_cafe(640.0f, 640.0f));
+        auto waiter_id = game.create_waiter_dog(in_cafe(768.0f, 640.0f));
+        game.claim(customer_id, table_id);
+        game.claim(waiter_id, table_id);
+        nudge(game, customer_id);
+        nudge(game, waiter_id);
+
         game.set_interaction_behaviour(interaction_config::customer_table_sit, record_into(sit));
         game.set_interaction_behaviour(interaction_config::waiter_table_serve, record_into(serve));
 
@@ -310,14 +310,14 @@ SCENARIO("processing dispatches every performable index with the pair's ids and 
     }
 }
 
-SCENARIO("an interaction is cancelled when either half stops being true",
+SCENARIO("destroying an entity cancels the interactions naming it",
         "[ecs][interaction][cleanup]"){
-    GIVEN("a seated customer holding an interaction"){
+    GIVEN("a customer holding an interaction with a table"){
         testing::ecs_test_game game;
         auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-        auto customer_id = game.create_customer_dog(in_cafe(1024.0f, 1024.0f));
+        auto customer_id = game.create_customer_dog(in_cafe(640.0f, 640.0f));
         game.claim(customer_id, table_id);
-        REQUIRE(walk_to(game, customer_id, table_id));
+        nudge(game, customer_id);
         REQUIRE(game.interaction_count() == 1);
 
         WHEN("the customer is destroyed"){
@@ -325,6 +325,13 @@ SCENARIO("an interaction is cancelled when either half stops being true",
 
             THEN("the pending interaction is dropped without waiting for a tick"){
                 REQUIRE(game.interaction_count() == 0);
+            }
+            THEN("no behaviour runs for it"){
+                recorder sit;
+                game.set_interaction_behaviour(interaction_config::customer_table_sit, record_into(sit));
+                game.tick(0.016f);
+                REQUIRE(sit.calls() == 0);
+                game.restore_interaction_behaviours();
             }
         }
         WHEN("the table is destroyed"){
@@ -334,73 +341,25 @@ SCENARIO("an interaction is cancelled when either half stops being true",
                 REQUIRE(game.interaction_count() == 0);
             }
         }
-        WHEN("the claim is released"){
-            game.unclaim(customer_id, table_id);
-            game.tick(0.016f);
-
-            THEN("the interaction is dropped on the next frame"){
-                REQUIRE(game.interaction_count() == 0);
-            }
-            THEN("no behaviour runs for it"){
-                recorder sit;
-                game.set_interaction_behaviour(interaction_config::customer_table_sit, record_into(sit));
-                game.tick(0.016f);
-                REQUIRE(sit.calls() == 0);
-            }
-        }
-        WHEN("the customer is moved out of range"){
-            auto seat = game.hitbox_of(customer_id);
-            game.move_entity(customer_id, in_cafe(1024.0f, 1024.0f));
-
-            THEN("the pair is dropped on the move itself, without waiting for a tick"){
-                REQUIRE_FALSE(game.interaction_boxes_overlap(customer_id, table_id));
-                REQUIRE(game.interaction_count() == 0);
-            }
-            THEN("no behaviour runs for it"){
-                recorder sit;
-                game.set_interaction_behaviour(interaction_config::customer_table_sit, record_into(sit));
-                game.tick(0.016f);
-                REQUIRE(sit.calls() == 0);
-            }
-            THEN("walking back into range raises it again, the claim never having moved"){
-                game.move_entity(customer_id, Vector2{seat.x, seat.y});
-                REQUIRE(game.interaction_count() == 1);
-                REQUIRE(game.has_interaction(customer_id, table_id));
-            }
-        }
-        WHEN("the table is moved out from under the customer"){
-            game.move_entity(table_id, in_cafe(1024.0f, 1024.0f));
-
-            THEN("the pair is dropped, the mover being the interactable"){
-                REQUIRE_FALSE(game.interaction_boxes_overlap(customer_id, table_id));
-                REQUIRE(game.interaction_count() == 0);
-            }
-        }
-        WHEN("an unrelated entity moves"){
-            auto bystander_id = game.create_customer_dog(in_cafe(1024.0f, 1024.0f));
-            game.move_entity(bystander_id, in_cafe(1088.0f, 1024.0f));
-
-            THEN("the pair is untouched"){
-                REQUIRE(game.interaction_count() == 1);
-                REQUIRE(game.has_interaction(customer_id, table_id));
-            }
-        }
     }
-    GIVEN("a destroyed entity that never had an interaction"){
+    GIVEN("two customers, each holding an interaction with its own table"){
         testing::ecs_test_game game;
-        auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-        auto customer_id = game.create_customer_dog(in_cafe(1024.0f, 1024.0f));
-        game.claim(customer_id, table_id);
-        auto bystander_id = game.create_customer_dog(in_cafe(1216.0f, 1024.0f));
-        REQUIRE(walk_to(game, customer_id, table_id));
-        REQUIRE(game.interaction_count() == 1);
+        auto first_table = game.create_table(in_cafe(320.0f, 320.0f));
+        auto second_table = game.create_table(in_cafe(640.0f, 320.0f));
+        auto first_customer = game.create_customer_dog(in_cafe(320.0f, 640.0f));
+        auto second_customer = game.create_customer_dog(in_cafe(640.0f, 640.0f));
+        game.claim(first_customer, first_table);
+        game.claim(second_customer, second_table);
+        nudge(game, first_customer);
+        nudge(game, second_customer);
+        REQUIRE(game.interaction_count() == 2);
 
-        WHEN("the bystander is destroyed"){
-            game.remove(bystander_id);
+        WHEN("the first customer is destroyed"){
+            game.remove(first_customer);
 
-            THEN("the unrelated interaction is untouched"){
+            THEN("only its own interaction goes"){
                 REQUIRE(game.interaction_count() == 1);
-                REQUIRE(game.has_interaction(customer_id, table_id));
+                REQUIRE(game.has_interaction(second_customer, second_table));
             }
         }
     }

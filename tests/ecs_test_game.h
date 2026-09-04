@@ -101,7 +101,6 @@ namespace testing{
             size_t interaction_count();
             bool has_interaction(size_t interactor, size_t interactee);
             std::vector<size_t> performable_interactions_of(size_t interactor, size_t interactee);
-            bool interaction_boxes_overlap(size_t interactor, size_t interactee);
             void set_interaction_behaviour(size_t index,
                 std::function<void(size_t, size_t, float)> behaviour);
             void restore_interaction_behaviours();

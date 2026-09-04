@@ -57,17 +57,20 @@ can also add tests for hte interaction processing, check the correctness of
 and setup listening to on0entity removed so any interactions that have yet to be prescessed that contain that enitty re effectively cancelled. i think you can just mimic how 
 other systems listen to that event and create a similar setu p
 
--> KNOWN GAP: interaction detection now hangs off move_entity (interaction_system::on_moved_entity
-   -> reconcile), so a pair is only ever tested when something moves. If an interactor is claimed
-   while it is already stationary and overlapping its target, no move fires and the interaction
-   never forms. movement_system::update skips entities with an empty path queue, so a claim with
-   no path issued after it is invisible to the system.
-   Not a live problem: customer_arrival_system::send_customer_to_table claims and then immediately
-   issues the path, and it is the only production caller of interact_with on the ECS path. It bites
-   whatever next starts setting targets - a waiter orchestrator assigning a waiter to the counter it
-   is already stood at, or player right-click.
-   Fix when needed: a started_interacting fact event fired wherever the target is set, executed not
-   queued, handled by interaction_system calling the same reconcile. The symmetric stopped_interacting
-   on release would also let drop_dead_interactions go, leaving update as just process_interactions.
-   Pinned by tests/interaction_scenarios.cpp:144 - customer spawned on its claimed table, ten ticks,
-   zero interactions.
+-> STATE: scaffold only. interactions.h stubs the two behaviours and interaction_system loads them
+   into defined_interactions_. interaction_system now subscribes to move_entity and remove_entity.
+   on_moved_entity guards on the interactor component, on it having a target, and on that target
+   having an interactable component, then calls create_interaction + add_interaction with the two
+   ids. on_destroyed_entity calls remove_interaction so pending pairs naming a dead entity go.
+   clear() added and wired into clear_all_systems.
+
+-> STILL TO DO, deliberately left out:
+   - nothing tests the interaction boxes, so a move raises a pair at any distance
+   - nothing dedupes, so every move of a claimed interactor appends another pair for the same two ids
+   - nothing ends a pair short of the entity being destroyed - no release check, no loss-of-overlap check
+   - process_interactions walks the vector by index while behaviours can erase from it and push onto it,
+     so a behaviour that destroys or moves an entity will skip or double-process a pair. collect and
+     apply after the run pass instead.
+   - a claim taken with no move after it is invisible: pairing hangs off move_entity, and
+     movement_system::update skips entities with an empty path queue. a started_interacting fact event
+     fired wherever the target is set would cover it.

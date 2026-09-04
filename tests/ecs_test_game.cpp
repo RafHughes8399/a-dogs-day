@@ -1,3 +1,5 @@
+#include <catch2/catch_test_macros.hpp>
+
 #include "ecs_test_game.h"
 
 #include "component.h"
@@ -26,9 +28,9 @@ namespace testing{
 
     ecs_test_game::~ecs_test_game(){
         events::global_dispatcher_.process_events(0.0f);
+        interaction_.restore_interaction_behaviours();
         component_helpers::clear_all_components();
         systems::clear_all_systems();
-        interaction_.restore_interaction_behaviours();
     }
 
     // ---------------- build actions ----------------
@@ -274,10 +276,6 @@ namespace testing{
         return interaction_.performable_interactions_of(interactor, interactee);
     }
 
-    bool ecs_test_game::interaction_boxes_overlap(size_t interactor, size_t interactee){
-        return interaction_.overlapping(interactor, interactee);
-    }
-
     void ecs_test_game::set_interaction_behaviour(size_t index,
         std::function<void(size_t, size_t, float)> behaviour){
         interaction_.set_interaction_behaviour(index, std::move(behaviour));
@@ -290,8 +288,9 @@ namespace testing{
     void ecs_test_game::claim(size_t interactor, size_t interactee){
         auto* interactable = component_managers::interactable_manager_.get_component(interactee);
         auto* actor = component_managers::interactor_manager_.get_component(interactor);
-        if(interactable == nullptr or actor == nullptr){ return; }
-        interactable->claim(interactor);
+        REQUIRE(interactable != nullptr);
+        REQUIRE(actor != nullptr);
+        REQUIRE(interactable->claim(interactor));
         actor->interact_with(interactee);
     }
 
