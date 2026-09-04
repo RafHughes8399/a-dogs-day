@@ -94,7 +94,7 @@ namespace ecs_entities {
     void build_player(size_t player_id, size_t cursor_id);
     void build_dog(size_t id, Vector2 position,
         std::vector<sprite::sprite> sprites, hitbox::hitbox dog_hitbox,
-        size_t kind, float reach);
+        size_t kind, float reach, std::vector<size_t> interactor_interactions = {});
         void build_khiri(size_t id);
         void build_mack(size_t id);
 
@@ -131,7 +131,7 @@ namespace ecs_entities {
 
     void build_station(size_t id, Vector2 position,
         sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
-        float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets);
+        float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets, std::vector<size_t> interactable_interactions = {});
         void build_counter(size_t id, Vector2 position, sprite::sprite counter_sprite);
             void build_food_counter(size_t id, Vector2 position);
         void build_table(size_t id, Vector2 position, sprite::sprite table_sprite);

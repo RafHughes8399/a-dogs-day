@@ -20,12 +20,12 @@ components::collision_component::hitbox_component component_builders::build_hitb
 components::collision_component component_builders::build_collision_component(components::collision_component::hitbox_component hitboxes){
     return components::collision_component(std::move(hitboxes));
 }
-components::interactor_component component_builders::build_interactor_component(float reach, std::optional<size_t> entity_id){
-    return components::interactor_component(reach, entity_id);
+components::interactor_component component_builders::build_interactor_component(float reach, std::optional<size_t> entity_id, std::vector<size_t> interactions){
+    return components::interactor_component(reach, entity_id, interactions);
 }
 components::interactable_component component_builders::build_interactable_component(float reach,
-    const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets){
-    return components::interactable_component(reach, slot_offsets);
+    const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions){
+    return components::interactable_component(reach, slot_offsets, interactions);
 }
 components::key_input_component component_builders::build_key_input_component(std::vector<game_config::input>& controls){
     return components::key_input_component(controls);

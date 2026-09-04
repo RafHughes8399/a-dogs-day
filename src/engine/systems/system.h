@@ -14,6 +14,7 @@
 #include <utility>
 #include <raylib.h>
 #include "graph.h"
+#include "interactions.h"
 #include "path.h"
 namespace systems{
     // storage system [quadtree managemet]
@@ -203,7 +204,7 @@ namespace systems{
             public:
                 ~interaction() = default;
                 interaction(size_t interactor, size_t interactee)
-                : interactee_(interactee), interactor_(interactor){
+                : interactor_(interactor), interactee_(interactee){
                     performable_interactions_ = determine_performable_interactions();
                 }
                 interaction(const interaction& other) = default;
@@ -226,7 +227,10 @@ namespace systems{
                 static interaction_system instance;
                 return instance;
             }
-            ~interaction_system() = default;
+            ~interaction_system(){
+                event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
+                event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+            }
             interaction_system(const interaction_system& other) = delete;
             interaction_system(interaction_system&& other) = delete;
 
@@ -235,22 +239,77 @@ namespace systems{
             interaction create_interaction(size_t interactor, size_t interactee);
             void add_interaction(interaction& interaction);
             void remove_interaction(size_t entity_id);
+            void on_destroyed_entity(const events::remove_entity& event);
+            void on_moved_entity(const events::move_entity& event);
+
+            // teardown between test scenarios - the singleton outlives them.
+            // the behaviour table survives, it is fixed at construction
+            void clear(){
+                interactions_to_process_.clear();
+            }
             
         private:
             interaction_system()
             : defined_interactions_({
-                // * POPULATE THE INTERACTIONS
-                [](size_t interactor, size_t interactee, float delta)-> void{
-                    return;
-                }
-            }), interactions_to_process_(){}
+                interactions::customer_table_sit,
+                interactions::waiter_table_serve
+            }), interactions_to_process_(),
+            move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
+            remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}){
+                event_interface::subscribe<events::move_entity>(move_entity_handler_);
+                event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+            }
             std::array<std::function<void(size_t, size_t, float)>, interaction_config::size> defined_interactions_;
             std::vector<interaction> interactions_to_process_;
+            events::event_handler<events::move_entity> move_entity_handler_;
+            events::event_handler<events::remove_entity> remove_entity_handler_;
+
+            // * a pair needs both halves - the arbitrated claim, and the boxes
+            // * touching. the claim is checked once a frame in drop_dead_interactions
+            // * because releasing it fires no event; the overlap is checked only
+            // * where it can change, in on_moved_entity
+            bool is_paired(size_t interactor, size_t interactee);
+            bool is_live(interaction& interaction);
+            void reconcile(size_t interactor_id);
+            void erase_interaction(size_t interactor, size_t interactee);
+            std::optional<Rectangle> interactor_box(size_t entity_id);
+            std::optional<Rectangle> interactable_box(size_t entity_id);
 
         public:
+            bool overlapping(size_t interactor, size_t interactee);
+            void drop_dead_interactions();
             void process_interactions(float delta);
             void process_interaction(interaction& interaction, float delta);
             void update(float delta);
+#ifdef DOG_DAYS_TESTING
+            size_t interaction_count(){
+                return interactions_to_process_.size();
+            }
+            bool has_interaction(size_t interactor, size_t interactee){
+                return is_paired(interactor, interactee);
+            }
+            std::vector<size_t> performable_interactions_of(size_t interactor, size_t interactee){
+                for(auto& interaction : interactions_to_process_){
+                    if(interaction.get_interactor() == interactor
+                        and interaction.get_interactee() == interactee){
+                        return interaction.get_performable_interactions();
+                    }
+                }
+                return {};
+            }
+            // swap a behaviour out so a scenario can observe exactly what the
+            // dispatch hands it - restored by restore_interaction_behaviours()
+            void set_interaction_behaviour(size_t index,
+                std::function<void(size_t, size_t, float)> behaviour){
+                defined_interactions_[index] = std::move(behaviour);
+            }
+            void restore_interaction_behaviours(){
+                defined_interactions_ = {
+                    interactions::customer_table_sit,
+                    interactions::waiter_table_serve
+                };
+            }
+#endif
     };
     // -> movement system assigning, calculating, processing and updating paths
     // -> the movment system is where the level_graph should be stored so it can in house process and check paths
@@ -596,6 +655,7 @@ namespace systems{
         control_input_system::get_instance().clear();
         selection_system::get_instance().clear();
         npc_system::get_instance().clear();
+        interaction_system::get_instance().clear();
     }
 
     // hold a refernece to the glboal managers that they need to process things

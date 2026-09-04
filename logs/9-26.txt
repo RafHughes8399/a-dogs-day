@@ -1,7 +1,7 @@
 
 September TODO:
 -> table occupancy bug [not counting]
--> waiter cooldown starts immediately after assigning paths, im assuming it always runs out leading to the ceaseless pathfinding
+-> waiter cooldown starts immediately after assigning paths, im assuming it always runs out leading to the ceaseless pathfinding [pending the state machine]
 -> the interaction class [as per that video]
     -> interactors and interactables define 
     -> an interaction object takes in an interactor and interactable types
@@ -26,5 +26,48 @@ September TODO:
 -> list of interactions on the component
 -> building the list of the component
 -> wire interaction list into the building of the components
+
 -> define the actual interaction perform functions
 -> wire up actually creatiing nad enqueueing the interaction when detected
+
+construct tests for processing and detecting interactions 
+i want the following cases to be handled:
+-> customer arrives and walks to a table, upon overlap with the interaction boxes, check that an interaction is detected,
+check that an interaction is created wit hthe two entity ids, check that their interaction_list is created correctly [i.e the interactions that c anb eperofrmed]
+-> and check that an interaction is performed
+
+-> do the same for waiters and tables
+
+
+-> also identify gaps in the build that prevent these tests from working in their current shape. I think what is requried is to create the interaction, and then define 
+the processing function for the interactions we have setup, those should be simple enough i feel.
+
+-> in the code that checks if an interaction exists, call the create interaction function for the interaction system with the two ids of the interactor an the interactee. may require 
+guards to check the existence of an interactor and interactable component. the interactor is the interactor, the interactable is the interactee
+-> do a brief scaffold of the interaction behaviours. i think can make a new file interactions.h and hten have inline function defintiiosn there. stub
+the two interactions already defined in the enum. should take the id of the two entities and the delta. DO NOT IMPLMENT THOUGH, just stub and maybe outline with a comment line or two [dont write a whole essay]
+-> and make sure the interaction system then establishes that in its interaction behaviorus list
+-> also check the existing logic for the rest of the setup for the interaction suite, determine correctes,, identify gaps if they exist
+
+the test cases should focus on checking the correctess of ids passed in, interaction incides for the behaviour and things like that, focus on asserting tangible arguments and 
+values as a result of the processing
+
+can also add tests for hte interaction processing, check the correctness of 
+
+and setup listening to on0entity removed so any interactions that have yet to be prescessed that contain that enitty re effectively cancelled. i think you can just mimic how 
+other systems listen to that event and create a similar setu p
+
+-> KNOWN GAP: interaction detection now hangs off move_entity (interaction_system::on_moved_entity
+   -> reconcile), so a pair is only ever tested when something moves. If an interactor is claimed
+   while it is already stationary and overlapping its target, no move fires and the interaction
+   never forms. movement_system::update skips entities with an empty path queue, so a claim with
+   no path issued after it is invisible to the system.
+   Not a live problem: customer_arrival_system::send_customer_to_table claims and then immediately
+   issues the path, and it is the only production caller of interact_with on the ECS path. It bites
+   whatever next starts setting targets - a waiter orchestrator assigning a waiter to the counter it
+   is already stood at, or player right-click.
+   Fix when needed: a started_interacting fact event fired wherever the target is set, executed not
+   queued, handled by interaction_system calling the same reconcile. The symmetric stopped_interacting
+   on release would also let drop_dead_interactions go, leaving update as just process_interactions.
+   Pinned by tests/interaction_scenarios.cpp:144 - customer spawned on its claimed table, ten ticks,
+   zero interactions.

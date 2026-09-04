@@ -55,14 +55,14 @@ void component_helpers::add_collision_component(size_t entity_id,
         component_builders::build_collision_component(std::move(hitbox)));
 }
 void component_helpers::add_interactor_component(size_t entity_id, float reach,
-    std::optional<size_t> target_entity_id){
+    std::optional<size_t> target_entity_id, std::vector<size_t> interactions){
     register_interactor_component(entity_id,
-        component_builders::build_interactor_component(reach, target_entity_id));
+        component_builders::build_interactor_component(reach, target_entity_id, interactions));
 }
 void component_helpers::add_interactable_component(size_t entity_id, float reach,
-    const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets){
+    const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions){
     register_interactable_component(entity_id,
-        component_builders::build_interactable_component(reach, slot_offsets));
+        component_builders::build_interactable_component(reach, slot_offsets, interactions));
 }
 void component_helpers::add_key_input_component(size_t entity_id, std::vector<game_config::input>& controls){
     register_key_input_component(entity_id,

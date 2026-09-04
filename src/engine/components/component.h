@@ -446,9 +446,9 @@ namespace component_builders{
     components::collision_component build_collision_component(
         components::collision_component::hitbox_component hitbox);
 
-    components::interactor_component build_interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt);
+    components::interactor_component build_interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt, std::vector<size_t> interactions = {});
     components::interactable_component build_interactable_component(float reach,
-        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets);
+        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions = {});
     components::key_input_component build_key_input_component(std::vector<game_config::input>& controls);
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
     components::state_machine_component::state_component build_state();
@@ -479,9 +479,9 @@ namespace component_helpers{
     void add_collision_component(size_t entity_id,
         components::collision_component::hitbox_component hitbox);
     void add_interactor_component(size_t entity_id, float reach,
-        std::optional<size_t> target_entity_id = std::nullopt);
+        std::optional<size_t> target_entity_id = std::nullopt, std::vector<size_t> interactions = {});
     void add_interactable_component(size_t entity_id, float reach,
-        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets);
+        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions = {});
     void add_key_input_component(size_t entity_id, std::vector<game_config::input>& controls);
     void add_mouse_input_component(size_t entity_id, std::vector<game_config::input>& inputs);
     void add_state_machine_component(size_t entity_id,
