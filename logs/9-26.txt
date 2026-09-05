@@ -74,3 +74,50 @@ other systems listen to that event and create a similar setu p
    - a claim taken with no move after it is invisible: pairing hangs off move_entity, and
      movement_system::update skips entities with an empty path queue. a started_interacting fact event
      fired wherever the target is set would cover it.
+
+
+-> state machine to hadnle interaction transitions
+-> then the interaction triggers the state
+
+
+-> essentially the interaciton function would be to create the specific state intial 
+transition 
+-> or if we are to define a general ineteraction transition state
+    -> picking up food interaction 
+    -> wokring the stove interaciotn
+    -> customer eating interaction 
+    -> customer getting upo/
+    -> customer leaving
+
+    all they differ by is their animation that plays 
+-> so really we dont even need a state we just bneed like an animation manager
+-> that can manage some aniamtion 
+
+-> and then the interaction can perform the under the hood logic
+of plike picking the food off, occuipying tables,m et cafe
+
+yeah that could be tech. atp we can 
+-> then the state machine can be more general, like interacting state non ineteracting state 
+]-> perhaps as like a notififer or querueur for other things, like it interrupts other requesuts, or queues them instead
+of immediately firing them, ? if that vene is a athign
+
+
+-> the naimation manger or system could have like polay animation anmd then 
+-> you just pass in the enum values adn then boom sorted
+
+-> yeah and then on starting the interaction you flip the state 
+-> and on finishing the interaction you flip the state back
+
+ok solid plan i think, we have the two next pieces
+-> animation component and state componetn + maanger interface
+-> interaction behaviours then maniuplate these, 
+    -> conditions to start and end could be 
+        ->  duriation,
+        -> on event 
+        -> on collision check 
+    -> for now is the collision check to determine the integrity of the handshake
+    -> if the handshake is no longer valid, the interaction must be cleaned up 
+
+    -> so each interaciton behaivour needs two then:
+        -> start interaciton?
+        -> end itneraciton
