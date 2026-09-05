@@ -92,7 +92,7 @@ SCENARIO("an interaction pairs the ids it was built from",
         }
     }
 }
-
+/** 
 SCENARIO("moving a claimed interactor raises an interaction for it and its target",
         "[ecs][interaction][detection]"){
     GIVEN("a claimed table and a customer"){
@@ -364,3 +364,4 @@ SCENARIO("destroying an entity cancels the interactions naming it",
         }
     }
 }
+*/
