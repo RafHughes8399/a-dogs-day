@@ -240,6 +240,7 @@ namespace systems{
             void add_interaction(interaction& interaction);
             void remove_interaction(size_t entity_id);
             void on_moved_entity(const events::move_entity& event);
+            void on_path_finished(const events::dog_completed_path& event);
             void on_destroyed_entity(const events::remove_entity& event);
             void clear(){
                 interactions_to_process_.clear();
@@ -252,14 +253,17 @@ namespace systems{
                 interactions::waiter_table_serve
             }), interactions_to_process_(),
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
-            remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}){
+            remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+            dog_completed_path_handler_([this](const events::dog_completed_path& event) -> void{on_path_finished(event);}){
                 event_interface::subscribe<events::move_entity>(move_entity_handler_);
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+                event_interface::subscribe<events::dog_completed_path>(dog_completed_path_handler_);
             }
             std::array<std::function<void(size_t, size_t, float)>, interaction_config::size> defined_interactions_;
             std::vector<interaction> interactions_to_process_;
             events::event_handler<events::move_entity> move_entity_handler_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
+            events::event_handler<events::dog_completed_path> dog_completed_path_handler_;
 
         public:
             void process_interactions(float delta);

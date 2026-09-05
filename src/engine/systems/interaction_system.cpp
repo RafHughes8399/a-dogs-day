@@ -55,12 +55,44 @@ void systems::interaction_system::on_moved_entity(const events::move_entity& eve
 
     auto target = interactor->get_target();
     if(not target.has_value()){ return; }
+    auto target_id = target.value();
 
-    auto interactee_id = target.value();
-    if(component_managers::interactable_manager_.get_component(interactee_id) == nullptr){ return; }
+    auto* interactor_collision = component_managers::collision_manager_.get_component(interactor_id);
+    auto* target_collision = component_managers::collision_manager_.get_component(target_id);
+    if(interactor_collision == nullptr or target_collision == nullptr){ return; }
 
-    auto built = create_interaction(interactor_id, interactee_id);
-    add_interaction(built);
+    Rectangle interactor_box = interactor->get_interaction_box(
+        interactor_collision->get_hitbox_component().get_hitbox().get_box());
+    Rectangle target_box = target_collision->get_hitbox_component().get_hitbox().get_box();
+
+    bool overlapping = CheckCollisionRecs(interactor_box, target_box);
+    if(not overlapping) {
+        // * drop the interaction, clean up both halves of the claim -
+        // * interactor->stop_interacting() and interactable->release() - and
+        // * process the state transition for the interaction having ended
+    }
+}
+void systems::interaction_system::on_path_finished(const events::dog_completed_path& event){
+    auto dog_id = event.get_id();
+    auto* interactor = component_managers::interactor_manager_.get_component(dog_id);
+    if(interactor == nullptr){ return; }
+
+    auto target = interactor->get_target();
+    if(not target.has_value()){ return; }
+    auto target_id = target.value();
+
+    auto* interactor_collision = component_managers::collision_manager_.get_component(dog_id);
+    auto* target_collision = component_managers::collision_manager_.get_component(target_id);
+    if(interactor_collision == nullptr or target_collision == nullptr){ return; }
+
+    Rectangle interactor_box = interactor->get_interaction_box(
+        interactor_collision->get_hitbox_component().get_hitbox().get_box());
+    Rectangle target_box = target_collision->get_hitbox_component().get_hitbox().get_box();
+
+    if(CheckCollisionRecs(interactor_box, target_box)){
+        auto interaction = create_interaction(dog_id, target_id);
+        add_interaction(interaction);
+    }
 }
 void systems::interaction_system::on_destroyed_entity(const events::remove_entity& event){
     remove_interaction(event.get_id());

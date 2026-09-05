@@ -30,13 +30,14 @@ void systems::movement_system::update(float delta){
             current.advance();
 
             if(current.is_path_complete()){
-                // unsure the ecs needs the same per-leg fact the entity system emitted
-                // std::unique_ptr<events::event> completed = std::make_unique<events::dog_completed_path>(id, waypoint);
-                // event_interface::queue_event(completed);
                 movement->finish_path();
                 if(not movement->get_paths().empty()){
                     determine_direction(id, *movement, position->get_position(),
                         movement->get_current_path().get_next_position());
+                }
+                else{
+                    std::unique_ptr<events::event> completed = std::make_unique<events::dog_completed_path>(id, waypoint);
+                    event_interface::queue_event(completed);
                 }
                 continue;
             }
