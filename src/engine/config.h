@@ -16,6 +16,25 @@ namespace type_config{
     // * component and the dogs all name the same type.
     using path = std::vector<Vector2>;
 }
+namespace interaction_config{
+    enum interactions{
+        customer_table_sit = 0,
+        waiter_table_serve,
+        size
+    };
+    // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- // 
+    inline std::vector<size_t> waiter_dog_interactor = {
+        waiter_table_serve
+    };
+    inline std::vector<size_t> customer_dog_interactor = {
+        customer_table_sit
+    };
+    // * ------------------- STATION INTERACTEE INTERACTIONS ----------------------------- //
+    inline std::vector<size_t> table_interactee = {
+        customer_table_sit,
+        waiter_table_serve,
+    };
+}
 namespace game_config {
     // * keyboard and mouse actions are separate enums, and `control`/`mouse_input`
     // * are separate structs, so a keyboard binding cannot carry a mouse action

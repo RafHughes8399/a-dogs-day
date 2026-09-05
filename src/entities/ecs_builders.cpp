@@ -4,6 +4,7 @@
 #include "sprite.h"
 #include "texture.h"
 #include <raylib.h>
+#include <vector>
 
 // qualified with ecs_entities:: so a name that doesn't match a declaration in
 // entity.h is a compile error here, not an undefined symbol at link time
@@ -28,7 +29,7 @@ void ecs_entities::build_player(size_t player_id, size_t cursor_id){
 }
 void ecs_entities::build_dog(size_t id, Vector2 position,
     std::vector<sprite::sprite> sprites, hitbox::hitbox dog_hitbox,
-    size_t kind, float reach){
+    size_t kind, float reach, std::vector<size_t> interactor_interactions){
     component_helpers::add_positional_component(id, position);
 
     std::vector<components::renderable_component::sprite_component> sprite_components = {
@@ -45,7 +46,7 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
 
     component_helpers::add_selectable_component(id, kind);
 
-    component_helpers::add_interactor_component(id, reach);
+    component_helpers::add_interactor_component(id, reach, std::nullopt, interactor_interactions);
 }
     void ecs_entities::build_khiri(size_t id){
         // ! left right, parallel to level_config::directions
@@ -76,7 +77,8 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
 void ecs_entities::build_customer_dog(size_t id, Vector2 position){
     build_dog(id, position, build_mack_sprites(),
     hitbox_builders::build_dog_across_hitbox(position),
-    entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);}
+    entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach, 
+    interaction_config::customer_dog_interactor);}
     //**
     
     // .
@@ -108,7 +110,8 @@ void ecs_entities::build_waiter_dog(size_t id, Vector2 position,
     std::vector<sprite::sprite> sprites, hitbox::hitbox waiter_hitbox){
     // build the dog for the base components
     build_dog(id, position, std::move(sprites), waiter_hitbox,
-        entity_config::selectable_kinds::waiter_dog_kind, dog_config::dog_reach);
+        entity_config::selectable_kinds::waiter_dog_kind, dog_config::dog_reach,
+    interaction_config::waiter_dog_interactor);
     // then build the remaining components, the state machine
     // * the idle state
     // * 
@@ -181,14 +184,14 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
 
 void ecs_entities::build_station(size_t id, Vector2 position,
     sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
-    float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> offsets){
+    float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> offsets, std::vector<size_t> interactable_interactions){
     build_decoration(id, position, station_sprite, station_hitbox);
     component_helpers::add_selectable_component(id,
         entity_config::selectable_kinds::station_kind);
     auto hitbox = component_managers::collision_manager_.get_component(id);
     Rectangle box = hitbox->get_hitbox_component().get_hitbox().get_box();
     component_helpers::create_offset_position_list(box, offsets);
-    component_helpers::add_interactable_component(id, station_reach, offsets);
+    component_helpers::add_interactable_component(id, station_reach, offsets, interactable_interactions);
 }
     void ecs_entities::build_counter(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,
@@ -208,7 +211,7 @@ void ecs_entities::build_station(size_t id, Vector2 position,
             hitbox_builders::build_table_hitbox(position),
             entity_config::station_reach,
             {entity_config::station_slot_left, entity_config::station_slot_right,
-             std::nullopt, std::nullopt});
+             std::nullopt, std::nullopt}, interaction_config::table_interactee);
     }
         void ecs_entities::build_dining_table(size_t id, Vector2 position){
             build_table(id, position, sprite_builders::build_dining_table_sprite());

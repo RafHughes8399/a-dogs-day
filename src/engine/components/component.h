@@ -106,16 +106,17 @@ public:
     // * this consttructor's precondtion is an existing collision component and thus
     // * performs the offset calcualtions in its body
     ~interactable_component() = default;
-    interactable_component(float reach, std::array<std::optional<Vector2>, DIRECTIONS> positions)
-    : reach_(reach), positions_(positions), interactors_(){
-
+    interactable_component(float reach, std::array<std::optional<Vector2>, DIRECTIONS> positions, std::vector<size_t> interactions = {})
+    : reach_(reach), positions_(positions), interactors_(), interactions_(interactions){
+        
     }
     interactable_component(const interactable_component& other) = default;
     interactable_component(interactable_component&& other) = default;
-
+    
     interactable_component& operator=(const interactable_component& other) = default;
     interactable_component& operator=(interactable_component&& other) = default;
-
+    
+    std::vector<size_t> get_interactions();
     Rectangle get_interaction_box(Rectangle box) const;
     std::optional<Vector2> get_interaction_offset(Vector2 source, Vector2 own_position) const;
     // * occupancy is a claim, not a proximity test - a table promised to a
@@ -143,28 +144,32 @@ private:
     std::array<std::optional<Vector2>, DIRECTIONS> positions_;
     // parallel to positions_ - interactors_[i] holds whoever claimed slot i
     std::array<std::optional<size_t>, DIRECTIONS> interactors_;
+    std::vector<size_t> interactions_;
 };
 
 // components::interactor_component  - actors do interaction
 class interactor_component {
-public:
+    public:
     ~interactor_component() = default;
-    interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt)
-    : reach_(reach), target_(entity_id){}
+    interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt, std::vector<size_t> interactions = {})
+    : reach_(reach), target_(entity_id), interactions_(interactions){}
     interactor_component(const interactor_component& other) = default;
     interactor_component(interactor_component&& other) = default;
-
+    
     interactor_component& operator=(const interactor_component& other) = default;
     interactor_component& operator=(interactor_component&& other) = default;
-
+    
     Rectangle get_interaction_box(Rectangle box) const;
     bool is_interacting() const { return target_.has_value(); }
     std::optional<size_t> get_target() const;
     void interact_with(size_t entity_id);
     void stop_interacting();
-private:
-    float reach_;
-    std::optional<size_t> target_;
+    std::vector<size_t> get_interactions();
+    
+    private:
+        float reach_;
+        std::optional<size_t> target_;
+        std::vector<size_t> interactions_;
 };
 
 
@@ -172,10 +177,10 @@ private:
 // * mouse_input_component; see the note there for why they are not one type.
 class key_input_component{
     public:
-        ~key_input_component() = default;
-        key_input_component(std::vector<game_config::input> controls)
-        :controls_(controls){}
-        key_input_component(const key_input_component& other) = default;
+    ~key_input_component() = default;
+    key_input_component(std::vector<game_config::input> controls)
+    :controls_(controls){}
+    key_input_component(const key_input_component& other) = default;
         key_input_component(key_input_component&& other) = default;
 
         key_input_component& operator=(const key_input_component& other) = default;
@@ -441,9 +446,9 @@ namespace component_builders{
     components::collision_component build_collision_component(
         components::collision_component::hitbox_component hitbox);
 
-    components::interactor_component build_interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt);
+    components::interactor_component build_interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt, std::vector<size_t> interactions = {});
     components::interactable_component build_interactable_component(float reach,
-        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets);
+        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions = {});
     components::key_input_component build_key_input_component(std::vector<game_config::input>& controls);
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
     components::state_machine_component::state_component build_state();
@@ -474,9 +479,9 @@ namespace component_helpers{
     void add_collision_component(size_t entity_id,
         components::collision_component::hitbox_component hitbox);
     void add_interactor_component(size_t entity_id, float reach,
-        std::optional<size_t> target_entity_id = std::nullopt);
+        std::optional<size_t> target_entity_id = std::nullopt, std::vector<size_t> interactions = {});
     void add_interactable_component(size_t entity_id, float reach,
-        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets);
+        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions = {});
     void add_key_input_component(size_t entity_id, std::vector<game_config::input>& controls);
     void add_mouse_input_component(size_t entity_id, std::vector<game_config::input>& inputs);
     void add_state_machine_component(size_t entity_id,

@@ -1,8 +1,18 @@
 
 September TODO:
 -> table occupancy bug [not counting]
--> waiter cooldown starts immediately after assigning paths, im assuming it always runs out leading to the ceaseless pathfinding
+-> waiter cooldown starts immediately after assigning paths, im assuming it always runs out leading to the ceaseless pathfinding [pending the state machine]
 -> the interaction class [as per that video]
+    -> interactors and interactables define 
+    -> an interaction object takes in an interactor and interactable types
+
+        -> interaction system:
+            -> define the interaction behaviours
+            -> define the interaciton class
+            -> create, process and destroy interactions
+
+        -> interactablke and interactor 
+            -> list of interactions that they can partake in    
 -> waiter serving
 -> animation speeds
 -> 9-sprite [basic right click hud on directions]
@@ -10,3 +20,104 @@ September TODO:
 
 -> customer eating and leaving 
 -> waiter clearing
+
+
+-> remove interaciton
+-> list of interactions on the component
+-> building the list of the component
+-> wire interaction list into the building of the components
+
+-> define the actual interaction perform functions
+-> wire up actually creatiing nad enqueueing the interaction when detected
+
+construct tests for processing and detecting interactions 
+i want the following cases to be handled:
+-> customer arrives and walks to a table, upon overlap with the interaction boxes, check that an interaction is detected,
+check that an interaction is created wit hthe two entity ids, check that their interaction_list is created correctly [i.e the interactions that c anb eperofrmed]
+-> and check that an interaction is performed
+
+-> do the same for waiters and tables
+
+
+-> also identify gaps in the build that prevent these tests from working in their current shape. I think what is requried is to create the interaction, and then define 
+the processing function for the interactions we have setup, those should be simple enough i feel.
+
+-> in the code that checks if an interaction exists, call the create interaction function for the interaction system with the two ids of the interactor an the interactee. may require 
+guards to check the existence of an interactor and interactable component. the interactor is the interactor, the interactable is the interactee
+-> do a brief scaffold of the interaction behaviours. i think can make a new file interactions.h and hten have inline function defintiiosn there. stub
+the two interactions already defined in the enum. should take the id of the two entities and the delta. DO NOT IMPLMENT THOUGH, just stub and maybe outline with a comment line or two [dont write a whole essay]
+-> and make sure the interaction system then establishes that in its interaction behaviorus list
+-> also check the existing logic for the rest of the setup for the interaction suite, determine correctes,, identify gaps if they exist
+
+the test cases should focus on checking the correctess of ids passed in, interaction incides for the behaviour and things like that, focus on asserting tangible arguments and 
+values as a result of the processing
+
+can also add tests for hte interaction processing, check the correctness of 
+
+and setup listening to on0entity removed so any interactions that have yet to be prescessed that contain that enitty re effectively cancelled. i think you can just mimic how 
+other systems listen to that event and create a similar setu p
+
+-> STATE: scaffold only. interactions.h stubs the two behaviours and interaction_system loads them
+   into defined_interactions_. interaction_system now subscribes to move_entity and remove_entity.
+   on_moved_entity guards on the interactor component, on it having a target, and on that target
+   having an interactable component, then calls create_interaction + add_interaction with the two
+   ids. on_destroyed_entity calls remove_interaction so pending pairs naming a dead entity go.
+   clear() added and wired into clear_all_systems.
+
+-> STILL TO DO, deliberately left out:
+   - nothing tests the interaction boxes, so a move raises a pair at any distance
+   - nothing dedupes, so every move of a claimed interactor appends another pair for the same two ids
+   - nothing ends a pair short of the entity being destroyed - no release check, no loss-of-overlap check
+   - process_interactions walks the vector by index while behaviours can erase from it and push onto it,
+     so a behaviour that destroys or moves an entity will skip or double-process a pair. collect and
+     apply after the run pass instead.
+   - a claim taken with no move after it is invisible: pairing hangs off move_entity, and
+     movement_system::update skips entities with an empty path queue. a started_interacting fact event
+     fired wherever the target is set would cover it.
+
+
+-> state machine to hadnle interaction transitions
+-> then the interaction triggers the state
+
+
+-> essentially the interaciton function would be to create the specific state intial 
+transition 
+-> or if we are to define a general ineteraction transition state
+    -> picking up food interaction 
+    -> wokring the stove interaciotn
+    -> customer eating interaction 
+    -> customer getting upo/
+    -> customer leaving
+
+    all they differ by is their animation that plays 
+-> so really we dont even need a state we just bneed like an animation manager
+-> that can manage some aniamtion 
+
+-> and then the interaction can perform the under the hood logic
+of plike picking the food off, occuipying tables,m et cafe
+
+yeah that could be tech. atp we can 
+-> then the state machine can be more general, like interacting state non ineteracting state 
+]-> perhaps as like a notififer or querueur for other things, like it interrupts other requesuts, or queues them instead
+of immediately firing them, ? if that vene is a athign
+
+
+-> the naimation manger or system could have like polay animation anmd then 
+-> you just pass in the enum values adn then boom sorted
+
+-> yeah and then on starting the interaction you flip the state 
+-> and on finishing the interaction you flip the state back
+
+ok solid plan i think, we have the two next pieces
+-> animation component and state componetn + maanger interface
+-> interaction behaviours then maniuplate these, 
+    -> conditions to start and end could be 
+        ->  duriation,
+        -> on event 
+        -> on collision check 
+    -> for now is the collision check to determine the integrity of the handshake
+    -> if the handshake is no longer valid, the interaction must be cleaned up 
+
+    -> so each interaciton behaivour needs two then:
+        -> start interaciton?
+        -> end itneraciton

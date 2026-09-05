@@ -1,3 +1,5 @@
+#include <catch2/catch_test_macros.hpp>
+
 #include "ecs_test_game.h"
 
 #include "component.h"
@@ -11,7 +13,8 @@ namespace testing{
     : lifespan_(systems::entity_lifespan_system::get_instance()),
       rendering_(systems::rendering_system::get_instance()),
       spatial_(systems::spatial_system::get_instance()),
-      movement_(systems::movement_system::get_instance()){
+      movement_(systems::movement_system::get_instance()),
+      interaction_(systems::interaction_system::get_instance()){
         // one hidden window for the whole run, same as test_game - the builders
         // LoadTexture and the shared cache has to stay valid across scenarios
         if(not IsWindowReady()){
@@ -20,10 +23,12 @@ namespace testing{
         }
         component_helpers::clear_all_components();
         systems::clear_all_systems();
+        interaction_.restore_interaction_behaviours();
     }
 
     ecs_test_game::~ecs_test_game(){
         events::global_dispatcher_.process_events(0.0f);
+        interaction_.restore_interaction_behaviours();
         component_helpers::clear_all_components();
         systems::clear_all_systems();
     }
@@ -118,6 +123,7 @@ namespace testing{
     void ecs_test_game::tick(float delta){
         events::global_dispatcher_.process_events(delta);
         movement_.update(delta);
+        interaction_.update(delta);
     }
 
     bool ecs_test_game::tick_until(std::function<bool()> predicate, int max_frames, float delta){
@@ -256,6 +262,43 @@ namespace testing{
     Rectangle ecs_test_game::hitbox_of(size_t entity_id){
         auto* collision = component_managers::collision_manager_.get_component(entity_id);
         return collision->get_hitbox_component().get_hitbox().get_box();
+    }
+
+    size_t ecs_test_game::interaction_count(){
+        return interaction_.interaction_count();
+    }
+
+    bool ecs_test_game::has_interaction(size_t interactor, size_t interactee){
+        return interaction_.has_interaction(interactor, interactee);
+    }
+
+    std::vector<size_t> ecs_test_game::performable_interactions_of(size_t interactor, size_t interactee){
+        return interaction_.performable_interactions_of(interactor, interactee);
+    }
+
+    void ecs_test_game::set_interaction_behaviour(size_t index,
+        std::function<void(size_t, size_t, float)> behaviour){
+        interaction_.set_interaction_behaviour(index, std::move(behaviour));
+    }
+
+    void ecs_test_game::restore_interaction_behaviours(){
+        interaction_.restore_interaction_behaviours();
+    }
+
+    void ecs_test_game::claim(size_t interactor, size_t interactee){
+        auto* interactable = component_managers::interactable_manager_.get_component(interactee);
+        auto* actor = component_managers::interactor_manager_.get_component(interactor);
+        REQUIRE(interactable != nullptr);
+        REQUIRE(actor != nullptr);
+        REQUIRE(interactable->claim(interactor));
+        actor->interact_with(interactee);
+    }
+
+    void ecs_test_game::unclaim(size_t interactor, size_t interactee){
+        auto* interactable = component_managers::interactable_manager_.get_component(interactee);
+        auto* actor = component_managers::interactor_manager_.get_component(interactor);
+        if(interactable != nullptr){ interactable->release(interactor); }
+        if(actor != nullptr){ actor->stop_interacting(); }
     }
 
     int ecs_test_game::graph_occupant_at(Vector2 position){

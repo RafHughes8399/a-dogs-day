@@ -12,6 +12,7 @@
 // -----------------------------------------------------------------------------
 
 #include <functional>
+#include <vector>
 
 #include "config.h"
 #include "entity.h"
@@ -96,6 +97,16 @@ namespace testing{
             bool node_bounds_of(size_t entity_id, raglib::bounding_box_2& bounds);
             Rectangle hitbox_of(size_t entity_id);
 
+            // ---------------- interaction accessors ----------------
+            size_t interaction_count();
+            bool has_interaction(size_t interactor, size_t interactee);
+            std::vector<size_t> performable_interactions_of(size_t interactor, size_t interactee);
+            void set_interaction_behaviour(size_t index,
+                std::function<void(size_t, size_t, float)> behaviour);
+            void restore_interaction_behaviours();
+            void claim(size_t interactor, size_t interactee);
+            void unclaim(size_t interactor, size_t interactee);
+
             // ---------------- graph accessors ----------------
             int graph_occupant_at(Vector2 position);
             size_t graph_occupied_node_count();
@@ -111,6 +122,7 @@ namespace testing{
             systems::rendering_system& rendering_;
             systems::spatial_system& spatial_;
             systems::movement_system& movement_;
+            systems::interaction_system& interaction_;
     };
 
 } // namespace testing

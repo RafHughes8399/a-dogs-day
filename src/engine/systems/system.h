@@ -11,10 +11,10 @@
 #include "render_layer.h"
 #include <array>
 #include <functional>
-#include <set>
 #include <utility>
 #include <raylib.h>
 #include "graph.h"
+#include "interactions.h"
 #include "path.h"
 namespace systems{
     // storage system [quadtree managemet]
@@ -200,21 +200,108 @@ namespace systems{
     class interaction_system{
         // for behavioural interactions
         public:
+            class interaction {
+            public:
+                ~interaction() = default;
+                interaction(size_t interactor, size_t interactee)
+                : interactee_(interactee), interactor_(interactor){
+                    performable_interactions_ = determine_performable_interactions();
+                }
+                interaction(const interaction& other) = default;
+                interaction(interaction&& other) = default;
+            
+                interaction& operator=(const interaction& other) = default;
+                interaction& operator=(interaction&& other) = default;
+                std::vector<size_t> get_performable_interactions();
+                size_t get_interactor();
+                size_t get_interactee();
+            private:
+                size_t interactor_;
+                size_t interactee_;
+                std::vector<size_t> performable_interactions_;
+
+                std::vector<size_t> determine_performable_interactions();
+            };
+        public:
             static interaction_system& get_instance(){
                 static interaction_system instance;
                 return instance;
             }
-            ~interaction_system() = default;
+            ~interaction_system(){
+                event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
+                event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+            }
             interaction_system(const interaction_system& other) = delete;
             interaction_system(interaction_system&& other) = delete;
 
             interaction_system& operator=(const interaction_system& other) = delete;
             interaction_system& operator=(interaction_system&& other) = delete;
+            interaction create_interaction(size_t interactor, size_t interactee);
+            void add_interaction(interaction& interaction);
+            void remove_interaction(size_t entity_id);
+            void on_moved_entity(const events::move_entity& event);
+            void on_path_finished(const events::dog_completed_path& event);
+            void on_destroyed_entity(const events::remove_entity& event);
+            void clear(){
+                interactions_to_process_.clear();
+            }
+            
         private:
-            interaction_system() = default;
-        public:
+            interaction_system()
+            : defined_interactions_({
+                interactions::customer_table_sit,
+                interactions::waiter_table_serve
+            }), interactions_to_process_(),
+            move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
+            remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+            dog_completed_path_handler_([this](const events::dog_completed_path& event) -> void{on_path_finished(event);}){
+                event_interface::subscribe<events::move_entity>(move_entity_handler_);
+                event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+                event_interface::subscribe<events::dog_completed_path>(dog_completed_path_handler_);
+            }
+            std::array<std::function<void(size_t, size_t, float)>, interaction_config::size> defined_interactions_;
+            std::vector<interaction> interactions_to_process_;
+            events::event_handler<events::move_entity> move_entity_handler_;
+            events::event_handler<events::remove_entity> remove_entity_handler_;
+            events::event_handler<events::dog_completed_path> dog_completed_path_handler_;
 
+        public:
+            void process_interactions(float delta);
+            void process_interaction(interaction& interaction, float delta);
             void update(float delta);
+#ifdef DOG_DAYS_TESTING
+            size_t interaction_count(){
+                return interactions_to_process_.size();
+            }
+            bool has_interaction(size_t interactor, size_t interactee){
+                for(auto& interaction : interactions_to_process_){
+                    if(interaction.get_interactor() == interactor
+                        and interaction.get_interactee() == interactee){
+                        return true;
+                    }
+                }
+                return false;
+            }
+            std::vector<size_t> performable_interactions_of(size_t interactor, size_t interactee){
+                for(auto& interaction : interactions_to_process_){
+                    if(interaction.get_interactor() == interactor
+                        and interaction.get_interactee() == interactee){
+                        return interaction.get_performable_interactions();
+                    }
+                }
+                return {};
+            }
+            void set_interaction_behaviour(size_t index,
+                std::function<void(size_t, size_t, float)> behaviour){
+                defined_interactions_[index] = std::move(behaviour);
+            }
+            void restore_interaction_behaviours(){
+                defined_interactions_ = {
+                    interactions::customer_table_sit,
+                    interactions::waiter_table_serve
+                };
+            }
+#endif
     };
     // -> movement system assigning, calculating, processing and updating paths
     // -> the movment system is where the level_graph should be stored so it can in house process and check paths
@@ -560,6 +647,7 @@ namespace systems{
         control_input_system::get_instance().clear();
         selection_system::get_instance().clear();
         npc_system::get_instance().clear();
+        interaction_system::get_instance().clear();
     }
 
     // hold a refernece to the glboal managers that they need to process things
