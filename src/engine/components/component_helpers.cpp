@@ -114,7 +114,7 @@ void component_helpers::create_offset_position_list(Rectangle box, std::array<st
 bool component_helpers::is_mouse_positioned(size_t entity_id){
     return component_managers::mouse_input_manager_.get_component(entity_id) != nullptr;
 }
-void component_helpers::set_sprite_index(size_t entity_id, size_t slot, size_t index){
+void component_helpers::set_active_index(size_t entity_id, size_t slot, size_t index){
     if(auto* renderable = component_managers::renderable_manager_.get_component(entity_id)){
         if(auto* slot_sprites = renderable->get_sprite_layer(slot)){
             if(index < slot_sprites->num_sprites()){
@@ -146,7 +146,7 @@ void component_helpers::update_item_sprite(size_t entity_id, size_t slot){
     }
     auto item_id = storage->head().get_id();
     if(renderable->get_sprite_layer(slot) != nullptr){
-        set_sprite_index(entity_id, slot, item_id);
+        set_active_index(entity_id, slot, item_id);
         return;
     }
     auto item_sprites = sprite_builders::build_food_sprites();

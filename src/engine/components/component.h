@@ -496,7 +496,7 @@ namespace component_helpers{
     void create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions);
     bool is_mouse_positioned(size_t entity_id);
     void set_facing_index(size_t entity_id, size_t index);
-    void set_sprite_index(size_t entity_id, size_t slot, size_t index);
+    void set_active_index(size_t entity_id, size_t slot, size_t index);
 
     void unregister_positional_component(size_t entity_id);
     void unregister_movement_component(size_t entity_id);
