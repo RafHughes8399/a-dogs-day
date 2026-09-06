@@ -256,6 +256,60 @@ namespace cafe_config{
 namespace station_config{
     inline const float station_reach = level_config::edge_weight * 0.25f;
 }
+namespace animation_config{
+    // * sheet rows, one enum per dog sprite slot. indices 0 - shared_size are the
+    // * same animation on every part, so a whole-body action plays with one index
+    // * across all four slots; part-specific rows start at shared_size.
+    // * index 0 is what a freshly built sprite shows - animation::current_animation_
+    // * starts there - so it is the resting row on every part.
+    enum shared{
+        idle = 0,
+        downward_dog,
+        eating,
+        shared_size
+    };
+    namespace tail{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            wag = shared::shared_size,
+            size
+        };
+    }
+    namespace body{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            walking = shared::shared_size,
+            pawing,
+            size
+        };
+    }
+    namespace head{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            pinned_back = shared::shared_size,
+            one_up,
+            bouncing,
+            size
+        };
+    }
+    namespace face{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            sniffing = shared::shared_size,
+            panting,
+            licking,
+            size
+        };
+    }
+}
 namespace entity_config{
     inline const char* player_dog_debug_id_prefix = "pd_";
     inline const char* customer_dog_debug_id_prefix = "cd_";
@@ -426,25 +480,25 @@ namespace entity_config{
 
     // TODO (06 / 09 / 26) placeholder splits - advancing widths sum to the matching
     // across width, but the proportions are guesses pending the part art
-    inline const float khiri_head_attributes[attributes::size] = {level_config::edge_weight * 0.60f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
-    inline const float khiri_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, 1.0f};
-    inline const float khiri_body_attributes[attributes::size] = {level_config::edge_weight * 1.00f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
-    inline const float khiri_tail_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.50f, 1.0f, 1.0f};
+    inline const float khiri_head_attributes[attributes::size] = {level_config::edge_weight * 0.60f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float khiri_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
+    inline const float khiri_body_attributes[attributes::size] = {level_config::edge_weight * 1.00f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float khiri_tail_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float mack_head_attributes[attributes::size] = {level_config::edge_weight * 0.60f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
-    inline const float mack_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, 1.0f};
-    inline const float mack_body_attributes[attributes::size] = {level_config::edge_weight * 1.00f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
-    inline const float mack_tail_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.50f, 1.0f, 1.0f};
+    inline const float mack_head_attributes[attributes::size] = {level_config::edge_weight * 0.60f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float mack_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
+    inline const float mack_body_attributes[attributes::size] = {level_config::edge_weight * 1.00f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float mack_tail_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float gianluca_head_attributes[attributes::size] = {level_config::edge_weight * 0.70f, level_config::edge_weight * 0.91f, 1.0f, 1.0f};
-    inline const float gianluca_face_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.35f, 1.0f, 1.0f};
-    inline const float gianluca_body_attributes[attributes::size] = {level_config::edge_weight * 1.10f, level_config::edge_weight * 0.91f, 1.0f, 1.0f};
-    inline const float gianluca_tail_attributes[attributes::size] = {level_config::edge_weight * 0.45f, level_config::edge_weight * 0.60f, 1.0f, 1.0f};
+    inline const float gianluca_head_attributes[attributes::size] = {level_config::edge_weight * 0.70f, level_config::edge_weight * 0.91f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float gianluca_face_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.35f, 1.0f, static_cast<float>(animation_config::face::size)};
+    inline const float gianluca_body_attributes[attributes::size] = {level_config::edge_weight * 1.10f, level_config::edge_weight * 0.91f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float gianluca_tail_attributes[attributes::size] = {level_config::edge_weight * 0.45f, level_config::edge_weight * 0.60f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float lionel_head_attributes[attributes::size] = {level_config::edge_weight * 0.50f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
-    inline const float lionel_face_attributes[attributes::size] = {level_config::edge_weight * 0.30f, level_config::edge_weight * 0.30f, 1.0f, 1.0f};
-    inline const float lionel_body_attributes[attributes::size] = {level_config::edge_weight * 0.90f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
-    inline const float lionel_tail_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.50f, 1.0f, 1.0f};
+    inline const float lionel_head_attributes[attributes::size] = {level_config::edge_weight * 0.50f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float lionel_face_attributes[attributes::size] = {level_config::edge_weight * 0.30f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
+    inline const float lionel_body_attributes[attributes::size] = {level_config::edge_weight * 0.90f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float lionel_tail_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
     inline const dog_part khiri_parts[dog_sprite_slots_size] = {
         {khiri_head_attributes, Vector2{0.0f, 0.0f}, true, khiri_head_left_path, khiri_head_right_path},
