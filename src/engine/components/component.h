@@ -262,46 +262,46 @@ private:
 
 class renderable_component {
 public:
-  class sprite_component {
+  class sprite_layer {
   public:
-    ~sprite_component() = default;
+    ~sprite_layer() = default;
     // TODO (25 / 8 / 26) fix magic number what is 0
-    sprite_component(std::vector<sprite::sprite> &sprites, size_t index = 0)
-        : sprites_(sprites), sprite_index_(index) {}
-    sprite_component(const sprite_component& other) = default;
-    sprite_component(sprite_component&& other) = default;
+    sprite_layer(std::vector<sprite::sprite> &sprites, size_t index = 0)
+        : sprites_(sprites), active_index_(index) {}
+    sprite_layer(const sprite_layer& other) = default;
+    sprite_layer(sprite_layer&& other) = default;
 
-    sprite_component& operator=(const sprite_component& other) = default;
-    sprite_component& operator=(sprite_component&& other) = default;
+    sprite_layer& operator=(const sprite_layer& other) = default;
+    sprite_layer& operator=(sprite_layer&& other) = default;
 
-      sprite::sprite& get_sprite();
+      sprite::sprite& get_active_sprite();
       std::vector<sprite::sprite>& get_sprites();
-      size_t get_sprite_index() const;
+      size_t get_active_index() const;
       size_t num_sprites() const;
       void set_index(size_t index);
 
   private:
     std::vector<sprite::sprite> sprites_;
-    size_t sprite_index_;
+    size_t active_index_;
   };
 
   ~renderable_component() = default;
-  renderable_component(std::vector<sprite_component> sprites = {})
-      : sprites_(std::move(sprites)) {}
+  renderable_component(std::vector<sprite_layer> layers = {})
+      : layers_(std::move(layers)) {}
   renderable_component(const renderable_component& other) = default;
   renderable_component(renderable_component&& other) = default;
 
   renderable_component& operator=(const renderable_component& other) = default;
   renderable_component& operator=(renderable_component&& other) = default;
 
-  std::vector<sprite_component>& get_sprites();
-  sprite_component* get_sprite_component(size_t index);
-  size_t num_sprite_components() const;
-  void add_sprite_component(sprite_component sprite);
-  void remove_sprite_component(size_t index);
-  void set_sprite_component(size_t index, sprite_component sprite);
+  std::vector<sprite_layer>& get_layers();
+  sprite_layer* get_sprite_layer(size_t index);
+  size_t num_sprite_layers() const;
+  void add_sprite_layer(sprite_layer layer);
+  void remove_sprite_layer(size_t index);
+  void set_sprite_layer(size_t index, sprite_layer layer);
 private:
-  std::vector<sprite_component> sprites_;
+  std::vector<sprite_layer> layers_;
 
 };
 
@@ -439,9 +439,9 @@ namespace component_builders{
     components::movement_component build_movement_component(Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
-    components::renderable_component::sprite_component build_sprite_component(std::vector<sprite::sprite>& sprites, size_t index);
+    components::renderable_component::sprite_layer build_sprite_layer(std::vector<sprite::sprite>& sprites, size_t index);
     components::renderable_component build_renderable_component(
-        std::vector<components::renderable_component::sprite_component>& sprite_components);
+        std::vector<components::renderable_component::sprite_layer>& sprite_layers);
 
     components::collision_component::hitbox_component build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
     components::collision_component build_collision_component(
@@ -476,7 +476,7 @@ namespace component_helpers{
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
     void add_renderable_component(size_t entity_id,
-        std::vector<components::renderable_component::sprite_component>& sprite_components);
+        std::vector<components::renderable_component::sprite_layer>& sprite_layers);
     void add_collision_component(size_t entity_id,
         components::collision_component::hitbox_component hitbox);
     void add_interactor_component(size_t entity_id, float reach,

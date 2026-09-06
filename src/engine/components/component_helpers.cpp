@@ -45,9 +45,9 @@ void component_helpers::add_movement_component(size_t entity_id, Vector2 move_sp
         component_builders::build_movement_component(move_speed, direction_scalar, std::move(paths)));
 }
 void component_helpers::add_renderable_component(size_t entity_id,
-    std::vector<components::renderable_component::sprite_component>& sprite_components){
+    std::vector<components::renderable_component::sprite_layer>& sprite_layers){
     register_renderable_component(entity_id,
-        component_builders::build_renderable_component(sprite_components));
+        component_builders::build_renderable_component(sprite_layers));
 }
 void component_helpers::add_collision_component(size_t entity_id,
     components::collision_component::hitbox_component hitbox){
@@ -116,7 +116,7 @@ bool component_helpers::is_mouse_positioned(size_t entity_id){
 }
 void component_helpers::set_sprite_index(size_t entity_id, size_t slot, size_t index){
     if(auto* renderable = component_managers::renderable_manager_.get_component(entity_id)){
-        if(auto* slot_sprites = renderable->get_sprite_component(slot)){
+        if(auto* slot_sprites = renderable->get_sprite_layer(slot)){
             if(index < slot_sprites->num_sprites()){
                 slot_sprites->set_index(index);
             }
@@ -141,25 +141,25 @@ void component_helpers::update_item_sprite(size_t entity_id, size_t slot){
     auto* renderable = component_managers::renderable_manager_.get_component(entity_id);
     if(storage == nullptr or renderable == nullptr){ return; }
     if(storage->empty()){
-        renderable->remove_sprite_component(slot);
+        renderable->remove_sprite_layer(slot);
         return;
     }
     auto item_id = storage->head().get_id();
-    if(renderable->get_sprite_component(slot) != nullptr){
+    if(renderable->get_sprite_layer(slot) != nullptr){
         set_sprite_index(entity_id, slot, item_id);
         return;
     }
     auto item_sprites = sprite_builders::build_food_sprites();
     if(item_id >= item_sprites.size()){ return; }
-    assert(renderable->num_sprite_components() == slot
+    assert(renderable->num_sprite_layers() == slot
         and "stored item sprite must append into its reserved slot");
-    renderable->add_sprite_component(
-        component_builders::build_sprite_component(item_sprites, item_id));
+    renderable->add_sprite_layer(
+        component_builders::build_sprite_layer(item_sprites, item_id));
 }
 // writes sprite and hitbox indices together. missing either component is fine
 void component_helpers::set_facing_index(size_t entity_id, size_t index){
     if(auto* renderable = component_managers::renderable_manager_.get_component(entity_id)){
-        for(auto& slot : renderable->get_sprites()){
+        for(auto& slot : renderable->get_layers()){
             if(index < slot.num_sprites()){
                 slot.set_index(index);
             }
