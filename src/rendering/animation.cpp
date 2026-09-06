@@ -23,6 +23,10 @@ int animation::animation::num_animations(){
 int animation::animation::num_frames(){
     return frames_;
 }
+
+int animation::animation::get_play_speed(){
+    return play_speed_;
+}
 void animation::animation::goto_animation(const int animation){
     if(animation < animations_){
         current_animation_ = animation;

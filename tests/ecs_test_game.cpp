@@ -14,7 +14,8 @@ namespace testing{
       rendering_(systems::rendering_system::get_instance()),
       spatial_(systems::spatial_system::get_instance()),
       movement_(systems::movement_system::get_instance()),
-      interaction_(systems::interaction_system::get_instance()){
+      interaction_(systems::interaction_system::get_instance()),
+      animation_(systems::animation_system::get_instance()){
         // one hidden window for the whole run, same as test_game - the builders
         // LoadTexture and the shared cache has to stay valid across scenarios
         if(not IsWindowReady()){
@@ -124,6 +125,7 @@ namespace testing{
         events::global_dispatcher_.process_events(delta);
         movement_.update(delta);
         interaction_.update(delta);
+        animation_.update(delta);
     }
 
     bool ecs_test_game::tick_until(std::function<bool()> predicate, int max_frames, float delta){
@@ -262,6 +264,10 @@ namespace testing{
     Rectangle ecs_test_game::hitbox_of(size_t entity_id){
         auto* collision = component_managers::collision_manager_.get_component(entity_id);
         return collision->get_hitbox_component().get_hitbox().get_box();
+    }
+
+    size_t ecs_test_game::in_flight_animation_count(){
+        return animation_.in_flight_count();
     }
 
     size_t ecs_test_game::interaction_count(){

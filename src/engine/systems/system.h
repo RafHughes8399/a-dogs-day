@@ -33,7 +33,9 @@ namespace systems{
                 static animation_system instance;
                 return instance;
             }
-            ~animation_system() = default;
+            ~animation_system(){
+                event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+            }
             animation_system(const animation_system& other) = delete;
             animation_system(animation_system&& other) = delete;
 
@@ -47,12 +49,37 @@ namespace systems{
                 bool repeat;
             };
 
+            void update(float delta);
             void play(size_t entity, const std::vector<sprite_animation>& animations);
             void play(size_t entity, sprite_animation animation);
             void stop(size_t entity);
             void stop(size_t entity, size_t sprite_slot);
+            void on_destroyed_entity(const events::remove_entity& event);
+            void clear(){
+                in_flight_.clear();
+            }
+#ifdef DOG_DAYS_TESTING
+            size_t in_flight_count() const{
+                return in_flight_.size();
+            }
+#endif
         private:
-            animation_system() = default;
+            // * only non-repeating plays are tracked, and only until they end.
+            // * the countdown runs in update rather than off animation::playing()
+            // * because advance() only steps while the entity is being rendered -
+            // * a one-shot started off screen would otherwise never finish
+            struct in_flight_animation{
+                size_t entity;
+                size_t sprite_slot;
+                size_t animation_index;
+                int frames_remaining;
+            };
+            animation_system()
+            : remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}){
+                event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+            }
+            std::vector<in_flight_animation> in_flight_;
+            events::event_handler<events::remove_entity> remove_entity_handler_;
     };
 
     class collision_system{
@@ -678,6 +705,7 @@ namespace systems{
         selection_system::get_instance().clear();
         npc_system::get_instance().clear();
         interaction_system::get_instance().clear();
+        animation_system::get_instance().clear();
     }
 
     // hold a refernece to the glboal managers that they need to process things

@@ -39,6 +39,7 @@ namespace animation{
 
             int num_frames();
             int num_animations();
+            int get_play_speed();
         private:
         // the frame of the sprite sheet
         Rectangle frame_;
