@@ -26,5 +26,6 @@
 #include "events/decoration_events.h"
 #include "events/input_events.h"
 #include "events/debug_events.h"
+#include "events/animation_events.h"
 
 #endif

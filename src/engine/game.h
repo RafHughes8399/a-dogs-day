@@ -27,6 +27,7 @@ namespace game{
                 spatial_(systems::spatial_system::get_instance()),
                 collision_(systems::collision_system::get_instance()),
                 interaction_(systems::interaction_system::get_instance()),
+                animation_(systems::animation_system::get_instance()),
                 rendering_(systems::rendering_system::get_instance()),
                 selection_(systems::selection_system::get_instance()){}
             // systems subscribe handlers in their constructors, so they are
@@ -54,6 +55,7 @@ namespace game{
             systems::spatial_system& spatial_;
             systems::collision_system& collision_;
             systems::interaction_system& interaction_;
+            systems::animation_system& animation_;
             systems::rendering_system& rendering_;
             systems::selection_system& selection_;
     };

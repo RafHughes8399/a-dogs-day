@@ -121,3 +121,15 @@ ok solid plan i think, we have the two next pieces
     -> so each interaciton behaivour needs two then:
         -> start interaciton?
         -> end itneraciton
+
+-> state for like carryinh, eating, waiting, idling, etc.
+-> these states will have update behaviours that will do things 
+    -> like incremeent the eating counter
+    -> update the position of the carried item to match the carrier and define the render positional offeset 
+
+-> so it is a two part solution 
+-> can keep just the renderable component as the component 
+-> and then introduce the animation manager to take aniamtion requests and perform them 
+
+-> the state machine is somewhat more complex
+-> 

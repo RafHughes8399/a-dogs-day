@@ -35,10 +35,11 @@ namespace animation{
 
             void advance(int frame);
             void pause();
-            void play();
+            void play(bool repeat = true);
 
             int num_frames();
             int num_animations();
+            int get_play_speed();
         private:
         // the frame of the sprite sheet
         Rectangle frame_;
@@ -52,6 +53,7 @@ namespace animation{
         int current_animation_ = 0;
         int play_speed_;
         bool is_playing_ = false;
+        bool repeat_ = true;
 
     };
 } // namespace name

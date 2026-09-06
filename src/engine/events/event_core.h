@@ -96,6 +96,7 @@ namespace events{
 		create,
 		create_path_to_id,
 		create_path_to_entity_id,
+		animation_finished_id,
 		size
 	};
 	class event{

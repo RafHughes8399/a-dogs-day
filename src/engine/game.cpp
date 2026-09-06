@@ -76,6 +76,7 @@ void game::game::update(float delta){
     spatial_.update(delta);
     collision_.update(delta);
     interaction_.update(delta);
+    animation_.update(delta);
 
     frame_count_++;
     if(frame_count_ == game_config::twenty_seconds){

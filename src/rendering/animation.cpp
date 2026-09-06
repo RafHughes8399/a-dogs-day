@@ -23,6 +23,10 @@ int animation::animation::num_animations(){
 int animation::animation::num_frames(){
     return frames_;
 }
+
+int animation::animation::get_play_speed(){
+    return play_speed_;
+}
 void animation::animation::goto_animation(const int animation){
     if(animation < animations_){
         current_animation_ = animation;
@@ -60,10 +64,15 @@ void animation::animation::next_frame(bool wrap){
 
 void animation::animation::advance(int frame){
     if(is_playing_ and play_speed_ > 0 and frame % play_speed_ == 0){
-        next_frame();
+        if(not repeat_ and current_frame_ == frames_ - 1){
+            is_playing_ = false;
+            return;
+        }
+        next_frame(repeat_);
     }
 }
-void animation::animation::play(){
+void animation::animation::play(bool repeat){
+    repeat_ = repeat;
     is_playing_ = true;
 }
 void animation::animation::pause(){

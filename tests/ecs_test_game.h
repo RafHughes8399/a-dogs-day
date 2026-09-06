@@ -99,6 +99,7 @@ namespace testing{
 
             // ---------------- interaction accessors ----------------
             size_t interaction_count();
+            size_t in_flight_animation_count();
             bool has_interaction(size_t interactor, size_t interactee);
             std::vector<size_t> performable_interactions_of(size_t interactor, size_t interactee);
             void set_interaction_behaviour(size_t index,
@@ -123,6 +124,7 @@ namespace testing{
             systems::spatial_system& spatial_;
             systems::movement_system& movement_;
             systems::interaction_system& interaction_;
+            systems::animation_system& animation_;
     };
 
 } // namespace testing
