@@ -287,6 +287,7 @@ namespace systems{
             ~interaction_system(){
                 event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
                 event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+                event_interface::unsubscribe<events::dog_completed_path>(dog_completed_path_handler_);
             }
             interaction_system(const interaction_system& other) = delete;
             interaction_system(interaction_system&& other) = delete;
