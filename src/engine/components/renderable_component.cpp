@@ -4,6 +4,9 @@
 sprite::sprite& components::renderable_component::sprite_component::get_sprite(){
     return sprites_[sprite_index_];
 }
+std::vector<sprite::sprite>& components::renderable_component::sprite_component::get_sprites(){
+    return sprites_;
+}
 size_t components::renderable_component::sprite_component::get_sprite_index() const{
     return sprite_index_;
 }

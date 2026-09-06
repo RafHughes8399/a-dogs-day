@@ -275,6 +275,7 @@ public:
     sprite_component& operator=(sprite_component&& other) = default;
 
       sprite::sprite& get_sprite();
+      std::vector<sprite::sprite>& get_sprites();
       size_t get_sprite_index() const;
       size_t num_sprites() const;
       void set_index(size_t index);

@@ -60,10 +60,15 @@ void animation::animation::next_frame(bool wrap){
 
 void animation::animation::advance(int frame){
     if(is_playing_ and play_speed_ > 0 and frame % play_speed_ == 0){
-        next_frame();
+        if(not repeat_ and current_frame_ == frames_ - 1){
+            is_playing_ = false;
+            return;
+        }
+        next_frame(repeat_);
     }
 }
-void animation::animation::play(){
+void animation::animation::play(bool repeat){
+    repeat_ = repeat;
     is_playing_ = true;
 }
 void animation::animation::pause(){

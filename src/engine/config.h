@@ -310,6 +310,13 @@ namespace entity_config{
         counter_food,
         counter_sprite_slots_size
     };
+    enum dog_sprite_slots{
+        dog_body = 0,
+        dog_head,
+        dog_ears,
+        dog_tail,
+        dog_sprite_slots_size
+    };
 
     // file paths
     // * ------------------------ ENVIRONMENT AND CURSOR PATHS --------------------------------------- *//

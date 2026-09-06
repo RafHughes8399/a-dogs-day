@@ -41,57 +41,18 @@ namespace systems{
             animation_system& operator=(const animation_system& other) = delete;
             animation_system& operator=(animation_system&& other) = delete;
 
-            void update(float delta, int frame);
-            void process_animations(float delta, int frame);
-            /** i think the logic is as follows:
-            -> a request ot play animation is made, which appends an animation object to the animation
-            system list
-            -> this animation object holds the entity and the animation_id
-            -> these are used to access the renderable component of the entity and the specific animation
-            -> then the update would advance the animations that are being played 
-            
-                -> animations can then be stopped by reaching their natural end [if not looping]
-                 -> or by external triggers [state changes, interactions ending, etc.]
-                */
-            // play
-            // stop
-            // advance_frame
-            // on_entity_removed {stop}
-            void play(size_t entity);
-            void stop(size_t entity);
-            void on_remove_entity(events::remove_entity& event);
-        private:
-            class animation {
-            public:
-                ~animation() = default;
-                animation(size_t entity_id, std::vector<size_t> sprite_indices, std::vector<size_t> animation_indices, bool repeat)
-                : entity_id_(entity_id), animations_({}), repeat_(repeat){
-                    // for sprite_indecies[0] you assign animaiton_incides[0]
-                    for(size_t i = 0;  i < sprite_indices.size(); ++i){
-                        animations_.push_back(sprite_animation{sprite_indices[i], animation_indices[i]});
-                    }
-                }
-                animation(const animation& other) = default;
-                animation(animation&& other) = default;
-            
-                animation& operator=(const animation& other) = default;
-                animation& operator=(animation&& other) = default;
-                
-                void update(float delta, int frame);
-            private:
-                struct sprite_animation{
-                    size_t sprite_index;
-                    size_t animation_index;
-                };
-            // i think we need some way to know which sprites and which of their animations are to be played
-            // take the dog 
-                size_t entity_id_;
-                std::vector<sprite_animation> animations_;
-                bool repeat_;
-
+            struct sprite_animation{
+                size_t sprite_slot;
+                size_t animation_index;
+                bool repeat;
             };
+
+            void play(size_t entity, const std::vector<sprite_animation>& animations);
+            void play(size_t entity, sprite_animation animation);
+            void stop(size_t entity);
+            void stop(size_t entity, size_t sprite_slot);
+        private:
             animation_system() = default;
-            std::vector<animation> animations_;
     };
 
     class collision_system{

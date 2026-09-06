@@ -159,9 +159,9 @@ void component_helpers::update_item_sprite(size_t entity_id, size_t slot){
 // writes sprite and hitbox indices together. missing either component is fine
 void component_helpers::set_facing_index(size_t entity_id, size_t index){
     if(auto* renderable = component_managers::renderable_manager_.get_component(entity_id)){
-        if(auto* body = renderable->get_sprite_component(0)){
-            if(index < body->num_sprites()){
-                body->set_index(index);
+        for(auto& slot : renderable->get_sprites()){
+            if(index < slot.num_sprites()){
+                slot.set_index(index);
             }
         }
     }
