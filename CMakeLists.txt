@@ -136,7 +136,8 @@ add_library(systems
   src/engine/systems/npc_system.cpp
   src/engine/systems/customer_arrival_system.cpp
   src/engine/systems/waiter_idling_system.cpp
-  src/engine/systems/selection_system.cpp)
+  src/engine/systems/selection_system.cpp
+  src/engine/systems/animation_system.cpp)
 link_libraries(systems)
 
 add_library(animation src/rendering/animation.cpp)
