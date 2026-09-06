@@ -91,7 +91,13 @@ namespace sprite_builders{
     sprite::sprite build_background_sprite();
     // every dog sprite is the same four attribute lookups off a cached texture
     sprite::sprite build_dog_sprite(int texture_key, const char* path,
-        const float attributes[entity_config::attributes::size]);
+        const float attributes[entity_config::attributes::size],
+        Vector2 draw_position_offset = Vector2Zero());
+    // one inner vector per dog_sprite_slots entry, each {left, right}
+    std::vector<std::vector<sprite::sprite>> build_dog_part_layers(
+        const entity_config::dog_part parts[entity_config::dog_sprite_slots_size],
+        const int texture_keys[entity_config::dog_sprite_slots_size][entity_config::dog_part_directions_size],
+        float expected_total_width);
     std::vector<sprite::sprite> build_gianluca_sprites();
     std::vector<sprite::sprite> build_lionel_sprites();
     // decorations, stations and food all draw off the test_decoration sheet and

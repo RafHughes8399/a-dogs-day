@@ -1,3 +1,5 @@
+#include <cassert>
+#include <cmath>
 #include "config.h"
 #include "sprite.h"
 #include "texture.h"
@@ -13,12 +15,42 @@ sprite::sprite sprite_builders::build_cursor_sprite(){
         entity_config::cursor_attributes[entity_config::attributes::animations]);
 }
 sprite::sprite sprite_builders::build_dog_sprite(int texture_key, const char* path,
-    const float attributes[entity_config::attributes::size]){
+    const float attributes[entity_config::attributes::size], Vector2 draw_position_offset){
     return build_sprite(textures::textures_.get_texture(texture_key, path),
         attributes[entity_config::attributes::frame_width],
         attributes[entity_config::attributes::frame_height],
         attributes[entity_config::attributes::frames],
-        attributes[entity_config::attributes::animations]);
+        attributes[entity_config::attributes::animations],
+        draw_position_offset);
+}
+std::vector<std::vector<sprite::sprite>> sprite_builders::build_dog_part_layers(
+    const entity_config::dog_part parts[entity_config::dog_sprite_slots_size],
+    const int texture_keys[entity_config::dog_sprite_slots_size][entity_config::dog_part_directions_size],
+    float expected_total_width){
+    std::vector<std::vector<sprite::sprite>> layers;
+    float cursor = 0.0f;
+    float anchor = 0.0f;
+
+    for(size_t slot = 0; slot < entity_config::dog_sprite_slots_size; ++slot){
+        const auto& part = parts[slot];
+        auto width = part.attributes[entity_config::attributes::frame_width];
+        if(part.advances){
+            anchor = cursor;
+            cursor += width;
+        }
+        auto x_left = anchor + part.offset.x;
+        auto x_right = expected_total_width - x_left - width;
+
+        std::vector<sprite::sprite> directions;
+        directions.push_back(build_dog_sprite(texture_keys[slot][entity_config::dog_part_left],
+            part.left_path, part.attributes, Vector2{x_left, part.offset.y}));
+        directions.push_back(build_dog_sprite(texture_keys[slot][entity_config::dog_part_right],
+            part.right_path, part.attributes, Vector2{x_right, part.offset.y}));
+        layers.push_back(std::move(directions));
+    }
+    assert(std::fabs(cursor - expected_total_width) < 0.01f
+        and "dog part widths must sum to the across hitbox width");
+    return layers;
 }
 std::vector<sprite::sprite> sprite_builders::build_gianluca_sprites(){
     std::vector<sprite::sprite> sprites;
