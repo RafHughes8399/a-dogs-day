@@ -15,8 +15,8 @@ September TODO:
             -> list of interactions that they can partake in    
 -> waiter serving
 -> animation speeds
--> 9-sprite [basic right click hud on directions]
 -> splitting the dog art up into body components
+-> 9-sprite [basic right click hud on directions]
 
 -> customer eating and leaving 
 -> waiter clearing
@@ -132,4 +132,85 @@ ok solid plan i think, we have the two next pieces
 -> and then introduce the animation manager to take aniamtion requests and perform them 
 
 -> the state machine is somewhat more complex
--> 
+
+
+**************animation speeds*************************************
+-> assuming a flat 60 fps, an animation speed of 1 means that 60 anim frames would be processed every second 
+-> this is speedy as hell and would require so so so so many animation frames
+-> so the following speeds could be considered 
+-> 5 for 12 frames per second 
+-> 6 for 10 frames per second
+-> 10 for 6 frames per second 
+-> 20 for 3 frames per second 
+*************splitting the dog art up into body components**********
+-> ok the bones of the animation system are in place, and the infrastructure for dog body components
+-> need to flesh out / restrucutre the api to allow for the animation system to be invoked to play new animations
+-> perhaps de ai-slopify and clean up the language
+    -> essentialyl need to be able to pick an entity, body part[s] and an animation index
+
+-> and then the state machine [idling, , serving, clearing, eating]
+    -> these states describe what the dog is doing at the moment and would be used to 
+        -> specify aniamtions
+        -> and some update behaviour
+    
+    -> so each state within a machine needs to specify 
+        -> an update behaviour
+        -> an animation
+        -> a transition to the next state, state.to_state(next_state);
+
+    -> we can define states as a separate structure, like sprite
+    -> same with a state machine 
+    -> and then the component can just assign a state machine to a dog
+
+    -> that gives us the ineritance freedom that would be inherent to desiging a state machine, while also retaining the component structure we have built 
+    the states we need are:
+        -> idling [waiters]
+        -> walking [customers]
+        -> waiting [customers]
+        -> eating [customers]
+        -> serving / clearing [waiters] - maybe better described as carrying 
+        -> interacting [player dogs]
+
+    -> because the animation system gives us the ability trigger animations that aren't repeating
+    -> the states gives us the ability to signal when a repeating animation should start and when it should stop
+
+
+    -> so a state needs the following data:
+        -> an update function
+        -> sprite and animation indices [for the body parts and the animations to play]
+        -> an on_transitioned_to behaviour to do like state setup when the state is started 
+        -> a transitioning_to behaivour to do state cleanup when the state is ended 
+    -> and a state machine needs the following:
+        -> define a node struct that carries a state and a pointer to the next state that can 
+         be transitioned to
+        -> the state machine graph that specifies what transitions can occur and how / when they can occur
+        -> track the active state, and call its update 
+        -> manage state transitions within the machine
+
+    -> then we define the state machines for the dogs
+        -> player [idle, walking, interacting] [idle -> walking, walking -> idle, walking -> interacting, interacting -> walking]
+        -> customer [ walking, sitting, eating] [walking -> sitting, sitting -> eating, eating -> sitting ->, sitting -> walking]
+        -> waiter [stationary, idle, interacting, carrying] [stationary -> idle, idle -> interacting, interacting -> carrying, carrying -> interacting, interacting -> idle]
+    
+    -> and assign one to each on dog construction
+    general state transitions
+        -> player idle -> walking transition occurs on path created from idle state 
+        -> player walking -> idle transition occurs on path findinshed
+        -> player walking to -> interacting occurs on interaction detected
+        -> player interacting -> walking occurs on path created from interacting state 
+
+        -> customer walking -> sitting, on paths finished and interacting with table 
+        -> customer sitting -> eating, on table served 
+        -> customer eating -> sitting, on meal finished 
+        -> custoemr sitting -> walking, on leave
+
+        -> waiter stationary -> idle, on idle path created
+        -> waiter idle  -> interacting, on path completed and interacting with station 
+        -> waiter interacting -> carrying, on interaction complete
+        -> waiter carrying -> interacting, on path to station complete, and interaction detected
+        -> waiter interacting -> idle 
+
+    -> state transitions can be managed by the system, that listens to events [on path finished, on interaction detected, on food served etc. etc.]
+    then find the entity that this occurs for, get their state machine component, and perform the transition should it be possible [ i think we can take the menu
+    graph code as an example perhaps ? like an adjacency graph where the is an event instead of a button press, maybe like enum the events over ints so we can refer to them via numbers]
+
