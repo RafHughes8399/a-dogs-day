@@ -214,3 +214,4 @@ ok solid plan i think, we have the two next pieces
     then find the entity that this occurs for, get their state machine component, and perform the transition should it be possible [ i think we can take the menu
     graph code as an example perhaps ? like an adjacency graph where the is an event instead of a button press, maybe like enum the events over ints so we can refer to them via numbers]
 
+    -> animation data should use the enum

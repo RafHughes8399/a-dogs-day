@@ -16,6 +16,22 @@
 #include "graph.h"
 #include "interactions.h"
 #include "path.h"
+/**
+    if components manage, organise and hold the data, then systems define the behaivours to act on those pieces of data. we define the following systems:
+    animation system
+    collision system
+    interaction system
+    lifespan system
+    movement system
+    npc system 
+    selection system
+    spatial system
+    rendering system
+
+
+
+    @author raffa, september 2026
+*/
 namespace systems{
     // storage system [quadtree managemet]
     // moovemnet sytem [ posiitons, pathfinding logic etc]

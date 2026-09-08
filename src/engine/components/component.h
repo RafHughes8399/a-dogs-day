@@ -20,15 +20,31 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "sprite.h"
+
+
+/**
+    header file to define components that make up entities within the game
+    currently defines the following components and the usage 
+    the collision component - holds the entity hitbox for spatial collision checking
+    the storage component - enables an entity to hold items
+    the interactor and interactable component - used in conjunction to support interactions between two entities, an interactor can only interact with interactables
+    the movement component - supports entity pathfinding
+    the position component - gives entities a position in the world
+    the renderable component - gives entities a sprite and animation capabilities
+    the state machine component - manages the state of an entity for behaivoural and animation purposes
+    the key input component - manages 
+
+    components are individually stored by their associated manager which uses a map to 
+    tie them to an entity id. hence, the managers act is pseudo parallel arrays where for entity 2
+    the postion_mananger[2] and rednerable_manger[2] gives that entity's sprite and position
+
+    @author raffa, september 2026
+*/
 namespace components {
 
 
 #define DIRECTIONS 4
-// * components carry no id of their own - the manager's map key IS the owning
-// * entity, so anything iterating components already has it.
-// * one hitbox_component per entity. its variants run parallel to the base
-// * sprite list, so the two indices are one facing - use
-// * component_helpers::set_facing_index.
+
 class collision_component {
 public:
   class hitbox_component {
