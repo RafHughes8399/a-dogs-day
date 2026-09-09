@@ -1,5 +1,5 @@
-#ifndef SYSTEMS_H
-#define SYSTEMS_H
+#ifndef SYSTEM_H
+#define SYSTEM_H
 #include "component.h"
 #include "config.h"
 #include "entity.h"
@@ -16,6 +16,21 @@
 #include "graph.h"
 #include "interactions.h"
 #include "path.h"
+/**
+    if components manage, organise and hold the data, then systems define the behaivours to act on those pieces of data. we define the following systems:
+    animation system - provides an interface to play and pause animations
+    state machine system - drives entity state transitions off the events that trigger them
+    collision system - checks for hitbox collisions  and handles them
+    interaction system - checks for interactions and handles them
+    lifespan system - manages entity creation and destruction
+    movement system - manages entity movenet 
+    npc system - controls npc dog behaivour 
+    selection system - handles selction of entities
+    spatial system - stores entities in a quadtree strucutre
+    rendering system - handles render layers, draw orders and visual culling 
+
+    @author raffa, september 2026
+*/
 namespace systems{
     // storage system [quadtree managemet]
     // moovemnet sytem [ posiitons, pathfinding logic etc]
@@ -24,6 +39,137 @@ namespace systems{
     // hud system ?
     // systems are non-copyable and non-movable - they subscribe handlers in the
     // constructor and unsubscribe in the destructor, so a copy double-subscribes
+
+
+    //** for processing and performing animations */
+    class animation_system{
+        public:
+            static animation_system& get_instance(){
+                static animation_system instance;
+                return instance;
+            }
+            ~animation_system(){
+                event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+            }
+            animation_system(const animation_system& other) = delete;
+            animation_system(animation_system&& other) = delete;
+
+
+            animation_system& operator=(const animation_system& other) = delete;
+            animation_system& operator=(animation_system&& other) = delete;
+
+            struct sprite_animation{
+                size_t sprite_slot;
+                size_t animation_index;
+                bool repeat;
+            };
+
+            void update(float delta);
+            void play(size_t entity, const std::vector<sprite_animation>& animations);
+            void play(size_t entity, sprite_animation animation);
+            void stop(size_t entity);
+            void stop(size_t entity, size_t sprite_slot);
+            void on_destroyed_entity(const events::remove_entity& event);
+            void clear(){
+                current_animations_.clear();
+            }
+#ifdef DOG_DAYS_TESTING
+            size_t in_flight_count() const{
+                return current_animations_.size();
+            }
+#endif
+        private:
+            // * only non-repeating plays are tracked, and only until they end.
+            // * the countdown runs in update rather than off animation::playing()
+            // * because advance() only steps while the entity is being rendered -
+            // * a one-shot started off screen would otherwise never finish
+            struct animation{
+                size_t entity;
+                size_t sprite_slot;
+                size_t animation_index;
+                int frames_remaining;
+            };
+            animation_system()
+            : remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}){
+                event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+            }
+            std::vector<animation> current_animations_;
+            events::event_handler<events::remove_entity> remove_entity_handler_;
+    };
+
+    class state_machine_system{
+        public:
+            static state_machine_system& get_instance(){
+                static state_machine_system instance;
+                return instance;
+            }
+            ~state_machine_system(){
+                event_interface::unsubscribe<events::dog_started_path>(started_path_handler_);
+                event_interface::unsubscribe<events::dog_completed_path>(completed_path_handler_);
+                event_interface::unsubscribe<events::interaction_started>(interaction_started_handler_);
+                event_interface::unsubscribe<events::interaction_finished>(interaction_finished_handler_);
+                event_interface::unsubscribe<events::order_served>(order_served_handler_);
+                event_interface::unsubscribe<events::waiter_collected_food>(collected_food_handler_);
+                event_interface::unsubscribe<events::customer_finished_meal>(finished_meal_handler_);
+                event_interface::unsubscribe<events::customer_dog_left>(customer_left_handler_);
+            }
+            state_machine_system(const state_machine_system& other) = delete;
+            state_machine_system(state_machine_system&& other) = delete;
+
+            state_machine_system& operator=(const state_machine_system& other) = delete;
+            state_machine_system& operator=(state_machine_system&& other) = delete;
+
+            void update(float delta);
+            void transition(size_t entity, int transition,
+                std::optional<size_t> payload = std::nullopt);
+
+            void on_started_path(const events::dog_started_path& event);
+            void on_completed_path(const events::dog_completed_path& event);
+            void on_interaction_started(const events::interaction_started& event);
+            void on_interaction_finished(const events::interaction_finished& event);
+            void on_order_served(const events::order_served& event);
+            void on_collected_food(const events::waiter_collected_food& event);
+            void on_finished_meal(const events::customer_finished_meal& event);
+            void on_customer_left(const events::customer_dog_left& event);
+            void clear(){
+            }
+#ifdef DOG_DAYS_TESTING
+            std::optional<size_t> state_of(size_t entity){
+                auto* component = component_managers::state_machine_manager_.get_component(entity);
+                if(component == nullptr){ return std::nullopt; }
+                return component->get_machine().current();
+            }
+#endif
+        private:
+            state_machine_system()
+            : started_path_handler_([this](const events::dog_started_path& event) -> void{on_started_path(event);}),
+            completed_path_handler_([this](const events::dog_completed_path& event) -> void{on_completed_path(event);}),
+            interaction_started_handler_([this](const events::interaction_started& event) -> void{on_interaction_started(event);}),
+            interaction_finished_handler_([this](const events::interaction_finished& event) -> void{on_interaction_finished(event);}),
+            order_served_handler_([this](const events::order_served& event) -> void{on_order_served(event);}),
+            collected_food_handler_([this](const events::waiter_collected_food& event) -> void{on_collected_food(event);}),
+            finished_meal_handler_([this](const events::customer_finished_meal& event) -> void{on_finished_meal(event);}),
+            customer_left_handler_([this](const events::customer_dog_left& event) -> void{on_customer_left(event);}){
+                event_interface::subscribe<events::dog_started_path>(started_path_handler_);
+                event_interface::subscribe<events::dog_completed_path>(completed_path_handler_);
+                event_interface::subscribe<events::interaction_started>(interaction_started_handler_);
+                event_interface::subscribe<events::interaction_finished>(interaction_finished_handler_);
+                event_interface::subscribe<events::order_served>(order_served_handler_);
+                event_interface::subscribe<events::waiter_collected_food>(collected_food_handler_);
+                event_interface::subscribe<events::customer_finished_meal>(finished_meal_handler_);
+                event_interface::subscribe<events::customer_dog_left>(customer_left_handler_);
+            }
+            void play_state_animation(size_t entity);
+
+            events::event_handler<events::dog_started_path> started_path_handler_;
+            events::event_handler<events::dog_completed_path> completed_path_handler_;
+            events::event_handler<events::interaction_started> interaction_started_handler_;
+            events::event_handler<events::interaction_finished> interaction_finished_handler_;
+            events::event_handler<events::order_served> order_served_handler_;
+            events::event_handler<events::waiter_collected_food> collected_food_handler_;
+            events::event_handler<events::customer_finished_meal> finished_meal_handler_;
+            events::event_handler<events::customer_dog_left> customer_left_handler_;
+    };
 
     class collision_system{
         // for physics based collisions
@@ -204,7 +350,7 @@ namespace systems{
             public:
                 ~interaction() = default;
                 interaction(size_t interactor, size_t interactee)
-                : interactee_(interactee), interactor_(interactor){
+                : interactor_(interactor), interactee_(interactee){
                     performable_interactions_ = determine_performable_interactions();
                 }
                 interaction(const interaction& other) = default;
@@ -230,6 +376,7 @@ namespace systems{
             ~interaction_system(){
                 event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
                 event_interface::unsubscribe<events::remove_entity>(remove_entity_handler_);
+                event_interface::unsubscribe<events::dog_completed_path>(dog_completed_path_handler_);
             }
             interaction_system(const interaction_system& other) = delete;
             interaction_system(interaction_system&& other) = delete;
@@ -648,6 +795,8 @@ namespace systems{
         selection_system::get_instance().clear();
         npc_system::get_instance().clear();
         interaction_system::get_instance().clear();
+        animation_system::get_instance().clear();
+        state_machine_system::get_instance().clear();
     }
 
     // hold a refernece to the glboal managers that they need to process things

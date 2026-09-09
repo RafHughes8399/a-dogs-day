@@ -13,9 +13,9 @@ std::vector<Vector2> graph::level_graph::get_path(const queries::path_query& que
 
 // ---------------- node predicates and lookup ----------------
 bool graph::level_graph::is_node_closer(int current_id, int next_id, int end_id){
-    Vector2 current_position = get_node(current_id)->position_;
-    Vector2 next_position = get_node(next_id)->position_;
-    Vector2 end_position = get_node(end_id)->position_;
+    Vector2 current_position = get_node(static_cast<size_t>(current_id))->position_;
+    Vector2 next_position = get_node(static_cast<size_t>(next_id))->position_;
+    Vector2 end_position = get_node(static_cast<size_t>(end_id))->position_;
 
     auto current_end_distance = Vector2Distance(current_position, end_position);
     auto next_end_distance = Vector2Distance(next_position, end_position);
@@ -23,12 +23,12 @@ bool graph::level_graph::is_node_closer(int current_id, int next_id, int end_id)
 }
 
 bool graph::level_graph::is_node_empty(int node_id){
-    return get_node(node_id)->entities_.empty();
+    return get_node(static_cast<size_t>(node_id))->entities_.empty();
 }
 // true if occupued, false if not, differs from empty by the use case
 // empty is used for dog pathfinding, occupied is used for decoration placement
 bool graph::level_graph::is_node_occupied(int node_id, int decoration_id){
-    auto& occupants = get_node(node_id)->entities_;
+    auto& occupants = get_node(static_cast<size_t>(node_id))->entities_;
     // occupied if anything other than the querying decoration itself is present
     for(auto occupant : occupants){
         if(occupant != decoration_id){ return true; }

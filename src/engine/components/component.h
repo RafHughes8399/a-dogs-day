@@ -20,15 +20,32 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "sprite.h"
+#include "state_machine.h"
+
+
+/**
+    header file to define components that make up entities within the game
+    currently defines the following components and the usage 
+    the collision component - holds the entity hitbox for spatial collision checking
+    the storage component - enables an entity to hold items
+    the interactor and interactable component - used in conjunction to support interactions between two entities, an interactor can only interact with interactables
+    the movement component - supports entity pathfinding
+    the position component - gives entities a position in the world
+    the renderable component - gives entities a sprite and animation capabilities
+    the state machine component - manages the state of an entity for behaivoural and animation purposes
+    the key input component - manages 
+
+    components are individually stored by their associated manager which uses a map to 
+    tie them to an entity id. hence, the managers act is pseudo parallel arrays where for entity 2
+    the postion_mananger[2] and rednerable_manger[2] gives that entity's sprite and position
+
+    @author raffa, september 2026
+*/
 namespace components {
 
 
 #define DIRECTIONS 4
-// * components carry no id of their own - the manager's map key IS the owning
-// * entity, so anything iterating components already has it.
-// * one hitbox_component per entity. its variants run parallel to the base
-// * sprite list, so the two indices are one facing - use
-// * component_helpers::set_facing_index.
+
 class collision_component {
 public:
   class hitbox_component {
@@ -262,45 +279,48 @@ private:
 
 class renderable_component {
 public:
-  class sprite_component {
+  class body {
   public:
-    ~sprite_component() = default;
+    ~body() = default;
     // TODO (25 / 8 / 26) fix magic number what is 0
-    sprite_component(std::vector<sprite::sprite> &sprites, size_t index = 0)
-        : sprites_(sprites), sprite_index_(index) {}
-    sprite_component(const sprite_component& other) = default;
-    sprite_component(sprite_component&& other) = default;
+    body(std::vector<sprite::sprite> &sprites, size_t index = 0)
+        : sprites_(sprites), active_index_(index) {}
+    body(const body& other) = default;
+    body(body&& other) = default;
 
-    sprite_component& operator=(const sprite_component& other) = default;
-    sprite_component& operator=(sprite_component&& other) = default;
+    body& operator=(const body& other) = default;
+    body& operator=(body&& other) = default;
 
-      sprite::sprite& get_sprite();
-      size_t get_sprite_index() const;
+      sprite::sprite& get_active_sprite();
+      std::vector<sprite::sprite>& get_sprites();
+      size_t get_active_index() const;
       size_t num_sprites() const;
       void set_index(size_t index);
 
   private:
+    // * holds all the parts of the dog
     std::vector<sprite::sprite> sprites_;
-    size_t sprite_index_;
+    size_t active_index_;
   };
 
   ~renderable_component() = default;
-  renderable_component(std::vector<sprite_component> sprites = {})
-      : sprites_(std::move(sprites)) {}
+  renderable_component(std::vector<body> layers = {})
+      : body_(std::move(layers)) {}
   renderable_component(const renderable_component& other) = default;
   renderable_component(renderable_component&& other) = default;
 
   renderable_component& operator=(const renderable_component& other) = default;
   renderable_component& operator=(renderable_component&& other) = default;
 
-  std::vector<sprite_component>& get_sprites();
-  sprite_component* get_sprite_component(size_t index);
-  size_t num_sprite_components() const;
-  void add_sprite_component(sprite_component sprite);
-  void remove_sprite_component(size_t index);
-  void set_sprite_component(size_t index, sprite_component sprite);
+  std::vector<body>& get_layers();
+  body* get_body(size_t index);
+  size_t num_bodys() const;
+  void add_body(body layer);
+  void remove_body(size_t index);
+  void set_body(size_t index, body layer);
 private:
-  std::vector<sprite_component> sprites_;
+  // * holds the different directions
+  std::vector<body> body_;
 
 };
 
@@ -324,46 +344,21 @@ private:
     bool is_selected_;
 };
 
-// ! A STATE MACHINE IS A SET OF STATE COMPONENTS
-// ! a STATE MACHINE COMPONENT IS A SET OF STATE COMPONENTS
-// A STATE MACHINE DEFFINES TRANSITIONS BETWEEN STATES
-    // THE CONDITION TO TRANISITION
-    // THE BEHAVIOUR OF TRANSITIONING
-    // AND THE NEXT STATE
-    // TODO 30 / 8 / 26 
-    // * states affect behaviour
-    // * state machines define the transitional logic [ akin to how the menu graph is setup]
-    // * best way to structure this logic:
-    // * i think sub states is good
-    // the entity needs state, and then the state machine assigns a behaviour to a state and performs it
-    // maps the state id to the state behaviour or characteristic ? 
 class state_machine_component{
 public:
-    class state_component {
-    public:
-        ~state_component() = default;
-        state_component() = default;
-        state_component(const state_component& other) = default;
-        state_component(state_component&& other) = default;
-
-        state_component& operator=(const state_component& other) = default;
-        state_component& operator=(state_component&& other) = default;
-
-        
-    private:
-        size_t state_id_;
-        state_component * next_state_;
-    };
-
     ~state_machine_component() = default;
     state_machine_component() = default;
-    state_machine_component(const state_machine_component& other) = default;
+    state_machine_component(state_machine::state_machine machine)
+    : machine_(std::move(machine)){}
+    state_machine_component(const state_machine_component& other) = delete;
     state_machine_component(state_machine_component&& other) = default;
 
-    state_machine_component& operator=(const state_machine_component& other) = default;
+    state_machine_component& operator=(const state_machine_component& other) = delete;
     state_machine_component& operator=(state_machine_component&& other) = default;
 
-    //std::vector<state_component>
+    state_machine::state_machine& get_machine();
+private:
+    state_machine::state_machine machine_;
 };
 
 // menu component ?
@@ -438,9 +433,9 @@ namespace component_builders{
     components::movement_component build_movement_component(Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
-    components::renderable_component::sprite_component build_sprite_component(std::vector<sprite::sprite>& sprites, size_t index);
+    components::renderable_component::body build_body(std::vector<sprite::sprite>& sprites, size_t index);
     components::renderable_component build_renderable_component(
-        std::vector<components::renderable_component::sprite_component>& sprite_components);
+        std::vector<components::renderable_component::body>& bodys);
 
     components::collision_component::hitbox_component build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
     components::collision_component build_collision_component(
@@ -451,8 +446,7 @@ namespace component_builders{
         const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions = {});
     components::key_input_component build_key_input_component(std::vector<game_config::input>& controls);
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
-    components::state_machine_component::state_component build_state();
-    components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
+    components::state_machine_component build_state_machine_component(state_machine::state_machine machine);
     components::selectable_component build_selectable_component(size_t kind);
     components::storage_component build_storage_component();
 }
@@ -475,7 +469,7 @@ namespace component_helpers{
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
     void add_renderable_component(size_t entity_id,
-        std::vector<components::renderable_component::sprite_component>& sprite_components);
+        std::vector<components::renderable_component::body>& bodys);
     void add_collision_component(size_t entity_id,
         components::collision_component::hitbox_component hitbox);
     void add_interactor_component(size_t entity_id, float reach,
@@ -484,8 +478,7 @@ namespace component_helpers{
         const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions = {});
     void add_key_input_component(size_t entity_id, std::vector<game_config::input>& controls);
     void add_mouse_input_component(size_t entity_id, std::vector<game_config::input>& inputs);
-    void add_state_machine_component(size_t entity_id,
-        std::vector<components::state_machine_component::state_component>& state_components);
+    void add_state_machine_component(size_t entity_id, state_machine::state_machine machine);
     void add_selectable_component(size_t entity_id, size_t kind);
     void add_storage_component(size_t entity_id);
     void add_stored_item(size_t entity_id, size_t slot, size_t item_id);
@@ -495,7 +488,7 @@ namespace component_helpers{
     void create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions);
     bool is_mouse_positioned(size_t entity_id);
     void set_facing_index(size_t entity_id, size_t index);
-    void set_sprite_index(size_t entity_id, size_t slot, size_t index);
+    void set_active_index(size_t entity_id, size_t slot, size_t index);
 
     void unregister_positional_component(size_t entity_id);
     void unregister_movement_component(size_t entity_id);

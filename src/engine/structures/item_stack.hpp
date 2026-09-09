@@ -11,7 +11,7 @@ namespace item_stack{
         public:
             ~item() = default;
             item(size_t item_id, std::uint8_t count = 1)
-            :item_id_(item_id), count_(count){};
+            :item_id_(item_id), count_(count){}
 
             item(const item& other) = default;
             item(item&& other) = default;

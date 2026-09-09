@@ -6,6 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "events/event_core.h"
 #include "raylib.h"
 #include <cstddef>
 #include <raymath.h>
@@ -256,6 +257,119 @@ namespace cafe_config{
 namespace station_config{
     inline const float station_reach = level_config::edge_weight * 0.25f;
 }
+namespace animation_config{
+    inline constexpr int default_play_speed = 6;
+
+    inline constexpr int idle_frames = 4;
+    inline constexpr int idle_play_speed = 10;
+    inline constexpr int downward_dog_frames = 6;
+    inline constexpr int downward_dog_play_speed = default_play_speed;
+    inline constexpr int eating_frames = 6;
+    inline constexpr int eating_play_speed = default_play_speed;
+    inline constexpr int walking_frames = 6;
+    inline constexpr int walking_play_speed = default_play_speed;
+    inline constexpr int sitting_frames = 3;
+    inline constexpr int sitting_play_speed = 10;
+    inline constexpr int interacting_frames = 5;
+    inline constexpr int interacting_play_speed = default_play_speed;
+    inline constexpr int carrying_frames = 6;
+    inline constexpr int carrying_play_speed = default_play_speed;
+
+    inline constexpr int head_pinned_back_frames = 2;
+    inline constexpr int head_pinned_back_play_speed = 10;
+    inline constexpr int head_one_up_frames = 2;
+    inline constexpr int head_one_up_play_speed = 10;
+    inline constexpr int head_bouncing_frames = 4;
+    inline constexpr int head_bouncing_play_speed = default_play_speed;
+
+    inline constexpr int face_sniffing_frames = 4;
+    inline constexpr int face_sniffing_play_speed = default_play_speed;
+    inline constexpr int face_panting_frames = 6;
+    inline constexpr int face_panting_play_speed = 5;
+    inline constexpr int face_licking_frames = 5;
+    inline constexpr int face_licking_play_speed = default_play_speed;
+
+    inline constexpr int body_pawing_frames = 4;
+    inline constexpr int body_pawing_play_speed = default_play_speed;
+
+    inline constexpr int tail_wag_frames = 4;
+    inline constexpr int tail_wag_play_speed = 5;
+
+    inline constexpr int static_frames = 1;
+    inline constexpr int static_play_speed = 1;
+
+    // * sheet rows, one enum per dog sprite slot. indices 0 - shared_size are the
+    // * same animation on every part, so a whole-body action plays with one index
+    // * across all four slots; part-specific rows start at shared_size.
+    // * index 0 is what a freshly built sprite shows - a sprite's active animation
+    // * starts there - so it is the resting row on every part.
+    enum shared{
+        idle = 0,
+        downward_dog,
+        eating,
+        walking,
+        sitting,
+        interacting,
+        carrying,
+        shared_size
+    };
+    namespace tail{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
+            wag = shared::shared_size,
+            size
+        };
+    }
+    namespace body{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
+            pawing = shared::shared_size,
+            size
+        };
+    }
+    namespace head{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
+            pinned_back = shared::shared_size,
+            one_up,
+            bouncing,
+            size
+        };
+    }
+    namespace face{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
+            sniffing = shared::shared_size,
+            panting,
+            licking,
+            size
+        };
+    }
+}
 namespace entity_config{
     inline const char* player_dog_debug_id_prefix = "pd_";
     inline const char* customer_dog_debug_id_prefix = "cd_";
@@ -310,6 +424,29 @@ namespace entity_config{
         counter_food,
         counter_sprite_slots_size
     };
+    enum dog_sprite_slots{
+        dog_head = 0,
+        dog_face,
+        dog_body,
+        dog_tail,
+        dog_sprite_slots_size
+    };
+    enum dog_part_directions{
+        dog_part_left = 0,
+        dog_part_right,
+        dog_part_directions_size
+    };
+
+    // * authored in left-facing space; the right-facing sprite mirrors x across
+    // * the dog's across width. advances == false anchors the part to the
+    // * preceding advancing part, and its offset.x is relative to that anchor.
+    struct dog_part{
+        const float* attributes;
+        Vector2 offset;
+        bool advances;
+        const char* left_path;
+        const char* right_path;
+    };
 
     // file paths
     // * ------------------------ ENVIRONMENT AND CURSOR PATHS --------------------------------------- *//
@@ -320,35 +457,53 @@ namespace entity_config{
     // * ------------------------ PLAYER DOG PATHS  --------------------------------------- *//
     inline const char* khiri_left_path = "../sprites/khiri_left.png";
     inline const char* khiri_right_path = "../sprites/khiri_right.png";
-    inline const char* khiri_up_path = "../sprites/khiri_up.png";
-    inline const char* khiri_down_path = "../sprites/khiri_down.png";
-    // Head sprite art pending.
-    // inline const char* khiri_head_left_path = "../sprites/khiri_head_left.png";
-    // inline const char* khiri_head_right_path = "../sprites/khiri_head_right.png";
-    
+    inline const char* khiri_head_left_path = "../sprites/khiri_head_left.png";
+    inline const char* khiri_head_right_path = "../sprites/khiri_head_right.png";
+    inline const char* khiri_face_left_path = "../sprites/khiri_face_left.png";
+    inline const char* khiri_face_right_path = "../sprites/khiri_face_right.png";
+    inline const char* khiri_body_left_path = "../sprites/khiri_body_left.png";
+    inline const char* khiri_body_right_path = "../sprites/khiri_body_right.png";
+    inline const char* khiri_tail_left_path = "../sprites/khiri_tail_left.png";
+    inline const char* khiri_tail_right_path = "../sprites/khiri_tail_right.png";
+
     inline const char* khiri_left_outline_path = "../sprites/khiri_left_outline.png";
     inline const char* khiri_right_outline_path = "../sprites/khiri_right_outline.png";
-    inline const char* khiri_up_outline_path = "../sprites/khiri_up_outline.png";
-    inline const char* khiri_down_outline_path = "../sprites/khiri_down_outline.png";
-    
-    
+
+
     inline const char* mack_left_path = "../sprites/mack_left.png";
     inline const char* mack_right_path = "../sprites/mack_right.png";
-    inline const char* mack_up_path = "../sprites/mack_up.png";
-    inline const char* mack_down_path = "../sprites/mack_down.png";
-    // Head sprite art pending.
-    // inline const char* mack_head_left_path = "../sprites/mack_head_left.png";
-    // inline const char* mack_head_right_path = "../sprites/mack_head_right.png";
-    
+    inline const char* mack_head_left_path = "../sprites/mack_head_left.png";
+    inline const char* mack_head_right_path = "../sprites/mack_head_right.png";
+    inline const char* mack_face_left_path = "../sprites/mack_face_left.png";
+    inline const char* mack_face_right_path = "../sprites/mack_face_right.png";
+    inline const char* mack_body_left_path = "../sprites/mack_body_left.png";
+    inline const char* mack_body_right_path = "../sprites/mack_body_right.png";
+    inline const char* mack_tail_left_path = "../sprites/mack_tail_left.png";
+    inline const char* mack_tail_right_path = "../sprites/mack_tail_right.png";
+
     inline const char* mack_left_outline_path = "../sprites/mack_left_outline.png";
     inline const char* mack_right_outline_path = "../sprites/mack_right_outline.png";
-    inline const char* mack_up_outline_path = "../sprites/mack_up_outline.png";
-    inline const char* mack_down_outline_path = "../sprites/mack_down_outline.png";
     // * ------------------------ WAITER DOG PATHS --------------------------------------- *//
     inline const char* gianluca_left_path = "../sprites/gianluca-left.png";
     inline const char* gianluca_right_path = "../sprites/gianluca-right.png";
+    inline const char* gianluca_head_left_path = "../sprites/gianluca_head_left.png";
+    inline const char* gianluca_head_right_path = "../sprites/gianluca_head_right.png";
+    inline const char* gianluca_face_left_path = "../sprites/gianluca_face_left.png";
+    inline const char* gianluca_face_right_path = "../sprites/gianluca_face_right.png";
+    inline const char* gianluca_body_left_path = "../sprites/gianluca_body_left.png";
+    inline const char* gianluca_body_right_path = "../sprites/gianluca_body_right.png";
+    inline const char* gianluca_tail_left_path = "../sprites/gianluca_tail_left.png";
+    inline const char* gianluca_tail_right_path = "../sprites/gianluca_tail_right.png";
     inline const char* lionel_left_path = "../sprites/lionel-left.png";
     inline const char* lionel_right_path = "../sprites/lionel-right.png";
+    inline const char* lionel_head_left_path = "../sprites/lionel_head_left.png";
+    inline const char* lionel_head_right_path = "../sprites/lionel_head_right.png";
+    inline const char* lionel_face_left_path = "../sprites/lionel_face_left.png";
+    inline const char* lionel_face_right_path = "../sprites/lionel_face_right.png";
+    inline const char* lionel_body_left_path = "../sprites/lionel_body_left.png";
+    inline const char* lionel_body_right_path = "../sprites/lionel_body_right.png";
+    inline const char* lionel_tail_left_path = "../sprites/lionel_tail_left.png";
+    inline const char* lionel_tail_right_path = "../sprites/lionel_tail_right.png";
     // * ------------------------ DECORATION PATHS --------------------------------------- *//
     
     inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
@@ -366,11 +521,6 @@ namespace entity_config{
     inline const char* lasagna_food_path = "../sprites/lasagna.png";
     inline const char* coffee_food_path = "../sprites/coffee.png";
     
-    // NPC dog sprite art pending.
-    // inline const char* npc_dog_left_path = "../sprites/npc_dog_left.png";
-    // inline const char* npc_dog_right_path = "../sprites/npc_dog_right.png";
-    // inline const char* npc_dog_head_left_path = "../sprites/npc_dog_head_left.png";
-    // inline const char* npc_dog_head_right_path = "../sprites/npc_dog_head_right.png";
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
     enum attributes{
         frame_width = 0,
@@ -384,17 +534,55 @@ namespace entity_config{
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
     inline const float khiri_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
-    inline const float khiri_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
-    // inline const float khiri_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
-    // inline const Vector2 khiri_head_left_offset = Vector2{0.0f, 0.0f};
-    // inline const Vector2 khiri_head_right_offset = Vector2{0.0f, 0.0f};
     inline const float mack_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
-    inline const float mack_down_attributes[attributes::size] =  {level_config::edge_weight * 0.75f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
-    // inline const float mack_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
-    // inline const Vector2 mack_head_left_offset = Vector2{0.0f, 0.0f};
-    // inline const Vector2 mack_head_right_offset = Vector2{0.0f, 0.0f};
     inline const float gianluca_attributes[attributes::size] =  {level_config::edge_weight * 2.25f, level_config::edge_weight * 0.91f, 1.0f, 1.0f};
     inline const float lionel_attributes[attributes::size] =  {level_config::edge_weight * 1.75f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
+
+    // TODO (06 / 09 / 26) placeholder splits - advancing widths sum to the matching
+    // across width, but the proportions are guesses pending the part art
+    inline const float khiri_head_attributes[attributes::size] = {level_config::edge_weight * 0.60f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float khiri_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
+    inline const float khiri_body_attributes[attributes::size] = {level_config::edge_weight * 1.00f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float khiri_tail_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
+
+    inline const float mack_head_attributes[attributes::size] = {level_config::edge_weight * 0.60f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float mack_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
+    inline const float mack_body_attributes[attributes::size] = {level_config::edge_weight * 1.00f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float mack_tail_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
+
+    inline const float gianluca_head_attributes[attributes::size] = {level_config::edge_weight * 0.70f, level_config::edge_weight * 0.91f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float gianluca_face_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.35f, 1.0f, static_cast<float>(animation_config::face::size)};
+    inline const float gianluca_body_attributes[attributes::size] = {level_config::edge_weight * 1.10f, level_config::edge_weight * 0.91f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float gianluca_tail_attributes[attributes::size] = {level_config::edge_weight * 0.45f, level_config::edge_weight * 0.60f, 1.0f, static_cast<float>(animation_config::tail::size)};
+
+    inline const float lionel_head_attributes[attributes::size] = {level_config::edge_weight * 0.50f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float lionel_face_attributes[attributes::size] = {level_config::edge_weight * 0.30f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
+    inline const float lionel_body_attributes[attributes::size] = {level_config::edge_weight * 0.90f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float lionel_tail_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
+
+    inline const dog_part khiri_parts[dog_sprite_slots_size] = {
+        {khiri_head_attributes, Vector2{0.0f, 0.0f}, true, khiri_head_left_path, khiri_head_right_path},
+        {khiri_face_attributes, Vector2{level_config::edge_weight * 0.15f, level_config::edge_weight * 0.15f}, false, khiri_face_left_path, khiri_face_right_path},
+        {khiri_body_attributes, Vector2{0.0f, 0.0f}, true, khiri_body_left_path, khiri_body_right_path},
+        {khiri_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.15f}, true, khiri_tail_left_path, khiri_tail_right_path}};
+
+    inline const dog_part mack_parts[dog_sprite_slots_size] = {
+        {mack_head_attributes, Vector2{0.0f, 0.0f}, true, mack_head_left_path, mack_head_right_path},
+        {mack_face_attributes, Vector2{level_config::edge_weight * 0.15f, level_config::edge_weight * 0.15f}, false, mack_face_left_path, mack_face_right_path},
+        {mack_body_attributes, Vector2{0.0f, 0.0f}, true, mack_body_left_path, mack_body_right_path},
+        {mack_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.15f}, true, mack_tail_left_path, mack_tail_right_path}};
+
+    inline const dog_part gianluca_parts[dog_sprite_slots_size] = {
+        {gianluca_head_attributes, Vector2{0.0f, 0.0f}, true, gianluca_head_left_path, gianluca_head_right_path},
+        {gianluca_face_attributes, Vector2{level_config::edge_weight * 0.18f, level_config::edge_weight * 0.18f}, false, gianluca_face_left_path, gianluca_face_right_path},
+        {gianluca_body_attributes, Vector2{0.0f, 0.0f}, true, gianluca_body_left_path, gianluca_body_right_path},
+        {gianluca_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.18f}, true, gianluca_tail_left_path, gianluca_tail_right_path}};
+
+    inline const dog_part lionel_parts[dog_sprite_slots_size] = {
+        {lionel_head_attributes, Vector2{0.0f, 0.0f}, true, lionel_head_left_path, lionel_head_right_path},
+        {lionel_face_attributes, Vector2{level_config::edge_weight * 0.12f, level_config::edge_weight * 0.15f}, false, lionel_face_left_path, lionel_face_right_path},
+        {lionel_body_attributes, Vector2{0.0f, 0.0f}, true, lionel_body_left_path, lionel_body_right_path},
+        {lionel_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.15f}, true, lionel_tail_left_path, lionel_tail_right_path}};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
@@ -421,14 +609,10 @@ namespace entity_config{
     inline const float station_reach = level_config::edge_weight * 0.25f;
     // where stored food is drawn relative to the counter origin.
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
-    // inline const float npc_dog_across_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f};
-    // inline const float npc_dog_head_across_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
-    // inline const Vector2 npc_dog_head_left_offset = Vector2{0.0f, 0.0f};
-    // inline const Vector2 npc_dog_head_right_offset = Vector2{0.0f, 0.0f};
-    inline const int dog_eating_duration = game_config::frames * 10;
 }
 namespace dog_config{
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
+    inline const int eating_duration = game_config::frames * 10;
     inline const float customer_spawn_interval = 20.0f;
     inline const float dog_reach = level_config::edge_weight * 0.3f;
 
@@ -446,6 +630,35 @@ namespace dog_config{
     enum customer_dog_types{
         fred = 0,
         john
+    };
+    enum player_dog_states{
+        player_idle = 0,
+        player_walking,
+        player_interacting,
+        player_states_size
+    };
+    enum customer_dog_states{
+        customer_walking = 0,
+        customer_sitting,
+        customer_eating,
+        customer_states_size
+    };
+    enum waiter_dog_states{
+        waiter_stationary = 0,
+        waiter_idle,
+        waiter_interacting,
+        waiter_carrying,
+        waiter_states_size
+    };
+    enum state_transitions{
+        path_created = events::ids::dog_started_path_id,
+        path_finished = events::ids::dog_path_complete,
+        interaction_started = events::ids::interaction_started_id,
+        interaction_finished = events::ids::interaction_finished_id,
+        order_served = events::ids::order_served_id,
+        food_collected = events::ids::waiter_collected_food_id,
+        meal_finished = events::ids::customer_finished_meal_id,
+        customer_leaving = events::ids::customer_left
     };
 }
 namespace controls_config{

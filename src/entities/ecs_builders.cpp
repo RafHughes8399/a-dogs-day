@@ -32,9 +32,9 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
     size_t kind, float reach, std::vector<size_t> interactor_interactions){
     component_helpers::add_positional_component(id, position);
 
-    std::vector<components::renderable_component::sprite_component> sprite_components = {
-        component_builders::build_sprite_component(sprites, level_config::directions::right)};
-    component_helpers::add_renderable_component(id, sprite_components);
+    std::vector<components::renderable_component::body> bodys = {
+        component_builders::build_body(sprites, level_config::directions::right)};
+    component_helpers::add_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes = {dog_hitbox, dog_hitbox};
     component_helpers::add_collision_component(id,
@@ -59,6 +59,8 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
         build_dog(id, level_config::khiri_start, std::move(sprites),
             hitbox_builders::build_dog_across_hitbox(level_config::khiri_start),
             entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach);
+        component_helpers::add_state_machine_component(id,
+            state_machine_builders::build_player_state_machine());
     }
     void ecs_entities::build_mack(size_t id){
         std::vector<sprite::sprite> sprites;
@@ -70,6 +72,8 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
         build_dog(id, level_config::mack_start, std::move(sprites),
             hitbox_builders::build_dog_across_hitbox(level_config::mack_start),
             entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach);
+        component_helpers::add_state_machine_component(id,
+            state_machine_builders::build_player_state_machine());
     }
 
 // TODO (25 / 8 / 26) mack's art stands in until npc dog sprites exist
@@ -78,7 +82,9 @@ void ecs_entities::build_customer_dog(size_t id, Vector2 position){
     build_dog(id, position, build_mack_sprites(),
     hitbox_builders::build_dog_across_hitbox(position),
     entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach, 
-    interaction_config::customer_dog_interactor);}
+    interaction_config::customer_dog_interactor);
+    component_helpers::add_state_machine_component(id,
+        state_machine_builders::build_customer_state_machine());}
     //**
     
     // .
@@ -94,6 +100,8 @@ void ecs_entities::build_customer_dog(size_t id, Vector2 position){
             entity_config::mack_right_path, entity_config::mack_across_attributes));
     build_dog(id, position, std::move(sprites), hitbox_builders::build_dog_across_hitbox(position),
         entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
+    component_helpers::add_state_machine_component(id,
+        state_machine_builders::build_customer_state_machine());
     }
     void ecs_entities::build_garfield(size_t id, Vector2 position){
             std::vector<sprite::sprite> sprites;
@@ -103,6 +111,8 @@ void ecs_entities::build_customer_dog(size_t id, Vector2 position){
                 entity_config::khiri_right_path, entity_config::khiri_across_attributes));
         build_dog(id, position, std::move(sprites), hitbox_builders::build_dog_across_hitbox(position),
             entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
+        component_helpers::add_state_machine_component(id,
+            state_machine_builders::build_customer_state_machine());
     }
 
 // TODO (28 / 8 / 26) - update to take in a sprite 
@@ -112,9 +122,8 @@ void ecs_entities::build_waiter_dog(size_t id, Vector2 position,
     build_dog(id, position, std::move(sprites), waiter_hitbox,
         entity_config::selectable_kinds::waiter_dog_kind, dog_config::dog_reach,
     interaction_config::waiter_dog_interactor);
-    // then build the remaining components, the state machine
-    // * the idle state
-    // * 
+    component_helpers::add_state_machine_component(id,
+        state_machine_builders::build_waiter_state_machine());
 }
 
     void ecs_entities::build_gianluca(size_t id, Vector2 position){
@@ -136,8 +145,8 @@ void ecs_entities::build_cursor(size_t id){
     component_helpers::add_positional_component(id, GetMousePosition());
     component_helpers::add_mouse_input_component(id, game_config::cursor_controls);
     std::vector<sprite::sprite> sprites = {sprite_builders::build_cursor_sprite()};
-    std::vector<components::renderable_component::sprite_component> sprite_components = {component_builders::build_sprite_component(sprites, 0)};
-    component_helpers::add_renderable_component(id, sprite_components);
+    std::vector<components::renderable_component::body> bodys = {component_builders::build_body(sprites, 0)};
+    component_helpers::add_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes = {hitbox_builders::build_cursor_hitbox(GetMousePosition())};
     component_helpers::add_collision_component(id,
@@ -148,9 +157,9 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
     component_helpers::add_positional_component(id, position);
 
     std::vector<sprite::sprite> sprites = {decoration_sprite};
-    std::vector<components::renderable_component::sprite_component> sprite_components = {
-        component_builders::build_sprite_component(sprites, 0)};
-    component_helpers::add_renderable_component(id, sprite_components);
+    std::vector<components::renderable_component::body> bodys = {
+        component_builders::build_body(sprites, 0)};
+    component_helpers::add_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes = {decoration_hitbox};
     component_helpers::add_collision_component(id,
@@ -248,6 +257,6 @@ void ecs_entities::build_background(size_t id){
     component_helpers::add_positional_component(id, Vector2{0.0f, 0.0f});
 
     std::vector<sprite::sprite> sprites = {sprite_builders::build_background_sprite()};
-    std::vector<components::renderable_component::sprite_component> sprite_components = {component_builders::build_sprite_component(sprites, 0)};
-    component_helpers::add_renderable_component(id, sprite_components);
+    std::vector<components::renderable_component::body> bodys = {component_builders::build_body(sprites, 0)};
+    component_helpers::add_renderable_component(id, bodys);
 }

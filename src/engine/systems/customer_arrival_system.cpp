@@ -45,7 +45,7 @@ int dbs::customer_arrival_system::pick_table(){
         // check its status
         auto interactable = component_managers::interactable_manager_.get_component(table);
         if(interactable and interactable->can_accept_interactor()){
-            return table;
+            return static_cast<int>(table);
         }
     }
     return game_config::empty_entity;

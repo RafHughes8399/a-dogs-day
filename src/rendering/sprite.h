@@ -16,7 +16,14 @@ namespace sprite{
         public:
             ~sprite() = default;
             sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations, Vector2 draw_position_offset = Vector2Zero(), Color tint = WHITE)
-                : sprite_animation_(animation::animation(frame_width, frame_height, static_cast<int>(frames), static_cast<int>(animations))),
+                : animations_(animation_builders::build_uniform_animations(frame_width, frame_height,
+                    static_cast<int>(animations), static_cast<int>(frames))),
+                sprite_texture_(texture),
+                draw_position_offset_(draw_position_offset),
+                tint_(tint){}
+            sprite(Texture2D texture, std::vector<animation::animation> animations,
+                Vector2 draw_position_offset = Vector2Zero(), Color tint = WHITE)
+                : animations_(std::move(animations)),
                 sprite_texture_(texture),
                 draw_position_offset_(draw_position_offset),
                 tint_(tint){}
@@ -27,13 +34,19 @@ namespace sprite{
             sprite& operator=(sprite&& other) = delete;
 
             animation::animation& get_animation();
+            animation::animation& get_animation(size_t index);
+            size_t get_animation_index() const;
+            size_t num_animations() const;
+            void set_animation(size_t index);
+
             const Texture2D& get_texture();
             Vector2 get_draw_position_offset() const;
             void render(Vector2 position, int frame);
         private:
             // has the texture 
             // and the animation
-            animation::animation sprite_animation_;
+            std::vector<animation::animation> animations_;
+            size_t animation_index_ = 0;
             const Texture2D sprite_texture_; 
             Vector2 draw_position_offset_;
             Color tint_;
@@ -91,7 +104,17 @@ namespace sprite_builders{
     sprite::sprite build_background_sprite();
     // every dog sprite is the same four attribute lookups off a cached texture
     sprite::sprite build_dog_sprite(int texture_key, const char* path,
-        const float attributes[entity_config::attributes::size]);
+        const float attributes[entity_config::attributes::size],
+        Vector2 draw_position_offset = Vector2Zero());
+    sprite::sprite build_dog_part_sprite(int texture_key, const char* path,
+        const float attributes[entity_config::attributes::size],
+        std::vector<animation::animation> animations,
+        Vector2 draw_position_offset = Vector2Zero());
+    // one inner vector per dog_sprite_slots entry, each {left, right}
+    std::vector<std::vector<sprite::sprite>> build_dog_part_layers(
+        const entity_config::dog_part parts[entity_config::dog_sprite_slots_size],
+        const int texture_keys[entity_config::dog_sprite_slots_size][entity_config::dog_part_directions_size],
+        float expected_total_width);
     std::vector<sprite::sprite> build_gianluca_sprites();
     std::vector<sprite::sprite> build_lionel_sprites();
     // decorations, stations and food all draw off the test_decoration sheet and

@@ -8,11 +8,11 @@ components::position_component component_builders::build_positional_component(Ve
 components::movement_component component_builders::build_movement_component(Vector2 move_speed, Vector2 direction_scalar, std::queue<path::path> paths){
     return components::movement_component(move_speed, direction_scalar, paths);
 }
-components::renderable_component::sprite_component component_builders::build_sprite_component(std::vector<sprite::sprite>& sprites, size_t index){
-    return components::renderable_component::sprite_component(sprites, index);
+components::renderable_component::body component_builders::build_body(std::vector<sprite::sprite>& sprites, size_t index){
+    return components::renderable_component::body(sprites, index);
 }
-components::renderable_component component_builders::build_renderable_component(std::vector<components::renderable_component::sprite_component>& sprite_components){
-    return components::renderable_component(sprite_components);
+components::renderable_component component_builders::build_renderable_component(std::vector<components::renderable_component::body>& bodys){
+    return components::renderable_component(bodys);
 }
 components::collision_component::hitbox_component component_builders::build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index){
     return components::collision_component::hitbox_component(hitboxes, index);
@@ -33,12 +33,8 @@ components::key_input_component component_builders::build_key_input_component(st
 components::mouse_input_component component_builders::build_mouse_input_component(std::vector<game_config::input>& inputs){
     return components::mouse_input_component(inputs);
 }
-components::state_machine_component::state_component component_builders::build_state(){
-    return components::state_machine_component::state_component();
-}
-components::state_machine_component component_builders::build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components){
-    (void) state_components;
-    return components::state_machine_component();
+components::state_machine_component component_builders::build_state_machine_component(state_machine::state_machine machine){
+    return components::state_machine_component(std::move(machine));
 }
 components::selectable_component component_builders::build_selectable_component(size_t kind){
     return components::selectable_component(kind);

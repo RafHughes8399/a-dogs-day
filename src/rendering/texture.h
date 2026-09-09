@@ -23,32 +23,52 @@ namespace textures{
         khiri_right,
         khiri_left_out,
         khiri_right_out,
+        khiri_head_left,
+        khiri_head_right,
+        khiri_face_left,
+        khiri_face_right,
+        khiri_body_left,
+        khiri_body_right,
+        khiri_tail_left,
+        khiri_tail_right,
         mack_left,
         mack_right,
-        mack_up,
-        mack_down,
         mack_left_out,
         mack_right_out,
+        mack_head_left,
+        mack_head_right,
+        mack_face_left,
+        mack_face_right,
+        mack_body_left,
+        mack_body_right,
+        mack_tail_left,
+        mack_tail_right,
         gianluca_left,
         gianluca_right,
+        gianluca_head_left,
+        gianluca_head_right,
+        gianluca_face_left,
+        gianluca_face_right,
+        gianluca_body_left,
+        gianluca_body_right,
+        gianluca_tail_left,
+        gianluca_tail_right,
         lionel_left,
         lionel_right,
+        lionel_head_left,
+        lionel_head_right,
+        lionel_face_left,
+        lionel_face_right,
+        lionel_body_left,
+        lionel_body_right,
+        lionel_tail_left,
+        lionel_tail_right,
         test_decoration,
         hud_edit_wheel,
         gargoyle_void,
         gargoyle_sick_of_it,
         poker_table,
         dog_painting,
-        // Head sprite art pending.
-        // khiri_head_left = 16,
-        // khiri_head_right = 17,
-        // mack_head_left = 18,
-        // mack_head_right = 19,
-        // NPC dog sprite art pending.
-        // npc_dog_left = 20,
-        // npc_dog_right = 21,
-        // npc_dog_head_left = 22,
-        // npc_dog_head_right = 23,
         dining_table,
         food_counter,
         lasagna,
@@ -57,6 +77,28 @@ namespace textures{
         size
         // and so on
     };
+    // * parallel to entity_config::<dog>_parts - the keys live here rather than in
+    // * the config table because texture.h includes config.h, not the reverse
+    inline const int khiri_part_keys[entity_config::dog_sprite_slots_size][entity_config::dog_part_directions_size] = {
+        {khiri_head_left, khiri_head_right},
+        {khiri_face_left, khiri_face_right},
+        {khiri_body_left, khiri_body_right},
+        {khiri_tail_left, khiri_tail_right}};
+    inline const int mack_part_keys[entity_config::dog_sprite_slots_size][entity_config::dog_part_directions_size] = {
+        {mack_head_left, mack_head_right},
+        {mack_face_left, mack_face_right},
+        {mack_body_left, mack_body_right},
+        {mack_tail_left, mack_tail_right}};
+    inline const int gianluca_part_keys[entity_config::dog_sprite_slots_size][entity_config::dog_part_directions_size] = {
+        {gianluca_head_left, gianluca_head_right},
+        {gianluca_face_left, gianluca_face_right},
+        {gianluca_body_left, gianluca_body_right},
+        {gianluca_tail_left, gianluca_tail_right}};
+    inline const int lionel_part_keys[entity_config::dog_sprite_slots_size][entity_config::dog_part_directions_size] = {
+        {lionel_head_left, lionel_head_right},
+        {lionel_face_left, lionel_face_right},
+        {lionel_body_left, lionel_body_right},
+        {lionel_tail_left, lionel_tail_right}};
     class texture{
         public:
             ~texture() = default;

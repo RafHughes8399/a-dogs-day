@@ -43,13 +43,13 @@ void game::game::init(){
     lifespan_.create_waiter_dog(entity_config::waiters::lionel, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 9});
 
     // * and some decorations
-    auto gargoyle_id = lifespan_.create([](size_t id)-> void {
+    lifespan_.create([](size_t id)-> void {
         ecs_entities::build_gargoyle(id, Vector2{level_config::edge_weight * 7,level_config::edge_weight *2});
     }, level_config::draw_layers::decoration);
-    auto poker_table_id = lifespan_.create([](size_t id)-> void {
+    lifespan_.create([](size_t id)-> void {
         ecs_entities::build_poker_table(id, Vector2{level_config::edge_weight * 10,level_config::edge_weight *20});
     }, level_config::draw_layers::decoration);
-    auto dog_painting__id = lifespan_.create([](size_t id)-> void {
+    lifespan_.create([](size_t id)-> void {
         ecs_entities::build_dog_painting(id, Vector2{level_config::edge_weight * 9,level_config::edge_weight * 4});
     }, level_config::draw_layers::decoration);
     // TODO menus and hud
@@ -76,6 +76,8 @@ void game::game::update(float delta){
     spatial_.update(delta);
     collision_.update(delta);
     interaction_.update(delta);
+    state_machine_.update(delta);
+    animation_.update(delta);
 
     frame_count_++;
     if(frame_count_ == game_config::twenty_seconds){

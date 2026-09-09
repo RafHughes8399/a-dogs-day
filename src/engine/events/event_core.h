@@ -24,7 +24,6 @@
 #include <utility>
 #include <optional>
 // project includes
-#include "../../entities/hitbox.h"
 #include "raylib.h"
 
 // Forward declarations so registration events can carry pointers to live level
@@ -96,6 +95,11 @@ namespace events{
 		create,
 		create_path_to_id,
 		create_path_to_entity_id,
+		animation_finished_id,
+		dog_started_path_id,
+		interaction_started_id,
+		interaction_finished_id,
+		customer_finished_meal_id,
 		size
 	};
 	class event{

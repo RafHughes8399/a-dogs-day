@@ -44,7 +44,7 @@ void systems::rendering_system::render(int frame){
     }
     //movement_system::get_instance().render_graph(view_frame_);
     Rectangle queue = {0, -2* level_config::edge_weight, level_config::edge_weight * 4.5f, level_config::world_y + (4 * level_config::edge_weight)};
-    DrawRectangleLines(queue.x, queue.y, queue.width, queue.height, RED);
+    DrawRectangleLines(static_cast<int>(queue.x), static_cast<int>(queue.y), static_cast<int>(queue.width), static_cast<int>(queue.height), RED);
 }
 
 void systems::rendering_system::clear(){

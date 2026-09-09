@@ -12,39 +12,24 @@ const Rectangle& animation::animation::get_frame() const{
 int animation::animation::get_current_frame(){
     return current_frame_;
 }
-int animation::animation::get_current_animation(){
-    return current_animation_;
-}
-
-int animation::animation::num_animations(){
-    return animations_;
+int animation::animation::get_row(){
+    return row_;
 }
 
 int animation::animation::num_frames(){
     return frames_;
 }
-void animation::animation::goto_animation(const int animation){
-    if(animation < animations_){
-        current_animation_ = animation;
-        frame_.y = frame_.height * animation;
-    }
+
+int animation::animation::get_play_speed(){
+    return play_speed_;
 }
 void animation::animation::goto_frame(const int frame){
     if(frame < frames_){
         current_frame_ = frame;
-        frame_.x = frame_.width * frame;
+        frame_.x = frame_.width * static_cast<float>(frame);
     }
 }
 
-void animation::animation::next_animation(){
-    // check bounds, increment, adjust rectangle
-    // 0 to animations -1
-    if(current_animation_ < animations_  - 1){
-        current_animation_++;
-    
-        frame_.y += frame_.height;
-    }
-}
 void animation::animation::next_frame(bool wrap){
     // check bounds, increment, adjust rectangle, loop if wrap 
     if(current_frame_ < frames_ - 1){
@@ -60,10 +45,15 @@ void animation::animation::next_frame(bool wrap){
 
 void animation::animation::advance(int frame){
     if(is_playing_ and play_speed_ > 0 and frame % play_speed_ == 0){
-        next_frame();
+        if(not repeat_ and current_frame_ == frames_ - 1){
+            is_playing_ = false;
+            return;
+        }
+        next_frame(repeat_);
     }
 }
-void animation::animation::play(){
+void animation::animation::play(bool repeat){
+    repeat_ = repeat;
     is_playing_ = true;
 }
 void animation::animation::pause(){

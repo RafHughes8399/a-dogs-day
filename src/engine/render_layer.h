@@ -73,8 +73,8 @@ namespace render_layer{
 
                     auto draw_position = Vector2Subtract(position->get_position(), frame_position);
                     // body, outlines and cosmetics all draw at the same position
-                    for(auto & sprite_component : renderable->get_sprites()){
-                        sprite_component.get_sprite().render(draw_position, frame);
+                    for(auto & body : renderable->get_layers()){
+                        body.get_active_sprite().render(draw_position, frame);
                     }
                     if(hitbox_debug){
                         auto* hitbox = component_managers::collision_manager_.get_component(entity_id);
@@ -83,16 +83,16 @@ namespace render_layer{
                         if(hitbox) {
                             auto box = hitbox->get_hitbox_component().get_hitbox().get_box();
                             auto box_position = Vector2Subtract({box.x, box.y}, frame_position);
-                            DrawRectangleLines(box_position.x, box_position.y, box.width, box.height, GREEN);
+                            DrawRectangleLines(static_cast<int>(box_position.x), static_cast<int>(box_position.y), static_cast<int>(box.width), static_cast<int>(box.height), GREEN);
                             if(interactor){
                                 auto interaction_box = interactor->get_interaction_box(box);
                                 auto interaction_box_position = Vector2Subtract({interaction_box.x, interaction_box.y}, frame_position);
-                                DrawRectangleLines(interaction_box_position.x, interaction_box_position.y, interaction_box.width, interaction_box.height, ORANGE);
+                                DrawRectangleLines(static_cast<int>(interaction_box_position.x), static_cast<int>(interaction_box_position.y), static_cast<int>(interaction_box.width), static_cast<int>(interaction_box.height), ORANGE);
                             }
                             if(interactable){
                                 auto interaction_box = interactable->get_interaction_box(box);
                                 auto interaction_box_position = Vector2Subtract({interaction_box.x, interaction_box.y}, frame_position);
-                                DrawRectangleLines(interaction_box_position.x, interaction_box_position.y, interaction_box.width, interaction_box.height, ORANGE);
+                                DrawRectangleLines(static_cast<int>(interaction_box_position.x), static_cast<int>(interaction_box_position.y), static_cast<int>(interaction_box.width), static_cast<int>(interaction_box.height), ORANGE);
                             }
                         }
                     }

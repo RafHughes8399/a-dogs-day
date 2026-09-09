@@ -4,6 +4,8 @@
 #ifndef EVENTS_DOG_EVENTS_H
 #define EVENTS_DOG_EVENTS_H
 
+#include <optional>
+
 #include "event_core.h"
 
 namespace events {
@@ -100,6 +102,17 @@ private:
   const size_t id_;
   const Vector2 destination_;
 };
+class dog_started_path : public event {
+public:
+  dog_started_path(size_t dog_id)
+      : event(ids::dog_started_path_id), id_(dog_id) {}
+
+  static int get_static_type() { return ids::dog_started_path_id; }
+  size_t get_id() const { return id_; }
+
+private:
+  const size_t id_;
+};
 class give_dog_path : public event {
 public:
   give_dog_path(size_t dog_id, std::vector<Vector2> path)
@@ -158,6 +171,17 @@ private:
 // (not a dog object) - the maitre d' uses it both as coarse
 // arrival-pressure input and to resolve which table to clear, by
 // matching against table::get_assigned_dog_id().
+class customer_finished_meal : public event {
+public:
+  customer_finished_meal(size_t customer_id)
+      : event(ids::customer_finished_meal_id), customer_id_(customer_id) {}
+
+  static int get_static_type() { return ids::customer_finished_meal_id; }
+  size_t get_customer_id() const { return customer_id_; }
+
+private:
+  const size_t customer_id_;
+};
 class customer_dog_left : public event {
 public:
   customer_dog_left(size_t customer_id)
@@ -333,14 +357,18 @@ private:
 // The expediter does the actual handoff - the dog can't resolve a counter id.
 class waiter_collected_food : public event {
 public:
-  waiter_collected_food(size_t waiter_id)
-      : event(ids::waiter_collected_food_id), waiter_id_(waiter_id) {}
+  waiter_collected_food(size_t waiter_id,
+                        std::optional<size_t> food_id = std::nullopt)
+      : event(ids::waiter_collected_food_id), waiter_id_(waiter_id),
+        food_id_(food_id) {}
 
   static int get_static_type() { return ids::waiter_collected_food_id; }
   size_t get_waiter_id() const { return waiter_id_; }
+  std::optional<size_t> get_food_id() const { return food_id_; }
 
 private:
   const size_t waiter_id_;
+  const std::optional<size_t> food_id_;
 };
 
 // Cafe-domain fact: a waiter has placed the food on the table. The expediter
