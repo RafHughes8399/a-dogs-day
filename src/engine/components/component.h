@@ -279,17 +279,17 @@ private:
 
 class renderable_component {
 public:
-  class sprite_layer {
+  class body {
   public:
-    ~sprite_layer() = default;
+    ~body() = default;
     // TODO (25 / 8 / 26) fix magic number what is 0
-    sprite_layer(std::vector<sprite::sprite> &sprites, size_t index = 0)
+    body(std::vector<sprite::sprite> &sprites, size_t index = 0)
         : sprites_(sprites), active_index_(index) {}
-    sprite_layer(const sprite_layer& other) = default;
-    sprite_layer(sprite_layer&& other) = default;
+    body(const body& other) = default;
+    body(body&& other) = default;
 
-    sprite_layer& operator=(const sprite_layer& other) = default;
-    sprite_layer& operator=(sprite_layer&& other) = default;
+    body& operator=(const body& other) = default;
+    body& operator=(body&& other) = default;
 
       sprite::sprite& get_active_sprite();
       std::vector<sprite::sprite>& get_sprites();
@@ -298,27 +298,29 @@ public:
       void set_index(size_t index);
 
   private:
+    // * holds all the parts of the dog
     std::vector<sprite::sprite> sprites_;
     size_t active_index_;
   };
 
   ~renderable_component() = default;
-  renderable_component(std::vector<sprite_layer> layers = {})
-      : layers_(std::move(layers)) {}
+  renderable_component(std::vector<body> layers = {})
+      : body_(std::move(layers)) {}
   renderable_component(const renderable_component& other) = default;
   renderable_component(renderable_component&& other) = default;
 
   renderable_component& operator=(const renderable_component& other) = default;
   renderable_component& operator=(renderable_component&& other) = default;
 
-  std::vector<sprite_layer>& get_layers();
-  sprite_layer* get_sprite_layer(size_t index);
+  std::vector<body>& get_layers();
+  body* get_sprite_layer(size_t index);
   size_t num_sprite_layers() const;
-  void add_sprite_layer(sprite_layer layer);
+  void add_sprite_layer(body layer);
   void remove_sprite_layer(size_t index);
-  void set_sprite_layer(size_t index, sprite_layer layer);
+  void set_sprite_layer(size_t index, body layer);
 private:
-  std::vector<sprite_layer> layers_;
+  // * holds the different directions
+  std::vector<body> body_;
 
 };
 
@@ -431,9 +433,9 @@ namespace component_builders{
     components::movement_component build_movement_component(Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
-    components::renderable_component::sprite_layer build_sprite_layer(std::vector<sprite::sprite>& sprites, size_t index);
+    components::renderable_component::body build_sprite_layer(std::vector<sprite::sprite>& sprites, size_t index);
     components::renderable_component build_renderable_component(
-        std::vector<components::renderable_component::sprite_layer>& sprite_layers);
+        std::vector<components::renderable_component::body>& sprite_layers);
 
     components::collision_component::hitbox_component build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
     components::collision_component build_collision_component(
@@ -467,7 +469,7 @@ namespace component_helpers{
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
     void add_renderable_component(size_t entity_id,
-        std::vector<components::renderable_component::sprite_layer>& sprite_layers);
+        std::vector<components::renderable_component::body>& sprite_layers);
     void add_collision_component(size_t entity_id,
         components::collision_component::hitbox_component hitbox);
     void add_interactor_component(size_t entity_id, float reach,

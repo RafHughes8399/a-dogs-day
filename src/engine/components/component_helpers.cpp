@@ -45,7 +45,7 @@ void component_helpers::add_movement_component(size_t entity_id, Vector2 move_sp
         component_builders::build_movement_component(move_speed, direction_scalar, std::move(paths)));
 }
 void component_helpers::add_renderable_component(size_t entity_id,
-    std::vector<components::renderable_component::sprite_layer>& sprite_layers){
+    std::vector<components::renderable_component::body>& sprite_layers){
     register_renderable_component(entity_id,
         component_builders::build_renderable_component(sprite_layers));
 }

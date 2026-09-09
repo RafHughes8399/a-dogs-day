@@ -1,5 +1,5 @@
-#ifndef SYSTEMS_H
-#define SYSTEMS_H
+#ifndef SYSTEM_H
+#define SYSTEM_H
 #include "component.h"
 #include "config.h"
 #include "entity.h"
@@ -71,7 +71,7 @@ namespace systems{
             void stop(size_t entity, size_t sprite_slot);
             void on_destroyed_entity(const events::remove_entity& event);
             void clear(){
-                in_flight_.clear();
+                current_animations_.clear();
             }
 #ifdef DOG_DAYS_TESTING
             size_t in_flight_count() const{
@@ -83,7 +83,7 @@ namespace systems{
             // * the countdown runs in update rather than off animation::playing()
             // * because advance() only steps while the entity is being rendered -
             // * a one-shot started off screen would otherwise never finish
-            struct in_flight_animation{
+            struct animation{
                 size_t entity;
                 size_t sprite_slot;
                 size_t animation_index;
@@ -93,7 +93,7 @@ namespace systems{
             : remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}){
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
             }
-            std::vector<in_flight_animation> in_flight_;
+            std::vector<animation> current_animations_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
     };
 

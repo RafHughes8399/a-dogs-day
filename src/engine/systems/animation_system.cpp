@@ -13,13 +13,13 @@ void systems::animation_system::play(size_t entity, const std::vector<sprite_ani
             slot_sprite.get_animation().play(anim.repeat);
         }
         // a new play on a slot supersedes whatever was counting down on it
-        std::erase_if(in_flight_, [entity, &anim](const auto& tracked) -> bool {
+        std::erase_if(current_animations_, [entity, &anim](const auto& tracked) -> bool {
             return tracked.entity == entity and tracked.sprite_slot == anim.sprite_slot;
         });
         if(anim.repeat){ continue; }
 
         auto& animation = slot->get_sprites().front().get_animation();
-        in_flight_.push_back(in_flight_animation{entity, anim.sprite_slot, anim.animation_index,
+        current_animations_.push_back(animation{entity, anim.sprite_slot, anim.animation_index,
             animation.num_frames() * animation.get_play_speed()});
     }
 }
@@ -37,7 +37,7 @@ void systems::animation_system::stop(size_t entity){
             slot_sprite.get_animation().pause();
         }
     }
-    std::erase_if(in_flight_, [entity](const auto& tracked) -> bool {
+    std::erase_if(current_animations_, [entity](const auto& tracked) -> bool {
         return tracked.entity == entity;
     });
 }
@@ -51,14 +51,14 @@ void systems::animation_system::stop(size_t entity, size_t sprite_slot){
             slot_sprite.get_animation().pause();
         }
     }
-    std::erase_if(in_flight_, [entity, sprite_slot](const auto& tracked) -> bool {
+    std::erase_if(current_animations_, [entity, sprite_slot](const auto& tracked) -> bool {
         return tracked.entity == entity and tracked.sprite_slot == sprite_slot;
     });
 }
 
 void systems::animation_system::on_destroyed_entity(const events::remove_entity& event){
     auto entity = event.get_id();
-    std::erase_if(in_flight_, [entity](const auto& tracked) -> bool {
+    std::erase_if(current_animations_, [entity](const auto& tracked) -> bool {
         return tracked.entity == entity;
     });
 }
@@ -67,9 +67,9 @@ void systems::animation_system::on_destroyed_entity(const events::remove_entity&
 // once per rendered frame, the same cadence animation::advance steps on
 void systems::animation_system::update(float delta){
     (void) delta;
-    std::vector<in_flight_animation> finished;
+    std::vector<animation> finished;
 
-    for(auto& tracked : in_flight_){
+    for(auto& tracked : current_animations_){
         tracked.frames_remaining--;
         if(tracked.frames_remaining <= 0){
             finished.push_back(tracked);
@@ -77,7 +77,7 @@ void systems::animation_system::update(float delta){
     }
     if(finished.empty()){ return; }
 
-    std::erase_if(in_flight_, [](const auto& tracked) -> bool {
+    std::erase_if(current_animations_, [](const auto& tracked) -> bool {
         return tracked.frames_remaining <= 0;
     });
     // erase first, then pause and announce - stop() prunes in_flight_ too, and a
