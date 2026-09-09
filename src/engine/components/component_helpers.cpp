@@ -72,10 +72,9 @@ void component_helpers::add_mouse_input_component(size_t entity_id, std::vector<
     register_mouse_input_component(entity_id,
         component_builders::build_mouse_input_component(inputs));
 }
-void component_helpers::add_state_machine_component(size_t entity_id,
-    std::vector<components::state_machine_component::state_component>& state_components){
+void component_helpers::add_state_machine_component(size_t entity_id, state_machine::state_machine machine){
     register_state_machine_component(entity_id,
-        component_builders::build_state_machine_component(state_components));
+        component_builders::build_state_machine_component(std::move(machine)));
 }
 void component_helpers::add_selectable_component(size_t entity_id, size_t kind){
     register_selectable_component(entity_id,

@@ -76,6 +76,7 @@ void game::game::update(float delta){
     spatial_.update(delta);
     collision_.update(delta);
     interaction_.update(delta);
+    state_machine_.update(delta);
     animation_.update(delta);
 
     frame_count_++;

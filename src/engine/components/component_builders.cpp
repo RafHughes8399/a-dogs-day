@@ -33,12 +33,8 @@ components::key_input_component component_builders::build_key_input_component(st
 components::mouse_input_component component_builders::build_mouse_input_component(std::vector<game_config::input>& inputs){
     return components::mouse_input_component(inputs);
 }
-components::state_machine_component::state_component component_builders::build_state(){
-    return components::state_machine_component::state_component();
-}
-components::state_machine_component component_builders::build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components){
-    (void) state_components;
-    return components::state_machine_component();
+components::state_machine_component component_builders::build_state_machine_component(state_machine::state_machine machine){
+    return components::state_machine_component(std::move(machine));
 }
 components::selectable_component component_builders::build_selectable_component(size_t kind){
     return components::selectable_component(kind);

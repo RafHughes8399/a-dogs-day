@@ -12,6 +12,7 @@
 // -----------------------------------------------------------------------------
 
 #include <functional>
+#include <optional>
 #include <vector>
 
 #include "config.h"
@@ -86,6 +87,9 @@ namespace testing{
             bool has_interactor(size_t entity_id);
             bool has_interactable(size_t entity_id);
             bool has_storage(size_t entity_id);
+            bool has_state_machine(size_t entity_id);
+            std::optional<size_t> state_of(size_t entity_id);
+            std::optional<size_t> carried_item_of(size_t entity_id);
             size_t selectable_kind_of(size_t entity_id);
             // total across every manager, for asserting a clean world
             size_t total_components();
@@ -124,6 +128,7 @@ namespace testing{
             systems::spatial_system& spatial_;
             systems::movement_system& movement_;
             systems::interaction_system& interaction_;
+            systems::state_machine_system& state_machine_;
             systems::animation_system& animation_;
     };
 

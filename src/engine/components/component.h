@@ -20,6 +20,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "sprite.h"
+#include "state_machine.h"
 
 
 /**
@@ -341,46 +342,21 @@ private:
     bool is_selected_;
 };
 
-// ! A STATE MACHINE IS A SET OF STATE COMPONENTS
-// ! a STATE MACHINE COMPONENT IS A SET OF STATE COMPONENTS
-// A STATE MACHINE DEFFINES TRANSITIONS BETWEEN STATES
-    // THE CONDITION TO TRANISITION
-    // THE BEHAVIOUR OF TRANSITIONING
-    // AND THE NEXT STATE
-    // TODO 30 / 8 / 26 
-    // * states affect behaviour
-    // * state machines define the transitional logic [ akin to how the menu graph is setup]
-    // * best way to structure this logic:
-    // * i think sub states is good
-    // the entity needs state, and then the state machine assigns a behaviour to a state and performs it
-    // maps the state id to the state behaviour or characteristic ? 
 class state_machine_component{
 public:
-    class state_component {
-    public:
-        ~state_component() = default;
-        state_component() = default;
-        state_component(const state_component& other) = default;
-        state_component(state_component&& other) = default;
-
-        state_component& operator=(const state_component& other) = default;
-        state_component& operator=(state_component&& other) = default;
-
-        
-    private:
-        size_t state_id_;
-        state_component * next_state_;
-    };
-
     ~state_machine_component() = default;
     state_machine_component() = default;
-    state_machine_component(const state_machine_component& other) = default;
+    state_machine_component(state_machine::state_machine machine)
+    : machine_(std::move(machine)){}
+    state_machine_component(const state_machine_component& other) = delete;
     state_machine_component(state_machine_component&& other) = default;
 
-    state_machine_component& operator=(const state_machine_component& other) = default;
+    state_machine_component& operator=(const state_machine_component& other) = delete;
     state_machine_component& operator=(state_machine_component&& other) = default;
 
-    //std::vector<state_component>
+    state_machine::state_machine& get_machine();
+private:
+    state_machine::state_machine machine_;
 };
 
 // menu component ?
@@ -468,8 +444,7 @@ namespace component_builders{
         const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions = {});
     components::key_input_component build_key_input_component(std::vector<game_config::input>& controls);
     components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
-    components::state_machine_component::state_component build_state();
-    components::state_machine_component build_state_machine_component(std::vector<components::state_machine_component::state_component>& state_components);
+    components::state_machine_component build_state_machine_component(state_machine::state_machine machine);
     components::selectable_component build_selectable_component(size_t kind);
     components::storage_component build_storage_component();
 }
@@ -501,8 +476,7 @@ namespace component_helpers{
         const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions = {});
     void add_key_input_component(size_t entity_id, std::vector<game_config::input>& controls);
     void add_mouse_input_component(size_t entity_id, std::vector<game_config::input>& inputs);
-    void add_state_machine_component(size_t entity_id,
-        std::vector<components::state_machine_component::state_component>& state_components);
+    void add_state_machine_component(size_t entity_id, state_machine::state_machine machine);
     void add_selectable_component(size_t entity_id, size_t kind);
     void add_storage_component(size_t entity_id);
     void add_stored_item(size_t entity_id, size_t slot, size_t item_id);

@@ -102,9 +102,19 @@ systems::interaction_system::interaction systems::interaction_system::create_int
     return interaction(interactor, interactee);
 }
 void systems::interaction_system::add_interaction(interaction& interaction){
+    std::unique_ptr<events::event> started = std::make_unique<events::interaction_started>(
+        interaction.get_interactor(), interaction.get_interactee());
     interactions_to_process_.push_back(std::move(interaction));
+    event_interface::queue_event(started);
 }
 void systems::interaction_system::remove_interaction(size_t entity_id){
+    for(auto& interaction : interactions_to_process_){
+        if(interaction.get_interactee() != entity_id and interaction.get_interactor() != entity_id){ continue; }
+
+        std::unique_ptr<events::event> finished = std::make_unique<events::interaction_finished>(
+            interaction.get_interactor(), interaction.get_interactee());
+        event_interface::queue_event(finished);
+    }
     std::erase_if(interactions_to_process_, [entity_id](auto& interaction) -> bool {
         return interaction.get_interactee() == entity_id or interaction.get_interactor() == entity_id;
     });

@@ -6,6 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "events/event_core.h"
 #include "raylib.h"
 #include <cstddef>
 #include <raymath.h>
@@ -266,6 +267,10 @@ namespace animation_config{
         idle = 0,
         downward_dog,
         eating,
+        walking,
+        sitting,
+        interacting,
+        carrying,
         shared_size
     };
     namespace tail{
@@ -273,6 +278,10 @@ namespace animation_config{
             idle = shared::idle,
             downward_dog = shared::downward_dog,
             eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
             wag = shared::shared_size,
             size
         };
@@ -282,8 +291,11 @@ namespace animation_config{
             idle = shared::idle,
             downward_dog = shared::downward_dog,
             eating = shared::eating,
-            walking = shared::shared_size,
-            pawing,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
+            pawing = shared::shared_size,
             size
         };
     }
@@ -292,6 +304,10 @@ namespace animation_config{
             idle = shared::idle,
             downward_dog = shared::downward_dog,
             eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
             pinned_back = shared::shared_size,
             one_up,
             bouncing,
@@ -303,6 +319,10 @@ namespace animation_config{
             idle = shared::idle,
             downward_dog = shared::downward_dog,
             eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
             sniffing = shared::shared_size,
             panting,
             licking,
@@ -549,10 +569,10 @@ namespace entity_config{
     inline const float station_reach = level_config::edge_weight * 0.25f;
     // where stored food is drawn relative to the counter origin.
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
-    inline const int dog_eating_duration = game_config::frames * 10;
 }
 namespace dog_config{
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
+    inline const int eating_duration = game_config::frames * 10;
     inline const float customer_spawn_interval = 20.0f;
     inline const float dog_reach = level_config::edge_weight * 0.3f;
 
@@ -570,6 +590,35 @@ namespace dog_config{
     enum customer_dog_types{
         fred = 0,
         john
+    };
+    enum player_dog_states{
+        player_idle = 0,
+        player_walking,
+        player_interacting,
+        player_states_size
+    };
+    enum customer_dog_states{
+        customer_walking = 0,
+        customer_sitting,
+        customer_eating,
+        customer_states_size
+    };
+    enum waiter_dog_states{
+        waiter_stationary = 0,
+        waiter_idle,
+        waiter_interacting,
+        waiter_carrying,
+        waiter_states_size
+    };
+    enum state_transitions{
+        path_created = events::ids::dog_started_path_id,
+        path_finished = events::ids::dog_path_complete,
+        interaction_started = events::ids::interaction_started_id,
+        interaction_finished = events::ids::interaction_finished_id,
+        order_served = events::ids::order_served_id,
+        food_collected = events::ids::waiter_collected_food_id,
+        meal_finished = events::ids::customer_finished_meal_id,
+        customer_leaving = events::ids::customer_left
     };
 }
 namespace controls_config{

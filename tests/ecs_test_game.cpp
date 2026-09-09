@@ -15,6 +15,7 @@ namespace testing{
       spatial_(systems::spatial_system::get_instance()),
       movement_(systems::movement_system::get_instance()),
       interaction_(systems::interaction_system::get_instance()),
+      state_machine_(systems::state_machine_system::get_instance()),
       animation_(systems::animation_system::get_instance()){
         // one hidden window for the whole run, same as test_game - the builders
         // LoadTexture and the shared cache has to stay valid across scenarios
@@ -125,6 +126,7 @@ namespace testing{
         events::global_dispatcher_.process_events(delta);
         movement_.update(delta);
         interaction_.update(delta);
+        state_machine_.update(delta);
         animation_.update(delta);
     }
 
@@ -236,6 +238,21 @@ namespace testing{
     }
     bool ecs_test_game::has_storage(size_t entity_id){
         return component_managers::storage_manager_.get_component(entity_id) != nullptr;
+    }
+    bool ecs_test_game::has_state_machine(size_t entity_id){
+        return component_managers::state_machine_manager_.get_component(entity_id) != nullptr;
+    }
+    std::optional<size_t> ecs_test_game::state_of(size_t entity_id){
+        auto* component = component_managers::state_machine_manager_.get_component(entity_id);
+        if(component == nullptr){ return std::nullopt; }
+        return component->get_machine().current();
+    }
+    std::optional<size_t> ecs_test_game::carried_item_of(size_t entity_id){
+        auto* component = component_managers::state_machine_manager_.get_component(entity_id);
+        if(component == nullptr){ return std::nullopt; }
+
+        auto* carrying = dynamic_cast<state::carrying_state*>(component->get_machine().get_current_state());
+        return carrying != nullptr ? carrying->get_carried_item() : std::nullopt;
     }
     bool ecs_test_game::has_interactable(size_t entity_id){
         return component_managers::interactable_manager_.get_component(entity_id) != nullptr;

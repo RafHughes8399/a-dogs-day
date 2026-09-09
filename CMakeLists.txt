@@ -109,6 +109,13 @@ add_library(factories
             src/entities/factories/dog_factory.cpp
             src/entities/factories/station_factory.cpp)
 link_libraries(factories)
+add_library(states
+  src/engine/structures/state.cpp
+  src/engine/structures/state_builders.cpp
+  src/engine/structures/state_machine.cpp
+  src/engine/structures/state_machine_builders.cpp)
+link_libraries(states)
+
 add_library(components
   src/engine/components/component_managers.cpp
   src/engine/components/component_builders.cpp
@@ -122,6 +129,7 @@ add_library(components
   src/engine/components/position_component.cpp
   src/engine/components/renderable_component.cpp
   src/engine/components/selectable_component.cpp
+  src/engine/components/state_machine_component.cpp
   src/engine/components/storage_component.cpp)
 link_libraries(components)
 
@@ -137,7 +145,8 @@ add_library(systems
   src/engine/systems/customer_arrival_system.cpp
   src/engine/systems/waiter_idling_system.cpp
   src/engine/systems/selection_system.cpp
-  src/engine/systems/animation_system.cpp)
+  src/engine/systems/animation_system.cpp
+  src/engine/systems/state_machine_system.cpp)
 link_libraries(systems)
 
 add_library(animation src/rendering/animation.cpp)
@@ -239,7 +248,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
-  raglib events queries components systems animation sprite item menu hud hitbox body texture
+  raglib events queries states components systems animation sprite item menu hud hitbox body texture
   player controls entities cursor dogs decorations stations food factories render_layer quadtree
   graph level maitre_d expediter dog_actions debug_log_interface debug_logger game ${PROJECT_NAME}
 )
@@ -296,6 +305,7 @@ add_executable(tests
   tests/counter_storage_scenarios.cpp
   tests/waiter_idling_scenarios.cpp
   tests/interaction_scenarios.cpp
+  tests/state_machine_scenarios.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the

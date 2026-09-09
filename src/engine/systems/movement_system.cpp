@@ -177,6 +177,8 @@ void systems::movement_system::commit_route(size_t entity_id, components::moveme
         determine_direction(entity_id, movement, position.get_position(),
             movement.get_current_path().get_next_position());
     }
+    std::unique_ptr<events::event> started = std::make_unique<events::dog_started_path>(entity_id);
+    event_interface::queue_event(started);
 }
 
 bool systems::movement_system::build_legs(Vector2 source, Vector2 direction, Vector2 destination,
