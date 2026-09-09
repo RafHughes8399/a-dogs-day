@@ -26,7 +26,7 @@ int animation::animation::get_play_speed(){
 void animation::animation::goto_frame(const int frame){
     if(frame < frames_){
         current_frame_ = frame;
-        frame_.x = frame_.width * frame;
+        frame_.x = frame_.width * static_cast<float>(frame);
     }
 }
 

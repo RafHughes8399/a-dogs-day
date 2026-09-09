@@ -105,7 +105,7 @@ sprite::sprite sprite_builders::build_test_decoration_sprite(const float attribu
 }
 sprite::sprite sprite_builders::build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size],
     Vector2 draw_position_offset){
-    return build_sprite(textures::textures_.get_texture(texture_id, decoration_path), 
+    return build_sprite(textures::textures_.get_texture(static_cast<int>(texture_id), decoration_path), 
     attributes[entity_config::attributes::frame_width],
     attributes[entity_config::attributes::frame_height],
     attributes[entity_config::attributes::frames],

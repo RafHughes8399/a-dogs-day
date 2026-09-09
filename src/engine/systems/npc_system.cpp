@@ -6,14 +6,6 @@
 #include <algorithm>
 #include <string>
 
-namespace {
-    std::string position_of(size_t id){
-        auto* position = component_managers::positional_manager_.get_component(id);
-        if(position == nullptr){ return "no position component"; }
-        return raglib::vector_to_string(position->get_position());
-    }
-}
-
 void systems::npc_system::update(float delta){
     customer_arrival_.update(delta);
     waiter_idling_.update(delta);

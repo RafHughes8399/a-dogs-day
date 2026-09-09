@@ -45,9 +45,9 @@ void component_helpers::add_movement_component(size_t entity_id, Vector2 move_sp
         component_builders::build_movement_component(move_speed, direction_scalar, std::move(paths)));
 }
 void component_helpers::add_renderable_component(size_t entity_id,
-    std::vector<components::renderable_component::body>& sprite_layers){
+    std::vector<components::renderable_component::body>& bodys){
     register_renderable_component(entity_id,
-        component_builders::build_renderable_component(sprite_layers));
+        component_builders::build_renderable_component(bodys));
 }
 void component_helpers::add_collision_component(size_t entity_id,
     components::collision_component::hitbox_component hitbox){
@@ -91,23 +91,23 @@ void component_helpers::create_offset_position_list(Rectangle box, std::array<st
     // * with no tie to break
     // * left is - 0.5 edgeweight x, height / 2 y
     if(positions[level_config::directions::left].has_value()){
-        positions[level_config::directions::left]->x = level_config::edge_weight * -0.5;
-        positions[level_config::directions::left]->y = box.height * 0.5;
+        positions[level_config::directions::left]->x = level_config::edge_weight * -0.5f;
+        positions[level_config::directions::left]->y = box.height * 0.5f;
     }
     // * right is width + 0.5 edgeweight x, height / 2 y
     if(positions[level_config::directions::right].has_value()){
-        positions[level_config::directions::right]->x = box.width + level_config::edge_weight * 0.5;
-        positions[level_config::directions::right]->y = box.height * 0.5;
+        positions[level_config::directions::right]->x = box.width + level_config::edge_weight * 0.5f;
+        positions[level_config::directions::right]->y = box.height * 0.5f;
     }
     // * up is width / 2 x, - 0.5 edgeweight y
     if(positions[level_config::directions::up].has_value()){
-        positions[level_config::directions::up]->x = box.width * 0.5;
-        positions[level_config::directions::up]->y = level_config::edge_weight * -0.5;
+        positions[level_config::directions::up]->x = box.width * 0.5f;
+        positions[level_config::directions::up]->y = level_config::edge_weight * -0.5f;
     }
     // * down is width / 2 x, height + 0.5 edgeweight y
     if(positions[level_config::directions::down].has_value()){
-        positions[level_config::directions::down]->x = box.width * 0.5;
-        positions[level_config::directions::down]->y = box.height + level_config::edge_weight * 0.5;
+        positions[level_config::directions::down]->x = box.width * 0.5f;
+        positions[level_config::directions::down]->y = box.height + level_config::edge_weight * 0.5f;
     }
 }
 bool component_helpers::is_mouse_positioned(size_t entity_id){
@@ -115,7 +115,7 @@ bool component_helpers::is_mouse_positioned(size_t entity_id){
 }
 void component_helpers::set_active_index(size_t entity_id, size_t slot, size_t index){
     if(auto* renderable = component_managers::renderable_manager_.get_component(entity_id)){
-        if(auto* slot_sprites = renderable->get_sprite_layer(slot)){
+        if(auto* slot_sprites = renderable->get_body(slot)){
             if(index < slot_sprites->num_sprites()){
                 slot_sprites->set_index(index);
             }
@@ -140,20 +140,20 @@ void component_helpers::update_item_sprite(size_t entity_id, size_t slot){
     auto* renderable = component_managers::renderable_manager_.get_component(entity_id);
     if(storage == nullptr or renderable == nullptr){ return; }
     if(storage->empty()){
-        renderable->remove_sprite_layer(slot);
+        renderable->remove_body(slot);
         return;
     }
     auto item_id = storage->head().get_id();
-    if(renderable->get_sprite_layer(slot) != nullptr){
+    if(renderable->get_body(slot) != nullptr){
         set_active_index(entity_id, slot, item_id);
         return;
     }
     auto item_sprites = sprite_builders::build_food_sprites();
     if(item_id >= item_sprites.size()){ return; }
-    assert(renderable->num_sprite_layers() == slot
+    assert(renderable->num_bodys() == slot
         and "stored item sprite must append into its reserved slot");
-    renderable->add_sprite_layer(
-        component_builders::build_sprite_layer(item_sprites, item_id));
+    renderable->add_body(
+        component_builders::build_body(item_sprites, item_id));
 }
 // writes sprite and hitbox indices together. missing either component is fine
 void component_helpers::set_facing_index(size_t entity_id, size_t index){

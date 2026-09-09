@@ -19,20 +19,20 @@ void components::renderable_component::body::set_index(size_t index){
 std::vector<components::renderable_component::body>& components::renderable_component::get_layers(){
     return body_;
 }
-components::renderable_component::body* components::renderable_component::get_sprite_layer(size_t index){
+components::renderable_component::body* components::renderable_component::get_body(size_t index){
     return index < body_.size() ? &body_[index] : nullptr;
 }
-size_t components::renderable_component::num_sprite_layers() const{
+size_t components::renderable_component::num_bodys() const{
     return body_.size();
 }
-void components::renderable_component::add_sprite_layer(body layer){
+void components::renderable_component::add_body(body layer){
     body_.push_back(std::move(layer));
 }
-void components::renderable_component::remove_sprite_layer(size_t index){
+void components::renderable_component::remove_body(size_t index){
     if(index >= body_.size()){ return; }
     body_.erase(body_.begin() + static_cast<decltype(body_)::difference_type>(index));
 }
-void components::renderable_component::set_sprite_layer(size_t index, body layer){
+void components::renderable_component::set_body(size_t index, body layer){
     if(index >= body_.size()){ return; }
     body_[index] = std::move(layer);
 }

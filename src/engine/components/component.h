@@ -313,11 +313,11 @@ public:
   renderable_component& operator=(renderable_component&& other) = default;
 
   std::vector<body>& get_layers();
-  body* get_sprite_layer(size_t index);
-  size_t num_sprite_layers() const;
-  void add_sprite_layer(body layer);
-  void remove_sprite_layer(size_t index);
-  void set_sprite_layer(size_t index, body layer);
+  body* get_body(size_t index);
+  size_t num_bodys() const;
+  void add_body(body layer);
+  void remove_body(size_t index);
+  void set_body(size_t index, body layer);
 private:
   // * holds the different directions
   std::vector<body> body_;
@@ -433,9 +433,9 @@ namespace component_builders{
     components::movement_component build_movement_component(Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
-    components::renderable_component::body build_sprite_layer(std::vector<sprite::sprite>& sprites, size_t index);
+    components::renderable_component::body build_body(std::vector<sprite::sprite>& sprites, size_t index);
     components::renderable_component build_renderable_component(
-        std::vector<components::renderable_component::body>& sprite_layers);
+        std::vector<components::renderable_component::body>& bodys);
 
     components::collision_component::hitbox_component build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
     components::collision_component build_collision_component(
@@ -469,7 +469,7 @@ namespace component_helpers{
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
     void add_renderable_component(size_t entity_id,
-        std::vector<components::renderable_component::body>& sprite_layers);
+        std::vector<components::renderable_component::body>& bodys);
     void add_collision_component(size_t entity_id,
         components::collision_component::hitbox_component hitbox);
     void add_interactor_component(size_t entity_id, float reach,

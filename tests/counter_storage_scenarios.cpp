@@ -11,11 +11,11 @@ namespace {
         auto* renderable = component_managers::renderable_manager_.get_component(counter_id);
         return renderable == nullptr
             ? nullptr
-            : renderable->get_sprite_layer(entity_config::counter_sprite_slots::counter_food);
+            : renderable->get_body(entity_config::counter_sprite_slots::counter_food);
     }
     size_t slot_count(size_t counter_id){
         auto* renderable = component_managers::renderable_manager_.get_component(counter_id);
-        return renderable == nullptr ? 0 : renderable->num_sprite_layers();
+        return renderable == nullptr ? 0 : renderable->num_bodys();
     }
     components::storage_component* storage_of(size_t counter_id){
         return component_managers::storage_manager_.get_component(counter_id);
@@ -50,7 +50,7 @@ SCENARIO("a counter is built empty with only its body sprite", "[counter][storag
             }
             THEN("the body slot is at index counter_body"){
                 auto* renderable = component_managers::renderable_manager_.get_component(counter_id);
-                REQUIRE(renderable->get_sprite_layer(
+                REQUIRE(renderable->get_body(
                     entity_config::counter_sprite_slots::counter_body) != nullptr);
             }
         }
@@ -86,7 +86,7 @@ SCENARIO("pushing food onto an empty counter creates the food slot", "[counter][
             }
             THEN("the body slot is untouched"){
                 auto* renderable = component_managers::renderable_manager_.get_component(counter_id);
-                REQUIRE(renderable->get_sprite_layer(
+                REQUIRE(renderable->get_body(
                     entity_config::counter_sprite_slots::counter_body)->get_active_index() == 0);
             }
         }

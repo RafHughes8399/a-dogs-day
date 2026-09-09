@@ -32,9 +32,9 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
     size_t kind, float reach, std::vector<size_t> interactor_interactions){
     component_helpers::add_positional_component(id, position);
 
-    std::vector<components::renderable_component::body> sprite_layers = {
-        component_builders::build_sprite_layer(sprites, level_config::directions::right)};
-    component_helpers::add_renderable_component(id, sprite_layers);
+    std::vector<components::renderable_component::body> bodys = {
+        component_builders::build_body(sprites, level_config::directions::right)};
+    component_helpers::add_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes = {dog_hitbox, dog_hitbox};
     component_helpers::add_collision_component(id,
@@ -145,8 +145,8 @@ void ecs_entities::build_cursor(size_t id){
     component_helpers::add_positional_component(id, GetMousePosition());
     component_helpers::add_mouse_input_component(id, game_config::cursor_controls);
     std::vector<sprite::sprite> sprites = {sprite_builders::build_cursor_sprite()};
-    std::vector<components::renderable_component::body> sprite_layers = {component_builders::build_sprite_layer(sprites, 0)};
-    component_helpers::add_renderable_component(id, sprite_layers);
+    std::vector<components::renderable_component::body> bodys = {component_builders::build_body(sprites, 0)};
+    component_helpers::add_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes = {hitbox_builders::build_cursor_hitbox(GetMousePosition())};
     component_helpers::add_collision_component(id,
@@ -157,9 +157,9 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
     component_helpers::add_positional_component(id, position);
 
     std::vector<sprite::sprite> sprites = {decoration_sprite};
-    std::vector<components::renderable_component::body> sprite_layers = {
-        component_builders::build_sprite_layer(sprites, 0)};
-    component_helpers::add_renderable_component(id, sprite_layers);
+    std::vector<components::renderable_component::body> bodys = {
+        component_builders::build_body(sprites, 0)};
+    component_helpers::add_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes = {decoration_hitbox};
     component_helpers::add_collision_component(id,
@@ -257,6 +257,6 @@ void ecs_entities::build_background(size_t id){
     component_helpers::add_positional_component(id, Vector2{0.0f, 0.0f});
 
     std::vector<sprite::sprite> sprites = {sprite_builders::build_background_sprite()};
-    std::vector<components::renderable_component::body> sprite_layers = {component_builders::build_sprite_layer(sprites, 0)};
-    component_helpers::add_renderable_component(id, sprite_layers);
+    std::vector<components::renderable_component::body> bodys = {component_builders::build_body(sprites, 0)};
+    component_helpers::add_renderable_component(id, bodys);
 }

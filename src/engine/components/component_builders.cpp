@@ -8,11 +8,11 @@ components::position_component component_builders::build_positional_component(Ve
 components::movement_component component_builders::build_movement_component(Vector2 move_speed, Vector2 direction_scalar, std::queue<path::path> paths){
     return components::movement_component(move_speed, direction_scalar, paths);
 }
-components::renderable_component::body component_builders::build_sprite_layer(std::vector<sprite::sprite>& sprites, size_t index){
+components::renderable_component::body component_builders::build_body(std::vector<sprite::sprite>& sprites, size_t index){
     return components::renderable_component::body(sprites, index);
 }
-components::renderable_component component_builders::build_renderable_component(std::vector<components::renderable_component::body>& sprite_layers){
-    return components::renderable_component(sprite_layers);
+components::renderable_component component_builders::build_renderable_component(std::vector<components::renderable_component::body>& bodys){
+    return components::renderable_component(bodys);
 }
 components::collision_component::hitbox_component component_builders::build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index){
     return components::collision_component::hitbox_component(hitboxes, index);

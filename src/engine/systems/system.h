@@ -350,7 +350,7 @@ namespace systems{
             public:
                 ~interaction() = default;
                 interaction(size_t interactor, size_t interactee)
-                : interactee_(interactee), interactor_(interactor){
+                : interactor_(interactor), interactee_(interactee){
                     performable_interactions_ = determine_performable_interactions();
                 }
                 interaction(const interaction& other) = default;
