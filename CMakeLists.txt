@@ -149,7 +149,7 @@ add_library(systems
   src/engine/systems/state_machine_system.cpp)
 link_libraries(systems)
 
-add_library(animation src/rendering/animation.cpp)
+add_library(animation src/rendering/animation.cpp src/rendering/animation_builders.cpp)
 link_libraries(animation)
 
 add_library(sprite src/rendering/sprite.cpp src/rendering/sprite_builders.cpp)

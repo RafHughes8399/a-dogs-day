@@ -159,11 +159,11 @@ int entities::cursor::update(float delta, int frame){
 
         if(is_colliding){
             // switch to colliding
-            body_.get_sprite().get_animation().goto_animation(animation_tags::hover);
+            body_.get_sprite().set_animation(animation_tags::hover);
 
         }
         else{
-            body_.get_sprite().get_animation().goto_animation(animation_tags::base);
+            body_.get_sprite().set_animation(animation_tags::base);
             // switch to default anim
         }
 

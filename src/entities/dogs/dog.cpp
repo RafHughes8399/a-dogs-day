@@ -110,11 +110,11 @@ void entities::dog::play_animation(int animation){
     // Guarded the same way as set_direction_index - get_sprite() indexes into
     // the parallel arrays, which are empty for a body with no sprites.
     if(body_.num_sprites() > 0){
-        body_.get_sprite().get_animation().goto_animation(animation);
+        body_.get_sprite().set_animation(static_cast<size_t>(animation));
         body_.get_sprite().get_animation().play();
     }
     if(head_.num_sprites() > 0){
-        head_.get_sprite().get_animation().goto_animation(animation);
+        head_.get_sprite().set_animation(static_cast<size_t>(animation));
         head_.get_sprite().get_animation().play();
     }
 }

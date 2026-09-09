@@ -9,7 +9,7 @@ void systems::animation_system::play(size_t entity, const std::vector<sprite_ani
         if(slot == nullptr or slot->get_sprites().empty()){ continue; }
 
         for(auto& slot_sprite : slot->get_sprites()){
-            slot_sprite.get_animation().goto_animation(static_cast<int>(anim.animation_index));
+            slot_sprite.set_animation(anim.animation_index);
             slot_sprite.get_animation().play(anim.repeat);
         }
         // a new play on a slot supersedes whatever was counting down on it

@@ -227,6 +227,8 @@ so an explicit todo looks like:
 -> and that can be how we define transitions
 
 
+
+[here we are 9 / 9]
 -> should change how animations are treated to allow for ragged animations for a body part
 -> i.e a blink animation may only need 3 frames, but a panting animation may need 10,
 -> i think this calculation then requires a more specific animation a has n frames in the config
@@ -243,7 +245,21 @@ so an explicit todo looks like:
 -> and when the animation system makes the call the sprite sheet sets the current animation index to the requested
 animation it should be peaches
 
+-> assign the dogs their state machine components
+-> check transitions occur and that they occur correctly
 
+-> some way to do like "random animations" perhaps when idle or stationary ? 
+-> like a dog could randomly blink, wag their tail, pant, sniff something, etc.
 
+-> separate the dog art 
+-> test rendering and state transitions without animations for now
+-> as you create the actual animations, incorporate them into the enum and states and test them
 
+-> for now the success criteria, is proper state machien constructuion and updating the animation structure
+-> then waiter serving and customer eating [wherein we can test the state transitions]
+
+-> as animations and states are introduced then we can test their transitioning
+
+-> then the 9 sprite 
+-> and menus / hud components and navigating them
 

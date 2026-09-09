@@ -65,6 +65,20 @@ namespace {
     }
 
     const size_t slot = entity_config::dog_sprite_slots::dog_head;
+
+    const float part_width = 20.0f;
+    const float part_height = 24.0f;
+
+    size_t build_part_entity(testing::ecs_test_game& game){
+        auto id = game.create_empty(level_config::draw_layers::dogs);
+        std::vector<sprite::sprite> sprites;
+        sprites.push_back(sprite::sprite(Texture2D{},
+            animation_builders::build_dog_head_animations(part_width, part_height)));
+        std::vector<components::renderable_component::sprite_layer> layers = {
+            component_builders::build_sprite_layer(sprites, 0)};
+        component_helpers::add_renderable_component(id, layers);
+        return id;
+    }
 }
 
 SCENARIO("a one-shot animation announces that it finished", "[animation]"){
@@ -213,6 +227,134 @@ SCENARIO("replaying a slot supersedes what was counting down on it", "[animation
 
             THEN("nothing is left counting down"){
                 REQUIRE(game.in_flight_animation_count() == 0);
+            }
+        }
+    }
+}
+
+SCENARIO("a dog part carries one animation per row of its sheet", "[animation]"){
+    GIVEN("a head sprite built from the head animation builders"){
+        auto head = sprite::sprite(Texture2D{},
+            animation_builders::build_dog_head_animations(part_width, part_height));
+
+        THEN("every row the head declares has an animation, and idle is active"){
+            REQUIRE(head.num_animations() == animation_config::head::size);
+            REQUIRE(head.get_animation_index() == animation_config::head::idle);
+            REQUIRE(head.get_animation().num_frames() == animation_config::idle_frames);
+            REQUIRE(head.get_animation().get_play_speed() == animation_config::idle_play_speed);
+        }
+
+        WHEN("a longer row is made active"){
+            head.set_animation(animation_config::head::walking);
+
+            THEN("it brings its own frame count and play speed"){
+                REQUIRE(head.get_animation().num_frames() == animation_config::walking_frames);
+                REQUIRE(head.get_animation().get_play_speed() == animation_config::walking_play_speed);
+            }
+            THEN("it samples its own row of the sheet"){
+                REQUIRE(head.get_animation().get_frame().y
+                    == part_height * static_cast<float>(animation_config::head::walking));
+            }
+        }
+
+        WHEN("a part specific row is made active"){
+            head.set_animation(animation_config::head::pinned_back);
+
+            THEN("the part row is shorter than the shared ones"){
+                REQUIRE(head.get_animation().num_frames() == animation_config::head_pinned_back_frames);
+                REQUIRE(head.get_animation().num_frames() < animation_config::walking_frames);
+            }
+        }
+
+        WHEN("a row the sheet does not have is asked for"){
+            head.set_animation(animation_config::head::size + 3);
+
+            THEN("the active animation is left alone"){
+                REQUIRE(head.get_animation_index() == animation_config::head::idle);
+            }
+        }
+    }
+}
+
+SCENARIO("the parts of one dog agree on the shared rows", "[animation]"){
+    GIVEN("every part of a dog"){
+        auto head = sprite::sprite(Texture2D{},
+            animation_builders::build_dog_head_animations(part_width, part_height));
+        auto face = sprite::sprite(Texture2D{},
+            animation_builders::build_dog_face_animations(part_width, part_height));
+        auto body = sprite::sprite(Texture2D{},
+            animation_builders::build_dog_body_animations(part_width, part_height));
+        auto tail = sprite::sprite(Texture2D{},
+            animation_builders::build_dog_tail_animations(part_width, part_height));
+
+        THEN("each declares as many animations as its own enum"){
+            REQUIRE(head.num_animations() == animation_config::head::size);
+            REQUIRE(face.num_animations() == animation_config::face::size);
+            REQUIRE(body.num_animations() == animation_config::body::size);
+            REQUIRE(tail.num_animations() == animation_config::tail::size);
+        }
+
+        WHEN("a whole body action plays with one index"){
+            head.set_animation(animation_config::shared::eating);
+            face.set_animation(animation_config::shared::eating);
+            body.set_animation(animation_config::shared::eating);
+            tail.set_animation(animation_config::shared::eating);
+
+            THEN("all four parts run the same length at the same speed"){
+                REQUIRE(head.get_animation().num_frames() == animation_config::eating_frames);
+                REQUIRE(face.get_animation().num_frames() == animation_config::eating_frames);
+                REQUIRE(body.get_animation().num_frames() == animation_config::eating_frames);
+                REQUIRE(tail.get_animation().num_frames() == animation_config::eating_frames);
+
+                REQUIRE(head.get_animation().get_play_speed() == animation_config::eating_play_speed);
+                REQUIRE(tail.get_animation().get_play_speed() == animation_config::eating_play_speed);
+            }
+        }
+    }
+}
+
+SCENARIO("a one-shot runs for its own frames and play speed", "[animation]"){
+    GIVEN("an entity whose slot holds a ragged sheet"){
+        testing::ecs_test_game game;
+        finished_recorder recorder;
+        auto id = build_part_entity(game);
+
+        WHEN("a part specific row plays once"){
+            systems::animation_system::get_instance().play(id,
+                {0, animation_config::head::bouncing, false});
+
+            const int ticks = animation_config::head_bouncing_frames
+                * animation_config::head_bouncing_play_speed;
+
+            THEN("it is still counting down a tick before its frames have played"){
+                game.tick_until([](){ return false; }, ticks - 1, 0.016f);
+                flush();
+
+                REQUIRE(recorder.count_ == 0);
+                REQUIRE(game.in_flight_animation_count() == 1);
+            }
+            THEN("it ends after frames times play speed ticks"){
+                game.tick_until([](){ return false; }, ticks, 0.016f);
+                flush();
+
+                REQUIRE(recorder.count_ == 1);
+                REQUIRE(recorder.last_id_ == id);
+                REQUIRE(recorder.last_animation_ == animation_config::head::bouncing);
+            }
+        }
+
+        WHEN("a shorter row plays once"){
+            systems::animation_system::get_instance().play(id,
+                {0, animation_config::head::pinned_back, false});
+
+            THEN("its countdown is its own, not the sheet's longest"){
+                const int ticks = animation_config::head_pinned_back_frames
+                    * animation_config::head_pinned_back_play_speed;
+                game.tick_until([](){ return false; }, ticks, 0.016f);
+                flush();
+
+                REQUIRE(recorder.count_ == 1);
+                REQUIRE(recorder.last_animation_ == animation_config::head::pinned_back);
             }
         }
     }

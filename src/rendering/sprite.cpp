@@ -2,7 +2,21 @@
 // ----------------------- sprite ----------------------- // 
 
 animation::animation& sprite::sprite::get_animation(){
-    return sprite_animation_;
+    return animations_[animation_index_];
+}
+animation::animation& sprite::sprite::get_animation(size_t index){
+    return animations_[index];
+}
+size_t sprite::sprite::get_animation_index() const{
+    return animation_index_;
+}
+size_t sprite::sprite::num_animations() const{
+    return animations_.size();
+}
+void sprite::sprite::set_animation(size_t index){
+    if(index < animations_.size()){
+        animation_index_ = index;
+    }
 }
 const Texture2D& sprite::sprite::get_texture(){
     return sprite_texture_;
@@ -12,10 +26,11 @@ Vector2 sprite::sprite::get_draw_position_offset() const{
 }
 
 void sprite::sprite::render(Vector2 position, int frame){
-    sprite_animation_.advance(frame);
+    if(animations_.empty()){ return; }
+    auto& animation = animations_[animation_index_];
+    animation.advance(frame);
 
-    DrawTextureRec(sprite_texture_, sprite_animation_.get_frame(), Vector2Add(position, draw_position_offset_), tint_);
-    // * partial rendering such that it is frame
+    DrawTextureRec(sprite_texture_, animation.get_frame(), Vector2Add(position, draw_position_offset_), tint_);
 }
 
 
