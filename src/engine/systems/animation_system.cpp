@@ -18,9 +18,9 @@ void systems::animation_system::play(size_t entity, const std::vector<sprite_ani
         });
         if(anim.repeat){ continue; }
 
-        auto& animation = slot->get_sprites().front().get_animation();
+        auto& played = slot->get_sprites().front().get_animation();
         current_animations_.push_back(animation{entity, anim.sprite_slot, anim.animation_index,
-            animation.num_frames() * animation.get_play_speed()});
+            played.num_frames() * played.get_play_speed()});
     }
 }
 
@@ -80,7 +80,7 @@ void systems::animation_system::update(float delta){
     std::erase_if(current_animations_, [](const auto& tracked) -> bool {
         return tracked.frames_remaining <= 0;
     });
-    // erase first, then pause and announce - stop() prunes in_flight_ too, and a
+    // erase first, then pause and announce - stop() prunes current_animations_ too, and a
     // handler reacting to the fact may start the next animation on this slot
     for(const auto& tracked : finished){
         stop(tracked.entity, tracked.sprite_slot);

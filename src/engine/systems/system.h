@@ -75,7 +75,7 @@ namespace systems{
             }
 #ifdef DOG_DAYS_TESTING
             size_t in_flight_count() const{
-                return in_flight_.size();
+                return current_animations_.size();
             }
 #endif
         private:
