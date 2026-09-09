@@ -18,17 +18,15 @@
 #include "path.h"
 /**
     if components manage, organise and hold the data, then systems define the behaivours to act on those pieces of data. we define the following systems:
-    animation system
-    collision system
-    interaction system
-    lifespan system
-    movement system
-    npc system 
-    selection system
-    spatial system
-    rendering system
-
-
+    animation system - provides an interface to play and pause animations
+    collision system - checks for hitbox collisions  and handles them
+    interaction system - checks for interactions and handles them
+    lifespan system - manages entity creation and destruction
+    movement system - manages entity movenet 
+    npc system - controls npc dog behaivour 
+    selection system - handles selction of entities
+    spatial system - stores entities in a quadtree strucutre
+    rendering system - handles render layers, draw orders and visual culling 
 
     @author raffa, september 2026
 */

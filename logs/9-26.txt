@@ -215,3 +215,35 @@ ok solid plan i think, we have the two next pieces
     graph code as an example perhaps ? like an adjacency graph where the is an event instead of a button press, maybe like enum the events over ints so we can refer to them via numbers]
 
     -> animation data should use the enum
+
+so an explicit todo looks like:
+-> define the state class and its subclasses
+-> define the state machine as a state graph, specify the transitions
+-> define the state and state machine buidlers
+-> build the state machines for each dog
+
+-> for the state machine and its transitions, it can function akin to how the menu graph works
+-> but the edge should be an event_id instead of a key, so we just use the event id enum 
+-> and that can be how we define transitions
+
+
+-> should change how animations are treated to allow for ragged animations for a body part
+-> i.e a blink animation may only need 3 frames, but a panting animation may need 10,
+-> i think this calculation then requires a more specific animation a has n frames in the config
+-> rather than a blanket value, i think we will need a separate animation config that specifies the frame count of each animation
+-> so this also requires a slight overhaul to the animation and sprite class where an animatoin specifies, the 
+    -> its row on the spritesheet [to establish its y offset]
+    -> the current frame
+    -> the play speed
+    -> the is_playing_
+    -> the repeating_
+    -> and the number of frames which can derived from a config variable
+-> the rest of the behavioural logic for animation can remain intact
+-> then the sprite instead handles a list of animations instead of just one
+-> and when the animation system makes the call the sprite sheet sets the current animation index to the requested
+animation it should be peaches
+
+
+
+
+
