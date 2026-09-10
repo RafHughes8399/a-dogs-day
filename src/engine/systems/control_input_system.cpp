@@ -202,6 +202,23 @@ void systems::control_input_system::left_click(size_t id){
 }
 // * right click tells the selected player dog entity where to go 
 // ? maybe extendable to waiters too ? if i wanted to change how the waiter interaction stuff goes
+// ! not sure where this should go right now. i think maybe a type system ? ceebs to implement that right now though
+bool is_dog(size_t dog){
+    switch(dog){
+        case entity_config::player_dog_kind:
+            return true;
+            break;
+        case entity_config::waiter_dog_kind:
+            return true;
+            break;
+        case entity_config::customer_dog_kind:
+            return true;
+            break;
+        default:
+            return false;
+            break;
+    }
+}
 void systems::control_input_system::right_click(size_t id){
     auto click_position = GetMousePosition();
     debug::log("[control_input_system::right_click, clicked] asked by: "
@@ -215,26 +232,23 @@ void systems::control_input_system::right_click(size_t id){
     }
     auto selected_id = static_cast<size_t>(selected);
     auto* selectable = component_managers::selectable_manager_.get_component(selected_id);
-    if(selectable->get_kind() != entity_config::selectable_kinds::player_dog_kind){
+    if(not is_dog(selectable->get_kind())){
         debug::log("[control_input_system::right_click, selection is not a player dog] id: "
             + std::to_string(selected_id)
-            + ", kind: " + std::to_string(selectable->get_kind()));
+            + ", kind: " + std::to_string(selectable->get_kind())
+            + ", player dog kind: " + std::to_string(entity_config::player_dog_kind)
+            + ", waiter dog kind: " + std::to_string(entity_config::waiter_dog_kind));
         return;
     }
 
     int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
-    // ! i think there is something wrong with this check here
-    // ! the path to a destination entity is not correct.
-    // ! the click resovles the detination entity correctly and the position but something lese
-    // ! is missing
-
-    // ! no the problem is that it cannot resolve a path to an occupied node. so need to adjust
-    // ! the position that we send the dog to when going to a entity
-    // ? perhaps need to revive the idea of interaction positions, based on the hitbox ?
     debug::log("[control_input_system::right_click, resolved destination] entity: "
         + (entity_id == game_config::empty_entity ? std::string("none, bare position")
                                                    : std::to_string(entity_id)));
+        // * there is potential future to refactor this section. we know the type of the selectabl, or can differentiate at least 
+        // * by selectable kind and that kind is an enum
 
+        // * hence we could define an array of dog_click_behaviours
     std::unique_ptr<events::event> create_path_event;
     if(entity_id == game_config::empty_entity){
         create_path_event = std::make_unique<events::create_path_to>(selected_id, click_position, path::replace);
