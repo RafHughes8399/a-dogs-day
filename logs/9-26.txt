@@ -260,6 +260,32 @@ animation it should be peaches
 
 -> as animations and states are introduced then we can test their transitioning
 
+-> first, fix the table occupancy bug
+    -> the table is being marked as occupied, it is just that since tables, have two interaction positions, it 
+    is never occupied
+    -> so the fix is:
+        -> enforce so that customers can only go to the left table position 
+        -> expand the customer system to handle customer arrival and leaving and then it can manage table occupancy, 
+        like the old matire_d
+        
+        -> while the first is somewaht more rigid, it is far less of a headache
+        -> there is a third and far simpler option, just simply check if there is an interactor, 
+        -> if there is, then you cannot go to the table, simples
+-> second as per the issue description:
+    -> send waiter to counter 
+    -> have waiter perform a counter interaction
+    -> transition the state, perform the underlying interaction behaviour
+    -> play the animation
+    -> then send waiter to table,
+    -> waiter interacts again, performs a table interaction
+    -> play the animation, perform the underlying interaction behaviour
+    [ need to properly decide what happens after placing down food]
+    -> then send back to origin ?
+
+    -> upon food being served, the customer starts to eat
+    -> after eating, the customer navigates to the entrance, and then to the exit
+
+
 -> then the 9 sprite 
 -> and menus / hud components and navigating them
 

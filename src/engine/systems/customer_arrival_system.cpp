@@ -44,7 +44,7 @@ int dbs::customer_arrival_system::pick_table(){
         // get the interactable component
         // check its status
         auto interactable = component_managers::interactable_manager_.get_component(table);
-        if(interactable and interactable->can_accept_interactor()){
+        if(interactable and not interactable->has_interactor()){
             return static_cast<int>(table);
         }
     }
@@ -93,10 +93,6 @@ void dbs::customer_arrival_system::send_customer_to_table(){
         + ", table: " + std::to_string(table_id)
         + ", via entrance: " + raglib::vector_to_string(cafe_config::cafe_entrance));
 
-    // * the entrance is a checkpoint, so the route is footpath -> entrance,
-    // * entrance -> table. the movement system would find the seam itself, but
-    // * naming the door keeps customers walking through it rather than the
-    // * nearest crossing to wherever they happen to be standing
     events::create_path_to_entity create_path_event{customer_id, table_id, path::replace,
         std::vector<Vector2>{cafe_config::cafe_entrance}};
     event_interface::execute_event(create_path_event);

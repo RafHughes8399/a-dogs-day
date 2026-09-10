@@ -112,16 +112,7 @@ class storage_component {
 };
 class interactable_component {
 public:
-    // to solve the problem where an entity is sent to a station but cannot pathfind
-    // becuase the raw click input is a blocked node on the graph. instead, we resolve
-    // an interaction offset against the station's own live position at query time -
-    // the offset is from the station origin, not a world position: a station can be
-    // moved, and a derived position has no sync path to get wrong.
 
-    // * the interaction positions require the existance of a collision component 
-    // * hence, the offsets arrays are simply Vector2Zeros() when passed in as the arrya
-    // * this consttructor's precondtion is an existing collision component and thus
-    // * performs the offset calcualtions in its body
     ~interactable_component() = default;
     interactable_component(float reach, std::array<std::optional<Vector2>, DIRECTIONS> positions, std::vector<size_t> interactions = {})
     : reach_(reach), positions_(positions), interactors_(), interactions_(interactions){
@@ -136,13 +127,10 @@ public:
     std::vector<size_t> get_interactions();
     Rectangle get_interaction_box(Rectangle box) const;
     std::optional<Vector2> get_interaction_offset(Vector2 source, Vector2 own_position) const;
-    // * occupancy is a claim, not a proximity test - a table promised to a
-    // * customer still walking over reads as taken, which a spatial check
-    // * cannot express. claim/release are the only writers of interactors_,
-    // * and their counterparts on interactor_component are interact_with/
-    // * stop_interacting - the two sides are paired only in
-    // * component_helpers::unregister_interact*_component
+
+
     bool can_accept_interactor() const;
+    bool has_interactor() const;
     bool claim(size_t interactor_id);
     void release(size_t interactor_id);
     const std::array<std::optional<size_t>, DIRECTIONS>& get_interactors() const;
