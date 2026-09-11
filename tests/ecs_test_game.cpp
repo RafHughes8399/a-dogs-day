@@ -76,7 +76,7 @@ namespace testing{
 
     size_t ecs_test_game::create_customer_dog(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_customer_dog(id, position);
+            ecs_entities::build_tex(id, position);
         }, layer);
     }
 

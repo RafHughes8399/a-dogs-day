@@ -21,6 +21,7 @@ namespace interaction_config{
     enum interactions{
         customer_table_sit = 0,
         waiter_table_serve,
+        waiter_counter_pickup,
         size
     };
     // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- // 

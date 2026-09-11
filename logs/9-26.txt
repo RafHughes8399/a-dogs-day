@@ -272,8 +272,10 @@ animation it should be peaches
         -> there is a third and far simpler option, just simply check if there is an interactor, 
         -> if there is, then you cannot go to the table, simples
 -> second as per the issue description:
-    -> send waiter to counter 
+    -> send waiter to counter x
+    -> build a counter with and without food
     -> have waiter perform a counter interaction
+    -> and a customer perform a sit interaction [i think we dont have interaction detection just yet]
     -> transition the state, perform the underlying interaction behaviour
     -> play the animation
     -> then send waiter to table,

@@ -397,7 +397,8 @@ namespace systems{
             interaction_system()
             : defined_interactions_({
                 interactions::customer_table_sit,
-                interactions::waiter_table_serve
+                interactions::waiter_table_serve,
+                interactions::waiter_counter_pickup
             }), interactions_to_process_(),
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
             remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),

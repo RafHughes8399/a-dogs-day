@@ -1,7 +1,8 @@
 #ifndef INTERACTIONS_H
 #define INTERACTIONS_H
 #include <cstddef>
-
+#include "debug_log_interface.h"
+#include "debug_logger.h"
 namespace interactions{
     // * behaviour signature is (interactor, interactee, delta) - the same shape
     // * interaction_system::defined_interactions_ is declared with, indexed by
@@ -12,6 +13,8 @@ namespace interactions{
         (void) interactor;
         (void) interactee;
         (void) delta;
+        debug::log("customer table sit interaction attempt");
+
     }
 
     // waiter carries food to the table, hands it over, then releases the slot
@@ -19,6 +22,12 @@ namespace interactions{
         (void) interactor;
         (void) interactee;
         (void) delta;
+    }
+    inline void waiter_counter_pickup(size_t interactor, size_t interactee, float delta){
+        (void) interactor;
+        (void) interactee;
+        (void) delta;
+        debug::log("waiter counter pickup interaction attempt");
     }
 }
 #endif

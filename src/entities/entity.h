@@ -98,7 +98,8 @@ namespace ecs_entities {
         void build_khiri(size_t id);
         void build_mack(size_t id);
 
-    void build_customer_dog(size_t id, Vector2 position);
+    void build_customer_dog(size_t id, Vector2 position,
+        std::vector<sprite::sprite> sprites, hitbox::hitbox customer_hitbox);
         void build_tex(size_t id, Vector2 position);
         void build_garfield(size_t id, Vector2 position);
         //**

@@ -78,10 +78,10 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
 
 // TODO (25 / 8 / 26) mack's art stands in until npc dog sprites exist
 // TODO (28 / 8 / 26) - update to take in a sprite 
-void ecs_entities::build_customer_dog(size_t id, Vector2 position){
-    build_dog(id, position, build_mack_sprites(),
-    hitbox_builders::build_dog_across_hitbox(position),
-    entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach, 
+void ecs_entities::build_customer_dog(size_t id, Vector2 position,
+    std::vector<sprite::sprite> sprites, hitbox::hitbox customer_hitbox){
+    build_dog(id, position, std::move(sprites), customer_hitbox,
+    entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach,
     interaction_config::customer_dog_interactor);
     component_helpers::add_state_machine_component(id,
         state_machine_builders::build_customer_state_machine());}
@@ -93,15 +93,8 @@ void ecs_entities::build_customer_dog(size_t id, Vector2 position){
     // build duck_hunt_dog();
     //  */
     void ecs_entities::build_tex(size_t id, Vector2 position){
-        std::vector<sprite::sprite> sprites;
-        sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_left,
-            entity_config::mack_left_path, entity_config::mack_across_attributes));
-        sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_right,
-            entity_config::mack_right_path, entity_config::mack_across_attributes));
-    build_dog(id, position, std::move(sprites), hitbox_builders::build_dog_across_hitbox(position),
-        entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
-    component_helpers::add_state_machine_component(id,
-        state_machine_builders::build_customer_state_machine());
+        build_customer_dog(id, position, build_mack_sprites(),
+            hitbox_builders::build_dog_across_hitbox(position));
     }
     void ecs_entities::build_garfield(size_t id, Vector2 position){
             std::vector<sprite::sprite> sprites;

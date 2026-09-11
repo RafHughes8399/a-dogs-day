@@ -1,4 +1,7 @@
+#include "debug_log_interface.h"
+#include "debug_logger.h"
 #include "system.h"
+#include <string>
 
 
 size_t systems::interaction_system::interaction::get_interactor(){
@@ -15,6 +18,8 @@ std::vector<size_t> systems::interaction_system::interaction::determine_performa
     auto interactor = component_managers::interactor_manager_.get_component(interactor_);
     auto interactee = component_managers::interactable_manager_.get_component(interactee_);
     if(interactor and interactee){
+        debug::log("[interaciotn system, determine performable interactions]: interactor interactions " + std::to_string(interactor->get_interactions().size()));
+        debug::log("[interaciotn system, determine performable interactions]: interactee interactions " + std::to_string(interactee->get_interactions().size()));
         for(auto interactor_interaction : interactor->get_interactions()){
             for(auto interactee_interaction : interactee->get_interactions()){
                if(interactor_interaction == interactee_interaction){
@@ -36,6 +41,8 @@ void systems::interaction_system::process_interactions(float delta){
     std::for_each(interactions_to_process_.begin(), interactions_to_process_.end(), [this, delta](auto& i) -> void {
         process_interaction(i, delta);
     });
+    //  ? empty the list if processed ?, yeah should be a one and done. for now, can introduce some more extensive checking later down the line should we need it
+    interactions_to_process_.clear();
 }
 void systems::interaction_system::process_interaction(interaction& interaction, float delta){
     // from the interaction, get the list of interaction indices that should be performed
@@ -43,7 +50,11 @@ void systems::interaction_system::process_interaction(interaction& interaction, 
     auto interactor = interaction.get_interactor();
     auto interactee = interaction.get_interactee();
     // and then perform them
+    debug::log("[interaction system - process interaction] - interactor " + std::to_string(interactor)
+            + " interactee: " + std::to_string(interactee) + " interactions to check: " + std::to_string(interactions.size()));
+        
     std::for_each(interactions.begin(), interactions.end(), [this, interactions, interactor, interactee, delta](auto& interaction_index) -> void {
+        debug::log("[interaction system - process interaction] - perform interaction " + std::to_string((interaction_index)));
         defined_interactions_[interaction_index](interactor, interactee, delta); // will need delta and the two ids
     });
 }
@@ -105,6 +116,7 @@ void systems::interaction_system::add_interaction(interaction& interaction){
     std::unique_ptr<events::event> started = std::make_unique<events::interaction_started>(
         interaction.get_interactor(), interaction.get_interactee());
     interactions_to_process_.push_back(std::move(interaction));
+    debug::log("add interaction to process");
     event_interface::queue_event(started);
 }
 void systems::interaction_system::remove_interaction(size_t entity_id){
