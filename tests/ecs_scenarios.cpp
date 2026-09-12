@@ -542,12 +542,12 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
         WHEN("food is built"){
             auto food_id = game.create_food(spot);
 
-            THEN("it is placed, drawn and collidable, but not selectable"){
+            THEN("it is placed and drawn, but not collidable or selectable"){
                 REQUIRE(game.has_position(food_id));
                 REQUIRE(game.has_renderable(food_id));
-                REQUIRE(game.has_collision(food_id));
+                REQUIRE_FALSE(game.has_collision(food_id));
                 REQUIRE_FALSE(game.has_selectable(food_id));
-                REQUIRE(game.num_components(food_id) == 3);
+                REQUIRE(game.num_components(food_id) == 2);
             }
         }
 

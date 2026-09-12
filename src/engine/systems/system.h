@@ -14,7 +14,6 @@
 #include <utility>
 #include <raylib.h>
 #include "graph.h"
-#include "interactions.h"
 #include "path.h"
 /**
     if components manage, organise and hold the data, then systems define the behaivours to act on those pieces of data. we define the following systems:
@@ -328,6 +327,9 @@ namespace systems{
 
             size_t create_counter(size_t counter, Vector2 position);
             void destroy_counter(size_t id);
+
+            size_t create_food(size_t food, Vector2 position);
+            void destroy_food(size_t id);
             void destroy(size_t entity_id);
             void update(float delta);
             // teardown between test scenarios - the singleton outlives them
@@ -342,6 +344,7 @@ namespace systems{
 
             factories::dog_factory dog_factory_;
             factories::station_factory station_factory_;
+            factories::food_factory food_factory_;
     };
     class interaction_system{
         // for behavioural interactions
@@ -396,9 +399,9 @@ namespace systems{
         private:
             interaction_system()
             : defined_interactions_({
-                interactions::customer_table_sit,
-                interactions::waiter_table_serve,
-                interactions::waiter_counter_pickup
+                customer_table_sit,
+                waiter_table_serve,
+                waiter_counter_pickup
             }), interactions_to_process_(),
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
             remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
@@ -407,6 +410,16 @@ namespace systems{
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
                 event_interface::subscribe<events::dog_completed_path>(dog_completed_path_handler_);
             }
+            // * behaviour signature is (interactor, interactee, delta) - the same shape
+            // * defined_interactions_ is declared with, indexed by
+            // * the interaction_config::interactions enum
+
+            // customer holds the table's slot, sits for a while, then releases and leaves
+            static void customer_table_sit(size_t interactor, size_t interactee, float delta);
+            // waiter carries food to the table, hands it over, then releases the slot
+            static void waiter_table_serve(size_t interactor, size_t interactee, float delta);
+            static void waiter_counter_pickup(size_t interactor, size_t interactee, float delta);
+
             std::array<std::function<void(size_t, size_t, float)>, interaction_config::size> defined_interactions_;
             std::vector<interaction> interactions_to_process_;
             events::event_handler<events::move_entity> move_entity_handler_;
@@ -445,14 +458,41 @@ namespace systems{
             }
             void restore_interaction_behaviours(){
                 defined_interactions_ = {
-                    interactions::customer_table_sit,
-                    interactions::waiter_table_serve
+                    customer_table_sit,
+                    waiter_table_serve
                 };
             }
 #endif
     };
     // -> movement system assigning, calculating, processing and updating paths
     // -> the movment system is where the level_graph should be stored so it can in house process and check paths
+    // * quick chill interface for items being placed and taken from counters
+    // * a way to interact with the storage component i suppose
+
+    // * what about the table ? it can just exist on the table, it doesnt need ot be placed down on a storage
+    // * component i think ?
+    class item_system {
+    public:
+        static item_system& get_instance(){
+            static item_system instance;
+            return instance;
+        }
+        ~item_system() = default;
+        item_system(const item_system& other) = default;
+        item_system(item_system&& other) = default;
+        
+        item_system& operator=(const item_system& other) = default;
+        item_system& operator=(item_system&& other) = default;
+        
+
+        // * current shape is to return the size_t of the created item entity
+        std::optional<item_stack::item> take_item(size_t counter_id);
+        void place_item(size_t counter_id, size_t item);
+        
+        private:
+            item_system() = default;
+            // don't think i need to track the counters 
+    };
     class movement_system{
         // the level graph and pathfinding
         public:

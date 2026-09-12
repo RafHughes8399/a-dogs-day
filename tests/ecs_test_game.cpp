@@ -118,7 +118,7 @@ namespace testing{
 
     size_t ecs_test_game::create_food(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_food(id, position);
+            ecs_entities::build_lasagna(id, position);
         }, layer);
     }
 

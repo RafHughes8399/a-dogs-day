@@ -14,12 +14,14 @@ CompileFlags:
   Add:
     - -isystem
     - build/_deps/raylib-src/src
+    - -Isrc
     - -Isrc/rendering
     - -Isrc/entities
     - -Isrc/entities/dogs
     - -Isrc/entities/decorations
     - -Isrc/entities/stations
     - -Isrc/entities/food
+    - -Isrc/entities/factories
     - -Isrc/engine
     - -Isrc/engine/components
     - -Isrc/engine/events

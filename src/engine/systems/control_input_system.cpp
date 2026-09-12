@@ -5,6 +5,7 @@
 #include "raglib.h"
 #include "system.h"
 #include "system_events.h"
+#include "testing_helpers.hpp"
 #include <cstddef>
 #include <optional>
 #include <raylib.h>
@@ -203,22 +204,6 @@ void systems::control_input_system::left_click(size_t id){
 // * right click tells the selected player dog entity where to go 
 // ? maybe extendable to waiters too ? if i wanted to change how the waiter interaction stuff goes
 // ! not sure where this should go right now. i think maybe a type system ? ceebs to implement that right now though
-bool is_dog(size_t dog){
-    switch(dog){
-        case entity_config::player_dog_kind:
-            return true;
-            break;
-        case entity_config::waiter_dog_kind:
-            return true;
-            break;
-        case entity_config::customer_dog_kind:
-            return true;
-            break;
-        default:
-            return false;
-            break;
-    }
-}
 void systems::control_input_system::right_click(size_t id){
     auto click_position = GetMousePosition();
     debug::log("[control_input_system::right_click, clicked] asked by: "
@@ -232,7 +217,7 @@ void systems::control_input_system::right_click(size_t id){
     }
     auto selected_id = static_cast<size_t>(selected);
     auto* selectable = component_managers::selectable_manager_.get_component(selected_id);
-    if(not is_dog(selectable->get_kind())){
+    if(not helpers::is_dog(selectable->get_kind())){
         debug::log("[control_input_system::right_click, selection is not a player dog] id: "
             + std::to_string(selected_id)
             + ", kind: " + std::to_string(selectable->get_kind())

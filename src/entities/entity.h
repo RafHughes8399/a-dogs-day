@@ -142,7 +142,9 @@ namespace ecs_entities {
         /**
         */
 
-    void build_food(size_t id, Vector2 position);
+    void build_food(size_t id, Vector2 position, sprite::sprite food_sprite);
+        void build_lasagna(size_t id, Vector2 position);
+        void build_coffee(size_t id, Vector2 position);
 
     // the level backdrop - renderable only, no hitbox, no collision
     void build_background(size_t id);

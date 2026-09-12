@@ -29,6 +29,8 @@ void dbs::waiter_idling_system::clear(){
     waiters_.clear();
 }
 
+
+// TODO update to a state check instead of this
 bool dbs::waiter_idling_system::is_idle(size_t waiter){
     auto interactor = component_managers::interactor_manager_.get_component(waiter);
     if(interactor and interactor->is_interacting()){ return false; }

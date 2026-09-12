@@ -31,6 +31,42 @@ std::vector<size_t> systems::interaction_system::interaction::determine_performa
     return interactions;
 }
 
+void systems::interaction_system::customer_table_sit(size_t interactor, size_t interactee, float delta){
+    (void) interactor;
+    (void) interactee;
+    (void) delta;
+    debug::log("customer table sit interaction attempt");
+    // TODO: update the customer state to sitting
+}
+void systems::interaction_system::waiter_table_serve(size_t interactor, size_t interactee, float delta){
+    (void) interactor;
+    (void) interactee;
+    (void) delta;
+}
+void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t counter, float delta){
+    (void) waiter;
+    (void) counter;
+    (void) delta;
+    debug::log("waiter counter pickup interaction attempt");
+    // two things to do:
+    // * 1. switch the dog state and play the animation 
+    // *.2 perform the taking from the counter, the building of the food and the assinging to the dog
+    // but should be done in reverse order, the dog animation should only play if the pickup was successful
+    
+    // * 3. maybe the dog needs a carrier component, or maybe the food entity needs a "movement" component ?
+    // * no, no ,no in the dog state, the dog will hold a food id, then the state update will take the dog position,
+    // * and the update the food position's accordingly
+    auto food_opt = item_system::get_instance().take_item(counter);
+    if(not food_opt.has_value()){
+        return;
+    }
+    auto food = food_opt.value();
+    auto dog_mouth = Vector2Zero(); // get the dog mouth offset
+    // lifespan system create.
+    entity_lifespan_system::get_instance().create_food(food.get_id(), dog_mouth);
+    // dog transition to  carrying 
+    // the dog state should handle the animation through on transition   
+}
 
 // TODO (25 / 8 / 26) stub - the loop calls this every frame, nothing to do yet
 void systems::interaction_system::update(float delta){
@@ -86,10 +122,18 @@ void systems::interaction_system::on_moved_entity(const events::move_entity& eve
 void systems::interaction_system::on_path_finished(const events::dog_completed_path& event){
     auto dog_id = event.get_id();
     auto* interactor = component_managers::interactor_manager_.get_component(dog_id);
-    if(interactor == nullptr){ return; }
+    if(interactor == nullptr){
+        debug::log("[interaction_system::on_path_finished] dog: " + std::to_string(dog_id)
+            + " has no interactor component - no interaction");
+        return;
+    }
 
     auto target = interactor->get_target();
-    if(not target.has_value()){ return; }
+    if(not target.has_value()){
+        debug::log("[interaction_system::on_path_finished] dog: " + std::to_string(dog_id)
+            + " arrived with no interactor target - no interaction");
+        return;
+    }
     auto target_id = target.value();
 
     auto* interactor_collision = component_managers::collision_manager_.get_component(dog_id);
@@ -100,7 +144,15 @@ void systems::interaction_system::on_path_finished(const events::dog_completed_p
         interactor_collision->get_hitbox_component().get_hitbox().get_box());
     Rectangle target_box = target_collision->get_hitbox_component().get_hitbox().get_box();
 
-    if(CheckCollisionRecs(interactor_box, target_box)){
+    bool overlapping = CheckCollisionRecs(interactor_box, target_box);
+    debug::log("[interaction_system::on_path_finished] dog: " + std::to_string(dog_id)
+        + ", target: " + std::to_string(target_id)
+        + ", interactor box: " + std::to_string(interactor_box.x) + "," + std::to_string(interactor_box.y)
+            + " " + std::to_string(interactor_box.width) + "x" + std::to_string(interactor_box.height)
+        + ", target box: " + std::to_string(target_box.x) + "," + std::to_string(target_box.y)
+            + " " + std::to_string(target_box.width) + "x" + std::to_string(target_box.height)
+        + ", overlapping: " + std::string(overlapping ? "yes" : "no"));
+    if(overlapping){
         auto interaction = create_interaction(dog_id, target_id);
         add_interaction(interaction);
     }

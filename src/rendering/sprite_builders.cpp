@@ -139,14 +139,20 @@ sprite::sprite sprite_builders::build_stove_sprite(){
 sprite::sprite sprite_builders::build_food_sprite(){
     return build_test_decoration_sprite(entity_config::test_food_attributes, RED);
 }
+sprite::sprite sprite_builders::build_lasagna_sprite(){
+    return build_decoration_sprite(textures::lasagna,
+        entity_config::lasagna_food_path, entity_config::lasagna_attributes,
+        entity_config::food_draw_offset);
+}
+sprite::sprite sprite_builders::build_coffee_sprite(){
+    return build_decoration_sprite(textures::coffee,
+        entity_config::coffee_food_path, entity_config::coffee_attributes,
+        entity_config::food_draw_offset);
+}
 std::vector<sprite::sprite> sprite_builders::build_food_sprites(){
     std::vector<sprite::sprite> sprites;
-    sprites.push_back(build_decoration_sprite(textures::lasagna,
-        entity_config::lasagna_food_path, entity_config::lasagna_attributes,
-        entity_config::food_draw_offset));
-    sprites.push_back(build_decoration_sprite(textures::coffee,
-        entity_config::coffee_food_path, entity_config::coffee_attributes,
-        entity_config::food_draw_offset));
+    sprites.push_back(build_lasagna_sprite());
+    sprites.push_back(build_coffee_sprite());
     return sprites;
 }
 sprite::sprite sprite_builders::build_background_sprite(){

@@ -107,7 +107,8 @@ add_library(item_stack src/engine/structures/item_stack.cpp)
 link_libraries(item_stack)
 add_library(factories
             src/entities/factories/dog_factory.cpp
-            src/entities/factories/station_factory.cpp)
+            src/entities/factories/station_factory.cpp
+            src/entities/factories/food_factory.cpp)
 link_libraries(factories)
 add_library(states
   src/engine/structures/state.cpp
@@ -146,7 +147,8 @@ add_library(systems
   src/engine/systems/waiter_idling_system.cpp
   src/engine/systems/selection_system.cpp
   src/engine/systems/animation_system.cpp
-  src/engine/systems/state_machine_system.cpp)
+  src/engine/systems/state_machine_system.cpp
+  src/engine/systems/item_system.cpp)
 link_libraries(systems)
 
 add_library(animation src/rendering/animation.cpp src/rendering/animation_builders.cpp)
@@ -255,6 +257,7 @@ set(PROJECT_TARGETS
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})
   target_include_directories(${target} PRIVATE
+    src
     src/rendering
     src/entities
     src/entities/dogs
@@ -311,6 +314,7 @@ target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the
 # strict MY_COMPILE_OPTIONS - those would fire inside Catch2 / raylib headers.
 target_include_directories(tests PRIVATE
+  src
   src/rendering
   src/entities
   src/entities/dogs

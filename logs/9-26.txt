@@ -274,9 +274,22 @@ animation it should be peaches
 -> second as per the issue description:
     -> send waiter to counter x
     -> build a counter with and without food
+        -> slight detour for the item system
+        -> and then food entity 
+
+        -> counter builder 
+        -> food builder 
+        -> build counter in an empty / filled state
+    -> the right click send to path for waiter should interrupt not append the path
     -> have waiter perform a counter interaction
+        -> perform the interaciton, flip the state, to prevent continued idle pathing
+        -> make idle pathing dependent on the state check instead of what it is currently
+        -> update the waiter idling to be a state check 
+
     -> and a customer perform a sit interaction [i think we dont have interaction detection just yet]
-    -> transition the state, perform the underlying interaction behaviour
+        -> transition the state, perform the underlying interaction behaviour
+        -> state transition, 
+        -> port the interaction behaviours over to the system so that they have access to thge rest of the stuff 
     -> play the animation
     -> then send waiter to table,
     -> waiter interacts again, performs a table interaction

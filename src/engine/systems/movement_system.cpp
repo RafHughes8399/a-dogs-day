@@ -170,9 +170,17 @@ void systems::movement_system::commit_route(size_t entity_id, components::moveme
     components::position_component& position, path::assignment mode, std::vector<path::path> legs){
     // * the mode applies to the route, not to each leg - legs after the first
     // * always append, or each would wipe the one before it
+    auto paths_before = movement.get_paths().size();
     if(mode == path::replace){ movement.clear_paths(); }
     const bool start_from_idle = movement.get_paths().empty();
+    auto legs_committed = legs.size();
     for(auto& leg : legs){ movement.append_path(std::move(leg)); }
+    debug::log("[movement_system::commit_route] dog: " + std::to_string(entity_id)
+        + ", mode: " + std::string(mode == path::replace ? "replace" : "append")
+        + ", paths before: " + std::to_string(paths_before)
+        + ", cleared: " + std::string(mode == path::replace ? "yes" : "no")
+        + ", legs committed: " + std::to_string(legs_committed)
+        + ", paths after: " + std::to_string(movement.get_paths().size()));
     if(start_from_idle){
         determine_direction(entity_id, movement, position.get_position(),
             movement.get_current_path().get_next_position());
@@ -213,6 +221,8 @@ bool systems::movement_system::build_leg(Vector2 source, Vector2 direction, Vect
         legs.push_back(std::move(leg.value()));
         return true;
     }
+    debug::log("[movement_system::build_leg] no graph planned a leg from "
+        + raglib::vector_to_string(source) + " to " + raglib::vector_to_string(destination));
     return false;
 }
 
@@ -230,10 +240,23 @@ void systems::movement_system::on_destroyed_entity(const events::remove_entity& 
 std::optional<path::path> systems::movement_system::create_path(graph::level_graph& graph,
     Vector2 source, Vector2 direction, Vector2 destination,
     std::optional<size_t> destination_entity){
-    if(not graph.position_in_area(source)){ return std::nullopt; }
-    if(not graph.position_in_area(destination)){ return std::nullopt; }
+    if(not graph.position_in_area(source)){
+        debug::log("[movement_system::create_path] source outside this graph: "
+            + raglib::vector_to_string(source));
+        return std::nullopt;
+    }
+    if(not graph.position_in_area(destination)){
+        debug::log("[movement_system::create_path] destination outside this graph: "
+            + raglib::vector_to_string(destination));
+        return std::nullopt;
+    }
     auto positions = graph.find_path(source, destination, direction);
-    if(positions.empty()){ return std::nullopt; }
+    if(positions.empty()){
+        debug::log("[movement_system::create_path] no route through this graph from "
+            + raglib::vector_to_string(source) + " to " + raglib::vector_to_string(destination)
+            + ", destination occupant: " + std::to_string(graph.occupant_at(destination)));
+        return std::nullopt;
+    }
     return path::build_path(source, destination, positions, destination_entity);
 }
 std::optional<path::path> systems::movement_system::create_path(Vector2 source, Vector2 direction,

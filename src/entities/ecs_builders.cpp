@@ -1,4 +1,5 @@
 #include "component.h"
+#include "testing_helpers.hpp"
 #include "config.h"
 #include "entity.h"
 #include "sprite.h"
@@ -206,6 +207,8 @@ void ecs_entities::build_station(size_t id, Vector2 position,
     }
         void ecs_entities::build_food_counter(size_t id, Vector2 position){
             build_counter(id, position, sprite_builders::build_food_counter_sprite());
+            helpers::add_items_to_counter(id, entity_config::foods::lasagna, 2);
+
         }
     void ecs_entities::build_table(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,
@@ -238,11 +241,20 @@ void ecs_entities::build_station(size_t id, Vector2 position,
         // void build_stove();
     */
 
-void ecs_entities::build_food(size_t id, Vector2 position){
-    build_decoration(id, position,
-        sprite_builders::build_food_sprite(),
-        hitbox_builders::build_food_hitbox(position));
+void ecs_entities::build_food(size_t id, Vector2 position, sprite::sprite food_sprite){
+    component_helpers::add_positional_component(id, position);
+
+    std::vector<sprite::sprite> sprites = {food_sprite};
+    std::vector<components::renderable_component::body> bodys = {
+        component_builders::build_body(sprites, 0)};
+    component_helpers::add_renderable_component(id, bodys);
 }
+    void ecs_entities::build_lasagna(size_t id, Vector2 position){
+        build_food(id, position, sprite_builders::build_lasagna_sprite());
+    }
+    void ecs_entities::build_coffee(size_t id, Vector2 position){
+        build_food(id, position, sprite_builders::build_coffee_sprite());
+    }
 
 // position and renderable only - no hitbox, so it is never in the spatial index
 // and is_entity_in_frame never culls it

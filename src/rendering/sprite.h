@@ -136,6 +136,8 @@ namespace sprite_builders{
     sprite::sprite build_dishwasher_sprite();
     sprite::sprite build_stove_sprite();
     sprite::sprite build_food_sprite();
+    sprite::sprite build_lasagna_sprite();
+    sprite::sprite build_coffee_sprite();
     std::vector<sprite::sprite> build_food_sprites();
 }
 #endif
