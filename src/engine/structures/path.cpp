@@ -8,6 +8,9 @@ Vector2 path::path::get_destination(){
 Vector2 path::path::get_next_position(){
     return is_path_complete() ? destination_ : positions_.front();
 }
+std::optional<size_t> path::path::get_destination_entity(){
+    return destination_entity_;
+}
 bool path::path::is_path_complete(){
     return positions_.empty();
 }

@@ -14,23 +14,28 @@ namespace {
         return raglib::vector_to_string(position->get_position());
     }
 }
-void dbs::customer_arrival_system::register_customer(size_t id){
+void dbs::customer_table_system::register_customer(size_t id){
     customers_.push_back(id);
 }
-void dbs::customer_arrival_system::unregister_customer(size_t id){
+void dbs::customer_table_system::unregister_customer(size_t id){
     customers_.erase(std::remove(customers_.begin(), customers_.end(), id), customers_.end());
     
 }
-void dbs::customer_arrival_system::register_table(size_t id){
-    tables_.push_back(id);
+void dbs::customer_table_system::register_table(size_t id){
+    tables_.push_back(registered_table(id));
 }
-void dbs::customer_arrival_system::unregister_table(size_t id){
-    tables_.erase(std::remove(tables_.begin(), tables_.end(), id), tables_.end());
+void dbs::customer_table_system::unregister_table(size_t id){
+    std::erase_if(tables_, [id](const registered_table& table) -> bool { return table.id() == id; });
+}
+void dbs::customer_table_system::reserve_table(size_t table_id){
+    for(auto& table : tables_){
+        if(table.id() == table_id){ table.set_status(table_status::reserved); }
+    }
 }             
-bool dbs::customer_arrival_system::free_tables(){
+bool dbs::customer_table_system::free_tables(){
     return pick_table() != game_config::empty_entity;
 }
-int dbs::customer_arrival_system::pick_customer(){
+int dbs::customer_table_system::pick_customer(){
     for(auto customer : customers_){
         auto interactor = component_managers::interactor_manager_.get_component(customer);
         if(interactor and not interactor->is_interacting()){
@@ -39,31 +44,26 @@ int dbs::customer_arrival_system::pick_customer(){
     }
     return game_config::empty_entity;
 }
-int dbs::customer_arrival_system::pick_table(){
+int dbs::customer_table_system::pick_table(){
     for(auto table : tables_){
-        // get the interactable component
-        // check its status
-        auto interactable = component_managers::interactable_manager_.get_component(table);
-        if(interactable and not interactable->has_interactor()){
-            return static_cast<int>(table);
-        }
+        if(table.status() == table_status::available){ return static_cast<int>(table.id()); }
     }
     return game_config::empty_entity;
 }
 
-void dbs::customer_arrival_system::create_customer_dog(){
+void dbs::customer_table_system::create_customer_dog(){
     if(time_since_dog_ >= dog_config::customer_spawn_interval){
         time_since_dog_ = 0.0f;
         auto id = systems::entity_lifespan_system::get_instance().create_customer_dog();
-        debug::log("[customer_arrival_system::create_customer_dog, built customer] id: "
+        debug::log("[customer_table_system::create_customer_dog, built customer] id: "
             + std::to_string(id)
             + ", spawn: " + position_of(id)
             + ", tracked customers: " + std::to_string(customers_.size()));
     }
 }
-void dbs::customer_arrival_system::destroy_customer_dog(size_t id){
+void dbs::customer_table_system::destroy_customer_dog(size_t id){
     // ? would i need a more specific remove, or should the generic be fine ?
-    debug::log("[customer_arrival_system::destroy_customer_dog, removing customer] id: "
+    debug::log("[customer_table_system::destroy_customer_dog, removing customer] id: "
         + std::to_string(id)
         + ", last position: " + position_of(id)
         + ", tracked customers: " + std::to_string(customers_.size()));
@@ -71,7 +71,7 @@ void dbs::customer_arrival_system::destroy_customer_dog(size_t id){
     std::erase_if(customers_,  [id](auto customer) -> bool {return customer == id;});
 }
 
-void dbs::customer_arrival_system::send_customer_to_table(){
+void dbs::customer_table_system::send_customer_to_table(){
     auto table = pick_table();
     auto customer = pick_customer();
     if(table == game_config::empty_entity or customer == game_config::empty_entity){ return; }
@@ -79,16 +79,14 @@ void dbs::customer_arrival_system::send_customer_to_table(){
     auto table_id = static_cast<size_t>(table);
     auto customer_id = static_cast<size_t>(customer);
 
-    // * the claim goes in before the walk, not on arrival - the customer is
-    // * crossing the whole cafe and the table has to read as taken for every
-    // * frame of it, or the next pick hands the same table to the next customer
-    auto interactable = component_managers::interactable_manager_.get_component(table_id);
-    auto interactor = component_managers::interactor_manager_.get_component(customer_id);
-    if(interactable == nullptr or interactor == nullptr){ return; }
-    if(not interactable->claim(customer_id)){ return; }
-    interactor->interact_with(table_id);
+    // * the reservation goes in before the walk - the customer is crossing the
+    // * whole cafe and the table has to read as taken for every frame of it, or
+    // * the next pick hands the same table to the next customer. the physical
+    // * claim is a separate thing, taken on arrival by the interaction system
+    // TODO this system should be extended to handle arrival and leaving
+    reserve_table(table_id);
 
-    debug::log("[customer_arrival_system::send_customer_to_table] customer: "
+    debug::log("[customer_table_system::send_customer_to_table] customer: "
         + std::to_string(customer_id)
         + ", table: " + std::to_string(table_id)
         + ", via entrance: " + raglib::vector_to_string(cafe_config::cafe_entrance));
@@ -98,7 +96,7 @@ void dbs::customer_arrival_system::send_customer_to_table(){
     event_interface::execute_event(create_path_event);
 }
 
-void dbs::customer_arrival_system::customer_cleanup(){
+void dbs::customer_table_system::customer_cleanup(){
     std::vector<size_t> departed;
     for(auto customer : customers_){
         // * a customer holding a table has arrived somewhere on purpose - an
@@ -115,7 +113,7 @@ void dbs::customer_arrival_system::customer_cleanup(){
     }
 }
 
-void dbs::customer_arrival_system::update(float delta){
+void dbs::customer_table_system::update(float delta){
     time_since_dog_ += delta;
     create_customer_dog();
      

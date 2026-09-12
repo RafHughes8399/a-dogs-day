@@ -165,7 +165,7 @@ entity in no graph.
 `build_customer_dog`, so the factory both assembles components and issues a movement command.
 It works because the event is *queued* while `create_entity` is executed immediately after — but
 that ordering is implicit and undocumented. Per the architecture split in `CLAUDE.md`, "walk to
-the footpath exit" reads like orchestration; the empty `customer_arrival_system` scaffold at
+the footpath exit" reads like orchestration; the empty `customer_table_system` scaffold at
 [system.h:246](src/engine/systems/system.h:246) looks like the intended home.
 
 ### 8. `world.hpp` is dead and duplicates `movement_system`

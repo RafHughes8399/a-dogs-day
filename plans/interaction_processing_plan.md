@@ -6,7 +6,7 @@
 ([interaction_system.cpp:4-6](src/engine/systems/interaction_system.cpp:4)), ticked every frame
 ([game.cpp:78](src/engine/game.cpp:78)), doing nothing. Arbitration already works —
 `send_customer_to_table` claims the table, sets the target, issues the path
-([customer_arrival_system.cpp:85-102](src/engine/systems/customer_arrival_system.cpp:85)) — so a
+([customer_table_system.cpp:85-102](src/engine/systems/customer_table_system.cpp:85)) — so a
 customer walks to a reserved table and nothing happens on arrival.
 
 Shape: participation lists on the two components; `interaction` is a live pair of entity ids; the
@@ -177,7 +177,7 @@ Notes:
 
 **Despawn race.** `npc_` ticks before `interaction_` ([game.cpp:74](src/engine/game.cpp:74) vs
 [:78](src/engine/game.cpp:78)), and `customer_cleanup` destroys any customer that is not interacting
-with an empty path queue ([customer_arrival_system.cpp:110-115](src/engine/systems/customer_arrival_system.cpp:110)).
+with an empty path queue ([customer_table_system.cpp:110-115](src/engine/systems/customer_table_system.cpp:110)).
 Releasing on frame N despawns on frame N+1 with no walk-out. Give the behaviour a departure path
 before it releases, or accept the instant despawn for slice 1.
 
@@ -204,7 +204,7 @@ Test the right slot explicitly; raise `station_reach` only if it fails.
 beside `spatial_` ([ecs_test_game.cpp:13](tests/ecs_test_game.cpp:13),
 [ecs_test_game.h:107-113](tests/ecs_test_game.h:107)) and call `interaction_.update(delta)` last.
 Do **not** add `npc_.update` — it spawns and destroys on a timer
-([customer_arrival_system.cpp:122-129](src/engine/systems/customer_arrival_system.cpp:122)) and would
+([customer_table_system.cpp:122-129](src/engine/systems/customer_table_system.cpp:122)) and would
 make every existing scenario nondeterministic; drive claims with a `seat()`-style helper as
 [customer_arrival_scenarios.cpp:26-33](tests/customer_arrival_scenarios.cpp:26) does.
 
@@ -231,8 +231,8 @@ lifecycle events, and the two test harnesses.
   ([component.h:145](src/engine/components/component.h:145)). Restructure occupation later.
 - **No broad-phase** — pairs only form from an arbitrated target, so nothing fires between two entities
   nobody sent to each other.
-- **One producer of targets** — only `customer_arrival_system`
-  ([customer_arrival_system.cpp:89](src/engine/systems/customer_arrival_system.cpp:89)); player
+- **One producer of targets** — only `customer_table_system`
+  ([customer_table_system.cpp:89](src/engine/systems/customer_table_system.cpp:89)); player
   right-click issues a path without naming one
   ([control_input_system.cpp:203-249](src/engine/systems/control_input_system.cpp:203)).
 - **`state_machine_component` stays empty** ([component.h:335](src/engine/components/component.h:335)),

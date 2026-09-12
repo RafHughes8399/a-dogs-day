@@ -31,6 +31,26 @@ std::vector<size_t> systems::interaction_system::interaction::determine_performa
     return interactions;
 }
 
+bool systems::interaction_system::establish_handhsake(size_t interactor_id, size_t interactable_id){
+    auto interactor = component_managers::interactor_manager_.get_component(interactor_id);
+    auto interactable = component_managers::interactable_manager_.get_component(interactable_id);
+    if(not (interactor and interactable)) {
+        return false;
+    }
+    if(not interactable->can_accept_interactor()){return false;}
+    if(not interactable->claim(interactor_id)){return false;}
+    interactor->interact_with(interactable_id);
+    return true;
+}
+void systems::interaction_system::teardown_handshake(size_t interactor_id, size_t interactable_id){
+    auto interactor = component_managers::interactor_manager_.get_component(interactor_id);
+    auto interactable = component_managers::interactable_manager_.get_component(interactable_id);
+    if(interactable){ interactable->release(interactor_id); }
+    if(interactor){ interactor->stop_interacting(); }
+}
+
+// * ----------------------------------------------------- INTERACTIONS ------------------------------------------------------- * // 
+
 void systems::interaction_system::customer_table_sit(size_t interactor, size_t interactee, float delta){
     (void) interactor;
     (void) interactee;
@@ -116,7 +136,8 @@ void systems::interaction_system::on_moved_entity(const events::move_entity& eve
     if(not overlapping) {
         // * drop the interaction, clean up both halves of the claim -
         // * interactor->stop_interacting() and interactable->release() - and
-        // * process the state transition for the interaction having ended
+        teardown_handshake(interactor_id, target_id);
+        // TODO: process the state transition for the interaction having ended
     }
 }
 void systems::interaction_system::on_path_finished(const events::dog_completed_path& event){
@@ -128,10 +149,10 @@ void systems::interaction_system::on_path_finished(const events::dog_completed_p
         return;
     }
 
-    auto target = interactor->get_target();
+    auto target = event.get_destination_entity();
     if(not target.has_value()){
         debug::log("[interaction_system::on_path_finished] dog: " + std::to_string(dog_id)
-            + " arrived with no interactor target - no interaction");
+            + " arrived with no destination entity and no interactor target - no interaction");
         return;
     }
     auto target_id = target.value();
@@ -152,7 +173,7 @@ void systems::interaction_system::on_path_finished(const events::dog_completed_p
         + ", target box: " + std::to_string(target_box.x) + "," + std::to_string(target_box.y)
             + " " + std::to_string(target_box.width) + "x" + std::to_string(target_box.height)
         + ", overlapping: " + std::string(overlapping ? "yes" : "no"));
-    if(overlapping){
+    if(overlapping and establish_handhsake(dog_id, target_id)){
         auto interaction = create_interaction(dog_id, target_id);
         add_interaction(interaction);
     }

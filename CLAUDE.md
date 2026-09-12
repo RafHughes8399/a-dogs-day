@@ -54,7 +54,7 @@ dog_days.cpp (main)
        process_events, then tick in member-declaration order:
          systems::entity_lifespan_system   id allocation, create/destroy
          systems::control_input_system     keyboard/mouse -> commands
-         systems::npc_system               owns dbs::customer_arrival_system, dbs::waiter_idling_system
+         systems::npc_system               owns dbs::customer_table_system, dbs::waiter_idling_system
          systems::movement_system          paths, positions, owns the level_graphs
          systems::spatial_system           owns the tree::ecs_quadtree
          systems::collision_system         stub
@@ -100,7 +100,7 @@ Event/query naming convention worth knowing: events are named as either **facts 
 | `key_input_component` / `mouse_input_component` | bound `game_config::input`s |
 | `state_machine_component` | **empty stub** — no members, no `.cpp`, not in `CMakeLists.txt` |
 
-`interactable_component` / `interactor_component` are a two-way claim, not a proximity test: `claim`/`release` on one side pair with `interact_with`/`stop_interacting` on the other, and the only place both halves are reconciled is `component_helpers::unregister_interact*_component`. The claim is taken by the orchestrator *before* the dog walks over (`dbs::customer_arrival_system::send_customer_to_table`), so a table promised to a customer still crossing the cafe already reads as taken.
+`interactable_component` / `interactor_component` are a two-way claim, not a proximity test: `claim`/`release` on one side pair with `interact_with`/`stop_interacting` on the other, and the only place both halves are reconciled is `component_helpers::unregister_interact*_component`. The claim is taken by the orchestrator *before* the dog walks over (`dbs::customer_table_system::send_customer_to_table`), so a table promised to a customer still crossing the cafe already reads as taken.
 
 ### Legacy entity hierarchy (test-only; being ported)
 
@@ -143,7 +143,7 @@ All tunable constants live in `config.h`, grouped by domain namespace rather tha
 ### Testing conventions
 
 - **Two composition roots, one per world.** `tests/ecs_test_game.h`/`.cpp` (`testing::ecs_test_game`) is the ECS one: it holds singleton references and wipes every component manager and system in its constructor and destructor, since the singletons outlive a scenario. `tests/test_game.h`/`.cpp` (`testing::test_game`) is the legacy one, owning a fresh `level_`, `maitre_d_`, `expediter_` per `SCENARIO`. Neither renders.
-- **`ecs_test_game::tick` deliberately runs only a subset** — `process_events` then `movement_.update`. It does *not* tick `npc_`, because `customer_arrival_system` spawns and destroys dogs on a timer and would make every scenario nondeterministic; drive claims explicitly with a `seat()`-style helper instead. Adding a system to that tick changes the blast radius for every existing ECS scenario, so re-run the whole suite when you do.
+- **`ecs_test_game::tick` deliberately runs only a subset** — `process_events` then `movement_.update`. It does *not* tick `npc_`, because `customer_table_system` spawns and destroys dogs on a timer and would make every scenario nondeterministic; drive claims explicitly with a `seat()`-style helper instead. Adding a system to that tick changes the blast radius for every existing ECS scenario, so re-run the whole suite when you do.
 - Accessors/build helpers guarded by `DOG_DAYS_TESTING` (set only on the `tests` target, never the shipped binary) expose otherwise-private state for assertions.
 - Prefer `tick_until(predicate, max_frames)` over hardcoded frame counts when a scenario needs to wait for a condition (e.g. a dog reaching a destination).
 - One scenario file per domain — ECS: `ecs_scenarios.cpp`, `customer_arrival_scenarios.cpp`, `control_input_scenarios.cpp`, `spatial_scenarios.cpp`, `waiter_idling_scenarios.cpp`, `counter_storage_scenarios.cpp`, `quadtree_scenarios.cpp`, `graph_scenarios.cpp`; legacy: `station_scenarios.cpp`, `food_scenarios.cpp`, `maitre_d_scenarios.cpp`, `expediter_scenarios.cpp`, `decoration_scenarios.cpp`, `player_scenarios.cpp`, `customer_dog_scenarios.cpp`, `waiter_dog_scenarios.cpp`, `dishwasher_dog_scenarios.cpp`, `dishwasher_scenarios.cpp`; plus `harness_scenarios.cpp` for the harness itself. Add new scenarios to the matching file, and register genuinely new files in `CMakeLists.txt`'s `tests` target.
@@ -152,7 +152,7 @@ All tunable constants live in `config.h`, grouped by domain namespace rather tha
 
 - **`systems::interaction_system` and `systems::collision_system` are `(void) delta;` stubs.** They are ticked every frame and do nothing. Nothing on the ECS path currently tests interaction-box overlap, and there is no ECS equivalent of the legacy `dog_reached_station` arrival fact — a customer walks to its claimed table and nothing happens. `entity_lifespan_system::update`, `spatial_system::update` and `selection_system::update` are also stubs, but deliberately: those systems are event-driven and hold no per-frame work.
 - **`components::state_machine_component` is empty** — no members (the `std::vector<state_component>` is commented out), no `.cpp`, not registered in `CMakeLists.txt`. `build_state_machine_component` discards its argument.
-- **Only `customer_arrival_system` ever sets an interactor's target.** Player right-click issues a path without naming a target, and `waiter_idling_system` only paths.
+- **Only `customer_table_system` ever sets an interactor's target.** Player right-click issues a path without naming a target, and `waiter_idling_system` only paths.
 - `entities::dishwasher_dog` exists as an entity/builder but has no dedicated orchestration system driving it (unlike `waiter_dog`/`expediter`).
 - `items.h`'s shop/inventory system (`item`, `shop_item`, `item_manager`) has a `.cpp` now, but zero consumers anywhere in `src/` or `tests/` — still scaffolding.
 - `render_layer::ecs_layer` and `tree::ecs_quadtree` carry `RENAME AFTER REFACTOR IS COMPLETE` TODOs; so does `namespace ecs_entities` in `entity.h`. The `ecs_` prefixes are temporary and go away when the legacy halves are deleted.

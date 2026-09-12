@@ -7,16 +7,39 @@
 #include <optional>
 #include <random>
 namespace dbs {
-    class customer_arrival_system{
+    enum table_status{
+        available = 0,
+        reserved,
+        occupied
+    };
+    class registered_table{
+        public:
+            ~registered_table() = default;
+            registered_table(size_t id, size_t status = table_status::available)
+            : id_(id), status_(status){}
+            registered_table(const registered_table& other) = default;
+            registered_table(registered_table&& other) = default;
+
+            registered_table& operator=(const registered_table& other) = default;
+            registered_table& operator=(registered_table&& other) = default;
+
+            size_t id() const{ return id_; }
+            size_t status() const{ return status_; }
+            void set_status(size_t status){ status_ = status; }
+        private:
+            size_t id_;
+            size_t status_;
+    };
+    class customer_table_system{
         public:
                     // TODO (25 / 8 / 26) must listen to table construction and deletion, can create a new event for it and update teh builders
                     // TODO and destroyers to emit those events
-            ~customer_arrival_system() = default;
-            customer_arrival_system() = default;
-            customer_arrival_system(const customer_arrival_system& other) = default;
-            customer_arrival_system(customer_arrival_system&& other) = default;
-            customer_arrival_system& operator=(const customer_arrival_system& other) = default;
-            customer_arrival_system& operator=(customer_arrival_system&& other) = default;
+            ~customer_table_system() = default;
+            customer_table_system() = default;
+            customer_table_system(const customer_table_system& other) = default;
+            customer_table_system(customer_table_system&& other) = default;
+            customer_table_system& operator=(const customer_table_system& other) = default;
+            customer_table_system& operator=(customer_table_system&& other) = default;
                     
                     // create_dog
                     // destroy_dog
@@ -28,6 +51,7 @@ namespace dbs {
             void unregister_customer(size_t id);
             void register_table(size_t id);
             void unregister_table(size_t id);
+            void reserve_table(size_t table_id);
                 
                     
             bool free_tables();
@@ -39,7 +63,7 @@ namespace dbs {
                     const std::vector<size_t>& get_customers() const{
                         return customers_;
                     }
-                    const std::vector<size_t>& get_tables() const{
+                    const std::vector<registered_table>& get_tables() const{
                         return tables_;
                     }
 #endif
@@ -55,7 +79,7 @@ namespace dbs {
             // const Rectangle cafe_entrace_;
             float time_since_dog_ = 0.0f;
             std::vector<size_t> customers_;
-            std::vector<size_t> tables_;
+            std::vector<registered_table> tables_;
     };
     class idle_waiter{
         public:

@@ -208,7 +208,6 @@ void ecs_entities::build_station(size_t id, Vector2 position,
         void ecs_entities::build_food_counter(size_t id, Vector2 position){
             build_counter(id, position, sprite_builders::build_food_counter_sprite());
             helpers::add_items_to_counter(id, entity_config::foods::lasagna, 2);
-
         }
     void ecs_entities::build_table(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,

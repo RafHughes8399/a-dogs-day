@@ -413,7 +413,7 @@ what is left
 
 customer arrival system + customer destroying
 
--> the customer_arrival_system scaffold is still empty, create_dog / destroy_dog are comments.
+-> the customer_table_system scaffold is still empty, create_dog / destroy_dog are comments.
    the factory builds the dog and issues its path, nothing owns the other end of its life
 -> nothing removes a customer once it finishes walking the footpath. it parks on the destination
    node and that node stays occupied forever
@@ -428,7 +428,7 @@ customer arrival system + customer destroying
 -> open question, where the departure lives:
    -> movement_system despawning when a path completes at a destination node is the cheap version,
       but that makes the movement system decide when a customer's life ends, which is orchestration
-   -> customer_arrival_system owning both ends [spawn a dog, hear it reach the footpath exit,
+   -> customer_table_system owning both ends [spawn a dog, hear it reach the footpath exit,
       destroy it] matches the world-ownership vs business-logic split and is where the scaffold
       already says it should go
    -> needs a "customer reached the footpath exit" fact to hang off. there is no path_failed and no

@@ -386,7 +386,10 @@ namespace systems{
 
             interaction_system& operator=(const interaction_system& other) = delete;
             interaction_system& operator=(interaction_system&& other) = delete;
+
             interaction create_interaction(size_t interactor, size_t interactee);
+            bool establish_handhsake(size_t interactor, size_t interactable);
+            void teardown_handshake(size_t interactor, size_t interactable);
             void add_interaction(interaction& interaction);
             void remove_interaction(size_t entity_id);
             void on_moved_entity(const events::move_entity& event);
@@ -650,12 +653,12 @@ namespace systems{
             void register_table(size_t id);
             void unregister_table(size_t id);
             void clear(){
-                customer_arrival_.clear();
+                customer_table_.clear();
                 waiter_idling_.clear();
             }
         private:
             npc_system() = default;
-            dbs::customer_arrival_system customer_arrival_;
+            dbs::customer_table_system customer_table_;
             dbs::waiter_idling_system waiter_idling_;
         public:
             void update(float delta);

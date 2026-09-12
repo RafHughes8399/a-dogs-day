@@ -275,24 +275,39 @@ animation it should be peaches
     -> send waiter to counter x
     -> build a counter with and without food
         -> slight detour for the item system
-        -> and then food entity 
-
-        -> counter builder 
-        -> food builder 
-        -> build counter in an empty / filled state
-    -> the right click send to path for waiter should interrupt not append the path
+        -> and then food entity x 
+        -> counter builder x 
+        -> food builder  x 
+        -> build counter in an empty / filled state x 
+    -> the right click send to path for waiter should interrupt not append the path 
     -> have waiter perform a counter interaction
-        -> perform the interaciton, flip the state, to prevent continued idle pathing
-        -> make idle pathing dependent on the state check instead of what it is currently
-        -> update the waiter idling to be a state check 
-
+        -> setup a helper to establish and teardown the interactor interactable hadnshalke x 
+        -> make idle pathing dependent on the state check instead of what it is currently 
+        -> perform the underlying interaction
+            -> take the item
+            -> perform the state transition 
+        
+    -> NOTE NEED TO HANDLE CUSTOMER TABLE UNRESERVERING WHEN THE CUSTOMER LEAVES
     -> and a customer perform a sit interaction [i think we dont have interaction detection just yet]
         -> transition the state, perform the underlying interaction behaviour
         -> state transition, 
         -> port the interaction behaviours over to the system so that they have access to thge rest of the stuff 
-    -> play the animation
-    -> then send waiter to table,
-    -> waiter interacts again, performs a table interaction
+    
+    -> then direct the waiter to the table
+        -> check the interaction 
+        -> definet the interaction behaviour
+        -> place the food entity on the table
+        _> transition the waiter state
+        -> emit food served to table x
+        -> within the customer table system
+            -> listen to food served at table x, customer state change to eating 
+                -> state transition
+            -> eating duration
+
+            -> then customer leave
+                -> pathfind to entrance and to exit
+
+            -> unregister table
     -> play the animation, perform the underlying interaction behaviour
     [ need to properly decide what happens after placing down food]
     -> then send back to origin ?

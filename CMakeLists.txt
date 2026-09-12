@@ -143,7 +143,7 @@ add_library(systems
   src/engine/systems/control_input_system.cpp
   src/engine/systems/entity_lifespan_system.cpp
   src/engine/systems/npc_system.cpp
-  src/engine/systems/customer_arrival_system.cpp
+  src/engine/systems/customer_table_system.cpp
   src/engine/systems/waiter_idling_system.cpp
   src/engine/systems/selection_system.cpp
   src/engine/systems/animation_system.cpp
@@ -304,7 +304,7 @@ add_executable(tests
   tests/customer_dog_scenarios.cpp
   tests/waiter_dog_scenarios.cpp
   tests/quadtree_scenarios.cpp
-  tests/customer_arrival_scenarios.cpp
+  tests/customer_table_scenarios.cpp
   tests/counter_storage_scenarios.cpp
   tests/waiter_idling_scenarios.cpp
   tests/interaction_scenarios.cpp
