@@ -80,6 +80,7 @@ namespace factories{
             station_factory()
             :table_builders_({
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_dining_table(id, position);},
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table(id, position);},
             }), counter_builders_({
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_food_counter(id, position);},
             }){

@@ -127,6 +127,9 @@ sprite::sprite sprite_builders::build_table_sprite(){
     sprite::sprite sprite_builders::build_dining_table_sprite(){
         return build_decoration_sprite(textures::dining_table, entity_config::dining_table_station_path, entity_config::dining_table_attributes);
     }
+    sprite::sprite sprite_builders::build_tiled_table_sprite(){
+        return build_decoration_sprite(textures::tiled_table, entity_config::tiled_table_station_path, entity_config::tiled_table_attributes);
+    }
     sprite::sprite sprite_builders::build_food_counter_sprite(){
         return build_decoration_sprite(textures::food_counter, entity_config::food_counter_station_path, entity_config::food_counter_attributes);
     }

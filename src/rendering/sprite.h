@@ -132,6 +132,7 @@ namespace sprite_builders{
     // *-------------------- station sprites --------------------* //
     sprite::sprite build_table_sprite();
     sprite::sprite build_dining_table_sprite();
+    sprite::sprite build_tiled_table_sprite();
     sprite::sprite build_food_counter_sprite();
     sprite::sprite build_dishwasher_sprite();
     sprite::sprite build_stove_sprite();

@@ -137,6 +137,7 @@ namespace ecs_entities {
             void build_food_counter(size_t id, Vector2 position);
         void build_table(size_t id, Vector2 position, sprite::sprite table_sprite);
             void build_dining_table(size_t id, Vector2 position);
+            void build_tiled_table(size_t id, Vector2 position);
         void build_dishwasher(size_t id, Vector2 position);
         void build_stove(size_t id, Vector2 position);
         /**

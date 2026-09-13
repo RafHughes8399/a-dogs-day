@@ -220,6 +220,9 @@ void ecs_entities::build_station(size_t id, Vector2 position,
         void ecs_entities::build_dining_table(size_t id, Vector2 position){
             build_table(id, position, sprite_builders::build_dining_table_sprite());
         }
+        void ecs_entities::build_tiled_table(size_t id, Vector2 position){
+            build_table(id, position, sprite_builders::build_tiled_table_sprite());
+        }
         
     void ecs_entities::build_dishwasher(size_t id, Vector2 position){
         build_station(id, position,
