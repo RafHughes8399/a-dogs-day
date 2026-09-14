@@ -279,13 +279,15 @@ animation it should be peaches
         -> counter builder x 
         -> food builder  x 
         -> build counter in an empty / filled state x 
-    -> the right click send to path for waiter should interrupt not append the path 
+    -> the right click send to path for waiter should interrupt not append the path  x
     -> have waiter perform a counter interaction
         -> setup a helper to establish and teardown the interactor interactable hadnshalke x 
         -> make idle pathing dependent on the state check instead of what it is currently 
         -> perform the underlying interaction
-            -> take the item
-            -> perform the state transition 
+            -> take the item x 
+            -> perform the state transition  x 
+            -> setup the interaction ifnra to support a waiter_counter_pickup interaction
+            -> i need counter and food art 
     -> NOTE NEED TO HANDLE CUSTOMER TABLE UNRESERVERING WHEN THE CUSTOMER LEAVES
     -> and a customer perform a sit interaction [i think we dont have interaction detection just yet]
         -> transition the state, perform the underlying interaction behaviour

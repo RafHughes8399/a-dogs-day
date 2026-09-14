@@ -1,3 +1,4 @@
+#include "component.h"
 #include "debug_log_interface.h"
 #include "debug_logger.h"
 #include "system.h"
@@ -63,10 +64,21 @@ void systems::interaction_system::waiter_table_serve(size_t interactor, size_t i
     (void) interactee;
     (void) delta;
 }
+
+Vector2 get_dog_mouth_offset(size_t dog){
+    auto hitbox = component_managers::collision_manager_.get_component(dog);
+    if(not hitbox) {return Vector2Zero();}
+    auto dog_box = hitbox->get_hitbox_component().get_hitbox().get_box();
+    auto direction = level_config::direction_scalars[level_config::directions::right];
+    if(auto* movement = component_managers::movement_manager_.get_component(dog)){
+        direction = movement->get_direction_scalar();
+    }
+    auto half_width = dog_box.width * 0.5f;
+    return Vector2{
+        half_width + (half_width * direction.x) - (entity_config::food_width * 0.5f),
+        (dog_box.height * 0.2f) - (entity_config::food_height * 0.5f)};
+}
 void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t counter, float delta){
-    (void) waiter;
-    (void) counter;
-    (void) delta;
     debug::log("waiter counter pickup interaction attempt");
     // two things to do:
     // * 1. switch the dog state and play the animation 
@@ -76,18 +88,21 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
     // * 3. maybe the dog needs a carrier component, or maybe the food entity needs a "movement" component ?
     // * no, no ,no in the dog state, the dog will hold a food id, then the state update will take the dog position,
     // * and the update the food position's accordingly
+    (void) delta;
+    auto* waiter_position = component_managers::positional_manager_.get_component(waiter);
+    if(not waiter_position){ return; }
+
     auto food_opt = item_system::get_instance().take_item(counter);
-    if(not food_opt.has_value()){
-        return;
-    }
-    auto food = food_opt.value();
-    auto dog_mouth = Vector2Zero(); // get the dog mouth offset
-    // lifespan system create.
-    entity_lifespan_system::get_instance().create_food(food.get_id(), dog_mouth);
-    // dog transition to  carrying 
-    // the dog state should handle the animation through on transition   
+    if(not food_opt.has_value()){ return; }
+
+    auto dog_mouth_position = Vector2Add(waiter_position->get_position(), get_dog_mouth_offset(waiter));
+    auto food_id = entity_lifespan_system::get_instance().create_food(food_opt.value().get_id(), dog_mouth_position);
+
+    std::unique_ptr<events::event> collected = std::make_unique<events::waiter_collected_food>(waiter, food_id);
+    event_interface::queue_event(collected);
 }
 
+// * ----------------------------------------------------- INTERACTIONS ------------------------------------------------------- * // 
 // TODO (25 / 8 / 26) stub - the loop calls this every frame, nothing to do yet
 void systems::interaction_system::update(float delta){
     process_interactions(delta);

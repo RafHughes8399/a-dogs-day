@@ -24,8 +24,8 @@ SCENARIO("a food entity is built with the expected identity and body", "[food]")
                 REQUIRE(food->get_position().x == position.x);
                 REQUIRE(food->get_position().y == position.y);
                 const Rectangle box = food->get_hitbox().get_box();
-                REQUIRE(box.width == entity_config::test_food_attributes[entity_config::attributes::frame_width]);
-                REQUIRE(box.height == entity_config::test_food_attributes[entity_config::attributes::frame_height]);
+                REQUIRE(box.width == entity_config::food_width);
+                REQUIRE(box.height == entity_config::food_height);
             }
         }
     }

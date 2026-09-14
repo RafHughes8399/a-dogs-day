@@ -536,6 +536,8 @@ namespace entity_config{
 
     inline const float station_width = level_config::edge_weight * 1.5f;
     inline const float station_height = level_config::edge_weight * 1.5f;
+    inline const float food_width = level_config::edge_weight * 0.5f;
+    inline const float food_height = level_config::edge_weight * 0.5f;
 
 
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
