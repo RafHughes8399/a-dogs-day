@@ -286,14 +286,31 @@ animation it should be peaches
         -> perform the underlying interaction
             -> take the item x 
             -> perform the state transition  x 
-            -> setup the interaction ifnra to support a waiter_counter_pickup interaction
-            -> i need counter and food art 
+    
+
+            -> setup the interaction infra to support a waiter_counter_pickup interaction
+            -> i think it should just transition directly to the carrying state , and then the on transition to p
+            plays the  pickup animation, and on transition from plays the put down animation
+            because the interacting state means something different, like that should be the "working this station" 
+            -> i need counter and food art
+
+            -> i also think there should be more of a distinction between idle and walking
+            -> like idle should mean idle, as in not moving, stationary
+            -> walking should mean walking
+
+            -> ok so a slight reorganistaion of the waiter state machine is necessary
+
+
     -> NOTE NEED TO HANDLE CUSTOMER TABLE UNRESERVERING WHEN THE CUSTOMER LEAVES
+
     -> and a customer perform a sit interaction [i think we dont have interaction detection just yet]
         -> transition the state, perform the underlying interaction behaviour
         -> state transition, 
         -> port the interaction behaviours over to the system so that they have access to thge rest of the stuff 
     
+
+
+
     -> then direct the waiter to the table
         -> check the interaction 
         -> definet the interaction behaviour
