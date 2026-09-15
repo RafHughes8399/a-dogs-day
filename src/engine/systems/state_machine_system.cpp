@@ -15,11 +15,13 @@ void systems::state_machine_system::transition(size_t entity, int transition,
     if(not machine.can_transition(transition)){ return; }
 
     auto previous = machine.current();
+    // *this function handles the transition to and on transition to 
     machine.transition(entity, transition, payload);
     debug::log("[state_machine_system::transition] entity: " + std::to_string(entity)
         + ", transition: " + std::to_string(transition)
         + ", state: " + std::to_string(previous) + " -> " + std::to_string(machine.current()));
-    play_state_animation(entity);
+        // * this shouldn't happen here
+        //play_state_animation(entity);
 }
 
 void systems::state_machine_system::play_state_animation(size_t entity){

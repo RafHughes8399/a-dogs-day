@@ -372,8 +372,8 @@ SCENARIO("npc dogs build with the same components as a player dog", "[ecs][compo
         WHEN("a waiter dog is built"){
             auto waiter_id = game.create_waiter_dog(spawn);
 
-            THEN("it carries the same seven components"){
-                REQUIRE(game.num_components(waiter_id) == 7);
+            THEN("it carries eight components"){
+                REQUIRE(game.num_components(waiter_id) == 8);
                 REQUIRE(game.has_movement(waiter_id));
                 REQUIRE(game.has_interactor(waiter_id));
                 REQUIRE(game.has_state_machine(waiter_id));

@@ -118,6 +118,8 @@ void ecs_entities::build_waiter_dog(size_t id, Vector2 position,
     interaction_config::waiter_dog_interactor);
     component_helpers::add_state_machine_component(id,
         state_machine_builders::build_waiter_state_machine());
+    auto* waiter_position = component_managers::positional_manager_.get_component(id);
+    component_helpers::add_carrier_component(id, position, waiter_position->get_position_pointer());
 }
 
     void ecs_entities::build_gianluca(size_t id, Vector2 position){

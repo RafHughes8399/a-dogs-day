@@ -98,6 +98,16 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
     auto dog_mouth_position = Vector2Add(waiter_position->get_position(), get_dog_mouth_offset(waiter));
     auto food_id = entity_lifespan_system::get_instance().create_food(food_opt.value().get_id(), dog_mouth_position);
 
+
+    // * update the carrier component
+    auto waiter_carrier = component_managers::carrier_manager_.get_component(waiter);
+    if(waiter_carrier){
+        waiter_carrier->set_carried_entity(food_id);
+        waiter_carrier->set_previous_position(waiter_position->get_position());
+    }
+    // * and the state [for animations]
+    // ? maybe in the future may have to override movement speed to 0 for some delay to ensure that hte 
+    // ? waiter cannot run away while still playing the interaction animation 
     std::unique_ptr<events::event> collected = std::make_unique<events::waiter_collected_food>(waiter, food_id);
     event_interface::queue_event(collected);
 }

@@ -96,6 +96,24 @@ namespace systems{
             events::event_handler<events::remove_entity> remove_entity_handler_;
     };
 
+    class carrier_system{
+        public:
+            static carrier_system& get_instance(){
+                static carrier_system instance;
+                return instance;
+            }
+            ~carrier_system() = default;
+            carrier_system(const carrier_system& other) = delete;
+            carrier_system(carrier_system&& other) = delete;
+
+            carrier_system& operator=(const carrier_system& other) = delete;
+            carrier_system& operator=(carrier_system&& other) = delete;
+
+            void update(float delta);
+        private:
+            carrier_system() = default;
+    };
+
     class state_machine_system{
         public:
             static state_machine_system& get_instance(){

@@ -121,6 +121,7 @@ add_library(components
   src/engine/components/component_managers.cpp
   src/engine/components/component_builders.cpp
   src/engine/components/component_helpers.cpp
+  src/engine/components/carrier_component.cpp
   src/engine/components/collision_component.cpp
   src/engine/components/interactable_component.cpp
   src/engine/components/interactor_component.cpp
@@ -136,6 +137,7 @@ link_libraries(components)
 
 add_library(systems
   src/engine/systems/movement_system.cpp
+  src/engine/systems/carrier_system.cpp
   src/engine/systems/rendering_system.cpp
   src/engine/systems/spatial_system.cpp
   src/engine/systems/collision_system.cpp

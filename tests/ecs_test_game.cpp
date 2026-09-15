@@ -367,7 +367,8 @@ namespace testing{
              + component_managers::mouse_input_manager_.size()
              + component_managers::state_machine_manager_.size()
              + component_managers::selectable_manager_.size()
-             + component_managers::storage_manager_.size();
+             + component_managers::storage_manager_.size()
+             + component_managers::carrier_manager_.size();
     }
 
 } // namespace testing

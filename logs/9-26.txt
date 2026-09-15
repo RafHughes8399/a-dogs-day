@@ -289,9 +289,10 @@ animation it should be peaches
     
 
             -> setup the interaction infra to support a waiter_counter_pickup interaction
-            -> i think it should just transition directly to the carrying state , and then the on transition to p
-            plays the  pickup animation, and on transition from plays the put down animation
-            because the interacting state means something different, like that should be the "working this station" 
+
+
+            -> the carrier component i think is the best bet then, simple way to tie two entities at the component level which is what 
+            -> we need the component, and the system to do the update behaviour
             -> i need counter and food art
 
             -> i also think there should be more of a distinction between idle and walking
@@ -299,7 +300,22 @@ animation it should be peaches
             -> walking should mean walking
 
             -> ok so a slight reorganistaion of the waiter state machine is necessary
+            -> i think it should just transition directly to the carrying state , and then the on transition to p
+            plays the  pickup animation, and on transition from plays the put down animation
+            because the interacting state means something different, like that should be the "working this station"
+            -> i think this food positional update needs to happen at the component level not the level below
+            -> how can that be achieved ?, i mean the simplest way is to set waiter food interactions
+            -> then the food will move as the waiter moves right ? the waiter moves, detects an interaction with the food
+            -> maybe a carryable component ?. then all the states manage is animations . are they even necssary then ? 
+            -> because i can trigger animations on interaction start and end well enough through the interaction system
+            -> no but how do you do looping animaionts then. the state is necessary, the state is necessary
 
+            -> consider the fact that table counter pick and table counter dropoff are two interactions taht can be performed
+            with the same interactor and interactee. i think that its fine if all interactions taht are available are processed
+            -> and the actual interaction behaivour is guarded behind a state check 
+            
+            -> so we do meaninguflly need the state machine haha 
+            there should be a state check at the sta
 
     -> NOTE NEED TO HANDLE CUSTOMER TABLE UNRESERVERING WHEN THE CUSTOMER LEAVES
 

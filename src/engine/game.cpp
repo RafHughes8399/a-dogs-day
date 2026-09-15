@@ -78,6 +78,7 @@ void game::game::update(float delta){
     input_.update(delta);
     npc_.update(delta);
     movement_.update(delta);
+    carrier_.update(delta);
     spatial_.update(delta);
     collision_.update(delta);
     interaction_.update(delta);

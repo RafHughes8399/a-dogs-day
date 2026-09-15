@@ -110,6 +110,31 @@ class storage_component {
   private:
     item_stack::item_stack items_;
 };
+
+class carrier_component {
+public:
+    ~carrier_component() = default;
+    carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt)
+    : previous_position_(previous_position), current_position_(current_position), carried_entity_(carried_entity){}
+    carrier_component(const carrier_component& other) = default;
+    carrier_component(carrier_component&& other) = default;
+
+    carrier_component& operator=(const carrier_component& other) = default;
+    carrier_component& operator=(carrier_component&& other) = default;
+
+    Vector2 get_previous_position() const;
+    void set_previous_position(Vector2 position);
+    Vector2* get_current_position() const;
+    void set_current_position(Vector2* position);
+    std::optional<size_t> get_carried_entity() const;
+    void set_carried_entity(std::optional<size_t> entity_id);
+    bool is_carrying() const;
+private:
+    Vector2 previous_position_;
+    Vector2* current_position_;
+    std::optional<size_t> carried_entity_;
+};
+
 class interactable_component {
 public:
 
@@ -258,6 +283,7 @@ public:
     position_component& operator=(position_component&& other) = default;
 
     Vector2 get_position();
+    Vector2* get_position_pointer();
     // only movement_system::update_position should call this - it is what keeps
     // the hitbox and the spatial index in step with the position
     void set_position(Vector2 position);
@@ -403,6 +429,7 @@ private:
 // * these live in their own namespace so call sites read
 // * component_managers::renderable_manager_ rather than components::renderable_manager_,
 // * which would blur the storage layer into the data layer.
+extern component_manager<components::carrier_component> carrier_manager_;
 extern component_manager<components::collision_component> collision_manager_;
 extern component_manager<components::key_input_component> control_manager_;
 extern component_manager<components::interactable_component> interactable_manager_;
@@ -437,6 +464,7 @@ namespace component_builders{
     components::state_machine_component build_state_machine_component(state_machine::state_machine machine);
     components::selectable_component build_selectable_component(size_t kind);
     components::storage_component build_storage_component();
+    components::carrier_component build_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
 }
 // thin forwarders to the right manager; defined in component_helpers.cpp
 namespace component_helpers{
@@ -451,6 +479,7 @@ namespace component_helpers{
     void register_state_machine_component(size_t entity_id, components::state_machine_component component);
     void register_selectable_component(size_t entity_id, components::selectable_component component);
     void register_storage_component(size_t entity_id, components::storage_component component);
+    void register_carrier_component(size_t entity_id, components::carrier_component component);
 
     void add_positional_component(size_t entity_id, Vector2 position);
     void add_movement_component(size_t entity_id, Vector2 move_speed,
@@ -469,6 +498,7 @@ namespace component_helpers{
     void add_state_machine_component(size_t entity_id, state_machine::state_machine machine);
     void add_selectable_component(size_t entity_id, size_t kind);
     void add_storage_component(size_t entity_id);
+    void add_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
     void add_stored_item(size_t entity_id, size_t slot, size_t item_id);
     std::optional<size_t> take_stored_item(size_t entity_id, size_t slot);
     void update_item_sprite(size_t entity_id, size_t slot);
@@ -489,6 +519,7 @@ namespace component_helpers{
     void unregister_state_machine_component(size_t entity_id);
     void unregister_selectable_component(size_t entity_id);
     void unregister_storage_component(size_t entity_id);
+    void unregister_carrier_component(size_t entity_id);
     void unregister_all_components(size_t entity_id);
 
     size_t num_registered_components(size_t entity_id);
