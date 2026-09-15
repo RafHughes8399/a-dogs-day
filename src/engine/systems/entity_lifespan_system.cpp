@@ -1,5 +1,6 @@
 #include "system.h"
 #include <iostream>
+#include <string>
 
 // ---------------- id allocation ----------------
 size_t systems::entity_lifespan_system::next_id(){
@@ -74,5 +75,16 @@ size_t systems::entity_lifespan_system::create_counter(size_t counter, Vector2 p
     return id;
 }
 void systems::entity_lifespan_system::destroy_counter(size_t id){
+    destroy(id);
+}
+
+size_t systems::entity_lifespan_system::create_food(size_t food, Vector2 position){
+    debug::log("[entity_lifespan_system, create food]: create food: " + std::to_string(food) + " at posiiton " + std::to_string(position.x) + ", " + std::to_string(position.y));
+    auto id = create([this](size_t food, size_t entity_id, Vector2 position) -> void{
+        food_factory_.build_food(food, entity_id, position); },
+        food, position, level_config::draw_layers::dogs);
+    return id;
+}
+void systems::entity_lifespan_system::destroy_food(size_t id){
     destroy(id);
 }

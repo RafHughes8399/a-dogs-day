@@ -56,6 +56,12 @@ std::optional<Vector2> components::interactable_component::get_interaction_offse
         : "[interactable_component::get_interaction_offset] no free interaction slot found");
     return closest_offset;
 }
+bool components::interactable_component::has_interactor() const{
+    for(size_t i = 0; i < interactors_.size(); ++i){
+        if(interactors_[i].has_value()) {return true;}
+    }
+    return false;
+}
 bool components::interactable_component::can_accept_interactor() const{
     for(size_t i = 0; i < positions_.size(); ++i){
         if(positions_[i].has_value() and not interactors_[i].has_value()){

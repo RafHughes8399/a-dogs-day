@@ -76,7 +76,7 @@ namespace testing{
 
     size_t ecs_test_game::create_customer_dog(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_customer_dog(id, position);
+            ecs_entities::build_tex(id, position);
         }, layer);
     }
 
@@ -118,7 +118,7 @@ namespace testing{
 
     size_t ecs_test_game::create_food(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_food(id, position);
+            ecs_entities::build_lasagna(id, position);
         }, layer);
     }
 
@@ -367,7 +367,8 @@ namespace testing{
              + component_managers::mouse_input_manager_.size()
              + component_managers::state_machine_manager_.size()
              + component_managers::selectable_manager_.size()
-             + component_managers::storage_manager_.size();
+             + component_managers::storage_manager_.size()
+             + component_managers::carrier_manager_.size();
     }
 
 } // namespace testing

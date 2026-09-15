@@ -28,6 +28,7 @@ namespace path{
             }
             Vector2 get_source();
             Vector2 get_destination();
+            std::optional<size_t> get_destination_entity();
             Vector2 get_next_position();
             bool is_path_complete();
             void advance();

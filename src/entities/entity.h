@@ -98,7 +98,8 @@ namespace ecs_entities {
         void build_khiri(size_t id);
         void build_mack(size_t id);
 
-    void build_customer_dog(size_t id, Vector2 position);
+    void build_customer_dog(size_t id, Vector2 position,
+        std::vector<sprite::sprite> sprites, hitbox::hitbox customer_hitbox);
         void build_tex(size_t id, Vector2 position);
         void build_garfield(size_t id, Vector2 position);
         //**
@@ -136,12 +137,15 @@ namespace ecs_entities {
             void build_food_counter(size_t id, Vector2 position);
         void build_table(size_t id, Vector2 position, sprite::sprite table_sprite);
             void build_dining_table(size_t id, Vector2 position);
+            void build_tiled_table(size_t id, Vector2 position);
         void build_dishwasher(size_t id, Vector2 position);
         void build_stove(size_t id, Vector2 position);
         /**
         */
 
-    void build_food(size_t id, Vector2 position);
+    void build_food(size_t id, Vector2 position, sprite::sprite food_sprite);
+        void build_lasagna(size_t id, Vector2 position);
+        void build_coffee(size_t id, Vector2 position);
 
     // the level backdrop - renderable only, no hitbox, no collision
     void build_background(size_t id);

@@ -21,10 +21,15 @@ namespace interaction_config{
     enum interactions{
         customer_table_sit = 0,
         waiter_table_serve,
+        waiter_counter_pickup,
+        waiter_counter_place_down,
         size
     };
     // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- // 
     inline std::vector<size_t> waiter_dog_interactor = {
+        waiter_table_serve,
+        waiter_counter_pickup,
+        waiter_counter_place_down,
         waiter_table_serve
     };
     inline std::vector<size_t> customer_dog_interactor = {
@@ -34,6 +39,10 @@ namespace interaction_config{
     inline std::vector<size_t> table_interactee = {
         customer_table_sit,
         waiter_table_serve,
+    };
+    inline std::vector<size_t> counter_interactee = {
+        waiter_counter_pickup,
+        waiter_counter_place_down
     };
 }
 namespace game_config {
@@ -408,6 +417,7 @@ namespace entity_config{
     };
     enum tables{
         dining_table = 0,
+        tiled_table,
         tables_size
     };
     enum counters{
@@ -513,7 +523,8 @@ namespace entity_config{
     inline const char* test_decoration_path ="../sprites/test_decoration.png";
     
     // * ------------------------ STATION PATHS --------------------------------------- *//
-    inline const char* dining_table_station_path = "../sprtes/dining-table.png";
+    inline const char* dining_table_station_path = "../sprites/dining-table.png";
+    inline const char* tiled_table_station_path ="../sprites/tiled-table.png";
     inline const char* food_counter_station_path = "";
     
     
@@ -530,6 +541,13 @@ namespace entity_config{
         size
     };
     
+
+    inline const float station_width = level_config::edge_weight * 1.5f;
+    inline const float station_height = level_config::edge_weight * 1.5f;
+    inline const float food_width = level_config::edge_weight * 0.5f;
+    inline const float food_height = level_config::edge_weight * 0.5f;
+
+
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
@@ -588,16 +606,22 @@ namespace entity_config{
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
     
-    inline const float table_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
-    inline const float dining_table_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 1.5f, 1.0f, 1.0f};
+    inline const float table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float dining_table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float tiled_table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
 
-    inline const float food_counter_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
-    inline const float dishwasher_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
-    inline const float stove_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
+    inline const float food_counter_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float dishwasher_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float stove_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     inline const float lasagna_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     inline const float coffee_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    
+    
+    
+    
+    
     // * legacy entities::station capacity. the ECS stations size their capacity
     // * off the slot offset lists below instead.
     inline const size_t food_counter_capacity = 3;

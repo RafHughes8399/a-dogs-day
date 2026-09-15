@@ -91,16 +91,20 @@ private:
 };
 class dog_completed_path : public event {
 public:
-  dog_completed_path(size_t dog_id, Vector2 destination)
-      : event(ids::dog_path_complete), id_(dog_id), destination_(destination) {}
+  dog_completed_path(size_t dog_id, Vector2 destination,
+      std::optional<size_t> destination_entity = std::nullopt)
+      : event(ids::dog_path_complete), id_(dog_id), destination_(destination),
+        destination_entity_(destination_entity) {}
 
   static int get_static_type() { return ids::dog_path_complete; }
   Vector2 get_destination() const { return destination_; }
   size_t get_id() const { return id_; }
+  std::optional<size_t> get_destination_entity() const { return destination_entity_; }
 
 private:
   const size_t id_;
   const Vector2 destination_;
+  const std::optional<size_t> destination_entity_;
 };
 class dog_started_path : public event {
 public:

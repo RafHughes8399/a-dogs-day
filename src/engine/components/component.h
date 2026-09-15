@@ -110,18 +110,35 @@ class storage_component {
   private:
     item_stack::item_stack items_;
 };
+
+class carrier_component {
+public:
+    ~carrier_component() = default;
+    carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt)
+    : previous_position_(previous_position), current_position_(current_position), carried_entity_(carried_entity){}
+    carrier_component(const carrier_component& other) = default;
+    carrier_component(carrier_component&& other) = default;
+
+    carrier_component& operator=(const carrier_component& other) = default;
+    carrier_component& operator=(carrier_component&& other) = default;
+
+    Vector2 get_previous_position() const;
+    void set_previous_position(Vector2 position);
+    Vector2* get_current_position() const;
+    void set_current_position(Vector2* position);
+    std::optional<size_t> get_carried_entity() const;
+    void set_carried_entity(std::optional<size_t> entity_id);
+    bool is_carrying() const;
+    void drop();
+private:
+    Vector2 previous_position_;
+    Vector2* current_position_;
+    std::optional<size_t> carried_entity_;
+};
+
 class interactable_component {
 public:
-    // to solve the problem where an entity is sent to a station but cannot pathfind
-    // becuase the raw click input is a blocked node on the graph. instead, we resolve
-    // an interaction offset against the station's own live position at query time -
-    // the offset is from the station origin, not a world position: a station can be
-    // moved, and a derived position has no sync path to get wrong.
 
-    // * the interaction positions require the existance of a collision component 
-    // * hence, the offsets arrays are simply Vector2Zeros() when passed in as the arrya
-    // * this consttructor's precondtion is an existing collision component and thus
-    // * performs the offset calcualtions in its body
     ~interactable_component() = default;
     interactable_component(float reach, std::array<std::optional<Vector2>, DIRECTIONS> positions, std::vector<size_t> interactions = {})
     : reach_(reach), positions_(positions), interactors_(), interactions_(interactions){
@@ -136,13 +153,10 @@ public:
     std::vector<size_t> get_interactions();
     Rectangle get_interaction_box(Rectangle box) const;
     std::optional<Vector2> get_interaction_offset(Vector2 source, Vector2 own_position) const;
-    // * occupancy is a claim, not a proximity test - a table promised to a
-    // * customer still walking over reads as taken, which a spatial check
-    // * cannot express. claim/release are the only writers of interactors_,
-    // * and their counterparts on interactor_component are interact_with/
-    // * stop_interacting - the two sides are paired only in
-    // * component_helpers::unregister_interact*_component
+
+
     bool can_accept_interactor() const;
+    bool has_interactor() const;
     bool claim(size_t interactor_id);
     void release(size_t interactor_id);
     const std::array<std::optional<size_t>, DIRECTIONS>& get_interactors() const;
@@ -270,6 +284,7 @@ public:
     position_component& operator=(position_component&& other) = default;
 
     Vector2 get_position();
+    Vector2* get_position_pointer();
     // only movement_system::update_position should call this - it is what keeps
     // the hitbox and the spatial index in step with the position
     void set_position(Vector2 position);
@@ -415,6 +430,7 @@ private:
 // * these live in their own namespace so call sites read
 // * component_managers::renderable_manager_ rather than components::renderable_manager_,
 // * which would blur the storage layer into the data layer.
+extern component_manager<components::carrier_component> carrier_manager_;
 extern component_manager<components::collision_component> collision_manager_;
 extern component_manager<components::key_input_component> control_manager_;
 extern component_manager<components::interactable_component> interactable_manager_;
@@ -449,6 +465,7 @@ namespace component_builders{
     components::state_machine_component build_state_machine_component(state_machine::state_machine machine);
     components::selectable_component build_selectable_component(size_t kind);
     components::storage_component build_storage_component();
+    components::carrier_component build_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
 }
 // thin forwarders to the right manager; defined in component_helpers.cpp
 namespace component_helpers{
@@ -463,6 +480,7 @@ namespace component_helpers{
     void register_state_machine_component(size_t entity_id, components::state_machine_component component);
     void register_selectable_component(size_t entity_id, components::selectable_component component);
     void register_storage_component(size_t entity_id, components::storage_component component);
+    void register_carrier_component(size_t entity_id, components::carrier_component component);
 
     void add_positional_component(size_t entity_id, Vector2 position);
     void add_movement_component(size_t entity_id, Vector2 move_speed,
@@ -481,6 +499,7 @@ namespace component_helpers{
     void add_state_machine_component(size_t entity_id, state_machine::state_machine machine);
     void add_selectable_component(size_t entity_id, size_t kind);
     void add_storage_component(size_t entity_id);
+    void add_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
     void add_stored_item(size_t entity_id, size_t slot, size_t item_id);
     std::optional<size_t> take_stored_item(size_t entity_id, size_t slot);
     void update_item_sprite(size_t entity_id, size_t slot);
@@ -501,6 +520,7 @@ namespace component_helpers{
     void unregister_state_machine_component(size_t entity_id);
     void unregister_selectable_component(size_t entity_id);
     void unregister_storage_component(size_t entity_id);
+    void unregister_carrier_component(size_t entity_id);
     void unregister_all_components(size_t entity_id);
 
     size_t num_registered_components(size_t entity_id);

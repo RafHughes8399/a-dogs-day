@@ -80,6 +80,7 @@ namespace factories{
             station_factory()
             :table_builders_({
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_dining_table(id, position);},
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table(id, position);},
             }), counter_builders_({
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_food_counter(id, position);},
             }){
@@ -97,6 +98,26 @@ namespace factories{
         private:
             std::array<std::function<void(size_t, Vector2)>, entity_config::tables_size> table_builders_;
             std::array<std::function<void(size_t, Vector2)>, entity_config::counters_size> counter_builders_;
+    };
+    class food_factory {
+    public:
+        ~food_factory() = default;
+        food_factory()
+        :food_builders_({
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_lasagna(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_coffee(id, position);}
+        }){
+
+        }
+        food_factory(const food_factory& other) = default;
+        food_factory(food_factory&& other) = default;
+    
+        food_factory& operator=(const food_factory& other) = default;
+        food_factory& operator=(food_factory&& other) = default;
+
+        void build_food(size_t food, size_t entity_id, Vector2 position);
+    private:
+        std::array<std::function<void(size_t, Vector2)>, entity_config::foods_size> food_builders_;
     };
 }
 #endif
