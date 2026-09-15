@@ -129,6 +129,7 @@ public:
     std::optional<size_t> get_carried_entity() const;
     void set_carried_entity(std::optional<size_t> entity_id);
     bool is_carrying() const;
+    void drop();
 private:
     Vector2 previous_position_;
     Vector2* current_position_;

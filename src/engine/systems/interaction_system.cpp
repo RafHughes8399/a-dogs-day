@@ -88,7 +88,13 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
     // * 3. maybe the dog needs a carrier component, or maybe the food entity needs a "movement" component ?
     // * no, no ,no in the dog state, the dog will hold a food id, then the state update will take the dog position,
     // * and the update the food position's accordingly
-    (void) delta;
+    // ! first state check guard, only perform this if not carrying !!!!!!!!
+    // ! cannot pick up if carrying ! must place  down instead !
+    auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
+    if(not waiter_state){return;}
+    if(waiter_state->get_machine().get_current_state()->get_state_id() == dog_config::waiter_carrying){
+        return; // 
+    }
     auto* waiter_position = component_managers::positional_manager_.get_component(waiter);
     if(not waiter_position){ return; }
 
@@ -110,6 +116,33 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
     // ? waiter cannot run away while still playing the interaction animation 
     std::unique_ptr<events::event> collected = std::make_unique<events::waiter_collected_food>(waiter, food_id);
     event_interface::queue_event(collected);
+}
+void waiter_counter_place_down(size_t waiter, size_t counter, float delta){
+    // ! first guard ! check that is carrying ! cannot put down if not carrying ! 
+    debug::log("waiter-counter place down interaction attempt");
+    auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
+    if(not waiter_state){
+        return;
+    }
+    if(waiter_state->get_machine().get_current_state()->get_state_id() != dog_config::waiter_carrying){
+        return;
+    }
+    // * 1. get the carried item
+    auto waiter_carrier = component_managers::carrier_manager_.get_component(waiter);
+    if(not waiter_carrier) {return;}
+    auto food_entity_opt = waiter_carrier->get_carried_entity();
+    if(not food_entity_opt) { return;}
+    auto food_entity_id = food_entity_opt.value();
+    // * 2. get the counter storage item
+    auto counter_storage = component_managers::storage_manager_.get_component(counter);
+    if(not counter_storage){
+        return;
+    }
+    auto food_item_id = 1; // food_manager.get_componet(food_entity_id)
+    // * 3. place the item oin the stroage component [requires food to know what item it is, pending that component implementation]
+    counter_storage->place(food_item_id);
+    // * 4. clean up the carrier component
+    waiter_carrier->drop();
 }
 
 // * ----------------------------------------------------- INTERACTIONS ------------------------------------------------------- * // 

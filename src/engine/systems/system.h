@@ -422,7 +422,8 @@ namespace systems{
             : defined_interactions_({
                 customer_table_sit,
                 waiter_table_serve,
-                waiter_counter_pickup
+                waiter_counter_pickup, 
+                waiter_counter_place_down
             }), interactions_to_process_(),
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
             remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
@@ -440,7 +441,7 @@ namespace systems{
             // waiter carries food to the table, hands it over, then releases the slot
             static void waiter_table_serve(size_t interactor, size_t interactee, float delta);
             static void waiter_counter_pickup(size_t interactor, size_t interactee, float delta);
-
+            static void waiter_counter_place_down(size_t interactor, size_t interactee, float delta);
             std::array<std::function<void(size_t, size_t, float)>, interaction_config::size> defined_interactions_;
             std::vector<interaction> interactions_to_process_;
             events::event_handler<events::move_entity> move_entity_handler_;

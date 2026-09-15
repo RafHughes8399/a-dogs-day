@@ -256,6 +256,7 @@ void ecs_entities::build_food(size_t id, Vector2 position, sprite::sprite food_s
     std::vector<hitbox::hitbox> hitboxes = {hitbox_builders::build_food_hitbox(position)};
     component_helpers::add_collision_component(id,
         component_builders::build_hitbox_component(hitboxes, 0));
+    
 }
     void ecs_entities::build_lasagna(size_t id, Vector2 position){
         build_food(id, position, sprite_builders::build_lasagna_sprite());

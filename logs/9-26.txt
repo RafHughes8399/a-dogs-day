@@ -315,6 +315,8 @@ animation it should be peaches
             -> and the actual interaction behaivour is guarded behind a state check 
             
             -> so we do meaninguflly need the state machine haha 
+
+            -> no thats good, that's the point right ? 
             there should be a state check at the sta
 
     -> NOTE NEED TO HANDLE CUSTOMER TABLE UNRESERVERING WHEN THE CUSTOMER LEAVES
