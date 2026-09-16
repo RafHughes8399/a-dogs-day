@@ -30,7 +30,6 @@ namespace interaction_config{
         waiter_table_serve,
         waiter_counter_pickup,
         waiter_counter_place_down,
-        waiter_table_serve
     };
     inline std::vector<size_t> customer_dog_interactor = {
         customer_table_sit
@@ -447,6 +446,8 @@ namespace entity_config{
         dog_part_directions_size
     };
 
+
+    
     // * authored in left-facing space; the right-facing sprite mirrors x across
     // * the dog's across width. advances == false anchors the part to the
     // * preceding advancing part, and its offset.x is relative to that anchor.

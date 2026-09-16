@@ -316,18 +316,30 @@ animation it should be peaches
             
             -> so we do meaninguflly need the state machine haha 
 
-            -> no thats good, that's the point right ? 
-            there should be a state check at the sta
+        -> create art for the counter and food for visual debugging
+        -> then test waiter pick up and place down
 
-    -> NOTE NEED TO HANDLE CUSTOMER TABLE UNRESERVERING WHEN THE CUSTOMER LEAVES
+        -> then wire the waiter serving table interaction
+            -> define the interaction, quite similar to counter but slightly different. i suppose the question is should 
+            the table have a storage component ? otherwise it would just sit there ? it kind of just needs to sit there
+            -> if the table had a storage component it would make things much easier, in terms of the interaction but we
+            need it to be an entity if we are to
+            -> i think it can just sit there, because it does need to be an entity 
+            -> then test it 
+            -> emit a served event that the customer table system listens for
+            -> and then it triggers that state change for the customer
+
+        -> NOTE NEED TO HANDLE CUSTOMER TABLE UNRESERVERING WHEN THE CUSTOMER LEAVES
 
     -> and a customer perform a sit interaction [i think we dont have interaction detection just yet]
         -> transition the state, perform the underlying interaction behaviour
         -> state transition, 
         -> port the interaction behaviours over to the system so that they have access to thge rest of the stuff 
     
-
-
+        -> then the customer eating i think can just be a state change
+        -> eating can just be a flat duration, the question is how do we want the food to react ?,
+        -> maybe food state ? cause that will give us animation control.
+        -> could just be a simple switch flick. yeah food state makes sense, follows similar principle 
 
     -> then direct the waiter to the table
         -> check the interaction 

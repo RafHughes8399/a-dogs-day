@@ -1,6 +1,9 @@
 #include "component.h"
+#include "config.h"
 #include "debug_log_interface.h"
 #include "debug_logger.h"
+#include "dog_events.h"
+#include "event_core.h"
 #include "system.h"
 #include <string>
 
@@ -59,11 +62,32 @@ void systems::interaction_system::customer_table_sit(size_t interactor, size_t i
     debug::log("customer table sit interaction attempt");
     // TODO: update the customer state to sitting
 }
-void systems::interaction_system::waiter_table_serve(size_t interactor, size_t interactee, float delta){
-    (void) interactor;
-    (void) interactee;
+void systems::interaction_system::waiter_table_serve(size_t waiter, size_t table, float delta){
+    (void) waiter;
+    (void) table;
     (void) delta;
-}
+    debug::log("waiter table serve interaction attempt");
+    // ! again the waiter must be carrying to serve
+    auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
+    if(not waiter_state or waiter_state->get_machine().get_current_state()->get_state_id() != dog_config::waiter_carrying){return;}
+
+    // get the table
+    auto table_position = component_managers::positional_manager_.get_component(table);
+    if(not table_position) {return;}
+
+    auto food_place_position = Vector2Add(table_position->get_position(), entity_config::food_draw_offset);
+    auto waiter_carrier = component_managers::carrier_manager_.get_component(waiter);
+    if(not waiter_carrier or not waiter_carrier->is_carrying()){ return; }
+    auto food = waiter_carrier->get_carried_entity().value();
+    waiter_carrier->drop();
+
+    // place the food at the table position + config_table_food_offset
+    auto food_position = component_managers::positional_manager_.get_component(food);
+    if(not food_position) {return;}
+    food_position->set_position(food_place_position);
+    // and emit a served evenmt
+    // std::unique_ptr<events::event> served = std::make_unique<events::order_served>();
+}   
 
 Vector2 get_dog_mouth_offset(size_t dog){
     auto hitbox = component_managers::collision_manager_.get_component(dog);
@@ -93,7 +117,7 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
     auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
     if(not waiter_state){return;}
     if(waiter_state->get_machine().get_current_state()->get_state_id() == dog_config::waiter_carrying){
-        return; // 
+        return; 
     }
     auto* waiter_position = component_managers::positional_manager_.get_component(waiter);
     if(not waiter_position){ return; }
