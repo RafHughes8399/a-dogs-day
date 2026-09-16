@@ -141,7 +141,7 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
     std::unique_ptr<events::event> collected = std::make_unique<events::waiter_collected_food>(waiter, food_id);
     event_interface::queue_event(collected);
 }
-void waiter_counter_place_down(size_t waiter, size_t counter, float delta){
+void systems::interaction_system::waiter_counter_place_down(size_t waiter, size_t counter, float delta){
     // ! first guard ! check that is carrying ! cannot put down if not carrying ! 
     debug::log("waiter-counter place down interaction attempt");
     auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
