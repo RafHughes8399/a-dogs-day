@@ -204,7 +204,7 @@ void ecs_entities::build_station(size_t id, Vector2 position,
             hitbox_builders::build_food_counter_hitbox(position),
             entity_config::station_reach,
             {entity_config::station_slot_left, entity_config::station_slot_right,
-             entity_config::station_slot_up, entity_config::station_slot_down});
+             entity_config::station_slot_up, entity_config::station_slot_down}, interaction_config::counter_interactee);
         component_helpers::add_storage_component(id);
     }
         void ecs_entities::build_food_counter(size_t id, Vector2 position){

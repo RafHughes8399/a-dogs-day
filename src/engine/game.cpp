@@ -36,7 +36,7 @@ void game::game::init(){
     debug::log("[game::init, built mack] id " + std::to_string(mack_id));
 
     //* -------------------------------------------------- STATION CREATE --------------------------------------------------------------------
-    auto counter = lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 12, level_config::edge_weight * 4});
+    auto counter = lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 5});
     auto food_items = component_managers::storage_manager_.get_component(counter)->size();
     /** a bit messy but we're going to create some items for the food counter to store */
     debug::log("[game::init, build counter]: id " + std::to_string(counter) + " with food items:  " + std::to_string(food_items));
@@ -76,7 +76,7 @@ void game::game::update(float delta){
     // tick order is the member declaration order in game.h
     lifespan_.update(delta);
     input_.update(delta);
-    npc_.update(delta);
+    //npc_.update(delta);
     movement_.update(delta);
     carrier_.update(delta);
     spatial_.update(delta);

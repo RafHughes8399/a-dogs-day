@@ -123,7 +123,8 @@ bool dbs::waiter_idling_system::build_paths(size_t waiter, size_t points, Rectan
 void dbs::waiter_idling_system::update(float delta){
     std::uniform_int_distribution<size_t> point_count(dog_config::waiter_idle_min_points,
         dog_config::waiter_idle_max_points);
-
+    
+    /** 
     for(auto& waiter : waiters_){
         waiter.tick(delta);
         // TODO pending state machine implmentatino, but here is where the states should be checked 
@@ -131,8 +132,8 @@ void dbs::waiter_idling_system::update(float delta){
         if(not waiter.ready()){ continue; 
         }
         if(not is_idle(waiter.id())){ continue;
-         }
-
+        }
+        
         auto bounds = determine_idle_bounds(waiter.id());
         if(bounds.has_value()){
             build_paths(waiter.id(), point_count(rng_), bounds.value());
@@ -140,4 +141,5 @@ void dbs::waiter_idling_system::update(float delta){
         // TODO: update state from not idle to idle
         waiter.start_cooldown(roll_cooldown());
     }
+    */
 }

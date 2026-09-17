@@ -115,15 +115,25 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
     // ! first state check guard, only perform this if not carrying !!!!!!!!
     // ! cannot pick up if carrying ! must place  down instead !
     auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
-    if(not waiter_state){return;}
+    if(not waiter_state){
+        debug::log("[waiter counter pickup interaction] no waiter state");
+        return;
+    }
     if(waiter_state->get_machine().get_current_state()->get_state_id() == dog_config::waiter_carrying){
+        debug::log("[waiter counter pickup interaction] waiter is in the carrying state, cannot pickup");
         return; 
     }
     auto* waiter_position = component_managers::positional_manager_.get_component(waiter);
-    if(not waiter_position){ return; }
+    if(not waiter_position){ 
+        debug::log("[waiter counter pickup interaction] no waiter position ");
+        return; 
+    }
 
     auto food_opt = item_system::get_instance().take_item(counter);
-    if(not food_opt.has_value()){ return; }
+    if(not food_opt.has_value()){ 
+        debug::log("[waiter counter pickup interaction] no food on the counter ");
+        return; 
+    }
 
     auto dog_mouth_position = Vector2Add(waiter_position->get_position(), get_dog_mouth_offset(waiter));
     auto food_id = entity_lifespan_system::get_instance().create_food(food_opt.value().get_id(), dog_mouth_position);
@@ -250,10 +260,6 @@ void systems::interaction_system::on_path_finished(const events::dog_completed_p
     bool overlapping = CheckCollisionRecs(interactor_box, target_box);
     debug::log("[interaction_system::on_path_finished] dog: " + std::to_string(dog_id)
         + ", target: " + std::to_string(target_id)
-        + ", interactor box: " + std::to_string(interactor_box.x) + "," + std::to_string(interactor_box.y)
-            + " " + std::to_string(interactor_box.width) + "x" + std::to_string(interactor_box.height)
-        + ", target box: " + std::to_string(target_box.x) + "," + std::to_string(target_box.y)
-            + " " + std::to_string(target_box.width) + "x" + std::to_string(target_box.height)
         + ", overlapping: " + std::string(overlapping ? "yes" : "no"));
     if(overlapping and establish_handhsake(dog_id, target_id)){
         auto interaction = create_interaction(dog_id, target_id);
@@ -268,6 +274,7 @@ systems::interaction_system::interaction systems::interaction_system::create_int
     return interaction(interactor, interactee);
 }
 void systems::interaction_system::add_interaction(interaction& interaction){
+    // ! it is this that is fucking us up. this event 
     std::unique_ptr<events::event> started = std::make_unique<events::interaction_started>(
         interaction.get_interactor(), interaction.get_interactee());
     interactions_to_process_.push_back(std::move(interaction));
