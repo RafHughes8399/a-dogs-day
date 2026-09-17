@@ -320,11 +320,16 @@ animation it should be peaches
         -> then test waiter pick up and place down
             // * testing notes *// 
                 -> food position needs to flip when direction flips 
-                -> food offset should be further right and a bit down, and the food should be larger 
-                
+                -> food offset should be further right and a bit down, and the food should be larger [restore edge weight dimensions]
+                -> and the screen resolution issue 
 
 
+                some other rapid fire things:
+                    -> for all stations, only two interaction positions, left and right, 
+                    -> the left interaction spot leaves a dog slightly too deep into the station and the right interaction spot
+                    actualklky doesnt put the dog flose enough or far enough down. thge left position also should place the dog down further
 
+        -> when i say these values need adjusting and i dont specify assume half an edge weight
 
         -> then wire the waiter serving table interaction
             -> define the interaction, quite similar to counter but slightly different. i suppose the question is should 
@@ -334,7 +339,7 @@ animation it should be peaches
             -> i think it can just sit there, because it does need to be an entity 
             -> then test it 
             -> emit a served event that the customer table system listens for
-            -> and then it triggers that state change for the customer
+            -> and then it triggers that state change for the customer [if there is one]
 
         -> NOTE NEED TO HANDLE CUSTOMER TABLE UNRESERVERING WHEN THE CUSTOMER LEAVES
 

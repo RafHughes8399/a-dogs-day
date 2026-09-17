@@ -110,6 +110,7 @@ namespace systems{
             carrier_system& operator=(carrier_system&& other) = delete;
 
             void update(float delta);
+            static Vector2 mouth_offset(size_t carrier);
         private:
             carrier_system() = default;
     };

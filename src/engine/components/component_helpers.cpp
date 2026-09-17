@@ -98,12 +98,12 @@ void component_helpers::create_offset_position_list(Rectangle box, std::array<st
     // * with no tie to break
     // * left is - 0.5 edgeweight x, height / 2 y
     if(positions[level_config::directions::left].has_value()){
-        positions[level_config::directions::left]->x = level_config::edge_weight * -0.5f;
+        positions[level_config::directions::left]->x = level_config::edge_weight * -1.0f;
         positions[level_config::directions::left]->y = box.height * 0.5f;
     }
     // * right is width + 0.5 edgeweight x, height / 2 y
     if(positions[level_config::directions::right].has_value()){
-        positions[level_config::directions::right]->x = box.width + level_config::edge_weight * 0.5f;
+        positions[level_config::directions::right]->x = box.width;
         positions[level_config::directions::right]->y = box.height * 0.5f;
     }
     // * up is width / 2 x, - 0.5 edgeweight y

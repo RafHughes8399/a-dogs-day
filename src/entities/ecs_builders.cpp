@@ -204,7 +204,7 @@ void ecs_entities::build_station(size_t id, Vector2 position,
             hitbox_builders::build_food_counter_hitbox(position),
             entity_config::station_reach,
             {entity_config::station_slot_left, entity_config::station_slot_right,
-             entity_config::station_slot_up, entity_config::station_slot_down}, interaction_config::counter_interactee);
+             std::nullopt, std::nullopt}, interaction_config::counter_interactee);
         component_helpers::add_storage_component(id);
     }
         void ecs_entities::build_food_counter(size_t id, Vector2 position){
@@ -231,7 +231,7 @@ void ecs_entities::build_station(size_t id, Vector2 position,
             sprite_builders::build_dishwasher_sprite(),
             hitbox_builders::build_dishwasher_hitbox(position),
             entity_config::station_reach,
-            {entity_config::station_slot_left, std::nullopt, std::nullopt, std::nullopt});
+            {entity_config::station_slot_left, entity_config::station_slot_right, std::nullopt, std::nullopt});
     }
     void ecs_entities::build_stove(size_t id, Vector2 position){
         build_station(id, position,
@@ -239,7 +239,7 @@ void ecs_entities::build_station(size_t id, Vector2 position,
             hitbox_builders::build_stove_hitbox(position),
             entity_config::station_reach,
             {entity_config::station_slot_left, entity_config::station_slot_right,
-             entity_config::station_slot_up, entity_config::station_slot_down});
+             std::nullopt, std::nullopt});
     }
     /**
         // void build_stove();

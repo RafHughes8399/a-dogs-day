@@ -109,19 +109,6 @@ void systems::interaction_system::waiter_table_serve(size_t waiter, size_t table
     // and emit a served evenmt
 }   
 
-Vector2 get_dog_mouth_offset(size_t dog){
-    auto hitbox = component_managers::collision_manager_.get_component(dog);
-    if(not hitbox) {return Vector2Zero();}
-    auto dog_box = hitbox->get_hitbox_component().get_hitbox().get_box();
-    auto direction = level_config::direction_scalars[level_config::directions::right];
-    if(auto* movement = component_managers::movement_manager_.get_component(dog)){
-        direction = movement->get_direction_scalar();
-    }
-    auto half_width = dog_box.width * 0.5f;
-    return Vector2{
-        half_width + (half_width * direction.x) - (entity_config::food_width * 0.5f),
-        (dog_box.height * 0.2f) - (entity_config::food_height * 0.5f)};
-}
 void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t counter, float delta){
     debug::log("waiter counter pickup interaction attempt");
     // two things to do:
@@ -155,7 +142,7 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
         return; 
     }
 
-    auto dog_mouth_position = Vector2Add(waiter_position->get_position(), get_dog_mouth_offset(waiter));
+    auto dog_mouth_position = Vector2Add(waiter_position->get_position(), carrier_system::mouth_offset(waiter));
     auto food_id = entity_lifespan_system::get_instance().create_food(food_opt.value().get_id(), dog_mouth_position);
 
 

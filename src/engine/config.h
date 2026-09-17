@@ -545,8 +545,8 @@ namespace entity_config{
 
     inline const float station_width = level_config::edge_weight * 1.5f;
     inline const float station_height = level_config::edge_weight * 1.5f;
-    inline const float food_width = level_config::edge_weight * 0.5f;
-    inline const float food_height = level_config::edge_weight * 0.5f;
+    inline const float food_width = level_config::edge_weight * 0.6f;
+    inline const float food_height = level_config::edge_weight * 0.6f;
 
 
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
@@ -634,6 +634,7 @@ namespace entity_config{
     inline const float station_reach = level_config::edge_weight * 0.25f;
     // where stored food is drawn relative to the counter origin.
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
+    inline const Vector2 food_carry_offset = {level_config::edge_weight * 0.25f, 0.0f};
 }
 namespace dog_config{
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
