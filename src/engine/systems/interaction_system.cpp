@@ -69,24 +69,44 @@ void systems::interaction_system::waiter_table_serve(size_t waiter, size_t table
     debug::log("waiter table serve interaction attempt");
     // ! again the waiter must be carrying to serve
     auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
-    if(not waiter_state or waiter_state->get_machine().get_current_state()->get_state_id() != dog_config::waiter_carrying){return;}
-
+    if(not waiter_state or waiter_state->get_machine().get_current_state()->get_state_id() != dog_config::waiter_carrying){
+        debug::log("[waiter table serve attempt: ] - state is not carrying, cannot serve");
+        debug::log("[waiter table serve attempt: ] - state is " + std::to_string(waiter_state->get_machine().get_current_state()->get_state_id()));
+        debug::log("[waiter table serve attempt: ] - state should be " + std::to_string(dog_config::waiter_carrying));
+        return;
+    }
+    
     // get the table
     auto table_position = component_managers::positional_manager_.get_component(table);
-    if(not table_position) {return;}
-
+    if(not table_position) {
+        debug::log("[waiter table serve attempt: ] - no table position");
+        return;
+    }
+    
     auto food_place_position = Vector2Add(table_position->get_position(), entity_config::food_draw_offset);
+    
     auto waiter_carrier = component_managers::carrier_manager_.get_component(waiter);
-    if(not waiter_carrier or not waiter_carrier->is_carrying()){ return; }
+    if(not waiter_carrier or not waiter_carrier->is_carrying()){ 
+        debug::log("[waiter table serve attempt: ] - no waiter carrier, or waiter is not carrying");
+        return;
+    }
     auto food = waiter_carrier->get_carried_entity().value();
     waiter_carrier->drop();
-
+    std::unique_ptr<events::event> served = std::make_unique<events::order_served>(waiter, table);
+    event_interface::queue_event(served);
+    auto carried_after_drop = waiter_carrier->get_carried_entity();
+    debug::log("[waiter table serve attempt: ] - post drop, waiter: " + std::to_string(waiter)
+        + ", table: " + std::to_string(table)
+        + ", dropped food: " + std::to_string(food)
+        + ", carrier carrying: " + std::string(waiter_carrier->is_carrying() ? "yes" : "no")
+        + ", carried entity: " + (carried_after_drop.has_value() ? std::to_string(carried_after_drop.value()) : std::string("none"))
+        + ", state: " + std::to_string(waiter_state->get_machine().get_current_state()->get_state_id()));
+    // !!!! and transition the state 
     // place the food at the table position + config_table_food_offset
     auto food_position = component_managers::positional_manager_.get_component(food);
     if(not food_position) {return;}
     food_position->set_position(food_place_position);
     // and emit a served evenmt
-    // std::unique_ptr<events::event> served = std::make_unique<events::order_served>();
 }   
 
 Vector2 get_dog_mouth_offset(size_t dog){
@@ -274,10 +294,10 @@ systems::interaction_system::interaction systems::interaction_system::create_int
     return interaction(interactor, interactee);
 }
 void systems::interaction_system::add_interaction(interaction& interaction){
-    // ! it is this that is fucking us up. this event 
+    // ! it is this that is fucking us up. this event being called at the wrong spot, all it does is call
+    interactions_to_process_.push_back(std::move(interaction));
     std::unique_ptr<events::event> started = std::make_unique<events::interaction_started>(
         interaction.get_interactor(), interaction.get_interactee());
-    interactions_to_process_.push_back(std::move(interaction));
     debug::log("add interaction to process");
     event_interface::queue_event(started);
 }

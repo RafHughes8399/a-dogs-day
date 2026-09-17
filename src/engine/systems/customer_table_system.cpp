@@ -96,6 +96,22 @@ void dbs::customer_table_system::send_customer_to_table(){
     event_interface::execute_event(create_path_event);
 }
 
+std::optional<size_t> dbs::customer_table_system::customer_at(size_t table_id){
+    auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+    if(interactable == nullptr){ return std::nullopt; }
+    for(auto slot : interactable->get_interactors()){
+        if(slot.has_value() and std::ranges::find(customers_, slot.value()) != customers_.end()){
+            return slot.value();
+        }
+    }
+    return std::nullopt;
+}
+void dbs::customer_table_system::on_order_served(const events::order_served& event){
+    auto customer = customer_at(event.get_table_id());
+    if(not customer.has_value()){ return; }
+    systems::state_machine_system::get_instance().transition(customer.value(), dog_config::order_served);
+}
+
 void dbs::customer_table_system::customer_cleanup(){
     std::vector<size_t> departed;
     for(auto customer : customers_){

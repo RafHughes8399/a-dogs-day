@@ -338,7 +338,7 @@ void level::level::on_dog_reached_station_event(
   station->enter(dog_id);
 }
 
-void level::level::on_order_served_event(const events::order_served &event) {
+void level::level::on_order_served_event(const events::legacy_order_served &event) {
   auto customer_id = static_cast<int>(event.get_customer_id());
   auto customer_record = id_entity_map_.find(static_cast<size_t>(customer_id));
   if (customer_record == id_entity_map_.end()) {

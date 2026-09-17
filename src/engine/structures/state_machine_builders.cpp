@@ -40,8 +40,7 @@ state_machine::state_machine state_machine_builders::build_waiter_state_machine(
         {state_machine::edge(dog_config::path_created, dog_config::waiter_idle)}));
 
     graph.push_back(state_machine::node(state_builders::build_waiter_idle_state(),
-        {state_machine::edge(dog_config::interaction_started, dog_config::waiter_interacting),
-            state_machine::edge(dog_config::food_collected, dog_config::waiter_carrying)}));
+        {state_machine::edge(dog_config::food_collected, dog_config::waiter_carrying)}));
 
     graph.push_back(state_machine::node(state_builders::build_waiter_carrying_state(),
         {state_machine::edge(dog_config::order_served, dog_config::waiter_idle)

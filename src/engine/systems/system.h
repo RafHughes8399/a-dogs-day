@@ -656,7 +656,9 @@ namespace systems{
                 static npc_system instance;
                 return instance;
             }
-            ~npc_system() = default;
+            ~npc_system(){
+                event_interface::unsubscribe<events::order_served>(order_served_handler_);
+            }
             npc_system(const npc_system& other) = delete;
             npc_system(npc_system&& other) = delete;
 
@@ -676,9 +678,13 @@ namespace systems{
                 waiter_idling_.clear();
             }
         private:
-            npc_system() = default;
+            npc_system()
+            : order_served_handler_([this](const events::order_served& event) -> void{customer_table_.on_order_served(event);}){
+                event_interface::subscribe<events::order_served>(order_served_handler_);
+            }
             dbs::customer_table_system customer_table_;
             dbs::waiter_idling_system waiter_idling_;
+            events::event_handler<events::order_served> order_served_handler_;
         public:
             void update(float delta);
     };

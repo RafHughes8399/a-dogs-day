@@ -671,7 +671,6 @@ namespace dog_config{
     enum waiter_dog_states{
         waiter_stationary = 0,
         waiter_idle,
-        waiter_interacting,
         waiter_carrying,
         waiter_states_size
     };

@@ -124,7 +124,6 @@ namespace state_builders{
 
     std::unique_ptr<state::state> build_waiter_stationary_state();
     std::unique_ptr<state::state> build_waiter_idle_state();
-    std::unique_ptr<state::state> build_waiter_interacting_state();
     std::unique_ptr<state::state> build_waiter_carrying_state();
 }
 #endif

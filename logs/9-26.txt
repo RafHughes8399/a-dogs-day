@@ -315,9 +315,16 @@ animation it should be peaches
             -> and the actual interaction behaivour is guarded behind a state check 
             
             -> so we do meaninguflly need the state machine haha 
-
+        17 / 09 here 
         -> create art for the counter and food for visual debugging
         -> then test waiter pick up and place down
+            // * testing notes *// 
+                -> food position needs to flip when direction flips 
+                -> food offset should be further right and a bit down, and the food should be larger 
+                
+
+
+
 
         -> then wire the waiter serving table interaction
             -> define the interaction, quite similar to counter but slightly different. i suppose the question is should 

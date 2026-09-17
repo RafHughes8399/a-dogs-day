@@ -51,7 +51,6 @@ void systems::state_machine_system::on_interaction_finished(const events::intera
     transition(event.get_interactor_id(), dog_config::interaction_finished);
 }
 void systems::state_machine_system::on_order_served(const events::order_served& event){
-    transition(event.get_customer_id(), dog_config::order_served);
     transition(event.get_waiter_id(), dog_config::order_served);
 }
 void systems::state_machine_system::on_collected_food(const events::waiter_collected_food& event){

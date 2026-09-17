@@ -290,13 +290,26 @@ private:
 // Cafe-domain fact: a waiter has served food for an order.
 class order_served : public event {
 public:
-  order_served(size_t order_id, size_t waiter_id, size_t customer_id,
+  order_served(size_t waiter_id, size_t table_id)
+      : event(ids::order_served_id), waiter_id_(waiter_id), table_id_(table_id) {}
+
+  static int get_static_type() { return ids::order_served_id; }
+  size_t get_waiter_id() const { return waiter_id_; }
+  size_t get_table_id() const { return table_id_; }
+
+private:
+  const size_t waiter_id_;
+  const size_t table_id_;
+};
+class legacy_order_served : public event {
+public:
+  legacy_order_served(size_t order_id, size_t waiter_id, size_t customer_id,
                size_t table_id, Vector2 table_position)
-      : event(ids::order_served_id), order_id_(order_id), waiter_id_(waiter_id),
+      : event(ids::legacy_order_served_id), order_id_(order_id), waiter_id_(waiter_id),
         customer_id_(customer_id), table_id_(table_id),
         table_position_(table_position) {}
 
-  static int get_static_type() { return ids::order_served_id; }
+  static int get_static_type() { return ids::legacy_order_served_id; }
   size_t get_order_id() const { return order_id_; }
   size_t get_waiter_id() const { return waiter_id_; }
   size_t get_customer_id() const { return customer_id_; }

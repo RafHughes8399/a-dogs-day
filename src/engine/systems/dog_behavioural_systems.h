@@ -2,6 +2,7 @@
 #define DOG_BEHAVIOURAL_SYSTEMS_H
 #include <vector>
 #include "config.h"
+#include "dog_events.h"
 #include "raylib.h"
 #include "raglib.h"
 #include <optional>
@@ -59,6 +60,8 @@ namespace dbs {
             int pick_customer();
             void customer_cleanup();
             void send_customer_to_table();
+            std::optional<size_t> customer_at(size_t table_id);
+            void on_order_served(const events::order_served& event);
 #ifdef DOG_DAYS_TESTING
                     const std::vector<size_t>& get_customers() const{
                         return customers_;
