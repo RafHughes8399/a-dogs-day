@@ -11,14 +11,13 @@
 #include <random>
 #include <string>
 
-float dbs::waiter_idling_system::roll_cooldown(){
-    std::uniform_real_distribution<float> cooldown(dog_config::waiter_idle_cooldown_min,
-        dog_config::waiter_idle_cooldown_max);
-    return cooldown(rng_);
+bool dbs::waiter_idling_system::roll_wander(){
+    std::uniform_int_distribution<size_t> roll(1, dog_config::waiter_wander_odds);
+    return roll(rng_) == 1;
 }
 
 void dbs::waiter_idling_system::register_waiter(size_t waiter_id){
-    waiters_.emplace_back(waiter_id, roll_cooldown());
+    waiters_.emplace_back(waiter_id);
 }
 void dbs::waiter_idling_system::unregister_waiter(size_t waiter_id){
     std::erase_if(waiters_, [waiter_id](const idle_waiter& waiter) -> bool {
@@ -29,6 +28,8 @@ void dbs::waiter_idling_system::clear(){
     waiters_.clear();
 }
 
+
+// TODO update to a state check instead of this
 bool dbs::waiter_idling_system::is_idle(size_t waiter){
     auto interactor = component_managers::interactor_manager_.get_component(waiter);
     if(interactor and interactor->is_interacting()){ return false; }
@@ -118,24 +119,19 @@ bool dbs::waiter_idling_system::build_paths(size_t waiter, size_t points, Rectan
         + " attempts, candidates: " + std::to_string(candidates.size()));
     return false;
 }
-void dbs::waiter_idling_system::update(float delta){
+void dbs::waiter_idling_system::update(float delta, int frame){
+    (void) delta;
+    if(frame % game_config::frames != 0){ return; }
+
     std::uniform_int_distribution<size_t> point_count(dog_config::waiter_idle_min_points,
         dog_config::waiter_idle_max_points);
 
     for(auto& waiter : waiters_){
-        waiter.tick(delta);
-        // TODO pending state machine implmentatino, but here is where the states should be checked 
-        // to go from not idle -> idle
-        if(not waiter.ready()){ continue; 
-        }
-        if(not is_idle(waiter.id())){ continue;
-         }
+        if(not is_idle(waiter.id())){ continue; }
+        if(not roll_wander()){ continue; }
 
         auto bounds = determine_idle_bounds(waiter.id());
-        if(bounds.has_value()){
-            build_paths(waiter.id(), point_count(rng_), bounds.value());
-        }
-        // TODO: update state from not idle to idle
-        waiter.start_cooldown(roll_cooldown());
+        if(not bounds.has_value()){ continue; }
+        build_paths(waiter.id(), point_count(rng_), bounds.value());
     }
 }

@@ -19,10 +19,6 @@ namespace{
         return Vector2{level_config::cafe_x + x, level_config::cafe_y + y};
     }
 
-    float past_cooldown(){
-        return dog_config::waiter_idle_cooldown_max + 1.0f;
-    }
-
     bool tracks(const std::vector<dbs::idle_waiter>& waiters, size_t id){
         return std::find_if(waiters.begin(), waiters.end(),
             [id](const dbs::idle_waiter& waiter) -> bool { return waiter.id() == id; }) != waiters.end();
@@ -175,71 +171,6 @@ SCENARIO("the bounds sweep returns only walkable nodes on the graph",
     }
 }
 
-SCENARIO("an idle waiter is given a multi-legged wander route",
-        "[ecs][npc][waiter_idling]"){
-    GIVEN("a registered waiter in open floor"){
-        testing::ecs_test_game game;
-        dbs::waiter_idling_system idling;
-        auto waiter_id = game.create_waiter_dog(in_cafe(1280.0f, 1280.0f));
-        idling.register_waiter(waiter_id);
-        REQUIRE(game.queued_path_count(waiter_id) == 0);
-
-        WHEN("its cooldown expires"){
-            idling.update(past_cooldown());
-
-            THEN("it holds one leg per picked point"){
-                auto legs = game.queued_path_count(waiter_id);
-                REQUIRE(legs >= dog_config::waiter_idle_min_points);
-                REQUIRE(legs <= dog_config::waiter_idle_max_points);
-            }
-
-            THEN("every leg ends on a node the graph holds"){
-                for(auto destination : game.path_destinations(waiter_id)){
-                    REQUIRE(Vector2Equals(game.graph_node_position_at(destination), destination));
-                }
-            }
-
-            THEN("it walks the route out and comes to rest"){
-                REQUIRE(game.tick_until([&game, waiter_id]() -> bool {
-                    return game.queued_path_count(waiter_id) == 0;
-                }, 2000, frame));
-            }
-        }
-    }
-}
-
-SCENARIO("the cooldown holds a waiter still between routes",
-        "[ecs][npc][waiter_idling]"){
-    GIVEN("a waiter that has just been given a route"){
-        testing::ecs_test_game game;
-        dbs::waiter_idling_system idling;
-        auto waiter_id = game.create_waiter_dog(in_cafe(1280.0f, 1280.0f));
-        idling.register_waiter(waiter_id);
-
-        idling.update(past_cooldown());
-        REQUIRE(game.queued_path_count(waiter_id) > 0);
-
-        WHEN("it finishes the route and a single frame passes"){
-            clear_paths(waiter_id);
-            REQUIRE(idling.is_idle(waiter_id));
-            idling.update(frame);
-
-            THEN("it is not routed again"){
-                REQUIRE(game.queued_path_count(waiter_id) == 0);
-            }
-        }
-
-        WHEN("it finishes the route and the cooldown expires"){
-            clear_paths(waiter_id);
-            idling.update(past_cooldown());
-
-            THEN("it is routed again"){
-                REQUIRE(game.queued_path_count(waiter_id) > 0);
-            }
-        }
-    }
-}
-
 SCENARIO("bounds holding no walkable node leave the waiter where it is",
         "[ecs][npc][waiter_idling]"){
     GIVEN("a registered waiter"){
@@ -263,24 +194,33 @@ SCENARIO("bounds holding no walkable node leave the waiter where it is",
     }
 }
 
-SCENARIO("the npc system routes a waiter built through the lifespan system",
+SCENARIO("a route built over open floor holds one leg per picked point",
         "[ecs][npc][waiter_idling]"){
-    GIVEN("a waiter created the way game::init creates one"){
+    GIVEN("a registered waiter in open floor"){
         testing::ecs_test_game game;
-        auto& npc = systems::npc_system::get_instance();
-        auto waiter_id = systems::entity_lifespan_system::get_instance().create_waiter_dog(
-            entity_config::waiters::gianluca,
-            Vector2{level_config::edge_weight * 13, level_config::edge_weight * 6});
+        dbs::waiter_idling_system idling;
+        auto waiter_id = game.create_waiter_dog(in_cafe(1280.0f, 1280.0f));
+        idling.register_waiter(waiter_id);
+        REQUIRE(game.queued_path_count(waiter_id) == 0);
 
-        THEN("it stands still until the npc system ticks"){
-            REQUIRE(game.queued_path_count(waiter_id) == 0);
-        }
+        auto bounds = idling.determine_idle_bounds(waiter_id);
+        REQUIRE(bounds.has_value());
 
-        WHEN("the npc system ticks past the cooldown"){
-            npc.update(past_cooldown());
+        WHEN("a route is built for the maximum number of points"){
+            REQUIRE(idling.build_paths(waiter_id, dog_config::waiter_idle_max_points,
+                bounds.value()));
 
-            THEN("the waiter is routed and walks the route out"){
-                REQUIRE(game.queued_path_count(waiter_id) > 0);
+            THEN("it holds one leg per picked point"){
+                REQUIRE(game.queued_path_count(waiter_id) == dog_config::waiter_idle_max_points);
+            }
+
+            THEN("every leg ends on a node the graph holds"){
+                for(auto destination : game.path_destinations(waiter_id)){
+                    REQUIRE(Vector2Equals(game.graph_node_position_at(destination), destination));
+                }
+            }
+
+            THEN("it walks the route out and comes to rest"){
                 REQUIRE(game.tick_until([&game, waiter_id]() -> bool {
                     return game.queued_path_count(waiter_id) == 0;
                 }, 3000, frame));

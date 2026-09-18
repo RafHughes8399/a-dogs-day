@@ -91,16 +91,20 @@ private:
 };
 class dog_completed_path : public event {
 public:
-  dog_completed_path(size_t dog_id, Vector2 destination)
-      : event(ids::dog_path_complete), id_(dog_id), destination_(destination) {}
+  dog_completed_path(size_t dog_id, Vector2 destination,
+      std::optional<size_t> destination_entity = std::nullopt)
+      : event(ids::dog_path_complete), id_(dog_id), destination_(destination),
+        destination_entity_(destination_entity) {}
 
   static int get_static_type() { return ids::dog_path_complete; }
   Vector2 get_destination() const { return destination_; }
   size_t get_id() const { return id_; }
+  std::optional<size_t> get_destination_entity() const { return destination_entity_; }
 
 private:
   const size_t id_;
   const Vector2 destination_;
+  const std::optional<size_t> destination_entity_;
 };
 class dog_started_path : public event {
 public:
@@ -286,13 +290,38 @@ private:
 // Cafe-domain fact: a waiter has served food for an order.
 class order_served : public event {
 public:
-  order_served(size_t order_id, size_t waiter_id, size_t customer_id,
+  order_served(size_t waiter_id, size_t table_id)
+      : event(ids::order_served_id), waiter_id_(waiter_id), table_id_(table_id) {}
+
+  static int get_static_type() { return ids::order_served_id; }
+  size_t get_waiter_id() const { return waiter_id_; }
+  size_t get_table_id() const { return table_id_; }
+
+private:
+  const size_t waiter_id_;
+  const size_t table_id_;
+};
+class food_dropped : public event{
+  public:
+  food_dropped(size_t waiter_id)
+      : event(ids::food_dropped_id), waiter_id_(waiter_id) {}
+
+  static int get_static_type() { return ids::food_dropped_id; }
+  size_t get_waiter_id() const { return waiter_id_; }
+
+
+private:
+  const size_t waiter_id_;
+};
+class legacy_order_served : public event {
+public:
+  legacy_order_served(size_t order_id, size_t waiter_id, size_t customer_id,
                size_t table_id, Vector2 table_position)
-      : event(ids::order_served_id), order_id_(order_id), waiter_id_(waiter_id),
+      : event(ids::legacy_order_served_id), order_id_(order_id), waiter_id_(waiter_id),
         customer_id_(customer_id), table_id_(table_id),
         table_position_(table_position) {}
 
-  static int get_static_type() { return ids::order_served_id; }
+  static int get_static_type() { return ids::legacy_order_served_id; }
   size_t get_order_id() const { return order_id_; }
   size_t get_waiter_id() const { return waiter_id_; }
   size_t get_customer_id() const { return customer_id_; }

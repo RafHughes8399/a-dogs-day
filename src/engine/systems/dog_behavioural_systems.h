@@ -2,21 +2,45 @@
 #define DOG_BEHAVIOURAL_SYSTEMS_H
 #include <vector>
 #include "config.h"
+#include "dog_events.h"
 #include "raylib.h"
 #include "raglib.h"
 #include <optional>
 #include <random>
 namespace dbs {
-    class customer_arrival_system{
+    enum table_status{
+        available = 0,
+        reserved,
+        occupied
+    };
+    class registered_table{
+        public:
+            ~registered_table() = default;
+            registered_table(size_t id, size_t status = table_status::available)
+            : id_(id), status_(status){}
+            registered_table(const registered_table& other) = default;
+            registered_table(registered_table&& other) = default;
+
+            registered_table& operator=(const registered_table& other) = default;
+            registered_table& operator=(registered_table&& other) = default;
+
+            size_t id() const{ return id_; }
+            size_t status() const{ return status_; }
+            void set_status(size_t status){ status_ = status; }
+        private:
+            size_t id_;
+            size_t status_;
+    };
+    class customer_table_system{
         public:
                     // TODO (25 / 8 / 26) must listen to table construction and deletion, can create a new event for it and update teh builders
                     // TODO and destroyers to emit those events
-            ~customer_arrival_system() = default;
-            customer_arrival_system() = default;
-            customer_arrival_system(const customer_arrival_system& other) = default;
-            customer_arrival_system(customer_arrival_system&& other) = default;
-            customer_arrival_system& operator=(const customer_arrival_system& other) = default;
-            customer_arrival_system& operator=(customer_arrival_system&& other) = default;
+            ~customer_table_system() = default;
+            customer_table_system() = default;
+            customer_table_system(const customer_table_system& other) = default;
+            customer_table_system(customer_table_system&& other) = default;
+            customer_table_system& operator=(const customer_table_system& other) = default;
+            customer_table_system& operator=(customer_table_system&& other) = default;
                     
                     // create_dog
                     // destroy_dog
@@ -28,6 +52,7 @@ namespace dbs {
             void unregister_customer(size_t id);
             void register_table(size_t id);
             void unregister_table(size_t id);
+            void reserve_table(size_t table_id);
                 
                     
             bool free_tables();
@@ -35,11 +60,13 @@ namespace dbs {
             int pick_customer();
             void customer_cleanup();
             void send_customer_to_table();
+            std::optional<size_t> customer_at(size_t table_id);
+            void on_order_served(const events::order_served& event);
 #ifdef DOG_DAYS_TESTING
                     const std::vector<size_t>& get_customers() const{
                         return customers_;
                     }
-                    const std::vector<size_t>& get_tables() const{
+                    const std::vector<registered_table>& get_tables() const{
                         return tables_;
                     }
 #endif
@@ -55,13 +82,13 @@ namespace dbs {
             // const Rectangle cafe_entrace_;
             float time_since_dog_ = 0.0f;
             std::vector<size_t> customers_;
-            std::vector<size_t> tables_;
+            std::vector<registered_table> tables_;
     };
     class idle_waiter{
         public:
             ~idle_waiter() = default;
-            idle_waiter(size_t id, float cooldown)
-            : id_(id), cooldown_(cooldown){}
+            idle_waiter(size_t id)
+            : id_(id){}
             idle_waiter(const idle_waiter& other) = default;
             idle_waiter(idle_waiter&& other) = default;
 
@@ -71,18 +98,8 @@ namespace dbs {
             size_t id() const{
                 return id_;
             }
-            bool ready() const{
-                return cooldown_ <= 0.0f;
-            }
-            void tick(float delta){
-                cooldown_ -= delta;
-            }
-            void start_cooldown(float seconds){
-                cooldown_ = seconds;
-            }
         private:
             size_t id_;
-            float cooldown_;
     };
     class waiter_idling_system {
         public:
@@ -106,7 +123,7 @@ namespace dbs {
             std::vector<Vector2> pick_points(const std::vector<Vector2>& candidates, size_t points);
             void order_points(Vector2 from, std::vector<Vector2>& points);
             bool build_paths(size_t waiter, size_t points, Rectangle bounds);
-            void update(float delta);
+            void update(float delta, int frame);
 #ifdef DOG_DAYS_TESTING
             const std::vector<idle_waiter>& get_waiters() const{
                 return waiters_;
@@ -114,7 +131,7 @@ namespace dbs {
 #endif
 
         private:
-            float roll_cooldown();
+            bool roll_wander();
 
             std::vector<idle_waiter> waiters_;
             std::mt19937 rng_;

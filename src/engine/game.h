@@ -24,6 +24,7 @@ namespace game{
                 input_(systems::control_input_system::get_instance()),
                 npc_(systems::npc_system::get_instance()),
                 movement_(systems::movement_system::get_instance()),
+                carrier_(systems::carrier_system::get_instance()),
                 spatial_(systems::spatial_system::get_instance()),
                 collision_(systems::collision_system::get_instance()),
                 interaction_(systems::interaction_system::get_instance()),
@@ -53,6 +54,7 @@ namespace game{
             systems::control_input_system& input_;
             systems::npc_system& npc_;
             systems::movement_system& movement_;
+            systems::carrier_system& carrier_;
             systems::spatial_system& spatial_;
             systems::collision_system& collision_;
             systems::interaction_system& interaction_;

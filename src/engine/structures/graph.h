@@ -7,6 +7,9 @@
 #define GRAPH_H
 
 #include <cmath>
+#include <functional>
+#include <limits>
+#include <queue>
 #include <set>
 #include <utility>
 #include <vector>
@@ -55,6 +58,7 @@ namespace graph{
             bool check_for_decoration(Rectangle rectangle, int id);
             bool is_node_closer(int current_id, int next_id, int end_id);
             bool is_node_empty(int node_id);
+            bool diagonal_step_clear(int source_id, int destination_id);
             bool is_node_occupied(int node_id, int decoration_id);
             bool is_on_map(Vector2 position);
             bool nearest_node(Vector2 position, int& node_index);

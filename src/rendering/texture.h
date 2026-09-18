@@ -70,6 +70,7 @@ namespace textures{
         poker_table,
         dog_painting,
         dining_table,
+        tiled_table,
         food_counter,
         lasagna,
         coffee,

@@ -6,6 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "dog_events.h"
 #include "events/event_core.h"
 #include "raylib.h"
 #include <cstddef>
@@ -21,11 +22,15 @@ namespace interaction_config{
     enum interactions{
         customer_table_sit = 0,
         waiter_table_serve,
+        waiter_counter_pickup,
+        waiter_counter_place_down,
         size
     };
     // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- // 
     inline std::vector<size_t> waiter_dog_interactor = {
-        waiter_table_serve
+        waiter_table_serve,
+        waiter_counter_pickup,
+        waiter_counter_place_down,
     };
     inline std::vector<size_t> customer_dog_interactor = {
         customer_table_sit
@@ -34,6 +39,10 @@ namespace interaction_config{
     inline std::vector<size_t> table_interactee = {
         customer_table_sit,
         waiter_table_serve,
+    };
+    inline std::vector<size_t> counter_interactee = {
+        waiter_counter_pickup,
+        waiter_counter_place_down
     };
 }
 namespace game_config {
@@ -69,6 +78,7 @@ namespace game_config {
         int key_;
         int action_;
     };
+    inline const int counter_start_stock = 2;
     inline std::vector<input> player_controls = {
         {KEY_LEFT, key_hold},
         {KEY_RIGHT, key_hold},
@@ -408,6 +418,7 @@ namespace entity_config{
     };
     enum tables{
         dining_table = 0,
+        tiled_table,
         tables_size
     };
     enum counters{
@@ -437,6 +448,8 @@ namespace entity_config{
         dog_part_directions_size
     };
 
+
+    
     // * authored in left-facing space; the right-facing sprite mirrors x across
     // * the dog's across width. advances == false anchors the part to the
     // * preceding advancing part, and its offset.x is relative to that anchor.
@@ -513,7 +526,8 @@ namespace entity_config{
     inline const char* test_decoration_path ="../sprites/test_decoration.png";
     
     // * ------------------------ STATION PATHS --------------------------------------- *//
-    inline const char* dining_table_station_path = "../sprtes/dining-table.png";
+    inline const char* dining_table_station_path = "../sprites/dining-table.png";
+    inline const char* tiled_table_station_path ="../sprites/tiled-table.png";
     inline const char* food_counter_station_path = "";
     
     
@@ -530,6 +544,13 @@ namespace entity_config{
         size
     };
     
+
+    inline const float station_width = level_config::edge_weight * 1.5f;
+    inline const float station_height = level_config::edge_weight * 1.5f;
+    inline const float food_width = level_config::edge_weight * 0.6f;
+    inline const float food_height = level_config::edge_weight * 0.6f;
+
+
     inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
@@ -588,16 +609,22 @@ namespace entity_config{
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
     
-    inline const float table_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
-    inline const float dining_table_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 1.5f, 1.0f, 1.0f};
+    inline const float table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float dining_table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float tiled_table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
 
-    inline const float food_counter_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
-    inline const float dishwasher_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
-    inline const float stove_attributes[attributes::size] = {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f};
+    inline const float food_counter_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float dishwasher_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float stove_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     inline const float lasagna_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     inline const float coffee_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    
+    
+    
+    
+    
     // * legacy entities::station capacity. the ECS stations size their capacity
     // * off the slot offset lists below instead.
     inline const size_t food_counter_capacity = 3;
@@ -606,9 +633,10 @@ namespace entity_config{
     inline const Vector2 station_slot_up    = Vector2Zero();
     inline const Vector2 station_slot_down  = Vector2Zero(); 
 
-    inline const float station_reach = level_config::edge_weight * 0.25f;
+    inline const float station_reach = level_config::edge_weight * 0.5f;
     // where stored food is drawn relative to the counter origin.
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
+    inline const Vector2 food_carry_offset = {level_config::edge_weight * 0.25f, 0.0f};
 }
 namespace dog_config{
     inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
@@ -619,8 +647,7 @@ namespace dog_config{
     inline const float waiter_idle_bounds_edges = 3.0f;
     inline const size_t waiter_idle_min_points = 2;
     inline const size_t waiter_idle_max_points = 4;
-    inline const float waiter_idle_cooldown_min = 4.0f;
-    inline const float waiter_idle_cooldown_max = 5.0f;
+    inline const size_t waiter_wander_odds = 6;
     inline const size_t waiter_idle_max_attempts = 3;
 
     enum waiter_dog_types{
@@ -646,7 +673,6 @@ namespace dog_config{
     enum waiter_dog_states{
         waiter_stationary = 0,
         waiter_idle,
-        waiter_interacting,
         waiter_carrying,
         waiter_states_size
     };
@@ -656,6 +682,7 @@ namespace dog_config{
         interaction_started = events::ids::interaction_started_id,
         interaction_finished = events::ids::interaction_finished_id,
         order_served = events::ids::order_served_id,
+        food_dropped = events::ids::food_dropped_id,
         food_collected = events::ids::waiter_collected_food_id,
         meal_finished = events::ids::customer_finished_meal_id,
         customer_leaving = events::ids::customer_left

@@ -76,7 +76,7 @@ namespace testing{
 
     size_t ecs_test_game::create_customer_dog(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_customer_dog(id, position);
+            ecs_entities::build_tex(id, position);
         }, layer);
     }
 
@@ -118,7 +118,7 @@ namespace testing{
 
     size_t ecs_test_game::create_food(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_food(id, position);
+            ecs_entities::build_lasagna(id, position);
         }, layer);
     }
 
@@ -151,6 +151,12 @@ namespace testing{
         }
         event_interface::queue_event(request);
         tick(0.0f);
+    }
+
+    std::vector<Vector2> ecs_test_game::current_path_waypoints(size_t entity_id){
+        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        if(movement == nullptr or movement->get_paths().empty()){ return {}; }
+        return movement->get_current_path().get_positions();
     }
 
     size_t ecs_test_game::queued_path_count(size_t entity_id){
@@ -238,6 +244,14 @@ namespace testing{
     }
     bool ecs_test_game::has_storage(size_t entity_id){
         return component_managers::storage_manager_.get_component(entity_id) != nullptr;
+    }
+    bool ecs_test_game::has_food(size_t entity_id){
+        return component_managers::food_manager_.get_component(entity_id) != nullptr;
+    }
+    std::optional<size_t> ecs_test_game::food_item_of(size_t entity_id){
+        auto* component = component_managers::food_manager_.get_component(entity_id);
+        if(component == nullptr){ return std::nullopt; }
+        return component->get_item_id();
     }
     bool ecs_test_game::has_state_machine(size_t entity_id){
         return component_managers::state_machine_manager_.get_component(entity_id) != nullptr;
@@ -367,7 +381,9 @@ namespace testing{
              + component_managers::mouse_input_manager_.size()
              + component_managers::state_machine_manager_.size()
              + component_managers::selectable_manager_.size()
-             + component_managers::storage_manager_.size();
+             + component_managers::storage_manager_.size()
+             + component_managers::food_manager_.size()
+             + component_managers::carrier_manager_.size();
     }
 
 } // namespace testing

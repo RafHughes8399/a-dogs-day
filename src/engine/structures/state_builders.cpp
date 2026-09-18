@@ -35,10 +35,6 @@ std::unique_ptr<state::state> state_builders::build_waiter_idle_state(){
     return std::make_unique<state::idle_state>(dog_config::waiter_idle,
         animation_config::shared::walking);
 }
-std::unique_ptr<state::state> state_builders::build_waiter_interacting_state(){
-    return std::make_unique<state::interacting_state>(dog_config::waiter_interacting,
-        animation_config::shared::interacting);
-}
 std::unique_ptr<state::state> state_builders::build_waiter_carrying_state(){
     return std::make_unique<state::carrying_state>(dog_config::waiter_carrying,
         animation_config::shared::carrying);

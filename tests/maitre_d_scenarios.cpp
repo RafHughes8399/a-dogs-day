@@ -135,7 +135,7 @@ SCENARIO("a customer dog transitions through its lifecycle states", "[customer][
         }
 
         WHEN("an order_served event is delivered for the customer"){
-            std::unique_ptr<events::event> served = std::make_unique<events::order_served>(
+            std::unique_ptr<events::event> served = std::make_unique<events::legacy_order_served>(
                 0, 6, static_cast<size_t>(customer_id), 3, table_position);
             event_interface::queue_event(served);
             game.tick(1.0f / 60.0f); // level routes order_served -> customer.set_eating

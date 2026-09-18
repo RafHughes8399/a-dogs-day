@@ -260,6 +260,171 @@ animation it should be peaches
 
 -> as animations and states are introduced then we can test their transitioning
 
--> then the 9 sprite 
--> and menus / hud components and navigating them
+-> first, fix the table occupancy bug
+    -> the table is being marked as occupied, it is just that since tables, have two interaction positions, it 
+    is never occupied
+    -> so the fix is:
+        -> enforce so that customers can only go to the left table position 
+        -> expand the customer system to handle customer arrival and leaving and then it can manage table occupancy, 
+        like the old matire_d
+        
+        -> while the first is somewaht more rigid, it is far less of a headache
+        -> there is a third and far simpler option, just simply check if there is an interactor, 
+        -> if there is, then you cannot go to the table, simples
+-> second as per the issue description:
+    -> send waiter to counter x
+    -> build a counter with and without food
+        -> slight detour for the item system
+        -> and then food entity x 
+        -> counter builder x 
+        -> food builder  x 
+        -> build counter in an empty / filled state x 
+    -> the right click send to path for waiter should interrupt not append the path  x
+    -> have waiter perform a counter interaction
+        -> setup a helper to establish and teardown the interactor interactable hadnshalke x 
+        -> make idle pathing dependent on the state check instead of what it is currently 
+        -> perform the underlying interaction
+            -> take the item x 
+            -> perform the state transition  x 
+    
+
+            -> setup the interaction infra to support a waiter_counter_pickup interaction
+
+
+            -> the carrier component i think is the best bet then, simple way to tie two entities at the component level which is what 
+            -> we need the component, and the system to do the update behaviour
+            -> i need counter and food art
+
+            -> i also think there should be more of a distinction between idle and walking
+            -> like idle should mean idle, as in not moving, stationary
+            -> walking should mean walking
+
+            -> ok so a slight reorganistaion of the waiter state machine is necessary
+            -> i think it should just transition directly to the carrying state , and then the on transition to p
+            plays the  pickup animation, and on transition from plays the put down animation
+            because the interacting state means something different, like that should be the "working this station"
+            -> i think this food positional update needs to happen at the component level not the level below
+            -> how can that be achieved ?, i mean the simplest way is to set waiter food interactions
+            -> then the food will move as the waiter moves right ? the waiter moves, detects an interaction with the food
+            -> maybe a carryable component ?. then all the states manage is animations . are they even necssary then ? 
+            -> because i can trigger animations on interaction start and end well enough through the interaction system
+            -> no but how do you do looping animaionts then. the state is necessary, the state is necessary
+
+            -> consider the fact that table counter pick and table counter dropoff are two interactions taht can be performed
+            with the same interactor and interactee. i think that its fine if all interactions taht are available are processed
+            -> and the actual interaction behaivour is guarded behind a state check 
+            
+            -> so we do meaninguflly need the state machine haha 
+        17 / 09 here 
+        -> create art for the counter and food for visual debugging
+        -> then test waiter pick up and place down
+            // * testing notes *// 
+                -> food position needs to flip when direction flips 
+                -> food offset should be further right and a bit down, and the food should be larger [restore edge weight dimensions]
+                -> and the screen resolution issue 
+
+
+                some other rapid fire things:
+                    -> for all stations, only two interaction positions, left and right, 
+                    -> the left interaction spot leaves a dog slightly too deep into the station and the right interaction spot
+                    actualklky doesnt put the dog flose enough or far enough down. thge left position also should place the dog down further
+
+        -> when i say these values need adjusting and i dont specify assume half an edge weight
+
+        -> then wire the waiter serving table interaction
+            -> define the interaction, quite similar to counter but slightly different. i suppose the question is should 
+            the table have a storage component ? otherwise it would just sit there ? it kind of just needs to sit there
+            -> if the table had a storage component it would make things much easier, in terms of the interaction but we
+            need it to be an entity if we are to
+            -> i think it can just sit there, because it does need to be an entity 
+            -> then test it 
+            -> emit a served event that the customer table system listens for
+            -> and then it triggers that state change for the customer [if there is one]
+
+            -> and then it triggers that state change for the customer
+        -> and whatever that cursor bug is. i thikn its related to screen size ? or the difference between the window and the screen size? 
+        -> NOTE NEED TO HANDLE CUSTOMER TABLE UNRESERVERING WHEN THE CUSTOMER LEAVES
+
+    -> and a customer perform a sit interaction [i think we dont have interaction detection just yet]
+        -> transition the state, perform the underlying interaction behaviour
+        -> state transition, 
+        -> port the interaction behaviours over to the system so that they have access to thge rest of the stuff 
+    
+        -> then the customer eating i think can just be a state change
+        -> eating can just be a flat duration, the question is how do we want the food to react ?,
+        -> maybe food state ? cause that will give us animation control.
+        -> could just be a simple switch flick. yeah food state makes sense, follows similar principle 
+
+    -> then direct the waiter to the table
+        -> check the interaction 
+        -> definet the interaction behaviour
+        -> place the food entity on the table
+        _> transition the waiter state
+        -> emit food served to table x
+        -> within the customer table system
+            -> listen to food served at table x, customer state change to eating 
+                -> state transition
+            -> eating duration
+
+            -> then customer leave
+                -> pathfind to entrance and to exit
+
+            -> unregister table
+    
+    -> update interaction positions to either left or right, no up and down. and update the actual positions to be proper
+    -> play the animation, perform the underlying interaction behaviour
+    [ need to properly decide what happens after placing down food]
+    -> then send back to origin ?
+
+    -> upon food being served, the customer starts to eat
+    -> after eating, the customer navigates to the entrance, and then to the exit
+
+    // **************************** NEXT SLICE **************************** //
+        -> test waiter placing down on the counter x 
+            -> state transitions are clean, but the food placement position is funky
+            -> also should change how interaction positions are picked. should pick the closer one 
+        -> test serving food placement and with customer sitting 
+            -> still need to check state change on the part of the customer
+            -> and the food position offset
+        -> maybe need to either do one of the following: x x 
+            -> on right click get all the entities not just the first one incase they click on the dog  x x 
+            and the table ,adn then route to the one that is interactable x 
+            -> or increase the gap for the dog so it overlaps less with thetabelx  x  
+        -> test customer sit interaction
+        -> test customer state transition to eating
+        -> fix the test suite
+
+        -> i would say then the movement amendments based on that issuex x  x 
+        -> like clean up this flow before moving onto other stuff c 
+        -> and clean up waiter idling, the cooldown needs to be adjusted. 
+        i think instead of a cooldown, roll like a 1 / 6 chance to trigger it to 
+        wander around if its idle x x x 
+    // **************************** NEXT SLICE **************************** //
+    -> legacy clean up, we are well and truly past it
+    -> and debug logging should write to a file for the session
+    -> then counter and food art
+    -> and the screen resolution bug 
+    -> then customer eating completion and the food state change 
+    -> and customer leaving
+    [then that mechanic is like done for now]
+
+
+
+-> and the background tile maker
+-> and then dog art splitting
+-> and player dogs working stoves, ovens, etc. 
+    -> creation of those stations
+    -> the interactinos with the stations,
+    -> the transporting of the food to the counter
+-> hud components for stations
+    -> [the moving, deleting, stashing and selling]
+    -> [the item counts for the station]
+    -> progress bars for eating and cooking ? ?? ? ?? ? ? ?
+    -> the food choices to prepare at a cooking station
+ 
+
+-> then the 9 sprite for hud componetns
+-> consider ray gui for hud and menu
+
+
 

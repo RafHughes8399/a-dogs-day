@@ -5,27 +5,22 @@
 #include "raglib.h"
 #include <vector>
 // ------------------------------- dogs ------------------------------- //
+// * kept in step with movement_system::determine_direction - per axis, then
+// * normalised, so a waypoint that differs on both is walked as a diagonal
+// * rather than chased along x forever, and only x turns the sprite
 void entities::dog::determine_direction(Vector2 target){
-    if(position_.x < target.x){
-        direction_scalar_ = level_config::direction_scalars[level_config::directions::right];
-        set_direction_index(level_config::directions::right);
-        return;
-    }
-    else if(position_.x > target.x){
-        direction_scalar_ = level_config::direction_scalars[level_config::directions::left];
-        set_direction_index(level_config::directions::left);
-        return;
-    }
-    else if(position_.y < target.y){
-        direction_scalar_ = level_config::direction_scalars[level_config::directions::down];
-        set_direction_index(level_config::directions::down);
-        return;
-    }
-    else if(position_.y > target.y){
-        direction_scalar_ = level_config::direction_scalars[level_config::directions::up];
-        set_direction_index(level_config::directions::up);
-        return;
-    }
+    auto axes = Vector2Zero();
+    if(target.x > position_.x){ axes.x = 1.0f; }
+    else if(target.x < position_.x){ axes.x = -1.0f; }
+    if(target.y > position_.y){ axes.y = 1.0f; }
+    else if(target.y < position_.y){ axes.y = -1.0f; }
+    if(Vector2Equals(axes, Vector2Zero())){ return; }
+
+    direction_scalar_ = Vector2Normalize(axes);
+    if(axes.x == 0.0f){ return; }
+    set_direction_index(axes.x > 0.0f
+        ? level_config::directions::right
+        : level_config::directions::left);
 }
 
 Vector2 entities::dog::get_direction_scalar(){

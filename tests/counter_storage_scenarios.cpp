@@ -3,6 +3,7 @@
 #include "ecs_test_game.h"
 #include "component.h"
 #include "config.h"
+#include "testing_helpers.hpp"
 
 namespace {
     const Vector2 counter_spot{level_config::edge_weight * 8, level_config::edge_weight * 8};
@@ -339,6 +340,28 @@ SCENARIO("an item id with no sprite is stored but not drawn", "[counter][storage
                     REQUIRE(food_slot(counter_id)->get_active_index()
                         == entity_config::foods::coffee);
                 }
+            }
+        }
+    }
+}
+
+SCENARIO("add_items_to_counter stocks a counter through the item system", "[counter][storage][helper]"){
+    GIVEN("a fresh ecs world with an empty food counter"){
+        testing::ecs_test_game game;
+        auto counter_id = game.create_food_counter(counter_spot);
+
+        REQUIRE(storage_of(counter_id)->empty());
+        REQUIRE(storage_of(counter_id)->size() == 0);
+
+        WHEN("three lasagnas are added"){
+            helpers::add_items_to_counter(counter_id, entity_config::foods::lasagna, 3);
+
+            THEN("the counter is no longer empty"){
+                REQUIRE_FALSE(storage_of(counter_id)->empty());
+            }
+            THEN("they stack into a single entry holding three"){
+                REQUIRE(storage_of(counter_id)->size() == 1);
+                REQUIRE(storage_of(counter_id)->head().get_count() == 3);
             }
         }
     }

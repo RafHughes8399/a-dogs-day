@@ -92,6 +92,55 @@ SCENARIO("an interaction pairs the ids it was built from",
         }
     }
 }
+
+SCENARIO("carried food stays on the side the carrier faces",
+        "[ecs][interaction][carrier]"){
+    GIVEN("a waiter facing right and carrying food"){
+        testing::ecs_test_game game;
+        auto& carrier = systems::carrier_system::get_instance();
+        auto waiter_id = game.create_waiter_dog(in_cafe(320.0f, 320.0f));
+        auto food_id = game.create_food(in_cafe(320.0f, 320.0f));
+        component_managers::carrier_manager_.get_component(waiter_id)->set_carried_entity(food_id);
+
+        auto face = [&](size_t direction){
+            component_managers::movement_manager_.get_component(waiter_id)
+                ->set_direction_scalar(level_config::direction_scalars[direction]);
+            component_helpers::set_facing_index(waiter_id, direction);
+            carrier.update(0.0f);
+        };
+
+        face(level_config::directions::right);
+        auto dog = game.hitbox_of(waiter_id);
+        auto held = game.hitbox_of(food_id);
+        REQUIRE(held.x == dog.x + dog.width - entity_config::food_carry_offset.x);
+
+        WHEN("it turns to walk down"){
+            face(level_config::directions::down);
+
+            THEN("the food stays in front of it"){
+                REQUIRE(game.hitbox_of(food_id).x == held.x);
+                REQUIRE(game.hitbox_of(food_id).y == held.y);
+            }
+        }
+
+        WHEN("it turns left"){
+            face(level_config::directions::left);
+
+            THEN("the food moves to its left side"){
+                REQUIRE(game.hitbox_of(food_id).x
+                    == dog.x + entity_config::food_carry_offset.x - entity_config::food_width);
+            }
+            AND_WHEN("it then turns to walk up"){
+                auto left_held = game.hitbox_of(food_id);
+                face(level_config::directions::up);
+
+                THEN("the food stays on its left side"){
+                    REQUIRE(game.hitbox_of(food_id).x == left_held.x);
+                }
+            }
+        }
+    }
+}
 /** 
 SCENARIO("moving a claimed interactor raises an interaction for it and its target",
         "[ecs][interaction][detection]"){

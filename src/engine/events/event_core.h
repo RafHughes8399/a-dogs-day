@@ -71,6 +71,8 @@ namespace events{
 		register_food_counter,
 		waiter_arrived_table,
 		order_served_id,
+		food_dropped_id,
+		legacy_order_served_id,
 		send_waiter_table,
 		customer_left,
 		build_customer_dog_id,
