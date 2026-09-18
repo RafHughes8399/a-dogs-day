@@ -550,7 +550,11 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.has_renderable(food_id));
                 REQUIRE(game.has_collision(food_id));
                 REQUIRE_FALSE(game.has_selectable(food_id));
-                REQUIRE(game.num_components(food_id) == 3);
+                REQUIRE(game.has_food(food_id));
+                REQUIRE(game.num_components(food_id) == 4);
+            }
+            THEN("it knows which item it is"){
+                REQUIRE(game.food_item_of(food_id) == entity_config::lasagna);
             }
             THEN("its hitbox is the shared food size"){
                 auto box = game.hitbox_of(food_id);

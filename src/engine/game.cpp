@@ -41,6 +41,7 @@ void game::game::init(){
     /** a bit messy but we're going to create some items for the food counter to store */
     debug::log("[game::init, build counter]: id " + std::to_string(counter) + " with food items:  " + std::to_string(food_items));
     // this is injected here for testing purposes. not possible in the real game
+    lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 10});
     lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
     lifespan_.create_table(entity_config::tables::tiled_table,Vector2{level_config::edge_weight * 25, level_config::edge_weight * 14});
     //* ------------------------------------------------- WAITER CREATE---------------------------------------------------------------------

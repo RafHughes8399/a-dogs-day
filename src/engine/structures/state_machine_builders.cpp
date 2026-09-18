@@ -43,8 +43,8 @@ state_machine::state_machine state_machine_builders::build_waiter_state_machine(
         {state_machine::edge(dog_config::food_collected, dog_config::waiter_carrying)}));
 
     graph.push_back(state_machine::node(state_builders::build_waiter_carrying_state(),
-        {state_machine::edge(dog_config::order_served, dog_config::waiter_idle)
-        //,state_machine(dog_config::food_placed, dog_config::waiter_idle)}
+        {state_machine::edge(dog_config::order_served, dog_config::waiter_idle),
+        state_machine::edge(dog_config::food_dropped, dog_config::waiter_idle)
         }));
 
     return state_machine::state_machine(std::move(graph), dog_config::waiter_stationary);

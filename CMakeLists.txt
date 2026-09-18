@@ -132,7 +132,8 @@ add_library(components
   src/engine/components/renderable_component.cpp
   src/engine/components/selectable_component.cpp
   src/engine/components/state_machine_component.cpp
-  src/engine/components/storage_component.cpp)
+  src/engine/components/storage_component.cpp
+  src/engine/components/food_component.cpp)
 link_libraries(components)
 
 add_library(systems

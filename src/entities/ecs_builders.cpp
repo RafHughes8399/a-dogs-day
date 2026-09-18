@@ -260,9 +260,11 @@ void ecs_entities::build_food(size_t id, Vector2 position, sprite::sprite food_s
 }
     void ecs_entities::build_lasagna(size_t id, Vector2 position){
         build_food(id, position, sprite_builders::build_lasagna_sprite());
+        component_helpers::add_food_component(id, entity_config::lasagna);
     }
     void ecs_entities::build_coffee(size_t id, Vector2 position){
         build_food(id, position, sprite_builders::build_coffee_sprite());
+        component_helpers::add_food_component(id, entity_config::coffee);
     }
 
 // position and renderable only - no hitbox, so it is never in the spatial index

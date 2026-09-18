@@ -4,7 +4,9 @@
 #include "debug_logger.h"
 #include "dog_events.h"
 #include "event_core.h"
+#include "events_interface.h"
 #include "system.h"
+#include <memory>
 #include <string>
 
 
@@ -106,7 +108,6 @@ void systems::interaction_system::waiter_table_serve(size_t waiter, size_t table
     auto food_position = component_managers::positional_manager_.get_component(food);
     if(not food_position) {return;}
     food_position->set_position(food_place_position);
-    // and emit a served evenmt
 }   
 
 void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t counter, float delta){
@@ -143,7 +144,7 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
     }
 
     auto dog_mouth_position = Vector2Add(waiter_position->get_position(), carrier_system::mouth_offset(waiter));
-    auto food_id = entity_lifespan_system::get_instance().create_food(food_opt.value().get_id(), dog_mouth_position);
+    auto food_id = entity_lifespan_system::get_instance().create_food(food_opt.value(), dog_mouth_position);
 
 
     // * update the carrier component
@@ -163,27 +164,48 @@ void systems::interaction_system::waiter_counter_place_down(size_t waiter, size_
     debug::log("waiter-counter place down interaction attempt");
     auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
     if(not waiter_state){
+        debug::log("[waiter-counter place down interaction] - no waiter state");
         return;
     }
     if(waiter_state->get_machine().get_current_state()->get_state_id() != dog_config::waiter_carrying){
+        debug::log("[waiter-counter place down interaction] - dog is not in carrying state");
+        debug::log("[waiter-counter place down interaction] - dog is " + std::to_string(waiter_state->get_machine().get_current_state()->get_state_id()));
+        debug::log("[waiter-counter place down interaction] - carrying is " + std::to_string(dog_config::waiter_carrying));
+        
         return;
     }
     // * 1. get the carried item
     auto waiter_carrier = component_managers::carrier_manager_.get_component(waiter);
-    if(not waiter_carrier) {return;}
+    if(not waiter_carrier) {
+        debug::log("[waiter-counter place down interaction] - no waiter carrier");
+        return;
+    }
     auto food_entity_opt = waiter_carrier->get_carried_entity();
-    if(not food_entity_opt) { return;}
+    if(not food_entity_opt) { 
+        debug::log("[waiter-counter place down interaction] - waiter is not carrying an entity");
+        return;
+    }
     auto food_entity_id = food_entity_opt.value();
     // * 2. get the counter storage item
     auto counter_storage = component_managers::storage_manager_.get_component(counter);
     if(not counter_storage){
+        debug::log("[waiter-counter place down interaction] - no counter storage");
         return;
     }
-    auto food_item_id = 1; // food_manager.get_componet(food_entity_id)
-    // * 3. place the item oin the stroage component [requires food to know what item it is, pending that component implementation]
-    counter_storage->place(food_item_id);
+    auto food = component_managers::food_manager_.get_component(food_entity_id);
+    if(not food){
+        debug::log("[waiter-counter place down interaction] - carried entity is not food");
+        return;
+    }
+    // * 3. place the item oin the stroage component
+    item_system::get_instance().place_item(counter, food->get_item_id());
     // * 4. clean up the carrier component
     waiter_carrier->drop();
+    // * 5 destroy the food and tranision the state
+    entity_lifespan_system::get_instance().destroy_food(food_entity_id);
+    std::unique_ptr<events::event> dropped = std::make_unique<events::food_dropped>(waiter);
+    event_interface::queue_event(dropped);
+    // need to do the state transition out of carrying and destroy the food entity
 }
 
 // * ----------------------------------------------------- INTERACTIONS ------------------------------------------------------- * // 

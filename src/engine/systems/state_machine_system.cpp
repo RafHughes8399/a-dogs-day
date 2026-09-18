@@ -1,3 +1,5 @@
+#include "config.h"
+#include "dog_events.h"
 #include "system.h"
 
 void systems::state_machine_system::update(float delta){
@@ -52,6 +54,9 @@ void systems::state_machine_system::on_interaction_finished(const events::intera
 }
 void systems::state_machine_system::on_order_served(const events::order_served& event){
     transition(event.get_waiter_id(), dog_config::order_served);
+}
+void systems::state_machine_system::on_food_dropped(const events::food_dropped& event){
+    transition(event.get_waiter_id(), dog_config::food_dropped);
 }
 void systems::state_machine_system::on_collected_food(const events::waiter_collected_food& event){
     transition(event.get_waiter_id(), dog_config::food_collected, event.get_food_id());

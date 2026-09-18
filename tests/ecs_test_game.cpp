@@ -239,6 +239,14 @@ namespace testing{
     bool ecs_test_game::has_storage(size_t entity_id){
         return component_managers::storage_manager_.get_component(entity_id) != nullptr;
     }
+    bool ecs_test_game::has_food(size_t entity_id){
+        return component_managers::food_manager_.get_component(entity_id) != nullptr;
+    }
+    std::optional<size_t> ecs_test_game::food_item_of(size_t entity_id){
+        auto* component = component_managers::food_manager_.get_component(entity_id);
+        if(component == nullptr){ return std::nullopt; }
+        return component->get_item_id();
+    }
     bool ecs_test_game::has_state_machine(size_t entity_id){
         return component_managers::state_machine_manager_.get_component(entity_id) != nullptr;
     }
@@ -368,6 +376,7 @@ namespace testing{
              + component_managers::state_machine_manager_.size()
              + component_managers::selectable_manager_.size()
              + component_managers::storage_manager_.size()
+             + component_managers::food_manager_.size()
              + component_managers::carrier_manager_.size();
     }
 

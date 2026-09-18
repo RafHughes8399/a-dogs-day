@@ -380,7 +380,9 @@ animation it should be peaches
     -> after eating, the customer navigates to the entrance, and then to the exit
 
     // **************************** NEXT SLICE **************************** //
-        -> test waiter placing down on the counter
+        -> test waiter placing down on the counter x 
+            -> state transitions are clean, but the food placement position is funky
+            -> also should change how interaction positions are picked. should pick the closer one 
         -> test serving food placement and with customer sitting
         -> test customer sit interaction
         -> test customer state transition to eating
@@ -390,7 +392,10 @@ animation it should be peaches
         -> like clean up this flow before moving onto other stuff
         -> and clean up waiter idling, the cooldown needs to be adjusted. i think instead of a cooldown, roll like a 1 / 6 chance to trigger it to wander around if its idle
     // **************************** NEXT SLICE **************************** //
+    -> legacy clean up, we are well and truly past it
+    -> and debug logging should write to a file for the session
     -> then counter and food art
+    -> and the screen resolution bug 
     -> then customer eating completion and the food state change 
     -> and customer leaving
     [then that mechanic is like done for now]

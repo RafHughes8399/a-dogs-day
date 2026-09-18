@@ -87,6 +87,8 @@ namespace testing{
             bool has_interactor(size_t entity_id);
             bool has_interactable(size_t entity_id);
             bool has_storage(size_t entity_id);
+            bool has_food(size_t entity_id);
+            std::optional<size_t> food_item_of(size_t entity_id);
             bool has_state_machine(size_t entity_id);
             std::optional<size_t> state_of(size_t entity_id);
             std::optional<size_t> carried_item_of(size_t entity_id);

@@ -127,6 +127,7 @@ namespace systems{
                 event_interface::unsubscribe<events::interaction_started>(interaction_started_handler_);
                 event_interface::unsubscribe<events::interaction_finished>(interaction_finished_handler_);
                 event_interface::unsubscribe<events::order_served>(order_served_handler_);
+                event_interface::unsubscribe<events::food_dropped>(food_dropped_handler_);
                 event_interface::unsubscribe<events::waiter_collected_food>(collected_food_handler_);
                 event_interface::unsubscribe<events::customer_finished_meal>(finished_meal_handler_);
                 event_interface::unsubscribe<events::customer_dog_left>(customer_left_handler_);
@@ -146,6 +147,7 @@ namespace systems{
             void on_interaction_started(const events::interaction_started& event);
             void on_interaction_finished(const events::interaction_finished& event);
             void on_order_served(const events::order_served& event);
+            void on_food_dropped(const events::food_dropped& event);
             void on_collected_food(const events::waiter_collected_food& event);
             void on_finished_meal(const events::customer_finished_meal& event);
             void on_customer_left(const events::customer_dog_left& event);
@@ -165,6 +167,7 @@ namespace systems{
             interaction_started_handler_([this](const events::interaction_started& event) -> void{on_interaction_started(event);}),
             interaction_finished_handler_([this](const events::interaction_finished& event) -> void{on_interaction_finished(event);}),
             order_served_handler_([this](const events::order_served& event) -> void{on_order_served(event);}),
+            food_dropped_handler_([this](const events::food_dropped& event) -> void{on_food_dropped(event);}),
             collected_food_handler_([this](const events::waiter_collected_food& event) -> void{on_collected_food(event);}),
             finished_meal_handler_([this](const events::customer_finished_meal& event) -> void{on_finished_meal(event);}),
             customer_left_handler_([this](const events::customer_dog_left& event) -> void{on_customer_left(event);}){
@@ -173,6 +176,7 @@ namespace systems{
                 event_interface::subscribe<events::interaction_started>(interaction_started_handler_);
                 event_interface::subscribe<events::interaction_finished>(interaction_finished_handler_);
                 event_interface::subscribe<events::order_served>(order_served_handler_);
+                event_interface::subscribe<events::food_dropped>(food_dropped_handler_);
                 event_interface::subscribe<events::waiter_collected_food>(collected_food_handler_);
                 event_interface::subscribe<events::customer_finished_meal>(finished_meal_handler_);
                 event_interface::subscribe<events::customer_dog_left>(customer_left_handler_);
@@ -184,6 +188,7 @@ namespace systems{
             events::event_handler<events::interaction_started> interaction_started_handler_;
             events::event_handler<events::interaction_finished> interaction_finished_handler_;
             events::event_handler<events::order_served> order_served_handler_;
+            events::event_handler<events::food_dropped> food_dropped_handler_;
             events::event_handler<events::waiter_collected_food> collected_food_handler_;
             events::event_handler<events::customer_finished_meal> finished_meal_handler_;
             events::event_handler<events::customer_dog_left> customer_left_handler_;
@@ -509,7 +514,7 @@ namespace systems{
         
 
         // * current shape is to return the size_t of the created item entity
-        std::optional<item_stack::item> take_item(size_t counter_id);
+        std::optional<size_t> take_item(size_t counter_id);
         void place_item(size_t counter_id, size_t item);
         
         private:

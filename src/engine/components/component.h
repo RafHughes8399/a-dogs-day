@@ -111,6 +111,23 @@ class storage_component {
     item_stack::item_stack items_;
 };
 
+class food_component {
+public:
+    ~food_component() = default;
+    food_component(size_t item_id)
+    : item_id_(item_id){}
+    food_component(const food_component& other) = default;
+    food_component(food_component&& other) = default;
+
+    food_component& operator=(const food_component& other) = default;
+    food_component& operator=(food_component&& other) = default;
+
+    size_t get_item_id() const;
+
+private:
+    size_t item_id_;
+};
+
 class carrier_component {
 public:
     ~carrier_component() = default;
@@ -432,6 +449,7 @@ private:
 // * which would blur the storage layer into the data layer.
 extern component_manager<components::carrier_component> carrier_manager_;
 extern component_manager<components::collision_component> collision_manager_;
+extern component_manager<components::food_component> food_manager_;
 extern component_manager<components::key_input_component> control_manager_;
 extern component_manager<components::interactable_component> interactable_manager_;
 extern component_manager<components::interactor_component> interactor_manager_;
@@ -465,6 +483,7 @@ namespace component_builders{
     components::state_machine_component build_state_machine_component(state_machine::state_machine machine);
     components::selectable_component build_selectable_component(size_t kind);
     components::storage_component build_storage_component();
+    components::food_component build_food_component(size_t item_id);
     components::carrier_component build_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
 }
 // thin forwarders to the right manager; defined in component_helpers.cpp
@@ -480,6 +499,7 @@ namespace component_helpers{
     void register_state_machine_component(size_t entity_id, components::state_machine_component component);
     void register_selectable_component(size_t entity_id, components::selectable_component component);
     void register_storage_component(size_t entity_id, components::storage_component component);
+    void register_food_component(size_t entity_id, components::food_component component);
     void register_carrier_component(size_t entity_id, components::carrier_component component);
 
     void add_positional_component(size_t entity_id, Vector2 position);
@@ -499,6 +519,7 @@ namespace component_helpers{
     void add_state_machine_component(size_t entity_id, state_machine::state_machine machine);
     void add_selectable_component(size_t entity_id, size_t kind);
     void add_storage_component(size_t entity_id);
+    void add_food_component(size_t entity_id, size_t item_id);
     void add_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
     void add_stored_item(size_t entity_id, size_t slot, size_t item_id);
     std::optional<size_t> take_stored_item(size_t entity_id, size_t slot);
@@ -520,6 +541,7 @@ namespace component_helpers{
     void unregister_state_machine_component(size_t entity_id);
     void unregister_selectable_component(size_t entity_id);
     void unregister_storage_component(size_t entity_id);
+    void unregister_food_component(size_t entity_id);
     void unregister_carrier_component(size_t entity_id);
     void unregister_all_components(size_t entity_id);
 

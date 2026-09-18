@@ -301,6 +301,18 @@ private:
   const size_t waiter_id_;
   const size_t table_id_;
 };
+class food_dropped : public event{
+  public:
+  food_dropped(size_t waiter_id)
+      : event(ids::food_dropped_id), waiter_id_(waiter_id) {}
+
+  static int get_static_type() { return ids::food_dropped_id; }
+  size_t get_waiter_id() const { return waiter_id_; }
+
+
+private:
+  const size_t waiter_id_;
+};
 class legacy_order_served : public event {
 public:
   legacy_order_served(size_t order_id, size_t waiter_id, size_t customer_id,

@@ -6,6 +6,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include "dog_events.h"
 #include "events/event_core.h"
 #include "raylib.h"
 #include <cstddef>
@@ -681,6 +682,7 @@ namespace dog_config{
         interaction_started = events::ids::interaction_started_id,
         interaction_finished = events::ids::interaction_finished_id,
         order_served = events::ids::order_served_id,
+        food_dropped = events::ids::food_dropped_id,
         food_collected = events::ids::waiter_collected_food_id,
         meal_finished = events::ids::customer_finished_meal_id,
         customer_leaving = events::ids::customer_left
