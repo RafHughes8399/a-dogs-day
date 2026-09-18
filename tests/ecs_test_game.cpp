@@ -153,6 +153,12 @@ namespace testing{
         tick(0.0f);
     }
 
+    std::vector<Vector2> ecs_test_game::current_path_waypoints(size_t entity_id){
+        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        if(movement == nullptr or movement->get_paths().empty()){ return {}; }
+        return movement->get_current_path().get_positions();
+    }
+
     size_t ecs_test_game::queued_path_count(size_t entity_id){
         auto* movement = component_managers::movement_manager_.get_component(entity_id);
         return movement == nullptr ? 0 : movement->get_paths().size();

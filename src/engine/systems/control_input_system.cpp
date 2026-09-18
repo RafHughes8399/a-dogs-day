@@ -11,6 +11,12 @@
 #include <raylib.h>
 #include <raymath.h>
 
+namespace {
+    bool is_interactable(size_t entity_id){
+        return component_managers::interactable_manager_.get_component(entity_id) != nullptr;
+    }
+}
+
 // ---------------- input dispatch ----------------
 void systems::control_input_system::check_inputs(size_t id, std::vector<game_config::input>& controls, float delta){
     for(auto it = controls.begin(); it != controls.end(); ++it){
@@ -226,7 +232,8 @@ void systems::control_input_system::right_click(size_t id){
         return;
     }
 
-    int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
+    int entity_id = spatial_system::get_instance().check_collision_with(id, click_position,
+        is_interactable);
     debug::log("[control_input_system::right_click, resolved destination] entity: "
         + (entity_id == game_config::empty_entity ? std::string("none, bare position")
                                                    : std::to_string(entity_id)));

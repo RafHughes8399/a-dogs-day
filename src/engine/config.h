@@ -78,6 +78,7 @@ namespace game_config {
         int key_;
         int action_;
     };
+    inline const int counter_start_stock = 2;
     inline std::vector<input> player_controls = {
         {KEY_LEFT, key_hold},
         {KEY_RIGHT, key_hold},
@@ -632,7 +633,7 @@ namespace entity_config{
     inline const Vector2 station_slot_up    = Vector2Zero();
     inline const Vector2 station_slot_down  = Vector2Zero(); 
 
-    inline const float station_reach = level_config::edge_weight * 0.25f;
+    inline const float station_reach = level_config::edge_weight * 0.5f;
     // where stored food is drawn relative to the counter origin.
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
     inline const Vector2 food_carry_offset = {level_config::edge_weight * 0.25f, 0.0f};
@@ -646,8 +647,7 @@ namespace dog_config{
     inline const float waiter_idle_bounds_edges = 3.0f;
     inline const size_t waiter_idle_min_points = 2;
     inline const size_t waiter_idle_max_points = 4;
-    inline const float waiter_idle_cooldown_min = 4.0f;
-    inline const float waiter_idle_cooldown_max = 5.0f;
+    inline const size_t waiter_wander_odds = 6;
     inline const size_t waiter_idle_max_attempts = 3;
 
     enum waiter_dog_types{

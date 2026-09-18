@@ -87,8 +87,8 @@ namespace dbs {
     class idle_waiter{
         public:
             ~idle_waiter() = default;
-            idle_waiter(size_t id, float cooldown)
-            : id_(id), cooldown_(cooldown){}
+            idle_waiter(size_t id)
+            : id_(id){}
             idle_waiter(const idle_waiter& other) = default;
             idle_waiter(idle_waiter&& other) = default;
 
@@ -98,18 +98,8 @@ namespace dbs {
             size_t id() const{
                 return id_;
             }
-            bool ready() const{
-                return cooldown_ <= 0.0f;
-            }
-            void tick(float delta){
-                cooldown_ -= delta;
-            }
-            void start_cooldown(float seconds){
-                cooldown_ = seconds;
-            }
         private:
             size_t id_;
-            float cooldown_;
     };
     class waiter_idling_system {
         public:
@@ -133,7 +123,7 @@ namespace dbs {
             std::vector<Vector2> pick_points(const std::vector<Vector2>& candidates, size_t points);
             void order_points(Vector2 from, std::vector<Vector2>& points);
             bool build_paths(size_t waiter, size_t points, Rectangle bounds);
-            void update(float delta);
+            void update(float delta, int frame);
 #ifdef DOG_DAYS_TESTING
             const std::vector<idle_waiter>& get_waiters() const{
                 return waiters_;
@@ -141,7 +131,7 @@ namespace dbs {
 #endif
 
         private:
-            float roll_cooldown();
+            bool roll_wander();
 
             std::vector<idle_waiter> waiters_;
             std::mt19937 rng_;

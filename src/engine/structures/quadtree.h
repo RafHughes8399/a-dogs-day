@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 #include <algorithm>
+#include <functional>
 #include <iostream>
 
 #include "component.h"
@@ -30,6 +31,8 @@
 
 // nodes have a bounding box, entities have a rectangle
 namespace tree{
+    inline const std::function<bool(size_t)> any_entity = [](size_t) -> bool { return true; };
+
     class quadtree {
     protected:
         // node definition
@@ -285,8 +288,10 @@ namespace tree{
         bool is_empty(std::unique_ptr<node>& tree);
         bool is_leaf(std::unique_ptr<node>& tree);
         bool is_there_collision(std::unique_ptr<node>& tree, hitbox::hitbox& bounds, size_t id);
-        int is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id);
-        int is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id);
+        int is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id,
+            const std::function<bool(size_t)>& filter);
+        int is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id,
+            const std::function<bool(size_t)>& filter);
         int is_there_interaction(std::unique_ptr<node>& tree, Rectangle box, size_t id);
         bool node_contains_object(raglib::bounding_box_2& node, const Rectangle& object);
         bool node_contains_position(raglib::bounding_box_2& ndoe, const Vector2& position);
@@ -384,11 +389,13 @@ namespace tree{
             erase(root_, entity_id);
             insert(root_, entity_id, bounds);
         }
-        int check_collision(size_t id, Vector2 position){
-            return is_there_collision(root_, position, id);
+        int check_collision(size_t id, Vector2 position,
+            const std::function<bool(size_t)>& filter = any_entity){
+            return is_there_collision(root_, position, id, filter);
         }
-        int check_collision(size_t id, Rectangle box){
-            return is_there_collision(root_, box,  id);
+        int check_collision(size_t id, Rectangle box,
+            const std::function<bool(size_t)>& filter = any_entity){
+            return is_there_collision(root_, box,  id, filter);
         }
         int check_interaction(size_t id, Rectangle box){
             return is_there_interaction(root_, box, id);

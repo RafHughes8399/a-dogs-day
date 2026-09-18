@@ -692,7 +692,7 @@ namespace systems{
             dbs::waiter_idling_system waiter_idling_;
             events::event_handler<events::order_served> order_served_handler_;
         public:
-            void update(float delta);
+            void update(float delta, int frame);
     };
     class rendering_system{
         // rendering layers
@@ -845,8 +845,10 @@ namespace systems{
             void clear(){
                 entities_.clear();
             }
-            int check_collision_with(size_t id, Vector2 position);
-            int check_collision_with(size_t id, Rectangle box);
+            int check_collision_with(size_t id, Vector2 position,
+                const std::function<bool(size_t)>& filter = tree::any_entity);
+            int check_collision_with(size_t id, Rectangle box,
+                const std::function<bool(size_t)>& filter = tree::any_entity);
             int check_interactions_with(size_t id, Rectangle box);
         private:
             // an entity with no collision component has no bounds and is not indexed

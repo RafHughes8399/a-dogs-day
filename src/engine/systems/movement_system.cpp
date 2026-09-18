@@ -51,16 +51,27 @@ void systems::movement_system::update(float delta){
         update_position(id, Vector2Add(position->get_position(), step));
     }
 }
+// * each axis is set independently, so a target that differs on both gives a
+// * diagonal heading rather than the x-first L-walk a single direction index
+// * forced. normalising is what keeps a diagonal the same speed as a cardinal -
+// * an un-normalised {1,1} moves 1.41x too fast.
+// * facing is deliberately not taken from the same value: only an x difference
+// * turns the sprite, so walking straight up or down leaves the dog facing
+// * whichever way it already was.
 void systems::movement_system::determine_direction(size_t id, components::movement_component& movement,
     Vector2 position, Vector2 target){
-    size_t direction = level_config::directions::right;
-    if(position.x < target.x){ direction = level_config::directions::right; }
-    else if(position.x > target.x){ direction = level_config::directions::left; }
-    else if(position.y < target.y){ direction = level_config::directions::down; }
-    else if(position.y > target.y){ direction = level_config::directions::up; }
-    else { return; }
-    movement.set_direction_scalar(level_config::direction_scalars[direction]);
-    component_helpers::set_facing_index(id, direction);
+    auto axes = Vector2Zero();
+    if(target.x > position.x){ axes.x = 1.0f; }
+    else if(target.x < position.x){ axes.x = -1.0f; }
+    if(target.y > position.y){ axes.y = 1.0f; }
+    else if(target.y < position.y){ axes.y = -1.0f; }
+    if(Vector2Equals(axes, Vector2Zero())){ return; }
+
+    movement.set_direction_scalar(Vector2Normalize(axes));
+    if(axes.x == 0.0f){ return; }
+    component_helpers::set_facing_index(id, axes.x > 0.0f
+        ? level_config::directions::right
+        : level_config::directions::left);
 }
 
 // ---------------- event handlers ----------------

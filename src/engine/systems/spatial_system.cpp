@@ -34,11 +34,13 @@ void systems::spatial_system::update(float delta){
     (void) delta;
 }
 // ---------------- collision checks ----------------
-int systems::spatial_system::check_collision_with(size_t id, Rectangle box){
-    return entities_.check_collision(id, box);
+int systems::spatial_system::check_collision_with(size_t id, Rectangle box,
+    const std::function<bool(size_t)>& filter){
+    return entities_.check_collision(id, box, filter);
 }
-int systems::spatial_system::check_collision_with(size_t id, Vector2 position){
-    return entities_.check_collision(id, position);
+int systems::spatial_system::check_collision_with(size_t id, Vector2 position,
+    const std::function<bool(size_t)>& filter){
+    return entities_.check_collision(id, position, filter);
 }
 
 

@@ -52,38 +52,61 @@ bool graph::level_graph::box_in_area(Rectangle box){
     return position_in_area({box.x, box.y}) and position_in_area({box.x + box.width, box.y + box.height});
 }
 // ---------------- pathfinding ----------------
+// * a diagonal edge costs hypot(edge_weight, edge_weight), so the frontier has
+// * to come off the queue cheapest-first rather than in insertion order - an
+// * unweighted sweep would treat a diagonal hop as equal to a cardinal one and
+// * hand back a route whose stored weights say otherwise.
 std::vector<int> graph::level_graph::bfs(int start_id, int end_id){
     size_t visited_size = graph_.size();
     auto visited = std::vector<int>(visited_size, -1);
-    // init all with -1 
-    bool found = false;
-    
+    auto cheapest = std::vector<float>(visited_size, std::numeric_limits<float>::infinity());
+
     visited[static_cast<size_t>(start_id)] = start_id;
-    
-    auto nodes = std::queue<int>();
-    nodes.push(start_id);
-    while(not nodes.empty() and not found){
-        auto current = nodes.front();
+    cheapest[static_cast<size_t>(start_id)] = 0.0f;
+
+    using frontier_entry = std::pair<float, int>;
+    auto nodes = std::priority_queue<frontier_entry, std::vector<frontier_entry>,
+        std::greater<frontier_entry>>();
+    nodes.emplace(0.0f, start_id);
+
+    while(not nodes.empty()){
+        auto [cost, current] = nodes.top();
         nodes.pop();
-        if(current == end_id){
-            found = true;
-            return visited;
-        }
-        else{
-            // for each outgoing edge from current 
-            for(auto & edge : graph_[static_cast<size_t>(current)].second){
-                auto closer = is_node_closer(current, edge.destination_->id_, end_id);
-                (void) closer;
-                auto empty = is_node_empty(edge.destination_->id_);
-                // then explore if not visited and if empty
-                if(visited[static_cast<size_t>(edge.destination_->id_)] == -1 and empty){
-                    visited[static_cast<size_t>(edge.destination_->id_)] = current;
-                    nodes.push(edge.destination_->id_);
-                }
-            }
+        if(current == end_id){ return visited; }
+        // * a node can sit in the queue more than once - the stale copy is the
+        // * one whose cost no longer matches the best known
+        if(cost > cheapest[static_cast<size_t>(current)]){ continue; }
+
+        for(auto & edge : graph_[static_cast<size_t>(current)].second){
+            auto destination = edge.destination_->id_;
+            if(not is_node_empty(destination)){ continue; }
+            if(not diagonal_step_clear(current, destination)){ continue; }
+
+            auto destination_cost = cost + edge.weight_;
+            if(destination_cost >= cheapest[static_cast<size_t>(destination)]){ continue; }
+            cheapest[static_cast<size_t>(destination)] = destination_cost;
+            visited[static_cast<size_t>(destination)] = current;
+            nodes.emplace(destination_cost, destination);
         }
     }
     return visited;
+}
+
+// * walkability is per node, so without this a diagonal slips between two
+// * blocked cells that touch only at a corner - through the join of a wall.
+// * cardinal steps share a row or a column and are always clear by this test.
+bool graph::level_graph::diagonal_step_clear(int source_id, int destination_id){
+    int source_row = source_id / row_length_;
+    int source_column = source_id % row_length_;
+    int destination_row = destination_id / row_length_;
+    int destination_column = destination_id % row_length_;
+    if(source_row == destination_row or source_column == destination_column){ return true; }
+
+    int horizontal_neighbour = 0;
+    int vertical_neighbour = 0;
+    if(not to_index(source_row, destination_column, horizontal_neighbour)){ return false; }
+    if(not to_index(destination_row, source_column, vertical_neighbour)){ return false; }
+    return is_node_empty(horizontal_neighbour) and is_node_empty(vertical_neighbour);
 }
 std::vector<Vector2> graph::level_graph::make_position_path(std::vector<Vector2>& position_path, std::vector<int>& visited, size_t start_id, size_t end_id){
     if(visited[end_id] == -1 and end_id != start_id){
@@ -201,8 +224,7 @@ std::vector<graph::level_graph::edge> graph::level_graph::build_corner_edges(int
         
         destination_index = source_index + row_length_ + 1;
         auto x_plus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_plus_y_plus;
-        // edges.push_back(x_plus_y_plus);
+        edges.push_back(x_plus_y_plus);
     } 
     else if(top_row and not left_column){ // top right corner
         destination_index = source_index + row_length_;
@@ -215,8 +237,7 @@ std::vector<graph::level_graph::edge> graph::level_graph::build_corner_edges(int
         
         destination_index = source_index + row_length_ - 1;
         auto x_minus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_minus_y_plus;
-        // edges.push_back(x_minus_y_plus);
+        edges.push_back(x_minus_y_plus);
     }
     else if(not top_row and left_column){ // bottom left corner
         destination_index = source_index - row_length_;
@@ -229,8 +250,7 @@ std::vector<graph::level_graph::edge> graph::level_graph::build_corner_edges(int
         
         destination_index = source_index - row_length_ + 1;
         auto x_plus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};      
-        (void) x_plus_y_minus;
-        // edges.push_back(x_plus_y_minus);  
+        edges.push_back(x_plus_y_minus);  
     } 
     else if(not top_row and not left_column){
         destination_index = source_index - row_length_;
@@ -243,8 +263,7 @@ std::vector<graph::level_graph::edge> graph::level_graph::build_corner_edges(int
 
         destination_index = source_index - row_length_ - 1;
         auto x_minus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_minus_y_minus;
-        // edges.push_back(x_minus_y_minus);
+        edges.push_back(x_minus_y_minus);
     } // bottom right corner
     return edges;
 }
@@ -274,23 +293,19 @@ std::vector<graph::level_graph::edge> graph::level_graph::build_interior_edges(i
     
     destination_index = source_index - row_length_ - 1;
     auto x_minus_y_minus =  edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-    (void) x_minus_y_minus;
-    // edges.push_back(x_minus_y_minus);
+    edges.push_back(x_minus_y_minus);
     
     destination_index = source_index - row_length_ +  1;
     auto x_plus_y_minus =  edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-    (void) x_plus_y_minus;
-    // edges.push_back(x_plus_y_minus);
+    edges.push_back(x_plus_y_minus);
     
     destination_index = source_index + row_length_ - 1;
     auto x_minus_y_plus =  edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-    (void) x_minus_y_plus;
-    // edges.push_back(x_minus_y_plus);
+    edges.push_back(x_minus_y_plus);
     
     destination_index = source_index + row_length_ + 1;
     auto x_plus_y_plus =  edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-    (void) x_plus_y_plus;
-    // edges.push_back(x_plus_y_plus);
+    edges.push_back(x_plus_y_plus);
 
     return edges;   
 }
@@ -320,13 +335,11 @@ std::vector<graph::level_graph::edge> graph::level_graph::build_perimeter_edges(
         
         destination_index = source_index + row_length_ - 1;
         auto x_minus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_minus_y_plus;
-        // edges.push_back(x_minus_y_plus);
+        edges.push_back(x_minus_y_plus);
         
         destination_index = source_index + row_length_ + 1;
         auto x_plus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_plus_y_plus;
-        // edges.push_back(x_plus_y_plus);
+        edges.push_back(x_plus_y_plus);
     }
     else if(bottom_row){
         destination_index = source_index - 1;
@@ -343,13 +356,11 @@ std::vector<graph::level_graph::edge> graph::level_graph::build_perimeter_edges(
         
         destination_index = source_index - row_length_ - 1;
         auto x_minus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_minus_y_minus;
-        // edges.push_back(x_minus_y_minus);
+        edges.push_back(x_minus_y_minus);
         
         destination_index = source_index - row_length_ + 1;
         auto x_plus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_plus_y_minus;
-        // edges.push_back(x_plus_y_minus);
+        edges.push_back(x_plus_y_minus);
     }
     else if(left_column){
         destination_index = source_index - row_length_;
@@ -365,13 +376,11 @@ std::vector<graph::level_graph::edge> graph::level_graph::build_perimeter_edges(
         
         destination_index = source_index - row_length_ + 1;
         auto x_plus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_plus_y_minus;
-        // edges.push_back(x_plus_y_minus);
+        edges.push_back(x_plus_y_minus);
 
         destination_index = source_index + row_length_ + 1;
         auto x_plus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_plus_y_plus;
-        // edges.push_back(x_plus_y_plus);
+        edges.push_back(x_plus_y_plus);
     }
     else if(right_column){
         destination_index = source_index - row_length_;
@@ -387,13 +396,11 @@ std::vector<graph::level_graph::edge> graph::level_graph::build_perimeter_edges(
         
         destination_index = source_index - row_length_ - 1;
         auto x_minus_y_minus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_minus_y_minus;
-        // edges.push_back(x_minus_y_minus);
+        edges.push_back(x_minus_y_minus);
 
         destination_index = source_index + row_length_ - 1;
         auto x_minus_y_plus = edge{&graph_[static_cast<size_t>(destination_index)].first, hypotenuse_weight};
-        (void) x_minus_y_plus;
-        // edges.push_back(x_minus_y_plus);
+        edges.push_back(x_minus_y_plus);
     }
     return edges;
 }

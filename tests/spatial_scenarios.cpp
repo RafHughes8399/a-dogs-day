@@ -178,3 +178,56 @@ SCENARIO("a move keeps the entity in one node, reindexing only when it must", "[
         }
     }
 }
+
+SCENARIO("a filtered collision check skips candidates the caller does not want",
+         "[ecs][spatial]"){
+    GIVEN("a customer seated in a table's left interaction slot"){
+        testing::ecs_test_game game;
+        auto nobody = static_cast<size_t>(game_config::empty_entity);
+        auto table_position = Vector2{level_config::graph_x + 500.0f,
+            level_config::graph_y + 500.0f};
+        auto table = game.create_table(table_position);
+
+        auto* interactable = component_managers::interactable_manager_.get_component(table);
+        REQUIRE(interactable != nullptr);
+        auto seat_offset = interactable->get_slot_offset(level_config::directions::left);
+        REQUIRE(seat_offset.has_value());
+        auto customer = game.create_customer_dog(Vector2Add(table_position, seat_offset.value()));
+
+        auto click = Vector2{table_position.x + 8.0f, table_position.y + 60.0f};
+        REQUIRE(CheckCollisionPointRec(click, game.hitbox_of(table)));
+        REQUIRE(CheckCollisionPointRec(click, game.hitbox_of(customer)));
+        REQUIRE(game.has_interactable(table));
+        REQUIRE_FALSE(game.has_interactable(customer));
+
+        WHEN("the click asks only for interactables"){
+            auto hit = systems::spatial_system::get_instance().check_collision_with(nobody, click,
+                [](size_t candidate) -> bool {
+                    return component_managers::interactable_manager_.get_component(candidate) != nullptr;
+                });
+
+            THEN("the table answers, not the customer sitting over it"){
+                REQUIRE(hit == static_cast<int>(table));
+            }
+        }
+
+        WHEN("nothing under the click matches the filter"){
+            auto hit = systems::spatial_system::get_instance().check_collision_with(nobody, click,
+                [](size_t candidate) -> bool {
+                    return component_managers::storage_manager_.get_component(candidate) != nullptr;
+                });
+
+            THEN("the check reports empty rather than the nearest miss"){
+                REQUIRE(hit == game_config::empty_entity);
+            }
+        }
+
+        WHEN("the click is unfiltered"){
+            auto hit = systems::spatial_system::get_instance().check_collision_with(nobody, click);
+
+            THEN("either box can answer"){
+                REQUIRE((hit == static_cast<int>(table) or hit == static_cast<int>(customer)));
+            }
+        }
+    }
+}

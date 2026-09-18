@@ -452,7 +452,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
                 auto right = interactable->get_slot_offset(level_config::directions::right);
                 REQUIRE(right.has_value());
-                REQUIRE(right->x == level_config::edge_weight * 1.5f);
+                REQUIRE(right->x == level_config::edge_weight * 2.0f);
                 REQUIRE(right->y == level_config::edge_weight * 0.75f);
 
                 REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());
@@ -480,7 +480,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
                 auto right = interactable->get_slot_offset(level_config::directions::right);
                 REQUIRE(right.has_value());
-                REQUIRE(right->x == level_config::edge_weight * 1.5f);
+                REQUIRE(right->x == level_config::edge_weight * 2.0f);
                 REQUIRE(right->y == level_config::edge_weight * 0.75f);
 
                 REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());
@@ -507,7 +507,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
                 auto right = interactable->get_slot_offset(level_config::directions::right);
                 REQUIRE(right.has_value());
-                REQUIRE(right->x == level_config::edge_weight * 1.5f);
+                REQUIRE(right->x == level_config::edge_weight * 2.0f);
                 REQUIRE(right->y == level_config::edge_weight * 0.75f);
 
                 REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());
@@ -534,7 +534,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
                 auto right = interactable->get_slot_offset(level_config::directions::right);
                 REQUIRE(right.has_value());
-                REQUIRE(right->x == level_config::edge_weight * 1.5f);
+                REQUIRE(right->x == level_config::edge_weight * 2.0f);
                 REQUIRE(right->y == level_config::edge_weight * 0.75f);
 
                 REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());

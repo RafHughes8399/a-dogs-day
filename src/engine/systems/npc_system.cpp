@@ -6,9 +6,9 @@
 #include <algorithm>
 #include <string>
 
-void systems::npc_system::update(float delta){
+void systems::npc_system::update(float delta, int frame){
     customer_table_.update(delta);
-    waiter_idling_.update(delta);
+    waiter_idling_.update(delta, frame);
 }
 
 void systems::npc_system::register_customer(size_t id){
