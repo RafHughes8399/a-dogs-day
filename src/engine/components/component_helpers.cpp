@@ -1,5 +1,6 @@
 #include "component.h"
 #include <cassert>
+#include <cmath>
 
 void component_helpers::register_positional_component(size_t entity_id, components::position_component component){
     component_managers::positional_manager_.register_component(entity_id, std::move(component));
@@ -110,7 +111,8 @@ void component_helpers::create_offset_position_list(Rectangle box, std::array<st
     }
     // * right is width + 0.5 edgeweight x, height / 2 y
     if(positions[level_config::directions::right].has_value()){
-        positions[level_config::directions::right]->x = box.width;
+        positions[level_config::directions::right]->x =
+            std::ceil(box.width / level_config::edge_weight) * level_config::edge_weight;
         positions[level_config::directions::right]->y = box.height * 0.5f;
     }
     // * up is width / 2 x, - 0.5 edgeweight y

@@ -632,7 +632,7 @@ namespace entity_config{
     inline const Vector2 station_slot_up    = Vector2Zero();
     inline const Vector2 station_slot_down  = Vector2Zero(); 
 
-    inline const float station_reach = level_config::edge_weight * 0.25f;
+    inline const float station_reach = level_config::edge_weight * 0.5f;
     // where stored food is drawn relative to the counter origin.
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
     inline const Vector2 food_carry_offset = {level_config::edge_weight * 0.25f, 0.0f};

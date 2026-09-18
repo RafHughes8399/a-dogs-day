@@ -383,7 +383,13 @@ animation it should be peaches
         -> test waiter placing down on the counter x 
             -> state transitions are clean, but the food placement position is funky
             -> also should change how interaction positions are picked. should pick the closer one 
-        -> test serving food placement and with customer sitting
+        -> test serving food placement and with customer sitting 
+            -> still need to check state change on the part of the customer
+            -> and the food position offset
+        -> maybe need to either do one of the following:
+            -> on right click get all the entities not just the first one incase they click on the dog 
+            and the table ,adn then route to the one that is interactable
+            -> or increase the gap for the dog so it overlaps less with thetabel
         -> test customer sit interaction
         -> test customer state transition to eating
         -> fix the test suite
