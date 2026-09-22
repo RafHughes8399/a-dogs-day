@@ -29,8 +29,9 @@ void dbs::waiter_idling_system::clear(){
 }
 
 
-// TODO update to a state check instead of this
 bool dbs::waiter_idling_system::is_idle(size_t waiter){
+    auto state = component_managers::state_machine_manager_.get_component(waiter);
+    if(state == nullptr or state->get_machine().current() != dog_config::waiter_stationary){ return false; }
     auto interactor = component_managers::interactor_manager_.get_component(waiter);
     if(interactor and interactor->is_interacting()){ return false; }
     auto movement_component = component_managers::movement_manager_.get_component(waiter);

@@ -3,6 +3,8 @@
 #include <vector>
 #include "config.h"
 #include "dog_events.h"
+#include "event_core.h"
+#include "events_interface.h"
 #include "raylib.h"
 #include "raglib.h"
 #include <optional>
@@ -17,7 +19,7 @@ namespace dbs {
         public:
             ~registered_table() = default;
             registered_table(size_t id, size_t status = table_status::available)
-            : id_(id), status_(status){}
+            : id_(id), status_(status), customer_(std::nullopt){}
             registered_table(const registered_table& other) = default;
             registered_table(registered_table&& other) = default;
 
@@ -27,20 +29,36 @@ namespace dbs {
             size_t id() const{ return id_; }
             size_t status() const{ return status_; }
             void set_status(size_t status){ status_ = status; }
+            std::optional<size_t> customer() const{ return customer_; }
+            void reserve_for(size_t customer){
+                status_ = table_status::reserved;
+                customer_ = customer;
+            }
+            void release(){
+                status_ = table_status::available;
+                customer_ = std::nullopt;
+            }
         private:
             size_t id_;
             size_t status_;
+            std::optional<size_t> customer_;
     };
     class customer_table_system{
         public:
-                    // TODO (25 / 8 / 26) must listen to table construction and deletion, can create a new event for it and update teh builders
-                    // TODO and destroyers to emit those events
-            ~customer_table_system() = default;
-            customer_table_system() = default;
-            customer_table_system(const customer_table_system& other) = default;
-            customer_table_system(customer_table_system&& other) = default;
-            customer_table_system& operator=(const customer_table_system& other) = default;
-            customer_table_system& operator=(customer_table_system&& other) = default;
+            // TODO (25 / 8 / 26) must listen to table construction and deletion, can create a new event for it and update teh builders
+            // TODO and destroyers to emit those events
+            ~customer_table_system(){
+                event_interface::unsubscribe<events::order_served>(order_served_handler_);
+            }
+            customer_table_system()
+            : customers_({}), tables_({}), 
+            order_served_handler_([this](const events::order_served& event) -> void { on_order_served(event);}){
+                event_interface::subscribe<events::order_served>(order_served_handler_);
+            }
+            customer_table_system(const customer_table_system& other) = delete;
+            customer_table_system(customer_table_system&& other) = delete;
+            customer_table_system& operator=(const customer_table_system& other) = delete;
+            customer_table_system& operator=(customer_table_system&& other) = delete;
                     
                     // create_dog
                     // destroy_dog
@@ -52,7 +70,9 @@ namespace dbs {
             void unregister_customer(size_t id);
             void register_table(size_t id);
             void unregister_table(size_t id);
-            void reserve_table(size_t table_id);
+            void reserve_table(size_t table_id, size_t customer_id);
+            void release_table_of(size_t customer_id);
+            bool holds_reservation(size_t customer_id) const;
                 
                     
             bool free_tables();
@@ -62,6 +82,7 @@ namespace dbs {
             void send_customer_to_table();
             std::optional<size_t> customer_at(size_t table_id);
             void on_order_served(const events::order_served& event);
+
 #ifdef DOG_DAYS_TESTING
                     const std::vector<size_t>& get_customers() const{
                         return customers_;
@@ -83,6 +104,9 @@ namespace dbs {
             float time_since_dog_ = 0.0f;
             std::vector<size_t> customers_;
             std::vector<registered_table> tables_;
+
+            events::event_handler<events::order_served> order_served_handler_; 
+
     };
     class idle_waiter{
         public:

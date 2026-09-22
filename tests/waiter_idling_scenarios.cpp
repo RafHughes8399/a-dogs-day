@@ -228,3 +228,91 @@ SCENARIO("a route built over open floor holds one leg per picked point",
         }
     }
 }
+
+SCENARIO("idling is gated on the waiter standing still in its machine",
+        "[ecs][npc][waiter_idling][state_machine]"){
+    GIVEN("a registered waiter in open floor"){
+        testing::ecs_test_game game;
+        dbs::waiter_idling_system idling;
+        auto waiter_id = game.create_waiter_dog(in_cafe(1280.0f, 1280.0f));
+        idling.register_waiter(waiter_id);
+
+        THEN("it starts stationary and idle"){
+            REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_stationary);
+            REQUIRE(idling.is_idle(waiter_id));
+        }
+
+        WHEN("it wanders"){
+            auto bounds = idling.determine_idle_bounds(waiter_id);
+            REQUIRE(bounds.has_value());
+            REQUIRE(idling.build_paths(waiter_id, dog_config::waiter_idle_min_points, bounds.value()));
+            game.tick(frame);
+
+            THEN("it is walking idle, and not eligible to wander again"){
+                REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_idle);
+                REQUIRE_FALSE(idling.is_idle(waiter_id));
+            }
+
+            AND_WHEN("it walks the route out"){
+                REQUIRE(game.tick_until([&game, waiter_id]() -> bool {
+                    return game.queued_path_count(waiter_id) == 0;
+                }, 3000, frame));
+                game.tick(frame);
+
+                THEN("it is stationary again and eligible to wander"){
+                    REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_stationary);
+                    REQUIRE(idling.is_idle(waiter_id));
+                }
+            }
+        }
+
+        WHEN("its path queue empties but the machine still reads walking"){
+            systems::state_machine_system::get_instance().transition(waiter_id, dog_config::path_created);
+            REQUIRE(game.queued_path_count(waiter_id) == 0);
+
+            THEN("it is not idle - the state decides, not the queue alone"){
+                REQUIRE_FALSE(idling.is_idle(waiter_id));
+            }
+        }
+
+        WHEN("it is carrying food and standing still with nothing claimed"){
+            systems::state_machine_system::get_instance().transition(waiter_id, dog_config::food_collected);
+            REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_carrying);
+            REQUIRE(game.queued_path_count(waiter_id) == 0);
+
+            THEN("it is not idle, so it never wanders off with the food"){
+                REQUIRE_FALSE(idling.is_idle(waiter_id));
+            }
+            THEN("a second of updates commits no route"){
+                for(int tick = 0; tick < 200; ++tick){
+                    idling.update(frame, tick * game_config::frames);
+                }
+                REQUIRE(game.queued_path_count(waiter_id) == 0);
+            }
+        }
+
+        WHEN("it is standing still and the update rolls many times"){
+            bool wandered = false;
+            for(int tick = 0; tick < 200 and not wandered; ++tick){
+                idling.update(frame, tick * game_config::frames);
+                wandered = game.queued_path_count(waiter_id) > 0;
+            }
+
+            THEN("it eventually wanders"){
+                REQUIRE(wandered);
+            }
+        }
+    }
+
+    GIVEN("a registered id with no state machine"){
+        testing::ecs_test_game game;
+        dbs::waiter_idling_system idling;
+        auto decoration_id = game.create_test_decoration(in_cafe(1280.0f, 1280.0f));
+        idling.register_waiter(decoration_id);
+
+        THEN("it is never idle"){
+            REQUIRE_FALSE(game.has_state_machine(decoration_id));
+            REQUIRE_FALSE(idling.is_idle(decoration_id));
+        }
+    }
+}

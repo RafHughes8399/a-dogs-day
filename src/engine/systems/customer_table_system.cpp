@@ -19,7 +19,7 @@ void dbs::customer_table_system::register_customer(size_t id){
 }
 void dbs::customer_table_system::unregister_customer(size_t id){
     customers_.erase(std::remove(customers_.begin(), customers_.end(), id), customers_.end());
-    
+    release_table_of(id);
 }
 void dbs::customer_table_system::register_table(size_t id){
     tables_.push_back(registered_table(id));
@@ -27,16 +27,27 @@ void dbs::customer_table_system::register_table(size_t id){
 void dbs::customer_table_system::unregister_table(size_t id){
     std::erase_if(tables_, [id](const registered_table& table) -> bool { return table.id() == id; });
 }
-void dbs::customer_table_system::reserve_table(size_t table_id){
+void dbs::customer_table_system::reserve_table(size_t table_id, size_t customer_id){
     for(auto& table : tables_){
-        if(table.id() == table_id){ table.set_status(table_status::reserved); }
+        if(table.id() == table_id){ table.reserve_for(customer_id); }
     }
+}
+void dbs::customer_table_system::release_table_of(size_t customer_id){
+    for(auto& table : tables_){
+        if(table.customer() == customer_id){ table.release(); }
+    }
+}
+bool dbs::customer_table_system::holds_reservation(size_t customer_id) const{
+    return std::ranges::any_of(tables_, [customer_id](const registered_table& table) -> bool {
+        return table.customer() == customer_id;
+    });
 }             
 bool dbs::customer_table_system::free_tables(){
     return pick_table() != game_config::empty_entity;
 }
 int dbs::customer_table_system::pick_customer(){
     for(auto customer : customers_){
+        if(holds_reservation(customer)){ continue; }
         auto interactor = component_managers::interactor_manager_.get_component(customer);
         if(interactor and not interactor->is_interacting()){
             return static_cast<int>(customer);
@@ -46,7 +57,9 @@ int dbs::customer_table_system::pick_customer(){
 }
 int dbs::customer_table_system::pick_table(){
     for(auto table : tables_){
-        if(table.status() == table_status::available){ return static_cast<int>(table.id()); }
+        if(table.status() != table_status::available){ continue; }
+        if(component_managers::interactable_manager_.get_component(table.id()) == nullptr){ continue; }
+        return static_cast<int>(table.id());
     }
     return game_config::empty_entity;
 }
@@ -69,6 +82,7 @@ void dbs::customer_table_system::destroy_customer_dog(size_t id){
         + ", tracked customers: " + std::to_string(customers_.size()));
     systems::entity_lifespan_system::get_instance().destroy_customer_dog(id);
     std::erase_if(customers_,  [id](auto customer) -> bool {return customer == id;});
+    release_table_of(id);
 }
 
 void dbs::customer_table_system::send_customer_to_table(){
@@ -84,7 +98,7 @@ void dbs::customer_table_system::send_customer_to_table(){
     // * the next pick hands the same table to the next customer. the physical
     // * claim is a separate thing, taken on arrival by the interaction system
     // TODO this system should be extended to handle arrival and leaving
-    reserve_table(table_id);
+    reserve_table(table_id, customer_id);
 
     debug::log("[customer_table_system::send_customer_to_table] customer: "
         + std::to_string(customer_id)

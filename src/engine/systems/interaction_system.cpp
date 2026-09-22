@@ -37,6 +37,19 @@ std::vector<size_t> systems::interaction_system::interaction::determine_performa
     return interactions;
 }
 
+bool systems::interaction_system::in_reach(size_t interactor_id, size_t interactable_id){
+    auto* interactor = component_managers::interactor_manager_.get_component(interactor_id);
+    auto* interactable = component_managers::interactable_manager_.get_component(interactable_id);
+    auto* interactor_collision = component_managers::collision_manager_.get_component(interactor_id);
+    auto* interactable_collision = component_managers::collision_manager_.get_component(interactable_id);
+    if(not (interactor and interactable and interactor_collision and interactable_collision)){ return false; }
+
+    Rectangle interactor_box = interactor->get_interaction_box(
+        interactor_collision->get_hitbox_component().get_hitbox().get_box());
+    Rectangle interactable_box = interactable->get_interaction_box(
+        interactable_collision->get_hitbox_component().get_hitbox().get_box());
+    return CheckCollisionRecs(interactor_box, interactable_box);
+}
 bool systems::interaction_system::establish_handhsake(size_t interactor_id, size_t interactable_id){
     auto interactor = component_managers::interactor_manager_.get_component(interactor_id);
     auto interactable = component_managers::interactable_manager_.get_component(interactable_id);
@@ -62,11 +75,9 @@ void systems::interaction_system::customer_table_sit(size_t interactor, size_t i
     (void) interactee;
     (void) delta;
     debug::log("customer table sit interaction attempt");
-    // TODO: update the customer state to sitting
+    // TODO: update the customer state to sitting. is that even necessary
 }
 void systems::interaction_system::waiter_table_serve(size_t waiter, size_t table, float delta){
-    (void) waiter;
-    (void) table;
     (void) delta;
     debug::log("waiter table serve interaction attempt");
     // ! again the waiter must be carrying to serve
@@ -103,11 +114,8 @@ void systems::interaction_system::waiter_table_serve(size_t waiter, size_t table
         + ", carrier carrying: " + std::string(waiter_carrier->is_carrying() ? "yes" : "no")
         + ", carried entity: " + (carried_after_drop.has_value() ? std::to_string(carried_after_drop.value()) : std::string("none"))
         + ", state: " + std::to_string(waiter_state->get_machine().get_current_state()->get_state_id()));
-    // !!!! and transition the state 
-    // place the food at the table position + config_table_food_offset
-    auto food_position = component_managers::positional_manager_.get_component(food);
-    if(not food_position) {return;}
-    food_position->set_position(food_place_position);
+
+    movement_system::get_instance().update_position(food, food_place_position);
 }   
 
 void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t counter, float delta){
@@ -245,15 +253,7 @@ void systems::interaction_system::on_moved_entity(const events::move_entity& eve
     if(not target.has_value()){ return; }
     auto target_id = target.value();
 
-    auto* interactor_collision = component_managers::collision_manager_.get_component(interactor_id);
-    auto* target_collision = component_managers::collision_manager_.get_component(target_id);
-    if(interactor_collision == nullptr or target_collision == nullptr){ return; }
-
-    Rectangle interactor_box = interactor->get_interaction_box(
-        interactor_collision->get_hitbox_component().get_hitbox().get_box());
-    Rectangle target_box = target_collision->get_hitbox_component().get_hitbox().get_box();
-
-    bool overlapping = CheckCollisionRecs(interactor_box, target_box);
+    bool overlapping = in_reach(interactor_id, target_id);
     if(not overlapping) {
         // * drop the interaction, clean up both halves of the claim -
         // * interactor->stop_interacting() and interactable->release() - and
@@ -278,15 +278,7 @@ void systems::interaction_system::on_path_finished(const events::dog_completed_p
     }
     auto target_id = target.value();
 
-    auto* interactor_collision = component_managers::collision_manager_.get_component(dog_id);
-    auto* target_collision = component_managers::collision_manager_.get_component(target_id);
-    if(interactor_collision == nullptr or target_collision == nullptr){ return; }
-
-    Rectangle interactor_box = interactor->get_interaction_box(
-        interactor_collision->get_hitbox_component().get_hitbox().get_box());
-    Rectangle target_box = target_collision->get_hitbox_component().get_hitbox().get_box();
-
-    bool overlapping = CheckCollisionRecs(interactor_box, target_box);
+    bool overlapping = in_reach(dog_id, target_id);
     debug::log("[interaction_system::on_path_finished] dog: " + std::to_string(dog_id)
         + ", target: " + std::to_string(target_id)
         + ", overlapping: " + std::string(overlapping ? "yes" : "no"));

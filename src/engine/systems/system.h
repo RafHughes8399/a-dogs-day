@@ -412,6 +412,7 @@ namespace systems{
             interaction_system& operator=(interaction_system&& other) = delete;
 
             interaction create_interaction(size_t interactor, size_t interactee);
+            bool in_reach(size_t interactor, size_t interactable);
             bool establish_handhsake(size_t interactor, size_t interactable);
             void teardown_handshake(size_t interactor, size_t interactable);
             void add_interaction(interaction& interaction);
@@ -487,7 +488,9 @@ namespace systems{
             void restore_interaction_behaviours(){
                 defined_interactions_ = {
                     customer_table_sit,
-                    waiter_table_serve
+                    waiter_table_serve,
+                    waiter_counter_pickup,
+                    waiter_counter_place_down
                 };
             }
 #endif
@@ -662,9 +665,7 @@ namespace systems{
                 static npc_system instance;
                 return instance;
             }
-            ~npc_system(){
-                event_interface::unsubscribe<events::order_served>(order_served_handler_);
-            }
+            ~npc_system() = default;
             npc_system(const npc_system& other) = delete;
             npc_system(npc_system&& other) = delete;
 
@@ -684,13 +685,9 @@ namespace systems{
                 waiter_idling_.clear();
             }
         private:
-            npc_system()
-            : order_served_handler_([this](const events::order_served& event) -> void{customer_table_.on_order_served(event);}){
-                event_interface::subscribe<events::order_served>(order_served_handler_);
-            }
+            npc_system() = default;
             dbs::customer_table_system customer_table_;
             dbs::waiter_idling_system waiter_idling_;
-            events::event_handler<events::order_served> order_served_handler_;
         public:
             void update(float delta, int frame);
     };

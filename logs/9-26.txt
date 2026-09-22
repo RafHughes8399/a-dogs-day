@@ -396,14 +396,32 @@ animation it should be peaches
 
         -> i would say then the movement amendments based on that issuex x  x 
         -> like clean up this flow before moving onto other stuff c 
-        -> and clean up waiter idling, the cooldown needs to be adjusted. 
+        -> and clean up waiter idling, the cooldown needs to be adjusted. x
         i think instead of a cooldown, roll like a 1 / 6 chance to trigger it to 
         wander around if its idle x x x 
     // **************************** NEXT SLICE **************************** //
+
+
+
+
+    // ------ 21 / 09 -------// 
+        -> test movment and idling 
+        -> ensure the state distinction between stationary idle and walking idle
+            -> double check the waiter states and that hte pathing works on that state check
+            -> double check those state transitions occur
+        -> and fix the food table position offset thing so it is placed properly x
+        -> customer sitting transition, and customer eating transitions    x
+    -> then counter and food art
+    // -------- once here i think that is a fair place to merge ------ //
+
+    // ------- and this below can be its own slice -----------------///
     -> legacy clean up, we are well and truly past it
     -> and debug logging should write to a file for the session
-    -> then counter and food art
     -> and the screen resolution bug 
+    // -----------------------------------------------------------//
+
+
+
     -> then customer eating completion and the food state change 
     -> and customer leaving
     [then that mechanic is like done for now]

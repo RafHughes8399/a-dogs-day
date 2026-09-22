@@ -37,10 +37,17 @@ namespace{
         interactor->interact_with(table_id);
     }
 
-    // build_table opens a left and a right slot, so a table seats two
-    void fill(testing::ecs_test_game& game, size_t table_id){
-        seat(game.create_customer_dog(in_cafe(2000.0f, 2000.0f)), table_id);
-        seat(game.create_customer_dog(in_cafe(2000.0f, 2000.0f)), table_id);
+    size_t reserve(testing::ecs_test_game& game, dbs::customer_table_system& arrival, size_t table_id){
+        auto holder = game.create_customer_dog(in_cafe(2000.0f, 2000.0f));
+        arrival.reserve_table(table_id, holder);
+        return holder;
+    }
+
+    std::optional<size_t> reservation_of(const dbs::customer_table_system& arrival, size_t table_id){
+        for(const auto& table : arrival.get_tables()){
+            if(table.id() == table_id){ return table.customer(); }
+        }
+        return std::nullopt;
     }
 
     bool claimed_by(size_t table_id, size_t dog_id){
@@ -254,7 +261,6 @@ SCENARIO("a table takes two claims to fill", "[ecs][npc][customer_arrival][pick_
 
             THEN("the second slot is still open"){
                 REQUIRE(interactable->can_accept_interactor());
-                REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
             }
 
             AND_WHEN("a second dog claims it"){
@@ -263,7 +269,6 @@ SCENARIO("a table takes two claims to fill", "[ecs][npc][customer_arrival][pick_
 
                 THEN("the table is full"){
                     REQUIRE_FALSE(interactable->can_accept_interactor());
-                    REQUIRE(arrival.pick_table() == game_config::empty_entity);
                 }
                 THEN("a third dog is turned away"){
                     auto third_id = game.create_customer_dog(in_cafe(320.0f, 320.0f + k_clear_gap));
@@ -312,10 +317,10 @@ SCENARIO("picking a table with a single registered table", "[ecs][npc][customer_
             }
         }
 
-        WHEN("both of the one registered table's slots are claimed"){
+        WHEN("the one registered table is reserved"){
             auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
             arrival.register_table(table_id);
-            fill(game, table_id);
+            reserve(game, arrival, table_id);
 
             THEN("nothing is picked"){
                 REQUIRE(arrival.pick_table() == game_config::empty_entity);
@@ -328,7 +333,7 @@ SCENARIO("picking a table with a single registered table", "[ecs][npc][customer_
             game.create_customer_dog(in_cafe(320.0f, 320.0f));
             arrival.register_table(table_id);
 
-            THEN("it is still picked - occupancy is a claim, not proximity"){
+            THEN("it is still picked - occupancy is a reservation, not proximity"){
                 REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
                 REQUIRE(arrival.free_tables());
             }
@@ -375,8 +380,8 @@ SCENARIO("checking free tables with exactly two registered tables", "[ecs][npc][
             }
         }
 
-        WHEN("the first is full and the second is unclaimed"){
-            fill(game, first_id);
+        WHEN("the first is reserved and the second is not"){
+            reserve(game, arrival, first_id);
 
             THEN("a table is still free and the second is picked"){
                 REQUIRE(arrival.free_tables());
@@ -384,8 +389,8 @@ SCENARIO("checking free tables with exactly two registered tables", "[ecs][npc][
             }
         }
 
-        WHEN("the first is unclaimed and the second is full"){
-            fill(game, second_id);
+        WHEN("the first is not reserved and the second is"){
+            reserve(game, arrival, second_id);
 
             THEN("a table is still free and the first is picked"){
                 REQUIRE(arrival.free_tables());
@@ -393,20 +398,20 @@ SCENARIO("checking free tables with exactly two registered tables", "[ecs][npc][
             }
         }
 
-        WHEN("the first is only half claimed and the second is full"){
+        WHEN("the first is physically claimed but unreserved and the second is reserved"){
             auto lone_dog = game.create_customer_dog(in_cafe(320.0f, 320.0f + 2.0f * k_clear_gap));
             seat(lone_dog, first_id);
-            fill(game, second_id);
+            reserve(game, arrival, second_id);
 
-            THEN("the half-claimed table still counts as free"){
+            THEN("the unreserved table still counts as free - a claim is not a reservation"){
                 REQUIRE(arrival.free_tables());
                 REQUIRE(arrival.pick_table() == static_cast<int>(first_id));
             }
         }
 
-        WHEN("both are full"){
-            fill(game, first_id);
-            fill(game, second_id);
+        WHEN("both are reserved"){
+            reserve(game, arrival, first_id);
+            reserve(game, arrival, second_id);
 
             THEN("no table is free"){
                 REQUIRE_FALSE(arrival.free_tables());
@@ -443,16 +448,16 @@ SCENARIO("picking a table with several registered tables", "[ecs][npc][customer_
             }
         }
 
-        WHEN("every registered table is full"){
+        WHEN("every registered table is reserved"){
             auto first_id = game.create_table(in_cafe(320.0f, 320.0f));
             auto second_id = game.create_table(in_cafe(320.0f, 320.0f + k_clear_gap));
             auto third_id = game.create_table(in_cafe(320.0f, 320.0f + 2.0f * k_clear_gap));
             arrival.register_table(first_id);
             arrival.register_table(second_id);
             arrival.register_table(third_id);
-            fill(game, first_id);
-            fill(game, second_id);
-            fill(game, third_id);
+            reserve(game, arrival, first_id);
+            reserve(game, arrival, second_id);
+            reserve(game, arrival, third_id);
 
             THEN("nothing is picked"){
                 REQUIRE(arrival.pick_table() == game_config::empty_entity);
@@ -467,10 +472,10 @@ SCENARIO("picking a table with several registered tables", "[ecs][npc][customer_
             arrival.register_table(first_id);
             arrival.register_table(second_id);
             arrival.register_table(free_id);
-            fill(game, first_id);
-            fill(game, second_id);
+            reserve(game, arrival, first_id);
+            reserve(game, arrival, second_id);
 
-            THEN("the full pair is skipped and the free table is picked"){
+            THEN("the reserved pair is skipped and the free table is picked"){
                 REQUIRE(arrival.pick_table() == static_cast<int>(free_id));
                 REQUIRE(arrival.free_tables());
             }
@@ -485,20 +490,28 @@ SCENARIO("picking a table with several registered tables", "[ecs][npc][customer_
             }
         }
 
-        WHEN("a claiming dog walks away without releasing"){
+        WHEN("the reserving dog walks away"){
             auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
             arrival.register_table(table_id);
             auto first_id = game.create_customer_dog(in_cafe(320.0f, 320.0f));
-            auto second_id = game.create_customer_dog(in_cafe(320.0f, 320.0f));
-            seat(first_id, table_id);
-            seat(second_id, table_id);
+            arrival.register_customer(first_id);
+            arrival.reserve_table(table_id, first_id);
             REQUIRE(arrival.pick_table() == game_config::empty_entity);
 
             game.move_entity(first_id, in_cafe(320.0f, 320.0f + 2.0f * k_clear_gap));
 
             THEN("the table stays taken - this is what reservation means"){
                 REQUIRE(arrival.pick_table() == game_config::empty_entity);
-                REQUIRE(claimed_by(table_id, first_id));
+                REQUIRE(reservation_of(arrival, table_id) == first_id);
+            }
+
+            AND_WHEN("it is unregistered"){
+                arrival.unregister_customer(first_id);
+
+                THEN("its reservation goes with it"){
+                    REQUIRE_FALSE(reservation_of(arrival, table_id).has_value());
+                    REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
+                }
             }
         }
     }
@@ -517,7 +530,8 @@ SCENARIO("removing an entity undoes both halves of the claim",
         seat(first_id, table_id);
         seat(second_id, table_id);
 
-        REQUIRE(arrival.pick_table() == game_config::empty_entity);
+        auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+        REQUIRE_FALSE(interactable->can_accept_interactor());
         REQUIRE(claimed_by(table_id, first_id));
         REQUIRE(target_of(first_id) == table_id);
 
@@ -526,7 +540,7 @@ SCENARIO("removing an entity undoes both halves of the claim",
 
             THEN("its slot is released and the table opens up again"){
                 REQUIRE_FALSE(claimed_by(table_id, first_id));
-                REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
+                REQUIRE(interactable->can_accept_interactor());
             }
             THEN("the other dog keeps its own claim"){
                 REQUIRE(claimed_by(table_id, second_id));
@@ -539,11 +553,9 @@ SCENARIO("removing an entity undoes both halves of the claim",
             game.remove(second_id);
 
             THEN("the table is empty"){
-                auto* interactable = component_managers::interactable_manager_.get_component(table_id);
                 for(auto slot : interactable->get_interactors()){
                     REQUIRE_FALSE(slot.has_value());
                 }
-                REQUIRE(arrival.pick_table() == static_cast<int>(table_id));
             }
         }
 
@@ -592,9 +604,13 @@ SCENARIO("sending a customer to a table routes it through the entrance",
         WHEN("it is sent to a table"){
             arrival.send_customer_to_table();
 
-            THEN("the table is claimed before the walk starts"){
-                REQUIRE(claimed_by(table_id, customer_id));
-                REQUIRE(target_of(customer_id) == table_id);
+            THEN("the table is reserved for it before the walk starts"){
+                REQUIRE(reservation_of(arrival, table_id) == customer_id);
+                REQUIRE(arrival.pick_table() == game_config::empty_entity);
+            }
+            THEN("the physical claim waits for arrival"){
+                REQUIRE_FALSE(claimed_by(table_id, customer_id));
+                REQUIRE_FALSE(target_of(customer_id).has_value());
             }
             THEN("the route is two legs - the entrance checkpoint is the crossing, so no extra split"){
                 REQUIRE(game.queued_path_count(customer_id) == 2);
@@ -610,30 +626,15 @@ SCENARIO("sending a customer to a table routes it through the entrance",
             }
         }
 
-        WHEN("a second customer is sent while the first holds a slot"){
+        WHEN("a second customer is sent while the first holds the reservation"){
             arrival.send_customer_to_table();
             auto second_id = game.create_customer_dog(Vector2{96.0f, 640.0f});
             arrival.register_customer(second_id);
             arrival.send_customer_to_table();
 
-            THEN("it takes the table's other slot, not the first one"){
-                REQUIRE(claimed_by(table_id, second_id));
-                REQUIRE(claimed_by(table_id, customer_id));
-                REQUIRE(target_of(second_id) == table_id);
-            }
-            THEN("the table is now full"){
-                REQUIRE(arrival.pick_table() == game_config::empty_entity);
-            }
-
-            AND_WHEN("a third customer is sent"){
-                auto third_id = game.create_customer_dog(Vector2{96.0f, 768.0f});
-                arrival.register_customer(third_id);
-                arrival.send_customer_to_table();
-
-                THEN("it gets nothing - no table left to claim"){
-                    REQUIRE_FALSE(target_of(third_id).has_value());
-                    REQUIRE(game.queued_path_count(third_id) == 0);
-                }
+            THEN("it gets nothing - one reservation per table"){
+                REQUIRE(reservation_of(arrival, table_id) == customer_id);
+                REQUIRE(game.queued_path_count(second_id) == 0);
             }
         }
 
@@ -643,9 +644,10 @@ SCENARIO("sending a customer to a table routes it through the entrance",
             arrival.register_table(second_table);
             arrival.send_customer_to_table();
 
-            THEN("the seated customer is not re-sent"){
-                REQUIRE(target_of(customer_id) == table_id);
-                REQUIRE_FALSE(claimed_by(second_table, customer_id));
+            THEN("the customer already walking is not re-sent"){
+                REQUIRE(reservation_of(arrival, table_id) == customer_id);
+                REQUIRE_FALSE(reservation_of(arrival, second_table).has_value());
+                REQUIRE(arrival.pick_table() == static_cast<int>(second_table));
             }
         }
     }
@@ -663,8 +665,8 @@ SCENARIO("sending a customer to a table respects table occupancy",
         WHEN("no table is registered"){
             arrival.send_customer_to_table();
 
-            THEN("the customer is left unclaimed and unrouted"){
-                REQUIRE_FALSE(target_of(customer_id).has_value());
+            THEN("the customer is left unreserved and unrouted"){
+                REQUIRE_FALSE(arrival.holds_reservation(customer_id));
                 REQUIRE(game.queued_path_count(customer_id) == 0);
             }
         }
@@ -674,51 +676,50 @@ SCENARIO("sending a customer to a table respects table occupancy",
             arrival.register_table(table_id);
             arrival.send_customer_to_table();
 
-            THEN("the customer claims it and is routed via the entrance"){
-                REQUIRE(claimed_by(table_id, customer_id));
-                REQUIRE(target_of(customer_id) == table_id);
+            THEN("the customer reserves it and is routed via the entrance"){
+                REQUIRE(reservation_of(arrival, table_id) == customer_id);
                 REQUIRE(game.queued_path_count(customer_id) == 2);
             }
         }
 
-        WHEN("the one registered table is full"){
+        WHEN("the one registered table is reserved"){
             auto table_id = game.create_table(Vector2{1600.0f, 1024.0f});
             arrival.register_table(table_id);
-            fill(game, table_id);
+            reserve(game, arrival, table_id);
             arrival.send_customer_to_table();
 
-            THEN("the customer is left unclaimed and unrouted"){
-                REQUIRE_FALSE(target_of(customer_id).has_value());
+            THEN("the customer is left unreserved and unrouted"){
+                REQUIRE_FALSE(arrival.holds_reservation(customer_id));
                 REQUIRE(game.queued_path_count(customer_id) == 0);
             }
         }
 
-        WHEN("of two registered tables, the first is full and the second is free"){
+        WHEN("of two registered tables, the first is reserved and the second is free"){
             auto first_id = game.create_table(Vector2{1600.0f, 1024.0f});
             auto second_id = game.create_table(Vector2{1600.0f, 1024.0f + k_clear_gap});
             arrival.register_table(first_id);
             arrival.register_table(second_id);
-            fill(game, first_id);
+            reserve(game, arrival, first_id);
             arrival.send_customer_to_table();
 
-            THEN("the customer claims the free second table, not the full first"){
-                REQUIRE(claimed_by(second_id, customer_id));
-                REQUIRE_FALSE(claimed_by(first_id, customer_id));
-                REQUIRE(target_of(customer_id) == second_id);
+            THEN("the customer reserves the free second table, not the reserved first"){
+                REQUIRE(reservation_of(arrival, second_id) == customer_id);
+                REQUIRE(reservation_of(arrival, first_id) != customer_id);
+                REQUIRE(game.queued_path_count(customer_id) == 2);
             }
         }
 
-        WHEN("both of the two registered tables are full"){
+        WHEN("both of the two registered tables are reserved"){
             auto first_id = game.create_table(Vector2{1600.0f, 1024.0f});
             auto second_id = game.create_table(Vector2{1600.0f, 1024.0f + k_clear_gap});
             arrival.register_table(first_id);
             arrival.register_table(second_id);
-            fill(game, first_id);
-            fill(game, second_id);
+            reserve(game, arrival, first_id);
+            reserve(game, arrival, second_id);
             arrival.send_customer_to_table();
 
-            THEN("the customer is left unclaimed and unrouted"){
-                REQUIRE_FALSE(target_of(customer_id).has_value());
+            THEN("the customer is left unreserved and unrouted"){
+                REQUIRE_FALSE(arrival.holds_reservation(customer_id));
                 REQUIRE(game.queued_path_count(customer_id) == 0);
             }
         }
@@ -740,6 +741,13 @@ SCENARIO("a seated customer survives the departure sweep",
         REQUIRE(game.tick_until([&](){
             return game.queued_path_count(customer_id) == 0;
         }, 8000));
+        game.tick(0.016f);
+
+        THEN("arriving took the physical claim and sat it down"){
+            REQUIRE(claimed_by(table_id, customer_id));
+            REQUIRE(target_of(customer_id) == table_id);
+            REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
+        }
 
         WHEN("the cleanup sweep runs with its path queue empty"){
             arrival.customer_cleanup();
