@@ -1,5 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
+#include <algorithm>
+#include <cmath>
+
 #include "ecs_test_game.h"
 #include "component.h"
 #include "raymath.h"
@@ -492,6 +495,184 @@ SCENARIO("a checkpointed route still carries its destination entity on the last 
                 auto destinations = game.path_destinations(dog_id);
                 REQUIRE_FALSE(Vector2Equals(destinations.back(), far_in_cafe()));
                 REQUIRE(destinations.back().x >= level_config::cafe_x);
+            }
+        }
+    }
+}
+
+namespace {
+    size_t sprite_index_of(size_t entity_id){
+        auto* renderable = component_managers::renderable_manager_.get_component(entity_id);
+        REQUIRE(renderable != nullptr);
+        return renderable->get_layers().front().get_active_index();
+    }
+    Vector2 heading_of(size_t entity_id){
+        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        REQUIRE(movement != nullptr);
+        return movement->get_direction_scalar();
+    }
+    Vector2 position_of(size_t entity_id){
+        auto* position = component_managers::positional_manager_.get_component(entity_id);
+        REQUIRE(position != nullptr);
+        return position->get_position();
+    }
+    Vector2 open_floor(float cells_x, float cells_y){
+        return Vector2{level_config::cafe_x + (level_config::edge_weight * cells_x),
+            level_config::edge_weight * cells_y};
+    }
+    bool walk_out(testing::ecs_test_game& game, size_t entity_id, int max_frames){
+        return game.tick_until([&game, entity_id]() -> bool {
+            return game.queued_path_count(entity_id) == 0;
+        }, max_frames);
+    }
+}
+
+SCENARIO("a diagonal run is one leg of diagonal steps, not an axis-by-axis L",
+        "[ecs][graph][movement][diagonal]"){
+    GIVEN("a dog on open cafe floor"){
+        testing::ecs_test_game game;
+        auto cell = level_config::edge_weight;
+        auto dog = game.create_khiri();
+        auto start = open_floor(10.0f, 10.0f);
+        game.move_entity(dog, start);
+
+        WHEN("it is pathed five cells right and five cells down"){
+            auto target = Vector2{start.x + (cell * 5.0f), start.y + (cell * 5.0f)};
+            game.path_to(dog, target);
+            auto waypoints = game.current_path_waypoints(dog);
+
+            // * the dog's own hitbox blocks the two cells it stands on, so the
+            // * route starts a cell off its position - the span is measured
+            // * between the route's own ends rather than assumed from the request
+            THEN("it takes as many steps as the longer axis, not the sum of both"){
+                auto columns = std::fabs(waypoints.back().x - waypoints.front().x) / cell;
+                auto rows = std::fabs(waypoints.back().y - waypoints.front().y) / cell;
+                REQUIRE(columns > 0.0f);
+                REQUIRE(rows > 0.0f);
+                REQUIRE(waypoints.size() - 1 == static_cast<size_t>(std::max(columns, rows)));
+            }
+            THEN("the steps that close both axes at once are diagonal"){
+                size_t diagonal_steps = 0;
+                for(size_t step = 1; step < waypoints.size(); ++step){
+                    if(waypoints[step].x != waypoints[step - 1].x
+                        and waypoints[step].y != waypoints[step - 1].y){
+                        ++diagonal_steps;
+                    }
+                }
+                REQUIRE(diagonal_steps > 0);
+            }
+            THEN("it walks the whole route out and lands on the target"){
+                REQUIRE(walk_out(game, dog, 4000));
+                REQUIRE(Vector2Distance(position_of(dog), target) < 1.0f);
+            }
+        }
+    }
+}
+
+SCENARIO("a diagonal heading is normalised, so it is no faster than a cardinal one",
+        "[ecs][graph][movement][diagonal]"){
+    GIVEN("a dog on open cafe floor"){
+        testing::ecs_test_game game;
+        auto cell = level_config::edge_weight;
+        auto dog = game.create_khiri();
+        auto start = open_floor(10.0f, 10.0f);
+        game.move_entity(dog, start);
+
+        WHEN("it walks a diagonal route"){
+            game.path_to(dog, Vector2{start.x + (cell * 5.0f), start.y + (cell * 5.0f)});
+
+            THEN("the heading is a unit vector on every frame it is moving"){
+                int frames = 0;
+                while(game.queued_path_count(dog) > 0 and frames < 4000){
+                    REQUIRE(std::fabs(Vector2Length(heading_of(dog)) - 1.0f) < 0.001f);
+                    game.tick(0.016f);
+                    ++frames;
+                }
+                REQUIRE(frames < 4000);
+            }
+        }
+    }
+}
+
+SCENARIO("a diagonal step is refused where two blockers meet at a corner",
+        "[ecs][graph][movement][diagonal]"){
+    GIVEN("two decorations touching at exactly one corner"){
+        testing::ecs_test_game game;
+        auto cell = level_config::edge_weight;
+        auto origin = open_floor(10.0f, 10.0f);
+        // a test decoration is two cells square, so offsetting the second by two
+        // cells leaves the pair sharing a single corner and nothing else
+        game.create_test_decoration(origin);
+        game.create_test_decoration(Vector2{origin.x + (cell * 2.0f), origin.y + (cell * 2.0f)});
+
+        auto from = Vector2{origin.x + (cell * 2.0f), origin.y + cell};
+        auto to = Vector2{origin.x + cell, origin.y + (cell * 2.0f)};
+
+        THEN("the cells either side of the join are free, and the join is not"){
+            REQUIRE(game.graph_occupant_at(from) == graph_config::empty_node);
+            REQUIRE(game.graph_occupant_at(to) == graph_config::empty_node);
+            REQUIRE(game.graph_occupant_at(Vector2{origin.x + cell, origin.y + cell})
+                != graph_config::empty_node);
+            REQUIRE(game.graph_occupant_at(Vector2{origin.x + (cell * 2.0f),
+                origin.y + (cell * 2.0f)}) != graph_config::empty_node);
+        }
+
+        WHEN("a dog is pathed from one free cell to the other"){
+            auto dog = game.create_khiri();
+            game.move_entity(dog, from);
+            game.path_to(dog, to);
+            auto waypoints = game.current_path_waypoints(dog);
+
+            THEN("it does not squeeze through the join"){
+                REQUIRE(waypoints.size() > 2);
+            }
+            THEN("it goes round instead and still arrives"){
+                REQUIRE(walk_out(game, dog, 6000));
+                REQUIRE(Vector2Distance(position_of(dog), to) < 1.0f);
+            }
+        }
+    }
+}
+
+SCENARIO("only a horizontal difference turns the dog", "[ecs][graph][movement][facing]"){
+    GIVEN("a dog that has just walked left"){
+        testing::ecs_test_game game;
+        auto cell = level_config::edge_weight;
+        auto dog = game.create_khiri();
+        auto start = open_floor(10.0f, 10.0f);
+        game.move_entity(dog, start);
+
+        game.path_to(dog, Vector2{start.x - (cell * 3.0f), start.y});
+        REQUIRE(walk_out(game, dog, 2000));
+        REQUIRE(sprite_index_of(dog) == level_config::directions::left);
+
+        WHEN("it walks straight down"){
+            auto here = position_of(dog);
+            game.path_to(dog, Vector2{here.x, here.y + (cell * 3.0f)});
+            REQUIRE(walk_out(game, dog, 2000));
+
+            THEN("it is still facing left"){
+                REQUIRE(sprite_index_of(dog) == level_config::directions::left);
+            }
+
+            AND_WHEN("it walks straight back up"){
+                auto down = position_of(dog);
+                game.path_to(dog, Vector2{down.x, down.y - (cell * 3.0f)});
+                REQUIRE(walk_out(game, dog, 2000));
+
+                THEN("it is still facing left"){
+                    REQUIRE(sprite_index_of(dog) == level_config::directions::left);
+                }
+            }
+        }
+
+        WHEN("it walks right"){
+            auto here = position_of(dog);
+            game.path_to(dog, Vector2{here.x + (cell * 3.0f), here.y});
+            REQUIRE(walk_out(game, dog, 2000));
+
+            THEN("it turns to face right"){
+                REQUIRE(sprite_index_of(dog) == level_config::directions::right);
             }
         }
     }

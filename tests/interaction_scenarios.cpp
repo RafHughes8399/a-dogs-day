@@ -6,7 +6,9 @@
 #include "config.h"
 #include "ecs_test_game.h"
 #include "raylib.h"
+#include "raymath.h"
 #include "system.h"
+#include "testing_helpers.hpp"
 
 namespace{
     Vector2 in_cafe(float x, float y){
@@ -27,6 +29,27 @@ namespace{
             log.interactees_.push_back(interactee);
             log.deltas_.push_back(delta);
         };
+    }
+
+    bool walk_to(testing::ecs_test_game& game, size_t dog_id, size_t entity_id){
+        game.path_to(dog_id, Vector2Zero(), entity_id);
+        if(game.queued_path_count(dog_id) == 0){ return false; }
+        if(not game.tick_until([&game, dog_id]() -> bool {
+            return game.queued_path_count(dog_id) == 0;
+        }, 4000)){ return false; }
+        game.tick(0.016f);
+        game.tick(0.016f);
+        return true;
+    }
+
+    bool claims(size_t dog_id, size_t entity_id){
+        auto* interactor = component_managers::interactor_manager_.get_component(dog_id);
+        return interactor != nullptr and interactor->get_target() == entity_id;
+    }
+
+    std::optional<size_t> carried_by(size_t dog_id){
+        auto* carrier = component_managers::carrier_manager_.get_component(dog_id);
+        return carrier == nullptr ? std::nullopt : carrier->get_carried_entity();
     }
 
     void nudge(testing::ecs_test_game& game, size_t entity_id){
@@ -88,6 +111,55 @@ SCENARIO("an interaction pairs the ids it was built from",
 
             THEN("nothing is performable"){
                 REQUIRE(built.get_performable_interactions().empty());
+            }
+        }
+    }
+}
+
+SCENARIO("carried food stays on the side the carrier faces",
+        "[ecs][interaction][carrier]"){
+    GIVEN("a waiter facing right and carrying food"){
+        testing::ecs_test_game game;
+        auto& carrier = systems::carrier_system::get_instance();
+        auto waiter_id = game.create_waiter_dog(in_cafe(320.0f, 320.0f));
+        auto food_id = game.create_food(in_cafe(320.0f, 320.0f));
+        component_managers::carrier_manager_.get_component(waiter_id)->set_carried_entity(food_id);
+
+        auto face = [&](size_t direction){
+            component_managers::movement_manager_.get_component(waiter_id)
+                ->set_direction_scalar(level_config::direction_scalars[direction]);
+            component_helpers::set_facing_index(waiter_id, direction);
+            carrier.update(0.0f);
+        };
+
+        face(level_config::directions::right);
+        auto dog = game.hitbox_of(waiter_id);
+        auto held = game.hitbox_of(food_id);
+        REQUIRE(held.x == dog.x + dog.width - entity_config::food_carry_offset.x);
+
+        WHEN("it turns to walk down"){
+            face(level_config::directions::down);
+
+            THEN("the food stays in front of it"){
+                REQUIRE(game.hitbox_of(food_id).x == held.x);
+                REQUIRE(game.hitbox_of(food_id).y == held.y);
+            }
+        }
+
+        WHEN("it turns left"){
+            face(level_config::directions::left);
+
+            THEN("the food moves to its left side"){
+                REQUIRE(game.hitbox_of(food_id).x
+                    == dog.x + entity_config::food_carry_offset.x - entity_config::food_width);
+            }
+            AND_WHEN("it then turns to walk up"){
+                auto left_held = game.hitbox_of(food_id);
+                face(level_config::directions::up);
+
+                THEN("the food stays on its left side"){
+                    REQUIRE(game.hitbox_of(food_id).x == left_held.x);
+                }
             }
         }
     }
@@ -365,3 +437,171 @@ SCENARIO("destroying an entity cancels the interactions naming it",
     }
 }
 */
+SCENARIO("a dog arriving on either slot of a station is in reach of it",
+        "[ecs][interaction][reach]"){
+    GIVEN("a stocked counter and a waiter to its right"){
+        testing::ecs_test_game game;
+        auto counter_id = game.create_food_counter(in_cafe(640.0f, 640.0f));
+        auto waiter_id = game.create_waiter_dog(in_cafe(1152.0f, 640.0f));
+        helpers::add_items_to_counter(counter_id, entity_config::foods::lasagna, 1);
+
+        WHEN("it walks to the counter"){
+            REQUIRE(walk_to(game, waiter_id, counter_id));
+
+            THEN("it stands on the right slot, clear of the counter's own hitbox"){
+                auto counter_box = game.hitbox_of(counter_id);
+                REQUIRE(game.hitbox_of(waiter_id).x >= counter_box.x + counter_box.width);
+            }
+            THEN("it is in reach, and the handshake is taken"){
+                REQUIRE(systems::interaction_system::get_instance().in_reach(waiter_id, counter_id));
+                REQUIRE(claims(waiter_id, counter_id));
+            }
+            THEN("it picks the food up"){
+                REQUIRE(carried_by(waiter_id).has_value());
+                REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_carrying);
+            }
+        }
+    }
+
+    GIVEN("a stocked counter and a waiter to its left"){
+        testing::ecs_test_game game;
+        auto counter_id = game.create_food_counter(in_cafe(640.0f, 640.0f));
+        auto waiter_id = game.create_waiter_dog(in_cafe(128.0f, 640.0f));
+        helpers::add_items_to_counter(counter_id, entity_config::foods::lasagna, 1);
+
+        WHEN("it walks to the counter"){
+            REQUIRE(walk_to(game, waiter_id, counter_id));
+
+            THEN("it is in reach and picks the food up"){
+                REQUIRE(game.hitbox_of(waiter_id).x < game.hitbox_of(counter_id).x);
+                REQUIRE(claims(waiter_id, counter_id));
+                REQUIRE(carried_by(waiter_id).has_value());
+            }
+        }
+    }
+
+    GIVEN("a table and a customer to its right"){
+        testing::ecs_test_game game;
+        auto table_id = game.create_table(in_cafe(640.0f, 640.0f));
+        auto customer_id = game.create_customer_dog(in_cafe(1152.0f, 640.0f));
+
+        WHEN("it walks to the table"){
+            REQUIRE(walk_to(game, customer_id, table_id));
+
+            THEN("it claims a seat and sits"){
+                REQUIRE(claims(customer_id, table_id));
+                REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
+            }
+        }
+    }
+
+    GIVEN("a dog one reach short of a station"){
+        testing::ecs_test_game game;
+        auto counter_id = game.create_food_counter(in_cafe(640.0f, 640.0f));
+        auto counter_box = game.hitbox_of(counter_id);
+        auto waiter_id = game.create_waiter_dog(in_cafe(640.0f, 640.0f));
+        game.move_entity(waiter_id, Vector2{counter_box.x + counter_box.width
+            + entity_config::station_reach + dog_config::dog_reach + 1.0f, counter_box.y});
+
+        THEN("it is out of reach"){
+            REQUIRE_FALSE(systems::interaction_system::get_instance().in_reach(waiter_id, counter_id));
+        }
+    }
+}
+
+SCENARIO("a waiter carries food from the counter to a seated customer",
+        "[ecs][interaction][service]"){
+    GIVEN("a stocked counter, a table, a waiter and a customer seated at the table"){
+        testing::ecs_test_game game;
+        auto counter_id = game.create_food_counter(in_cafe(640.0f, 640.0f));
+        auto table_id = game.create_table(in_cafe(1280.0f, 1024.0f));
+        auto waiter_id = game.create_waiter_dog(in_cafe(640.0f, 1024.0f));
+        auto customer_id = game.create_customer_dog(in_cafe(1792.0f, 1024.0f));
+        systems::npc_system::get_instance().register_customer(customer_id);
+        helpers::add_items_to_counter(counter_id, entity_config::foods::lasagna, 2);
+
+        REQUIRE(walk_to(game, customer_id, table_id));
+        REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
+
+        WHEN("the waiter collects food from the counter"){
+            REQUIRE(walk_to(game, waiter_id, counter_id));
+            auto food_id = carried_by(waiter_id);
+
+            THEN("it carries a food entity and the counter gives one up"){
+                REQUIRE(food_id.has_value());
+                REQUIRE(game.has_food(food_id.value()));
+                REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_carrying);
+                REQUIRE(game.carried_item_of(waiter_id) == food_id);
+                REQUIRE(component_managers::storage_manager_.get_component(counter_id)->head().get_count() == 1);
+            }
+
+            AND_WHEN("it walks the food to the table"){
+                game.path_to(waiter_id, Vector2Zero(), table_id);
+                game.tick(0.016f);
+
+                THEN("it is still carrying on the way"){
+                    REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_carrying);
+                }
+
+                AND_WHEN("it arrives"){
+                    REQUIRE(game.tick_until([&game, waiter_id]() -> bool {
+                        return game.queued_path_count(waiter_id) == 0;
+                    }, 4000));
+                    game.tick(0.016f);
+                    game.tick(0.016f);
+
+                    THEN("the food is handed over and the waiter is left standing"){
+                        REQUIRE_FALSE(carried_by(waiter_id).has_value());
+                        REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_stationary);
+                    }
+                    THEN("the food sits on the table at the draw offset, hitbox and all"){
+                        auto* table_position = component_managers::positional_manager_.get_component(table_id);
+                        auto expected = Vector2Add(table_position->get_position(), entity_config::food_draw_offset);
+                        auto* food_position = component_managers::positional_manager_.get_component(food_id.value());
+                        REQUIRE(Vector2Equals(food_position->get_position(), expected));
+                        auto food_box = game.hitbox_of(food_id.value());
+                        REQUIRE(Vector2Equals(Vector2{food_box.x, food_box.y}, expected));
+                    }
+                    THEN("the food stays put once the waiter walks away"){
+                        game.path_to(waiter_id, in_cafe(640.0f, 1536.0f));
+                        game.tick_until([](){ return false; }, 60);
+                        auto* table_position = component_managers::positional_manager_.get_component(table_id);
+                        auto expected = Vector2Add(table_position->get_position(), entity_config::food_draw_offset);
+                        REQUIRE(Vector2Equals(component_managers::positional_manager_.get_component(food_id.value())->get_position(), expected));
+                    }
+                    THEN("the seated customer starts eating"){
+                        REQUIRE(game.state_of(customer_id).value() == dog_config::customer_eating);
+                    }
+                    THEN("the customer sits again once the meal is done"){
+                        game.tick_until([](){ return false; }, dog_config::eating_duration + 1);
+                        REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
+                    }
+                }
+            }
+
+            AND_WHEN("it puts the food back on the counter instead"){
+                game.path_to(waiter_id, in_cafe(640.0f, 1280.0f));
+                REQUIRE(game.tick_until([&game, waiter_id]() -> bool {
+                    return game.queued_path_count(waiter_id) == 0;
+                }, 4000));
+                REQUIRE(walk_to(game, waiter_id, counter_id));
+
+                THEN("the food is stored again and the waiter is left standing"){
+                    REQUIRE_FALSE(carried_by(waiter_id).has_value());
+                    REQUIRE_FALSE(game.has_food(food_id.value()));
+                    REQUIRE(component_managers::storage_manager_.get_component(counter_id)->head().get_count() == 2);
+                    REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_stationary);
+                }
+            }
+        }
+
+        WHEN("the waiter walks to the table empty-handed"){
+            REQUIRE(walk_to(game, waiter_id, table_id));
+
+            THEN("nothing is served and the customer keeps sitting"){
+                REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_stationary);
+                REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
+            }
+        }
+    }
+}

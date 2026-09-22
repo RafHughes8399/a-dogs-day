@@ -65,6 +65,7 @@ namespace testing{
                 std::vector<Vector2> checkpoints = {});
             size_t queued_path_count(size_t entity_id);
             std::vector<Vector2> path_destinations(size_t entity_id);
+            std::vector<Vector2> current_path_waypoints(size_t entity_id);
             void remove(size_t entity_id);
             // the single legal position write - moves the hitbox and reindexes
             void move_entity(size_t entity_id, Vector2 position);
@@ -87,6 +88,8 @@ namespace testing{
             bool has_interactor(size_t entity_id);
             bool has_interactable(size_t entity_id);
             bool has_storage(size_t entity_id);
+            bool has_food(size_t entity_id);
+            std::optional<size_t> food_item_of(size_t entity_id);
             bool has_state_machine(size_t entity_id);
             std::optional<size_t> state_of(size_t entity_id);
             std::optional<size_t> carried_item_of(size_t entity_id);

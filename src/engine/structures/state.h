@@ -12,7 +12,8 @@
 #include <cstddef>
 #include <memory>
 #include <optional>
-
+#include "raylib.h"
+#include "raymath.h"
 namespace state{
     class state{
         public:
@@ -85,7 +86,8 @@ namespace state{
         public:
             ~carrying_state() override = default;
             carrying_state(size_t state_id, size_t animation)
-            : state(state_id, animation), carried_item_(std::nullopt){}
+            : state(state_id, animation), carried_item_(std::nullopt), 
+            previous_dog_position_(Vector2Zero()){}
 
             void update(size_t entity, float delta) override;
             void on_transitioned_to(size_t entity, std::optional<size_t> payload) override;
@@ -94,6 +96,7 @@ namespace state{
             std::optional<size_t> get_carried_item() const;
         private:
             std::optional<size_t> carried_item_;
+            Vector2 previous_dog_position_;
     };
 
     class eating_state : public state{
@@ -121,7 +124,6 @@ namespace state_builders{
 
     std::unique_ptr<state::state> build_waiter_stationary_state();
     std::unique_ptr<state::state> build_waiter_idle_state();
-    std::unique_ptr<state::state> build_waiter_interacting_state();
     std::unique_ptr<state::state> build_waiter_carrying_state();
 }
 #endif

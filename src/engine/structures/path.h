@@ -28,9 +28,15 @@ namespace path{
             }
             Vector2 get_source();
             Vector2 get_destination();
+            std::optional<size_t> get_destination_entity();
             Vector2 get_next_position();
             bool is_path_complete();
             void advance();
+#ifdef DOG_DAYS_TESTING
+            const std::vector<Vector2>& get_positions() const{
+                return positions_;
+            }
+#endif
         private:
             Vector2 source_;
             Vector2 destination_;

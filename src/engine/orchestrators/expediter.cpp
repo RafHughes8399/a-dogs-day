@@ -426,7 +426,7 @@ void expediter::expediter::on_waiter_served_order_event(
   }
   // Customer resolved off the table rather than cached, so it can't go stale
   // between order creation and delivery.
-  std::unique_ptr<events::event> served = std::make_unique<events::order_served>(
+  std::unique_ptr<events::event> served = std::make_unique<events::legacy_order_served>(
       job->job_id, job->waiter_id,
       static_cast<size_t>(table->get_assigned_dog_id()),
       static_cast<size_t>(table->get_id()), table->get_position());

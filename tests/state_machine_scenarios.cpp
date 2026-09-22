@@ -96,12 +96,13 @@ SCENARIO("the customer machine walks its service cycle", "[state_machine]"){
     }
 }
 
-SCENARIO("the waiter machine splits collecting from serving", "[state_machine]"){
+SCENARIO("the waiter machine goes straight from idle to carrying", "[state_machine]"){
     GIVEN("a waiter machine at its post"){
         auto machine = state_machine_builders::build_waiter_state_machine();
 
-        THEN("it starts stationary"){
+        THEN("it starts stationary, with a node for every waiter state"){
             REQUIRE(machine.current() == dog_config::waiter_stationary);
+            REQUIRE(machine.num_states() == dog_config::waiter_states_size);
         }
 
         WHEN("it wanders, reaches a station, and collects food"){
@@ -109,37 +110,110 @@ SCENARIO("the waiter machine splits collecting from serving", "[state_machine]")
             REQUIRE(machine.current() == dog_config::waiter_idle);
 
             machine.transition(0, dog_config::interaction_started);
-            REQUIRE(machine.current() == dog_config::waiter_interacting);
+            REQUIRE(machine.current() == dog_config::waiter_idle);
 
             machine.transition(0, dog_config::food_collected, 42);
 
             THEN("it carries what it was handed"){
                 REQUIRE(machine.current() == dog_config::waiter_carrying);
+                REQUIRE(machine.get_current_state()->get_state_id() == dog_config::waiter_carrying);
                 auto* carrying = dynamic_cast<state::carrying_state*>(machine.get_current_state());
                 REQUIRE(carrying != nullptr);
                 REQUIRE(carrying->get_carried_item().has_value());
                 REQUIRE(carrying->get_carried_item().value() == 42);
             }
-            THEN("reaching the table interacts again, and serving returns it to idle"){
+            THEN("reaching the table keeps it carrying, and serving leaves it standing"){
+                machine.transition(0, dog_config::path_finished);
                 machine.transition(0, dog_config::interaction_started);
-                REQUIRE(machine.current() == dog_config::waiter_interacting);
+                REQUIRE(machine.current() == dog_config::waiter_carrying);
 
                 machine.transition(0, dog_config::order_served);
-                REQUIRE(machine.current() == dog_config::waiter_idle);
+                REQUIRE(machine.current() == dog_config::waiter_stationary);
+            }
+            THEN("dropping it back on the counter leaves it standing"){
+                machine.transition(0, dog_config::food_dropped);
+                REQUIRE(machine.current() == dog_config::waiter_stationary);
+            }
+            THEN("walking while carrying keeps it carrying"){
+                machine.transition(0, dog_config::path_created);
+                REQUIRE(machine.current() == dog_config::waiter_carrying);
+                machine.transition(0, dog_config::path_finished);
+                REQUIRE(machine.current() == dog_config::waiter_carrying);
             }
         }
 
-        WHEN("it leaves the carrying state"){
+        WHEN("it serves and leaves the carrying state"){
             machine.transition(0, dog_config::path_created);
-            machine.transition(0, dog_config::interaction_started);
             machine.transition(0, dog_config::food_collected, 42);
-            machine.transition(0, dog_config::interaction_started);
+            machine.transition(0, dog_config::order_served);
 
             THEN("the carried item is let go"){
                 machine.transition(0, dog_config::food_collected, 7);
                 auto* carrying = dynamic_cast<state::carrying_state*>(machine.get_current_state());
                 REQUIRE(carrying != nullptr);
                 REQUIRE(carrying->get_carried_item().value() == 7);
+            }
+        }
+    }
+}
+
+SCENARIO("the waiter machine separates standing still from walking idle", "[state_machine]"){
+    GIVEN("a waiter machine at its post"){
+        auto machine = state_machine_builders::build_waiter_state_machine();
+
+        WHEN("it is given a path"){
+            machine.transition(0, dog_config::path_created);
+
+            THEN("it is walking idle"){
+                REQUIRE(machine.current() == dog_config::waiter_idle);
+                REQUIRE(machine.get_current_state()->get_animation() == animation_config::shared::walking);
+            }
+            THEN("another path mid-walk keeps it walking"){
+                machine.transition(0, dog_config::path_created);
+                REQUIRE(machine.current() == dog_config::waiter_idle);
+            }
+
+            AND_WHEN("the path finishes"){
+                machine.transition(0, dog_config::path_finished);
+
+                THEN("it is standing still again, with the idle animation"){
+                    REQUIRE(machine.current() == dog_config::waiter_stationary);
+                    REQUIRE(machine.get_current_state()->get_animation() == animation_config::shared::idle);
+                }
+                THEN("it can wander again"){
+                    machine.transition(0, dog_config::path_created);
+                    REQUIRE(machine.current() == dog_config::waiter_idle);
+                }
+            }
+        }
+
+        WHEN("a path finishes while it is already standing"){
+            machine.transition(0, dog_config::path_finished);
+
+            THEN("nothing changes"){
+                REQUIRE(machine.current() == dog_config::waiter_stationary);
+            }
+        }
+
+        WHEN("it collects food while standing, the way arriving at a counter leaves it"){
+            machine.transition(0, dog_config::path_created);
+            machine.transition(0, dog_config::path_finished);
+            machine.transition(0, dog_config::food_collected, 42);
+
+            THEN("it carries it"){
+                REQUIRE(machine.current() == dog_config::waiter_carrying);
+                auto* carrying = dynamic_cast<state::carrying_state*>(machine.get_current_state());
+                REQUIRE(carrying != nullptr);
+                REQUIRE(carrying->get_carried_item().value() == 42);
+            }
+        }
+
+        WHEN("it is served or drops food without carrying anything"){
+            machine.transition(0, dog_config::order_served);
+            machine.transition(0, dog_config::food_dropped);
+
+            THEN("nothing changes"){
+                REQUIRE(machine.current() == dog_config::waiter_stationary);
             }
         }
     }
@@ -215,12 +289,24 @@ SCENARIO("a seated customer eats for as long as the config says", "[state_machin
         testing::ecs_test_game game;
         auto customer_id = game.create_customer_dog(Vector2{200.0f, 200.0f});
         auto waiter_id = game.create_waiter_dog(Vector2{300.0f, 300.0f});
+        auto table_id = game.create_table(Vector2{400.0f, 400.0f});
+        systems::npc_system::get_instance().register_customer(customer_id);
 
-        raise<events::interaction_started>(customer_id, waiter_id);
+        game.claim(customer_id, table_id);
+        raise<events::interaction_started>(customer_id, table_id);
         REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
 
+        WHEN("an order is served at a different table"){
+            auto other_table_id = game.create_table(Vector2{600.0f, 600.0f});
+            raise<events::order_served>(waiter_id, other_table_id);
+
+            THEN("it keeps sitting"){
+                REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
+            }
+        }
+
         WHEN("its order is served"){
-            raise<events::order_served>(0, waiter_id, customer_id, 0, Vector2{0.0f, 0.0f});
+            raise<events::order_served>(waiter_id, table_id);
 
             THEN("it eats"){
                 REQUIRE(game.state_of(customer_id).value() == dog_config::customer_eating);
@@ -240,14 +326,14 @@ SCENARIO("a seated customer eats for as long as the config says", "[state_machin
 }
 
 SCENARIO("a waiter carries the food the event handed it", "[state_machine]"){
-    GIVEN("a waiter interacting with a counter"){
+    GIVEN("a waiter that has reached a counter"){
         testing::ecs_test_game game;
         auto waiter_id = game.create_waiter_dog(Vector2{300.0f, 300.0f});
         auto counter_id = game.create_food_counter(Vector2{400.0f, 400.0f});
 
         raise<events::dog_started_path>(waiter_id);
         raise<events::interaction_started>(waiter_id, counter_id);
-        REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_interacting);
+        REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_idle);
 
         WHEN("it collects a named food entity"){
             raise<events::waiter_collected_food>(waiter_id, std::optional<size_t>(counter_id));
@@ -255,6 +341,11 @@ SCENARIO("a waiter carries the food the event handed it", "[state_machine]"){
             THEN("the carrying state holds that entity"){
                 REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_carrying);
                 REQUIRE(game.carried_item_of(waiter_id).value() == counter_id);
+            }
+            THEN("serving it at a table leaves it standing"){
+                auto table_id = game.create_table(Vector2{500.0f, 500.0f});
+                raise<events::order_served>(waiter_id, table_id);
+                REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_stationary);
             }
         }
 

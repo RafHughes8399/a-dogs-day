@@ -718,10 +718,12 @@ bool tree::ecs_quadtree::is_leaf(std::unique_ptr<node>& tree) {
 // ---------------- ecs_quadtree - collision ----------------
 // the querying entity is skipped - the cursor sits on its own click position
 // every frame, so without this a click never sees past it
-int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id){
+int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id,
+    const std::function<bool(size_t)>& filter){
     if(not tree) {return game_config::empty_entity;}
     for(size_t entity : tree->entities_){
         if(entity == id){ continue; }
+        if(not filter(entity)){ continue; }
         auto entity_collision_component = component_managers::collision_manager_.get_component(entity);
         if(entity_collision_component == nullptr){ continue; }
         auto entity_bounds = entity_collision_component->get_hitbox_component().get_hitbox().get_box();
@@ -734,7 +736,7 @@ int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 
     // to the first
     for(auto& child : tree->children_){
         if(node_contains_position(child->bounds_, position)){
-            int entity = is_there_collision(child, position, id);
+            int entity = is_there_collision(child, position, id, filter);
             if(entity != game_config::empty_entity){
                 return entity;
             }
@@ -742,10 +744,12 @@ int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 
     }
     return game_config::empty_entity;
 }
-int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id){
+int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id,
+    const std::function<bool(size_t)>& filter){
     if(not tree) {return game_config::empty_entity;}
     for(size_t entity : tree->entities_){
         if(entity == id){ continue; }
+        if(not filter(entity)){ continue; }
         auto entity_collision_component = component_managers::collision_manager_.get_component(entity);
         if(entity_collision_component == nullptr){ continue; }
         auto entity_bounds = entity_collision_component->get_hitbox_component().get_hitbox().get_box();
@@ -759,7 +763,7 @@ int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Rectangl
     // children are worth searching
     for(auto& child : tree->children_){
         if(node_overlaps_object(child->bounds_, box)){
-            int entity = is_there_collision(child, box, id);
+            int entity = is_there_collision(child, box, id, filter);
             if(entity != game_config::empty_entity){
                 return entity;
             }

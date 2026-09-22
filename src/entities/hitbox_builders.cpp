@@ -72,7 +72,5 @@ hitbox::hitbox hitbox_builders::build_stove_hitbox(Vector2 position){
         entity_config::stove_attributes[entity_config::attributes::frame_height]);
 }
 hitbox::hitbox hitbox_builders::build_food_hitbox(Vector2 position){
-    return build_hitbox(position,
-        entity_config::test_food_attributes[entity_config::attributes::frame_width],
-        entity_config::test_food_attributes[entity_config::attributes::frame_height]);
+    return build_hitbox(position, entity_config::food_width, entity_config::food_height);
 }

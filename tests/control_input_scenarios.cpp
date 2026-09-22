@@ -74,6 +74,26 @@ namespace {
     game_config::input key_hold_of(int key){
         return game_config::input{key, game_config::key_hold};
     }
+    // GetMousePosition() reports (0,0) with no window taking real input, and the
+    // device state is process-wide - restored on the way out so a scenario that
+    // needs the click somewhere specific does not move it for the rest of the run
+    class mouse_at{
+        public:
+            mouse_at(float x, float y)
+            : previous_(GetMousePosition()){
+                SetMousePosition(static_cast<int>(x), static_cast<int>(y));
+            }
+            ~mouse_at(){
+                SetMousePosition(static_cast<int>(previous_.x), static_cast<int>(previous_.y));
+            }
+            mouse_at(const mouse_at&) = delete;
+            mouse_at(mouse_at&&) = delete;
+            mouse_at& operator=(const mouse_at&) = delete;
+            mouse_at& operator=(mouse_at&&) = delete;
+        private:
+            Vector2 previous_;
+    };
+
     game_config::input mouse_press_of(int button){
         return game_config::input{button, game_config::mouse_press};
     }
@@ -328,6 +348,75 @@ SCENARIO("a right click paths the selected player dog to the clicked position",
             THEN("no path is requested and the selection is untouched"){
                 REQUIRE(path_for.empty());
                 REQUIRE(selection().selected() == static_cast<int>(khiri_id));
+            }
+        }
+    }
+}
+
+SCENARIO("a right click over a seated customer still targets the table underneath",
+         "[ecs][controls][movement][interaction]"){
+    GIVEN("a selected waiter, and a customer seated in the left slot of a table under the cursor"){
+        testing::ecs_test_game game;
+        auto cursor_id = game.create_cursor();
+
+        // right_click reads GetMousePosition() itself, so the table is placed
+        // around that point rather than the mouse being moved onto the table.
+        // (-8,-60) puts the click inside both the table box and the box of a
+        // customer seated in the left slot; at this particular position the
+        // unfiltered check resolves to the customer, so the scenario fails
+        // without the interactable filter rather than passing by luck
+        mouse_at cursor_position{208.0f, 64.0f};
+        auto click = GetMousePosition();
+        auto table_position = Vector2{click.x - 8.0f, click.y - 60.0f};
+        auto table_id = game.create_table(table_position);
+
+        auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+        REQUIRE(interactable != nullptr);
+        auto seat_offset = interactable->get_slot_offset(level_config::directions::left);
+        REQUIRE(seat_offset.has_value());
+        auto customer_id = game.create_customer_dog(Vector2Add(table_position, seat_offset.value()));
+        game.claim(customer_id, table_id);
+
+        auto waiter_id = game.create_waiter_dog(Vector2Add(table_position,
+            Vector2{level_config::edge_weight * 6.0f, 0.0f}));
+
+        REQUIRE(CheckCollisionPointRec(click, game.hitbox_of(table_id)));
+        REQUIRE(CheckCollisionPointRec(click, game.hitbox_of(customer_id)));
+        REQUIRE(game.has_interactable(table_id));
+        REQUIRE_FALSE(game.has_interactable(customer_id));
+
+        selection().select(waiter_id);
+        REQUIRE(selection().selected() == static_cast<int>(waiter_id));
+
+        std::vector<size_t> path_for;
+        std::vector<size_t> path_to_entity;
+        listener<events::create_path_to_entity> entity_paths(
+            [&](const events::create_path_to_entity& event) -> void{
+                path_for.push_back(event.get_id());
+                path_to_entity.push_back(event.get_destination_entity());
+            });
+        std::vector<Vector2> bare_paths;
+        listener<events::create_path_to> positions([&](const events::create_path_to& event) -> void{
+            bare_paths.push_back(event.get_destination());
+        });
+
+        WHEN("the right button is pressed"){
+            controls().simulate_input(mouse_press_of(MOUSE_BUTTON_RIGHT), cursor_id);
+            flush();
+
+            THEN("one entity-targeted path is requested, for the waiter"){
+                REQUIRE(path_for.size() == 1);
+                REQUIRE(path_for[0] == waiter_id);
+            }
+            THEN("it names the table, not the customer sitting over it"){
+                REQUIRE(path_to_entity.size() == 1);
+                REQUIRE(path_to_entity[0] == table_id);
+            }
+            THEN("the click does not fall through to a bare position"){
+                REQUIRE(bare_paths.empty());
+            }
+            THEN("the waiter is given a route"){
+                REQUIRE(game.has_path(waiter_id));
             }
         }
     }

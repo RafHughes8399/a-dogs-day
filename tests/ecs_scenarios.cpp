@@ -372,8 +372,8 @@ SCENARIO("npc dogs build with the same components as a player dog", "[ecs][compo
         WHEN("a waiter dog is built"){
             auto waiter_id = game.create_waiter_dog(spawn);
 
-            THEN("it carries the same seven components"){
-                REQUIRE(game.num_components(waiter_id) == 7);
+            THEN("it carries eight components"){
+                REQUIRE(game.num_components(waiter_id) == 8);
                 REQUIRE(game.has_movement(waiter_id));
                 REQUIRE(game.has_interactor(waiter_id));
                 REQUIRE(game.has_state_machine(waiter_id));
@@ -447,13 +447,13 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
 
                 auto left = interactable->get_slot_offset(level_config::directions::left);
                 REQUIRE(left.has_value());
-                REQUIRE(left->x == level_config::edge_weight * -0.5f);
-                REQUIRE(left->y == level_config::edge_weight);
+                REQUIRE(left->x == level_config::edge_weight * -1.0f);
+                REQUIRE(left->y == level_config::edge_weight * 0.75f);
 
                 auto right = interactable->get_slot_offset(level_config::directions::right);
                 REQUIRE(right.has_value());
-                REQUIRE(right->x == level_config::edge_weight * 2.5f);
-                REQUIRE(right->y == level_config::edge_weight);
+                REQUIRE(right->x == level_config::edge_weight * 2.0f);
+                REQUIRE(right->y == level_config::edge_weight * 0.75f);
 
                 REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());
                 REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::down).has_value());
@@ -469,29 +469,22 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.has_storage(counter_id));
                 REQUIRE(game.num_components(counter_id) == 6);
             }
-            THEN("it offers all four interaction slots"){
+            THEN("it offers left and right interaction slots only"){
                 auto* interactable = component_managers::interactable_manager_.get_component(counter_id);
                 REQUIRE(interactable != nullptr);
 
                 auto left = interactable->get_slot_offset(level_config::directions::left);
                 REQUIRE(left.has_value());
-                REQUIRE(left->x == level_config::edge_weight * -0.5f);
-                REQUIRE(left->y == level_config::edge_weight);
+                REQUIRE(left->x == level_config::edge_weight * -1.0f);
+                REQUIRE(left->y == level_config::edge_weight * 0.75f);
 
                 auto right = interactable->get_slot_offset(level_config::directions::right);
                 REQUIRE(right.has_value());
-                REQUIRE(right->x == level_config::edge_weight * 2.5f);
-                REQUIRE(right->y == level_config::edge_weight);
+                REQUIRE(right->x == level_config::edge_weight * 2.0f);
+                REQUIRE(right->y == level_config::edge_weight * 0.75f);
 
-                auto up = interactable->get_slot_offset(level_config::directions::up);
-                REQUIRE(up.has_value());
-                REQUIRE(up->x == level_config::edge_weight);
-                REQUIRE(up->y == level_config::edge_weight * -0.5f);
-
-                auto down = interactable->get_slot_offset(level_config::directions::down);
-                REQUIRE(down.has_value());
-                REQUIRE(down->x == level_config::edge_weight);
-                REQUIRE(down->y == level_config::edge_weight * 2.5f);
+                REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());
+                REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::down).has_value());
             }
         }
 
@@ -503,29 +496,22 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.has_interactable(stove_id));
                 REQUIRE(game.num_components(stove_id) == 5);
             }
-            THEN("it offers all four interaction slots"){
+            THEN("it offers left and right interaction slots only"){
                 auto* interactable = component_managers::interactable_manager_.get_component(stove_id);
                 REQUIRE(interactable != nullptr);
 
                 auto left = interactable->get_slot_offset(level_config::directions::left);
                 REQUIRE(left.has_value());
-                REQUIRE(left->x == level_config::edge_weight * -0.5f);
-                REQUIRE(left->y == level_config::edge_weight);
+                REQUIRE(left->x == level_config::edge_weight * -1.0f);
+                REQUIRE(left->y == level_config::edge_weight * 0.75f);
 
                 auto right = interactable->get_slot_offset(level_config::directions::right);
                 REQUIRE(right.has_value());
-                REQUIRE(right->x == level_config::edge_weight * 2.5f);
-                REQUIRE(right->y == level_config::edge_weight);
+                REQUIRE(right->x == level_config::edge_weight * 2.0f);
+                REQUIRE(right->y == level_config::edge_weight * 0.75f);
 
-                auto up = interactable->get_slot_offset(level_config::directions::up);
-                REQUIRE(up.has_value());
-                REQUIRE(up->x == level_config::edge_weight);
-                REQUIRE(up->y == level_config::edge_weight * -0.5f);
-
-                auto down = interactable->get_slot_offset(level_config::directions::down);
-                REQUIRE(down.has_value());
-                REQUIRE(down->x == level_config::edge_weight);
-                REQUIRE(down->y == level_config::edge_weight * 2.5f);
+                REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());
+                REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::down).has_value());
             }
         }
 
@@ -537,6 +523,23 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.has_interactable(dishwasher_id));
                 REQUIRE(game.num_components(dishwasher_id) == 5);
             }
+            THEN("it offers left and right interaction slots only"){
+                auto* interactable = component_managers::interactable_manager_.get_component(dishwasher_id);
+                REQUIRE(interactable != nullptr);
+
+                auto left = interactable->get_slot_offset(level_config::directions::left);
+                REQUIRE(left.has_value());
+                REQUIRE(left->x == level_config::edge_weight * -1.0f);
+                REQUIRE(left->y == level_config::edge_weight * 0.75f);
+
+                auto right = interactable->get_slot_offset(level_config::directions::right);
+                REQUIRE(right.has_value());
+                REQUIRE(right->x == level_config::edge_weight * 2.0f);
+                REQUIRE(right->y == level_config::edge_weight * 0.75f);
+
+                REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::up).has_value());
+                REQUIRE_FALSE(interactable->get_slot_offset(level_config::directions::down).has_value());
+            }
         }
 
         WHEN("food is built"){
@@ -547,7 +550,16 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.has_renderable(food_id));
                 REQUIRE(game.has_collision(food_id));
                 REQUIRE_FALSE(game.has_selectable(food_id));
-                REQUIRE(game.num_components(food_id) == 3);
+                REQUIRE(game.has_food(food_id));
+                REQUIRE(game.num_components(food_id) == 4);
+            }
+            THEN("it knows which item it is"){
+                REQUIRE(game.food_item_of(food_id) == entity_config::lasagna);
+            }
+            THEN("its hitbox is the shared food size"){
+                auto box = game.hitbox_of(food_id);
+                REQUIRE(box.width == entity_config::food_width);
+                REQUIRE(box.height == entity_config::food_height);
             }
         }
 

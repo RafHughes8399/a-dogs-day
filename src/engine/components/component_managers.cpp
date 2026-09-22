@@ -1,8 +1,10 @@
 #include "component.h"
 
 namespace component_managers {
+component_manager<components::carrier_component> carrier_manager_;
 component_manager<components::collision_component> collision_manager_;
 component_manager<components::key_input_component> control_manager_;
+component_manager<components::food_component> food_manager_;
 component_manager<components::interactable_component> interactable_manager_;
 component_manager<components::interactor_component> interactor_manager_;
 component_manager<components::mouse_input_component> mouse_input_manager_;

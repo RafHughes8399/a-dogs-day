@@ -1,5 +1,6 @@
 #include "component.h"
 #include <cassert>
+#include <cmath>
 
 void component_helpers::register_positional_component(size_t entity_id, components::position_component component){
     component_managers::positional_manager_.register_component(entity_id, std::move(component));
@@ -33,6 +34,12 @@ void component_helpers::register_selectable_component(size_t entity_id, componen
 }
 void component_helpers::register_storage_component(size_t entity_id, components::storage_component component){
     component_managers::storage_manager_.register_component(entity_id, std::move(component));
+}
+void component_helpers::register_food_component(size_t entity_id, components::food_component component){
+    component_managers::food_manager_.register_component(entity_id, std::move(component));
+}
+void component_helpers::register_carrier_component(size_t entity_id, components::carrier_component component){
+    component_managers::carrier_manager_.register_component(entity_id, std::move(component));
 }
 
 void component_helpers::add_positional_component(size_t entity_id, Vector2 position){
@@ -84,6 +91,14 @@ void component_helpers::add_storage_component(size_t entity_id){
     register_storage_component(entity_id,
         component_builders::build_storage_component());
 }
+void component_helpers::add_food_component(size_t entity_id, size_t item_id){
+    register_food_component(entity_id,
+        component_builders::build_food_component(item_id));
+}
+void component_helpers::add_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity){
+    register_carrier_component(entity_id,
+        component_builders::build_carrier_component(previous_position, current_position, carried_entity));
+}
 
 void component_helpers::create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions){
     // * a half edgeweight step lands on the centre of the neighbouring cell, the
@@ -91,12 +106,13 @@ void component_helpers::create_offset_position_list(Rectangle box, std::array<st
     // * with no tie to break
     // * left is - 0.5 edgeweight x, height / 2 y
     if(positions[level_config::directions::left].has_value()){
-        positions[level_config::directions::left]->x = level_config::edge_weight * -0.5f;
+        positions[level_config::directions::left]->x = level_config::edge_weight * -1.0f;
         positions[level_config::directions::left]->y = box.height * 0.5f;
     }
     // * right is width + 0.5 edgeweight x, height / 2 y
     if(positions[level_config::directions::right].has_value()){
-        positions[level_config::directions::right]->x = box.width + level_config::edge_weight * 0.5f;
+        positions[level_config::directions::right]->x =
+            std::ceil(box.width / level_config::edge_weight) * level_config::edge_weight;
         positions[level_config::directions::right]->y = box.height * 0.5f;
     }
     // * up is width / 2 x, - 0.5 edgeweight y
@@ -224,6 +240,12 @@ void component_helpers::unregister_selectable_component(size_t entity_id){
 void component_helpers::unregister_storage_component(size_t entity_id){
     component_managers::storage_manager_.unregister_component(entity_id);
 }
+void component_helpers::unregister_food_component(size_t entity_id){
+    component_managers::food_manager_.unregister_component(entity_id);
+}
+void component_helpers::unregister_carrier_component(size_t entity_id){
+    component_managers::carrier_manager_.unregister_component(entity_id);
+}
 
 // blanket teardown - erase on a missing key is a no-op, so this is correct
 // for every entity kind without tracking what a builder registered
@@ -239,6 +261,8 @@ void component_helpers::unregister_all_components(size_t entity_id){
     unregister_state_machine_component(entity_id);
     unregister_selectable_component(entity_id);
     unregister_storage_component(entity_id);
+    unregister_food_component(entity_id);
+    unregister_carrier_component(entity_id);
 }
 
 // total components registered across every manager
@@ -255,6 +279,8 @@ size_t component_helpers::num_registered_components(size_t entity_id){
     count += component_managers::state_machine_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
     count += component_managers::selectable_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
     count += component_managers::storage_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+    count += component_managers::food_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+    count += component_managers::carrier_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
     return count;
 }
 
@@ -271,4 +297,6 @@ void component_helpers::clear_all_components(){
     component_managers::state_machine_manager_.clear();
     component_managers::selectable_manager_.clear();
     component_managers::storage_manager_.clear();
+    component_managers::food_manager_.clear();
+    component_managers::carrier_manager_.clear();
 }

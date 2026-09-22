@@ -1,3 +1,5 @@
+#include "config.h"
+#include "dog_events.h"
 #include "system.h"
 
 void systems::state_machine_system::update(float delta){
@@ -15,11 +17,13 @@ void systems::state_machine_system::transition(size_t entity, int transition,
     if(not machine.can_transition(transition)){ return; }
 
     auto previous = machine.current();
+    // *this function handles the transition to and on transition to 
     machine.transition(entity, transition, payload);
     debug::log("[state_machine_system::transition] entity: " + std::to_string(entity)
         + ", transition: " + std::to_string(transition)
         + ", state: " + std::to_string(previous) + " -> " + std::to_string(machine.current()));
-    play_state_animation(entity);
+        // * this shouldn't happen here
+        //play_state_animation(entity);
 }
 
 void systems::state_machine_system::play_state_animation(size_t entity){
@@ -49,8 +53,10 @@ void systems::state_machine_system::on_interaction_finished(const events::intera
     transition(event.get_interactor_id(), dog_config::interaction_finished);
 }
 void systems::state_machine_system::on_order_served(const events::order_served& event){
-    transition(event.get_customer_id(), dog_config::order_served);
     transition(event.get_waiter_id(), dog_config::order_served);
+}
+void systems::state_machine_system::on_food_dropped(const events::food_dropped& event){
+    transition(event.get_waiter_id(), dog_config::food_dropped);
 }
 void systems::state_machine_system::on_collected_food(const events::waiter_collected_food& event){
     transition(event.get_waiter_id(), dog_config::food_collected, event.get_food_id());
