@@ -727,8 +727,7 @@ namespace hud_config{
 
 }
 namespace debug_logger_config{
-    inline const int toggle_key = KEY_J;
-    inline const int pause_key = KEY_P;
+    inline const char* log_directory = "../debug_logs";
     inline const float logger_height_ratio = 0.6f;
     inline const float logger_y_position_scalar = 1.0f - logger_height_ratio;
     inline const int backdrop_opacity = 102;

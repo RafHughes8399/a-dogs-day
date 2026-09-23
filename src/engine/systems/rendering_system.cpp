@@ -62,3 +62,8 @@ void systems::rendering_system::move_frame(Vector2 move_delta){
     view_frame_.x = std::max(std::min(view_frame_.x + move_delta.x, max_x), min);
     view_frame_.y = std::max(std::min(view_frame_.y + move_delta.y, max_y), min);
 }
+Vector2 systems::rendering_system::screen_to_world(Vector2 screen_position){
+    auto clamped = Vector2Clamp(screen_position, Vector2Zero(),
+        Vector2{level_config::screen_width, level_config::screen_height});
+    return Vector2Add(clamped, Vector2{view_frame_.x, view_frame_.y});
+}

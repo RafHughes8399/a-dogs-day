@@ -74,15 +74,13 @@ void systems::control_input_system::update(float delta){
         check_inputs(id, inputs, delta);
     }
     // * check mouse components
-
-    // * and check mouse delta, this retursn an int, figure out what that int means
-    // * 1 is true, 0 is false
     for(auto it = component_managers::mouse_input_manager_.begin(); it != component_managers::mouse_input_manager_.end(); ++it){
         size_t id = static_cast<size_t>(*&it->first);
         auto inputs = it->second.get_inputs();
-        if(not Vector2Equals(GetMouseDelta(), Vector2Zero())){
-            auto current_position = component_managers::positional_manager_.get_component(id)->get_position();
-            systems::movement_system::get_instance().update_position(id, Vector2Add(current_position, GetMouseDelta()));
+        auto cursor_position = rendering_system::get_instance().screen_to_world(GetMousePosition());
+        auto* position = component_managers::positional_manager_.get_component(id);
+        if(position != nullptr and not Vector2Equals(position->get_position(), cursor_position)){
+            systems::movement_system::get_instance().update_position(id, cursor_position);
         }
         // * check for mouse input also
         check_inputs(id, inputs, delta);
@@ -186,7 +184,9 @@ void systems::control_input_system::move_view_frame(Vector2 direction_scalar, fl
 
 
 void systems::control_input_system::left_click(size_t id){
-    auto click_position = GetMousePosition();
+    auto* cursor = component_managers::positional_manager_.get_component(id);
+    if(cursor == nullptr){ return; }
+    auto click_position = cursor->get_position();
     debug::log("[control_input_system::left_click, clicked] asked by: "
         + std::to_string(id)
         + ", position: " + raglib::vector_to_string(click_position));
@@ -211,7 +211,9 @@ void systems::control_input_system::left_click(size_t id){
 // ? maybe extendable to waiters too ? if i wanted to change how the waiter interaction stuff goes
 // ! not sure where this should go right now. i think maybe a type system ? ceebs to implement that right now though
 void systems::control_input_system::right_click(size_t id){
-    auto click_position = GetMousePosition();
+    auto* cursor = component_managers::positional_manager_.get_component(id);
+    if(cursor == nullptr){ return; }
+    auto click_position = cursor->get_position();
     debug::log("[control_input_system::right_click, clicked] asked by: "
         + std::to_string(id)
         + ", position: " + raglib::vector_to_string(click_position));

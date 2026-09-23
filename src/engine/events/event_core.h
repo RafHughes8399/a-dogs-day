@@ -26,74 +26,25 @@
 // project includes
 #include "raylib.h"
 
-// Forward declarations so registration events can carry pointers to live level
-// entities without including the entity hierarchy (entities.h includes this
-// header, so including it back would be a cycle). A pointer member needs only a
-// forward declaration; the full type is required solely in the .cpp files that
-// create the pointer (level) or dereference it (the cafe systems).
-namespace entities{
-	class table;
-	class food_counter;
-	class waiter_dog;
-	class customer_dog;
-	class dishwasher;
-}
-
 namespace events{
-	enum customer_queue_side{
-		left_queue = 0,
-		right_queue = 1
-	};
 	// an enum ID for event types
 	enum ids{
-		move_frame = 1,
-		right_mouse,
-		left_mouse,
-		move,
+		move = 1,
 		remove,
-		interact,
 		menu_interact,
 		select_dog,
 		press_key,
 		lvl_up,
 		enter_edit,
 		exit_edit,
-		cursor_move,
-		decoration_move,
-		decoration_place,
 		hold_edit,
 		empty,
-		register_table,
-		register_customer,
-		request_customer_table,
-		customer_arrived,
-		register_waiter,
-		register_food_counter,
-		waiter_arrived_table,
 		order_served_id,
 		food_dropped_id,
-		legacy_order_served_id,
-		send_waiter_table,
 		customer_left,
-		build_customer_dog_id,
-		send_customer_position,
 		debug_log_id,
 		dog_path_complete,
-		give_dog_path_id,
-		table_removed,
-		dog_to_station,
-		food_counter_removed,
-		dog_reached_station_id,
-		waiter_removed,
-		waiter_arrived_counter,
-		table_cleared,
-		register_dishwasher,
-		dishwasher_removed,
-		customer_removed,
-		waiter_finished_clearing_id,
 		waiter_collected_food_id,
-		waiter_served_order_id,
-		waiter_abandoned_serving_id,
 		create,
 		create_path_to_id,
 		create_path_to_entity_id,
