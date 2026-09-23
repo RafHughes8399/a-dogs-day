@@ -80,8 +80,8 @@ void debug::logger::add_message(const std::string& message){
 }
 
 void debug::logger::render_backdrop(){
-    auto screen_width = static_cast<float>(GetScreenWidth());
-    auto screen_height = static_cast<float>(GetScreenHeight());
+    auto screen_width = level_config::screen_width;
+    auto screen_height = level_config::screen_height;
     auto backdrop = Rectangle{
         0.0f,
         screen_height * debug_logger_config::logger_y_position_scalar,
@@ -92,7 +92,7 @@ void debug::logger::render_backdrop(){
 }
 
 void debug::logger::render_messages(){
-    auto screen_height = static_cast<float>(GetScreenHeight());
+    auto screen_height = level_config::screen_height;
     auto start_x = debug_logger_config::padding_x;
     auto start_y = static_cast<int>(screen_height * debug_logger_config::logger_y_position_scalar)
         + debug_logger_config::padding_y;

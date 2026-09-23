@@ -172,51 +172,11 @@ link_libraries(hud)
 add_library(hitbox src/entities/hitbox.cpp src/entities/hitbox_builders.cpp)
 link_libraries(hitbox)
 
-add_library(body src/rendering/body.cpp)
-link_libraries(body)
-
 add_library(texture src/rendering/texture.cpp)
 link_libraries(texture)
 
-add_library(player src/interfaces/player.cpp)
-link_libraries(player)
-
-add_library(controls src/interfaces/controls.cpp)
-link_libraries(controls)
-
-add_library(entities src/entities/entity.cpp src/entities/entity_builder.cpp src/entities/ecs_builders.cpp)
+add_library(entities src/entities/ecs_builders.cpp)
 link_libraries(entities)
-
-add_library(cursor src/entities/cursor.cpp src/entities/cursor_builder.cpp)
-link_libraries(cursor)
-
-add_library(dogs
-  src/entities/dogs/dog.cpp
-  src/entities/dogs/player_dog.cpp
-  src/entities/dogs/customer_dog.cpp
-  src/entities/dogs/waiter_dog.cpp
-  src/entities/dogs/player_dog_builder.cpp
-  src/entities/dogs/customer_dog_builder.cpp
-  src/entities/dogs/waiter_dog_builder.cpp
-  src/entities/dogs/dishwasher_dog_builder.cpp)
-link_libraries(dogs)
-
-add_library(decorations
-  src/entities/decorations/decoration.cpp
-  src/entities/decorations/decoration_builder.cpp)
-link_libraries(decorations)
-
-add_library(stations
-  src/entities/stations/station.cpp
-  src/entities/stations/table.cpp
-  src/entities/stations/food_counter.cpp
-  src/entities/stations/table_builder.cpp
-  src/entities/stations/food_counter_builder.cpp
-  src/entities/stations/dishwasher_builder.cpp)
-link_libraries(stations)
-
-add_library(food src/entities/food/food_builder.cpp)
-link_libraries(food)
 
 add_library(render_layer src/engine/render_layer.cpp)
 link_libraries(render_layer)
@@ -226,18 +186,6 @@ link_libraries(quadtree)
 
 add_library(graph src/engine/structures/graph.cpp src/engine/structures/path.cpp)
 link_libraries(graph)
-
-add_library(level src/engine/level.cpp)
-link_libraries(level)
-
-add_library(dog_actions src/engine/orchestrators/dog_actions.cpp)
-link_libraries(dog_actions)
-
-add_library(maitre_d src/engine/orchestrators/maitre_d.cpp src/engine/orchestrators/dog_queue.cpp)
-link_libraries(maitre_d)
-
-add_library(expediter src/engine/orchestrators/expediter.cpp)
-link_libraries(expediter)
 
 add_library(debug_log_interface src/engine/logger/debug_log_interface.cpp)
 link_libraries(debug_log_interface)
@@ -253,9 +201,8 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
-  raglib events queries states components systems animation sprite item menu hud hitbox body texture
-  player controls entities cursor dogs decorations stations food factories render_layer quadtree
-  graph level maitre_d expediter dog_actions debug_log_interface debug_logger game ${PROJECT_NAME}
+  raglib events queries states components systems animation sprite item menu hud hitbox texture
+  entities factories render_layer quadtree graph debug_log_interface debug_logger game ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})
@@ -263,16 +210,11 @@ foreach(target IN LISTS PROJECT_TARGETS)
     src
     src/rendering
     src/entities
-    src/entities/dogs
-    src/entities/decorations
-    src/entities/stations
-    src/entities/food
     src/entities/factories
     src/engine
     src/engine/components
     src/engine/events
     src/engine/logger
-    src/engine/orchestrators
     src/engine/queries
     src/engine/structures
     src/engine/systems
@@ -288,24 +230,12 @@ endforeach()
 # calls above; here we add the test sources, headers, and the test-only macro.
 add_executable(tests
   tests/smoke_test.cpp
-  tests/test_game.cpp
   tests/ecs_test_game.cpp
   tests/ecs_scenarios.cpp
   tests/animation_scenarios.cpp
   tests/control_input_scenarios.cpp
   tests/spatial_scenarios.cpp
   tests/graph_scenarios.cpp
-  tests/harness_scenarios.cpp
-  tests/player_scenarios.cpp
-  tests/decoration_scenarios.cpp
-  tests/food_scenarios.cpp
-  tests/maitre_d_scenarios.cpp
-  tests/expediter_scenarios.cpp
-  tests/station_scenarios.cpp
-  tests/dishwasher_dog_scenarios.cpp
-  tests/dishwasher_scenarios.cpp
-  tests/customer_dog_scenarios.cpp
-  tests/waiter_dog_scenarios.cpp
   tests/quadtree_scenarios.cpp
   tests/customer_table_scenarios.cpp
   tests/counter_storage_scenarios.cpp
@@ -320,16 +250,11 @@ target_include_directories(tests PRIVATE
   src
   src/rendering
   src/entities
-  src/entities/dogs
-  src/entities/decorations
-  src/entities/stations
-  src/entities/food
   src/entities/factories
   src/engine
   src/engine/components
   src/engine/events
   src/engine/logger
-  src/engine/orchestrators
   src/engine/queries
   src/engine/structures
   src/engine/systems

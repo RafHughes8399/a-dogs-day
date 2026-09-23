@@ -5,7 +5,7 @@
 #define SPAWN_POSITIONS 2  
 #define DESTINATION_POSITIONS 2
 #include <array>
-#include "entities.h"
+#include "entity.h"
 #include <functional>
 #include "raylib.h"
 namespace factories{

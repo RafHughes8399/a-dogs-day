@@ -6,43 +6,7 @@
 #include <raymath.h>
 #include <vector>
 #include "component.h"
-#include "entities.h"
 namespace render_layer{
-    class layer{
-        public:
-            ~layer() = default;
-            layer() {}
-            layer(const layer& other) = default;
-            layer(layer&& other) = default;
-
-            layer& operator=(const layer& other) = default;
-            layer& operator=(layer&& other) = default;
-
-            template<typename P> // P for predicate
-            void render(P p);
-            
-            void render(){
-                render(true);
-            }
-
-            void add_entity(entities::entity* entity);
-            void remove_entity(entities::entity* entity);
-            void remove_entities(std::vector<int> entity_ids);
-
-            template<typename UnaryPred>
-            void draw(UnaryPred p, Vector2 frame_position, int frame){
-                for(auto & entity : entities_){
-                    if(p(entity)){
-                        auto draw_position = Vector2Subtract(entity->get_position(), frame_position);
-                        entity->render(draw_position, frame); 
-                    }
-                }
-            }
-        private:
-            std::vector<entities::entity*> entities_;
-
-    };
-
     // TODO (25 / 8 / 26) RENAME AFTER REFACTOR IS COMPLETE - replaces layer once level is gone.
     // same shape as layer, holding ids - a stale entry is skipped via a null
     // component lookup rather than dereferenced

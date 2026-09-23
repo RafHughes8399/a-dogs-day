@@ -74,26 +74,6 @@ namespace {
     game_config::input key_hold_of(int key){
         return game_config::input{key, game_config::key_hold};
     }
-    // GetMousePosition() reports (0,0) with no window taking real input, and the
-    // device state is process-wide - restored on the way out so a scenario that
-    // needs the click somewhere specific does not move it for the rest of the run
-    class mouse_at{
-        public:
-            mouse_at(float x, float y)
-            : previous_(GetMousePosition()){
-                SetMousePosition(static_cast<int>(x), static_cast<int>(y));
-            }
-            ~mouse_at(){
-                SetMousePosition(static_cast<int>(previous_.x), static_cast<int>(previous_.y));
-            }
-            mouse_at(const mouse_at&) = delete;
-            mouse_at(mouse_at&&) = delete;
-            mouse_at& operator=(const mouse_at&) = delete;
-            mouse_at& operator=(mouse_at&&) = delete;
-        private:
-            Vector2 previous_;
-    };
-
     game_config::input mouse_press_of(int button){
         return game_config::input{button, game_config::mouse_press};
     }
@@ -241,9 +221,9 @@ SCENARIO("switching dogs flips the selection and announces it", "[ecs][controls]
 }
 
 SCENARIO("a left click selects the entity under the cursor", "[ecs][controls][selection]"){
-    // left_click reads GetMousePosition() itself and the device cannot be
-    // driven from a test, so the dog is placed AT whatever the mouse reports
-    // rather than the mouse being moved onto the dog. the click is asked for by
+    // left_click reads the cursor's position, and the cursor is built at
+    // whatever the mouse reports, so the dog is placed AT that point rather than
+    // the mouse being moved onto the dog. the click is asked for by
     // the cursor, which sits on that same position - the query has to see past
     // itself to find the dog underneath
     GIVEN("a player dog sitting under the cursor"){
@@ -359,14 +339,14 @@ SCENARIO("a right click over a seated customer still targets the table underneat
         testing::ecs_test_game game;
         auto cursor_id = game.create_cursor();
 
-        // right_click reads GetMousePosition() itself, so the table is placed
-        // around that point rather than the mouse being moved onto the table.
-        // (-8,-60) puts the click inside both the table box and the box of a
-        // customer seated in the left slot; at this particular position the
-        // unfiltered check resolves to the customer, so the scenario fails
+        // right_click reads the cursor's position, so the cursor is put where
+        // the per-frame mouse sync would leave it and the table is placed around
+        // that point. (-8,-60) puts the click inside both the table box and the
+        // box of a customer seated in the left slot; at this particular position
+        // the unfiltered check resolves to the customer, so the scenario fails
         // without the interactable filter rather than passing by luck
-        mouse_at cursor_position{208.0f, 64.0f};
-        auto click = GetMousePosition();
+        auto click = Vector2{208.0f, 64.0f};
+        game.move_entity(cursor_id, click);
         auto table_position = Vector2{click.x - 8.0f, click.y - 60.0f};
         auto table_id = game.create_table(table_position);
 
@@ -695,6 +675,53 @@ SCENARIO("menu keys navigate the menu graph", "[controls][menus]"){
 
             THEN("the graph ends where it started"){
                 REQUIRE(menus.current_ == blank_menu);
+            }
+        }
+    }
+}
+
+SCENARIO("a panned view frame maps the mouse onto the world under it", "[ecs][controls][view_frame]"){
+    GIVEN("a player dog, and a view frame panned right"){
+        testing::ecs_test_game game;
+        auto cursor_id = game.create_cursor();
+        auto player_id = game.create_player(cursor_id);
+        auto khiri_id = game.create_khiri();
+        auto& rendering = systems::rendering_system::get_instance();
+
+        float delta = half_span_hold(frame_span_x(), level_config::frame_move.x);
+        controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), player_id, delta);
+        auto frame = game.view_frame();
+        REQUIRE(frame.x > 0.0f);
+
+        WHEN("a point on the screen is mapped into the world"){
+            auto screen = Vector2{600.0f, 400.0f};
+            auto world = rendering.screen_to_world(screen);
+
+            THEN("it is offset by the frame's origin"){
+                REQUIRE(world.x == screen.x + frame.x);
+                REQUIRE(world.y == screen.y + frame.y);
+            }
+        }
+
+        WHEN("a point past the canvas edge is mapped into the world"){
+            auto world = rendering.screen_to_world(Vector2{-50.0f, level_config::screen_height + 50.0f});
+
+            THEN("it is clamped to the visible frame"){
+                REQUIRE(world.x == frame.x);
+                REQUIRE(world.y == frame.y + level_config::screen_height);
+            }
+        }
+
+        WHEN("the dog is drawn under the mouse and the cursor is synced to it"){
+            auto screen = Vector2{600.0f, 400.0f};
+            auto world = rendering.screen_to_world(screen);
+            game.move_entity(khiri_id, world);
+            game.move_entity(cursor_id, world);
+            controls().simulate_input(mouse_press_of(MOUSE_BUTTON_LEFT), cursor_id);
+            flush();
+
+            THEN("a left click selects the dog, not whatever sits at the unpanned screen point"){
+                REQUIRE(selection().selected() == static_cast<int>(khiri_id));
             }
         }
     }

@@ -714,6 +714,7 @@ namespace systems{
             void on_created_entity(const events::create_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
             void move_frame(Vector2 move_delta);
+            Vector2 screen_to_world(Vector2 screen_position);
             // teardown between test scenarios - the singleton outlives them
             void clear();
 #ifdef DOG_DAYS_TESTING

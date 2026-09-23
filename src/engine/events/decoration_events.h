@@ -47,47 +47,6 @@ namespace events{
 			const int edit_progress_;
 
 	};
-	class moved_decoration : public event{
-		public:
-			moved_decoration(Rectangle pre, Rectangle post, int id)
-			: event(ids::decoration_move), pre_move_(pre), post_move_(post), id_(id){}
-
-			static int get_static_type(){
-				return ids::decoration_move;
-			}
-			Rectangle get_pre_move() const{
-				return pre_move_;
-			}
-			Rectangle get_post_move() const {
-				return post_move_;
-			}
-			int get_id() const {
-				return id_;
-			}
-		private:
-			const Rectangle pre_move_;
-			const Rectangle post_move_;
-			const int id_;
-	};
-	class placed_decoration : public event{
-		public:
-			placed_decoration(Rectangle rec, size_t id)
-			: event(ids::decoration_place), rectangle_(rec), id_(id){}
-
-			static int get_static_type(){
-				return ids::decoration_place;
-			}
-			Rectangle get_rectangle() const{
-				return rectangle_;
-			}
-
-			size_t get_id() const {
-				return id_;
-			}
-		private:
-			const Rectangle rectangle_;
-			const size_t id_;
-	};
 }
 
 #endif

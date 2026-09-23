@@ -49,7 +49,7 @@ std::unique_ptr<hud::hud_element> hud::hud_builder::build_edit_wheel(){
 std::unique_ptr<hud::hud_element> hud::hud_builder::build_decoration_grid(){
     auto draw_strategy = std::make_unique<hud_element::grid_draw>();
     auto empty_handler_strategy = std::make_unique<hud_element::empty_handler_strategy>();
-    return std::make_unique<hud_element>(Rectangle {0, 0, static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())}, std::move(draw_strategy), std::move(empty_handler_strategy));
+    return std::make_unique<hud_element>(Rectangle {0, 0, level_config::screen_width, level_config::screen_height}, std::move(draw_strategy), std::move(empty_handler_strategy));
 }
 
 std::unique_ptr<hud::hud_element> hud::hud_builder::build_decoration_overlay(){
@@ -77,8 +77,8 @@ void hud::hud_element::rectangle_draw::draw(){
 // position is assumed to be Vector2Zero(), the grid will cover the whole screen (for now)
 void hud::hud_element::grid_draw::draw(){
 
-    float screen_w = static_cast<float>(GetScreenWidth());
-    float screen_h = static_cast<float>(GetScreenHeight());
+    float screen_w = level_config::screen_width;
+    float screen_h = level_config::screen_height;
     for(int x = static_cast<int>(position_.x); x <= static_cast<int>(screen_w); x += static_cast<int>(level_config::edge_weight)){
         DrawLineEx({static_cast<float>(x), position_.y}, {static_cast<float>(x), screen_h}, hud_config::decoration_grid_thickness, hud_config::decoration_grid_highlight);
     }

@@ -1,6 +1,4 @@
-/** Generic entity lifecycle/movement events, plus station (table/food
- * counter/dishwasher) registration facts.
- */
+/** Generic entity lifecycle/movement events. */
 #ifndef EVENTS_ENTITY_EVENTS_H
 #define EVENTS_ENTITY_EVENTS_H
 
@@ -44,102 +42,6 @@ namespace events{
 		private:
 			const size_t id_;
 
-	};
-	// Cafe-domain fact: a table entity exists in the level and can be tracked by
-	// the maitre d'. The event carries value data so the cafe/order system does
-	// not need concrete entity types or ownership of level entities.
-	class registered_table : public event{
-		public:
-			registered_table(entities::table* table)
-			: event(ids::register_table), table_(table){}
-
-			static int get_static_type(){
-				return ids::register_table;
-			}
-			entities::table* get_table() const{
-				return table_;
-			}
-		private:
-			entities::table* const table_;
-	};
-	class removed_table : public event{
-		public:
-			removed_table(size_t table_id)
-			: event(ids::table_removed), table_id_(table_id){}
-
-			static int get_static_type(){
-				return ids::table_removed;
-			}
-			size_t get_table_id() const{
-				return table_id_;
-			}
-		private:
-			const size_t table_id_;
-	};
-	// Cafe-domain fact: a food counter/pickup point exists. The expediter uses
-	// these positions when routing waiter dogs through a pickup checkpoint.
-	class registered_food_counter : public event{
-		public:
-			registered_food_counter(entities::food_counter* counter)
-			: event(ids::register_food_counter), counter_(counter){}
-
-			static int get_static_type(){
-				return ids::register_food_counter;
-			}
-			entities::food_counter* get_counter() const{
-				return counter_;
-			}
-		private:
-			entities::food_counter* const counter_;
-	};
-	// Cafe-domain fact: a food counter was removed from the level; the expediter
-	// must drop its pointer to avoid dereferencing a destroyed entity.
-	class removed_food_counter : public event{
-		public:
-			removed_food_counter(size_t counter_id)
-			: event(ids::food_counter_removed), counter_id_(counter_id){}
-
-			static int get_static_type(){
-				return ids::food_counter_removed;
-			}
-			size_t get_counter_id() const{
-				return counter_id_;
-			}
-		private:
-			const size_t counter_id_;
-	};
-	// Cafe-domain fact: a dishwasher station exists in the level. The
-	// expediter uses these as the drop-off point when a clearing waiter
-	// finishes bussing a table.
-	class registered_dishwasher : public event{
-		public:
-			registered_dishwasher(entities::dishwasher* dishwasher)
-			: event(ids::register_dishwasher), dishwasher_(dishwasher){}
-
-			static int get_static_type(){
-				return ids::register_dishwasher;
-			}
-			entities::dishwasher* get_dishwasher() const{
-				return dishwasher_;
-			}
-		private:
-			entities::dishwasher* const dishwasher_;
-	};
-	// Cafe-domain fact: a dishwasher station was removed from the level; the
-	// expediter must drop its pointer to avoid dereferencing a destroyed entity.
-	class removed_dishwasher : public event{
-		public:
-			removed_dishwasher(size_t dishwasher_id)
-			: event(ids::dishwasher_removed), dishwasher_id_(dishwasher_id){}
-
-			static int get_static_type(){
-				return ids::dishwasher_removed;
-			}
-			size_t get_dishwasher_id() const{
-				return dishwasher_id_;
-			}
-		private:
-			const size_t dishwasher_id_;
 	};
 }
 
