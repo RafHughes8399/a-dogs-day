@@ -1,0 +1,25 @@
+[14:22:35.236 f000000] [game::init, start] building the starting world
+[14:22:35.671 f000000] [game::init, built background] id 0
+[14:22:35.672 f000000] [game::init, built cursor] id 1
+[14:22:35.672 f000000] [game::init, built player] id 2 holding cursor 1
+[14:22:35.673 f000000] [game::init, built khiri] id 3
+[14:22:35.674 f000000] [game::init, built mack] id 4
+[14:22:35.674 f000000] [game::init, build counter]: id 5 with food items:  1
+[14:22:35.681 f000000] [game::init, done] built 7 components on khiri
+[14:22:35.681 f000000] [game::init, done] built 7 components on mack
+[14:22:35.681 f000000] [movement_system::create_path_to] dog: 10, source: {1280.000000, 576.000000}, destination: {1152.000000, 704.000000}, checkpoints: 2
+[14:22:35.681 f000000] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
+[14:22:35.681 f000000] [waiter_idling_system::build_paths] waiter: 10, points: 3, destination: {1152.000000, 704.000000}, attempt: 1
+[14:22:35.762 f000001] [state_machine_system::transition] entity: 10, transition: 53, state: 0 -> 1
+[14:22:39.793 f000240] [movement_system::create_path_to] dog: 9, source: {832.000000, 384.000000}, destination: {960.000000, 512.000000}, checkpoints: 2
+[14:22:39.793 f000240] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
+[14:22:39.793 f000240] [waiter_idling_system::build_paths] waiter: 9, points: 3, destination: {960.000000, 512.000000}, attempt: 1
+[14:22:39.810 f000241] [state_machine_system::transition] entity: 9, transition: 53, state: 0 -> 1
+[14:22:45.732 f000590] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[14:22:45.732 f000590] [state_machine_system::transition] entity: 10, transition: 33, state: 1 -> 0
+[14:22:49.722 f000825] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
+[14:22:49.722 f000825] [state_machine_system::transition] entity: 9, transition: 33, state: 1 -> 0
+[14:22:50.996 f000900] [movement_system::create_path_to] dog: 9, source: {960.000000, 512.000000}, destination: {768.000000, 512.000000}, checkpoints: 1
+[14:22:50.996 f000900] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[14:22:50.996 f000900] [waiter_idling_system::build_paths] waiter: 9, points: 2, destination: {768.000000, 512.000000}, attempt: 1
+[14:22:51.013 f000901] [state_machine_system::transition] entity: 9, transition: 53, state: 0 -> 1

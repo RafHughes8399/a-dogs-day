@@ -1,0 +1,13 @@
+[14:22:29.594 f000000] [game::init, start] building the starting world
+[14:22:30.026 f000000] [game::init, built background] id 0
+[14:22:30.027 f000000] [game::init, built cursor] id 1
+[14:22:30.027 f000000] [game::init, built player] id 2 holding cursor 1
+[14:22:30.028 f000000] [game::init, built khiri] id 3
+[14:22:30.029 f000000] [game::init, built mack] id 4
+[14:22:30.029 f000000] [game::init, build counter]: id 5 with food items:  1
+[14:22:30.036 f000000] [game::init, done] built 7 components on khiri
+[14:22:30.036 f000000] [game::init, done] built 7 components on mack
+[14:22:30.036 f000000] [movement_system::create_path_to] dog: 9, source: {832.000000, 384.000000}, destination: {768.000000, 192.000000}, checkpoints: 2
+[14:22:30.036 f000000] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
+[14:22:30.036 f000000] [waiter_idling_system::build_paths] waiter: 9, points: 3, destination: {768.000000, 192.000000}, attempt: 1
+[14:22:30.133 f000001] [state_machine_system::transition] entity: 9, transition: 53, state: 0 -> 1

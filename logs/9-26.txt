@@ -420,13 +420,10 @@ animation it should be peaches
     -> and the screen resolution bug 
     // -----------------------------------------------------------//
 
-
-
     -> then customer eating completion and the food state change 
     -> and customer leaving
+    -> and waiter returning to some position after serving 
     [then that mechanic is like done for now]
-
-
 
 -> and the background tile maker
 -> and then dog art splitting
@@ -435,11 +432,12 @@ animation it should be peaches
     -> the interactinos with the stations,
     -> the transporting of the food to the counter
 -> hud components for stations
+    -> the infra and the building
+    -> the assiging of a hud compoennt to an entity, its rendering conditions, etc 
     -> [the moving, deleting, stashing and selling]
     -> [the item counts for the station]
     -> progress bars for eating and cooking ? ?? ? ?? ? ? ?
     -> the food choices to prepare at a cooking station
- 
 
 -> then the 9 sprite for hud componetns
 -> consider ray gui for hud and menu

@@ -3,22 +3,19 @@
 #include "config.h"
 #include "events_interface.h"
 
+#include <filesystem>
 #include <chrono>
 #include <cstdio>
 #include <ctime>
+#include <iterator>
+#include <string>
+#include <utility>
 
 debug::logger& debug::logger::get_instance(){
     static logger instance;
     return instance;
 }
 
-debug::logger::logger()
-: state_(std::make_unique<inactive>()),
-debug_log_handler_([this](const events::debug_log& event) -> void {on_debug_log_event(event);}),
-messages_({}),
-frame_(0),
-subscribed_(false),
-paused_(false){}
 
 void debug::logger::inactive::render(logger& logger){
     (void) logger;
@@ -29,61 +26,27 @@ void debug::logger::active::render(logger& logger){
     logger.render_messages();
 }
 
-void debug::logger::update(float delta){
-    (void) delta;
-    if(IsKeyPressed(debug_logger_config::toggle_key)){
-        toggle();
-    }
-    if(subscribed_ and IsKeyPressed(debug_logger_config::pause_key)){
-        toggle_pause();
-    }
-}
-
 void debug::logger::render(){
     state_->render(*this);
 }
 
 void debug::logger::toggle(){
-    if(subscribed_){
-        unsubscribe();
-        paused_ = false;
+    if(active_){
         state_ = std::make_unique<inactive>();
-        return;
     }
-    subscribe();
-    state_ = std::make_unique<active>();
+    else{
+        state_ = std::make_unique<active>();
+    }
+    active_ = not active_;
 }
-
-void debug::logger::toggle_pause(){
-    paused_ = not paused_;
-}
-
 void debug::logger::set_frame(int frame){
     frame_ = frame;
 }
 
 void debug::logger::on_debug_log_event(const events::debug_log& event){
-    if(paused_){
-        return;
-    }
     add_message(event.get_message());
 }
 
-void debug::logger::subscribe(){
-    if(subscribed_){
-        return;
-    }
-    event_interface::subscribe<events::debug_log>(debug_log_handler_);
-    subscribed_ = true;
-}
-
-void debug::logger::unsubscribe(){
-    if(not subscribed_){
-        return;
-    }
-    event_interface::unsubscribe<events::debug_log>(debug_log_handler_);
-    subscribed_ = false;
-}
 
 std::string debug::logger::timestamp(){
     auto now = std::chrono::system_clock::now();
@@ -108,7 +71,9 @@ std::string debug::logger::timestamp(){
 }
 
 void debug::logger::add_message(const std::string& message){
-    messages_.push_back(timestamp() + message);
+    auto line = timestamp() + message;
+    output_file_ << line << std::endl;
+    messages_.push_back(std::move(line));
     while(messages_.size() > debug_logger_config::max_messages){
         messages_.pop_front();
     }
@@ -142,4 +107,20 @@ void debug::logger::render_messages(){
             debug_logger_config::text);
         ++line_index;
     }
+}
+
+size_t debug::logger::get_num_log_files(){
+    auto files = std::filesystem::directory_iterator(debug_logger_config::log_directory);
+    return static_cast<size_t>(std::distance(std::filesystem::begin(files), std::filesystem::end(files)));
+}
+
+std::filesystem::path debug::logger::get_log_file_path(){
+    std::filesystem::create_directories(debug_logger_config::log_directory);
+    auto run = get_num_log_files();
+    std::filesystem::path path;
+    do{
+        ++run;
+        path = std::filesystem::path(debug_logger_config::log_directory) / ("debug_run_" + std::to_string(run) + ".txt");
+    } while(std::filesystem::exists(path));
+    return path;
 }
