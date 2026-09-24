@@ -261,7 +261,7 @@ namespace cafe_config{
         level_config::cafe_x,
         level_config::cafe_y + level_config::cafe_height * 0.5f
     };
-    inline const Vector2 cafe_exit = Vector2Zero();  // TODO (25 / 8 / 26) placeholder, input actual value
+    inline const Vector2 cafe_exit = Vector2{cafe_entrance.x, -2.0f * level_config::edge_weight};
     
 }
 namespace station_config{
