@@ -115,8 +115,16 @@ namespace level_config{
     inline const float screen_height = static_cast<float>(game_config::window_height);
     inline const float edge_weight = 64.0f; // placeholder
     
+    // TODO the background tiles should be 768 * 768, so the original frame of the tile  is 256 * 256
+    // TODO and the world should bcome a square, and then the tiles become 4  to fill it out
+    inline const size_t num_tiles = 16;
+    inline const float tile_width = 768.0f;
+    inline const float tile_height = 768.0f;
+
     inline float world_x = 3072.0f;
-    inline float world_y = 2048.0f;
+    inline float world_y = 3072.0f;
+    inline const size_t tile_rows = world_y / tile_height;
+    inline const size_t tile_columns = world_x / tile_width;
     
     inline float graph_x = 0.0f;
     inline float footpath_overhang = 3 * edge_weight;
@@ -261,7 +269,7 @@ namespace cafe_config{
         level_config::cafe_x,
         level_config::cafe_y + level_config::cafe_height * 0.5f
     };
-    inline const Vector2 cafe_exit = Vector2Zero();  // TODO (25 / 8 / 26) placeholder, input actual value
+    inline const Vector2 cafe_exit = Vector2{cafe_entrance.x, -2.0f * level_config::edge_weight};
     
 }
 namespace station_config{

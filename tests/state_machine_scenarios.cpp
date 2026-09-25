@@ -87,9 +87,16 @@ SCENARIO("the customer machine walks its service cycle", "[state_machine]"){
 
             machine.transition(0, dog_config::meal_finished);
 
-            THEN("it is sitting again, and leaving walks it out"){
-                REQUIRE(machine.current() == dog_config::customer_sitting);
-                machine.transition(0, dog_config::customer_leaving);
+            THEN("it walks out"){
+                REQUIRE(machine.current() == dog_config::customer_walking);
+            }
+        }
+
+        WHEN("it is seated and leaves before it is served"){
+            machine.transition(0, dog_config::interaction_started);
+            machine.transition(0, dog_config::customer_leaving);
+
+            THEN("it walks out"){
                 REQUIRE(machine.current() == dog_config::customer_walking);
             }
         }
@@ -316,10 +323,13 @@ SCENARIO("a seated customer eats for as long as the config says", "[state_machin
                 flush();
                 REQUIRE(game.state_of(customer_id).value() == dog_config::customer_eating);
             }
-            THEN("it sits again once the meal is done"){
+            THEN("it walks for the exit once the meal is done"){
                 game.tick_until([](){ return false; }, dog_config::eating_duration);
                 flush();
-                REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
+                REQUIRE(game.state_of(customer_id).value() == dog_config::customer_walking);
+                auto destinations = game.path_destinations(customer_id);
+                REQUIRE_FALSE(destinations.empty());
+                REQUIRE(Vector2Equals(destinations.back(), cafe_config::cafe_exit));
             }
         }
     }

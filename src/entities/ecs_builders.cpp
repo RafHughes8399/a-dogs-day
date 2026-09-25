@@ -269,8 +269,8 @@ void ecs_entities::build_food(size_t id, Vector2 position, sprite::sprite food_s
 // and is_entity_in_frame never culls it
 void ecs_entities::build_background(size_t id){
     component_helpers::add_positional_component(id, Vector2{0.0f, 0.0f});
-
     std::vector<sprite::sprite> sprites = {sprite_builders::build_background_sprite()};
+    
     std::vector<components::renderable_component::body> bodys = {component_builders::build_body(sprites, 0)};
     component_helpers::add_renderable_component(id, bodys);
 }
