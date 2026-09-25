@@ -1,5 +1,7 @@
 #include <cassert>
 #include <cmath>
+#include <raylib.h>
+#include <string>
 #include "config.h"
 #include "sprite.h"
 #include "texture.h"
@@ -159,6 +161,34 @@ std::vector<sprite::sprite> sprite_builders::build_food_sprites(){
     return sprites;
 }
 sprite::sprite sprite_builders::build_background_sprite(){
+    // TODO * load all the images, then patch them to add everything 
+    // lets do a 4 * 4 then just repeat it four times, assume the naming convention of "backround_tile_[num]"
+    std::string file_name_base = "../sprites/background-tile-";
+    std::string file_extension = ".png";
+    Image base = LoadImage(entity_config::background_path);
+    Rectangle base_rectangle = Rectangle{0.0f, 0.0f, static_cast<float>(base.width), static_cast<float>(base.height)};
+    // * an inline load image here will suffice, its a one off, could be a helper if we need it to be
+    for(size_t i = 1; i <= level_config::num_tiles; ++i){
+        std::string path = file_name_base + std::to_string(i) + file_extension;
+        auto tile_image = LoadImage(path.c_str());
+        auto tile_rectangle = Rectangle{0.0f, 0.0f, static_cast<float>(tile_image.width), static_cast<float>(tile_image.height)};
+        auto tile_index = i - 1;
+        auto tile_column = tile_index % level_config::tile_columns;
+        auto tile_row = tile_index / level_config::tile_columns;
+        auto background_sub_rectangle = Rectangle{
+            static_cast<float>(tile_column) * level_config::tile_width,
+            static_cast<float>(tile_row) * level_config::tile_height,
+            level_config::tile_width,
+            level_config::tile_height};
+
+        ImageDraw(&base, tile_image, tile_rectangle, background_sub_rectangle, WHITE);
+        UnloadImage(tile_image);
+    }
+    // *then once the image is built, you can just load it as a texture, can keep the same path and everything no stress
+    if(not textures::textures_.check_texture(textures::background)){
+        textures::textures_.load_texture(textures::background, LoadTextureFromImage(base));
+    }
+    UnloadImage(base);
     auto background_texture = textures::textures_.get_texture(textures::background, entity_config::background_path);
     return build_sprite(background_texture,
         entity_config::background_attributes[entity_config::attributes::frame_width],
