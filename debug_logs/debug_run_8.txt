@@ -1,0 +1,25 @@
+[13:49:37.646 f000000] [game::init, start] building the starting world
+[13:49:38.024 f000000] [build background]: load tile 1 draw onto image at 0.000000,  0.000000, 768.000000, 768.000000
+[13:49:38.048 f000000] [build background]: load tile 2 draw onto image at 768.000000,  0.000000, 1536.000000, 768.000000
+[13:49:38.071 f000000] [build background]: load tile 3 draw onto image at 1536.000000,  0.000000, 2304.000000, 768.000000
+[13:49:38.095 f000000] [build background]: load tile 4 draw onto image at 2304.000000,  0.000000, 3072.000000, 768.000000
+[13:49:38.119 f000000] [build background]: load tile 5 draw onto image at 0.000000,  768.000000, 768.000000, 1536.000000
+[13:49:38.142 f000000] [build background]: load tile 6 draw onto image at 768.000000,  768.000000, 1536.000000, 1536.000000
+[13:49:38.167 f000000] [build background]: load tile 7 draw onto image at 1536.000000,  768.000000, 2304.000000, 1536.000000
+[13:49:38.191 f000000] [build background]: load tile 8 draw onto image at 2304.000000,  768.000000, 3072.000000, 1536.000000
+[13:49:38.215 f000000] [build background]: load tile 9 draw onto image at 0.000000,  1536.000000, 768.000000, 2304.000000
+[13:49:38.243 f000000] [build background]: load tile 10 draw onto image at 768.000000,  1536.000000, 1536.000000, 2304.000000
+[13:49:38.269 f000000] [build background]: load tile 11 draw onto image at 1536.000000,  1536.000000, 2304.000000, 2304.000000
+[13:49:38.293 f000000] [build background]: load tile 12 draw onto image at 2304.000000,  1536.000000, 3072.000000, 2304.000000
+[13:49:38.318 f000000] [build background]: load tile 13 draw onto image at 0.000000,  2304.000000, 768.000000, 3072.000000
+[13:49:38.341 f000000] [build background]: load tile 14 draw onto image at 768.000000,  2304.000000, 1536.000000, 3072.000000
+[13:49:38.367 f000000] [build background]: load tile 15 draw onto image at 1536.000000,  2304.000000, 2304.000000, 3072.000000
+[13:49:38.391 f000000] [build background]: load tile 16 draw onto image at 2304.000000,  2304.000000, 3072.000000, 3072.000000
+[13:49:38.742 f000000] [game::init, built background] id 0
+[13:49:38.742 f000000] [game::init, built cursor] id 1
+[13:49:38.743 f000000] [game::init, built player] id 2 holding cursor 1
+[13:49:38.744 f000000] [game::init, built khiri] id 3
+[13:49:38.745 f000000] [game::init, built mack] id 4
+[13:49:38.745 f000000] [game::init, build counter]: id 5 with food items:  1
+[13:49:38.753 f000000] [game::init, done] built 7 components on khiri
+[13:49:38.753 f000000] [game::init, done] built 7 components on mack

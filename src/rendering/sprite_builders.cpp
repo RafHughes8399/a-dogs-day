@@ -5,6 +5,7 @@
 #include "config.h"
 #include "sprite.h"
 #include "texture.h"
+#include "debug_log_interface.h"
 sprite::sprite sprite_builders::build_sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations,
     Vector2 draw_position_offset, Color tint){
     return sprite::sprite(texture, frame_width, frame_height, frames, animations, draw_position_offset, tint);
@@ -180,7 +181,8 @@ sprite::sprite sprite_builders::build_background_sprite(){
             static_cast<float>(tile_row) * level_config::tile_height,
             level_config::tile_width,
             level_config::tile_height};
-
+        debug::log("[build background]: load tile " + std::to_string(i) + " draw onto image at " + std::to_string(background_sub_rectangle.x) + ",  " + std::to_string(background_sub_rectangle.y) + ", " + std::to_string(background_sub_rectangle.x + background_sub_rectangle.width) + 
+        ", " + std::to_string(background_sub_rectangle.y + background_sub_rectangle.height));
         ImageDraw(&base, tile_image, tile_rectangle, background_sub_rectangle, WHITE);
         UnloadImage(tile_image);
     }

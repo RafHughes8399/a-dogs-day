@@ -559,7 +559,7 @@ namespace entity_config{
     inline const float food_height = level_config::edge_weight * 0.6f;
 
 
-    inline const float background_attributes[attributes::size] = {3840.0f, 2160.0f, 1.0f, 1.0f};
+    inline const float background_attributes[attributes::size] = {level_config::world_x, level_config::world_y, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f}; 
     inline const float paw_mark_attributes[attributes::size] =  {20.0f, 20.0f, 81.0f, 1.0f};
     inline const float khiri_across_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 0.75f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
