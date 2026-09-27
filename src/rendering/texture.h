@@ -67,6 +67,7 @@ namespace textures{
         hud_edit_wheel,
         gargoyle_void,
         gargoyle_sick_of_it,
+        pavlov,
         poker_table,
         dog_painting,
         dining_table,

@@ -41,6 +41,10 @@ hitbox::hitbox hitbox_builders::build_gargoyle_hitbox(Vector2 position){
         entity_config::gargoyle_decoration_attributes[entity_config::attributes::frame_width],
         entity_config::gargoyle_decoration_attributes[entity_config::attributes::frame_height]);
 }
+hitbox::hitbox hitbox_builders::build_pavlov_hitbox(Vector2 position){
+    return build_hitbox(position, entity_config::pavlov_attributes[entity_config::attributes::frame_width],
+    entity_config::pavlov_attributes[entity_config::attributes::frame_height]);
+}
 hitbox::hitbox hitbox_builders::build_poker_table_hitbox(Vector2 position){
     return build_hitbox(position,
         entity_config::poker_table_attributes[entity_config::attributes::frame_width],

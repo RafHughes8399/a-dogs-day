@@ -125,6 +125,7 @@ namespace sprite_builders{
     // *-------------------- deocration sprites --------------------* //
     sprite::sprite build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size],
         Vector2 draw_position_offset = Vector2Zero());
+    sprite::sprite build_pavlov();
     sprite::sprite build_poker_table();
     sprite::sprite build_dog_painting();
     sprite::sprite build_gargoyle();

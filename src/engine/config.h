@@ -530,6 +530,7 @@ namespace entity_config{
     inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
     inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle-void.png";
     inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
+    inline const char* pavlov_path = "../sprites/pavlov.png";
     inline const char* poker_table_decoration_path = "../sprites/dog-poker.png";
     inline const char* test_decoration_path ="../sprites/test_decoration.png";
     
@@ -614,6 +615,7 @@ namespace entity_config{
         {lionel_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.15f}, true, lionel_tail_left_path, lionel_tail_right_path}};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
+    inline const float pavlov_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 2.75f, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
     

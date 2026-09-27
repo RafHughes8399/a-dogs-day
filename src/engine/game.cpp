@@ -61,7 +61,9 @@ void game::game::init(){
     lifespan_.create([](size_t id)-> void {
         ecs_entities::build_dog_painting(id, Vector2{level_config::edge_weight * 9,level_config::edge_weight * 4});
     }, level_config::draw_layers::decoration);
-
+    lifespan_.create([](size_t id) -> void{
+        ecs_entities::build_pavlov(id, Vector2{level_config::edge_weight * 12, level_config::edge_weight * 30});
+    }, level_config::draw_layers::decoration);
     debug::log("[game::init, done] built "
         + std::to_string(component_helpers::num_registered_components(khiri_id))
         + " components on khiri");
