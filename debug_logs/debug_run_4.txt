@@ -1,0 +1,756 @@
+[15:43:41.438 f000000] [game::init, start] building the starting world
+[15:43:41.875 f000000] [game::init, built background] id 0
+[15:43:41.875 f000000] [game::init, built cursor] id 1
+[15:43:41.875 f000000] [game::init, built player] id 2 holding cursor 1
+[15:43:41.877 f000000] [game::init, built khiri] id 3
+[15:43:41.878 f000000] [game::init, built mack] id 4
+[15:43:41.878 f000000] [game::init, build counter]: id 5 with food items:  1
+[15:43:41.885 f000000] [game::init, done] built 7 components on khiri
+[15:43:41.885 f000000] [game::init, done] built 7 components on mack
+[15:43:41.885 f000000] [movement_system::create_path_to] dog: 10, source: {1280.000000, 576.000000}, destination: {1152.000000, 704.000000}, checkpoints: 3
+[15:43:41.885 f000000] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
+[15:43:41.885 f000000] [waiter_idling_system::build_paths] waiter: 10, points: 4, destination: {1152.000000, 704.000000}, attempt: 1
+[15:43:41.997 f000001] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[15:43:50.510 f000494] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[15:43:50.511 f000494] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[15:43:54.356 f000720] [movement_system::create_path_to] dog: 10, source: {1152.000000, 704.000000}, destination: {1280.000000, 512.000000}, checkpoints: 3
+[15:43:54.357 f000720] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
+[15:43:54.357 f000720] [waiter_idling_system::build_paths] waiter: 10, points: 4, destination: {1280.000000, 512.000000}, attempt: 1
+[15:43:54.373 f000721] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[15:43:55.765 f000803] [control_input_system::left_click, clicked] asked by: 1, position: {924.994995, 389.287933}
+[15:43:55.766 f000803] [control_input_system::left_click, hit entity] selecting: 9
+[15:43:55.766 f000803] [control_input_system::left_click, selection settled] selected: 9
+[15:43:56.527 f000848] [control_input_system::right_click, clicked] asked by: 1, position: {1320.431519, 356.167908}
+[15:43:56.527 f000848] [control_input_system::right_click, resolved destination] entity: 5
+[15:43:56.527 f000848] [control_input_system::right_click, queued path request] dog: 9, destination: {1320.431519, 356.167908}
+[15:43:56.544 f000849] [interactable_component::get_interaction_offset] direction: left, position: {1216.000000, 368.000000}, node_id: 235, distance_from_source: 384.333191
+[15:43:56.544 f000849] [interactable_component::get_interaction_offset] direction: right, position: {1408.000000, 368.000000}, node_id: 238, distance_from_source: 576.222168
+[15:43:56.544 f000849] [interactable_component::get_interaction_offset] chosen offset: {-64.000000, 48.000000}
+[15:43:56.544 f000849] [movement_system::create_path_to_entity] dog: 9, source: {832.000000, 384.000000}, destination entity: 5, resolved destination: {1216.000000, 320.000000}, checkpoints: 0
+[15:43:56.544 f000849] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[15:43:56.544 f000849] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
+[15:44:01.423 f001136] [dog_factory::build_customer_dog, built customer] id: 14
+[15:44:01.423 f001136] [movement_system::create_path_to] dog: 14, source: {64.000000, -128.000000}, destination: {64.000000, 2176.000000}, checkpoints: 0
+[15:44:01.424 f001136] [movement_system::commit_route] dog: 14, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[15:44:01.424 f001136] [customer_table_system::create_customer_dog, built customer] id: 14, spawn: {64.000000, -128.000000}, tracked customers: 1
+[15:44:01.424 f001136] [customer_table_system::send_customer_to_table] customer: 14, table: 7, via entrance: {256.000000, 1024.000000}
+[15:44:01.424 f001136] [interactable_component::get_interaction_offset] direction: left, position: {320.000000, 432.000000}, node_id: 265, distance_from_source: 615.740234
+[15:44:01.424 f001136] [interactable_component::get_interaction_offset] direction: right, position: {512.000000, 432.000000}, node_id: 268, distance_from_source: 717.149902
+[15:44:01.424 f001136] [interactable_component::get_interaction_offset] chosen offset: {-64.000000, 48.000000}
+[15:44:01.424 f001136] [movement_system::create_path_to_entity] dog: 14, source: {64.000000, -128.000000}, destination entity: 7, resolved destination: {320.000000, 384.000000}, checkpoints: 1
+[15:44:01.425 f001136] [movement_system::commit_route] dog: 14, mode: replace, paths before: 1, cleared: yes, legs committed: 2, paths after: 2
+[15:44:03.227 f001242] [interaction_system::on_path_finished] dog: 9, target: 5, overlapping: yes
+[15:44:03.227 f001242] [interaciotn system, determine performable interactions]: interactor interactions 3
+[15:44:03.227 f001242] [interaciotn system, determine performable interactions]: interactee interactions 2
+[15:44:03.227 f001242] add interaction to process
+[15:44:03.227 f001242] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
+[15:44:03.227 f001242] [interaction system - process interaction] - interactor 9 interactee: 5 interactions to check: 2
+[15:44:03.227 f001242] [interaction system - process interaction] - perform interaction 2
+[15:44:03.227 f001242] waiter counter pickup interaction attempt
+[15:44:03.227 f001242] [entity_lifespan_system, create food]: create food: 0 at posiiton 1344.000000, 312.447998
+[15:44:03.227 f001242] [interaction system - process interaction] - perform interaction 3
+[15:44:03.227 f001242] waiter-counter place down interaction attempt
+[15:44:03.227 f001242] [waiter-counter place down interaction] - dog is not in carrying state
+[15:44:03.227 f001242] [waiter-counter place down interaction] - dog is 0
+[15:44:03.227 f001242] [waiter-counter place down interaction] - carrying is 2
+[15:44:03.244 f001243] [state_machine_system::transition] entity: 9, transition: 16, state: 0 -> 2
+[15:44:06.067 f001409] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[15:44:06.067 f001409] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[15:44:08.633 f001560] [movement_system::create_path_to] dog: 10, source: {1280.000000, 512.000000}, destination: {1408.000000, 320.000000}, checkpoints: 3
+[15:44:08.635 f001560] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
+[15:44:08.635 f001560] [waiter_idling_system::build_paths] waiter: 10, points: 4, destination: {1408.000000, 320.000000}, attempt: 1
+[15:44:08.650 f001561] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[15:44:11.437 f001725] [control_input_system::left_click, clicked] asked by: 1, position: {1269.340210, 330.453613}
+[15:44:11.437 f001725] [control_input_system::left_click, hit entity] selecting: 9
+[15:44:11.437 f001725] [control_input_system::left_click, selection settled] selected: 9
+[15:44:20.547 f002261] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[15:44:20.549 f002261] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[15:44:21.431 f002313] [dog_factory::build_customer_dog, built customer] id: 16
+[15:44:21.432 f002313] [movement_system::create_path_to] dog: 16, source: {64.000000, -128.000000}, destination: {64.000000, 2176.000000}, checkpoints: 0
+[15:44:21.432 f002313] [movement_system::commit_route] dog: 16, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[15:44:21.432 f002313] [customer_table_system::create_customer_dog, built customer] id: 16, spawn: {64.000000, -128.000000}, tracked customers: 2
+[15:44:21.432 f002313] [customer_table_system::send_customer_to_table] customer: 16, table: 8, via entrance: {256.000000, 1024.000000}
+[15:44:21.432 f002313] [interactable_component::get_interaction_offset] direction: left, position: {576.000000, 560.000000}, node_id: 357, distance_from_source: 857.605957
+[15:44:21.432 f002313] [interactable_component::get_interaction_offset] direction: right, position: {768.000000, 560.000000}, node_id: 360, distance_from_source: 984.357666
+[15:44:21.432 f002313] [interactable_component::get_interaction_offset] chosen offset: {-64.000000, 48.000000}
+[15:44:21.432 f002313] [movement_system::create_path_to_entity] dog: 16, source: {64.000000, -128.000000}, destination entity: 8, resolved destination: {576.000000, 512.000000}, checkpoints: 1
+[15:44:21.432 f002313] [movement_system::commit_route] dog: 16, mode: replace, paths before: 1, cleared: yes, legs committed: 2, paths after: 2
+[15:44:22.911 f002400] [movement_system::create_path_to] dog: 10, source: {1408.000000, 320.000000}, destination: {1536.000000, 448.000000}, checkpoints: 2
+[15:44:22.911 f002400] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
+[15:44:22.911 f002400] [waiter_idling_system::build_paths] waiter: 10, points: 3, destination: {1536.000000, 448.000000}, attempt: 1
+[15:44:22.928 f002401] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[15:44:29.810 f002806] [interaction_system::on_path_finished] dog: 14, target: 7, overlapping: yes
+[15:44:29.810 f002806] [interaciotn system, determine performable interactions]: interactor interactions 1
+[15:44:29.810 f002806] [interaciotn system, determine performable interactions]: interactee interactions 2
+[15:44:29.810 f002806] add interaction to process
+[15:44:29.810 f002806] [state_machine_system::transition] entity: 14, transition: 22, state: 0 -> 1
+[15:44:29.810 f002806] [interaction system - process interaction] - interactor 14 interactee: 7 interactions to check: 1
+[15:44:29.810 f002806] [interaction system - process interaction] - perform interaction 0
+[15:44:29.810 f002806] customer table sit interaction attempt
+[15:44:31.952 f002932] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[15:44:31.952 f002932] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[15:44:32.889 f002987] [control_input_system::right_click, clicked] asked by: 1, position: {444.940460, 440.542877}
+[15:44:32.889 f002987] [control_input_system::right_click, resolved destination] entity: 7
+[15:44:32.889 f002987] [control_input_system::right_click, queued path request] dog: 9, destination: {444.940460, 440.542877}
+[15:44:32.905 f002988] [interactable_component::get_interaction_offset] direction: left, position: {320.000000, 432.000000}, node_id: 265, REJECTED - occupied by entity 14
+[15:44:32.905 f002988] [interactable_component::get_interaction_offset] direction: right, position: {512.000000, 432.000000}, node_id: 268, distance_from_source: 712.853394
+[15:44:32.905 f002988] [interactable_component::get_interaction_offset] chosen offset: {128.000000, 48.000000}
+[15:44:32.906 f002988] [movement_system::create_path_to_entity] dog: 9, source: {1216.000000, 320.000000}, destination entity: 7, resolved destination: {512.000000, 384.000000}, checkpoints: 0
+[15:44:32.906 f002988] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[15:44:33.109 f003000] [movement_system::create_path_to] dog: 10, source: {1536.000000, 448.000000}, destination: {1600.000000, 512.000000}, checkpoints: 1
+[15:44:33.110 f003000] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[15:44:33.110 f003000] [waiter_idling_system::build_paths] waiter: 10, points: 2, destination: {1600.000000, 512.000000}, attempt: 1
+[15:44:33.126 f003001] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[15:44:35.051 f003114] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[15:44:35.051 f003114] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[15:44:41.442 f003490] [dog_factory::build_customer_dog, built customer] id: 17
+[15:44:41.443 f003490] [movement_system::create_path_to] dog: 17, source: {64.000000, -128.000000}, destination: {64.000000, 2176.000000}, checkpoints: 0
+[15:44:41.443 f003490] [movement_system::commit_route] dog: 17, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[15:44:41.443 f003490] [customer_table_system::create_customer_dog, built customer] id: 17, spawn: {64.000000, -128.000000}, tracked customers: 3
+[15:44:45.205 f000111] [interaction_system::on_path_finished] dog: 9, target: 7, overlapping: yes
+[15:44:45.206 f000111] [interaciotn system, determine performable interactions]: interactor interactions 3
+[15:44:45.206 f000111] [interaciotn system, determine performable interactions]: interactee interactions 2
+[15:44:45.206 f000111] add interaction to process
+[15:44:45.206 f000111] [interaction system - process interaction] - interactor 9 interactee: 7 interactions to check: 1
+[15:44:45.206 f000111] [interaction system - process interaction] - perform interaction 1
+[15:44:45.206 f000111] waiter table serve interaction attempt
+[15:44:45.206 f000111] [waiter table serve attempt: ] - post drop, waiter: 9, table: 7, dropped food: 15, carrier carrying: no, carried entity: none, state: 2
+[15:44:45.223 f000112] [state_machine_system::transition] entity: 14, transition: 11, state: 1 -> 2
+[15:44:45.223 f000112] [state_machine_system::transition] entity: 9, transition: 11, state: 2 -> 0
+[15:44:45.223 f000112] [dog eating state update] : eating elapsed : 1 duration cap: 600
+[15:44:45.240 f000113] [dog eating state update] : eating elapsed : 2 duration cap: 600
+[15:44:45.257 f000114] [dog eating state update] : eating elapsed : 3 duration cap: 600
+[15:44:45.274 f000115] [dog eating state update] : eating elapsed : 4 duration cap: 600
+[15:44:45.291 f000116] [dog eating state update] : eating elapsed : 5 duration cap: 600
+[15:44:45.308 f000117] [dog eating state update] : eating elapsed : 6 duration cap: 600
+[15:44:45.325 f000118] [dog eating state update] : eating elapsed : 7 duration cap: 600
+[15:44:45.342 f000119] [dog eating state update] : eating elapsed : 8 duration cap: 600
+[15:44:45.359 f000120] [dog eating state update] : eating elapsed : 9 duration cap: 600
+[15:44:45.376 f000121] [dog eating state update] : eating elapsed : 10 duration cap: 600
+[15:44:45.393 f000122] [dog eating state update] : eating elapsed : 11 duration cap: 600
+[15:44:45.410 f000123] [dog eating state update] : eating elapsed : 12 duration cap: 600
+[15:44:45.427 f000124] [dog eating state update] : eating elapsed : 13 duration cap: 600
+[15:44:45.445 f000125] [dog eating state update] : eating elapsed : 14 duration cap: 600
+[15:44:45.462 f000126] [dog eating state update] : eating elapsed : 15 duration cap: 600
+[15:44:45.479 f000127] [dog eating state update] : eating elapsed : 16 duration cap: 600
+[15:44:45.496 f000128] [dog eating state update] : eating elapsed : 17 duration cap: 600
+[15:44:45.513 f000129] [dog eating state update] : eating elapsed : 18 duration cap: 600
+[15:44:45.530 f000130] [dog eating state update] : eating elapsed : 19 duration cap: 600
+[15:44:45.547 f000131] [dog eating state update] : eating elapsed : 20 duration cap: 600
+[15:44:45.564 f000132] [dog eating state update] : eating elapsed : 21 duration cap: 600
+[15:44:45.581 f000133] [dog eating state update] : eating elapsed : 22 duration cap: 600
+[15:44:45.598 f000134] [dog eating state update] : eating elapsed : 23 duration cap: 600
+[15:44:45.615 f000135] [dog eating state update] : eating elapsed : 24 duration cap: 600
+[15:44:45.633 f000136] [dog eating state update] : eating elapsed : 25 duration cap: 600
+[15:44:45.650 f000137] [dog eating state update] : eating elapsed : 26 duration cap: 600
+[15:44:45.667 f000138] [dog eating state update] : eating elapsed : 27 duration cap: 600
+[15:44:45.684 f000139] [dog eating state update] : eating elapsed : 28 duration cap: 600
+[15:44:45.701 f000140] [dog eating state update] : eating elapsed : 29 duration cap: 600
+[15:44:45.718 f000141] [dog eating state update] : eating elapsed : 30 duration cap: 600
+[15:44:45.735 f000142] [dog eating state update] : eating elapsed : 31 duration cap: 600
+[15:44:45.752 f000143] [dog eating state update] : eating elapsed : 32 duration cap: 600
+[15:44:45.769 f000144] [dog eating state update] : eating elapsed : 33 duration cap: 600
+[15:44:45.786 f000145] [dog eating state update] : eating elapsed : 34 duration cap: 600
+[15:44:45.803 f000146] [dog eating state update] : eating elapsed : 35 duration cap: 600
+[15:44:45.820 f000147] [dog eating state update] : eating elapsed : 36 duration cap: 600
+[15:44:45.837 f000148] [dog eating state update] : eating elapsed : 37 duration cap: 600
+[15:44:45.854 f000149] [dog eating state update] : eating elapsed : 38 duration cap: 600
+[15:44:45.871 f000150] [dog eating state update] : eating elapsed : 39 duration cap: 600
+[15:44:45.887 f000151] [dog eating state update] : eating elapsed : 40 duration cap: 600
+[15:44:45.905 f000152] [dog eating state update] : eating elapsed : 41 duration cap: 600
+[15:44:45.921 f000153] [dog eating state update] : eating elapsed : 42 duration cap: 600
+[15:44:45.939 f000154] [dog eating state update] : eating elapsed : 43 duration cap: 600
+[15:44:45.955 f000155] [dog eating state update] : eating elapsed : 44 duration cap: 600
+[15:44:45.973 f000156] [dog eating state update] : eating elapsed : 45 duration cap: 600
+[15:44:45.990 f000157] [dog eating state update] : eating elapsed : 46 duration cap: 600
+[15:44:46.007 f000158] [dog eating state update] : eating elapsed : 47 duration cap: 600
+[15:44:46.024 f000159] [dog eating state update] : eating elapsed : 48 duration cap: 600
+[15:44:46.041 f000160] [dog eating state update] : eating elapsed : 49 duration cap: 600
+[15:44:46.058 f000161] [dog eating state update] : eating elapsed : 50 duration cap: 600
+[15:44:46.075 f000162] [dog eating state update] : eating elapsed : 51 duration cap: 600
+[15:44:46.092 f000163] [dog eating state update] : eating elapsed : 52 duration cap: 600
+[15:44:46.109 f000164] [dog eating state update] : eating elapsed : 53 duration cap: 600
+[15:44:46.126 f000165] [dog eating state update] : eating elapsed : 54 duration cap: 600
+[15:44:46.143 f000166] [dog eating state update] : eating elapsed : 55 duration cap: 600
+[15:44:46.160 f000167] [dog eating state update] : eating elapsed : 56 duration cap: 600
+[15:44:46.178 f000168] [dog eating state update] : eating elapsed : 57 duration cap: 600
+[15:44:46.194 f000169] [dog eating state update] : eating elapsed : 58 duration cap: 600
+[15:44:46.212 f000170] [dog eating state update] : eating elapsed : 59 duration cap: 600
+[15:44:46.229 f000171] [dog eating state update] : eating elapsed : 60 duration cap: 600
+[15:44:46.246 f000172] [dog eating state update] : eating elapsed : 61 duration cap: 600
+[15:44:46.263 f000173] [dog eating state update] : eating elapsed : 62 duration cap: 600
+[15:44:46.280 f000174] [dog eating state update] : eating elapsed : 63 duration cap: 600
+[15:44:46.297 f000175] [dog eating state update] : eating elapsed : 64 duration cap: 600
+[15:44:46.314 f000176] [dog eating state update] : eating elapsed : 65 duration cap: 600
+[15:44:46.331 f000177] [dog eating state update] : eating elapsed : 66 duration cap: 600
+[15:44:46.348 f000178] [dog eating state update] : eating elapsed : 67 duration cap: 600
+[15:44:46.365 f000179] [dog eating state update] : eating elapsed : 68 duration cap: 600
+[15:44:46.383 f000180] [dog eating state update] : eating elapsed : 69 duration cap: 600
+[15:44:46.399 f000181] [dog eating state update] : eating elapsed : 70 duration cap: 600
+[15:44:46.416 f000182] [dog eating state update] : eating elapsed : 71 duration cap: 600
+[15:44:46.433 f000183] [dog eating state update] : eating elapsed : 72 duration cap: 600
+[15:44:46.450 f000184] [dog eating state update] : eating elapsed : 73 duration cap: 600
+[15:44:46.467 f000185] [dog eating state update] : eating elapsed : 74 duration cap: 600
+[15:44:46.484 f000186] [dog eating state update] : eating elapsed : 75 duration cap: 600
+[15:44:46.501 f000187] [dog eating state update] : eating elapsed : 76 duration cap: 600
+[15:44:46.517 f000188] [dog eating state update] : eating elapsed : 77 duration cap: 600
+[15:44:46.534 f000189] [dog eating state update] : eating elapsed : 78 duration cap: 600
+[15:44:46.551 f000190] [dog eating state update] : eating elapsed : 79 duration cap: 600
+[15:44:46.568 f000191] [dog eating state update] : eating elapsed : 80 duration cap: 600
+[15:44:46.585 f000192] [dog eating state update] : eating elapsed : 81 duration cap: 600
+[15:44:46.602 f000193] [dog eating state update] : eating elapsed : 82 duration cap: 600
+[15:44:46.619 f000194] [dog eating state update] : eating elapsed : 83 duration cap: 600
+[15:44:46.636 f000195] [dog eating state update] : eating elapsed : 84 duration cap: 600
+[15:44:46.653 f000196] [dog eating state update] : eating elapsed : 85 duration cap: 600
+[15:44:46.670 f000197] [dog eating state update] : eating elapsed : 86 duration cap: 600
+[15:44:46.687 f000198] [dog eating state update] : eating elapsed : 87 duration cap: 600
+[15:44:46.704 f000199] [dog eating state update] : eating elapsed : 88 duration cap: 600
+[15:44:46.721 f000200] [dog eating state update] : eating elapsed : 89 duration cap: 600
+[15:44:46.738 f000201] [dog eating state update] : eating elapsed : 90 duration cap: 600
+[15:44:46.755 f000202] [dog eating state update] : eating elapsed : 91 duration cap: 600
+[15:44:46.772 f000203] [dog eating state update] : eating elapsed : 92 duration cap: 600
+[15:44:46.789 f000204] [dog eating state update] : eating elapsed : 93 duration cap: 600
+[15:44:46.806 f000205] [dog eating state update] : eating elapsed : 94 duration cap: 600
+[15:44:46.824 f000206] [dog eating state update] : eating elapsed : 95 duration cap: 600
+[15:44:46.841 f000207] [dog eating state update] : eating elapsed : 96 duration cap: 600
+[15:44:46.857 f000208] [dog eating state update] : eating elapsed : 97 duration cap: 600
+[15:44:46.874 f000209] [dog eating state update] : eating elapsed : 98 duration cap: 600
+[15:44:46.891 f000210] [dog eating state update] : eating elapsed : 99 duration cap: 600
+[15:44:46.908 f000211] [dog eating state update] : eating elapsed : 100 duration cap: 600
+[15:44:46.925 f000212] [dog eating state update] : eating elapsed : 101 duration cap: 600
+[15:44:46.941 f000213] [dog eating state update] : eating elapsed : 102 duration cap: 600
+[15:44:46.958 f000214] [dog eating state update] : eating elapsed : 103 duration cap: 600
+[15:44:46.975 f000215] [dog eating state update] : eating elapsed : 104 duration cap: 600
+[15:44:46.992 f000216] [dog eating state update] : eating elapsed : 105 duration cap: 600
+[15:44:47.009 f000217] [dog eating state update] : eating elapsed : 106 duration cap: 600
+[15:44:47.026 f000218] [dog eating state update] : eating elapsed : 107 duration cap: 600
+[15:44:47.043 f000219] [dog eating state update] : eating elapsed : 108 duration cap: 600
+[15:44:47.060 f000220] [dog eating state update] : eating elapsed : 109 duration cap: 600
+[15:44:47.077 f000221] [dog eating state update] : eating elapsed : 110 duration cap: 600
+[15:44:47.095 f000222] [dog eating state update] : eating elapsed : 111 duration cap: 600
+[15:44:47.112 f000223] [dog eating state update] : eating elapsed : 112 duration cap: 600
+[15:44:47.129 f000224] [dog eating state update] : eating elapsed : 113 duration cap: 600
+[15:44:47.145 f000225] [dog eating state update] : eating elapsed : 114 duration cap: 600
+[15:44:47.162 f000226] [dog eating state update] : eating elapsed : 115 duration cap: 600
+[15:44:47.179 f000227] [dog eating state update] : eating elapsed : 116 duration cap: 600
+[15:44:47.196 f000228] [dog eating state update] : eating elapsed : 117 duration cap: 600
+[15:44:47.214 f000229] [dog eating state update] : eating elapsed : 118 duration cap: 600
+[15:44:47.231 f000230] [dog eating state update] : eating elapsed : 119 duration cap: 600
+[15:44:47.248 f000231] [dog eating state update] : eating elapsed : 120 duration cap: 600
+[15:44:47.265 f000232] [dog eating state update] : eating elapsed : 121 duration cap: 600
+[15:44:47.282 f000233] [dog eating state update] : eating elapsed : 122 duration cap: 600
+[15:44:47.299 f000234] [dog eating state update] : eating elapsed : 123 duration cap: 600
+[15:44:47.316 f000235] [dog eating state update] : eating elapsed : 124 duration cap: 600
+[15:44:47.333 f000236] [dog eating state update] : eating elapsed : 125 duration cap: 600
+[15:44:47.350 f000237] [dog eating state update] : eating elapsed : 126 duration cap: 600
+[15:44:47.367 f000238] [dog eating state update] : eating elapsed : 127 duration cap: 600
+[15:44:47.384 f000239] [dog eating state update] : eating elapsed : 128 duration cap: 600
+[15:44:47.401 f000240] [dog eating state update] : eating elapsed : 129 duration cap: 600
+[15:44:47.417 f000241] [dog eating state update] : eating elapsed : 130 duration cap: 600
+[15:44:47.436 f000242] [dog eating state update] : eating elapsed : 131 duration cap: 600
+[15:44:47.451 f000243] [dog eating state update] : eating elapsed : 132 duration cap: 600
+[15:44:47.469 f000244] [dog eating state update] : eating elapsed : 133 duration cap: 600
+[15:44:47.486 f000245] [dog eating state update] : eating elapsed : 134 duration cap: 600
+[15:44:47.503 f000246] [dog eating state update] : eating elapsed : 135 duration cap: 600
+[15:44:47.520 f000247] [dog eating state update] : eating elapsed : 136 duration cap: 600
+[15:44:47.537 f000248] [dog eating state update] : eating elapsed : 137 duration cap: 600
+[15:44:47.554 f000249] [dog eating state update] : eating elapsed : 138 duration cap: 600
+[15:44:47.571 f000250] [dog eating state update] : eating elapsed : 139 duration cap: 600
+[15:44:47.588 f000251] [dog eating state update] : eating elapsed : 140 duration cap: 600
+[15:44:47.605 f000252] [dog eating state update] : eating elapsed : 141 duration cap: 600
+[15:44:47.622 f000253] [dog eating state update] : eating elapsed : 142 duration cap: 600
+[15:44:47.639 f000254] [dog eating state update] : eating elapsed : 143 duration cap: 600
+[15:44:47.656 f000255] [dog eating state update] : eating elapsed : 144 duration cap: 600
+[15:44:47.673 f000256] [dog eating state update] : eating elapsed : 145 duration cap: 600
+[15:44:47.690 f000257] [dog eating state update] : eating elapsed : 146 duration cap: 600
+[15:44:47.707 f000258] [dog eating state update] : eating elapsed : 147 duration cap: 600
+[15:44:47.724 f000259] [dog eating state update] : eating elapsed : 148 duration cap: 600
+[15:44:47.741 f000260] [dog eating state update] : eating elapsed : 149 duration cap: 600
+[15:44:47.757 f000261] [dog eating state update] : eating elapsed : 150 duration cap: 600
+[15:44:47.774 f000262] [dog eating state update] : eating elapsed : 151 duration cap: 600
+[15:44:47.791 f000263] [dog eating state update] : eating elapsed : 152 duration cap: 600
+[15:44:47.808 f000264] [dog eating state update] : eating elapsed : 153 duration cap: 600
+[15:44:47.824 f000265] [dog eating state update] : eating elapsed : 154 duration cap: 600
+[15:44:47.842 f000266] [dog eating state update] : eating elapsed : 155 duration cap: 600
+[15:44:47.859 f000267] [dog eating state update] : eating elapsed : 156 duration cap: 600
+[15:44:47.876 f000268] [dog eating state update] : eating elapsed : 157 duration cap: 600
+[15:44:47.893 f000269] [dog eating state update] : eating elapsed : 158 duration cap: 600
+[15:44:47.910 f000270] [dog eating state update] : eating elapsed : 159 duration cap: 600
+[15:44:47.927 f000271] [dog eating state update] : eating elapsed : 160 duration cap: 600
+[15:44:47.944 f000272] [dog eating state update] : eating elapsed : 161 duration cap: 600
+[15:44:47.961 f000273] [dog eating state update] : eating elapsed : 162 duration cap: 600
+[15:44:47.978 f000274] [dog eating state update] : eating elapsed : 163 duration cap: 600
+[15:44:47.995 f000275] [dog eating state update] : eating elapsed : 164 duration cap: 600
+[15:44:48.012 f000276] [dog eating state update] : eating elapsed : 165 duration cap: 600
+[15:44:48.029 f000277] [dog eating state update] : eating elapsed : 166 duration cap: 600
+[15:44:48.046 f000278] [dog eating state update] : eating elapsed : 167 duration cap: 600
+[15:44:48.063 f000279] [dog eating state update] : eating elapsed : 168 duration cap: 600
+[15:44:48.081 f000280] [dog eating state update] : eating elapsed : 169 duration cap: 600
+[15:44:48.098 f000281] [dog eating state update] : eating elapsed : 170 duration cap: 600
+[15:44:48.115 f000282] [dog eating state update] : eating elapsed : 171 duration cap: 600
+[15:44:48.132 f000283] [dog eating state update] : eating elapsed : 172 duration cap: 600
+[15:44:48.149 f000284] [dog eating state update] : eating elapsed : 173 duration cap: 600
+[15:44:48.166 f000285] [dog eating state update] : eating elapsed : 174 duration cap: 600
+[15:44:48.183 f000286] [dog eating state update] : eating elapsed : 175 duration cap: 600
+[15:44:48.200 f000287] [dog eating state update] : eating elapsed : 176 duration cap: 600
+[15:44:48.217 f000288] [dog eating state update] : eating elapsed : 177 duration cap: 600
+[15:44:48.234 f000289] [dog eating state update] : eating elapsed : 178 duration cap: 600
+[15:44:48.251 f000290] [dog eating state update] : eating elapsed : 179 duration cap: 600
+[15:44:48.268 f000291] [dog eating state update] : eating elapsed : 180 duration cap: 600
+[15:44:48.285 f000292] [dog eating state update] : eating elapsed : 181 duration cap: 600
+[15:44:48.301 f000293] [dog eating state update] : eating elapsed : 182 duration cap: 600
+[15:44:48.318 f000294] [dog eating state update] : eating elapsed : 183 duration cap: 600
+[15:44:48.335 f000295] [dog eating state update] : eating elapsed : 184 duration cap: 600
+[15:44:48.353 f000296] [dog eating state update] : eating elapsed : 185 duration cap: 600
+[15:44:48.370 f000297] [dog eating state update] : eating elapsed : 186 duration cap: 600
+[15:44:48.387 f000298] [dog eating state update] : eating elapsed : 187 duration cap: 600
+[15:44:48.404 f000299] [dog eating state update] : eating elapsed : 188 duration cap: 600
+[15:44:48.421 f000300] [dog eating state update] : eating elapsed : 189 duration cap: 600
+[15:44:48.437 f000301] [dog eating state update] : eating elapsed : 190 duration cap: 600
+[15:44:48.455 f000302] [dog eating state update] : eating elapsed : 191 duration cap: 600
+[15:44:48.472 f000303] [dog eating state update] : eating elapsed : 192 duration cap: 600
+[15:44:48.489 f000304] [dog eating state update] : eating elapsed : 193 duration cap: 600
+[15:44:48.506 f000305] [dog eating state update] : eating elapsed : 194 duration cap: 600
+[15:44:48.523 f000306] [dog eating state update] : eating elapsed : 195 duration cap: 600
+[15:44:48.541 f000307] [dog eating state update] : eating elapsed : 196 duration cap: 600
+[15:44:48.558 f000308] [dog eating state update] : eating elapsed : 197 duration cap: 600
+[15:44:48.575 f000309] [dog eating state update] : eating elapsed : 198 duration cap: 600
+[15:44:48.592 f000310] [dog eating state update] : eating elapsed : 199 duration cap: 600
+[15:44:48.609 f000311] [dog eating state update] : eating elapsed : 200 duration cap: 600
+[15:44:48.626 f000312] [dog eating state update] : eating elapsed : 201 duration cap: 600
+[15:44:48.643 f000313] [dog eating state update] : eating elapsed : 202 duration cap: 600
+[15:44:48.660 f000314] [dog eating state update] : eating elapsed : 203 duration cap: 600
+[15:44:48.677 f000315] [dog eating state update] : eating elapsed : 204 duration cap: 600
+[15:44:48.694 f000316] [dog eating state update] : eating elapsed : 205 duration cap: 600
+[15:44:48.712 f000317] [dog eating state update] : eating elapsed : 206 duration cap: 600
+[15:44:48.729 f000318] [dog eating state update] : eating elapsed : 207 duration cap: 600
+[15:44:48.746 f000319] [dog eating state update] : eating elapsed : 208 duration cap: 600
+[15:44:48.763 f000320] [dog eating state update] : eating elapsed : 209 duration cap: 600
+[15:44:48.780 f000321] [dog eating state update] : eating elapsed : 210 duration cap: 600
+[15:44:48.797 f000322] [dog eating state update] : eating elapsed : 211 duration cap: 600
+[15:44:48.814 f000323] [dog eating state update] : eating elapsed : 212 duration cap: 600
+[15:44:48.831 f000324] [dog eating state update] : eating elapsed : 213 duration cap: 600
+[15:44:48.848 f000325] [dog eating state update] : eating elapsed : 214 duration cap: 600
+[15:44:48.866 f000326] [dog eating state update] : eating elapsed : 215 duration cap: 600
+[15:44:48.883 f000327] [dog eating state update] : eating elapsed : 216 duration cap: 600
+[15:44:48.900 f000328] [dog eating state update] : eating elapsed : 217 duration cap: 600
+[15:44:48.917 f000329] [dog eating state update] : eating elapsed : 218 duration cap: 600
+[15:44:48.934 f000330] [dog eating state update] : eating elapsed : 219 duration cap: 600
+[15:44:48.951 f000331] [dog eating state update] : eating elapsed : 220 duration cap: 600
+[15:44:48.968 f000332] [dog eating state update] : eating elapsed : 221 duration cap: 600
+[15:44:48.985 f000333] [dog eating state update] : eating elapsed : 222 duration cap: 600
+[15:44:49.002 f000334] [dog eating state update] : eating elapsed : 223 duration cap: 600
+[15:44:49.019 f000335] [dog eating state update] : eating elapsed : 224 duration cap: 600
+[15:44:49.036 f000336] [dog eating state update] : eating elapsed : 225 duration cap: 600
+[15:44:49.053 f000337] [dog eating state update] : eating elapsed : 226 duration cap: 600
+[15:44:49.070 f000338] [dog eating state update] : eating elapsed : 227 duration cap: 600
+[15:44:49.088 f000339] [dog eating state update] : eating elapsed : 228 duration cap: 600
+[15:44:49.104 f000340] [dog eating state update] : eating elapsed : 229 duration cap: 600
+[15:44:49.121 f000341] [dog eating state update] : eating elapsed : 230 duration cap: 600
+[15:44:49.138 f000342] [dog eating state update] : eating elapsed : 231 duration cap: 600
+[15:44:49.156 f000343] [dog eating state update] : eating elapsed : 232 duration cap: 600
+[15:44:49.173 f000344] [dog eating state update] : eating elapsed : 233 duration cap: 600
+[15:44:49.190 f000345] [dog eating state update] : eating elapsed : 234 duration cap: 600
+[15:44:49.207 f000346] [dog eating state update] : eating elapsed : 235 duration cap: 600
+[15:44:49.224 f000347] [dog eating state update] : eating elapsed : 236 duration cap: 600
+[15:44:49.241 f000348] [dog eating state update] : eating elapsed : 237 duration cap: 600
+[15:44:49.258 f000349] [dog eating state update] : eating elapsed : 238 duration cap: 600
+[15:44:49.275 f000350] [dog eating state update] : eating elapsed : 239 duration cap: 600
+[15:44:49.293 f000351] [dog eating state update] : eating elapsed : 240 duration cap: 600
+[15:44:49.310 f000352] [dog eating state update] : eating elapsed : 241 duration cap: 600
+[15:44:49.327 f000353] [dog eating state update] : eating elapsed : 242 duration cap: 600
+[15:44:49.344 f000354] [dog eating state update] : eating elapsed : 243 duration cap: 600
+[15:44:49.361 f000355] [dog eating state update] : eating elapsed : 244 duration cap: 600
+[15:44:49.378 f000356] [dog eating state update] : eating elapsed : 245 duration cap: 600
+[15:44:49.395 f000357] [dog eating state update] : eating elapsed : 246 duration cap: 600
+[15:44:49.413 f000358] [dog eating state update] : eating elapsed : 247 duration cap: 600
+[15:44:49.429 f000359] [dog eating state update] : eating elapsed : 248 duration cap: 600
+[15:44:49.446 f000360] [dog eating state update] : eating elapsed : 249 duration cap: 600
+[15:44:49.464 f000361] [dog eating state update] : eating elapsed : 250 duration cap: 600
+[15:44:49.481 f000362] [dog eating state update] : eating elapsed : 251 duration cap: 600
+[15:44:49.498 f000363] [dog eating state update] : eating elapsed : 252 duration cap: 600
+[15:44:49.515 f000364] [dog eating state update] : eating elapsed : 253 duration cap: 600
+[15:44:49.532 f000365] [dog eating state update] : eating elapsed : 254 duration cap: 600
+[15:44:49.549 f000366] [dog eating state update] : eating elapsed : 255 duration cap: 600
+[15:44:49.566 f000367] [dog eating state update] : eating elapsed : 256 duration cap: 600
+[15:44:49.583 f000368] [dog eating state update] : eating elapsed : 257 duration cap: 600
+[15:44:49.600 f000369] [dog eating state update] : eating elapsed : 258 duration cap: 600
+[15:44:49.617 f000370] [dog eating state update] : eating elapsed : 259 duration cap: 600
+[15:44:49.634 f000371] [dog eating state update] : eating elapsed : 260 duration cap: 600
+[15:44:49.651 f000372] [dog eating state update] : eating elapsed : 261 duration cap: 600
+[15:44:49.668 f000373] [dog eating state update] : eating elapsed : 262 duration cap: 600
+[15:44:49.685 f000374] [dog eating state update] : eating elapsed : 263 duration cap: 600
+[15:44:49.702 f000375] [dog eating state update] : eating elapsed : 264 duration cap: 600
+[15:44:49.719 f000376] [dog eating state update] : eating elapsed : 265 duration cap: 600
+[15:44:49.736 f000377] [dog eating state update] : eating elapsed : 266 duration cap: 600
+[15:44:49.753 f000378] [dog eating state update] : eating elapsed : 267 duration cap: 600
+[15:44:49.770 f000379] [dog eating state update] : eating elapsed : 268 duration cap: 600
+[15:44:49.787 f000380] [dog eating state update] : eating elapsed : 269 duration cap: 600
+[15:44:49.804 f000381] [dog eating state update] : eating elapsed : 270 duration cap: 600
+[15:44:49.822 f000382] [dog eating state update] : eating elapsed : 271 duration cap: 600
+[15:44:49.838 f000383] [dog eating state update] : eating elapsed : 272 duration cap: 600
+[15:44:49.855 f000384] [dog eating state update] : eating elapsed : 273 duration cap: 600
+[15:44:49.873 f000385] [dog eating state update] : eating elapsed : 274 duration cap: 600
+[15:44:49.890 f000386] [dog eating state update] : eating elapsed : 275 duration cap: 600
+[15:44:49.907 f000387] [dog eating state update] : eating elapsed : 276 duration cap: 600
+[15:44:49.924 f000388] [dog eating state update] : eating elapsed : 277 duration cap: 600
+[15:44:49.941 f000389] [dog eating state update] : eating elapsed : 278 duration cap: 600
+[15:44:49.958 f000390] [dog eating state update] : eating elapsed : 279 duration cap: 600
+[15:44:49.975 f000391] [dog eating state update] : eating elapsed : 280 duration cap: 600
+[15:44:49.992 f000392] [dog eating state update] : eating elapsed : 281 duration cap: 600
+[15:44:50.009 f000393] [dog eating state update] : eating elapsed : 282 duration cap: 600
+[15:44:50.026 f000394] [dog eating state update] : eating elapsed : 283 duration cap: 600
+[15:44:50.044 f000395] [dog eating state update] : eating elapsed : 284 duration cap: 600
+[15:44:50.060 f000396] [dog eating state update] : eating elapsed : 285 duration cap: 600
+[15:44:50.077 f000397] [dog eating state update] : eating elapsed : 286 duration cap: 600
+[15:44:50.094 f000398] [dog eating state update] : eating elapsed : 287 duration cap: 600
+[15:44:50.111 f000399] [dog eating state update] : eating elapsed : 288 duration cap: 600
+[15:44:50.129 f000400] [dog eating state update] : eating elapsed : 289 duration cap: 600
+[15:44:50.146 f000401] [dog eating state update] : eating elapsed : 290 duration cap: 600
+[15:44:50.162 f000402] [dog eating state update] : eating elapsed : 291 duration cap: 600
+[15:44:50.180 f000403] [interaction_system::on_path_finished] dog: 16, target: 8, overlapping: yes
+[15:44:50.180 f000403] [interaciotn system, determine performable interactions]: interactor interactions 1
+[15:44:50.180 f000403] [interaciotn system, determine performable interactions]: interactee interactions 2
+[15:44:50.180 f000403] add interaction to process
+[15:44:50.180 f000403] [state_machine_system::transition] entity: 16, transition: 22, state: 0 -> 1
+[15:44:50.180 f000403] [interaction system - process interaction] - interactor 16 interactee: 8 interactions to check: 1
+[15:44:50.180 f000403] [interaction system - process interaction] - perform interaction 0
+[15:44:50.180 f000403] customer table sit interaction attempt
+[15:44:50.180 f000403] [dog eating state update] : eating elapsed : 292 duration cap: 600
+[15:44:50.196 f000404] [dog eating state update] : eating elapsed : 293 duration cap: 600
+[15:44:50.213 f000405] [dog eating state update] : eating elapsed : 294 duration cap: 600
+[15:44:50.231 f000406] [dog eating state update] : eating elapsed : 295 duration cap: 600
+[15:44:50.248 f000407] [dog eating state update] : eating elapsed : 296 duration cap: 600
+[15:44:50.265 f000408] [dog eating state update] : eating elapsed : 297 duration cap: 600
+[15:44:50.282 f000409] [dog eating state update] : eating elapsed : 298 duration cap: 600
+[15:44:50.299 f000410] [dog eating state update] : eating elapsed : 299 duration cap: 600
+[15:44:50.316 f000411] [dog eating state update] : eating elapsed : 300 duration cap: 600
+[15:44:50.333 f000412] [dog eating state update] : eating elapsed : 301 duration cap: 600
+[15:44:50.350 f000413] [dog eating state update] : eating elapsed : 302 duration cap: 600
+[15:44:50.368 f000414] [dog eating state update] : eating elapsed : 303 duration cap: 600
+[15:44:50.385 f000415] [dog eating state update] : eating elapsed : 304 duration cap: 600
+[15:44:50.401 f000416] [dog eating state update] : eating elapsed : 305 duration cap: 600
+[15:44:50.419 f000417] [dog eating state update] : eating elapsed : 306 duration cap: 600
+[15:44:50.436 f000418] [dog eating state update] : eating elapsed : 307 duration cap: 600
+[15:44:50.452 f000419] [dog eating state update] : eating elapsed : 308 duration cap: 600
+[15:44:50.469 f000420] [dog eating state update] : eating elapsed : 309 duration cap: 600
+[15:44:50.486 f000421] [dog eating state update] : eating elapsed : 310 duration cap: 600
+[15:44:50.503 f000422] [dog eating state update] : eating elapsed : 311 duration cap: 600
+[15:44:50.521 f000423] [dog eating state update] : eating elapsed : 312 duration cap: 600
+[15:44:50.538 f000424] [dog eating state update] : eating elapsed : 313 duration cap: 600
+[15:44:50.555 f000425] [dog eating state update] : eating elapsed : 314 duration cap: 600
+[15:44:50.572 f000426] [dog eating state update] : eating elapsed : 315 duration cap: 600
+[15:44:50.589 f000427] [dog eating state update] : eating elapsed : 316 duration cap: 600
+[15:44:50.606 f000428] [dog eating state update] : eating elapsed : 317 duration cap: 600
+[15:44:50.623 f000429] [dog eating state update] : eating elapsed : 318 duration cap: 600
+[15:44:50.640 f000430] [dog eating state update] : eating elapsed : 319 duration cap: 600
+[15:44:50.657 f000431] [dog eating state update] : eating elapsed : 320 duration cap: 600
+[15:44:50.674 f000432] [dog eating state update] : eating elapsed : 321 duration cap: 600
+[15:44:50.691 f000433] [dog eating state update] : eating elapsed : 322 duration cap: 600
+[15:44:50.708 f000434] [dog eating state update] : eating elapsed : 323 duration cap: 600
+[15:44:50.725 f000435] [dog eating state update] : eating elapsed : 324 duration cap: 600
+[15:44:50.742 f000436] [dog eating state update] : eating elapsed : 325 duration cap: 600
+[15:44:50.759 f000437] [dog eating state update] : eating elapsed : 326 duration cap: 600
+[15:44:50.776 f000438] [dog eating state update] : eating elapsed : 327 duration cap: 600
+[15:44:50.793 f000439] [dog eating state update] : eating elapsed : 328 duration cap: 600
+[15:44:50.810 f000440] [dog eating state update] : eating elapsed : 329 duration cap: 600
+[15:44:50.827 f000441] [dog eating state update] : eating elapsed : 330 duration cap: 600
+[15:44:50.845 f000442] [dog eating state update] : eating elapsed : 331 duration cap: 600
+[15:44:50.862 f000443] [dog eating state update] : eating elapsed : 332 duration cap: 600
+[15:44:50.879 f000444] [dog eating state update] : eating elapsed : 333 duration cap: 600
+[15:44:50.896 f000445] [dog eating state update] : eating elapsed : 334 duration cap: 600
+[15:44:50.913 f000446] [dog eating state update] : eating elapsed : 335 duration cap: 600
+[15:44:50.930 f000447] [dog eating state update] : eating elapsed : 336 duration cap: 600
+[15:44:50.947 f000448] [dog eating state update] : eating elapsed : 337 duration cap: 600
+[15:44:50.964 f000449] [dog eating state update] : eating elapsed : 338 duration cap: 600
+[15:44:50.981 f000450] [dog eating state update] : eating elapsed : 339 duration cap: 600
+[15:44:50.998 f000451] [dog eating state update] : eating elapsed : 340 duration cap: 600
+[15:44:51.016 f000452] [dog eating state update] : eating elapsed : 341 duration cap: 600
+[15:44:51.033 f000453] [dog eating state update] : eating elapsed : 342 duration cap: 600
+[15:44:51.050 f000454] [dog eating state update] : eating elapsed : 343 duration cap: 600
+[15:44:51.067 f000455] [dog eating state update] : eating elapsed : 344 duration cap: 600
+[15:44:51.084 f000456] [dog eating state update] : eating elapsed : 345 duration cap: 600
+[15:44:51.101 f000457] [dog eating state update] : eating elapsed : 346 duration cap: 600
+[15:44:51.118 f000458] [dog eating state update] : eating elapsed : 347 duration cap: 600
+[15:44:51.135 f000459] [dog eating state update] : eating elapsed : 348 duration cap: 600
+[15:44:51.152 f000460] [dog eating state update] : eating elapsed : 349 duration cap: 600
+[15:44:51.169 f000461] [dog eating state update] : eating elapsed : 350 duration cap: 600
+[15:44:51.186 f000462] [dog eating state update] : eating elapsed : 351 duration cap: 600
+[15:44:51.203 f000463] [dog eating state update] : eating elapsed : 352 duration cap: 600
+[15:44:51.220 f000464] [dog eating state update] : eating elapsed : 353 duration cap: 600
+[15:44:51.237 f000465] [dog eating state update] : eating elapsed : 354 duration cap: 600
+[15:44:51.254 f000466] [dog eating state update] : eating elapsed : 355 duration cap: 600
+[15:44:51.271 f000467] [dog eating state update] : eating elapsed : 356 duration cap: 600
+[15:44:51.288 f000468] [dog eating state update] : eating elapsed : 357 duration cap: 600
+[15:44:51.305 f000469] [dog eating state update] : eating elapsed : 358 duration cap: 600
+[15:44:51.322 f000470] [dog eating state update] : eating elapsed : 359 duration cap: 600
+[15:44:51.339 f000471] [dog eating state update] : eating elapsed : 360 duration cap: 600
+[15:44:51.356 f000472] [dog eating state update] : eating elapsed : 361 duration cap: 600
+[15:44:51.374 f000473] [dog eating state update] : eating elapsed : 362 duration cap: 600
+[15:44:51.391 f000474] [dog eating state update] : eating elapsed : 363 duration cap: 600
+[15:44:51.408 f000475] [dog eating state update] : eating elapsed : 364 duration cap: 600
+[15:44:51.424 f000476] [dog eating state update] : eating elapsed : 365 duration cap: 600
+[15:44:51.441 f000477] [dog eating state update] : eating elapsed : 366 duration cap: 600
+[15:44:51.458 f000478] [dog eating state update] : eating elapsed : 367 duration cap: 600
+[15:44:51.475 f000479] [dog eating state update] : eating elapsed : 368 duration cap: 600
+[15:44:51.492 f000480] [dog eating state update] : eating elapsed : 369 duration cap: 600
+[15:44:51.509 f000481] [dog eating state update] : eating elapsed : 370 duration cap: 600
+[15:44:51.526 f000482] [dog eating state update] : eating elapsed : 371 duration cap: 600
+[15:44:51.543 f000483] [dog eating state update] : eating elapsed : 372 duration cap: 600
+[15:44:51.561 f000484] [dog eating state update] : eating elapsed : 373 duration cap: 600
+[15:44:51.578 f000485] [dog eating state update] : eating elapsed : 374 duration cap: 600
+[15:44:51.595 f000486] [dog eating state update] : eating elapsed : 375 duration cap: 600
+[15:44:51.612 f000487] [dog eating state update] : eating elapsed : 376 duration cap: 600
+[15:44:51.630 f000488] [dog eating state update] : eating elapsed : 377 duration cap: 600
+[15:44:51.647 f000489] [dog eating state update] : eating elapsed : 378 duration cap: 600
+[15:44:51.664 f000490] [dog eating state update] : eating elapsed : 379 duration cap: 600
+[15:44:51.681 f000491] [dog eating state update] : eating elapsed : 380 duration cap: 600
+[15:44:51.698 f000492] [dog eating state update] : eating elapsed : 381 duration cap: 600
+[15:44:51.715 f000493] [dog eating state update] : eating elapsed : 382 duration cap: 600
+[15:44:51.732 f000494] [dog eating state update] : eating elapsed : 383 duration cap: 600
+[15:44:51.749 f000495] [dog eating state update] : eating elapsed : 384 duration cap: 600
+[15:44:51.766 f000496] [dog eating state update] : eating elapsed : 385 duration cap: 600
+[15:44:51.783 f000497] [dog eating state update] : eating elapsed : 386 duration cap: 600
+[15:44:51.800 f000498] [dog eating state update] : eating elapsed : 387 duration cap: 600
+[15:44:51.817 f000499] [dog eating state update] : eating elapsed : 388 duration cap: 600
+[15:44:51.834 f000500] [dog eating state update] : eating elapsed : 389 duration cap: 600
+[15:44:51.851 f000501] [dog eating state update] : eating elapsed : 390 duration cap: 600
+[15:44:51.868 f000502] [dog eating state update] : eating elapsed : 391 duration cap: 600
+[15:44:51.886 f000503] [dog eating state update] : eating elapsed : 392 duration cap: 600
+[15:44:51.903 f000504] [dog eating state update] : eating elapsed : 393 duration cap: 600
+[15:44:51.920 f000505] [dog eating state update] : eating elapsed : 394 duration cap: 600
+[15:44:51.937 f000506] [dog eating state update] : eating elapsed : 395 duration cap: 600
+[15:44:51.954 f000507] [dog eating state update] : eating elapsed : 396 duration cap: 600
+[15:44:51.971 f000508] [dog eating state update] : eating elapsed : 397 duration cap: 600
+[15:44:51.989 f000509] [dog eating state update] : eating elapsed : 398 duration cap: 600
+[15:44:52.005 f000510] [dog eating state update] : eating elapsed : 399 duration cap: 600
+[15:44:52.022 f000511] [dog eating state update] : eating elapsed : 400 duration cap: 600
+[15:44:52.040 f000512] [dog eating state update] : eating elapsed : 401 duration cap: 600
+[15:44:52.056 f000513] [dog eating state update] : eating elapsed : 402 duration cap: 600
+[15:44:52.073 f000514] [dog eating state update] : eating elapsed : 403 duration cap: 600
+[15:44:52.090 f000515] [dog eating state update] : eating elapsed : 404 duration cap: 600
+[15:44:52.107 f000516] [dog eating state update] : eating elapsed : 405 duration cap: 600
+[15:44:52.124 f000517] [dog eating state update] : eating elapsed : 406 duration cap: 600
+[15:44:52.140 f000518] [dog eating state update] : eating elapsed : 407 duration cap: 600
+[15:44:52.157 f000519] [dog eating state update] : eating elapsed : 408 duration cap: 600
+[15:44:52.174 f000520] [dog eating state update] : eating elapsed : 409 duration cap: 600
+[15:44:52.191 f000521] [dog eating state update] : eating elapsed : 410 duration cap: 600
+[15:44:52.208 f000522] [dog eating state update] : eating elapsed : 411 duration cap: 600
+[15:44:52.225 f000523] [dog eating state update] : eating elapsed : 412 duration cap: 600
+[15:44:52.242 f000524] [dog eating state update] : eating elapsed : 413 duration cap: 600
+[15:44:52.259 f000525] [dog eating state update] : eating elapsed : 414 duration cap: 600
+[15:44:52.276 f000526] [dog eating state update] : eating elapsed : 415 duration cap: 600
+[15:44:52.293 f000527] [dog eating state update] : eating elapsed : 416 duration cap: 600
+[15:44:52.310 f000528] [dog eating state update] : eating elapsed : 417 duration cap: 600
+[15:44:52.327 f000529] [dog eating state update] : eating elapsed : 418 duration cap: 600
+[15:44:52.345 f000530] [dog eating state update] : eating elapsed : 419 duration cap: 600
+[15:44:52.362 f000531] [dog eating state update] : eating elapsed : 420 duration cap: 600
+[15:44:52.379 f000532] [dog eating state update] : eating elapsed : 421 duration cap: 600
+[15:44:52.396 f000533] [dog eating state update] : eating elapsed : 422 duration cap: 600
+[15:44:52.413 f000534] [dog eating state update] : eating elapsed : 423 duration cap: 600
+[15:44:52.430 f000535] [dog eating state update] : eating elapsed : 424 duration cap: 600
+[15:44:52.447 f000536] [dog eating state update] : eating elapsed : 425 duration cap: 600
+[15:44:52.464 f000537] [dog eating state update] : eating elapsed : 426 duration cap: 600
+[15:44:52.481 f000538] [dog eating state update] : eating elapsed : 427 duration cap: 600
+[15:44:52.499 f000539] [dog eating state update] : eating elapsed : 428 duration cap: 600
+[15:44:52.516 f000540] [movement_system::create_path_to] dog: 10, source: {1600.000000, 512.000000}, destination: {1472.000000, 512.000000}, checkpoints: 3
+[15:44:52.516 f000540] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
+[15:44:52.516 f000540] [waiter_idling_system::build_paths] waiter: 10, points: 4, destination: {1472.000000, 512.000000}, attempt: 1
+[15:44:52.517 f000540] [dog eating state update] : eating elapsed : 429 duration cap: 600
+[15:44:52.533 f000541] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[15:44:52.533 f000541] [dog eating state update] : eating elapsed : 430 duration cap: 600
+[15:44:52.550 f000542] [dog eating state update] : eating elapsed : 431 duration cap: 600
+[15:44:52.567 f000543] [dog eating state update] : eating elapsed : 432 duration cap: 600
+[15:44:52.584 f000544] [dog eating state update] : eating elapsed : 433 duration cap: 600
+[15:44:52.601 f000545] [dog eating state update] : eating elapsed : 434 duration cap: 600
+[15:44:52.618 f000546] [dog eating state update] : eating elapsed : 435 duration cap: 600
+[15:44:52.635 f000547] [dog eating state update] : eating elapsed : 436 duration cap: 600
+[15:44:52.653 f000548] [dog eating state update] : eating elapsed : 437 duration cap: 600
+[15:44:52.669 f000549] [dog eating state update] : eating elapsed : 438 duration cap: 600
+[15:44:52.686 f000550] [dog eating state update] : eating elapsed : 439 duration cap: 600
+[15:44:52.703 f000551] [dog eating state update] : eating elapsed : 440 duration cap: 600
+[15:44:52.720 f000552] [dog eating state update] : eating elapsed : 441 duration cap: 600
+[15:44:52.737 f000553] [dog eating state update] : eating elapsed : 442 duration cap: 600
+[15:44:52.754 f000554] [dog eating state update] : eating elapsed : 443 duration cap: 600
+[15:44:52.772 f000555] [dog eating state update] : eating elapsed : 444 duration cap: 600
+[15:44:52.789 f000556] [dog eating state update] : eating elapsed : 445 duration cap: 600
+[15:44:52.806 f000557] [dog eating state update] : eating elapsed : 446 duration cap: 600
+[15:44:52.823 f000558] [dog eating state update] : eating elapsed : 447 duration cap: 600
+[15:44:52.840 f000559] [dog eating state update] : eating elapsed : 448 duration cap: 600
+[15:44:52.857 f000560] [dog eating state update] : eating elapsed : 449 duration cap: 600
+[15:44:52.874 f000561] [dog eating state update] : eating elapsed : 450 duration cap: 600
+[15:44:52.891 f000562] [dog eating state update] : eating elapsed : 451 duration cap: 600
+[15:44:52.908 f000563] [dog eating state update] : eating elapsed : 452 duration cap: 600
+[15:44:52.924 f000564] [dog eating state update] : eating elapsed : 453 duration cap: 600
+[15:44:52.941 f000565] [dog eating state update] : eating elapsed : 454 duration cap: 600
+[15:44:52.958 f000566] [dog eating state update] : eating elapsed : 455 duration cap: 600
+[15:44:52.975 f000567] [dog eating state update] : eating elapsed : 456 duration cap: 600
+[15:44:52.992 f000568] [dog eating state update] : eating elapsed : 457 duration cap: 600
+[15:44:53.009 f000569] [dog eating state update] : eating elapsed : 458 duration cap: 600
+[15:44:53.027 f000570] [dog eating state update] : eating elapsed : 459 duration cap: 600
+[15:44:53.043 f000571] [dog eating state update] : eating elapsed : 460 duration cap: 600
+[15:44:53.061 f000572] [dog eating state update] : eating elapsed : 461 duration cap: 600
+[15:44:53.078 f000573] [dog eating state update] : eating elapsed : 462 duration cap: 600
+[15:44:53.095 f000574] [dog eating state update] : eating elapsed : 463 duration cap: 600
+[15:44:53.112 f000575] [dog eating state update] : eating elapsed : 464 duration cap: 600
+[15:44:53.129 f000576] [dog eating state update] : eating elapsed : 465 duration cap: 600
+[15:44:53.147 f000577] [dog eating state update] : eating elapsed : 466 duration cap: 600
+[15:44:53.164 f000578] [dog eating state update] : eating elapsed : 467 duration cap: 600
+[15:44:53.181 f000579] [dog eating state update] : eating elapsed : 468 duration cap: 600
+[15:44:53.198 f000580] [dog eating state update] : eating elapsed : 469 duration cap: 600
+[15:44:53.215 f000581] [dog eating state update] : eating elapsed : 470 duration cap: 600
+[15:44:53.232 f000582] [dog eating state update] : eating elapsed : 471 duration cap: 600
+[15:44:53.249 f000583] [dog eating state update] : eating elapsed : 472 duration cap: 600
+[15:44:53.266 f000584] [dog eating state update] : eating elapsed : 473 duration cap: 600
+[15:44:53.283 f000585] [dog eating state update] : eating elapsed : 474 duration cap: 600
+[15:44:53.300 f000586] [dog eating state update] : eating elapsed : 475 duration cap: 600
+[15:44:53.317 f000587] [dog eating state update] : eating elapsed : 476 duration cap: 600
+[15:44:53.334 f000588] [dog eating state update] : eating elapsed : 477 duration cap: 600
+[15:44:53.351 f000589] [dog eating state update] : eating elapsed : 478 duration cap: 600
+[15:44:53.368 f000590] [dog eating state update] : eating elapsed : 479 duration cap: 600
+[15:44:53.385 f000591] [dog eating state update] : eating elapsed : 480 duration cap: 600
+[15:44:53.402 f000592] [dog eating state update] : eating elapsed : 481 duration cap: 600
+[15:44:53.419 f000593] [dog eating state update] : eating elapsed : 482 duration cap: 600
+[15:44:53.436 f000594] [dog eating state update] : eating elapsed : 483 duration cap: 600
+[15:44:53.453 f000595] [dog eating state update] : eating elapsed : 484 duration cap: 600
+[15:44:53.471 f000596] [dog eating state update] : eating elapsed : 485 duration cap: 600
+[15:44:53.487 f000597] [dog eating state update] : eating elapsed : 486 duration cap: 600
+[15:44:53.505 f000598] [dog eating state update] : eating elapsed : 487 duration cap: 600
+[15:44:53.522 f000599] [dog eating state update] : eating elapsed : 488 duration cap: 600
+[15:44:53.539 f000600] [dog eating state update] : eating elapsed : 489 duration cap: 600
+[15:44:53.556 f000601] [dog eating state update] : eating elapsed : 490 duration cap: 600
+[15:44:53.572 f000602] [dog eating state update] : eating elapsed : 491 duration cap: 600
+[15:44:53.590 f000603] [dog eating state update] : eating elapsed : 492 duration cap: 600
+[15:44:53.607 f000604] [dog eating state update] : eating elapsed : 493 duration cap: 600
+[15:44:53.623 f000605] [dog eating state update] : eating elapsed : 494 duration cap: 600
+[15:44:53.640 f000606] [dog eating state update] : eating elapsed : 495 duration cap: 600
+[15:44:53.657 f000607] [dog eating state update] : eating elapsed : 496 duration cap: 600
+[15:44:53.674 f000608] [dog eating state update] : eating elapsed : 497 duration cap: 600
+[15:44:53.691 f000609] [dog eating state update] : eating elapsed : 498 duration cap: 600
+[15:44:53.708 f000610] [dog eating state update] : eating elapsed : 499 duration cap: 600
+[15:44:53.725 f000611] [dog eating state update] : eating elapsed : 500 duration cap: 600
+[15:44:53.742 f000612] [dog eating state update] : eating elapsed : 501 duration cap: 600
+[15:44:53.759 f000613] [dog eating state update] : eating elapsed : 502 duration cap: 600
+[15:44:53.777 f000614] [dog eating state update] : eating elapsed : 503 duration cap: 600
+[15:44:53.794 f000615] [dog eating state update] : eating elapsed : 504 duration cap: 600
+[15:44:53.811 f000616] [dog eating state update] : eating elapsed : 505 duration cap: 600
+[15:44:53.828 f000617] [dog eating state update] : eating elapsed : 506 duration cap: 600
+[15:44:53.846 f000618] [dog eating state update] : eating elapsed : 507 duration cap: 600
+[15:44:53.863 f000619] [dog eating state update] : eating elapsed : 508 duration cap: 600
+[15:44:53.880 f000620] [dog eating state update] : eating elapsed : 509 duration cap: 600
+[15:44:53.897 f000621] [dog eating state update] : eating elapsed : 510 duration cap: 600
+[15:44:53.914 f000622] [dog eating state update] : eating elapsed : 511 duration cap: 600
+[15:44:53.931 f000623] [dog eating state update] : eating elapsed : 512 duration cap: 600
+[15:44:53.948 f000624] [dog eating state update] : eating elapsed : 513 duration cap: 600
+[15:44:53.965 f000625] [dog eating state update] : eating elapsed : 514 duration cap: 600
+[15:44:53.982 f000626] [dog eating state update] : eating elapsed : 515 duration cap: 600
+[15:44:53.999 f000627] [dog eating state update] : eating elapsed : 516 duration cap: 600
+[15:44:54.016 f000628] [dog eating state update] : eating elapsed : 517 duration cap: 600
+[15:44:54.033 f000629] [dog eating state update] : eating elapsed : 518 duration cap: 600
+[15:44:54.050 f000630] [dog eating state update] : eating elapsed : 519 duration cap: 600
+[15:44:54.067 f000631] [dog eating state update] : eating elapsed : 520 duration cap: 600
+[15:44:54.085 f000632] [dog eating state update] : eating elapsed : 521 duration cap: 600
+[15:44:54.102 f000633] [dog eating state update] : eating elapsed : 522 duration cap: 600
+[15:44:54.119 f000634] [dog eating state update] : eating elapsed : 523 duration cap: 600
+[15:44:54.136 f000635] [dog eating state update] : eating elapsed : 524 duration cap: 600
+[15:44:54.153 f000636] [dog eating state update] : eating elapsed : 525 duration cap: 600
+[15:44:54.169 f000637] [dog eating state update] : eating elapsed : 526 duration cap: 600
+[15:44:54.186 f000638] [dog eating state update] : eating elapsed : 527 duration cap: 600
+[15:44:54.203 f000639] [dog eating state update] : eating elapsed : 528 duration cap: 600
+[15:44:54.220 f000640] [dog eating state update] : eating elapsed : 529 duration cap: 600
+[15:44:54.238 f000641] [dog eating state update] : eating elapsed : 530 duration cap: 600
+[15:44:54.255 f000642] [dog eating state update] : eating elapsed : 531 duration cap: 600
+[15:44:54.272 f000643] [dog eating state update] : eating elapsed : 532 duration cap: 600
+[15:44:54.289 f000644] [dog eating state update] : eating elapsed : 533 duration cap: 600
+[15:44:54.307 f000645] [dog eating state update] : eating elapsed : 534 duration cap: 600
+[15:44:54.323 f000646] [dog eating state update] : eating elapsed : 535 duration cap: 600
+[15:44:54.341 f000647] [dog eating state update] : eating elapsed : 536 duration cap: 600
+[15:44:54.358 f000648] [dog eating state update] : eating elapsed : 537 duration cap: 600
+[15:44:54.375 f000649] [dog eating state update] : eating elapsed : 538 duration cap: 600
+[15:44:54.392 f000650] [dog eating state update] : eating elapsed : 539 duration cap: 600
+[15:44:54.409 f000651] [dog eating state update] : eating elapsed : 540 duration cap: 600
+[15:44:54.425 f000652] [dog eating state update] : eating elapsed : 541 duration cap: 600
+[15:44:54.442 f000653] [dog eating state update] : eating elapsed : 542 duration cap: 600
+[15:44:54.459 f000654] [dog eating state update] : eating elapsed : 543 duration cap: 600
+[15:44:54.476 f000655] [dog eating state update] : eating elapsed : 544 duration cap: 600
+[15:44:54.493 f000656] [dog eating state update] : eating elapsed : 545 duration cap: 600
+[15:44:54.510 f000657] [dog eating state update] : eating elapsed : 546 duration cap: 600
+[15:44:54.527 f000658] [dog eating state update] : eating elapsed : 547 duration cap: 600
+[15:44:54.545 f000659] [dog eating state update] : eating elapsed : 548 duration cap: 600
+[15:44:54.562 f000660] [dog eating state update] : eating elapsed : 549 duration cap: 600
+[15:44:54.579 f000661] [dog eating state update] : eating elapsed : 550 duration cap: 600
+[15:44:54.596 f000662] [dog eating state update] : eating elapsed : 551 duration cap: 600
+[15:44:54.613 f000663] [dog eating state update] : eating elapsed : 552 duration cap: 600
+[15:44:54.630 f000664] [dog eating state update] : eating elapsed : 553 duration cap: 600
+[15:44:54.647 f000665] [dog eating state update] : eating elapsed : 554 duration cap: 600
+[15:44:54.664 f000666] [dog eating state update] : eating elapsed : 555 duration cap: 600
+[15:44:54.681 f000667] [dog eating state update] : eating elapsed : 556 duration cap: 600
+[15:44:54.698 f000668] [dog eating state update] : eating elapsed : 557 duration cap: 600
+[15:44:54.715 f000669] [dog eating state update] : eating elapsed : 558 duration cap: 600
+[15:44:54.732 f000670] [dog eating state update] : eating elapsed : 559 duration cap: 600
+[15:44:54.749 f000671] [dog eating state update] : eating elapsed : 560 duration cap: 600
+[15:44:54.766 f000672] [dog eating state update] : eating elapsed : 561 duration cap: 600
+[15:44:54.783 f000673] [dog eating state update] : eating elapsed : 562 duration cap: 600
+[15:44:54.801 f000674] [dog eating state update] : eating elapsed : 563 duration cap: 600
+[15:44:54.818 f000675] [dog eating state update] : eating elapsed : 564 duration cap: 600
+[15:44:54.835 f000676] [dog eating state update] : eating elapsed : 565 duration cap: 600
+[15:44:54.852 f000677] [dog eating state update] : eating elapsed : 566 duration cap: 600
+[15:44:54.869 f000678] [dog eating state update] : eating elapsed : 567 duration cap: 600
+[15:44:54.886 f000679] [dog eating state update] : eating elapsed : 568 duration cap: 600
+[15:44:54.903 f000680] [dog eating state update] : eating elapsed : 569 duration cap: 600
+[15:44:54.920 f000681] [dog eating state update] : eating elapsed : 570 duration cap: 600
+[15:44:54.937 f000682] [dog eating state update] : eating elapsed : 571 duration cap: 600
+[15:44:54.954 f000683] [dog eating state update] : eating elapsed : 572 duration cap: 600
+[15:44:54.971 f000684] [dog eating state update] : eating elapsed : 573 duration cap: 600
+[15:44:54.988 f000685] [dog eating state update] : eating elapsed : 574 duration cap: 600
+[15:44:55.005 f000686] [dog eating state update] : eating elapsed : 575 duration cap: 600
+[15:44:55.023 f000687] [dog eating state update] : eating elapsed : 576 duration cap: 600
+[15:44:55.040 f000688] [dog eating state update] : eating elapsed : 577 duration cap: 600
+[15:44:55.057 f000689] [dog eating state update] : eating elapsed : 578 duration cap: 600
+[15:44:55.073 f000690] [dog eating state update] : eating elapsed : 579 duration cap: 600
+[15:44:55.090 f000691] [dog eating state update] : eating elapsed : 580 duration cap: 600
+[15:44:55.108 f000692] [dog eating state update] : eating elapsed : 581 duration cap: 600
+[15:44:55.125 f000693] [dog eating state update] : eating elapsed : 582 duration cap: 600
+[15:44:55.142 f000694] [dog eating state update] : eating elapsed : 583 duration cap: 600
+[15:44:55.159 f000695] [dog eating state update] : eating elapsed : 584 duration cap: 600
+[15:44:55.176 f000696] [dog eating state update] : eating elapsed : 585 duration cap: 600
+[15:44:55.193 f000697] [dog eating state update] : eating elapsed : 586 duration cap: 600
+[15:44:55.210 f000698] [dog eating state update] : eating elapsed : 587 duration cap: 600
+[15:44:55.227 f000699] [dog eating state update] : eating elapsed : 588 duration cap: 600
+[15:44:55.244 f000700] [dog eating state update] : eating elapsed : 589 duration cap: 600
+[15:44:55.261 f000701] [dog eating state update] : eating elapsed : 590 duration cap: 600
+[15:44:55.279 f000702] [dog eating state update] : eating elapsed : 591 duration cap: 600
+[15:44:55.296 f000703] [dog eating state update] : eating elapsed : 592 duration cap: 600
+[15:44:55.313 f000704] [dog eating state update] : eating elapsed : 593 duration cap: 600
+[15:44:55.330 f000705] [dog eating state update] : eating elapsed : 594 duration cap: 600
+[15:44:55.347 f000706] [dog eating state update] : eating elapsed : 595 duration cap: 600
+[15:44:55.364 f000707] [dog eating state update] : eating elapsed : 596 duration cap: 600
+[15:44:55.381 f000708] [dog eating state update] : eating elapsed : 597 duration cap: 600
+[15:44:55.398 f000709] [dog eating state update] : eating elapsed : 598 duration cap: 600
+[15:44:55.415 f000710] [dog eating state update] : eating elapsed : 599 duration cap: 600
+[15:44:55.432 f000711] [dog eating state update] : eating elapsed : 600 duration cap: 600
+[15:44:55.449 f000712] [state_machine_system::transition] entity: 14, transition: 24, state: 2 -> 0
+[15:44:55.449 f000712] [movement_system::create_path_to] dog: 14, source: {320.000000, 384.000000}, destination: {256.000000, -128.000000}, checkpoints: 1
+[15:44:55.450 f000712] [movement_system::commit_route] dog: 14, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[15:45:01.455 f001065] [dog_factory::build_customer_dog, built customer] id: 18
+[15:45:01.456 f001065] [movement_system::create_path_to] dog: 18, source: {64.000000, -128.000000}, destination: {64.000000, 2176.000000}, checkpoints: 0
+[15:45:01.456 f001065] [movement_system::commit_route] dog: 18, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[15:45:01.456 f001065] [customer_table_system::create_customer_dog, built customer] id: 18, spawn: {64.000000, -128.000000}, tracked customers: 4
+[15:45:02.119 f001104] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[15:45:02.119 f001104] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[15:45:03.751 f001200] [movement_system::create_path_to] dog: 10, source: {1472.000000, 512.000000}, destination: {1536.000000, 320.000000}, checkpoints: 1
+[15:45:03.751 f001200] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[15:45:03.751 f001200] [waiter_idling_system::build_paths] waiter: 10, points: 2, destination: {1536.000000, 320.000000}, attempt: 1
+[15:45:03.768 f001201] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[15:45:07.067 f001395] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[15:45:07.067 f001395] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[15:45:15.774 f001907] [interaction_system::on_path_finished] dog: 17 arrived with no destination entity and no interactor target - no interaction
+[15:45:15.774 f001907] [customer_table_system::destroy_customer_dog, removing customer] id: 17, last position: {64.000000, 2176.000000}, tracked customers: 4
+[15:45:15.997 f001920] [movement_system::create_path_to] dog: 10, source: {1536.000000, 320.000000}, destination: {1536.000000, 128.000000}, checkpoints: 1
+[15:45:15.997 f001920] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[15:45:15.997 f001920] [waiter_idling_system::build_paths] waiter: 10, points: 2, destination: {1536.000000, 128.000000}, attempt: 1
+[15:45:16.014 f001921] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[15:45:21.460 f002241] [dog_factory::build_customer_dog, built customer] id: 17
+[15:45:21.462 f002241] [movement_system::create_path_to] dog: 17, source: {64.000000, -128.000000}, destination: {64.000000, 2176.000000}, checkpoints: 0
+[15:45:21.462 f002241] [movement_system::commit_route] dog: 17, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[15:45:21.462 f002241] [customer_table_system::create_customer_dog, built customer] id: 17, spawn: {64.000000, -128.000000}, tracked customers: 4

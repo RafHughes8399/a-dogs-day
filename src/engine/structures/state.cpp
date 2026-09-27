@@ -1,8 +1,10 @@
 #include "state.h"
-
+#include "debug_log_interface.h"
+#include "debug_logger.h"
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
+#include <string>
 
 size_t state::state::get_state_id() const{
     return state_id_;
@@ -70,7 +72,9 @@ void state::eating_state::update(size_t entity, float delta){
     if(elapsed_ >= dog_config::eating_duration){ return; }
 
     elapsed_++;
-    if(elapsed_ == dog_config::eating_duration){
+    debug::log("[dog eating state update] : eating elapsed : " + std::to_string(elapsed_) 
+    + " duration cap: " + std::to_string(dog_config::eating_duration));
+    if(elapsed_ >= dog_config::eating_duration){
         std::unique_ptr<events::event> event = std::make_unique<events::customer_finished_meal>(entity);
         event_interface::queue_event(event);
     }

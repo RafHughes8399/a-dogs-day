@@ -421,12 +421,24 @@ animation it should be peaches
     // -----------------------------------------------------------//
 
     -> then customer eating completion and the food state change 
+        -> have afeeling this should be practically there
     -> and customer leaving
+        -> route to the entrance, and then walk offscreen left. 
     -> and waiter returning to some position after serving 
+        -> eh leave it 
     [then that mechanic is like done for now]
 
 -> and the background tile maker
+    -> im thinking 8 tiles like 4 * 4 edges
+    -> then you can define clusters, like subshapes made out of speicfic combinations  
+    -> and then draw those clusters randomly ? 
+    -> or define patterns, like a paint by numbers ?  
 -> and then dog art splitting
+    -> final split is:
+        -> tail
+        -> body and legs
+        -> neck head, ears
+        -> face
 -> and player dogs working stoves, ovens, etc. 
     -> creation of those stations
     -> the interactinos with the stations,
@@ -438,8 +450,9 @@ animation it should be peaches
     -> [the item counts for the station]
     -> progress bars for eating and cooking ? ?? ? ?? ? ? ?
     -> the food choices to prepare at a cooking station
-
+ 
 -> then the 9 sprite for hud componetns
+-> then dog collision and dog pathfinding adjustments [encourage more fluid movement]
 -> consider ray gui for hud and menu
 
 

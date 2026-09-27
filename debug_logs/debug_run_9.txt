@@ -1,0 +1,178 @@
+[13:54:44.279 f000000] [game::init, start] building the starting world
+[13:54:44.663 f000000] [build background]: load tile 1 draw onto image at 0.000000,  0.000000, 768.000000, 768.000000
+[13:54:44.687 f000000] [build background]: load tile 2 draw onto image at 768.000000,  0.000000, 1536.000000, 768.000000
+[13:54:44.710 f000000] [build background]: load tile 3 draw onto image at 1536.000000,  0.000000, 2304.000000, 768.000000
+[13:54:44.733 f000000] [build background]: load tile 4 draw onto image at 2304.000000,  0.000000, 3072.000000, 768.000000
+[13:54:44.757 f000000] [build background]: load tile 5 draw onto image at 0.000000,  768.000000, 768.000000, 1536.000000
+[13:54:44.780 f000000] [build background]: load tile 6 draw onto image at 768.000000,  768.000000, 1536.000000, 1536.000000
+[13:54:44.804 f000000] [build background]: load tile 7 draw onto image at 1536.000000,  768.000000, 2304.000000, 1536.000000
+[13:54:44.827 f000000] [build background]: load tile 8 draw onto image at 2304.000000,  768.000000, 3072.000000, 1536.000000
+[13:54:44.850 f000000] [build background]: load tile 9 draw onto image at 0.000000,  1536.000000, 768.000000, 2304.000000
+[13:54:44.876 f000000] [build background]: load tile 10 draw onto image at 768.000000,  1536.000000, 1536.000000, 2304.000000
+[13:54:44.902 f000000] [build background]: load tile 11 draw onto image at 1536.000000,  1536.000000, 2304.000000, 2304.000000
+[13:54:44.926 f000000] [build background]: load tile 12 draw onto image at 2304.000000,  1536.000000, 3072.000000, 2304.000000
+[13:54:44.951 f000000] [build background]: load tile 13 draw onto image at 0.000000,  2304.000000, 768.000000, 3072.000000
+[13:54:44.977 f000000] [build background]: load tile 14 draw onto image at 768.000000,  2304.000000, 1536.000000, 3072.000000
+[13:54:45.003 f000000] [build background]: load tile 15 draw onto image at 1536.000000,  2304.000000, 2304.000000, 3072.000000
+[13:54:45.028 f000000] [build background]: load tile 16 draw onto image at 2304.000000,  2304.000000, 3072.000000, 3072.000000
+[13:54:45.361 f000000] [game::init, built background] id 0
+[13:54:45.362 f000000] [game::init, built cursor] id 1
+[13:54:45.362 f000000] [game::init, built player] id 2 holding cursor 1
+[13:54:45.364 f000000] [game::init, built khiri] id 3
+[13:54:45.365 f000000] [game::init, built mack] id 4
+[13:54:45.365 f000000] [game::init, build counter]: id 5 with food items:  1
+[13:54:45.375 f000000] [game::init, done] built 7 components on khiri
+[13:54:45.375 f000000] [game::init, done] built 7 components on mack
+[13:54:46.384 f000060] [movement_system::create_path_to] dog: 9, source: {832.000000, 384.000000}, destination: {704.000000, 192.000000}, checkpoints: 1
+[13:54:46.384 f000060] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[13:54:46.384 f000060] [waiter_idling_system::build_paths] waiter: 9, points: 2, destination: {704.000000, 192.000000}, attempt: 1
+[13:54:46.400 f000061] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
+[13:54:48.370 f000179] [control_input_system::left_click, clicked] asked by: 1, position: {519.750000, 294.750000}
+[13:54:48.370 f000179] [control_input_system::left_click, hit entity] selecting: 4
+[13:54:48.370 f000179] [control_input_system::left_click, selection settled] selected: 4
+[13:54:53.387 f000480] [movement_system::create_path_to] dog: 10, source: {1280.000000, 576.000000}, destination: {1408.000000, 640.000000}, checkpoints: 3
+[13:54:53.387 f000480] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
+[13:54:53.387 f000480] [waiter_idling_system::build_paths] waiter: 10, points: 4, destination: {1408.000000, 640.000000}, attempt: 1
+[13:54:53.403 f000481] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[13:54:55.271 f000593] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
+[13:54:55.271 f000593] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
+[13:54:55.387 f000600] [movement_system::create_path_to] dog: 9, source: {704.000000, 192.000000}, destination: {832.000000, 128.000000}, checkpoints: 3
+[13:54:55.388 f000600] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
+[13:54:55.388 f000600] [waiter_idling_system::build_paths] waiter: 9, points: 4, destination: {832.000000, 128.000000}, attempt: 1
+[13:54:55.404 f000601] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
+[13:55:04.021 f001118] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[13:55:04.021 f001118] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[13:55:04.221 f001130] [dog_factory::build_customer_dog, built customer] id: 14
+[13:55:04.221 f001130] [movement_system::create_path_to] dog: 14, source: {64.000000, -128.000000}, destination: {64.000000, 3200.000000}, checkpoints: 0
+[13:55:04.221 f001130] [movement_system::commit_route] dog: 14, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[13:55:04.221 f001130] [customer_table_system::create_customer_dog, built customer] id: 14, spawn: {64.000000, -128.000000}, tracked customers: 1
+[13:55:04.221 f001130] [customer_table_system::send_customer_to_table] customer: 14, table: 7, via entrance: {256.000000, 1536.000000}
+[13:55:04.221 f001130] [interactable_component::get_interaction_offset] direction: left, position: {320.000000, 432.000000}, node_id: 265, distance_from_source: 615.740234
+[13:55:04.222 f001130] [interactable_component::get_interaction_offset] direction: right, position: {512.000000, 432.000000}, node_id: 268, distance_from_source: 717.149902
+[13:55:04.222 f001130] [interactable_component::get_interaction_offset] chosen offset: {-64.000000, 48.000000}
+[13:55:04.222 f001130] [movement_system::create_path_to_entity] dog: 14, source: {64.000000, -128.000000}, destination entity: 7, resolved destination: {320.000000, 384.000000}, checkpoints: 1
+[13:55:04.222 f001130] [movement_system::commit_route] dog: 14, mode: replace, paths before: 1, cleared: yes, legs committed: 2, paths after: 2
+[13:55:09.704 f001459] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
+[13:55:09.704 f001459] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
+[13:55:10.388 f001500] [movement_system::create_path_to] dog: 9, source: {832.000000, 128.000000}, destination: {640.000000, 128.000000}, checkpoints: 2
+[13:55:10.388 f001500] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
+[13:55:10.388 f001500] [waiter_idling_system::build_paths] waiter: 9, points: 3, destination: {640.000000, 128.000000}, attempt: 1
+[13:55:10.404 f001501] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
+[13:55:11.388 f001560] [movement_system::create_path_to] dog: 10, source: {1408.000000, 640.000000}, destination: {1408.000000, 512.000000}, checkpoints: 3
+[13:55:11.388 f001560] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
+[13:55:11.388 f001560] [waiter_idling_system::build_paths] waiter: 10, points: 4, destination: {1408.000000, 512.000000}, attempt: 1
+[13:55:11.404 f001561] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[13:55:19.121 f002024] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[13:55:19.121 f002024] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[13:55:20.388 f002100] [movement_system::create_path_to] dog: 10, source: {1408.000000, 512.000000}, destination: {1536.000000, 448.000000}, checkpoints: 3
+[13:55:20.389 f002100] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
+[13:55:20.389 f002100] [waiter_idling_system::build_paths] waiter: 10, points: 4, destination: {1536.000000, 448.000000}, attempt: 1
+[13:55:20.405 f002101] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[13:55:23.088 f002262] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
+[13:55:23.088 f002262] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
+[13:55:24.221 f002330] [dog_factory::build_customer_dog, built customer] id: 15
+[13:55:24.222 f002330] [movement_system::create_path_to] dog: 15, source: {64.000000, -128.000000}, destination: {64.000000, 3200.000000}, checkpoints: 0
+[13:55:24.222 f002330] [movement_system::commit_route] dog: 15, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[13:55:24.222 f002330] [customer_table_system::create_customer_dog, built customer] id: 15, spawn: {64.000000, -128.000000}, tracked customers: 2
+[13:55:24.222 f002330] [customer_table_system::send_customer_to_table] customer: 15, table: 8, via entrance: {256.000000, 1536.000000}
+[13:55:24.222 f002330] [interactable_component::get_interaction_offset] direction: left, position: {576.000000, 560.000000}, node_id: 357, distance_from_source: 857.605957
+[13:55:24.222 f002330] [interactable_component::get_interaction_offset] direction: right, position: {768.000000, 560.000000}, node_id: 360, distance_from_source: 984.357666
+[13:55:24.222 f002330] [interactable_component::get_interaction_offset] chosen offset: {-64.000000, 48.000000}
+[13:55:24.222 f002330] [movement_system::create_path_to_entity] dog: 15, source: {64.000000, -128.000000}, destination entity: 8, resolved destination: {576.000000, 512.000000}, checkpoints: 1
+[13:55:24.223 f002330] [movement_system::commit_route] dog: 15, mode: replace, paths before: 1, cleared: yes, legs committed: 2, paths after: 2
+[13:55:27.388 f002520] [movement_system::create_path_to] dog: 9, source: {640.000000, 128.000000}, destination: {448.000000, 64.000000}, checkpoints: 2
+[13:55:27.388 f002520] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
+[13:55:27.388 f002520] [waiter_idling_system::build_paths] waiter: 9, points: 3, destination: {448.000000, 64.000000}, attempt: 1
+[13:55:27.405 f002521] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
+[13:55:29.905 f002671] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[13:55:29.905 f002671] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[13:55:36.405 f003061] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
+[13:55:36.405 f003061] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
+[13:55:41.389 f003360] [movement_system::create_path_to] dog: 10, source: {1536.000000, 448.000000}, destination: {1344.000000, 448.000000}, checkpoints: 1
+[13:55:41.389 f003360] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[13:55:41.389 f003360] [waiter_idling_system::build_paths] waiter: 10, points: 2, destination: {1344.000000, 448.000000}, attempt: 1
+[13:55:41.405 f003361] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[13:55:44.222 f003530] [dog_factory::build_customer_dog, built customer] id: 16
+[13:55:44.222 f003530] [movement_system::create_path_to] dog: 16, source: {64.000000, -128.000000}, destination: {64.000000, 3200.000000}, checkpoints: 0
+[13:55:44.223 f003530] [movement_system::commit_route] dog: 16, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[13:55:44.223 f003530] [customer_table_system::create_customer_dog, built customer] id: 16, spawn: {64.000000, -128.000000}, tracked customers: 3
+[13:55:45.105 f003583] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[13:55:45.105 f003583] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[13:55:47.389 f000120] [movement_system::create_path_to] dog: 10, source: {1344.000000, 448.000000}, destination: {1152.000000, 448.000000}, checkpoints: 1
+[13:55:47.390 f000120] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[13:55:47.390 f000120] [waiter_idling_system::build_paths] waiter: 10, points: 2, destination: {1152.000000, 448.000000}, attempt: 1
+[13:55:47.406 f000121] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[13:55:47.839 f000147] [interaction_system::on_path_finished] dog: 14, target: 7, overlapping: yes
+[13:55:47.839 f000147] [interaciotn system, determine performable interactions]: interactor interactions 1
+[13:55:47.839 f000147] [interaciotn system, determine performable interactions]: interactee interactions 2
+[13:55:47.839 f000147] add interaction to process
+[13:55:47.839 f000147] [state_machine_system::transition] entity: 14, transition: 22, state: 0 -> 1
+[13:55:47.840 f000147] [interaction system - process interaction] - interactor 14 interactee: 7 interactions to check: 1
+[13:55:47.840 f000147] [interaction system - process interaction] - perform interaction 0
+[13:55:47.840 f000147] customer table sit interaction attempt
+[13:55:53.606 f000493] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[13:55:53.606 f000493] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[13:55:56.389 f000660] [movement_system::create_path_to] dog: 9, source: {448.000000, 64.000000}, destination: {320.000000, 128.000000}, checkpoints: 1
+[13:55:56.390 f000660] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[13:55:56.390 f000660] [waiter_idling_system::build_paths] waiter: 9, points: 2, destination: {320.000000, 128.000000}, attempt: 1
+[13:55:56.406 f000661] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
+[13:55:59.273 f000833] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
+[13:55:59.273 f000833] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
+[13:56:03.390 f001080] [movement_system::create_path_to] dog: 9, source: {320.000000, 128.000000}, destination: {384.000000, 256.000000}, checkpoints: 3
+[13:56:03.390 f001080] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
+[13:56:03.390 f001080] [waiter_idling_system::build_paths] waiter: 9, points: 4, destination: {384.000000, 256.000000}, attempt: 1
+[13:56:03.390 f001080] [movement_system::create_path_to] dog: 10, source: {1152.000000, 448.000000}, destination: {960.000000, 512.000000}, checkpoints: 2
+[13:56:03.390 f001080] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
+[13:56:03.390 f001080] [waiter_idling_system::build_paths] waiter: 10, points: 3, destination: {960.000000, 512.000000}, attempt: 1
+[13:56:03.406 f001081] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
+[13:56:03.406 f001081] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[13:56:04.223 f001130] [dog_factory::build_customer_dog, built customer] id: 17
+[13:56:04.223 f001130] [movement_system::create_path_to] dog: 17, source: {64.000000, -128.000000}, destination: {64.000000, 3200.000000}, checkpoints: 0
+[13:56:04.223 f001130] [movement_system::commit_route] dog: 17, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[13:56:04.223 f001130] [customer_table_system::create_customer_dog, built customer] id: 17, spawn: {64.000000, -128.000000}, tracked customers: 4
+[13:56:07.656 f001336] [interaction_system::on_path_finished] dog: 15, target: 8, overlapping: yes
+[13:56:07.656 f001336] [interaciotn system, determine performable interactions]: interactor interactions 1
+[13:56:07.656 f001336] [interaciotn system, determine performable interactions]: interactee interactions 2
+[13:56:07.656 f001336] add interaction to process
+[13:56:07.656 f001336] [state_machine_system::transition] entity: 15, transition: 22, state: 0 -> 1
+[13:56:07.657 f001336] [interaction system - process interaction] - interactor 15 interactee: 8 interactions to check: 1
+[13:56:07.657 f001336] [interaction system - process interaction] - perform interaction 0
+[13:56:07.657 f001336] customer table sit interaction attempt
+[13:56:08.073 f001361] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[13:56:08.073 f001361] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[13:56:10.390 f001500] [movement_system::create_path_to] dog: 10, source: {960.000000, 512.000000}, destination: {768.000000, 576.000000}, checkpoints: 1
+[13:56:10.390 f001500] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[13:56:10.390 f001500] [waiter_idling_system::build_paths] waiter: 10, points: 2, destination: {768.000000, 576.000000}, attempt: 1
+[13:56:10.407 f001501] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[13:56:18.041 f001959] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[13:56:18.041 f001959] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[13:56:18.391 f001980] [movement_system::create_path_to] dog: 10, source: {768.000000, 576.000000}, destination: {576.000000, 576.000000}, checkpoints: 1
+[13:56:18.391 f001980] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[13:56:18.391 f001980] [waiter_idling_system::build_paths] waiter: 10, points: 2, destination: {576.000000, 576.000000}, attempt: 1
+[13:56:18.407 f001981] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[13:56:24.008 f002317] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
+[13:56:24.008 f002317] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
+[13:56:24.224 f002330] [dog_factory::build_customer_dog, built customer] id: 18
+[13:56:24.224 f002330] [movement_system::create_path_to] dog: 18, source: {64.000000, -128.000000}, destination: {64.000000, 3200.000000}, checkpoints: 0
+[13:56:24.225 f002330] [movement_system::commit_route] dog: 18, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[13:56:24.225 f002330] [customer_table_system::create_customer_dog, built customer] id: 18, spawn: {64.000000, -128.000000}, tracked customers: 5
+[13:56:25.075 f002381] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
+[13:56:25.075 f002381] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
+[13:56:27.391 f002520] [movement_system::create_path_to] dog: 9, source: {384.000000, 256.000000}, destination: {256.000000, 64.000000}, checkpoints: 1
+[13:56:27.392 f002520] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[13:56:27.392 f002520] [waiter_idling_system::build_paths] waiter: 9, points: 2, destination: {256.000000, 64.000000}, attempt: 1
+[13:56:27.392 f002520] [movement_system::create_path_to] dog: 10, source: {576.000000, 576.000000}, destination: {384.000000, 704.000000}, checkpoints: 1
+[13:56:27.392 f002520] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[13:56:27.392 f002520] [waiter_idling_system::build_paths] waiter: 10, points: 2, destination: {384.000000, 704.000000}, attempt: 1
+[13:56:27.408 f002521] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
+[13:56:27.408 f002521] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
+[13:56:33.958 f002914] [interaction_system::on_path_finished] dog: 16 arrived with no destination entity and no interactor target - no interaction
+[13:56:33.959 f002914] [customer_table_system::destroy_customer_dog, removing customer] id: 16, last position: {64.000000, 3200.000000}, tracked customers: 5
+[13:56:34.075 f002921] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
+[13:56:34.075 f002921] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
+[13:56:36.392 f003060] [movement_system::create_path_to] dog: 9, source: {256.000000, 64.000000}, destination: {256.000000, 128.000000}, checkpoints: 3
+[13:56:36.393 f003060] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
+[13:56:36.393 f003060] [waiter_idling_system::build_paths] waiter: 9, points: 4, destination: {256.000000, 128.000000}, attempt: 1
+[13:56:36.409 f003061] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
+[13:56:37.945 f003153] [control_input_system::left_click, clicked] asked by: 1, position: {1014.500977, 633.742371}
+[13:56:37.945 f003153] [control_input_system::left_click, hit nothing] deselecting, was: 4

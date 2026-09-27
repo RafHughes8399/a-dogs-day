@@ -28,7 +28,7 @@ state_machine::state_machine state_machine_builders::build_customer_state_machin
          state_machine::edge(dog_config::customer_leaving, dog_config::customer_walking)}));
 
     graph.push_back(state_machine::node(state_builders::build_customer_eating_state(),
-        {state_machine::edge(dog_config::meal_finished, dog_config::customer_sitting)}));
+        {state_machine::edge(dog_config::meal_finished, dog_config::customer_walking)}));
 
     return state_machine::state_machine(std::move(graph), dog_config::customer_walking);
 }

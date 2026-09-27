@@ -2,9 +2,13 @@
 #include "component.h"
 #include "config.h"
 #include "debug_log_interface.h"
+#include "dog_events.h"
+#include "events_interface.h"
 #include "raglib.h"
 #include "system.h"
+#include "system_events.h"
 #include <algorithm>
+#include <memory>
 #include <string>
 
 namespace {
@@ -109,7 +113,15 @@ void dbs::customer_table_system::send_customer_to_table(){
         std::vector<Vector2>{cafe_config::cafe_entrance}};
     event_interface::execute_event(create_path_event);
 }
-
+void dbs::customer_table_system::send_customer_to_exit(size_t customer_id){
+    std::unique_ptr<events::event> create_path_event = std::make_unique<events::create_path_to>(
+        customer_id,
+        cafe_config::cafe_exit,
+        path::replace,
+        std::vector<Vector2>{cafe_config::cafe_entrance}
+    );
+    event_interface::queue_event(create_path_event);
+}
 std::optional<size_t> dbs::customer_table_system::customer_at(size_t table_id){
     auto* interactable = component_managers::interactable_manager_.get_component(table_id);
     if(interactable == nullptr){ return std::nullopt; }
@@ -124,6 +136,11 @@ void dbs::customer_table_system::on_order_served(const events::order_served& eve
     auto customer = customer_at(event.get_table_id());
     if(not customer.has_value()){ return; }
     systems::state_machine_system::get_instance().transition(customer.value(), dog_config::order_served);
+}
+
+void dbs::customer_table_system::on_customer_finished_meal(const events::customer_finished_meal& event){
+    auto customer = event.get_customer_id();
+    send_customer_to_exit(customer);
 }
 
 void dbs::customer_table_system::customer_cleanup(){

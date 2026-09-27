@@ -97,7 +97,11 @@ link_libraries(raylib)
 
 add_library(raglib src/engine/raglib.cpp)
 link_libraries(raglib)
+add_library(debug_log_interface src/engine/logger/debug_log_interface.cpp)
+link_libraries(debug_log_interface)
 
+add_library(debug_logger src/engine/logger/debug_logger.cpp)
+link_libraries(debug_logger)
 add_library(events src/engine/events/events.cpp)
 link_libraries(events)
 
@@ -186,12 +190,6 @@ link_libraries(quadtree)
 
 add_library(graph src/engine/structures/graph.cpp src/engine/structures/path.cpp)
 link_libraries(graph)
-
-add_library(debug_log_interface src/engine/logger/debug_log_interface.cpp)
-link_libraries(debug_log_interface)
-
-add_library(debug_logger src/engine/logger/debug_logger.cpp)
-link_libraries(debug_logger)
 
 add_library(game src/engine/game.cpp)
 link_libraries(game)

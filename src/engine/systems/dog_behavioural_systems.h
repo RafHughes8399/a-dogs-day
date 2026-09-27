@@ -48,11 +48,14 @@ namespace dbs {
             // TODO (25 / 8 / 26) must listen to table construction and deletion, can create a new event for it and update teh builders
             // TODO and destroyers to emit those events
             ~customer_table_system(){
+                event_interface::unsubscribe<events::customer_finished_meal>(customer_finished_meal_handler_);
                 event_interface::unsubscribe<events::order_served>(order_served_handler_);
             }
             customer_table_system()
             : customers_({}), tables_({}), 
+            customer_finished_meal_handler_([this](const events::customer_finished_meal& event) -> void {on_customer_finished_meal(event);}),
             order_served_handler_([this](const events::order_served& event) -> void { on_order_served(event);}){
+                event_interface::subscribe<events::customer_finished_meal>(customer_finished_meal_handler_);
                 event_interface::subscribe<events::order_served>(order_served_handler_);
             }
             customer_table_system(const customer_table_system& other) = delete;
@@ -80,8 +83,10 @@ namespace dbs {
             int pick_customer();
             void customer_cleanup();
             void send_customer_to_table();
+            void send_customer_to_exit(size_t customer_id);
             std::optional<size_t> customer_at(size_t table_id);
             void on_order_served(const events::order_served& event);
+            void on_customer_finished_meal(const events::customer_finished_meal& event);
 
 #ifdef DOG_DAYS_TESTING
                     const std::vector<size_t>& get_customers() const{
@@ -105,6 +110,7 @@ namespace dbs {
             std::vector<size_t> customers_;
             std::vector<registered_table> tables_;
 
+            events::event_handler<events::customer_finished_meal> customer_finished_meal_handler_; 
             events::event_handler<events::order_served> order_served_handler_; 
 
     };

@@ -572,9 +572,12 @@ SCENARIO("a waiter carries food from the counter to a seated customer",
                     THEN("the seated customer starts eating"){
                         REQUIRE(game.state_of(customer_id).value() == dog_config::customer_eating);
                     }
-                    THEN("the customer sits again once the meal is done"){
+                    THEN("the customer walks for the exit once the meal is done"){
                         game.tick_until([](){ return false; }, dog_config::eating_duration + 1);
-                        REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
+                        REQUIRE(game.state_of(customer_id).value() == dog_config::customer_walking);
+                        auto destinations = game.path_destinations(customer_id);
+                        REQUIRE_FALSE(destinations.empty());
+                        REQUIRE(Vector2Equals(destinations.back(), cafe_config::cafe_exit));
                     }
                 }
             }
