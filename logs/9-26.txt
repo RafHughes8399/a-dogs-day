@@ -433,14 +433,20 @@ animation it should be peaches
     -> then you can define clusters, like subshapes made out of speicfic combinations  
     -> and then draw those clusters randomly ? 
     -> or define patterns, like a paint by numbers ?  
+
+
+
 -> and then dog art splitting
     -> final split is:
         -> tail
-        -> body and legs
-        -> neck head, ears
+        -> body and legs [body_group]
+        -> neck head, ears [head_group]
         -> face
+    -> need to update the config and the builders to reflect that
+    -> need to split the assets
 -> and player dogs working stoves, ovens, etc. 
     -> creation of those stations
+        -> builders
     -> the interactinos with the stations,
     -> the transporting of the food to the counter
 -> hud components for stations
@@ -456,4 +462,28 @@ animation it should be peaches
 -> consider ray gui for hud and menu
 
 
+
+ok ok ok ok ok ko ko ko k creativity time what food:
+treats from the streets bush  :
+-> sausages on a stick
+-> chicken feet
+->  bird
+coffee pot 
+ -> espresso
+ - > pup cup
+pot : 
+    -> chicken soup
+
+pan :
+    -> risotto  
+    -> steak and eggs
+    -> egg and bacon roll 
+oven : 
+    -> lasagna
+    -> bone buscuits
+mini fridge:
+    -> charpoocherie board
+    -> leftover steak
+    -> cutlets
+    -> 
 
