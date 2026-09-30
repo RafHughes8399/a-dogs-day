@@ -140,6 +140,7 @@ namespace sprite_builders{
     sprite::sprite build_food_sprite();
     sprite::sprite build_lasagna_sprite();
     sprite::sprite build_coffee_sprite();
+    sprite::sprite build_cutlets_sprite();
     std::vector<sprite::sprite> build_food_sprites();
 }
 #endif

@@ -267,6 +267,10 @@ void ecs_entities::build_food(size_t id, Vector2 position, sprite::sprite food_s
         build_food(id, position, sprite_builders::build_coffee_sprite());
         component_helpers::add_food_component(id, entity_config::coffee);
     }
+    void ecs_entities::build_cutlets(size_t id, Vector2 position){
+        build_food(id, position, sprite_builders::build_cutlets_sprite());
+        component_helpers::add_food_component(id, entity_config::cutlets);
+    }
 
 // position and renderable only - no hitbox, so it is never in the spatial index
 // and is_entity_in_frame never culls it

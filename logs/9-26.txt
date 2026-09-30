@@ -487,3 +487,71 @@ mini fridge:
     -> cutlets
     -> 
 
+cooking stations
+we have the stove, the oven, the coffee station, the mini fridge, the bush, and the chopping board
+that's quite extensive, a fair list. a sufficient list
+
+what does a cooking station need ? 
+-> a list of food items that the station can prepare [ defined as config listys, like interactor interactee]
+-> station components [food id -> food builder call, will need a food factory]
+-> varied sizes, will define as needed, for now keep the basic station sizes
+-> state machine unworked <-> worked [adjusts update behaviour essentially
+-> std::optional<size t> selected_food_id]
+
+what does a cooking station do
+-> prepare food
+    -> a consequence the dog interaction and the user selection [ user selection can follow, that is a part of other infrastructure to be built]
+-> store food
+    -> storage component simple enough - ish, going to be slightly more complex than that. should store numbers  
+    -> 
+
+
+what interactions are there that would involve the 
+-> player dog interactor cooking station interactee [on interaction work station, on stop interaction unwork station]
+-> and then the hud element but that is sort of its own slice and a  half 
+
+
+-> currently we just need to build the storing and food builder capcity and then define the dog interaction with it. and then the hud component ties it together with actually triggering the food selction to build
+-> becuase we woill need some kind of niche storage to track this here, each food you can cook should track the number of that food, so every build call you increment for the food_id 
+-> and then every time you export,  you clear  that number, simples, so we can sepearte the food into a struct of id, builder, count . that can be our little struct
+-> AND DURATION, FOOD ITEMS NEED A DURATION TO COOK which can be a value read from config 
+
+ok and the state machine is relatively simple, just a switch flick on interaction
+and selected food id is how you pick what to build
+
+
+
+more concretely:
+recipe  : 
+    food id, 
+    food builder
+    count
+    duration_
+    elapsed
+
+    cook() // incremenets the duration 
+    get_id()
+    build()
+    get_count()
+    materialise() // the creating of the actual food entities to place on a counter
+
+cooking stations have a recipes component that holds a list of recipes
+amongst the rest of the station components 
+
+will need a recipe manager for sure ? yeah to interact, and access the recipes
+
+
+ok lets go station by station again and then recipe by recipe
+stove,
+    -> 
+the oven,
+  
+the coffee station,
+   
+   
+the mini fridge,
+    
+    
+the bush,
+     
+and the chopping board

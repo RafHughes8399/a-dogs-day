@@ -105,7 +105,8 @@ namespace factories{
         food_factory()
         :food_builders_({
             [](size_t id, Vector2 position) -> void{ecs_entities::build_lasagna(id, position);},
-            [](size_t id, Vector2 position) -> void{ecs_entities::build_coffee(id, position);}
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_coffee(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_cutlets(id, position);}
         }){
 
         }

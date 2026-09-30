@@ -40,6 +40,8 @@ void game::game::init(){
     for(int lasagna = 0; lasagna < game_config::counter_start_stock; ++lasagna){
         systems::item_system::get_instance().place_item(counter, entity_config::foods::lasagna);
     }
+    systems::item_system::get_instance().place_item(counter, entity_config::foods::coffee);
+    systems::item_system::get_instance().place_item(counter, entity_config::foods::cutlets);
     auto food_items = component_managers::storage_manager_.get_component(counter)->size();
     /** a bit messy but we're going to create some items for the food counter to store */
     debug::log("[game::init, build counter]: id " + std::to_string(counter) + " with food items:  " + std::to_string(food_items));

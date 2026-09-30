@@ -158,10 +158,16 @@ sprite::sprite sprite_builders::build_coffee_sprite(){
         entity_config::coffee_food_path, entity_config::coffee_attributes,
         entity_config::food_draw_offset);
 }
+sprite::sprite sprite_builders::build_cutlets_sprite(){
+    return build_decoration_sprite(textures::cutlets,
+        entity_config::cutlets_food_path, entity_config::cutlets_attributes,
+        entity_config::food_draw_offset);
+}
 std::vector<sprite::sprite> sprite_builders::build_food_sprites(){
     std::vector<sprite::sprite> sprites;
     sprites.push_back(build_lasagna_sprite());
     sprites.push_back(build_coffee_sprite());
+    sprites.push_back(build_cutlets_sprite());
     return sprites;
 }
 sprite::sprite sprite_builders::build_background_sprite(){

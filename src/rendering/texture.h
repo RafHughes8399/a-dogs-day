@@ -75,6 +75,7 @@ namespace textures{
         food_counter,
         lasagna,
         coffee,
+        cutlets,
         background,
         size
         // and so on

@@ -436,6 +436,7 @@ namespace entity_config{
     enum foods{
         lasagna = 0,
         coffee,
+        cutlets,
         foods_size
     };
     enum counter_sprite_slots{
@@ -543,6 +544,7 @@ namespace entity_config{
     // * ------------------------ FOOD PATHS --------------------------------------- *//
     inline const char* lasagna_food_path = "../sprites/lasagna.png";
     inline const char* coffee_food_path = "../sprites/coffee.png";
+    inline const char* cutlets_food_path = "../sprites/cutlets.png";
     
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
     enum attributes{
@@ -628,8 +630,9 @@ namespace entity_config{
     inline const float stove_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
-    inline const float lasagna_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
-    inline const float coffee_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    inline const float lasagna_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float coffee_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float cutlets_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
     
     
     
