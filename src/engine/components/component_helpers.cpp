@@ -41,7 +41,9 @@ void component_helpers::register_food_component(size_t entity_id, components::fo
 void component_helpers::register_carrier_component(size_t entity_id, components::carrier_component component){
     component_managers::carrier_manager_.register_component(entity_id, std::move(component));
 }
-
+void component_helpers::register_recipes_component(size_t entity_id, components::recipes_component component){
+    component_managers::recipes_manager_.register_component(entity_id, component);
+}
 void component_helpers::add_positional_component(size_t entity_id, Vector2 position){
     register_positional_component(entity_id,
         component_builders::build_positional_component(position));
@@ -193,6 +195,9 @@ void component_helpers::unregister_positional_component(size_t entity_id){
 }
 void component_helpers::unregister_movement_component(size_t entity_id){
     component_managers::movement_manager_.unregister_component(entity_id);
+}
+void component_helpers::unregister_recipes_component(size_t entity_id){
+    component_managers::recipes_manager_.unregister_component(entity_id);
 }
 void component_helpers::unregister_renderable_component(size_t entity_id){
     component_managers::renderable_manager_.unregister_component(entity_id);

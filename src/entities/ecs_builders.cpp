@@ -200,6 +200,13 @@ void ecs_entities::build_station(size_t id, Vector2 position,
     component_helpers::create_offset_position_list(box, offsets);
     component_helpers::add_interactable_component(id, station_reach, offsets, interactable_interactions);
 }
+
+void ecs_entities::build_cooking_station(size_t id, Vector2 position,
+    sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
+    float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> offsets, std::vector<recipe::recipe>& recipes,  std::vector<size_t> interactable_interactions){
+        build_station(id, position, station_sprite, station_hitbox, station_reach, offsets);
+        component_helpers::add_recipes_component(id, recipes);
+    }
     void ecs_entities::build_counter(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,
             sprite,

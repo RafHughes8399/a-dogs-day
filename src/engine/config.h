@@ -101,6 +101,9 @@ namespace game_config {
     /** Frames to ignore edit-hold after exiting edit (prevents instant re-enter). */
     inline const int edit_cooldown = static_cast<int>(frames * 0.5);
     inline const int empty_entity = -1;
+
+
+    inline const int cook_speed = 2;
 }
 namespace player_config{
     inline const int max_bones = 999999;
