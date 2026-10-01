@@ -76,3 +76,24 @@ its slightly different but still retains the outline previsouly identified
 ok so we need the recipe for the cooking station which can assign foods that a station can make 
 
 the recipe doesnt need a system. it is the cooking station udpate that would then be like if (active, recipes->[selected_recipe]->cook()
+
+
+ok so the base builder is done, now we need to:
+    -> define the ecs builders for the stations 
+    -> define the attributes for the stations
+    -> define the textures for the stations 
+    -> define the sprite and hitbox builders for the stations 
+    -> define the factory builders for the statsions
+    -> define the lifespane system builders for the stations 
+    -> define the dog station interaction behaviorus 
+    -> and define the state machine for the station [worked / unworked]
+    -> then define the recipes for each station
+    -> then split the dog art 
+    -> then add station art
+
+    -> stations change appearance as you unlock recipes
+
+    thats a nice little slice, thats the construction adn the setup given what we currently have
+t
+
+    -> we've got to do the sove

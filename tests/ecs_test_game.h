@@ -55,7 +55,7 @@ namespace testing{
             size_t create_table(Vector2 position, size_t layer = level_config::draw_layers::stations);
             size_t create_food_counter(Vector2 position, size_t layer = level_config::draw_layers::stations);
             size_t create_dishwasher(Vector2 position, size_t layer = level_config::draw_layers::stations);
-            size_t create_stove(Vector2 position, size_t layer = level_config::draw_layers::stations);
+            size_t create_cooking_station(size_t cooking_station, Vector2 position, size_t layer = level_config::draw_layers::stations);
             size_t create_food(Vector2 position, size_t layer = level_config::draw_layers::decoration);
 
             void tick(float delta);
@@ -88,6 +88,7 @@ namespace testing{
             bool has_interactor(size_t entity_id);
             bool has_interactable(size_t entity_id);
             bool has_storage(size_t entity_id);
+            bool has_recipes(size_t entity_id);
             bool has_food(size_t entity_id);
             std::optional<size_t> food_item_of(size_t entity_id);
             bool has_state_machine(size_t entity_id);

@@ -204,7 +204,7 @@ void ecs_entities::build_station(size_t id, Vector2 position,
 void ecs_entities::build_cooking_station(size_t id, Vector2 position,
     sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
     float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> offsets, std::vector<recipe::recipe>& recipes,  std::vector<size_t> interactable_interactions){
-        build_station(id, position, station_sprite, station_hitbox, station_reach, offsets);
+        build_station(id, position, station_sprite, station_hitbox, station_reach, offsets, interactable_interactions);
         component_helpers::add_recipes_component(id, recipes);
     }
     void ecs_entities::build_counter(size_t id, Vector2 position, sprite::sprite sprite){
@@ -242,12 +242,64 @@ void ecs_entities::build_cooking_station(size_t id, Vector2 position,
             {entity_config::station_slot_left, entity_config::station_slot_right, std::nullopt, std::nullopt});
     }
     void ecs_entities::build_stove(size_t id, Vector2 position){
-        build_station(id, position,
+        std::vector<recipe::recipe> recipes;
+        build_cooking_station(id, position,
             sprite_builders::build_stove_sprite(),
             hitbox_builders::build_stove_hitbox(position),
             entity_config::station_reach,
             {entity_config::station_slot_left, entity_config::station_slot_right,
-             std::nullopt, std::nullopt});
+             std::nullopt, std::nullopt},
+            recipes);
+    }
+    void ecs_entities::build_oven(size_t id, Vector2 position){
+        std::vector<recipe::recipe> recipes;
+        build_cooking_station(id, position,
+            sprite_builders::build_oven_sprite(),
+            hitbox_builders::build_oven_hitbox(position),
+            entity_config::station_reach,
+            {entity_config::station_slot_left, entity_config::station_slot_right,
+             std::nullopt, std::nullopt},
+            recipes);
+    }
+    void ecs_entities::build_coffee_station(size_t id, Vector2 position){
+        std::vector<recipe::recipe> recipes;
+        build_cooking_station(id, position,
+            sprite_builders::build_coffee_station_sprite(),
+            hitbox_builders::build_coffee_station_hitbox(position),
+            entity_config::station_reach,
+            {entity_config::station_slot_left, entity_config::station_slot_right,
+             std::nullopt, std::nullopt},
+            recipes);
+    }
+    void ecs_entities::build_mini_fridge(size_t id, Vector2 position){
+        std::vector<recipe::recipe> recipes;
+        build_cooking_station(id, position,
+            sprite_builders::build_mini_fridge_sprite(),
+            hitbox_builders::build_mini_fridge_hitbox(position),
+            entity_config::station_reach,
+            {entity_config::station_slot_left, entity_config::station_slot_right,
+             std::nullopt, std::nullopt},
+            recipes);
+    }
+    void ecs_entities::build_bush(size_t id, Vector2 position){
+        std::vector<recipe::recipe> recipes;
+        build_cooking_station(id, position,
+            sprite_builders::build_bush_sprite(),
+            hitbox_builders::build_bush_hitbox(position),
+            entity_config::station_reach,
+            {entity_config::station_slot_left, entity_config::station_slot_right,
+             std::nullopt, std::nullopt},
+            recipes);
+    }
+    void ecs_entities::build_chopping_board(size_t id, Vector2 position){
+        std::vector<recipe::recipe> recipes;
+        build_cooking_station(id, position,
+            sprite_builders::build_chopping_board_sprite(),
+            hitbox_builders::build_chopping_board_hitbox(position),
+            entity_config::station_reach,
+            {entity_config::station_slot_left, entity_config::station_slot_right,
+             std::nullopt, std::nullopt},
+            recipes);
     }
     /**
         // void build_stove();

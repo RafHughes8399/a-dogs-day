@@ -101,6 +101,10 @@ void component_helpers::add_carrier_component(size_t entity_id, Vector2 previous
     register_carrier_component(entity_id,
         component_builders::build_carrier_component(previous_position, current_position, carried_entity));
 }
+void component_helpers::add_recipes_component(size_t entity_id, std::vector<recipe::recipe>& recipes){
+    register_recipes_component(entity_id,
+        component_builders::build_recipes_component(recipes));
+}
 
 void component_helpers::create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions){
     // * a half edgeweight step lands on the centre of the neighbouring cell, the
@@ -268,6 +272,7 @@ void component_helpers::unregister_all_components(size_t entity_id){
     unregister_storage_component(entity_id);
     unregister_food_component(entity_id);
     unregister_carrier_component(entity_id);
+    unregister_recipes_component(entity_id);
 }
 
 // total components registered across every manager
@@ -286,6 +291,7 @@ size_t component_helpers::num_registered_components(size_t entity_id){
     count += component_managers::storage_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
     count += component_managers::food_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
     count += component_managers::carrier_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+    count += component_managers::recipes_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
     return count;
 }
 
@@ -304,4 +310,5 @@ void component_helpers::clear_all_components(){
     component_managers::storage_manager_.clear();
     component_managers::food_manager_.clear();
     component_managers::carrier_manager_.clear();
+    component_managers::recipes_manager_.clear();
 }

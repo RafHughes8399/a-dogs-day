@@ -436,6 +436,15 @@ namespace entity_config{
         food_counter = 0,
         counters_size
     };
+    enum cooking_stations{
+        stove = 0,
+        oven,
+        coffee_station,
+        mini_fridge,
+        bush,
+        chopping_board,
+        cooking_stations_size
+    };
     enum foods{
         lasagna = 0,
         coffee,
@@ -542,6 +551,12 @@ namespace entity_config{
     inline const char* dining_table_station_path = "../sprites/dining-table.png";
     inline const char* tiled_table_station_path ="../sprites/tiled-table.png";
     inline const char* food_counter_station_path = "";
+    inline const char* stove_station_path = "../sprites/stove.png";
+    inline const char* oven_station_path = "../sprites/oven.png";
+    inline const char* coffee_station_path = "../sprites/coffee-station.png";
+    inline const char* mini_fridge_station_path = "../sprites/mini-fridge.png";
+    inline const char* bush_station_path = "../sprites/bush.png";
+    inline const char* chopping_board_station_path = "../sprites/chopping-board.png";
     
     
     // * ------------------------ FOOD PATHS --------------------------------------- *//
@@ -631,6 +646,11 @@ namespace entity_config{
     inline const float food_counter_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float dishwasher_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float stove_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float oven_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float coffee_station_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float mini_fridge_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float bush_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float chopping_board_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     inline const float lasagna_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};

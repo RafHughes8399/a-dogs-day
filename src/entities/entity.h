@@ -83,7 +83,12 @@ namespace ecs_entities {
             void build_dining_table(size_t id, Vector2 position);
             void build_tiled_table(size_t id, Vector2 position);
         void build_dishwasher(size_t id, Vector2 position);
-        void build_stove(size_t id, Vector2 position);
+            void build_stove(size_t id, Vector2 position);
+            void build_oven(size_t id, Vector2 position);
+            void build_coffee_station(size_t id, Vector2 position);
+            void build_mini_fridge(size_t id, Vector2 position);
+            void build_bush(size_t id, Vector2 position);
+            void build_chopping_board(size_t id, Vector2 position);
         /**
         */
 
