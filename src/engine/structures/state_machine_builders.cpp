@@ -53,6 +53,13 @@ state_machine::state_machine state_machine_builders::build_waiter_state_machine(
 }
 
 state_machine::state_machine state_machine_builders::build_cooking_station_state_machine(){
-    state_machine::graph graph_;
-    graph_.push_back(state_machine::node(state_builders::build_cook_station_idle_state())))
+    state_machine::graph graph;
+    graph.push_back(state_machine::node(state_builders::build_cook_station_idle_state(), 
+    {state_machine::edge(station_config::player_engaged, station_config::station_active)}));
+    
+    graph.push_back(state_machine::node(state_builders::build_cook_station_active_state(), 
+    {state_machine::edge(station_config::player_disengaged, station_config::station_idle)}));
+    
+    return state_machine::state_machine(std::move(graph), station_config::station_idle);
+
 }

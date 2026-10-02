@@ -112,6 +112,17 @@ namespace state{
         private:
             int elapsed_;
     };
+    class station_active_state : public state{
+        public:
+            ~station_active_state() override = default;
+            station_active_state(size_t state_id, size_t animation)
+            : state(state_id, animation){}
+
+            void update(size_t entity, float delta) override;
+            void on_transitioned_to(size_t entity, std::optional<size_t> payload) override;
+
+        private:
+    };
 }
 namespace state_builders{
     std::unique_ptr<state::state> build_player_idle_state();
@@ -125,5 +136,8 @@ namespace state_builders{
     std::unique_ptr<state::state> build_waiter_stationary_state();
     std::unique_ptr<state::state> build_waiter_idle_state();
     std::unique_ptr<state::state> build_waiter_carrying_state();
+
+    std::unique_ptr<state::state> build_cook_station_idle_state();
+    std::unique_ptr<state::state> build_cook_station_active_state();
 }
 #endif

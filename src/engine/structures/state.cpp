@@ -87,3 +87,11 @@ void state::eating_state::on_transitioned_to(size_t entity, std::optional<size_t
 int state::eating_state::get_elapsed() const{
     return elapsed_;
 }
+void state::station_active_state::update(size_t entity, float delta){
+    (void) entity;
+    (void) delta;
+}
+void state::station_active_state::on_transitioned_to(size_t entity, std::optional<size_t> payload){
+    (void) entity;
+    (void) payload;
+}

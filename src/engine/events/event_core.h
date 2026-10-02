@@ -53,6 +53,8 @@ namespace events{
 		interaction_started_id,
 		interaction_finished_id,
 		customer_finished_meal_id,
+        player_engaged_id,
+        player_disengaged_id,
 		size
 	};
 	class event{

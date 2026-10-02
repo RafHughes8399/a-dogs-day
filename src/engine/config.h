@@ -287,6 +287,16 @@ namespace cafe_config{
 }
 namespace station_config{
     inline const float station_reach = level_config::edge_weight * 0.25f;
+
+    enum cook_station_states{
+        station_idle = 0,
+        station_active,
+        station_states_size
+    };
+    enum state_transitions{
+        player_engaged = events::ids::player_engaged_id,
+        player_disengaged = events::ids::player_disengaged_id
+    };
 }
 namespace animation_config{
     inline constexpr int default_play_speed = 6;
@@ -397,6 +407,13 @@ namespace animation_config{
             sniffing = shared::shared_size,
             panting,
             licking,
+            size
+        };
+    }
+    namespace station{
+        enum tags{
+            idle = 0,
+            active,
             size
         };
     }
