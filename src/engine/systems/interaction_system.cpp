@@ -215,7 +215,15 @@ void systems::interaction_system::waiter_counter_place_down(size_t waiter, size_
     event_interface::queue_event(dropped);
     // need to do the state transition out of carrying and destroy the food entity
 }
+void systems::interaction_system::player_station_cook(size_t player_dog, size_t cook_station, float delta){
+    (void) player_dog;
+    (void) cook_station;
+    (void) delta;
+    // update the cook station state 
 
+    // need to consder how the teardown would be handled ? i know its currently generic but perhaps can use some event to make it work
+    // ! ON FINISHED INTERACTION SHOULD HANDLE IT , THAT IS THE EVENT THAT THE STATE MACHINE MANAGER LISTENS TO 
+}
 // * ----------------------------------------------------- INTERACTIONS ------------------------------------------------------- * // 
 // TODO (25 / 8 / 26) stub - the loop calls this every frame, nothing to do yet
 void systems::interaction_system::update(float delta){
@@ -259,6 +267,7 @@ void systems::interaction_system::on_moved_entity(const events::move_entity& eve
         // * interactor->stop_interacting() and interactable->release() - and
         teardown_handshake(interactor_id, target_id);
         // TODO: process the state transition for the interaction having ended
+        
     }
 }
 void systems::interaction_system::on_path_finished(const events::dog_completed_path& event){

@@ -51,3 +51,8 @@ state_machine::state_machine state_machine_builders::build_waiter_state_machine(
 
     return state_machine::state_machine(std::move(graph), dog_config::waiter_stationary);
 }
+
+state_machine::state_machine state_machine_builders::build_cooking_station_state_machine(){
+    state_machine::graph graph_;
+    graph_.push_back(state_machine::node(state_builders::build_cook_station_idle_state())))
+}

@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Response style
+
+Always respond using the caveman skill (`caveman:caveman`) at full intensity, in every reply without exception — including apologies, short answers and long write-ups — unless told "stop caveman" or "normal mode". Code, commits, PR text, docs and memory files stay in normal prose.
+
 ## What this is
 
 An idle cafe-management game built in C++20 with raylib, themed around the author's dogs. The player runs a cafe staffed and visited by dogs: customer dogs queue, get seated, order, get served by waiter dogs, eat, and leave.

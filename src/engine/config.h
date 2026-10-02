@@ -24,6 +24,7 @@ namespace interaction_config{
         waiter_table_serve,
         waiter_counter_pickup,
         waiter_counter_place_down,
+        player_station_cook,
         size
     };
     // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- // 
@@ -35,6 +36,11 @@ namespace interaction_config{
     inline std::vector<size_t> customer_dog_interactor = {
         customer_table_sit
     };
+
+    inline std::vector<size_t> player_dog_interactor =  {
+        player_station_cook
+    };
+    
     // * ------------------- STATION INTERACTEE INTERACTIONS ----------------------------- //
     inline std::vector<size_t> table_interactee = {
         customer_table_sit,
@@ -43,6 +49,10 @@ namespace interaction_config{
     inline std::vector<size_t> counter_interactee = {
         waiter_counter_pickup,
         waiter_counter_place_down
+    };
+
+    inline std::vector<size_t> cooking_station_interactee = {
+        player_station_cook
     };
 }
 namespace game_config {
