@@ -352,6 +352,15 @@ namespace systems{
             size_t create_counter(size_t counter, Vector2 position);
             void destroy_counter(size_t id);
 
+            size_t create_cooking_station(size_t cooking_station, Vector2 position);
+            void destroy_cooking_station(size_t id);
+            size_t create_stove(Vector2 position);
+            size_t create_oven(Vector2 position);
+            size_t create_coffee_station(Vector2 position);
+            size_t create_mini_fridge(Vector2 position);
+            size_t create_bush(Vector2 position);
+            size_t create_chopping_board(Vector2 position);
+
             size_t create_food(size_t food, Vector2 position);
             void destroy_food(size_t id);
             void destroy(size_t entity_id);

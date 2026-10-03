@@ -97,3 +97,20 @@ ok so the base builder is done, now we need to:
 t
 
     -> we've got to do the sove
+
+    -> actually define the interaciton behaviour
+    -> basic basic art
+    -> definfethe interaciton cleanup [ i think interactions in general will need to be extended to have a parallel on interaction finish
+     currently just the teardown occurs but no meaningful state change occurs]
+
+     -> i could define another parrelel, no because i dont know what interaction is being performed 
+     -> i do have the interactor and i do have the interactee
+     -> so you can type check 
+     -> or you can just emit an interaction ended event, then the state machine can call the necessary transitions
+     -> like it can typecheck for what the entity is and then call the necessary transition ? i think that could work, its a simple enough switch case
+     -> like end of the day its not that huge of a system so this solution can work
+
+     then boom you can test
+
+     -. or maybe check the type of the ineteractable during the teardown adn then emit the event if it is a cooking station
+     -> either way the check has to exist somewhere 
