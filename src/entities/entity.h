@@ -76,7 +76,7 @@ namespace ecs_entities {
     void build_cooking_station(size_t id, Vector2 position,
         sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
         float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets,
-        std::vector<recipe::recipe>& recipes, std::vector<size_t> interactable_interactions = {});
+        std::vector<recipe::recipe>& recipes);
         void build_counter(size_t id, Vector2 position, sprite::sprite counter_sprite);
             void build_food_counter(size_t id, Vector2 position);
         void build_table(size_t id, Vector2 position, sprite::sprite table_sprite);

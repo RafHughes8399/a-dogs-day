@@ -493,14 +493,15 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
             auto cooking_station = static_cast<size_t>(GENERATE(range(0, static_cast<int>(entity_config::cooking_stations_size))));
             auto station_id = game.create_cooking_station(cooking_station, spot);
 
-            THEN("it carries the station component set plus recipes"){
+            THEN("it carries the station component set plus recipes and a state machine"){
                 REQUIRE(game.has_position(station_id));
                 REQUIRE(game.has_renderable(station_id));
                 REQUIRE(game.has_collision(station_id));
                 REQUIRE(game.has_selectable(station_id));
                 REQUIRE(game.has_interactable(station_id));
                 REQUIRE(game.has_recipes(station_id));
-                REQUIRE(game.num_components(station_id) == 6);
+                REQUIRE(game.has_state_machine(station_id));
+                REQUIRE(game.num_components(station_id) == 7);
             }
             THEN("it answers to the station kind"){
                 REQUIRE(game.selectable_kind_of(station_id)

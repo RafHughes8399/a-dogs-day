@@ -50,7 +50,7 @@ void game::game::init(){
     lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
     lifespan_.create_table(entity_config::tables::tiled_table,Vector2{level_config::edge_weight * 10, level_config::edge_weight * 8});
    
-   lifespan_.create_stove(Vector2{level_config::edge_weight * 10, level_config::edge_weight * 8});
+   lifespan_.create_stove(Vector2{level_config::edge_weight * 14, level_config::edge_weight * 8});
    
     //* ------------------------------------------------- WAITER CREATE---------------------------------------------------------------------
     lifespan_.create_waiter_dog(entity_config::waiters::gianluca, Vector2 {level_config::edge_weight * 13, level_config::edge_weight * 6});

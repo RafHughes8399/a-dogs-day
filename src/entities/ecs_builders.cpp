@@ -58,7 +58,8 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
 
         build_dog(id, level_config::khiri_start, std::move(sprites),
             hitbox_builders::build_dog_across_hitbox(level_config::khiri_start),
-            entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach);
+            entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach,
+            interaction_config::player_dog_interactor);
         component_helpers::add_state_machine_component(id,
             state_machine_builders::build_player_state_machine());
     }
@@ -71,7 +72,8 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
 
         build_dog(id, level_config::mack_start, std::move(sprites),
             hitbox_builders::build_dog_across_hitbox(level_config::mack_start),
-            entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach);
+            entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach,
+            interaction_config::player_dog_interactor);
         component_helpers::add_state_machine_component(id,
             state_machine_builders::build_player_state_machine());
     }
@@ -203,9 +205,11 @@ void ecs_entities::build_station(size_t id, Vector2 position,
 
 void ecs_entities::build_cooking_station(size_t id, Vector2 position,
     sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
-    float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> offsets, std::vector<recipe::recipe>& recipes,  std::vector<size_t> interactable_interactions){
-        build_station(id, position, station_sprite, station_hitbox, station_reach, offsets, interactable_interactions);
+    float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> offsets, std::vector<recipe::recipe>& recipes){
+        build_station(id, position, station_sprite, station_hitbox, station_reach, offsets, interaction_config::cooking_station_interactee);
         component_helpers::add_recipes_component(id, recipes);
+        component_helpers::add_state_machine_component(id,
+            state_machine_builders::build_cooking_station_state_machine());
     }
     void ecs_entities::build_counter(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,

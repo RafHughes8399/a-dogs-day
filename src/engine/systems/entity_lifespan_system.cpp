@@ -82,9 +82,15 @@ size_t systems::entity_lifespan_system::create_cooking_station(size_t cooking_st
     auto id = create([this](size_t cooking_station, size_t entity_id, Vector2 position) -> void{
         station_factory_.build_cooking_station(cooking_station, entity_id, position); },
         cooking_station, position, level_config::draw_layers::stations);
+    debug::log("[entity_lifespan_system::create_cooking_station] built cooking station: "
+        + std::to_string(cooking_station)
+        + ", id: " + std::to_string(id)
+        + ", position: " + raglib::vector_to_string(position));
     return id;
 }
 void systems::entity_lifespan_system::destroy_cooking_station(size_t id){
+    debug::log("[entity_lifespan_system::destroy_cooking_station] removing cooking station id: "
+        + std::to_string(id));
     destroy(id);
 }
 size_t systems::entity_lifespan_system::create_stove(Vector2 position){
