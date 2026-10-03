@@ -143,7 +143,22 @@ sprite::sprite sprite_builders::build_dishwasher_sprite(){
     return build_test_decoration_sprite(entity_config::dishwasher_attributes, PURPLE);
 }
 sprite::sprite sprite_builders::build_stove_sprite(){
-    return build_test_decoration_sprite(entity_config::stove_attributes, ORANGE);
+    return build_decoration_sprite(textures::stove, entity_config::stove_station_path, entity_config::stove_attributes);
+}
+sprite::sprite sprite_builders::build_oven_sprite(){
+    return build_decoration_sprite(textures::oven, entity_config::oven_station_path, entity_config::oven_attributes);
+}
+sprite::sprite sprite_builders::build_coffee_station_sprite(){
+    return build_decoration_sprite(textures::coffee_station, entity_config::coffee_station_path, entity_config::coffee_station_attributes);
+}
+sprite::sprite sprite_builders::build_mini_fridge_sprite(){
+    return build_decoration_sprite(textures::mini_fridge, entity_config::mini_fridge_station_path, entity_config::mini_fridge_attributes);
+}
+sprite::sprite sprite_builders::build_bush_sprite(){
+    return build_decoration_sprite(textures::bush, entity_config::bush_station_path, entity_config::bush_attributes);
+}
+sprite::sprite sprite_builders::build_chopping_board_sprite(){
+    return build_decoration_sprite(textures::chopping_board, entity_config::chopping_board_station_path, entity_config::chopping_board_attributes);
 }
 sprite::sprite sprite_builders::build_food_sprite(){
     return build_test_decoration_sprite(entity_config::test_food_attributes, RED);
@@ -158,10 +173,16 @@ sprite::sprite sprite_builders::build_coffee_sprite(){
         entity_config::coffee_food_path, entity_config::coffee_attributes,
         entity_config::food_draw_offset);
 }
+sprite::sprite sprite_builders::build_cutlets_sprite(){
+    return build_decoration_sprite(textures::cutlets,
+        entity_config::cutlets_food_path, entity_config::cutlets_attributes,
+        entity_config::food_draw_offset);
+}
 std::vector<sprite::sprite> sprite_builders::build_food_sprites(){
     std::vector<sprite::sprite> sprites;
     sprites.push_back(build_lasagna_sprite());
     sprites.push_back(build_coffee_sprite());
+    sprites.push_back(build_cutlets_sprite());
     return sprites;
 }
 sprite::sprite sprite_builders::build_background_sprite(){

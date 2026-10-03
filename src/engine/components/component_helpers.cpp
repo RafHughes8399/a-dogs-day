@@ -41,7 +41,9 @@ void component_helpers::register_food_component(size_t entity_id, components::fo
 void component_helpers::register_carrier_component(size_t entity_id, components::carrier_component component){
     component_managers::carrier_manager_.register_component(entity_id, std::move(component));
 }
-
+void component_helpers::register_recipes_component(size_t entity_id, components::recipes_component component){
+    component_managers::recipes_manager_.register_component(entity_id, component);
+}
 void component_helpers::add_positional_component(size_t entity_id, Vector2 position){
     register_positional_component(entity_id,
         component_builders::build_positional_component(position));
@@ -98,6 +100,10 @@ void component_helpers::add_food_component(size_t entity_id, size_t item_id){
 void component_helpers::add_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity){
     register_carrier_component(entity_id,
         component_builders::build_carrier_component(previous_position, current_position, carried_entity));
+}
+void component_helpers::add_recipes_component(size_t entity_id, std::vector<recipe::recipe>& recipes){
+    register_recipes_component(entity_id,
+        component_builders::build_recipes_component(recipes));
 }
 
 void component_helpers::create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions){
@@ -194,6 +200,9 @@ void component_helpers::unregister_positional_component(size_t entity_id){
 void component_helpers::unregister_movement_component(size_t entity_id){
     component_managers::movement_manager_.unregister_component(entity_id);
 }
+void component_helpers::unregister_recipes_component(size_t entity_id){
+    component_managers::recipes_manager_.unregister_component(entity_id);
+}
 void component_helpers::unregister_renderable_component(size_t entity_id){
     component_managers::renderable_manager_.unregister_component(entity_id);
 }
@@ -263,6 +272,7 @@ void component_helpers::unregister_all_components(size_t entity_id){
     unregister_storage_component(entity_id);
     unregister_food_component(entity_id);
     unregister_carrier_component(entity_id);
+    unregister_recipes_component(entity_id);
 }
 
 // total components registered across every manager
@@ -281,6 +291,7 @@ size_t component_helpers::num_registered_components(size_t entity_id){
     count += component_managers::storage_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
     count += component_managers::food_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
     count += component_managers::carrier_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
+    count += component_managers::recipes_manager_.get_component(entity_id) != nullptr ? 1u : 0u;
     return count;
 }
 
@@ -299,4 +310,5 @@ void component_helpers::clear_all_components(){
     component_managers::storage_manager_.clear();
     component_managers::food_manager_.clear();
     component_managers::carrier_manager_.clear();
+    component_managers::recipes_manager_.clear();
 }

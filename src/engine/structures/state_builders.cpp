@@ -39,3 +39,11 @@ std::unique_ptr<state::state> state_builders::build_waiter_carrying_state(){
     return std::make_unique<state::carrying_state>(dog_config::waiter_carrying,
         animation_config::shared::carrying);
 }
+
+std::unique_ptr<state::state> state_builders::build_cook_station_idle_state(){
+    return std::make_unique<state::idle_state>(station_config::station_idle, animation_config::station::idle);
+}
+std::unique_ptr<state::state> state_builders::build_cook_station_active_state(){
+    return std::make_unique<state::station_active_state>(station_config::station_active, animation_config::station::active);
+
+}

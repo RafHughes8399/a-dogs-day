@@ -78,6 +78,40 @@ void systems::entity_lifespan_system::destroy_counter(size_t id){
     destroy(id);
 }
 
+size_t systems::entity_lifespan_system::create_cooking_station(size_t cooking_station, Vector2 position){
+    auto id = create([this](size_t cooking_station, size_t entity_id, Vector2 position) -> void{
+        station_factory_.build_cooking_station(cooking_station, entity_id, position); },
+        cooking_station, position, level_config::draw_layers::stations);
+    debug::log("[entity_lifespan_system::create_cooking_station] built cooking station: "
+        + std::to_string(cooking_station)
+        + ", id: " + std::to_string(id)
+        + ", position: " + raglib::vector_to_string(position));
+    return id;
+}
+void systems::entity_lifespan_system::destroy_cooking_station(size_t id){
+    debug::log("[entity_lifespan_system::destroy_cooking_station] removing cooking station id: "
+        + std::to_string(id));
+    destroy(id);
+}
+size_t systems::entity_lifespan_system::create_stove(Vector2 position){
+    return create_cooking_station(entity_config::cooking_stations::stove, position);
+}
+size_t systems::entity_lifespan_system::create_oven(Vector2 position){
+    return create_cooking_station(entity_config::cooking_stations::oven, position);
+}
+size_t systems::entity_lifespan_system::create_coffee_station(Vector2 position){
+    return create_cooking_station(entity_config::cooking_stations::coffee_station, position);
+}
+size_t systems::entity_lifespan_system::create_mini_fridge(Vector2 position){
+    return create_cooking_station(entity_config::cooking_stations::mini_fridge, position);
+}
+size_t systems::entity_lifespan_system::create_bush(Vector2 position){
+    return create_cooking_station(entity_config::cooking_stations::bush, position);
+}
+size_t systems::entity_lifespan_system::create_chopping_board(Vector2 position){
+    return create_cooking_station(entity_config::cooking_stations::chopping_board, position);
+}
+
 size_t systems::entity_lifespan_system::create_food(size_t food, Vector2 position){
     debug::log("[entity_lifespan_system, create food]: create food: " + std::to_string(food) + " at posiiton " + std::to_string(position.x) + ", " + std::to_string(position.y));
     auto id = create([this](size_t food, size_t entity_id, Vector2 position) -> void{

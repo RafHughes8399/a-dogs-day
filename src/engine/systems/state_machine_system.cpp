@@ -48,9 +48,13 @@ void systems::state_machine_system::on_completed_path(const events::dog_complete
 }
 void systems::state_machine_system::on_interaction_started(const events::interaction_started& event){
     transition(event.get_interactor_id(), dog_config::interaction_started);
+    transition(event.get_interactee_id(), station_config::player_engaged);
 }
 void systems::state_machine_system::on_interaction_finished(const events::interaction_finished& event){
     transition(event.get_interactor_id(), dog_config::interaction_finished);
+    auto* interactable = component_managers::interactable_manager_.get_component(event.get_interactee_id());
+    if(interactable and interactable->has_interactor()){ return; }
+    transition(event.get_interactee_id(), station_config::player_disengaged);
 }
 void systems::state_machine_system::on_order_served(const events::order_served& event){
     transition(event.get_waiter_id(), dog_config::order_served);

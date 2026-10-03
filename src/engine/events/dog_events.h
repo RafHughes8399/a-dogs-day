@@ -1,8 +1,8 @@
 /** Cafe/dog-domain events: customer and waiter dog lifecycle, pathing,
  * and order fulfillment.
  */
-#ifndef EVENTS_DOG_EVENTS_H
-#define EVENTS_DOG_EVENTS_H
+#ifndef DOG_EVENTS_H
+#define DOG_EVENTS_H
 
 #include <optional>
 
@@ -121,7 +121,22 @@ private:
   const std::optional<size_t> food_id_;
 };
 
+class player_engaged : public event {
+    public:
+    player_engaged() 
+    :event(ids::player_engaged_id){}
 
+    private:
+
+};
+class player_disengaged : public event {
+    public:
+    player_disengaged() 
+    :event(ids::player_disengaged_id){}
+
+    private:
+
+};
 } // namespace events
 
 #endif

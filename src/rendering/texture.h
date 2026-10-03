@@ -73,8 +73,15 @@ namespace textures{
         dining_table,
         tiled_table,
         food_counter,
+        stove,
+        oven,
+        coffee_station,
+        mini_fridge,
+        bush,
+        chopping_board,
         lasagna,
         coffee,
+        cutlets,
         background,
         size
         // and so on

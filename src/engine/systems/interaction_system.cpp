@@ -66,6 +66,9 @@ void systems::interaction_system::teardown_handshake(size_t interactor_id, size_
     auto interactable = component_managers::interactable_manager_.get_component(interactable_id);
     if(interactable){ interactable->release(interactor_id); }
     if(interactor){ interactor->stop_interacting(); }
+    std::unique_ptr<events::event> finished = std::make_unique<events::interaction_finished>(
+        interactor_id, interactable_id);
+    event_interface::queue_event(finished);
 }
 
 // * ----------------------------------------------------- INTERACTIONS ------------------------------------------------------- * // 
@@ -215,7 +218,15 @@ void systems::interaction_system::waiter_counter_place_down(size_t waiter, size_
     event_interface::queue_event(dropped);
     // need to do the state transition out of carrying and destroy the food entity
 }
-
+void systems::interaction_system::player_station_cook(size_t player_dog, size_t cook_station, float delta){
+    (void) player_dog;
+    (void) cook_station;
+    (void) delta;
+    // update the cook station state 
+    // TODO: 
+    // need to consder how the teardown would be handled ? i know its currently generic but perhaps can use some event to make it work
+    // ! ON FINISHED INTERACTION SHOULD HANDLE IT , THAT IS THE EVENT THAT THE STATE MACHINE MANAGER LISTENS TO 
+}
 // * ----------------------------------------------------- INTERACTIONS ------------------------------------------------------- * // 
 // TODO (25 / 8 / 26) stub - the loop calls this every frame, nothing to do yet
 void systems::interaction_system::update(float delta){
@@ -258,7 +269,6 @@ void systems::interaction_system::on_moved_entity(const events::move_entity& eve
         // * drop the interaction, clean up both halves of the claim -
         // * interactor->stop_interacting() and interactable->release() - and
         teardown_handshake(interactor_id, target_id);
-        // TODO: process the state transition for the interaction having ended
     }
 }
 void systems::interaction_system::on_path_finished(const events::dog_completed_path& event){
@@ -282,6 +292,10 @@ void systems::interaction_system::on_path_finished(const events::dog_completed_p
     debug::log("[interaction_system::on_path_finished] dog: " + std::to_string(dog_id)
         + ", target: " + std::to_string(target_id)
         + ", overlapping: " + std::string(overlapping ? "yes" : "no"));
+    auto held = interactor->get_target();
+    if(overlapping and held.has_value() and held.value() != target_id){
+        teardown_handshake(dog_id, held.value());
+    }
     if(overlapping and establish_handhsake(dog_id, target_id)){
         auto interaction = create_interaction(dog_id, target_id);
         add_interaction(interaction);

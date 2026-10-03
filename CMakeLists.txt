@@ -97,18 +97,25 @@ link_libraries(raylib)
 
 add_library(raglib src/engine/raglib.cpp)
 link_libraries(raglib)
+
 add_library(debug_log_interface src/engine/logger/debug_log_interface.cpp)
 link_libraries(debug_log_interface)
 
 add_library(debug_logger src/engine/logger/debug_logger.cpp)
 link_libraries(debug_logger)
+
 add_library(events src/engine/events/events.cpp)
 link_libraries(events)
 
 add_library(queries src/engine/queries/queries.cpp)
 link_libraries(queries)
+
 add_library(item_stack src/engine/structures/item_stack.cpp)
 link_libraries(item_stack)
+
+add_library(recipe src/engine/structures/recipe.cpp)
+link_libraries(recipe)
+
 add_library(factories
             src/entities/factories/dog_factory.cpp
             src/entities/factories/station_factory.cpp
@@ -137,7 +144,8 @@ add_library(components
   src/engine/components/selectable_component.cpp
   src/engine/components/state_machine_component.cpp
   src/engine/components/storage_component.cpp
-  src/engine/components/food_component.cpp)
+  src/engine/components/food_component.cpp
+  src/engine/components/recipes_component.cpp)
 link_libraries(components)
 
 add_library(systems
@@ -199,7 +207,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
-  raglib events queries states components systems animation sprite item menu hud hitbox texture
+  raglib events queries states recipe components systems animation sprite item menu hud hitbox texture
   entities factories render_layer quadtree graph debug_log_interface debug_logger game ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)

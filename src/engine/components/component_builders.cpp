@@ -48,3 +48,6 @@ components::food_component component_builders::build_food_component(size_t item_
 components::carrier_component component_builders::build_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity){
     return components::carrier_component(previous_position, current_position, carried_entity);
 }
+components::recipes_component component_builders::build_recipes_component(std::vector<recipe::recipe>& recipes){
+    return components::recipes_component(recipes);
+}

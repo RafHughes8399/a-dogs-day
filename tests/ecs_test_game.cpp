@@ -110,9 +110,9 @@ namespace testing{
         }, layer);
     }
 
-    size_t ecs_test_game::create_stove(Vector2 position, size_t layer){
-        return lifespan_.create([position](size_t id){
-            ecs_entities::build_stove(id, position);
+    size_t ecs_test_game::create_cooking_station(size_t cooking_station, Vector2 position, size_t layer){
+        return lifespan_.create([cooking_station, position](size_t id){
+            factories::station_factory().build_cooking_station(cooking_station, id, position);
         }, layer);
     }
 
@@ -244,6 +244,9 @@ namespace testing{
     }
     bool ecs_test_game::has_storage(size_t entity_id){
         return component_managers::storage_manager_.get_component(entity_id) != nullptr;
+    }
+    bool ecs_test_game::has_recipes(size_t entity_id){
+        return component_managers::recipes_manager_.get_component(entity_id) != nullptr;
     }
     bool ecs_test_game::has_food(size_t entity_id){
         return component_managers::food_manager_.get_component(entity_id) != nullptr;
@@ -383,7 +386,8 @@ namespace testing{
              + component_managers::selectable_manager_.size()
              + component_managers::storage_manager_.size()
              + component_managers::food_manager_.size()
-             + component_managers::carrier_manager_.size();
+             + component_managers::carrier_manager_.size()
+             + component_managers::recipes_manager_.size();
     }
 
 } // namespace testing

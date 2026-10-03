@@ -12,8 +12,7 @@ void factories::station_factory::build_counter(size_t counter, size_t entity_id,
     auto counter_builder = counter_builders_[counter];
     counter_builder(entity_id, position);
 }
-void factories::station_factory::build_stove(size_t id, Vector2 position){
-    (void) id;
-    (void) position;
-    return;
+void factories::station_factory::build_cooking_station(size_t cooking_station, size_t entity_id, Vector2 position){
+    auto cooking_station_builder = cooking_station_builders_[cooking_station];
+    cooking_station_builder(entity_id, position);
 }

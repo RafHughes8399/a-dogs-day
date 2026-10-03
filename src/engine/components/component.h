@@ -19,6 +19,7 @@
 #include "path.h"
 #include "raylib.h"
 #include "raymath.h"
+#include "recipe.hpp"
 #include "sprite.h"
 #include "state_machine.h"
 
@@ -308,7 +309,25 @@ public:
 private:
     Vector2 position_;
 };
+class recipes_component{
+    public:
+        ~recipes_component() = default;
+        recipes_component(std::vector<recipe::recipe>& recipes, size_t selected_recipe = 0)
+        :recipes_(recipes), selected_recipe_(selected_recipe){}
+        
+        recipes_component(const recipes_component& other) = default;
+        recipes_component(recipes_component&& other) = default;
 
+        recipes_component& operator=(const recipes_component& other) = default;
+        recipes_component& operator=(recipes_component&& other) = default;
+
+        void select_recipe(size_t index);
+        std::vector<recipe::recipe>& get_selected_recipes();
+        recipe::recipe& get_selected_recipe();
+    private:
+        std::vector<recipe::recipe> recipes_;
+        size_t selected_recipe_;
+};
 class renderable_component {
 public:
   class body {
@@ -456,6 +475,7 @@ extern component_manager<components::interactor_component> interactor_manager_;
 extern component_manager<components::mouse_input_component> mouse_input_manager_;
 extern component_manager<components::movement_component> movement_manager_;
 extern component_manager<components::position_component> positional_manager_;
+extern component_manager<components::recipes_component> recipes_manager_;
 extern component_manager<components::renderable_component> renderable_manager_;
 extern component_manager<components::selectable_component> selectable_manager_;
 extern component_manager<components::state_machine_component> state_machine_manager_;
@@ -485,6 +505,7 @@ namespace component_builders{
     components::storage_component build_storage_component();
     components::food_component build_food_component(size_t item_id);
     components::carrier_component build_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
+    components::recipes_component build_recipes_component(std::vector<recipe::recipe>& recipes);
 }
 // thin forwarders to the right manager; defined in component_helpers.cpp
 namespace component_helpers{
@@ -501,11 +522,14 @@ namespace component_helpers{
     void register_storage_component(size_t entity_id, components::storage_component component);
     void register_food_component(size_t entity_id, components::food_component component);
     void register_carrier_component(size_t entity_id, components::carrier_component component);
+    void register_recipes_component(size_t entity_id, components::recipes_component component);
+
 
     void add_positional_component(size_t entity_id, Vector2 position);
     void add_movement_component(size_t entity_id, Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
+    void add_recipes_component(size_t entity_id, std::vector<recipe::recipe>& recipes);
     void add_renderable_component(size_t entity_id,
         std::vector<components::renderable_component::body>& bodys);
     void add_collision_component(size_t entity_id,
@@ -532,6 +556,7 @@ namespace component_helpers{
 
     void unregister_positional_component(size_t entity_id);
     void unregister_movement_component(size_t entity_id);
+    void unregister_recipes_component(size_t entity_id);
     void unregister_renderable_component(size_t entity_id);
     void unregister_collision_component(size_t entity_id);
     void unregister_interactor_component(size_t entity_id);

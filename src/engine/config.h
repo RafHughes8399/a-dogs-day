@@ -24,6 +24,7 @@ namespace interaction_config{
         waiter_table_serve,
         waiter_counter_pickup,
         waiter_counter_place_down,
+        player_station_cook,
         size
     };
     // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- // 
@@ -35,6 +36,11 @@ namespace interaction_config{
     inline std::vector<size_t> customer_dog_interactor = {
         customer_table_sit
     };
+
+    inline std::vector<size_t> player_dog_interactor =  {
+        player_station_cook
+    };
+    
     // * ------------------- STATION INTERACTEE INTERACTIONS ----------------------------- //
     inline std::vector<size_t> table_interactee = {
         customer_table_sit,
@@ -43,6 +49,10 @@ namespace interaction_config{
     inline std::vector<size_t> counter_interactee = {
         waiter_counter_pickup,
         waiter_counter_place_down
+    };
+
+    inline std::vector<size_t> cooking_station_interactee = {
+        player_station_cook
     };
 }
 namespace game_config {
@@ -101,6 +111,9 @@ namespace game_config {
     /** Frames to ignore edit-hold after exiting edit (prevents instant re-enter). */
     inline const int edit_cooldown = static_cast<int>(frames * 0.5);
     inline const int empty_entity = -1;
+
+
+    inline const int cook_speed = 2;
 }
 namespace player_config{
     inline const int max_bones = 999999;
@@ -274,6 +287,16 @@ namespace cafe_config{
 }
 namespace station_config{
     inline const float station_reach = level_config::edge_weight * 0.25f;
+
+    enum cook_station_states{
+        station_idle = 0,
+        station_active,
+        station_states_size
+    };
+    enum state_transitions{
+        player_engaged = events::ids::player_engaged_id,
+        player_disengaged = events::ids::player_disengaged_id
+    };
 }
 namespace animation_config{
     inline constexpr int default_play_speed = 6;
@@ -387,6 +410,13 @@ namespace animation_config{
             size
         };
     }
+    namespace station{
+        enum tags{
+            idle = 0,
+            active,
+            size
+        };
+    }
 }
 namespace entity_config{
     inline const char* player_dog_debug_id_prefix = "pd_";
@@ -433,9 +463,19 @@ namespace entity_config{
         food_counter = 0,
         counters_size
     };
+    enum cooking_stations{
+        stove = 0,
+        oven,
+        coffee_station,
+        mini_fridge,
+        bush,
+        chopping_board,
+        cooking_stations_size
+    };
     enum foods{
         lasagna = 0,
         coffee,
+        cutlets,
         foods_size
     };
     enum counter_sprite_slots{
@@ -538,11 +578,18 @@ namespace entity_config{
     inline const char* dining_table_station_path = "../sprites/dining-table.png";
     inline const char* tiled_table_station_path ="../sprites/tiled-table.png";
     inline const char* food_counter_station_path = "";
+    inline const char* stove_station_path = "../sprites/stove.png";
+    inline const char* oven_station_path = "../sprites/oven.png";
+    inline const char* coffee_station_path = "../sprites/coffee-station.png";
+    inline const char* mini_fridge_station_path = "../sprites/mini-fridge.png";
+    inline const char* bush_station_path = "../sprites/bush.png";
+    inline const char* chopping_board_station_path = "../sprites/chopping-board.png";
     
     
     // * ------------------------ FOOD PATHS --------------------------------------- *//
     inline const char* lasagna_food_path = "../sprites/lasagna.png";
     inline const char* coffee_food_path = "../sprites/coffee.png";
+    inline const char* cutlets_food_path = "../sprites/cutlets.png";
     
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
     enum attributes{
@@ -626,10 +673,16 @@ namespace entity_config{
     inline const float food_counter_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float dishwasher_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float stove_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float oven_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float coffee_station_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float mini_fridge_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float bush_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float chopping_board_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
-    inline const float lasagna_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
-    inline const float coffee_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    inline const float lasagna_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float coffee_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float cutlets_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
     
     
     

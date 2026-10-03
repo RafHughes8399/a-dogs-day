@@ -137,9 +137,15 @@ namespace sprite_builders{
     sprite::sprite build_food_counter_sprite();
     sprite::sprite build_dishwasher_sprite();
     sprite::sprite build_stove_sprite();
+    sprite::sprite build_oven_sprite();
+    sprite::sprite build_coffee_station_sprite();
+    sprite::sprite build_mini_fridge_sprite();
+    sprite::sprite build_bush_sprite();
+    sprite::sprite build_chopping_board_sprite();
     sprite::sprite build_food_sprite();
     sprite::sprite build_lasagna_sprite();
     sprite::sprite build_coffee_sprite();
+    sprite::sprite build_cutlets_sprite();
     std::vector<sprite::sprite> build_food_sprites();
 }
 #endif
