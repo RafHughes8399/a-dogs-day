@@ -248,6 +248,7 @@ add_executable(tests
   tests/waiter_idling_scenarios.cpp
   tests/interaction_scenarios.cpp
   tests/state_machine_scenarios.cpp
+  tests/hud_scenarios.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the

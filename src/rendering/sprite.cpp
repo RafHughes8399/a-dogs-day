@@ -86,7 +86,7 @@ void sprite::nine_sprite::render(Vector2 position, int frame){
     // * horizontal top 
     horizontal_piece_.render({position.x + hud_config::nine_sprite_corner_width, position.y}, frame, {scale_.x, 1.0f}, 0.0f, tint_);
     // * horizontal bottom 
-    horizontal_piece_.render({position.x + hud_config::nine_sprite_corner_width, position.y + frame_.width - hud_config::nine_sprite_corner_height}, frame, {scale_.x, 1.0f}, 180.0f, tint_);
+    horizontal_piece_.render({position.x + hud_config::nine_sprite_corner_width, position.y + frame_.height - hud_config::nine_sprite_corner_height}, frame, {scale_.x, 1.0f}, 180.0f, tint_);
     // * centre
     centre_piece_.render({position.x + hud_config::nine_sprite_corner_width, position.y + hud_config::nine_sprite_corner_height}, frame, scale_, 0.0f, tint_);
 }

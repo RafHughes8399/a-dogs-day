@@ -62,6 +62,17 @@ namespace sprite{
 
         void render(Vector2 position, int frame);
 
+#ifdef DOG_DAYS_TESTING
+        Rectangle get_frame() const{
+            return frame_;
+        }
+        Vector2 get_scale() const{
+            return scale_;
+        }
+        Color get_tint() const{
+            return tint_;
+        }
+#endif
     private:
         sprite corner_piece_;
         sprite centre_piece_;
