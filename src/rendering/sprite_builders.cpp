@@ -7,8 +7,8 @@
 #include "texture.h"
 #include "debug_log_interface.h"
 sprite::sprite sprite_builders::build_sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations,
-    Vector2 draw_position_offset, Color tint){
-    return sprite::sprite(texture, frame_width, frame_height, frames, animations, draw_position_offset, tint);
+    Vector2 draw_position_offset){
+    return sprite::sprite(texture, frame_width, frame_height, frames, animations, draw_position_offset);
 }
 sprite::sprite sprite_builders::build_cursor_sprite(){
     auto cursor_texture = textures::textures_.get_texture(textures::cursor, entity_config::cursor_path);
@@ -97,14 +97,12 @@ std::vector<sprite::sprite> sprite_builders::build_lionel_sprites(){
         entity_config::lionel_right_path, entity_config::lionel_attributes));
     return sprites;
 }
-sprite::sprite sprite_builders::build_test_decoration_sprite(const float attributes[entity_config::attributes::size], Color tint){
+sprite::sprite sprite_builders::build_test_decoration_sprite(const float attributes[entity_config::attributes::size]){
     return build_sprite(textures::textures_.get_texture(textures::test_decoration, entity_config::test_decoration_path),
         attributes[entity_config::attributes::frame_width],
         attributes[entity_config::attributes::frame_height],
         attributes[entity_config::attributes::frames],
-        attributes[entity_config::attributes::animations],
-        Vector2Zero(),
-        tint);
+        attributes[entity_config::attributes::animations]);
 }
 sprite::sprite sprite_builders::build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size],
     Vector2 draw_position_offset){
@@ -128,7 +126,7 @@ sprite::sprite sprite_builders::build_gargoyle(){
         return build_decoration_sprite(textures::gargoyle_void, entity_config::gargoyle_void_decoration_path, entity_config::gargoyle_decoration_attributes);
 }
 sprite::sprite sprite_builders::build_table_sprite(){
-    return build_test_decoration_sprite(entity_config::table_attributes, RED);
+    return build_test_decoration_sprite(entity_config::table_attributes);
 }
     sprite::sprite sprite_builders::build_dining_table_sprite(){
         return build_decoration_sprite(textures::dining_table, entity_config::dining_table_station_path, entity_config::dining_table_attributes);
@@ -140,7 +138,7 @@ sprite::sprite sprite_builders::build_table_sprite(){
         return build_decoration_sprite(textures::food_counter, entity_config::food_counter_station_path, entity_config::food_counter_attributes);
     }
 sprite::sprite sprite_builders::build_dishwasher_sprite(){
-    return build_test_decoration_sprite(entity_config::dishwasher_attributes, PURPLE);
+    return build_test_decoration_sprite(entity_config::dishwasher_attributes);
 }
 sprite::sprite sprite_builders::build_stove_sprite(){
     return build_decoration_sprite(textures::stove, entity_config::stove_station_path, entity_config::stove_attributes);
@@ -161,7 +159,7 @@ sprite::sprite sprite_builders::build_chopping_board_sprite(){
     return build_decoration_sprite(textures::chopping_board, entity_config::chopping_board_station_path, entity_config::chopping_board_attributes);
 }
 sprite::sprite sprite_builders::build_food_sprite(){
-    return build_test_decoration_sprite(entity_config::test_food_attributes, RED);
+    return build_test_decoration_sprite(entity_config::test_food_attributes);
 }
 sprite::sprite sprite_builders::build_lasagna_sprite(){
     return build_decoration_sprite(textures::lasagna,
@@ -185,13 +183,24 @@ std::vector<sprite::sprite> sprite_builders::build_food_sprites(){
     sprites.push_back(build_cutlets_sprite());
     return sprites;
 }
+sprite::sprite sprite_builders::build_nine_corner_piece(){
+    return build_sprite(textures::textures_.get_texture(textures::nine_sprite_corner, hud_config::nine_sprite_corner_path), hud_config::nine_sprite_corner_width, hud_config::nine_sprite_corner_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
+}
+sprite::sprite sprite_builders::build_nine_centre_piece(){
+    return build_sprite(textures::textures_.get_texture(textures::nine_sprite_centre, hud_config::nine_sprite_centre_path), hud_config::nine_sprite_centre_width, hud_config::nine_sprite_centre_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
+}
+sprite::sprite sprite_builders::build_nine_vertical_piece(){
+    return build_sprite(textures::textures_.get_texture(textures::nine_sprite_vertical, hud_config::nine_sprite_vertical_path), hud_config::nine_sprite_corner_width, hud_config::nine_sprite_centre_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
+}
+sprite::sprite sprite_builders::build_nine_horizontal_piece(){
+    return build_sprite(textures::textures_.get_texture(textures::nine_sprite_corner, hud_config::nine_sprite_corner_path),hud_config::nine_sprite_centre_width, hud_config::nine_sprite_corner_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
+}
 sprite::sprite sprite_builders::build_background_sprite(){
     // TODO * load all the images, then patch them to add everything 
     // lets do a 4 * 4 then just repeat it four times, assume the naming convention of "backround_tile_[num]"
     std::string file_name_base = "../sprites/background-tile-";
     std::string file_extension = ".png";
     Image base = LoadImage(entity_config::background_path);
-    Rectangle base_rectangle = Rectangle{0.0f, 0.0f, static_cast<float>(base.width), static_cast<float>(base.height)};
     // * an inline load image here will suffice, its a one off, could be a helper if we need it to be
     for(size_t i = 1; i <= level_config::num_tiles; ++i){
         std::string path = file_name_base + std::to_string(i) + file_extension;

@@ -83,6 +83,10 @@ namespace textures{
         espresso,
         cutlets,
         background,
+        nine_sprite_corner,
+        nine_sprite_centre,
+        nine_sprite_vertical,
+        nine_sprite_horizontal,
         size
         // and so on
     };

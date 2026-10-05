@@ -154,6 +154,25 @@ private:
     std::optional<size_t> carried_entity_;
 };
 
+class hud_component {
+public:
+    ~hud_component() = default;
+    hud_component(sprite::nine_sprite& base)
+    : active_(false), base_(base){}
+    hud_component(const hud_component& other) = default;
+    hud_component(hud_component&& other) = default;
+
+    hud_component& operator=(const hud_component& other) = delete;
+    hud_component& operator=(hud_component&& other) = delete;
+
+    bool is_active();
+    sprite::nine_sprite& get_base();
+    
+private:
+    bool active_;
+    sprite::nine_sprite base_;
+};
+
 class interactable_component {
 public:
 

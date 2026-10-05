@@ -119,9 +119,39 @@ t
 
     -> for now recipe cook duratiosn are all the same, for ismplicity of just getting the build off the ground, 
     can change in the future if need be
-     -> define the recipes, can just be enum definitions for now 
-     -> actually define the interaction state change
+     -> define the recipes, can just be enum definitions for now  X 
+     -> actually define the interaction state change X 
      -> scaffold the nine sprite for the hud element
+        -> what does this look like, read an article
+            -> the four corners are fixed in size
+            -> the centre scales both x and y
+            -> the top and bottom scale on x 
+            -> the left and right scale on y n  
+
+
+            -> essentially the hud sprite needs to be scaled WITH DRAWTEXTUREPRO
+            -> the hud needs the base scaled sprite, then the hud elements [buttons, text, icons, etc]
+            -> 
+
+            -> huds are eventually attached to an entity ? as a hud component ? 
+            -> or are they relegated some own thing. they should be their own thing otherwise they may get mixed up with the entities in the quadtrree
+            -> or should just have their own, like they operate on their own layer, 
+            -> there is the hud and the entities. they giuve each other interfaces to interact with
+            -> but the hud should be treated sepeartely at the end of the day
+            -> the hud component can jsut store the details and send the requests to show and hide the hud 
+            -> and then the hud system can be seperately responsible for determining clicks and user interactions
+            -> to then perform certain actions. but then it may need to be tied top an entity in some circumstances
+
+
+            -> kind of like interactions in a wayi suppose
+            -> first we can just define the nine-sprite that is all we need for now
+            -> that is what we know is needed
+
+
+            -> ok we've already given the ability of a sprite to scale
+            -> so now we just define the nine-sprite
+            -> nine sprite organises nine indvidual sprites, and draws them at their offset based 
+            on their position
      -> split the dog art, setup that building and rendering
     -> ray gui icons ? 
 

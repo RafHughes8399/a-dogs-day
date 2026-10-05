@@ -128,6 +128,7 @@ void systems::interaction_system::waiter_table_serve(size_t waiter, size_t table
 }   
 
 void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t counter, float delta){
+    (void) delta;
     debug::log("waiter counter pickup interaction attempt");
     // two things to do:
     // * 1. switch the dog state and play the animation 
@@ -177,6 +178,7 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
     event_interface::queue_event(collected);
 }
 void systems::interaction_system::waiter_counter_place_down(size_t waiter, size_t counter, float delta){
+    (void) delta;
     // ! first guard ! check that is carrying ! cannot put down if not carrying ! 
     debug::log("waiter-counter place down interaction attempt");
     auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);

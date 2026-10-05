@@ -86,8 +86,8 @@ namespace level_config{
 
     inline float world_x = 3072.0f;
     inline float world_y = 3072.0f;
-    inline const size_t tile_rows = world_y / tile_height;
-    inline const size_t tile_columns = world_x / tile_width;
+    inline const size_t tile_rows = static_cast<size_t>(world_y / tile_height);
+    inline const size_t tile_columns = static_cast<size_t>(world_x / tile_width);
     
     inline float graph_x = 0.0f;
     inline float footpath_overhang = 3 * edge_weight;
@@ -767,6 +767,29 @@ namespace hud_config{
     
     inline const float edit_wheel_attributes[entity_config::attributes::size] = {35.0f, 35.0f, static_cast<float>(game_config::hold_duration),  1.0f}; // for now, pending animation play speed implementation , frames is 90
 
+    inline const float nine_sprite_corner_width = level_config::edge_weight * 0.5;
+    inline const float nine_sprite_corner_height = level_config::edge_weight * 0.5;
+    inline const Vector2 nine_sprite_corner = {nine_sprite_corner_width, nine_sprite_corner_height};
+    inline const float nine_sprite_centre_width = level_config::edge_weight;
+    inline const float nine_sprite_centre_height = level_config::edge_weight;
+    inline const Vector2 nine_sprite_centre{nine_sprite_centre_width, nine_sprite_centre_height};
+
+    inline const Vector2 nine_sprite_horizontal = {nine_sprite_centre_width, nine_sprite_corner_height};
+    inline const Vector2 nine_sprite_vertical = {nine_sprite_corner_width, nine_sprite_centre_height};
+
+
+    inline const Vector2 top_left_corner_offset = {};
+    inline const Vector2 top_right_corner_offset = {};
+    inline const Vector2 bottom_left_corner_offset = {};
+    inline const Vector2 bottom_right_corner_offset = {};
+
+    inline const float nine_sprite_frames = 1.0f;
+    inline const float nine_sprite_animations = 1.0f; 
+
+    inline const char* nine_sprite_corner_path = "";
+    inline const char* nine_sprite_centre_path = "";
+    inline const char* nine_sprite_horizontal_path = "";
+    inline const char* nine_sprite_vertical_path = "";
 }
 namespace interaction_config{
     enum interactions{

@@ -53,6 +53,7 @@ void state::carrying_state::update(size_t entity, float delta){
 
 }
 void state::carrying_state::on_transitioned_to(size_t entity, std::optional<size_t> payload){
+    (void) entity;
     // pplay the waiter dog pickup animation
     // start carrying the food
     // i need the previous position too
