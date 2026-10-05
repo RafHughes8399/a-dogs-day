@@ -86,7 +86,7 @@ namespace factories{
             }), cooking_station_builders_({
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_stove(id, position);},
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_oven(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_coffee_station(id, position);},
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_espresso_station(id, position);},
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_mini_fridge(id, position);},
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_bush(id, position);},
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_chopping_board(id, position);},
@@ -113,7 +113,7 @@ namespace factories{
         food_factory()
         :food_builders_({
             [](size_t id, Vector2 position) -> void{ecs_entities::build_lasagna(id, position);},
-            [](size_t id, Vector2 position) -> void{ecs_entities::build_coffee(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_espresso(id, position);},
             [](size_t id, Vector2 position) -> void{ecs_entities::build_cutlets(id, position);}
         }){
 

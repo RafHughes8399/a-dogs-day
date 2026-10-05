@@ -148,8 +148,8 @@ sprite::sprite sprite_builders::build_stove_sprite(){
 sprite::sprite sprite_builders::build_oven_sprite(){
     return build_decoration_sprite(textures::oven, entity_config::oven_station_path, entity_config::oven_attributes);
 }
-sprite::sprite sprite_builders::build_coffee_station_sprite(){
-    return build_decoration_sprite(textures::coffee_station, entity_config::coffee_station_path, entity_config::coffee_station_attributes);
+sprite::sprite sprite_builders::build_espresso_station_sprite(){
+    return build_decoration_sprite(textures::espresso_station, entity_config::espresso_station_path, entity_config::espresso_station_attributes);
 }
 sprite::sprite sprite_builders::build_mini_fridge_sprite(){
     return build_decoration_sprite(textures::mini_fridge, entity_config::mini_fridge_station_path, entity_config::mini_fridge_attributes);
@@ -168,9 +168,9 @@ sprite::sprite sprite_builders::build_lasagna_sprite(){
         entity_config::lasagna_food_path, entity_config::lasagna_attributes,
         entity_config::food_draw_offset);
 }
-sprite::sprite sprite_builders::build_coffee_sprite(){
-    return build_decoration_sprite(textures::coffee,
-        entity_config::coffee_food_path, entity_config::coffee_attributes,
+sprite::sprite sprite_builders::build_espresso_sprite(){
+    return build_decoration_sprite(textures::espresso,
+        entity_config::espresso_food_path, entity_config::espresso_attributes,
         entity_config::food_draw_offset);
 }
 sprite::sprite sprite_builders::build_cutlets_sprite(){
@@ -181,7 +181,7 @@ sprite::sprite sprite_builders::build_cutlets_sprite(){
 std::vector<sprite::sprite> sprite_builders::build_food_sprites(){
     std::vector<sprite::sprite> sprites;
     sprites.push_back(build_lasagna_sprite());
-    sprites.push_back(build_coffee_sprite());
+    sprites.push_back(build_espresso_sprite());
     sprites.push_back(build_cutlets_sprite());
     return sprites;
 }

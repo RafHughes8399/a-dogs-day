@@ -5,14 +5,16 @@ state_machine::state_machine state_machine_builders::build_player_state_machine(
     state_machine::graph graph;
 
     graph.push_back(state_machine::node(state_builders::build_player_idle_state(),
-        {state_machine::edge(dog_config::path_created, dog_config::player_walking)}));
+        {state_machine::edge(dog_config::path_created, dog_config::player_walking),
+         state_machine::edge(dog_config::player_work_station, dog_config::player_interacting)}));
 
     graph.push_back(state_machine::node(state_builders::build_player_walking_state(),
         {state_machine::edge(dog_config::path_finished, dog_config::player_idle),
-         state_machine::edge(dog_config::interaction_started, dog_config::player_interacting)}));
+         state_machine::edge(dog_config::player_work_station, dog_config::player_interacting)}));
 
     graph.push_back(state_machine::node(state_builders::build_player_interacting_state(),
-        {state_machine::edge(dog_config::path_created, dog_config::player_walking)}));
+        {state_machine::edge(dog_config::path_created, dog_config::player_walking),
+         state_machine::edge(dog_config::interaction_finished, dog_config::player_idle)}));
 
     return state_machine::state_machine(std::move(graph), dog_config::player_idle);
 }
@@ -21,7 +23,7 @@ state_machine::state_machine state_machine_builders::build_customer_state_machin
     state_machine::graph graph;
 
     graph.push_back(state_machine::node(state_builders::build_customer_walking_state(),
-        {state_machine::edge(dog_config::interaction_started, dog_config::customer_sitting)}));
+        {state_machine::edge(dog_config::player_work_station, dog_config::customer_sitting)}));
 
     graph.push_back(state_machine::node(state_builders::build_customer_sitting_state(),
         {state_machine::edge(dog_config::order_served, dog_config::customer_eating),

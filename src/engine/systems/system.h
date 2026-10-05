@@ -124,7 +124,7 @@ namespace systems{
             ~state_machine_system(){
                 event_interface::unsubscribe<events::dog_started_path>(started_path_handler_);
                 event_interface::unsubscribe<events::dog_completed_path>(completed_path_handler_);
-                event_interface::unsubscribe<events::interaction_started>(interaction_started_handler_);
+                event_interface::unsubscribe<events::player_work_station>(player_work_station_handler_);
                 event_interface::unsubscribe<events::interaction_finished>(interaction_finished_handler_);
                 event_interface::unsubscribe<events::order_served>(order_served_handler_);
                 event_interface::unsubscribe<events::food_dropped>(food_dropped_handler_);
@@ -144,7 +144,7 @@ namespace systems{
 
             void on_started_path(const events::dog_started_path& event);
             void on_completed_path(const events::dog_completed_path& event);
-            void on_interaction_started(const events::interaction_started& event);
+            void on_player_work_station(const events::player_work_station& event);
             void on_interaction_finished(const events::interaction_finished& event);
             void on_order_served(const events::order_served& event);
             void on_food_dropped(const events::food_dropped& event);
@@ -164,7 +164,7 @@ namespace systems{
             state_machine_system()
             : started_path_handler_([this](const events::dog_started_path& event) -> void{on_started_path(event);}),
             completed_path_handler_([this](const events::dog_completed_path& event) -> void{on_completed_path(event);}),
-            interaction_started_handler_([this](const events::interaction_started& event) -> void{on_interaction_started(event);}),
+            player_work_station_handler_([this](const events::player_work_station& event) -> void{on_player_work_station(event);}),
             interaction_finished_handler_([this](const events::interaction_finished& event) -> void{on_interaction_finished(event);}),
             order_served_handler_([this](const events::order_served& event) -> void{on_order_served(event);}),
             food_dropped_handler_([this](const events::food_dropped& event) -> void{on_food_dropped(event);}),
@@ -173,7 +173,7 @@ namespace systems{
             customer_left_handler_([this](const events::customer_dog_left& event) -> void{on_customer_left(event);}){
                 event_interface::subscribe<events::dog_started_path>(started_path_handler_);
                 event_interface::subscribe<events::dog_completed_path>(completed_path_handler_);
-                event_interface::subscribe<events::interaction_started>(interaction_started_handler_);
+                event_interface::subscribe<events::player_work_station>(player_work_station_handler_);
                 event_interface::subscribe<events::interaction_finished>(interaction_finished_handler_);
                 event_interface::subscribe<events::order_served>(order_served_handler_);
                 event_interface::subscribe<events::food_dropped>(food_dropped_handler_);
@@ -185,7 +185,7 @@ namespace systems{
 
             events::event_handler<events::dog_started_path> started_path_handler_;
             events::event_handler<events::dog_completed_path> completed_path_handler_;
-            events::event_handler<events::interaction_started> interaction_started_handler_;
+            events::event_handler<events::player_work_station> player_work_station_handler_;
             events::event_handler<events::interaction_finished> interaction_finished_handler_;
             events::event_handler<events::order_served> order_served_handler_;
             events::event_handler<events::food_dropped> food_dropped_handler_;
@@ -356,7 +356,7 @@ namespace systems{
             void destroy_cooking_station(size_t id);
             size_t create_stove(Vector2 position);
             size_t create_oven(Vector2 position);
-            size_t create_coffee_station(Vector2 position);
+            size_t create_espresso_station(Vector2 position);
             size_t create_mini_fridge(Vector2 position);
             size_t create_bush(Vector2 position);
             size_t create_chopping_board(Vector2 position);

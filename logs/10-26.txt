@@ -114,3 +114,19 @@ t
 
      -. or maybe check the type of the ineteractable during the teardown adn then emit the event if it is a cooking station
      -> either way the check has to exist somewhere 
+
+     -> CHECK THE STATION INTERACTABLE BUILD IS IT BEING GIVEN THE INTERACTIONS ? ?? ? ?? ?  
+
+    -> for now recipe cook duratiosn are all the same, for ismplicity of just getting the build off the ground, 
+    can change in the future if need be
+     -> define the recipes, can just be enum definitions for now 
+     -> actually define the interaction state change
+     -> scaffold the nine sprite for the hud element
+     -> split the dog art, setup that building and rendering
+    -> ray gui icons ? 
+
+    -> need to build the hud elements
+    -> need to attach them to entities
+    -> need to be able to interact with them via the cursor
+    -> need to be able to perform some function
+     

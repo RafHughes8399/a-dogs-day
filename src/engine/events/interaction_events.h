@@ -11,14 +11,14 @@
 #include "event_core.h"
 
 namespace events{
-	class interaction_started : public event{
+	class player_work_station : public event{
 		public:
-			interaction_started(size_t interactor_id, size_t interactee_id)
-			: event(ids::interaction_started_id), interactor_id_(interactor_id),
+			player_work_station(size_t interactor_id, size_t interactee_id)
+			: event(ids::player_work_station_id), interactor_id_(interactor_id),
 			interactee_id_(interactee_id){}
 
 			static int get_static_type(){
-				return ids::interaction_started_id;
+				return ids::player_work_station_id;
 			}
 			size_t get_interactor_id() const{
 				return interactor_id_;

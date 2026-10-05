@@ -99,8 +99,8 @@ size_t systems::entity_lifespan_system::create_stove(Vector2 position){
 size_t systems::entity_lifespan_system::create_oven(Vector2 position){
     return create_cooking_station(entity_config::cooking_stations::oven, position);
 }
-size_t systems::entity_lifespan_system::create_coffee_station(Vector2 position){
-    return create_cooking_station(entity_config::cooking_stations::coffee_station, position);
+size_t systems::entity_lifespan_system::create_espresso_station(Vector2 position){
+    return create_cooking_station(entity_config::cooking_stations::espresso_station, position);
 }
 size_t systems::entity_lifespan_system::create_mini_fridge(Vector2 position){
     return create_cooking_station(entity_config::cooking_stations::mini_fridge, position);

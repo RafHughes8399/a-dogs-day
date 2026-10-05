@@ -58,7 +58,7 @@ namespace hitbox_builders{
     hitbox::hitbox build_dishwasher_hitbox(Vector2 position);
     hitbox::hitbox build_stove_hitbox(Vector2 position);
     hitbox::hitbox build_oven_hitbox(Vector2 position);
-    hitbox::hitbox build_coffee_station_hitbox(Vector2 position);
+    hitbox::hitbox build_espresso_station_hitbox(Vector2 position);
     hitbox::hitbox build_mini_fridge_hitbox(Vector2 position);
     hitbox::hitbox build_bush_hitbox(Vector2 position);
     hitbox::hitbox build_chopping_board_hitbox(Vector2 position);

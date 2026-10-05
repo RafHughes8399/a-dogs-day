@@ -76,7 +76,7 @@ namespace ecs_entities {
     void build_cooking_station(size_t id, Vector2 position,
         sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
         float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets,
-        std::vector<recipe::recipe>& recipes);
+        std::vector<recipe::recipe> recipes);
         void build_counter(size_t id, Vector2 position, sprite::sprite counter_sprite);
             void build_food_counter(size_t id, Vector2 position);
         void build_table(size_t id, Vector2 position, sprite::sprite table_sprite);
@@ -85,7 +85,7 @@ namespace ecs_entities {
         void build_dishwasher(size_t id, Vector2 position);
             void build_stove(size_t id, Vector2 position);
             void build_oven(size_t id, Vector2 position);
-            void build_coffee_station(size_t id, Vector2 position);
+            void build_espresso_station(size_t id, Vector2 position);
             void build_mini_fridge(size_t id, Vector2 position);
             void build_bush(size_t id, Vector2 position);
             void build_chopping_board(size_t id, Vector2 position);
@@ -94,7 +94,7 @@ namespace ecs_entities {
 
     void build_food(size_t id, Vector2 position, sprite::sprite food_sprite);
         void build_lasagna(size_t id, Vector2 position);
-        void build_coffee(size_t id, Vector2 position);
+        void build_espresso(size_t id, Vector2 position);
         void build_cutlets(size_t id, Vector2 position);
 
     // the level backdrop - renderable only, no hitbox, no collision

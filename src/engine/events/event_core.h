@@ -50,7 +50,7 @@ namespace events{
 		create_path_to_entity_id,
 		animation_finished_id,
 		dog_started_path_id,
-		interaction_started_id,
+		player_work_station_id,
 		interaction_finished_id,
 		customer_finished_meal_id,
         player_engaged_id,

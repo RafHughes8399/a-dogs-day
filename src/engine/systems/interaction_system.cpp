@@ -66,6 +66,12 @@ void systems::interaction_system::teardown_handshake(size_t interactor_id, size_
     auto interactable = component_managers::interactable_manager_.get_component(interactable_id);
     if(interactable){ interactable->release(interactor_id); }
     if(interactor){ interactor->stop_interacting(); }
+    auto interactor_state = component_managers::state_machine_manager_.get_component(interactor_id);
+    auto interactable_state = component_managers::state_machine_manager_.get_component(interactable_id);
+    debug::log("[interaction_system::teardown_handshake] CLEANUP - interactor: " + std::to_string(interactor_id)
+        + " in state: " + (interactor_state ? std::to_string(interactor_state->get_machine().current()) : std::string("none"))
+        + ", interactee: " + std::to_string(interactable_id)
+        + " in state: " + (interactable_state ? std::to_string(interactable_state->get_machine().current()) : std::string("none")));
     std::unique_ptr<events::event> finished = std::make_unique<events::interaction_finished>(
         interactor_id, interactable_id);
     event_interface::queue_event(finished);
@@ -219,13 +225,25 @@ void systems::interaction_system::waiter_counter_place_down(size_t waiter, size_
     // need to do the state transition out of carrying and destroy the food entity
 }
 void systems::interaction_system::player_station_cook(size_t player_dog, size_t cook_station, float delta){
-    (void) player_dog;
-    (void) cook_station;
     (void) delta;
-    // update the cook station state 
-    // TODO: 
-    // need to consder how the teardown would be handled ? i know its currently generic but perhaps can use some event to make it work
-    // ! ON FINISHED INTERACTION SHOULD HANDLE IT , THAT IS THE EVENT THAT THE STATE MACHINE MANAGER LISTENS TO 
+    debug::log("player-cook station work interaction attempt");
+    // need to state transition the player and the cook station
+    auto player_state = component_managers::state_machine_manager_.get_component(player_dog);
+    if(not player_state) {
+        debug::log("[player-cook station work interaction] - no player state machine, player: " + std::to_string(player_dog));
+        return;
+    }
+    auto cook_station_state = component_managers::state_machine_manager_.get_component(cook_station);
+    if(not cook_station_state) {
+        debug::log("[player-cook station work interaction] - no cook station state machine, station: " + std::to_string(cook_station));
+        return;
+    }
+    debug::log("[player-cook station work interaction] START - player: " + std::to_string(player_dog)
+        + " in state: " + std::to_string(player_state->get_machine().current())
+        + " (interacting is " + std::to_string(dog_config::player_interacting) + ")"
+        + ", station: " + std::to_string(cook_station)
+        + " in state: " + std::to_string(cook_station_state->get_machine().current())
+        + " (active is " + std::to_string(station_config::station_active) + ")");
 }
 // * ----------------------------------------------------- INTERACTIONS ------------------------------------------------------- * // 
 // TODO (25 / 8 / 26) stub - the loop calls this every frame, nothing to do yet
@@ -269,6 +287,10 @@ void systems::interaction_system::on_moved_entity(const events::move_entity& eve
         // * drop the interaction, clean up both halves of the claim -
         // * interactor->stop_interacting() and interactable->release() - and
         teardown_handshake(interactor_id, target_id);
+        // maybe some end_interaction helper would be cleaner. 
+        // if we have the interactable and interactor components store the 
+        // and then define the interaction cleanup list, it can call that on the teardown. which is far simpler and cleaner
+        // yes it would result in mostly an empty array but it is much more expandable 
     }
 }
 void systems::interaction_system::on_path_finished(const events::dog_completed_path& event){
@@ -311,7 +333,7 @@ systems::interaction_system::interaction systems::interaction_system::create_int
 void systems::interaction_system::add_interaction(interaction& interaction){
     // ! it is this that is fucking us up. this event being called at the wrong spot, all it does is call
     interactions_to_process_.push_back(std::move(interaction));
-    std::unique_ptr<events::event> started = std::make_unique<events::interaction_started>(
+    std::unique_ptr<events::event> started = std::make_unique<events::player_work_station>(
         interaction.get_interactor(), interaction.get_interactee());
     debug::log("add interaction to process");
     event_interface::queue_event(started);

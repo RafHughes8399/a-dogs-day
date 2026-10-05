@@ -12,49 +12,6 @@
 #include <cstddef>
 #include <raymath.h>
 #include <vector>
-namespace type_config{
-    // * an ordered run of world positions to walk through. Lives here rather
-    // * than inside any one class so the graph, the query layer, the movement
-    // * component and the dogs all name the same type.
-    using path = std::vector<Vector2>;
-}
-namespace interaction_config{
-    enum interactions{
-        customer_table_sit = 0,
-        waiter_table_serve,
-        waiter_counter_pickup,
-        waiter_counter_place_down,
-        player_station_cook,
-        size
-    };
-    // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- // 
-    inline std::vector<size_t> waiter_dog_interactor = {
-        waiter_table_serve,
-        waiter_counter_pickup,
-        waiter_counter_place_down,
-    };
-    inline std::vector<size_t> customer_dog_interactor = {
-        customer_table_sit
-    };
-
-    inline std::vector<size_t> player_dog_interactor =  {
-        player_station_cook
-    };
-    
-    // * ------------------- STATION INTERACTEE INTERACTIONS ----------------------------- //
-    inline std::vector<size_t> table_interactee = {
-        customer_table_sit,
-        waiter_table_serve,
-    };
-    inline std::vector<size_t> counter_interactee = {
-        waiter_counter_pickup,
-        waiter_counter_place_down
-    };
-
-    inline std::vector<size_t> cooking_station_interactee = {
-        player_station_cook
-    };
-}
 namespace game_config {
     // * keyboard and mouse actions are separate enums, and `control`/`mouse_input`
     // * are separate structs, so a keyboard binding cannot carry a mouse action
@@ -114,13 +71,6 @@ namespace game_config {
 
 
     inline const int cook_speed = 2;
-}
-namespace player_config{
-    inline const int max_bones = 999999;
-    inline const int max_level = 50;
-}
-namespace feature_flag_config{
-    inline const bool automatic_arrivals = false;
 }
 namespace level_config{
     // world dimensions
@@ -207,96 +157,6 @@ namespace level_config{
         Vector2{1,1}    // all   (index 4) - see TODO above, no sprite for this
     };
 
-}
-namespace graph_config{
-    inline const int empty_node = -1;
-}
-namespace cafe_config{
-    enum queue_sides{
-        left = 0,
-        right
-    };
-    inline const int queue_width_edges = 3;
-    inline const int queue_x_edges = 1;
-    inline const int queue_y_buffer_edges = 1;
-    inline const int queue_y_edges = level_config::screen_edges_y - (2 * queue_y_buffer_edges);
-    inline const float queue_gap_edges = 2.0f;
-    inline const float queue_arrival_s = 120.0f;
-    inline const float queue_left_window_s = 30.0f;
-    inline const int queue_left_trigger = 3;
-    // How long a customer stays in the eating state before leaving (seconds).
-    inline const float eating_duration_s = 10.0f;
-    // How long a pickup/placement animation holds a dog still (seconds). One
-    // value for all four until one of them needs to differ.
-    inline const float animation_duration_s = 0.5f;
-    inline const int customer_dog_type = 0;
-    inline const Vector2 queue_dir = Vector2{0.0f, 1.0f};
-    inline const Vector2 customer_spawn_positions[2] = {
-        Vector2{queue_x_edges * level_config::edge_weight, 0 - (2.0f * level_config::edge_weight)},
-        Vector2{queue_x_edges * level_config::edge_weight, level_config::screen_height + (2.0f * level_config::edge_weight)}
-    };
-    inline const float queue_width = queue_width_edges * level_config::edge_weight;
-    inline const float queue_height = level_config::screen_height;
-
-    inline const int queue_midpoint_y_edges = level_config::screen_edges_y / 2;
-    inline const float queue_midpoint_y = queue_midpoint_y_edges * level_config::edge_weight;
-    inline const Vector2 left_queue_head = Vector2{
-        queue_x_edges * level_config::edge_weight,
-        queue_midpoint_y - level_config::edge_weight
-    };
-    inline const Vector2 right_queue_head = Vector2{
-        queue_x_edges * level_config::edge_weight,
-        queue_midpoint_y + level_config::edge_weight
-    };
-    
-    inline const int queue_capacity = queue_y_edges;
-    inline const std::vector<Vector2> left_queue_positions = [](){
-        auto positions = std::vector<Vector2>{};
-        positions.reserve(static_cast<size_t>(queue_capacity));
-        for(int index = 0; index < queue_capacity; ++index){
-            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
-            positions.push_back(Vector2{left_queue_head.x, left_queue_head.y - offset});
-        }
-        return positions;
-    }();
-    inline const std::vector<Vector2> right_queue_positions = [](){
-        auto positions = std::vector<Vector2>{};
-        positions.reserve(static_cast<size_t>(queue_capacity));
-        for(int index = 0; index < queue_capacity; ++index){
-            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
-            positions.push_back(Vector2{right_queue_head.x, right_queue_head.y + offset});
-        }
-        return positions;
-    }();
-    inline const Rectangle queue_debug_bounds = Rectangle{
-        0.0f,
-        0.0f,
-        queue_width,
-        queue_height
-    };
-    // * halfway up the cafe, on the seam the two zones share - x in
-    // * [cafe_x, footpath_x + footpath_width) sits inside both areas, and
-    // * level_config::cafe_x is the one grid column both graphs hold a node
-    // * for, so a path can end here from the footpath and start here into the cafe
-    inline const Vector2 cafe_entrance = Vector2{
-        level_config::cafe_x,
-        level_config::cafe_y + level_config::cafe_height * 0.5f
-    };
-    inline const Vector2 cafe_exit = Vector2{cafe_entrance.x, -2.0f * level_config::edge_weight};
-    
-}
-namespace station_config{
-    inline const float station_reach = level_config::edge_weight * 0.25f;
-
-    enum cook_station_states{
-        station_idle = 0,
-        station_active,
-        station_states_size
-    };
-    enum state_transitions{
-        player_engaged = events::ids::player_engaged_id,
-        player_disengaged = events::ids::player_disengaged_id
-    };
 }
 namespace animation_config{
     inline constexpr int default_play_speed = 6;
@@ -418,6 +278,169 @@ namespace animation_config{
         };
     }
 }
+namespace cafe_config{
+    enum queue_sides{
+        left = 0,
+        right
+    };
+    inline const int queue_width_edges = 3;
+    inline const int queue_x_edges = 1;
+    inline const int queue_y_buffer_edges = 1;
+    inline const int queue_y_edges = level_config::screen_edges_y - (2 * queue_y_buffer_edges);
+    inline const float queue_gap_edges = 2.0f;
+    inline const float queue_arrival_s = 120.0f;
+    inline const float queue_left_window_s = 30.0f;
+    inline const int queue_left_trigger = 3;
+    // How long a customer stays in the eating state before leaving (seconds).
+    inline const float eating_duration_s = 10.0f;
+    // How long a pickup/placement animation holds a dog still (seconds). One
+    // value for all four until one of them needs to differ.
+    inline const float animation_duration_s = 0.5f;
+    inline const int customer_dog_type = 0;
+    inline const Vector2 queue_dir = Vector2{0.0f, 1.0f};
+    inline const Vector2 customer_spawn_positions[2] = {
+        Vector2{queue_x_edges * level_config::edge_weight, 0 - (2.0f * level_config::edge_weight)},
+        Vector2{queue_x_edges * level_config::edge_weight, level_config::screen_height + (2.0f * level_config::edge_weight)}
+    };
+    inline const float queue_width = queue_width_edges * level_config::edge_weight;
+    inline const float queue_height = level_config::screen_height;
+
+    inline const int queue_midpoint_y_edges = level_config::screen_edges_y / 2;
+    inline const float queue_midpoint_y = queue_midpoint_y_edges * level_config::edge_weight;
+    inline const Vector2 left_queue_head = Vector2{
+        queue_x_edges * level_config::edge_weight,
+        queue_midpoint_y - level_config::edge_weight
+    };
+    inline const Vector2 right_queue_head = Vector2{
+        queue_x_edges * level_config::edge_weight,
+        queue_midpoint_y + level_config::edge_weight
+    };
+    
+    inline const int queue_capacity = queue_y_edges;
+    inline const std::vector<Vector2> left_queue_positions = [](){
+        auto positions = std::vector<Vector2>{};
+        positions.reserve(static_cast<size_t>(queue_capacity));
+        for(int index = 0; index < queue_capacity; ++index){
+            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
+            positions.push_back(Vector2{left_queue_head.x, left_queue_head.y - offset});
+        }
+        return positions;
+    }();
+    inline const std::vector<Vector2> right_queue_positions = [](){
+        auto positions = std::vector<Vector2>{};
+        positions.reserve(static_cast<size_t>(queue_capacity));
+        for(int index = 0; index < queue_capacity; ++index){
+            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
+            positions.push_back(Vector2{right_queue_head.x, right_queue_head.y + offset});
+        }
+        return positions;
+    }();
+    inline const Rectangle queue_debug_bounds = Rectangle{
+        0.0f,
+        0.0f,
+        queue_width,
+        queue_height
+    };
+    // * halfway up the cafe, on the seam the two zones share - x in
+    // * [cafe_x, footpath_x + footpath_width) sits inside both areas, and
+    // * level_config::cafe_x is the one grid column both graphs hold a node
+    // * for, so a path can end here from the footpath and start here into the cafe
+    inline const Vector2 cafe_entrance = Vector2{
+        level_config::cafe_x,
+        level_config::cafe_y + level_config::cafe_height * 0.5f
+    };
+    inline const Vector2 cafe_exit = Vector2{cafe_entrance.x, -2.0f * level_config::edge_weight};
+    
+}
+namespace controls_config{
+    // controls 
+    inline std::vector<int> mouse_controls = std::vector<int>{MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT};
+    enum key_press_actions{
+        dog_switch = KEY_F,
+        shop_open = KEY_S,
+        inventory_open = KEY_I,
+        menu_open = KEY_TAB,
+        quests_open = KEY_Q,
+        map_open = KEY_M,
+        back = KEY_ESCAPE,
+        exit_edit = KEY_E,
+        debug_toggle = KEY_J
+    };
+    enum key_hold_actions{
+        edit_mode = KEY_E,
+        move_down = KEY_DOWN,
+        move_up  = KEY_UP,
+        move_left = KEY_LEFT,
+        move_right = KEY_RIGHT
+    };
+    // ? antiicpating the need for multiple control schemes, one for the home level, and one for the 
+    // ? resource collecting levels 
+}
+namespace debug_logger_config{
+    inline const char* log_directory = "../debug_logs";
+    inline const float logger_height_ratio = 0.6f;
+    inline const float logger_y_position_scalar = 1.0f - logger_height_ratio;
+    inline const int backdrop_opacity = 102;
+    inline const Color backdrop = Color{28, 28, 28, backdrop_opacity};
+    inline const Color text = Color{245, 240, 225, 255};
+    // max_messages lines at line_height must fit inside the backdrop, which is
+    // logger_height_ratio of the screen less padding_y top and bottom
+    inline const int font_size = 20;
+    inline const int line_height = 30;
+    inline const int padding_x = 18;
+    inline const int padding_y = 16;
+    inline const size_t max_messages = 20;
+}
+namespace dog_config{
+    inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
+    inline const int eating_duration = game_config::frames * 10;
+    inline const float customer_spawn_interval = 20.0f;
+    inline const float dog_reach = level_config::edge_weight * 0.3f;
+
+    inline const float waiter_idle_bounds_edges = 3.0f;
+    inline const size_t waiter_idle_min_points = 2;
+    inline const size_t waiter_idle_max_points = 4;
+    inline const size_t waiter_wander_odds = 6;
+    inline const size_t waiter_idle_max_attempts = 3;
+
+    enum waiter_dog_types{
+        basic = 0,
+        size
+    };
+    enum customer_dog_types{
+        fred = 0,
+        john
+    };
+    enum player_dog_states{
+        player_idle = 0,
+        player_walking,
+        player_interacting,
+        player_states_size
+    };
+    enum customer_dog_states{
+        customer_walking = 0,
+        customer_sitting,
+        customer_eating,
+        customer_states_size
+    };
+    enum waiter_dog_states{
+        waiter_stationary = 0,
+        waiter_idle,
+        waiter_carrying,
+        waiter_states_size
+    };
+    enum state_transitions{
+        path_created = events::ids::dog_started_path_id,
+        path_finished = events::ids::dog_path_complete,
+        player_work_station = events::ids::player_work_station_id,
+        interaction_finished = events::ids::interaction_finished_id,
+        order_served = events::ids::order_served_id,
+        food_dropped = events::ids::food_dropped_id,
+        food_collected = events::ids::waiter_collected_food_id,
+        meal_finished = events::ids::customer_finished_meal_id,
+        customer_leaving = events::ids::customer_left
+    };
+}
 namespace entity_config{
     inline const char* player_dog_debug_id_prefix = "pd_";
     inline const char* customer_dog_debug_id_prefix = "cd_";
@@ -466,7 +489,7 @@ namespace entity_config{
     enum cooking_stations{
         stove = 0,
         oven,
-        coffee_station,
+        espresso_station,
         mini_fridge,
         bush,
         chopping_board,
@@ -474,8 +497,29 @@ namespace entity_config{
     };
     enum foods{
         lasagna = 0,
-        coffee,
+        bone_biscuits,
+
+        espresso,
+        pup_cup,
+        
         cutlets,
+        boiled_chicken,
+        risotto,
+        carbonara,
+
+        bird,
+        sausage_on_a_stick,
+        pork_knuckles,
+        lemongrass,
+
+        charpoocherie_board,
+        cheddar,
+        parmigiano,
+        shishamo,
+        rabbit_foot,
+
+        brisket_leftovers,
+        steak_leftovers,
         foods_size
     };
     enum counter_sprite_slots{
@@ -580,7 +624,7 @@ namespace entity_config{
     inline const char* food_counter_station_path = "";
     inline const char* stove_station_path = "../sprites/stove.png";
     inline const char* oven_station_path = "../sprites/oven.png";
-    inline const char* coffee_station_path = "../sprites/coffee-station.png";
+    inline const char* espresso_station_path = "../sprites/espresso-station.png";
     inline const char* mini_fridge_station_path = "../sprites/mini-fridge.png";
     inline const char* bush_station_path = "../sprites/bush.png";
     inline const char* chopping_board_station_path = "../sprites/chopping-board.png";
@@ -588,7 +632,7 @@ namespace entity_config{
     
     // * ------------------------ FOOD PATHS --------------------------------------- *//
     inline const char* lasagna_food_path = "../sprites/lasagna.png";
-    inline const char* coffee_food_path = "../sprites/coffee.png";
+    inline const char* espresso_food_path = "../sprites/espresso.png";
     inline const char* cutlets_food_path = "../sprites/cutlets.png";
     
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
@@ -674,14 +718,14 @@ namespace entity_config{
     inline const float dishwasher_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float stove_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float oven_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
-    inline const float coffee_station_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float espresso_station_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float mini_fridge_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float bush_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float chopping_board_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     inline const float lasagna_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
-    inline const float coffee_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float espresso_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
     inline const float cutlets_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
     
     
@@ -701,79 +745,14 @@ namespace entity_config{
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
     inline const Vector2 food_carry_offset = {level_config::edge_weight * 0.25f, 0.0f};
 }
-namespace dog_config{
-    inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
-    inline const int eating_duration = game_config::frames * 10;
-    inline const float customer_spawn_interval = 20.0f;
-    inline const float dog_reach = level_config::edge_weight * 0.3f;
-
-    inline const float waiter_idle_bounds_edges = 3.0f;
-    inline const size_t waiter_idle_min_points = 2;
-    inline const size_t waiter_idle_max_points = 4;
-    inline const size_t waiter_wander_odds = 6;
-    inline const size_t waiter_idle_max_attempts = 3;
-
-    enum waiter_dog_types{
-        basic = 0,
-        size
-    };
-    enum customer_dog_types{
-        fred = 0,
-        john
-    };
-    enum player_dog_states{
-        player_idle = 0,
-        player_walking,
-        player_interacting,
-        player_states_size
-    };
-    enum customer_dog_states{
-        customer_walking = 0,
-        customer_sitting,
-        customer_eating,
-        customer_states_size
-    };
-    enum waiter_dog_states{
-        waiter_stationary = 0,
-        waiter_idle,
-        waiter_carrying,
-        waiter_states_size
-    };
-    enum state_transitions{
-        path_created = events::ids::dog_started_path_id,
-        path_finished = events::ids::dog_path_complete,
-        interaction_started = events::ids::interaction_started_id,
-        interaction_finished = events::ids::interaction_finished_id,
-        order_served = events::ids::order_served_id,
-        food_dropped = events::ids::food_dropped_id,
-        food_collected = events::ids::waiter_collected_food_id,
-        meal_finished = events::ids::customer_finished_meal_id,
-        customer_leaving = events::ids::customer_left
-    };
+namespace feature_flag_config{
+    inline const bool automatic_arrivals = false;
 }
-namespace controls_config{
-    // controls 
-    inline std::vector<int> mouse_controls = std::vector<int>{MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT};
-    enum key_press_actions{
-        dog_switch = KEY_F,
-        shop_open = KEY_S,
-        inventory_open = KEY_I,
-        menu_open = KEY_TAB,
-        quests_open = KEY_Q,
-        map_open = KEY_M,
-        back = KEY_ESCAPE,
-        exit_edit = KEY_E,
-        debug_toggle = KEY_J
-    };
-    enum key_hold_actions{
-        edit_mode = KEY_E,
-        move_down = KEY_DOWN,
-        move_up  = KEY_UP,
-        move_left = KEY_LEFT,
-        move_right = KEY_RIGHT
-    };
-    // ? antiicpating the need for multiple control schemes, one for the home level, and one for the 
-    // ? resource collecting levels 
+namespace food_config{
+    inline const uint8_t cook_duration = 20;
+}
+namespace graph_config{
+    inline const int empty_node = -1;
 }
 namespace hud_config{
     // TODO (25 / 8 / 26) change values pending test
@@ -789,19 +768,99 @@ namespace hud_config{
     inline const float edit_wheel_attributes[entity_config::attributes::size] = {35.0f, 35.0f, static_cast<float>(game_config::hold_duration),  1.0f}; // for now, pending animation play speed implementation , frames is 90
 
 }
-namespace debug_logger_config{
-    inline const char* log_directory = "../debug_logs";
-    inline const float logger_height_ratio = 0.6f;
-    inline const float logger_y_position_scalar = 1.0f - logger_height_ratio;
-    inline const int backdrop_opacity = 102;
-    inline const Color backdrop = Color{28, 28, 28, backdrop_opacity};
-    inline const Color text = Color{245, 240, 225, 255};
-    // max_messages lines at line_height must fit inside the backdrop, which is
-    // logger_height_ratio of the screen less padding_y top and bottom
-    inline const int font_size = 20;
-    inline const int line_height = 30;
-    inline const int padding_x = 18;
-    inline const int padding_y = 16;
-    inline const size_t max_messages = 20;
+namespace interaction_config{
+    enum interactions{
+        customer_table_sit = 0,
+        waiter_table_serve,
+        waiter_counter_pickup,
+        waiter_counter_place_down,
+        player_station_cook,
+        size
+    };
+    // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- // 
+    inline std::vector<size_t> waiter_dog_interactor = {
+        waiter_table_serve,
+        waiter_counter_pickup,
+        waiter_counter_place_down,
+    };
+    inline std::vector<size_t> customer_dog_interactor = {
+        customer_table_sit
+    };
+
+    inline std::vector<size_t> player_dog_interactor =  {
+        player_station_cook
+    };
+    
+    // * ------------------- STATION INTERACTEE INTERACTIONS ----------------------------- //
+    inline std::vector<size_t> table_interactee = {
+        customer_table_sit,
+        waiter_table_serve,
+    };
+    inline std::vector<size_t> counter_interactee = {
+        waiter_counter_pickup,
+        waiter_counter_place_down
+    };
+
+    inline std::vector<size_t> cooking_station_interactee = {
+        player_station_cook
+    };
+}
+namespace player_config{
+    inline const int max_bones = 999999;
+    inline const int max_level = 50;
+}
+namespace station_config{
+
+    inline const float station_reach = level_config::edge_weight * 0.25f;
+
+    enum cook_station_states{
+        station_idle = 0,
+        station_active,
+        station_states_size
+    };
+    enum state_transitions{
+        player_engaged = events::ids::player_engaged_id,
+        player_disengaged = events::ids::player_disengaged_id
+    };
+
+
+    inline std::vector<int> stove_recipes = {
+        entity_config::foods::cutlets,
+        entity_config::foods::boiled_chicken,
+        entity_config::foods::risotto,
+        entity_config::foods::carbonara,
+    };
+    inline std::vector<int> oven_recipes = {
+        entity_config::foods::lasagna,
+        entity_config::foods::bone_biscuits
+    };
+    inline std::vector<int> espresso_station_recipes = {
+        entity_config::foods::espresso,
+        entity_config::foods::pup_cup
+    };
+    inline std::vector<int> bush_recipes = {
+        entity_config::foods::bird,
+        entity_config::foods::sausage_on_a_stick,
+        entity_config::foods::lemongrass,
+        entity_config::foods::pork_knuckles,
+    };
+    inline std::vector<int> chopping_board_recipes = {
+        entity_config::foods::charpoocherie_board,
+        entity_config::foods::cheddar,
+        entity_config::foods::parmigiano,
+        entity_config::foods::shishamo,
+        entity_config::foods::rabbit_foot
+    
+    };
+    inline std::vector<int> fridge_recipes = {
+        entity_config::foods::brisket_leftovers,        
+        entity_config::foods::steak_leftovers
+    };
+}
+namespace type_config{
+    // * an ordered run of world positions to walk through. Lives here rather
+    // * than inside any one class so the graph, the query layer, the movement
+    // * component and the dogs all name the same type.
+    using path = std::vector<Vector2>;
 }
 #endif

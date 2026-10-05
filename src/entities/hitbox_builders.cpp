@@ -80,10 +80,10 @@ hitbox::hitbox hitbox_builders::build_oven_hitbox(Vector2 position){
         entity_config::oven_attributes[entity_config::attributes::frame_width],
         entity_config::oven_attributes[entity_config::attributes::frame_height]);
 }
-hitbox::hitbox hitbox_builders::build_coffee_station_hitbox(Vector2 position){
+hitbox::hitbox hitbox_builders::build_espresso_station_hitbox(Vector2 position){
     return build_hitbox(position,
-        entity_config::coffee_station_attributes[entity_config::attributes::frame_width],
-        entity_config::coffee_station_attributes[entity_config::attributes::frame_height]);
+        entity_config::espresso_station_attributes[entity_config::attributes::frame_width],
+        entity_config::espresso_station_attributes[entity_config::attributes::frame_height]);
 }
 hitbox::hitbox hitbox_builders::build_mini_fridge_hitbox(Vector2 position){
     return build_hitbox(position,
