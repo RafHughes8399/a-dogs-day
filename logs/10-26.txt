@@ -156,7 +156,20 @@ t
     -> ray gui icons ? 
 
     -> need to build the hud elements
+        -> the art for the hud elements
+        -> then the specific sizes for each entity
+        -> then attaching it to an entity 
+        -> and the conditional rendering
     -> need to attach them to entities
     -> need to be able to interact with them via the cursor
     -> need to be able to perform some function
      
+
+     -> ok simple basic implementation for now for the hud manager, just the rendering side of it
+     -> selection system needs to trigger the hud state change for whatever the entity is when select and unselect is called
+     -> maybe the hud element can jsut have a flag, like its simple enough and there wont be that many so its fine right ? like 
+     otherwise all i can think of is like a state machien for the hud but that is an over-engineered flag essentially 
+        -> is it sufficient t
+
+        -> define the hud rectnalgles in the config 
+        -> then assign to the builder

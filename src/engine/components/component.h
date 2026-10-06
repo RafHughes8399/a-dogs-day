@@ -47,6 +47,31 @@ namespace components {
 
 #define DIRECTIONS 4
 
+class carrier_component {
+public:
+    ~carrier_component() = default;
+    carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt)
+    : previous_position_(previous_position), current_position_(current_position), carried_entity_(carried_entity){}
+    carrier_component(const carrier_component& other) = default;
+    carrier_component(carrier_component&& other) = default;
+
+    carrier_component& operator=(const carrier_component& other) = default;
+    carrier_component& operator=(carrier_component&& other) = default;
+
+    Vector2 get_previous_position() const;
+    void set_previous_position(Vector2 position);
+    Vector2* get_current_position() const;
+    void set_current_position(Vector2* position);
+    std::optional<size_t> get_carried_entity() const;
+    void set_carried_entity(std::optional<size_t> entity_id);
+    bool is_carrying() const;
+    void drop();
+private:
+    Vector2 previous_position_;
+    Vector2* current_position_;
+    std::optional<size_t> carried_entity_;
+};
+
 class collision_component {
 public:
   class hitbox_component {
@@ -86,32 +111,6 @@ private:
   hitbox_component hitbox_component_;
 };
 
-
-// for the table, the waiter, and the counter and the kitchen station
-class storage_component {
-  // ? current idea for the storage component is for stations to store food,
-  // ? tables to store foood
-  // ? and dishwasher to store plates
-  public:
-    ~storage_component() = default;
-    storage_component(item_stack::item_stack items)
-    :items_(items){}
-    storage_component(const storage_component& other) = default;
-    storage_component(storage_component&& other) = default;
-
-    storage_component& operator=(const storage_component& other) = default;
-    storage_component& operator=(storage_component&& other) = default;
-
-    bool empty() const;
-    size_t size() const;
-    item_stack::item& head();
-    size_t take();
-    void place(size_t item_id);
-
-  private:
-    item_stack::item_stack items_;
-};
-
 class food_component {
 public:
     ~food_component() = default;
@@ -129,48 +128,26 @@ private:
     size_t item_id_;
 };
 
-class carrier_component {
-public:
-    ~carrier_component() = default;
-    carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt)
-    : previous_position_(previous_position), current_position_(current_position), carried_entity_(carried_entity){}
-    carrier_component(const carrier_component& other) = default;
-    carrier_component(carrier_component&& other) = default;
-
-    carrier_component& operator=(const carrier_component& other) = default;
-    carrier_component& operator=(carrier_component&& other) = default;
-
-    Vector2 get_previous_position() const;
-    void set_previous_position(Vector2 position);
-    Vector2* get_current_position() const;
-    void set_current_position(Vector2* position);
-    std::optional<size_t> get_carried_entity() const;
-    void set_carried_entity(std::optional<size_t> entity_id);
-    bool is_carrying() const;
-    void drop();
-private:
-    Vector2 previous_position_;
-    Vector2* current_position_;
-    std::optional<size_t> carried_entity_;
-};
-
 class hud_component {
 public:
     ~hud_component() = default;
-    hud_component(sprite::nine_sprite& base)
-    : active_(false), base_(base){}
+    hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero())
+    : active_(false), base_(base), offset_(offset){}
     hud_component(const hud_component& other) = default;
     hud_component(hud_component&& other) = default;
 
     hud_component& operator=(const hud_component& other) = delete;
     hud_component& operator=(hud_component&& other) = delete;
 
-    bool is_active();
+    bool is_active() const;
+    void set_active(bool active);
     sprite::nine_sprite& get_base();
-    
+    Vector2 get_offset() const;
+
 private:
     bool active_;
     sprite::nine_sprite base_;
+    Vector2 offset_;
 };
 
 class interactable_component {
@@ -240,7 +217,6 @@ class interactor_component {
         std::vector<size_t> interactions_;
 };
 
-
 // * player control input component - keyboard bindings only. Mouse input is
 // * mouse_input_component; see the note there for why they are not one type.
 class key_input_component{
@@ -258,6 +234,7 @@ class key_input_component{
     private:
         std::vector<game_config::input> controls_;
 };
+
 class mouse_input_component{
     public:
         ~mouse_input_component() = default;
@@ -328,6 +305,7 @@ public:
 private:
     Vector2 position_;
 };
+
 class recipes_component{
     public:
         ~recipes_component() = default;
@@ -347,6 +325,7 @@ class recipes_component{
         std::vector<recipe::recipe> recipes_;
         size_t selected_recipe_;
 };
+
 class renderable_component {
 public:
   class body {
@@ -431,8 +410,30 @@ private:
     state_machine::state_machine machine_;
 };
 
-// menu component ?
-// hud component ?
+// for the table, the waiter, and the counter and the kitchen station
+class storage_component {
+  // ? current idea for the storage component is for stations to store food,
+  // ? tables to store foood
+  // ? and dishwasher to store plates
+  public:
+    ~storage_component() = default;
+    storage_component(item_stack::item_stack items)
+    :items_(items){}
+    storage_component(const storage_component& other) = default;
+    storage_component(storage_component&& other) = default;
+
+    storage_component& operator=(const storage_component& other) = default;
+    storage_component& operator=(storage_component&& other) = default;
+
+    bool empty() const;
+    size_t size() const;
+    item_stack::item& head();
+    size_t take();
+    void place(size_t item_id);
+
+  private:
+    item_stack::item_stack items_;
+};
 
 } // namespace components
 
@@ -450,7 +451,8 @@ public:
 
    // insert_or_assign - operator[] needs a default ctor some components lack
    void register_component(size_t entity, C component){
-        components_.insert_or_assign(entity, std::move(component));
+        components_.erase(entity);
+        components_.emplace(entity, std::move(component));
    }
    // * only need to unregister components when the entity is removed from the game
    void unregister_component(size_t entity){
@@ -465,6 +467,9 @@ public:
    auto end(){return components_.end();}
    auto cbegin() const {return components_.cbegin();}
    auto cend() const {return components_.cend();}
+   bool contains(size_t entity) const{
+        return components_.find(entity) != components_.end();
+   }
    size_t size() const{
         return components_.size();
    }
@@ -488,6 +493,7 @@ private:
 extern component_manager<components::carrier_component> carrier_manager_;
 extern component_manager<components::collision_component> collision_manager_;
 extern component_manager<components::food_component> food_manager_;
+extern component_manager<components::hud_component> hud_manager_;
 extern component_manager<components::key_input_component> control_manager_;
 extern component_manager<components::interactable_component> interactable_manager_;
 extern component_manager<components::interactor_component> interactor_manager_;
@@ -525,6 +531,7 @@ namespace component_builders{
     components::food_component build_food_component(size_t item_id);
     components::carrier_component build_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
     components::recipes_component build_recipes_component(std::vector<recipe::recipe>& recipes);
+    components::hud_component build_hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
 }
 // thin forwarders to the right manager; defined in component_helpers.cpp
 namespace component_helpers{
@@ -542,6 +549,7 @@ namespace component_helpers{
     void register_food_component(size_t entity_id, components::food_component component);
     void register_carrier_component(size_t entity_id, components::carrier_component component);
     void register_recipes_component(size_t entity_id, components::recipes_component component);
+    void register_hud_component(size_t entity_id, components::hud_component component);
 
 
     void add_positional_component(size_t entity_id, Vector2 position);
@@ -549,6 +557,7 @@ namespace component_helpers{
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
     void add_recipes_component(size_t entity_id, std::vector<recipe::recipe>& recipes);
+    void add_hud_component(size_t entity_id, sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
     void add_renderable_component(size_t entity_id,
         std::vector<components::renderable_component::body>& bodys);
     void add_collision_component(size_t entity_id,
@@ -587,6 +596,7 @@ namespace component_helpers{
     void unregister_storage_component(size_t entity_id);
     void unregister_food_component(size_t entity_id);
     void unregister_carrier_component(size_t entity_id);
+    void unregister_hud_component(size_t entity_id);
     void unregister_all_components(size_t entity_id);
 
     size_t num_registered_components(size_t entity_id);

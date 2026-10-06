@@ -786,10 +786,13 @@ namespace hud_config{
     inline const float nine_sprite_frames = 1.0f;
     inline const float nine_sprite_animations = 1.0f; 
 
-    inline const char* nine_sprite_corner_path = "";
-    inline const char* nine_sprite_centre_path = "";
-    inline const char* nine_sprite_horizontal_path = "";
-    inline const char* nine_sprite_vertical_path = "";
+    inline const char* nine_sprite_corner_path = "../sprites/hud/nine_sprite_corner.png";
+    inline const char* nine_sprite_centre_path = "../sprites/hud/nine_sprite_centre.png";
+    inline const char* nine_sprite_horizontal_path = "../sprites/hud/nine_sprite_horizontal.png";
+    inline const char* nine_sprite_vertical_path = "../sprites/hud/nine_sprite_vertical.png";
+
+    inline const Rectangle cook_station_hud_sprite = {0.0f, 0.0f, entity_config::station_width * 1.0f, entity_config::station_height * 0.75f };
+    inline const Vector2 cook_station_hud_offset = {entity_config::station_width, 0.0f};
 }
 namespace interaction_config{
     enum interactions{

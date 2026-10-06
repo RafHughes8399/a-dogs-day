@@ -387,7 +387,8 @@ namespace testing{
              + component_managers::storage_manager_.size()
              + component_managers::food_manager_.size()
              + component_managers::carrier_manager_.size()
-             + component_managers::recipes_manager_.size();
+             + component_managers::recipes_manager_.size()
+             + component_managers::hud_manager_.size();
     }
 
 } // namespace testing

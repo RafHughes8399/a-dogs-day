@@ -145,7 +145,8 @@ add_library(components
   src/engine/components/state_machine_component.cpp
   src/engine/components/storage_component.cpp
   src/engine/components/food_component.cpp
-  src/engine/components/recipes_component.cpp)
+  src/engine/components/recipes_component.cpp
+  src/engine/components/hud_component.cpp)
 link_libraries(components)
 
 add_library(systems
@@ -163,7 +164,9 @@ add_library(systems
   src/engine/systems/selection_system.cpp
   src/engine/systems/animation_system.cpp
   src/engine/systems/state_machine_system.cpp
-  src/engine/systems/item_system.cpp)
+  src/engine/systems/item_system.cpp
+  src/engine/systems/hud.cpp
+  src/engine/systems/hud_rendering_system.cpp)
 link_libraries(systems)
 
 add_library(animation src/rendering/animation.cpp src/rendering/animation_builders.cpp)

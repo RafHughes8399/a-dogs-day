@@ -728,12 +728,12 @@ namespace systems{
             Vector2 screen_to_world(Vector2 screen_position);
             // teardown between test scenarios - the singleton outlives them
             void clear();
+            Rectangle get_view_frame(){
+                return view_frame_;
+            }
 #ifdef DOG_DAYS_TESTING
             render_layer::ecs_layer& get_layer(size_t layer){
                 return render_layers_[layer];
-            }
-            Rectangle get_view_frame(){
-                return view_frame_;
             }
 #endif
         private:

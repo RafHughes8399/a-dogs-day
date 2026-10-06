@@ -8,6 +8,7 @@
 
 #include "debug_log_interface.h"
 #include "debug_logger.h"
+#include "hud_systems.hpp"
 #include "system.h"
 namespace game{
     // owns the systems by value so they are destroyed inside main, while
@@ -31,7 +32,8 @@ namespace game{
                 state_machine_(systems::state_machine_system::get_instance()),
                 animation_(systems::animation_system::get_instance()),
                 rendering_(systems::rendering_system::get_instance()),
-                selection_(systems::selection_system::get_instance()){}
+                selection_(systems::selection_system::get_instance()),
+                hud_(hud_systems::hud::get_instance()){}
             // systems subscribe handlers in their constructors, so they are
             // non-copyable and non-movable - and so is anything holding them.
             game(const game& other) = delete;
@@ -62,6 +64,7 @@ namespace game{
             systems::animation_system& animation_;
             systems::rendering_system& rendering_;
             systems::selection_system& selection_;
+            hud_systems::hud& hud_;
     };
 }
 #endif

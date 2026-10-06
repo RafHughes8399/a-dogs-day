@@ -51,3 +51,6 @@ components::carrier_component component_builders::build_carrier_component(Vector
 components::recipes_component component_builders::build_recipes_component(std::vector<recipe::recipe>& recipes){
     return components::recipes_component(recipes);
 }
+components::hud_component component_builders::build_hud_component(sprite::nine_sprite& base, Vector2 offset){
+    return components::hud_component(base, offset);
+}

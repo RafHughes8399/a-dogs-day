@@ -1,5 +1,7 @@
 #include "sprite.h"
+#include "debug_log_interface.h"
 #include <cmath>
+#include <string>
 // ----------------------- sprite ----------------------- // 
 
 animation::animation& sprite::sprite::get_animation(){
@@ -67,28 +69,44 @@ sprite::nine_sprite::nine_sprite(Rectangle frame, Color tint)
     }
 
 void sprite::nine_sprite::render(Vector2 position, int frame){
+    debug::log("[nine_sprite::render] position: (" + std::to_string(position.x) + ", " + std::to_string(position.y)
+        + "), frame: " + std::to_string(frame)
+        + ", frame_: (" + std::to_string(frame_.width) + " x " + std::to_string(frame_.height)
+        + "), scale_: (" + std::to_string(scale_.x) + ", " + std::to_string(scale_.y)
+        + "), tint alpha: " + std::to_string(static_cast<int>(tint_.a)));
+    auto draw = [&](const char* name, sprite& piece, Vector2 at, Vector2 piece_scale, float rotation) -> void{
+        debug::log(std::string("[nine_sprite::render, piece] ") + name
+            + " at: (" + std::to_string(at.x) + ", " + std::to_string(at.y)
+            + "), scale: (" + std::to_string(piece_scale.x) + ", " + std::to_string(piece_scale.y)
+            + "), rotation: " + std::to_string(rotation)
+            + ", animations: " + std::to_string(piece.num_animations())
+            + ", texture id: " + std::to_string(piece.get_texture().id)
+            + (piece.num_animations() == 0 ? ", SKIPPED - no animations" : "")
+            + (piece_scale.x <= 0.0f or piece_scale.y <= 0.0f ? ", WARNING - non positive scale" : ""));
+        piece.render(at, frame, piece_scale, rotation, tint_);
+    };
     // draw corners
         // top left, top right, bottom left bottom right
         //corner will be drawn as top left. so its just a horizontal and vertical flip []
     // * top left
-    corner_piece_.render(position, frame, Vector2One(), 0.0f, tint_);
+    draw("corner top left", corner_piece_, position, Vector2One(), 0.0f);
     // * top right, 
-    corner_piece_.render({position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y}, frame, Vector2One(), 90.0f, tint_);
+    draw("corner top right", corner_piece_, {position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y}, Vector2One(), 90.0f);
     // * bottom left
-    corner_piece_.render({position.x, position.y + frame_.height - hud_config::nine_sprite_corner_height}, frame, Vector2One(), 270.0f, tint_);
+    draw("corner bottom left", corner_piece_, {position.x, position.y + frame_.height - hud_config::nine_sprite_corner_height}, Vector2One(), 270.0f);
     // * bottom right
-    corner_piece_.render({position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y + frame_.height - hud_config::nine_sprite_corner_height}, frame, Vector2One(), 180.0f, tint_);
+    draw("corner bottom right", corner_piece_, {position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y + frame_.height - hud_config::nine_sprite_corner_height}, Vector2One(), 180.0f);
     // can come from config values
     // * vertical left
-    vertical_piece_.render({position.x, position.y + hud_config::nine_sprite_corner_height}, frame, {1.0f,scale_.y}, 0.0f, tint_);
+    draw("vertical left", vertical_piece_, {position.x, position.y + hud_config::nine_sprite_corner_height}, {1.0f,scale_.y}, 0.0f);
     // * vertical right
-    vertical_piece_.render({position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y + hud_config::nine_sprite_corner_height}, frame, {1.0f, scale_.y}, 90.0f, tint_);
+    draw("vertical right", vertical_piece_, {position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y + hud_config::nine_sprite_corner_height}, {1.0f, scale_.y}, 90.0f);
     // * horizontal top 
-    horizontal_piece_.render({position.x + hud_config::nine_sprite_corner_width, position.y}, frame, {scale_.x, 1.0f}, 0.0f, tint_);
+    draw("horizontal top", horizontal_piece_, {position.x + hud_config::nine_sprite_corner_width, position.y}, {scale_.x, 1.0f}, 0.0f);
     // * horizontal bottom 
-    horizontal_piece_.render({position.x + hud_config::nine_sprite_corner_width, position.y + frame_.height - hud_config::nine_sprite_corner_height}, frame, {scale_.x, 1.0f}, 180.0f, tint_);
+    draw("horizontal bottom", horizontal_piece_, {position.x + hud_config::nine_sprite_corner_width, position.y + frame_.height - hud_config::nine_sprite_corner_height}, {scale_.x, 1.0f}, 180.0f);
     // * centre
-    centre_piece_.render({position.x + hud_config::nine_sprite_corner_width, position.y + hud_config::nine_sprite_corner_height}, frame, scale_, 0.0f, tint_);
+    draw("centre", centre_piece_, {position.x + hud_config::nine_sprite_corner_width, position.y + hud_config::nine_sprite_corner_height}, scale_, 0.0f);
 }
 // ----------------------- spriteset ----------------------- //
 

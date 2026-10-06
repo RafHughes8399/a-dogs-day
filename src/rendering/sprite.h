@@ -183,5 +183,12 @@ namespace sprite_builders{
     sprite::sprite build_nine_centre_piece();
     sprite::sprite build_nine_vertical_piece();
     sprite::sprite build_nine_horizontal_piece();
+
+    sprite::nine_sprite build_stove_nine_sprite();
+    sprite::nine_sprite build_oven_nine_sprite();
+    sprite::nine_sprite build_espresso_station_nine_sprite();
+    sprite::nine_sprite build_mini_fridge_nine_sprite();
+    sprite::nine_sprite build_bush_nine_sprite();
+    sprite::nine_sprite build_chopping_board_nine_sprite();
 }
 #endif

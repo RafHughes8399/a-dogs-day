@@ -193,7 +193,25 @@ sprite::sprite sprite_builders::build_nine_vertical_piece(){
     return build_sprite(textures::textures_.get_texture(textures::nine_sprite_vertical, hud_config::nine_sprite_vertical_path), hud_config::nine_sprite_corner_width, hud_config::nine_sprite_centre_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
 }
 sprite::sprite sprite_builders::build_nine_horizontal_piece(){
-    return build_sprite(textures::textures_.get_texture(textures::nine_sprite_corner, hud_config::nine_sprite_corner_path),hud_config::nine_sprite_centre_width, hud_config::nine_sprite_corner_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
+    return build_sprite(textures::textures_.get_texture(textures::nine_sprite_horizontal, hud_config::nine_sprite_horizontal_path), hud_config::nine_sprite_centre_width, hud_config::nine_sprite_corner_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
+}
+sprite::nine_sprite sprite_builders::build_stove_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
+}
+sprite::nine_sprite sprite_builders::build_oven_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
+}
+sprite::nine_sprite sprite_builders::build_espresso_station_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
+}
+sprite::nine_sprite sprite_builders::build_mini_fridge_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
+}
+sprite::nine_sprite sprite_builders::build_bush_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
+}
+sprite::nine_sprite sprite_builders::build_chopping_board_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
 }
 sprite::sprite sprite_builders::build_background_sprite(){
     // TODO * load all the images, then patch them to add everything 

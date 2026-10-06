@@ -94,6 +94,7 @@ void game::game::update(float delta){
     interaction_.update(delta);
     state_machine_.update(delta);
     animation_.update(delta);
+    hud_.update(delta);
 
     frame_count_++;
     if(frame_count_ == game_config::twenty_seconds){
@@ -105,6 +106,7 @@ void game::game::update(float delta){
 void game::game::render(float delta){
     (void) delta;
     rendering_.render(frame_count_);
+    hud_.render(frame_count_);
     DrawFPS(25, 25);
     return;
 }
