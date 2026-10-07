@@ -538,10 +538,10 @@ namespace entity_config{
         counter_sprite_slots_size
     };
     enum dog_sprite_slots{
-        dog_head = 0,
-        dog_face,
-        dog_body,
+        dog_body = 0,
         dog_tail,
+        dog_head,
+        dog_face,
         dog_sprite_slots_size
     };
     enum dog_part_directions{
@@ -553,12 +553,10 @@ namespace entity_config{
 
     
     // * authored in left-facing space; the right-facing sprite mirrors x across
-    // * the dog's across width. advances == false anchors the part to the
-    // * preceding advancing part, and its offset.x is relative to that anchor.
+    // * the dog's across width. offset is measured from the left edge of the across width.
     struct dog_part{
         const float* attributes;
         Vector2 offset;
-        bool advances;
         const char* left_path;
         const char* right_path;
     };
@@ -572,14 +570,14 @@ namespace entity_config{
     // * ------------------------ PLAYER DOG PATHS  --------------------------------------- *//
     inline const char* khiri_left_path = "../sprites/khiri_left.png";
     inline const char* khiri_right_path = "../sprites/khiri_right.png";
-    inline const char* khiri_head_left_path = "../sprites/khiri_head_left.png";
-    inline const char* khiri_head_right_path = "../sprites/khiri_head_right.png";
-    inline const char* khiri_face_left_path = "../sprites/khiri_face_left.png";
-    inline const char* khiri_face_right_path = "../sprites/khiri_face_right.png";
-    inline const char* khiri_body_left_path = "../sprites/khiri_body_left.png";
-    inline const char* khiri_body_right_path = "../sprites/khiri_body_right.png";
-    inline const char* khiri_tail_left_path = "../sprites/khiri_tail_left.png";
-    inline const char* khiri_tail_right_path = "../sprites/khiri_tail_right.png";
+    inline const char* khiri_head_left_path = "../sprites/player-dogs/khiri-left-head.png";
+    inline const char* khiri_head_right_path = "../sprites/player-dogs/khiri-right-head.png";
+    inline const char* khiri_face_left_path = "../sprites/player-dogs/khiri-left-face.png";
+    inline const char* khiri_face_right_path = "../sprites/player-dogs/khiri-right-face.png";
+    inline const char* khiri_body_left_path = "../sprites/player-dogs/khiri-left-body.png";
+    inline const char* khiri_body_right_path = "../sprites/player-dogs/khiri-right-body.png";
+    inline const char* khiri_tail_left_path = "../sprites/player-dogs/khiri-left-tail.png";
+    inline const char* khiri_tail_right_path = "../sprites/player-dogs/khiri-right-tail.png";
 
     inline const char* khiri_left_outline_path = "../sprites/khiri_left_outline.png";
     inline const char* khiri_right_outline_path = "../sprites/khiri_right_outline.png";
@@ -587,38 +585,38 @@ namespace entity_config{
 
     inline const char* mack_left_path = "../sprites/mack_left.png";
     inline const char* mack_right_path = "../sprites/mack_right.png";
-    inline const char* mack_head_left_path = "../sprites/mack_head_left.png";
-    inline const char* mack_head_right_path = "../sprites/mack_head_right.png";
-    inline const char* mack_face_left_path = "../sprites/mack_face_left.png";
-    inline const char* mack_face_right_path = "../sprites/mack_face_right.png";
-    inline const char* mack_body_left_path = "../sprites/mack_body_left.png";
-    inline const char* mack_body_right_path = "../sprites/mack_body_right.png";
-    inline const char* mack_tail_left_path = "../sprites/mack_tail_left.png";
-    inline const char* mack_tail_right_path = "../sprites/mack_tail_right.png";
+    inline const char* mack_head_left_path = "../sprites/player-dogs/mack-left-head.png";
+    inline const char* mack_head_right_path = "../sprites/player-dogs/mack-right-head.png";
+    inline const char* mack_face_left_path = "../sprites/player-dogs/mack-left-face.png";
+    inline const char* mack_face_right_path = "../sprites/player-dogs/mack-right-face.png";
+    inline const char* mack_body_left_path = "../sprites/player-dogs/mack-left-body.png";
+    inline const char* mack_body_right_path = "../sprites/player-dogs/mack-right-body.png";
+    inline const char* mack_tail_left_path = "../sprites/player-dogs/mack-left-tail.png";
+    inline const char* mack_tail_right_path = "../sprites/player-dogs/mack-right-tail.png";
 
     inline const char* mack_left_outline_path = "../sprites/mack_left_outline.png";
     inline const char* mack_right_outline_path = "../sprites/mack_right_outline.png";
     // * ------------------------ WAITER DOG PATHS --------------------------------------- *//
     inline const char* gianluca_left_path = "../sprites/gianluca-left.png";
     inline const char* gianluca_right_path = "../sprites/gianluca-right.png";
-    inline const char* gianluca_head_left_path = "../sprites/gianluca_head_left.png";
-    inline const char* gianluca_head_right_path = "../sprites/gianluca_head_right.png";
-    inline const char* gianluca_face_left_path = "../sprites/gianluca_face_left.png";
-    inline const char* gianluca_face_right_path = "../sprites/gianluca_face_right.png";
-    inline const char* gianluca_body_left_path = "../sprites/gianluca_body_left.png";
-    inline const char* gianluca_body_right_path = "../sprites/gianluca_body_right.png";
-    inline const char* gianluca_tail_left_path = "../sprites/gianluca_tail_left.png";
-    inline const char* gianluca_tail_right_path = "../sprites/gianluca_tail_right.png";
+    inline const char* gianluca_head_left_path = "../sprites/player-dogs/gianluca-left-head.png";
+    inline const char* gianluca_head_right_path = "../sprites/player-dogs/gianluca-right-head.png";
+    inline const char* gianluca_face_left_path = "../sprites/player-dogs/gianluca-left-face.png";
+    inline const char* gianluca_face_right_path = "../sprites/player-dogs/gianluca-right-face.png";
+    inline const char* gianluca_body_left_path = "../sprites/player-dogs/gianluca-left-body.png";
+    inline const char* gianluca_body_right_path = "../sprites/player-dogs/gianluca-right-body.png";
+    inline const char* gianluca_tail_left_path = "../sprites/player-dogs/gianluca-left-tail.png";
+    inline const char* gianluca_tail_right_path = "../sprites/player-dogs/gianluca-right-tail.png";
     inline const char* lionel_left_path = "../sprites/lionel-left.png";
     inline const char* lionel_right_path = "../sprites/lionel-right.png";
-    inline const char* lionel_head_left_path = "../sprites/lionel_head_left.png";
-    inline const char* lionel_head_right_path = "../sprites/lionel_head_right.png";
-    inline const char* lionel_face_left_path = "../sprites/lionel_face_left.png";
-    inline const char* lionel_face_right_path = "../sprites/lionel_face_right.png";
-    inline const char* lionel_body_left_path = "../sprites/lionel_body_left.png";
-    inline const char* lionel_body_right_path = "../sprites/lionel_body_right.png";
-    inline const char* lionel_tail_left_path = "../sprites/lionel_tail_left.png";
-    inline const char* lionel_tail_right_path = "../sprites/lionel_tail_right.png";
+    inline const char* lionel_head_left_path = "../sprites/player-dogs/lionel-left-head.png";
+    inline const char* lionel_head_right_path = "../sprites/player-dogs/lionel-right-head.png";
+    inline const char* lionel_face_left_path = "../sprites/player-dogs/lionel-left-face.png";
+    inline const char* lionel_face_right_path = "../sprites/player-dogs/lionel-right-face.png";
+    inline const char* lionel_body_left_path = "../sprites/player-dogs/lionel-left-body.png";
+    inline const char* lionel_body_right_path = "../sprites/player-dogs/lionel-right-body.png";
+    inline const char* lionel_tail_left_path = "../sprites/player-dogs/lionel-left-tail.png";
+    inline const char* lionel_tail_right_path = "../sprites/player-dogs/lionel-right-tail.png";
     // * ------------------------ DECORATION PATHS --------------------------------------- *//
     
     inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
@@ -671,49 +669,49 @@ namespace entity_config{
 
     // TODO (06 / 09 / 26) placeholder splits - advancing widths sum to the matching
     // across width, but the proportions are guesses pending the part art
-    inline const float khiri_head_attributes[attributes::size] = {level_config::edge_weight * 0.60f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float khiri_head_attributes[attributes::size] = {35.0f, 62.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float khiri_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float khiri_body_attributes[attributes::size] = {level_config::edge_weight * 1.00f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float khiri_tail_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float khiri_body_attributes[attributes::size] = {88.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float khiri_tail_attributes[attributes::size] = {18.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float mack_head_attributes[attributes::size] = {level_config::edge_weight * 0.60f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float mack_head_attributes[attributes::size] = {30.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float mack_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float mack_body_attributes[attributes::size] = {level_config::edge_weight * 1.00f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float mack_tail_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float mack_body_attributes[attributes::size] = {92.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float mack_tail_attributes[attributes::size] = {16.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float gianluca_head_attributes[attributes::size] = {level_config::edge_weight * 0.70f, level_config::edge_weight * 0.91f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float gianluca_head_attributes[attributes::size] = {27.0f, 58.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float gianluca_face_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.35f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float gianluca_body_attributes[attributes::size] = {level_config::edge_weight * 1.10f, level_config::edge_weight * 0.91f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float gianluca_tail_attributes[attributes::size] = {level_config::edge_weight * 0.45f, level_config::edge_weight * 0.60f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float gianluca_body_attributes[attributes::size] = {117.0f, 58.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float gianluca_tail_attributes[attributes::size] = {4.0f, 58.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float lionel_head_attributes[attributes::size] = {level_config::edge_weight * 0.50f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float lionel_head_attributes[attributes::size] = {35.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float lionel_face_attributes[attributes::size] = {level_config::edge_weight * 0.30f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float lionel_body_attributes[attributes::size] = {level_config::edge_weight * 0.90f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float lionel_tail_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float lionel_body_attributes[attributes::size] = {90.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float lionel_tail_attributes[attributes::size] = {7.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
     inline const dog_part khiri_parts[dog_sprite_slots_size] = {
-        {khiri_head_attributes, Vector2{0.0f, 0.0f}, true, khiri_head_left_path, khiri_head_right_path},
-        {khiri_face_attributes, Vector2{level_config::edge_weight * 0.15f, level_config::edge_weight * 0.15f}, false, khiri_face_left_path, khiri_face_right_path},
-        {khiri_body_attributes, Vector2{0.0f, 0.0f}, true, khiri_body_left_path, khiri_body_right_path},
-        {khiri_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.15f}, true, khiri_tail_left_path, khiri_tail_right_path}};
+        {khiri_body_attributes, Vector2{26.0f, 0.0f}, khiri_body_left_path, khiri_body_right_path},
+        {khiri_tail_attributes, Vector2{110.0f, 0.0f}, khiri_tail_left_path, khiri_tail_right_path},
+        {khiri_head_attributes, Vector2{0.0f, -14.0f}, khiri_head_left_path, khiri_head_right_path},
+        {khiri_face_attributes, Vector2{level_config::edge_weight * 0.15f, level_config::edge_weight * 0.15f}, khiri_face_left_path, khiri_face_right_path}};
 
     inline const dog_part mack_parts[dog_sprite_slots_size] = {
-        {mack_head_attributes, Vector2{0.0f, 0.0f}, true, mack_head_left_path, mack_head_right_path},
-        {mack_face_attributes, Vector2{level_config::edge_weight * 0.15f, level_config::edge_weight * 0.15f}, false, mack_face_left_path, mack_face_right_path},
-        {mack_body_attributes, Vector2{0.0f, 0.0f}, true, mack_body_left_path, mack_body_right_path},
-        {mack_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.15f}, true, mack_tail_left_path, mack_tail_right_path}};
+        {mack_body_attributes, Vector2{21.0f, 0.0f}, mack_body_left_path, mack_body_right_path},
+        {mack_tail_attributes, Vector2{112.0f, 0.0f}, mack_tail_left_path, mack_tail_right_path},
+        {mack_head_attributes, Vector2{0.0f, 0.0f}, mack_head_left_path, mack_head_right_path},
+        {mack_face_attributes, Vector2{level_config::edge_weight * 0.15f, level_config::edge_weight * 0.15f}, mack_face_left_path, mack_face_right_path}};
 
     inline const dog_part gianluca_parts[dog_sprite_slots_size] = {
-        {gianluca_head_attributes, Vector2{0.0f, 0.0f}, true, gianluca_head_left_path, gianluca_head_right_path},
-        {gianluca_face_attributes, Vector2{level_config::edge_weight * 0.18f, level_config::edge_weight * 0.18f}, false, gianluca_face_left_path, gianluca_face_right_path},
-        {gianluca_body_attributes, Vector2{0.0f, 0.0f}, true, gianluca_body_left_path, gianluca_body_right_path},
-        {gianluca_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.18f}, true, gianluca_tail_left_path, gianluca_tail_right_path}};
+        {gianluca_body_attributes, Vector2{0.0f, 0.0f}, gianluca_body_left_path, gianluca_body_right_path},
+        {gianluca_tail_attributes, Vector2{140.0f, 0.0f}, gianluca_tail_left_path, gianluca_tail_right_path},
+        {gianluca_head_attributes, Vector2{0.0f, 0.0f}, gianluca_head_left_path, gianluca_head_right_path},
+        {gianluca_face_attributes, Vector2{level_config::edge_weight * 0.18f, level_config::edge_weight * 0.18f}, gianluca_face_left_path, gianluca_face_right_path}};
 
     inline const dog_part lionel_parts[dog_sprite_slots_size] = {
-        {lionel_head_attributes, Vector2{0.0f, 0.0f}, true, lionel_head_left_path, lionel_head_right_path},
-        {lionel_face_attributes, Vector2{level_config::edge_weight * 0.12f, level_config::edge_weight * 0.15f}, false, lionel_face_left_path, lionel_face_right_path},
-        {lionel_body_attributes, Vector2{0.0f, 0.0f}, true, lionel_body_left_path, lionel_body_right_path},
-        {lionel_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.15f}, true, lionel_tail_left_path, lionel_tail_right_path}};
+        {lionel_body_attributes, Vector2{16.0f, 0.0f}, lionel_body_left_path, lionel_body_right_path},
+        {lionel_tail_attributes, Vector2{105.0f, 0.0f}, lionel_tail_left_path, lionel_tail_right_path},
+        {lionel_head_attributes, Vector2{0.0f, 0.0f}, lionel_head_left_path, lionel_head_right_path},
+        {lionel_face_attributes, Vector2{level_config::edge_weight * 0.12f, level_config::edge_weight * 0.15f}, lionel_face_left_path, lionel_face_right_path}};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
     inline const float pavlov_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 2.75f, 1.0f, 1.0f}; // TODO update values (24/08/26)

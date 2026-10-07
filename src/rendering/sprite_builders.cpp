@@ -53,18 +53,14 @@ std::vector<std::vector<sprite::sprite>> sprite_builders::build_dog_part_layers(
     const int texture_keys[entity_config::dog_sprite_slots_size][entity_config::dog_part_directions_size],
     float expected_total_width){
     std::vector<std::vector<sprite::sprite>> layers;
-    float cursor = 0.0f;
-    float anchor = 0.0f;
 
     for(size_t slot = 0; slot < entity_config::dog_sprite_slots_size; ++slot){
         const auto& part = parts[slot];
         auto width = part.attributes[entity_config::attributes::frame_width];
-        if(part.advances){
-            anchor = cursor;
-            cursor += width;
-        }
-        auto x_left = anchor + part.offset.x;
+        auto x_left = part.offset.x;
         auto x_right = expected_total_width - x_left - width;
+        assert(x_left >= 0.0f and x_left + width <= expected_total_width + 0.01f
+            and "dog part must sit inside the across hitbox width");
 
         auto frame_height = part.attributes[entity_config::attributes::frame_height];
 
@@ -77,8 +73,6 @@ std::vector<std::vector<sprite::sprite>> sprite_builders::build_dog_part_layers(
             Vector2{x_right, part.offset.y}));
         layers.push_back(std::move(directions));
     }
-    assert(std::fabs(cursor - expected_total_width) < 0.01f
-        and "dog part widths must sum to the across hitbox width");
     return layers;
 }
 std::vector<sprite::sprite> sprite_builders::build_gianluca_sprites(){
