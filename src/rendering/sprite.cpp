@@ -91,20 +91,20 @@ void sprite::nine_sprite::render(Vector2 position, int frame){
     // * top left
     draw("corner top left", corner_piece_, position, Vector2One(), 0.0f);
     // * top right, 
-    draw("corner top right", corner_piece_, {position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y}, Vector2One(), 90.0f);
+    draw("corner top right", corner_piece_, {position.x + frame_.width, position.y}, Vector2One(), 90.0f);
     // * bottom left
-    draw("corner bottom left", corner_piece_, {position.x, position.y + frame_.height - hud_config::nine_sprite_corner_height}, Vector2One(), 270.0f);
+    draw("corner bottom left", corner_piece_, {position.x, position.y + frame_.height}, Vector2One(), 270.0f);
     // * bottom right
-    draw("corner bottom right", corner_piece_, {position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y + frame_.height - hud_config::nine_sprite_corner_height}, Vector2One(), 180.0f);
+    draw("corner bottom right", corner_piece_, {position.x + frame_.width, position.y + frame_.height}, Vector2One(), 180.0f);
     // can come from config values
     // * vertical left
     draw("vertical left", vertical_piece_, {position.x, position.y + hud_config::nine_sprite_corner_height}, {1.0f,scale_.y}, 0.0f);
     // * vertical right
-    draw("vertical right", vertical_piece_, {position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y + hud_config::nine_sprite_corner_height}, {1.0f, scale_.y}, 90.0f);
+    draw("vertical right", vertical_piece_, {position.x + frame_.width, position.y + frame_.height - hud_config::nine_sprite_corner_height}, {1.0f, scale_.y}, 180.0f);
     // * horizontal top 
     draw("horizontal top", horizontal_piece_, {position.x + hud_config::nine_sprite_corner_width, position.y}, {scale_.x, 1.0f}, 0.0f);
     // * horizontal bottom 
-    draw("horizontal bottom", horizontal_piece_, {position.x + hud_config::nine_sprite_corner_width, position.y + frame_.height - hud_config::nine_sprite_corner_height}, {scale_.x, 1.0f}, 180.0f);
+    draw("horizontal bottom", horizontal_piece_, {position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y + frame_.height}, {scale_.x, 1.0f}, 180.0f);
     // * centre
     draw("centre", centre_piece_, {position.x + hud_config::nine_sprite_corner_width, position.y + hud_config::nine_sprite_corner_height}, scale_, 0.0f);
 }

@@ -27,9 +27,9 @@ void hud_systems::hud_rendering_system::render(int frame){
                 debug::log("[hud_rendering_system::render, skipped] id: " + std::to_string(id) + ", no position component");
                 continue;
             }
-            auto position = Vector2Subtract(
+            auto position = GetWorldToScreen2D(
                 Vector2Add(position_component->get_position(), hud_component.get_offset()),
-                Vector2{view_frame.x, view_frame.y});
+                systems::rendering_system::get_instance().get_camera());
             auto world_position = position_component->get_position();
             auto offset = hud_component.get_offset();
             debug::log("[hud_rendering_system::render, drawing] id: " + std::to_string(id)

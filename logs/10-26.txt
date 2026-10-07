@@ -178,18 +178,23 @@ t
     -> fix visual issue with hud nine sprite
     -> resize for the station, should be able to fit 3 - 4 recipes [so if each food icon is 0.6, maybe we can scale down to 0.25 and then we can make it 1.25 * 1.25 edge to have like a buffer ] in the future if > 4 recipes, we just paginate
     -> raylib random isntead of the rand generator c++ x 
-    -> refactor to use camera2D so you can have zoom  
-        -> the render system should own the camera 
+    -> refactor to use camera2D so you can have zoom   x 
+        -> the render system should own the camera  x 
         -> although if the hud system needs it to then a pointer could work 
         -> no the render system owns the camera, and then provides accessors
         -> i would say the hud render system 
 
         -> change move frame to be move_camera which then recalcuates the view_frame and when zoom also
-        -> exapnd control config to support scroll input detection
-        -> bound camera movement and camera zooming 
-    -> zoom controls with scroll wheel
+        -> exapnd control config to support scroll input detectio x n
+        -> bound camera movement and camera zooming  x 
+    -> zoom controls with scroll wheel x 
     -> storing hud elements in their own spatial system, one level above and separate from other entities to avoid misclicks 
     -> and split the dog art, i know you dont want to but you need to
+    
+    
+    -> resize elements, assign to all stations
+    -> define hud spatial system
+    -> dog art split
     [ ------------- this is a fiar slice to stop at for the current branch ---------]
 
     -> then buttons [maybe this is where the clickable component comes in, because you can then define an on_click behaviour]

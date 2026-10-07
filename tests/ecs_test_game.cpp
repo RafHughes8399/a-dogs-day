@@ -25,6 +25,8 @@ namespace testing{
         }
         component_helpers::clear_all_components();
         systems::clear_all_systems();
+        rendering_.get_camera().zoom = 1.0f;
+        rendering_.recalibrate_view_frame();
         interaction_.restore_interaction_behaviours();
     }
 

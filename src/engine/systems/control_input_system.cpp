@@ -57,6 +57,11 @@ void systems::control_input_system::check_inputs(size_t id, std::vector<game_con
         }
     }
 }
+void systems::control_input_system::check_mouse_scroll(float time_delta){
+    if(not Vector2Equals(GetMouseWheelMoveV(), Vector2Zero())){
+        mouse_scroll(GetMouseWheelMoveV(), time_delta);
+    }
+}
 
 // an entity can hold a binding this system has no action for - that is a scheme
 // that has not been built yet, not an error
@@ -85,6 +90,8 @@ void systems::control_input_system::update(float delta){
         // * check for mouse input also
         check_inputs(id, inputs, delta);
     }
+    // * and check for scroll inputs
+    check_mouse_scroll(delta);
 }
 
 // ------------------------------- control map ------------------------------- //
@@ -178,8 +185,8 @@ void systems::control_input_system::switch_dog(){
 }
 
 void systems::control_input_system::move_view_frame(Vector2 direction_scalar, float delta){
-    auto move_vector = Vector2Scale(Vector2Multiply(level_config::frame_move, direction_scalar), delta);
-    rendering_system::get_instance().move_frame(move_vector);
+    auto move_vector = Vector2Scale(direction_scalar, camera_config::camera_move_speed);
+    rendering_system::get_instance().move_camera(move_vector);
 }
 
 
@@ -257,3 +264,8 @@ void systems::control_input_system::right_click(size_t id){
         + ", destination: " + raglib::vector_to_string(click_position));
 }
 
+void systems::control_input_system::mouse_scroll(Vector2 scroll_delta, float time_delta){
+    // you actually dont need to know scroll delta, you do for y for direction
+    (void) time_delta;
+    rendering_system::get_instance().adjust_zoom(scroll_delta.y * camera_config::camera_zoom_speed);
+}

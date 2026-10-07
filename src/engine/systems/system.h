@@ -260,6 +260,7 @@ namespace systems{
 
             void build_control_map();
             void check_inputs(size_t id, std::vector<game_config::input>& controls, float delta);
+            void check_mouse_scroll(float time_delta);
             void dispatch(int key, int action, size_t id, float delta);
 
             // the actions, mirroring player::controls' default scheme
@@ -276,7 +277,7 @@ namespace systems{
             void select_dog();
             void switch_dog();
             void toggle_debug_logger();
-
+            void mouse_scroll(Vector2 scroll_delta, float time_delta);
             // * keyed on {key_, action_}, not the key alone - KEY_E is both
             // * key_hold_actions::edit_mode and key_press_actions::exit_edit, and
             // * MOUSE_BUTTON_LEFT is 0, which is also a legal KEY_* value, so a
@@ -750,13 +751,15 @@ namespace systems{
                 render_layers_(), camera_({0}){
                     event_interface::subscribe<events::create_entity>(create_entity_handler_);
                     event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
-                    camera_.target = Vector2Zero();
                     camera_.offset = Vector2 {level_config::screen_width / 2, level_config::screen_height / 2};
+                    camera_.target = camera_.offset;
                     camera_.rotation = 0.0f;
                     camera_.zoom = 1.0f;
+                    recalibrate_view_frame();
                 }
 
             bool is_entity_in_frame(size_t id, Rectangle view_frame);
+            void clamp_target();
 
             events::event_handler<events::create_entity> create_entity_handler_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
