@@ -2,6 +2,11 @@
 #include "config.h"
 #include "entity.h"
 #include "testing_helpers.hpp"
+#include <raylib.h>
+
+Camera2D& game::game::get_camera(){
+    return rendering_.get_camera();
+}
 void game::game::init(){
     // toggle subscribes the log handler, so it has to come first or every step
     // below logs into nothing

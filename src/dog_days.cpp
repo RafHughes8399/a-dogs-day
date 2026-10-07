@@ -34,16 +34,18 @@ int main() {
     game.update(delta);
 
     BeginTextureMode(canvas);
-    ClearBackground(BLACK);
-    game.render(delta);
-    game.debug(delta);
+      ClearBackground(BLACK);
+      game.render(delta);
+      game.debug(delta);
     EndTextureMode();
 
     BeginDrawing();
+    BeginMode2D(game.get_camera());
     ClearBackground(BLACK);
     DrawTexturePro(canvas.texture, Rectangle{0.0f, 0.0f, base_width, -base_height},
-                   Rectangle{offset.x, offset.y, base_width * scale, base_height * scale},
-                   Vector2{0.0f, 0.0f}, 0.0f, WHITE);
+      Rectangle{offset.x, offset.y, base_width * scale, base_height * scale},
+      Vector2{0.0f, 0.0f}, 0.0f, WHITE);
+    EndMode2D();
     EndDrawing();
     if (IsKeyPressed(KEY_PERIOD) or WindowShouldClose()) {
       loop = false;

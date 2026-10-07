@@ -10,6 +10,7 @@
 #include "debug_logger.h"
 #include "hud_systems.hpp"
 #include "system.h"
+#include <raylib.h>
 namespace game{
     // owns the systems by value so they are destroyed inside main, while
     // events::global_dispatcher_ is still alive for them to unsubscribe from.
@@ -49,6 +50,8 @@ namespace game{
             void update(float delta_time);
             void render(float delta_time);
             void debug(float delta_time);
+
+            Camera2D& get_camera();
         private:
             int frame_count_;
 

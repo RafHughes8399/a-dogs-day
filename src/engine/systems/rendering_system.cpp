@@ -3,6 +3,7 @@
 #include "system.h"
 #include <algorithm>
 #include <raylib.h>
+#include <raymath.h>
 
 
 // ---------------- helpers ----------------
@@ -55,12 +56,22 @@ void systems::rendering_system::clear(){
 }
 
 // ---------------- accessors  and modifiers ----------------
-void systems::rendering_system::move_frame(Vector2 move_delta){
-    float min = 0.0f;
-    float max_x = std::max(level_config::world_x - view_frame_.width, min);
-    float max_y = std::max(level_config::world_y - view_frame_.height, min);
-    view_frame_.x = std::max(std::min(view_frame_.x + move_delta.x, max_x), min);
-    view_frame_.y = std::max(std::min(view_frame_.y + move_delta.y, max_y), min);
+void systems::rendering_system::recalibrate_view_frame(){
+    // Convert top-left and bottom-right screen corners to world space
+    Vector2 topLeft = GetScreenToWorld2D(Vector2Zero(), camera_);
+    Vector2 bottomRight = GetScreenToWorld2D({level_config::screen_width, level_config::screen_height}, camera_);
+    view_frame_ = {  topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y };
+}
+void systems::rendering_system::move_camera(Vector2 move_delta){
+    // TODO this needs to be rewritten, clamped again to the mins and maxes, adjust the target but retain
+    // the offset.
+    camera_.target.x = Clamp(camera_.target.x + move_delta.x, 0.0f, level_config::world_x - camera_.offset.x);
+    camera_.target.y = Clamp(camera_.target.y + move_delta.y, 0.0f, level_config::world_y - camera_.offset.y);
+    recalibrate_view_frame();
+}
+void systems::rendering_system::adjust_zoom(float zoom_delta){
+    camera_.zoom = Clamp(camera_.zoom + zoom_delta, camera_config::zoom_min,  camera_config::zoom_max);
+    recalibrate_view_frame();
 }
 Vector2 systems::rendering_system::screen_to_world(Vector2 screen_position){
     auto clamped = Vector2Clamp(screen_position, Vector2Zero(),

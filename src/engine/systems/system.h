@@ -11,6 +11,7 @@
 #include "render_layer.h"
 #include <array>
 #include <functional>
+#include <raymath.h>
 #include <utility>
 #include <raylib.h>
 #include "graph.h"
@@ -724,13 +725,16 @@ namespace systems{
             void render(int frame);
             void on_created_entity(const events::create_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
-            void move_frame(Vector2 move_delta);
+            void recalibrate_view_frame();
+            void move_camera(Vector2 move_delta);
+            void adjust_zoom(float zoom_delta);
             Vector2 screen_to_world(Vector2 screen_position);
             // teardown between test scenarios - the singleton outlives them
             void clear();
             Rectangle get_view_frame(){
                 return view_frame_;
             }
+            Camera2D& get_camera();
 #ifdef DOG_DAYS_TESTING
             render_layer::ecs_layer& get_layer(size_t layer){
                 return render_layers_[layer];
@@ -743,9 +747,13 @@ namespace systems{
                 : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
                 remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
                 view_frame_(Rectangle{0.0f, 0.0f, level_config::screen_width, level_config::screen_height}),
-                render_layers_(){
+                render_layers_(), camera_({0}){
                     event_interface::subscribe<events::create_entity>(create_entity_handler_);
                     event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+                    camera_.target = Vector2Zero();
+                    camera_.offset = Vector2 {level_config::screen_width / 2, level_config::screen_height / 2};
+                    camera_.rotation = 0.0f;
+                    camera_.zoom = 1.0f;
                 }
 
             bool is_entity_in_frame(size_t id, Rectangle view_frame);
@@ -758,6 +766,7 @@ namespace systems{
 
             Rectangle view_frame_;
             render_layer::ecs_layer render_layers_[level_config::draw_layers::size];
+            Camera2D camera_;
     };
     class selection_system{
         // owns which entity is currently selected
