@@ -201,3 +201,47 @@ t
     -> then buttons [maybe this is where the clickable component comes in, because you can then define an on_click behaviour]
     -> a button is an entity with a positional, renderable, collision and clickable. it is attached to a hud element
     -> maybe should be its own structure like a nine_sprite ? 
+    -> they kind of need to live in their own like space
+
+    -> the hud elements can be built in the same way as entities are
+        -> we can define components and refer to them through their ids
+        -> same builders, manangers and systems, just like parralel
+    -> should be a hud component like a
+    -> then 
+
+    so we have entity components and hud components and then we can build specific hud pieces
+    what is currently the 
+
+
+    small roadmap intermission:
+    -> hud framework 
+            -> the nine sprite base stuff x 
+            -> buttons 
+            -> page icons
+            -> text
+            -> count
+    -> hud element builders 
+            -> recipe icons
+            -> page navigation
+            -> page count
+            -> item counts,
+            etc.
+    -> some  interface between the hud and the entity systems
+        -> need some way to bridge between the two. i.e maybe events would suffice, or something event adjacent
+    -> test the user interaction with the cooking stations
+    -> perhaps then take a moment to clean up dog movmenet and a bit of a bug bash
+
+    -> not sure where decoraton and station movement - like player moving where they are placed, and storage ended up post refactor. i think that's a pretty important one 
+        -> need to define the constraints of the behaviour, i.e would we allow for it to be adjusted while its in use
+        -> i would say maybe yes if there is say a dog pathfinding to a station but like no if its being directly interacted with
+            -> so there would be in-flight recalibration that is required but interaction acts like a lock 
+    
+    -> currency and levelling
+        -> recipes have a value
+        -> items have a cost and a level requirement 
+        -> purchasing and serving nets experience
+    -> inventory and shop
+        -> 
+    -> cosmetics and animations
+
+    
