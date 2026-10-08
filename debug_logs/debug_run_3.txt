@@ -1,139 +1,1354 @@
-[22:31:17.704 f000000] [game::init, start] building the starting world
-[22:31:18.448 f000000] [game::init, built background] id 0
-[22:31:18.449 f000000] [game::init, built cursor] id 1
-[22:31:18.449 f000000] [game::init, built player] id 2 holding cursor 1
-[22:31:18.450 f000000] [game::init, built khiri] id 3
-[22:31:18.451 f000000] [game::init, built mack] id 4
-[22:31:18.451 f000000] [game::init, build counter]: id 5 with food items:  1
-[22:31:18.464 f000000] [game::init, done] built 7 components on khiri
-[22:31:18.464 f000000] [game::init, done] built 7 components on mack
-[22:31:20.547 f000120] [movement_system::create_path_to] dog: 9, source: {832.000000, 384.000000}, destination: {640.000000, 192.000000}, checkpoints: 3
-[22:31:20.547 f000120] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
-[22:31:20.547 f000120] [waiter_idling_system::build_paths] waiter: 9, points: 4, destination: {640.000000, 192.000000}, attempt: 1
-[22:31:20.563 f000121] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
-[22:31:21.547 f000180] [movement_system::create_path_to] dog: 10, source: {1280.000000, 576.000000}, destination: {1408.000000, 384.000000}, checkpoints: 1
-[22:31:21.547 f000180] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
-[22:31:21.547 f000180] [waiter_idling_system::build_paths] waiter: 10, points: 2, destination: {1408.000000, 384.000000}, attempt: 1
-[22:31:21.564 f000181] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
-[22:31:31.498 f000777] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
-[22:31:31.498 f000777] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
-[22:31:31.548 f000780] [movement_system::create_path_to] dog: 10, source: {1408.000000, 384.000000}, destination: {1280.000000, 512.000000}, checkpoints: 3
-[22:31:31.548 f000780] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
-[22:31:31.548 f000780] [waiter_idling_system::build_paths] waiter: 10, points: 4, destination: {1280.000000, 512.000000}, attempt: 1
-[22:31:31.564 f000781] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
-[22:31:33.681 f000908] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
-[22:31:33.681 f000908] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
-[22:31:37.648 f001146] [dog_factory::build_customer_dog, built customer] id: 14
-[22:31:37.648 f001146] [movement_system::create_path_to] dog: 14, source: {64.000000, -128.000000}, destination: {64.000000, 2176.000000}, checkpoints: 0
-[22:31:37.648 f001146] [movement_system::commit_route] dog: 14, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
-[22:31:37.648 f001146] [customer_table_system::create_customer_dog, built customer] id: 14, spawn: {64.000000, -128.000000}, tracked customers: 1
-[22:31:37.648 f001146] [customer_table_system::send_customer_to_table] customer: 14, table: 7, via entrance: {256.000000, 1024.000000}
-[22:31:37.648 f001146] [interactable_component::get_interaction_offset] direction: left, position: {320.000000, 432.000000}, node_id: 265, distance_from_source: 615.740234
-[22:31:37.648 f001146] [interactable_component::get_interaction_offset] direction: right, position: {512.000000, 432.000000}, node_id: 268, distance_from_source: 717.149902
-[22:31:37.648 f001146] [interactable_component::get_interaction_offset] chosen offset: {-64.000000, 48.000000}
-[22:31:37.648 f001146] [movement_system::create_path_to_entity] dog: 14, source: {64.000000, -128.000000}, destination entity: 7, resolved destination: {320.000000, 384.000000}, checkpoints: 1
-[22:31:37.648 f001146] [movement_system::commit_route] dog: 14, mode: replace, paths before: 1, cleared: yes, legs committed: 2, paths after: 2
-[22:31:38.764 f001213] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
-[22:31:38.764 f001213] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
-[22:31:42.548 f001440] [movement_system::create_path_to] dog: 9, source: {640.000000, 192.000000}, destination: {512.000000, 0.000000}, checkpoints: 2
-[22:31:42.548 f001440] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
-[22:31:42.548 f001440] [waiter_idling_system::build_paths] waiter: 9, points: 3, destination: {512.000000, 0.000000}, attempt: 1
-[22:31:42.564 f001441] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
-[22:31:46.281 f001664] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
-[22:31:46.281 f001664] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
-[22:31:52.548 f002040] [movement_system::create_path_to] dog: 9, source: {512.000000, 0.000000}, destination: {384.000000, 128.000000}, checkpoints: 2
-[22:31:52.548 f002040] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
-[22:31:52.548 f002040] [waiter_idling_system::build_paths] waiter: 9, points: 3, destination: {384.000000, 128.000000}, attempt: 1
-[22:31:52.564 f002041] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
-[22:31:53.682 f002108] [control_input_system::right_click, clicked] asked by: 1, position: {1056.000000, 1317.500000}
-[22:31:53.682 f002108] [control_input_system::right_click, nothing selected] no path requested
-[22:31:53.965 f002125] [control_input_system::right_click, clicked] asked by: 1, position: {1165.500000, 1349.750000}
-[22:31:53.965 f002125] [control_input_system::right_click, nothing selected] no path requested
-[22:31:54.282 f002144] [control_input_system::right_click, clicked] asked by: 1, position: {1143.000000, 1325.000000}
-[22:31:54.282 f002144] [control_input_system::right_click, nothing selected] no path requested
-[22:31:54.532 f002159] [control_input_system::right_click, clicked] asked by: 1, position: {1096.500000, 1299.500000}
-[22:31:54.532 f002159] [control_input_system::right_click, nothing selected] no path requested
-[22:31:54.932 f002183] [control_input_system::right_click, clicked] asked by: 1, position: {979.500000, 1251.500000}
-[22:31:54.932 f002183] [control_input_system::right_click, nothing selected] no path requested
-[22:31:55.315 f002206] [control_input_system::right_click, clicked] asked by: 1, position: {807.000000, 1221.500000}
-[22:31:55.315 f002206] [control_input_system::right_click, nothing selected] no path requested
-[22:31:55.516 f002218] [control_input_system::right_click, clicked] asked by: 1, position: {710.250000, 1215.500000}
-[22:31:55.516 f002218] [control_input_system::right_click, nothing selected] no path requested
-[22:31:55.699 f002229] [control_input_system::right_click, clicked] asked by: 1, position: {652.500000, 1223.750000}
-[22:31:55.699 f002229] [control_input_system::right_click, nothing selected] no path requested
-[22:31:55.899 f002241] [control_input_system::right_click, clicked] asked by: 1, position: {606.750000, 1237.250000}
-[22:31:55.899 f002241] [control_input_system::right_click, nothing selected] no path requested
-[22:31:56.082 f002252] [control_input_system::right_click, clicked] asked by: 1, position: {582.750000, 1247.000000}
-[22:31:56.082 f002252] [control_input_system::right_click, nothing selected] no path requested
-[22:31:56.815 f002296] [control_input_system::right_click, clicked] asked by: 1, position: {562.500000, 1265.000000}
-[22:31:56.815 f002296] [control_input_system::right_click, nothing selected] no path requested
-[22:31:57.015 f002308] [control_input_system::right_click, clicked] asked by: 1, position: {562.500000, 1265.000000}
-[22:31:57.015 f002308] [control_input_system::right_click, nothing selected] no path requested
-[22:31:57.181 f002318] [control_input_system::right_click, clicked] asked by: 1, position: {562.500000, 1265.000000}
-[22:31:57.182 f002318] [control_input_system::right_click, nothing selected] no path requested
-[22:31:57.648 f002346] [dog_factory::build_customer_dog, built customer] id: 15
-[22:31:57.648 f002346] [movement_system::create_path_to] dog: 15, source: {64.000000, -128.000000}, destination: {64.000000, 2176.000000}, checkpoints: 0
-[22:31:57.648 f002346] [movement_system::commit_route] dog: 15, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
-[22:31:57.648 f002346] [customer_table_system::create_customer_dog, built customer] id: 15, spawn: {64.000000, -128.000000}, tracked customers: 2
-[22:31:57.648 f002346] [customer_table_system::send_customer_to_table] customer: 15, table: 8, via entrance: {256.000000, 1024.000000}
-[22:31:57.648 f002346] [interactable_component::get_interaction_offset] direction: left, position: {576.000000, 560.000000}, node_id: 357, distance_from_source: 857.605957
-[22:31:57.648 f002346] [interactable_component::get_interaction_offset] direction: right, position: {768.000000, 560.000000}, node_id: 360, distance_from_source: 984.357666
-[22:31:57.648 f002346] [interactable_component::get_interaction_offset] chosen offset: {-64.000000, 48.000000}
-[22:31:57.648 f002346] [movement_system::create_path_to_entity] dog: 15, source: {64.000000, -128.000000}, destination entity: 8, resolved destination: {576.000000, 512.000000}, checkpoints: 1
-[22:31:57.649 f002346] [movement_system::commit_route] dog: 15, mode: replace, paths before: 1, cleared: yes, legs committed: 2, paths after: 2
-[22:31:59.665 f002467] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
-[22:31:59.665 f002467] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
-[22:32:01.548 f002580] [movement_system::create_path_to] dog: 10, source: {1280.000000, 512.000000}, destination: {1088.000000, 384.000000}, checkpoints: 2
-[22:32:01.548 f002580] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
-[22:32:01.548 f002580] [waiter_idling_system::build_paths] waiter: 10, points: 3, destination: {1088.000000, 384.000000}, attempt: 1
-[22:32:01.565 f002581] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
-[22:32:05.548 f002820] [movement_system::create_path_to] dog: 9, source: {384.000000, 128.000000}, destination: {384.000000, 256.000000}, checkpoints: 1
-[22:32:05.548 f002820] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
-[22:32:05.548 f002820] [waiter_idling_system::build_paths] waiter: 9, points: 2, destination: {384.000000, 256.000000}, attempt: 1
-[22:32:05.565 f002821] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
-[22:32:05.948 f002844] [interaction_system::on_path_finished] dog: 14, target: 7, overlapping: yes
-[22:32:05.948 f002844] [interaciotn system, determine performable interactions]: interactor interactions 1
-[22:32:05.948 f002844] [interaciotn system, determine performable interactions]: interactee interactions 2
-[22:32:05.948 f002844] add interaction to process
-[22:32:05.948 f002844] [state_machine_system::transition] entity: 14, transition: 22, state: 0 -> 1
-[22:32:05.948 f002844] [interaction system - process interaction] - interactor 14 interactee: 7 interactions to check: 1
-[22:32:05.948 f002844] [interaction system - process interaction] - perform interaction 0
-[22:32:05.948 f002844] customer table sit interaction attempt
-[22:32:07.481 f002936] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
-[22:32:07.482 f002936] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
-[22:32:10.548 f003120] [movement_system::create_path_to] dog: 9, source: {384.000000, 256.000000}, destination: {256.000000, 64.000000}, checkpoints: 1
-[22:32:10.548 f003120] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
-[22:32:10.548 f003120] [waiter_idling_system::build_paths] waiter: 9, points: 2, destination: {256.000000, 64.000000}, attempt: 1
-[22:32:10.565 f003121] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
-[22:32:11.048 f003150] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
-[22:32:11.048 f003150] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
-[22:32:11.548 f003180] [movement_system::create_path_to] dog: 10, source: {1088.000000, 384.000000}, destination: {896.000000, 320.000000}, checkpoints: 1
-[22:32:11.548 f003180] [movement_system::commit_route] dog: 10, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
-[22:32:11.548 f003180] [waiter_idling_system::build_paths] waiter: 10, points: 2, destination: {896.000000, 320.000000}, attempt: 1
-[22:32:11.565 f003181] [state_machine_system::transition] entity: 10, transition: 21, state: 0 -> 1
-[22:32:14.798 f003375] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
-[22:32:14.798 f003375] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
-[22:32:16.232 f003461] [interaction_system::on_path_finished] dog: 10 arrived with no destination entity and no interactor target - no interaction
-[22:32:16.232 f003461] [state_machine_system::transition] entity: 10, transition: 15, state: 1 -> 0
-[22:32:17.648 f003546] [dog_factory::build_customer_dog, built customer] id: 16
-[22:32:17.648 f003546] [movement_system::create_path_to] dog: 16, source: {64.000000, -128.000000}, destination: {64.000000, 2176.000000}, checkpoints: 0
-[22:32:17.649 f003546] [movement_system::commit_route] dog: 16, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
-[22:32:17.649 f003546] [customer_table_system::create_customer_dog, built customer] id: 16, spawn: {64.000000, -128.000000}, tracked customers: 3
-[22:32:22.548 f000240] [movement_system::create_path_to] dog: 9, source: {256.000000, 64.000000}, destination: {384.000000, 0.000000}, checkpoints: 1
-[22:32:22.549 f000240] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
-[22:32:22.549 f000240] [waiter_idling_system::build_paths] waiter: 9, points: 2, destination: {384.000000, 0.000000}, attempt: 1
-[22:32:22.565 f000241] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
-[22:32:25.432 f000413] [interaction_system::on_path_finished] dog: 9 arrived with no destination entity and no interactor target - no interaction
-[22:32:25.432 f000413] [state_machine_system::transition] entity: 9, transition: 15, state: 1 -> 0
-[22:32:26.248 f000462] [interaction_system::on_path_finished] dog: 15, target: 8, overlapping: yes
-[22:32:26.248 f000462] [interaciotn system, determine performable interactions]: interactor interactions 1
-[22:32:26.248 f000462] [interaciotn system, determine performable interactions]: interactee interactions 2
-[22:32:26.248 f000462] add interaction to process
-[22:32:26.249 f000462] [state_machine_system::transition] entity: 15, transition: 22, state: 0 -> 1
-[22:32:26.249 f000462] [interaction system - process interaction] - interactor 15 interactee: 8 interactions to check: 1
-[22:32:26.249 f000462] [interaction system - process interaction] - perform interaction 0
-[22:32:26.249 f000462] customer table sit interaction attempt
-[22:32:26.548 f000480] [movement_system::create_path_to] dog: 9, source: {384.000000, 0.000000}, destination: {512.000000, 128.000000}, checkpoints: 3
-[22:32:26.549 f000480] [movement_system::commit_route] dog: 9, mode: replace, paths before: 0, cleared: yes, legs committed: 4, paths after: 4
-[22:32:26.549 f000480] [waiter_idling_system::build_paths] waiter: 9, points: 4, destination: {512.000000, 128.000000}, attempt: 1
-[22:32:26.565 f000481] [state_machine_system::transition] entity: 9, transition: 21, state: 0 -> 1
+[19:47:22.717 f000000] [game::init, start] building the starting world
+[19:47:23.107 f000000] [build background]: load tile 1 draw onto image at 0.000000,  0.000000, 768.000000, 768.000000
+[19:47:23.131 f000000] [build background]: load tile 2 draw onto image at 768.000000,  0.000000, 1536.000000, 768.000000
+[19:47:23.161 f000000] [build background]: load tile 3 draw onto image at 1536.000000,  0.000000, 2304.000000, 768.000000
+[19:47:23.187 f000000] [build background]: load tile 4 draw onto image at 2304.000000,  0.000000, 3072.000000, 768.000000
+[19:47:23.211 f000000] [build background]: load tile 5 draw onto image at 0.000000,  768.000000, 768.000000, 1536.000000
+[19:47:23.235 f000000] [build background]: load tile 6 draw onto image at 768.000000,  768.000000, 1536.000000, 1536.000000
+[19:47:23.262 f000000] [build background]: load tile 7 draw onto image at 1536.000000,  768.000000, 2304.000000, 1536.000000
+[19:47:23.285 f000000] [build background]: load tile 8 draw onto image at 2304.000000,  768.000000, 3072.000000, 1536.000000
+[19:47:23.309 f000000] [build background]: load tile 9 draw onto image at 0.000000,  1536.000000, 768.000000, 2304.000000
+[19:47:23.334 f000000] [build background]: load tile 10 draw onto image at 768.000000,  1536.000000, 1536.000000, 2304.000000
+[19:47:23.361 f000000] [build background]: load tile 11 draw onto image at 1536.000000,  1536.000000, 2304.000000, 2304.000000
+[19:47:23.386 f000000] [build background]: load tile 12 draw onto image at 2304.000000,  1536.000000, 3072.000000, 2304.000000
+[19:47:23.412 f000000] [build background]: load tile 13 draw onto image at 0.000000,  2304.000000, 768.000000, 3072.000000
+[19:47:23.438 f000000] [build background]: load tile 14 draw onto image at 768.000000,  2304.000000, 1536.000000, 3072.000000
+[19:47:23.464 f000000] [build background]: load tile 15 draw onto image at 1536.000000,  2304.000000, 2304.000000, 3072.000000
+[19:47:23.487 f000000] [build background]: load tile 16 draw onto image at 2304.000000,  2304.000000, 3072.000000, 3072.000000
+[19:47:23.835 f000000] [game::init, built background] id 0
+[19:47:23.836 f000000] [game::init, built cursor] id 1
+[19:47:23.836 f000000] [game::init, built player] id 2 holding cursor 1
+[19:47:23.837 f000000] [game::init, built khiri] id 3
+[19:47:23.838 f000000] [game::init, built mack] id 4
+[19:47:23.839 f000000] [game::init, build counter]: id 5 with food items:  3
+[19:47:23.841 f000000] [entity_lifespan_system::create_cooking_station] built cooking station: 0, id: 9, position: {896.000000, 512.000000}
+[19:47:23.849 f000000] [game::init, done] built 7 components on khiri
+[19:47:23.849 f000000] [game::init, done] built 7 components on mack
+[19:47:23.849 f000000] [hud::render] frame: 1
+[19:47:23.849 f000000] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:23.849 f000000] [hud_rendering_system::render, entity] id: 9
+[19:47:23.849 f000000] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:23.873 f000001] [hud::render] frame: 2
+[19:47:23.873 f000001] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:23.873 f000001] [hud_rendering_system::render, entity] id: 9
+[19:47:23.873 f000001] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:23.887 f000002] [hud::render] frame: 3
+[19:47:23.887 f000002] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:23.887 f000002] [hud_rendering_system::render, entity] id: 9
+[19:47:23.887 f000002] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:23.903 f000003] [hud::render] frame: 4
+[19:47:23.903 f000003] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:23.903 f000003] [hud_rendering_system::render, entity] id: 9
+[19:47:23.903 f000003] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:23.920 f000004] [hud::render] frame: 5
+[19:47:23.920 f000004] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:23.920 f000004] [hud_rendering_system::render, entity] id: 9
+[19:47:23.920 f000004] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:23.937 f000005] [hud::render] frame: 6
+[19:47:23.937 f000005] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:23.937 f000005] [hud_rendering_system::render, entity] id: 9
+[19:47:23.937 f000005] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:23.954 f000006] [hud::render] frame: 7
+[19:47:23.954 f000006] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:23.954 f000006] [hud_rendering_system::render, entity] id: 9
+[19:47:23.954 f000006] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:23.970 f000007] [hud::render] frame: 8
+[19:47:23.971 f000007] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:23.971 f000007] [hud_rendering_system::render, entity] id: 9
+[19:47:23.971 f000007] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:23.987 f000008] [hud::render] frame: 9
+[19:47:23.987 f000008] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:23.987 f000008] [hud_rendering_system::render, entity] id: 9
+[19:47:23.987 f000008] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.004 f000009] [hud::render] frame: 10
+[19:47:24.004 f000009] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.004 f000009] [hud_rendering_system::render, entity] id: 9
+[19:47:24.004 f000009] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.020 f000010] [hud::render] frame: 11
+[19:47:24.020 f000010] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.020 f000010] [hud_rendering_system::render, entity] id: 9
+[19:47:24.020 f000010] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.037 f000011] [hud::render] frame: 12
+[19:47:24.037 f000011] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.037 f000011] [hud_rendering_system::render, entity] id: 9
+[19:47:24.037 f000011] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.053 f000012] [hud::render] frame: 13
+[19:47:24.053 f000012] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.053 f000012] [hud_rendering_system::render, entity] id: 9
+[19:47:24.053 f000012] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.070 f000013] [hud::render] frame: 14
+[19:47:24.070 f000013] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.070 f000013] [hud_rendering_system::render, entity] id: 9
+[19:47:24.070 f000013] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.087 f000014] [hud::render] frame: 15
+[19:47:24.087 f000014] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.087 f000014] [hud_rendering_system::render, entity] id: 9
+[19:47:24.087 f000014] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.103 f000015] [hud::render] frame: 16
+[19:47:24.103 f000015] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.103 f000015] [hud_rendering_system::render, entity] id: 9
+[19:47:24.103 f000015] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.120 f000016] [hud::render] frame: 17
+[19:47:24.120 f000016] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.120 f000016] [hud_rendering_system::render, entity] id: 9
+[19:47:24.120 f000016] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.137 f000017] [hud::render] frame: 18
+[19:47:24.137 f000017] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.137 f000017] [hud_rendering_system::render, entity] id: 9
+[19:47:24.137 f000017] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.153 f000018] [hud::render] frame: 19
+[19:47:24.153 f000018] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.153 f000018] [hud_rendering_system::render, entity] id: 9
+[19:47:24.153 f000018] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.170 f000019] [hud::render] frame: 20
+[19:47:24.170 f000019] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.170 f000019] [hud_rendering_system::render, entity] id: 9
+[19:47:24.170 f000019] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.187 f000020] [hud::render] frame: 21
+[19:47:24.187 f000020] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.187 f000020] [hud_rendering_system::render, entity] id: 9
+[19:47:24.187 f000020] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.203 f000021] [hud::render] frame: 22
+[19:47:24.203 f000021] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.203 f000021] [hud_rendering_system::render, entity] id: 9
+[19:47:24.203 f000021] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.220 f000022] [hud::render] frame: 23
+[19:47:24.220 f000022] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.220 f000022] [hud_rendering_system::render, entity] id: 9
+[19:47:24.220 f000022] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.237 f000023] [hud::render] frame: 24
+[19:47:24.237 f000023] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.238 f000023] [hud_rendering_system::render, entity] id: 9
+[19:47:24.238 f000023] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.254 f000024] [hud::render] frame: 25
+[19:47:24.254 f000024] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.254 f000024] [hud_rendering_system::render, entity] id: 9
+[19:47:24.254 f000024] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.270 f000025] [hud::render] frame: 26
+[19:47:24.270 f000025] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.270 f000025] [hud_rendering_system::render, entity] id: 9
+[19:47:24.270 f000025] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.288 f000026] [hud::render] frame: 27
+[19:47:24.288 f000026] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.288 f000026] [hud_rendering_system::render, entity] id: 9
+[19:47:24.288 f000026] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.304 f000027] [hud::render] frame: 28
+[19:47:24.304 f000027] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.304 f000027] [hud_rendering_system::render, entity] id: 9
+[19:47:24.304 f000027] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.320 f000028] [hud::render] frame: 29
+[19:47:24.321 f000028] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.321 f000028] [hud_rendering_system::render, entity] id: 9
+[19:47:24.321 f000028] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.337 f000029] [hud::render] frame: 30
+[19:47:24.337 f000029] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.337 f000029] [hud_rendering_system::render, entity] id: 9
+[19:47:24.337 f000029] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.354 f000030] [hud::render] frame: 31
+[19:47:24.354 f000030] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.354 f000030] [hud_rendering_system::render, entity] id: 9
+[19:47:24.354 f000030] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.370 f000031] [hud::render] frame: 32
+[19:47:24.370 f000031] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.370 f000031] [hud_rendering_system::render, entity] id: 9
+[19:47:24.371 f000031] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.387 f000032] [hud::render] frame: 33
+[19:47:24.388 f000032] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.388 f000032] [hud_rendering_system::render, entity] id: 9
+[19:47:24.388 f000032] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.404 f000033] [hud::render] frame: 34
+[19:47:24.404 f000033] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.404 f000033] [hud_rendering_system::render, entity] id: 9
+[19:47:24.404 f000033] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.420 f000034] [hud::render] frame: 35
+[19:47:24.420 f000034] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.420 f000034] [hud_rendering_system::render, entity] id: 9
+[19:47:24.420 f000034] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.437 f000035] [hud::render] frame: 36
+[19:47:24.438 f000035] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.438 f000035] [hud_rendering_system::render, entity] id: 9
+[19:47:24.438 f000035] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.454 f000036] [hud::render] frame: 37
+[19:47:24.454 f000036] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.454 f000036] [hud_rendering_system::render, entity] id: 9
+[19:47:24.454 f000036] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.470 f000037] [hud::render] frame: 38
+[19:47:24.470 f000037] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.470 f000037] [hud_rendering_system::render, entity] id: 9
+[19:47:24.470 f000037] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.487 f000038] [hud::render] frame: 39
+[19:47:24.488 f000038] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.488 f000038] [hud_rendering_system::render, entity] id: 9
+[19:47:24.488 f000038] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.504 f000039] [hud::render] frame: 40
+[19:47:24.504 f000039] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.504 f000039] [hud_rendering_system::render, entity] id: 9
+[19:47:24.504 f000039] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.521 f000040] [hud::render] frame: 41
+[19:47:24.521 f000040] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.521 f000040] [hud_rendering_system::render, entity] id: 9
+[19:47:24.521 f000040] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.537 f000041] [hud::render] frame: 42
+[19:47:24.537 f000041] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.537 f000041] [hud_rendering_system::render, entity] id: 9
+[19:47:24.537 f000041] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.553 f000042] [hud::render] frame: 43
+[19:47:24.553 f000042] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.554 f000042] [hud_rendering_system::render, entity] id: 9
+[19:47:24.554 f000042] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.570 f000043] [hud::render] frame: 44
+[19:47:24.570 f000043] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.570 f000043] [hud_rendering_system::render, entity] id: 9
+[19:47:24.570 f000043] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.587 f000044] [hud::render] frame: 45
+[19:47:24.587 f000044] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.587 f000044] [hud_rendering_system::render, entity] id: 9
+[19:47:24.587 f000044] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.603 f000045] [hud::render] frame: 46
+[19:47:24.603 f000045] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.604 f000045] [hud_rendering_system::render, entity] id: 9
+[19:47:24.604 f000045] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.620 f000046] [hud::render] frame: 47
+[19:47:24.620 f000046] [hud_rendering_system::render] hud components: 1, view_frame: (805.161255, 452.903229)
+[19:47:24.620 f000046] [hud_rendering_system::render, entity] id: 9
+[19:47:24.620 f000046] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.637 f000047] [hud::render] frame: 48
+[19:47:24.637 f000047] [hud_rendering_system::render] hud components: 1, view_frame: (803.902405, 452.195099)
+[19:47:24.637 f000047] [hud_rendering_system::render, entity] id: 9
+[19:47:24.637 f000047] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.654 f000048] [hud::render] frame: 49
+[19:47:24.654 f000048] [hud_rendering_system::render] hud components: 1, view_frame: (802.622925, 451.475403)
+[19:47:24.654 f000048] [hud_rendering_system::render, entity] id: 9
+[19:47:24.654 f000048] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.671 f000049] [hud::render] frame: 50
+[19:47:24.671 f000049] [hud_rendering_system::render] hud components: 1, view_frame: (801.322327, 450.743805)
+[19:47:24.671 f000049] [hud_rendering_system::render, entity] id: 9
+[19:47:24.671 f000049] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.687 f000050] [hud::render] frame: 51
+[19:47:24.687 f000050] [hud_rendering_system::render] hud components: 1, view_frame: (799.999878, 449.999969)
+[19:47:24.687 f000050] [hud_rendering_system::render, entity] id: 9
+[19:47:24.687 f000050] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.703 f000051] [hud::render] frame: 52
+[19:47:24.704 f000051] [hud_rendering_system::render] hud components: 1, view_frame: (798.655457, 449.243652)
+[19:47:24.704 f000051] [hud_rendering_system::render, entity] id: 9
+[19:47:24.704 f000051] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.720 f000052] [hud::render] frame: 53
+[19:47:24.720 f000052] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.720 f000052] [hud_rendering_system::render, entity] id: 9
+[19:47:24.720 f000052] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.737 f000053] [hud::render] frame: 54
+[19:47:24.737 f000053] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.737 f000053] [hud_rendering_system::render, entity] id: 9
+[19:47:24.737 f000053] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.753 f000054] [hud::render] frame: 55
+[19:47:24.753 f000054] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.753 f000054] [hud_rendering_system::render, entity] id: 9
+[19:47:24.754 f000054] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.770 f000055] [hud::render] frame: 56
+[19:47:24.770 f000055] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.770 f000055] [hud_rendering_system::render, entity] id: 9
+[19:47:24.770 f000055] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.787 f000056] [hud::render] frame: 57
+[19:47:24.787 f000056] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.787 f000056] [hud_rendering_system::render, entity] id: 9
+[19:47:24.787 f000056] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.803 f000057] [hud::render] frame: 58
+[19:47:24.803 f000057] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.804 f000057] [hud_rendering_system::render, entity] id: 9
+[19:47:24.804 f000057] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.820 f000058] [hud::render] frame: 59
+[19:47:24.820 f000058] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.820 f000058] [hud_rendering_system::render, entity] id: 9
+[19:47:24.820 f000058] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.837 f000059] [hud::render] frame: 60
+[19:47:24.837 f000059] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.837 f000059] [hud_rendering_system::render, entity] id: 9
+[19:47:24.837 f000059] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.853 f000060] [hud::render] frame: 61
+[19:47:24.853 f000060] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.854 f000060] [hud_rendering_system::render, entity] id: 9
+[19:47:24.854 f000060] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.870 f000061] [hud::render] frame: 62
+[19:47:24.870 f000061] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.870 f000061] [hud_rendering_system::render, entity] id: 9
+[19:47:24.870 f000061] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.887 f000062] [hud::render] frame: 63
+[19:47:24.887 f000062] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.887 f000062] [hud_rendering_system::render, entity] id: 9
+[19:47:24.887 f000062] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.903 f000063] [hud::render] frame: 64
+[19:47:24.903 f000063] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.904 f000063] [hud_rendering_system::render, entity] id: 9
+[19:47:24.904 f000063] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.920 f000064] [hud::render] frame: 65
+[19:47:24.920 f000064] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.920 f000064] [hud_rendering_system::render, entity] id: 9
+[19:47:24.920 f000064] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.937 f000065] [hud::render] frame: 66
+[19:47:24.937 f000065] [hud_rendering_system::render] hud components: 1, view_frame: (797.288086, 448.474518)
+[19:47:24.937 f000065] [hud_rendering_system::render, entity] id: 9
+[19:47:24.937 f000065] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.953 f000066] [hud::render] frame: 67
+[19:47:24.954 f000066] [hud_rendering_system::render] hud components: 1, view_frame: (795.897400, 447.692322)
+[19:47:24.954 f000066] [hud_rendering_system::render, entity] id: 9
+[19:47:24.954 f000066] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.970 f000067] [hud::render] frame: 68
+[19:47:24.970 f000067] [hud_rendering_system::render] hud components: 1, view_frame: (795.897400, 447.692322)
+[19:47:24.970 f000067] [hud_rendering_system::render, entity] id: 9
+[19:47:24.970 f000067] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:24.987 f000068] [hud::render] frame: 69
+[19:47:24.987 f000068] [hud_rendering_system::render] hud components: 1, view_frame: (793.043274, 446.086853)
+[19:47:24.987 f000068] [hud_rendering_system::render, entity] id: 9
+[19:47:24.987 f000068] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.004 f000069] [hud::render] frame: 70
+[19:47:25.004 f000069] [hud_rendering_system::render] hud components: 1, view_frame: (788.571228, 443.571350)
+[19:47:25.004 f000069] [hud_rendering_system::render, entity] id: 9
+[19:47:25.004 f000069] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.020 f000070] [hud::render] frame: 71
+[19:47:25.020 f000070] [hud_rendering_system::render] hud components: 1, view_frame: (785.454407, 441.818085)
+[19:47:25.020 f000070] [hud_rendering_system::render, entity] id: 9
+[19:47:25.020 f000070] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.037 f000071] [hud::render] frame: 72
+[19:47:25.037 f000071] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.037 f000071] [hud_rendering_system::render, entity] id: 9
+[19:47:25.037 f000071] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.054 f000072] [hud::render] frame: 73
+[19:47:25.054 f000072] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.054 f000072] [hud_rendering_system::render, entity] id: 9
+[19:47:25.054 f000072] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.070 f000073] [hud::render] frame: 74
+[19:47:25.070 f000073] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.070 f000073] [hud_rendering_system::render, entity] id: 9
+[19:47:25.070 f000073] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.087 f000074] [hud::render] frame: 75
+[19:47:25.087 f000074] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.087 f000074] [hud_rendering_system::render, entity] id: 9
+[19:47:25.087 f000074] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.103 f000075] [hud::render] frame: 76
+[19:47:25.104 f000075] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.104 f000075] [hud_rendering_system::render, entity] id: 9
+[19:47:25.104 f000075] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.120 f000076] [hud::render] frame: 77
+[19:47:25.120 f000076] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.120 f000076] [hud_rendering_system::render, entity] id: 9
+[19:47:25.120 f000076] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.137 f000077] [hud::render] frame: 78
+[19:47:25.137 f000077] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.137 f000077] [hud_rendering_system::render, entity] id: 9
+[19:47:25.137 f000077] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.153 f000078] [hud::render] frame: 79
+[19:47:25.154 f000078] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.154 f000078] [hud_rendering_system::render, entity] id: 9
+[19:47:25.154 f000078] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.170 f000079] [hud::render] frame: 80
+[19:47:25.170 f000079] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.170 f000079] [hud_rendering_system::render, entity] id: 9
+[19:47:25.170 f000079] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.187 f000080] [hud::render] frame: 81
+[19:47:25.187 f000080] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.187 f000080] [hud_rendering_system::render, entity] id: 9
+[19:47:25.187 f000080] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.203 f000081] [hud::render] frame: 82
+[19:47:25.204 f000081] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.204 f000081] [hud_rendering_system::render, entity] id: 9
+[19:47:25.204 f000081] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.220 f000082] [hud::render] frame: 83
+[19:47:25.220 f000082] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.220 f000082] [hud_rendering_system::render, entity] id: 9
+[19:47:25.220 f000082] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.237 f000083] [hud::render] frame: 84
+[19:47:25.237 f000083] [hud_rendering_system::render] hud components: 1, view_frame: (783.852966, 440.917297)
+[19:47:25.237 f000083] [hud_rendering_system::render, entity] id: 9
+[19:47:25.237 f000083] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.254 f000084] [hud::render] frame: 85
+[19:47:25.254 f000084] [hud_rendering_system::render] hud components: 1, view_frame: (782.221985, 439.999847)
+[19:47:25.254 f000084] [hud_rendering_system::render, entity] id: 9
+[19:47:25.254 f000084] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.270 f000085] [hud::render] frame: 86
+[19:47:25.271 f000085] [hud_rendering_system::render] hud components: 1, view_frame: (780.550842, 439.059875)
+[19:47:25.271 f000085] [hud_rendering_system::render, entity] id: 9
+[19:47:25.271 f000085] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.287 f000086] [hud::render] frame: 87
+[19:47:25.287 f000086] [hud_rendering_system::render] hud components: 1, view_frame: (777.132568, 437.137054)
+[19:47:25.287 f000086] [hud_rendering_system::render, entity] id: 9
+[19:47:25.287 f000086] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.304 f000087] [hud::render] frame: 88
+[19:47:25.304 f000087] [hud_rendering_system::render] hud components: 1, view_frame: (771.753784, 434.111481)
+[19:47:25.304 f000087] [hud_rendering_system::render, entity] id: 9
+[19:47:25.304 f000087] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.320 f000088] [hud::render] frame: 89
+[19:47:25.321 f000088] [hud_rendering_system::render] hud components: 1, view_frame: (769.889709, 433.062958)
+[19:47:25.321 f000088] [hud_rendering_system::render, entity] id: 9
+[19:47:25.321 f000088] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.337 f000089] [hud::render] frame: 90
+[19:47:25.337 f000089] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.337 f000089] [hud_rendering_system::render, entity] id: 9
+[19:47:25.337 f000089] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.354 f000090] [hud::render] frame: 91
+[19:47:25.354 f000090] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.354 f000090] [hud_rendering_system::render, entity] id: 9
+[19:47:25.354 f000090] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.370 f000091] [hud::render] frame: 92
+[19:47:25.370 f000091] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.370 f000091] [hud_rendering_system::render, entity] id: 9
+[19:47:25.370 f000091] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.387 f000092] [hud::render] frame: 93
+[19:47:25.387 f000092] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.387 f000092] [hud_rendering_system::render, entity] id: 9
+[19:47:25.387 f000092] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.404 f000093] [hud::render] frame: 94
+[19:47:25.404 f000093] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.404 f000093] [hud_rendering_system::render, entity] id: 9
+[19:47:25.404 f000093] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.420 f000094] [hud::render] frame: 95
+[19:47:25.420 f000094] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.420 f000094] [hud_rendering_system::render, entity] id: 9
+[19:47:25.420 f000094] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.437 f000095] [hud::render] frame: 96
+[19:47:25.437 f000095] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.437 f000095] [hud_rendering_system::render, entity] id: 9
+[19:47:25.437 f000095] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.454 f000096] [hud::render] frame: 97
+[19:47:25.454 f000096] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.454 f000096] [hud_rendering_system::render, entity] id: 9
+[19:47:25.454 f000096] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.471 f000097] [hud::render] frame: 98
+[19:47:25.471 f000097] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.471 f000097] [hud_rendering_system::render, entity] id: 9
+[19:47:25.471 f000097] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.487 f000098] [hud::render] frame: 99
+[19:47:25.487 f000098] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.487 f000098] [hud_rendering_system::render, entity] id: 9
+[19:47:25.487 f000098] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.504 f000099] [hud::render] frame: 100
+[19:47:25.504 f000099] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.504 f000099] [hud_rendering_system::render, entity] id: 9
+[19:47:25.504 f000099] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.520 f000100] [hud::render] frame: 101
+[19:47:25.520 f000100] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.520 f000100] [hud_rendering_system::render, entity] id: 9
+[19:47:25.520 f000100] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.537 f000101] [hud::render] frame: 102
+[19:47:25.537 f000101] [hud_rendering_system::render] hud components: 1, view_frame: (767.988525, 431.993561)
+[19:47:25.537 f000101] [hud_rendering_system::render, entity] id: 9
+[19:47:25.537 f000101] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.554 f000102] [hud::render] frame: 103
+[19:47:25.554 f000102] [hud_rendering_system::render] hud components: 1, view_frame: (764.069702, 429.789215)
+[19:47:25.554 f000102] [hud_rendering_system::render, entity] id: 9
+[19:47:25.554 f000102] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.570 f000103] [hud::render] frame: 104
+[19:47:25.570 f000103] [hud_rendering_system::render] hud components: 1, view_frame: (759.987488, 427.492981)
+[19:47:25.570 f000103] [hud_rendering_system::render, entity] id: 9
+[19:47:25.571 f000103] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.587 f000104] [hud::render] frame: 105
+[19:47:25.587 f000104] [hud_rendering_system::render] hud components: 1, view_frame: (753.535095, 423.863464)
+[19:47:25.587 f000104] [hud_rendering_system::render, entity] id: 9
+[19:47:25.587 f000104] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.604 f000105] [hud::render] frame: 106
+[19:47:25.604 f000105] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.604 f000105] [hud_rendering_system::render, entity] id: 9
+[19:47:25.604 f000105] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.620 f000106] [hud::render] frame: 107
+[19:47:25.620 f000106] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.620 f000106] [hud_rendering_system::render, entity] id: 9
+[19:47:25.621 f000106] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.637 f000107] [hud::render] frame: 108
+[19:47:25.637 f000107] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.637 f000107] [hud_rendering_system::render, entity] id: 9
+[19:47:25.637 f000107] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.654 f000108] [hud::render] frame: 109
+[19:47:25.654 f000108] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.654 f000108] [hud_rendering_system::render, entity] id: 9
+[19:47:25.654 f000108] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.670 f000109] [hud::render] frame: 110
+[19:47:25.670 f000109] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.670 f000109] [hud_rendering_system::render, entity] id: 9
+[19:47:25.670 f000109] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.687 f000110] [hud::render] frame: 111
+[19:47:25.687 f000110] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.687 f000110] [hud_rendering_system::render, entity] id: 9
+[19:47:25.687 f000110] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.704 f000111] [hud::render] frame: 112
+[19:47:25.704 f000111] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.704 f000111] [hud_rendering_system::render, entity] id: 9
+[19:47:25.704 f000111] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.720 f000112] [hud::render] frame: 113
+[19:47:25.720 f000112] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.720 f000112] [hud_rendering_system::render, entity] id: 9
+[19:47:25.720 f000112] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.737 f000113] [hud::render] frame: 114
+[19:47:25.737 f000113] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.737 f000113] [hud_rendering_system::render, entity] id: 9
+[19:47:25.737 f000113] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.754 f000114] [hud::render] frame: 115
+[19:47:25.754 f000114] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.754 f000114] [hud_rendering_system::render, entity] id: 9
+[19:47:25.754 f000114] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.770 f000115] [hud::render] frame: 116
+[19:47:25.771 f000115] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.771 f000115] [hud_rendering_system::render, entity] id: 9
+[19:47:25.771 f000115] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.787 f000116] [hud::render] frame: 117
+[19:47:25.787 f000116] [hud_rendering_system::render] hud components: 1, view_frame: (748.996948, 421.310760)
+[19:47:25.787 f000116] [hud_rendering_system::render, entity] id: 9
+[19:47:25.787 f000116] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.804 f000117] [hud::render] frame: 118
+[19:47:25.804 f000117] [hud_rendering_system::render] hud components: 1, view_frame: (746.652283, 419.991852)
+[19:47:25.804 f000117] [hud_rendering_system::render, entity] id: 9
+[19:47:25.804 f000117] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.821 f000118] [hud::render] frame: 119
+[19:47:25.821 f000118] [hud_rendering_system::render] hud components: 1, view_frame: (744.254883, 418.643433)
+[19:47:25.821 f000118] [hud_rendering_system::render, entity] id: 9
+[19:47:25.821 f000118] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.837 f000119] [hud::render] frame: 120
+[19:47:25.837 f000119] [hud_rendering_system::render] hud components: 1, view_frame: (739.294922, 415.853394)
+[19:47:25.837 f000119] [hud_rendering_system::render, entity] id: 9
+[19:47:25.837 f000119] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.854 f000120] [hud::render] frame: 121
+[19:47:25.854 f000120] [hud_rendering_system::render] hud components: 1, view_frame: (731.411743, 411.419128)
+[19:47:25.854 f000120] [hud_rendering_system::render, entity] id: 9
+[19:47:25.854 f000120] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.871 f000121] [hud::render] frame: 122
+[19:47:25.871 f000121] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:25.871 f000121] [hud_rendering_system::render, entity] id: 9
+[19:47:25.871 f000121] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.887 f000122] [hud::render] frame: 123
+[19:47:25.887 f000122] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:25.887 f000122] [hud_rendering_system::render, entity] id: 9
+[19:47:25.887 f000122] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.904 f000123] [hud::render] frame: 124
+[19:47:25.904 f000123] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:25.904 f000123] [hud_rendering_system::render, entity] id: 9
+[19:47:25.904 f000123] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.920 f000124] [hud::render] frame: 125
+[19:47:25.921 f000124] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:25.921 f000124] [hud_rendering_system::render, entity] id: 9
+[19:47:25.921 f000124] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.937 f000125] [hud::render] frame: 126
+[19:47:25.937 f000125] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:25.937 f000125] [hud_rendering_system::render, entity] id: 9
+[19:47:25.937 f000125] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.954 f000126] [hud::render] frame: 127
+[19:47:25.954 f000126] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:25.954 f000126] [hud_rendering_system::render, entity] id: 9
+[19:47:25.954 f000126] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.971 f000127] [hud::render] frame: 128
+[19:47:25.971 f000127] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:25.971 f000127] [hud_rendering_system::render, entity] id: 9
+[19:47:25.971 f000127] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:25.987 f000128] [hud::render] frame: 129
+[19:47:25.987 f000128] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:25.987 f000128] [hud_rendering_system::render, entity] id: 9
+[19:47:25.987 f000128] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.004 f000129] [hud::render] frame: 130
+[19:47:26.004 f000129] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:26.004 f000129] [hud_rendering_system::render, entity] id: 9
+[19:47:26.004 f000129] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.020 f000130] [hud::render] frame: 131
+[19:47:26.021 f000130] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:26.021 f000130] [hud_rendering_system::render, entity] id: 9
+[19:47:26.021 f000130] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.037 f000131] [hud::render] frame: 132
+[19:47:26.037 f000131] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:26.037 f000131] [hud_rendering_system::render, entity] id: 9
+[19:47:26.037 f000131] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.054 f000132] [hud::render] frame: 133
+[19:47:26.054 f000132] [hud_rendering_system::render] hud components: 1, view_frame: (725.835999, 408.282715)
+[19:47:26.054 f000132] [hud_rendering_system::render, entity] id: 9
+[19:47:26.054 f000132] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.071 f000133] [hud::render] frame: 134
+[19:47:26.071 f000133] [hud_rendering_system::render] hud components: 1, view_frame: (722.944824, 406.656494)
+[19:47:26.071 f000133] [hud_rendering_system::render, entity] id: 9
+[19:47:26.071 f000133] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.087 f000134] [hud::render] frame: 135
+[19:47:26.087 f000134] [hud_rendering_system::render] hud components: 1, view_frame: (719.981323, 404.989471)
+[19:47:26.087 f000134] [hud_rendering_system::render, entity] id: 9
+[19:47:26.087 f000134] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.104 f000135] [hud::render] frame: 136
+[19:47:26.104 f000135] [hud_rendering_system::render] hud components: 1, view_frame: (713.826477, 401.527374)
+[19:47:26.104 f000135] [hud_rendering_system::render, entity] id: 9
+[19:47:26.104 f000135] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.121 f000136] [hud::render] frame: 137
+[19:47:26.121 f000136] [hud_rendering_system::render] hud components: 1, view_frame: (700.518372, 394.041595)
+[19:47:26.121 f000136] [hud_rendering_system::render, entity] id: 9
+[19:47:26.121 f000136] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.138 f000137] [hud::render] frame: 138
+[19:47:26.138 f000137] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.138 f000137] [hud_rendering_system::render, entity] id: 9
+[19:47:26.138 f000137] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.154 f000138] [hud::render] frame: 139
+[19:47:26.154 f000138] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.154 f000138] [hud_rendering_system::render, entity] id: 9
+[19:47:26.154 f000138] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.171 f000139] [hud::render] frame: 140
+[19:47:26.171 f000139] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.171 f000139] [hud_rendering_system::render, entity] id: 9
+[19:47:26.171 f000139] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.187 f000140] [hud::render] frame: 141
+[19:47:26.187 f000140] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.187 f000140] [hud_rendering_system::render, entity] id: 9
+[19:47:26.187 f000140] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.204 f000141] [hud::render] frame: 142
+[19:47:26.204 f000141] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.204 f000141] [hud_rendering_system::render, entity] id: 9
+[19:47:26.204 f000141] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.220 f000142] [hud::render] frame: 143
+[19:47:26.221 f000142] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.221 f000142] [hud_rendering_system::render, entity] id: 9
+[19:47:26.221 f000142] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.237 f000143] [hud::render] frame: 144
+[19:47:26.237 f000143] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.237 f000143] [hud_rendering_system::render, entity] id: 9
+[19:47:26.237 f000143] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.254 f000144] [hud::render] frame: 145
+[19:47:26.254 f000144] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.254 f000144] [hud_rendering_system::render, entity] id: 9
+[19:47:26.254 f000144] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.271 f000145] [hud::render] frame: 146
+[19:47:26.271 f000145] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.271 f000145] [hud_rendering_system::render, entity] id: 9
+[19:47:26.271 f000145] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.287 f000146] [hud::render] frame: 147
+[19:47:26.287 f000146] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.287 f000146] [hud_rendering_system::render, entity] id: 9
+[19:47:26.287 f000146] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.304 f000147] [hud::render] frame: 148
+[19:47:26.304 f000147] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.304 f000147] [hud_rendering_system::render, entity] id: 9
+[19:47:26.304 f000147] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.320 f000148] [hud::render] frame: 149
+[19:47:26.321 f000148] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.321 f000148] [hud_rendering_system::render, entity] id: 9
+[19:47:26.321 f000148] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.337 f000149] [hud::render] frame: 150
+[19:47:26.337 f000149] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.337 f000149] [hud_rendering_system::render, entity] id: 9
+[19:47:26.337 f000149] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.354 f000150] [hud::render] frame: 151
+[19:47:26.354 f000150] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.354 f000150] [hud_rendering_system::render, entity] id: 9
+[19:47:26.354 f000150] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.370 f000151] [hud::render] frame: 152
+[19:47:26.371 f000151] [hud_rendering_system::render] hud components: 1, view_frame: (693.309875, 389.986786)
+[19:47:26.371 f000151] [hud_rendering_system::render, entity] id: 9
+[19:47:26.371 f000151] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.387 f000152] [hud::render] frame: 153
+[19:47:26.387 f000152] [hud_rendering_system::render] hud components: 1, view_frame: (685.689270, 385.700226)
+[19:47:26.387 f000152] [hud_rendering_system::render, entity] id: 9
+[19:47:26.387 f000152] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.404 f000153] [hud::render] frame: 154
+[19:47:26.404 f000153] [hud_rendering_system::render] hud components: 1, view_frame: (677.620483, 381.161499)
+[19:47:26.404 f000153] [hud_rendering_system::render, entity] id: 9
+[19:47:26.404 f000153] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.421 f000154] [hud::render] frame: 155
+[19:47:26.421 f000154] [hud_rendering_system::render] hud components: 1, view_frame: (659.969788, 371.232971)
+[19:47:26.421 f000154] [hud_rendering_system::render, entity] id: 9
+[19:47:26.421 f000154] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.437 f000155] [hud::render] frame: 156
+[19:47:26.437 f000155] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.437 f000155] [hud_rendering_system::render, entity] id: 9
+[19:47:26.437 f000155] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.454 f000156] [hud::render] frame: 157
+[19:47:26.454 f000156] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.454 f000156] [hud_rendering_system::render, entity] id: 9
+[19:47:26.454 f000156] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.470 f000157] [hud::render] frame: 158
+[19:47:26.471 f000157] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.471 f000157] [hud_rendering_system::render, entity] id: 9
+[19:47:26.471 f000157] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.487 f000158] [hud::render] frame: 159
+[19:47:26.487 f000158] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.487 f000158] [hud_rendering_system::render, entity] id: 9
+[19:47:26.487 f000158] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.504 f000159] [hud::render] frame: 160
+[19:47:26.504 f000159] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.504 f000159] [hud_rendering_system::render, entity] id: 9
+[19:47:26.504 f000159] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.520 f000160] [hud::render] frame: 161
+[19:47:26.521 f000160] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.521 f000160] [hud_rendering_system::render, entity] id: 9
+[19:47:26.521 f000160] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.537 f000161] [hud::render] frame: 162
+[19:47:26.537 f000161] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.537 f000161] [hud_rendering_system::render, entity] id: 9
+[19:47:26.537 f000161] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.554 f000162] [hud::render] frame: 163
+[19:47:26.554 f000162] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.554 f000162] [hud_rendering_system::render, entity] id: 9
+[19:47:26.554 f000162] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.570 f000163] [hud::render] frame: 164
+[19:47:26.571 f000163] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.571 f000163] [hud_rendering_system::render, entity] id: 9
+[19:47:26.571 f000163] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.587 f000164] [hud::render] frame: 165
+[19:47:26.587 f000164] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.587 f000164] [hud_rendering_system::render, entity] id: 9
+[19:47:26.587 f000164] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.604 f000165] [hud::render] frame: 166
+[19:47:26.604 f000165] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.604 f000165] [hud_rendering_system::render, entity] id: 9
+[19:47:26.604 f000165] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.620 f000166] [hud::render] frame: 167
+[19:47:26.621 f000166] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.621 f000166] [hud_rendering_system::render, entity] id: 9
+[19:47:26.621 f000166] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.637 f000167] [hud::render] frame: 168
+[19:47:26.637 f000167] [hud_rendering_system::render] hud components: 1, view_frame: (655.206848, 368.553833)
+[19:47:26.637 f000167] [hud_rendering_system::render, entity] id: 9
+[19:47:26.637 f000167] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.654 f000168] [hud::render] frame: 169
+[19:47:26.654 f000168] [hud_rendering_system::render] hud components: 1, view_frame: (650.290222, 365.788239)
+[19:47:26.654 f000168] [hud_rendering_system::render, entity] id: 9
+[19:47:26.654 f000168] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.671 f000169] [hud::render] frame: 170
+[19:47:26.671 f000169] [hud_rendering_system::render] hud components: 1, view_frame: (645.212463, 362.931976)
+[19:47:26.671 f000169] [hud_rendering_system::render, entity] id: 9
+[19:47:26.671 f000169] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.687 f000170] [hud::render] frame: 171
+[19:47:26.687 f000170] [hud_rendering_system::render] hud components: 1, view_frame: (628.928284, 353.772156)
+[19:47:26.687 f000170] [hud_rendering_system::render, entity] id: 9
+[19:47:26.687 f000170] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.704 f000171] [hud::render] frame: 172
+[19:47:26.704 f000171] [hud_rendering_system::render] hud components: 1, view_frame: (610.867493, 343.612946)
+[19:47:26.704 f000171] [hud_rendering_system::render, entity] id: 9
+[19:47:26.704 f000171] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.721 f000172] [hud::render] frame: 173
+[19:47:26.721 f000172] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.721 f000172] [hud_rendering_system::render, entity] id: 9
+[19:47:26.721 f000172] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.737 f000173] [hud::render] frame: 174
+[19:47:26.737 f000173] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.737 f000173] [hud_rendering_system::render, entity] id: 9
+[19:47:26.737 f000173] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.754 f000174] [hud::render] frame: 175
+[19:47:26.754 f000174] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.754 f000174] [hud_rendering_system::render, entity] id: 9
+[19:47:26.754 f000174] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.770 f000175] [hud::render] frame: 176
+[19:47:26.771 f000175] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.771 f000175] [hud_rendering_system::render, entity] id: 9
+[19:47:26.771 f000175] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.787 f000176] [hud::render] frame: 177
+[19:47:26.787 f000176] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.787 f000176] [hud_rendering_system::render, entity] id: 9
+[19:47:26.787 f000176] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.804 f000177] [hud::render] frame: 178
+[19:47:26.804 f000177] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.804 f000177] [hud_rendering_system::render, entity] id: 9
+[19:47:26.804 f000177] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.820 f000178] [hud::render] frame: 179
+[19:47:26.821 f000178] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.821 f000178] [hud_rendering_system::render, entity] id: 9
+[19:47:26.821 f000178] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.837 f000179] [hud::render] frame: 180
+[19:47:26.837 f000179] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.837 f000179] [hud_rendering_system::render, entity] id: 9
+[19:47:26.837 f000179] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.854 f000180] [hud::render] frame: 181
+[19:47:26.854 f000180] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.854 f000180] [hud_rendering_system::render, entity] id: 9
+[19:47:26.854 f000180] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.871 f000181] [hud::render] frame: 182
+[19:47:26.871 f000181] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.871 f000181] [hud_rendering_system::render, entity] id: 9
+[19:47:26.871 f000181] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.887 f000182] [hud::render] frame: 183
+[19:47:26.887 f000182] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.887 f000182] [hud_rendering_system::render, entity] id: 9
+[19:47:26.887 f000182] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.904 f000183] [hud::render] frame: 184
+[19:47:26.904 f000183] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.904 f000183] [hud_rendering_system::render, entity] id: 9
+[19:47:26.904 f000183] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.921 f000184] [hud::render] frame: 185
+[19:47:26.921 f000184] [hud_rendering_system::render] hud components: 1, view_frame: (604.401062, 339.975647)
+[19:47:26.921 f000184] [hud_rendering_system::render, entity] id: 9
+[19:47:26.921 f000184] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.937 f000185] [hud::render] frame: 186
+[19:47:26.937 f000185] [hud_rendering_system::render] hud components: 1, view_frame: (597.690857, 336.201080)
+[19:47:26.937 f000185] [hud_rendering_system::render, entity] id: 9
+[19:47:26.937 f000185] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.954 f000186] [hud::render] frame: 187
+[19:47:26.954 f000186] [hud_rendering_system::render] hud components: 1, view_frame: (590.722351, 332.281342)
+[19:47:26.954 f000186] [hud_rendering_system::render, entity] id: 9
+[19:47:26.954 f000186] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.971 f000187] [hud::render] frame: 188
+[19:47:26.971 f000187] [hud_rendering_system::render] hud components: 1, view_frame: (559.944641, 314.968872)
+[19:47:26.971 f000187] [hud_rendering_system::render, entity] id: 9
+[19:47:26.971 f000187] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:26.987 f000188] [hud::render] frame: 189
+[19:47:26.987 f000188] [hud_rendering_system::render] hud components: 1, view_frame: (542.548462, 305.183502)
+[19:47:26.987 f000188] [hud_rendering_system::render, entity] id: 9
+[19:47:26.987 f000188] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.004 f000189] [hud::render] frame: 190
+[19:47:27.004 f000189] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.004 f000189] [hud_rendering_system::render, entity] id: 9
+[19:47:27.004 f000189] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.021 f000190] [hud::render] frame: 191
+[19:47:27.021 f000190] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.021 f000190] [hud_rendering_system::render, entity] id: 9
+[19:47:27.021 f000190] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.037 f000191] [hud::render] frame: 192
+[19:47:27.037 f000191] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.037 f000191] [hud_rendering_system::render, entity] id: 9
+[19:47:27.037 f000191] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.054 f000192] [hud::render] frame: 193
+[19:47:27.054 f000192] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.054 f000192] [hud_rendering_system::render, entity] id: 9
+[19:47:27.054 f000192] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.071 f000193] [hud::render] frame: 194
+[19:47:27.071 f000193] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.071 f000193] [hud_rendering_system::render, entity] id: 9
+[19:47:27.071 f000193] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.087 f000194] [hud::render] frame: 195
+[19:47:27.087 f000194] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.087 f000194] [hud_rendering_system::render, entity] id: 9
+[19:47:27.087 f000194] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.104 f000195] [hud::render] frame: 196
+[19:47:27.104 f000195] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.104 f000195] [hud_rendering_system::render, entity] id: 9
+[19:47:27.104 f000195] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.121 f000196] [hud::render] frame: 197
+[19:47:27.121 f000196] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.121 f000196] [hud_rendering_system::render, entity] id: 9
+[19:47:27.121 f000196] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.137 f000197] [hud::render] frame: 198
+[19:47:27.137 f000197] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.137 f000197] [hud_rendering_system::render, entity] id: 9
+[19:47:27.137 f000197] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.154 f000198] [hud::render] frame: 199
+[19:47:27.154 f000198] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.154 f000198] [hud_rendering_system::render, entity] id: 9
+[19:47:27.154 f000198] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.171 f000199] [hud::render] frame: 200
+[19:47:27.171 f000199] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.171 f000199] [hud_rendering_system::render, entity] id: 9
+[19:47:27.171 f000199] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.187 f000200] [hud::render] frame: 201
+[19:47:27.187 f000200] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.187 f000200] [hud_rendering_system::render, entity] id: 9
+[19:47:27.187 f000200] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.204 f000201] [hud::render] frame: 202
+[19:47:27.204 f000201] [hud_rendering_system::render] hud components: 1, view_frame: (533.270264, 299.964539)
+[19:47:27.204 f000201] [hud_rendering_system::render, entity] id: 9
+[19:47:27.204 f000201] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.221 f000202] [hud::render] frame: 203
+[19:47:27.221 f000202] [hud_rendering_system::render] hud components: 1, view_frame: (523.570190, 294.508301)
+[19:47:27.221 f000202] [hud_rendering_system::render, entity] id: 9
+[19:47:27.221 f000202] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.237 f000203] [hud::render] frame: 204
+[19:47:27.237 f000203] [hud_rendering_system::render] hud components: 1, view_frame: (502.784454, 282.816254)
+[19:47:27.237 f000203] [hud_rendering_system::render, entity] id: 9
+[19:47:27.237 f000203] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.254 f000204] [hud::render] frame: 205
+[19:47:27.254 f000204] [hud_rendering_system::render] hud components: 1, view_frame: (467.607483, 263.029236)
+[19:47:27.254 f000204] [hud_rendering_system::render, entity] id: 9
+[19:47:27.254 f000204] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.271 f000205] [hud::render] frame: 206
+[19:47:27.271 f000205] [hud_rendering_system::render] hud components: 1, view_frame: (440.762360, 247.928833)
+[19:47:27.271 f000205] [hud_rendering_system::render, entity] id: 9
+[19:47:27.271 f000205] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.288 f000206] [hud::render] frame: 207
+[19:47:27.288 f000206] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.288 f000206] [hud_rendering_system::render, entity] id: 9
+[19:47:27.288 f000206] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.304 f000207] [hud::render] frame: 208
+[19:47:27.304 f000207] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.304 f000207] [hud_rendering_system::render, entity] id: 9
+[19:47:27.304 f000207] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.321 f000208] [hud::render] frame: 209
+[19:47:27.321 f000208] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.321 f000208] [hud_rendering_system::render, entity] id: 9
+[19:47:27.321 f000208] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.337 f000209] [hud::render] frame: 210
+[19:47:27.338 f000209] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.338 f000209] [hud_rendering_system::render, entity] id: 9
+[19:47:27.338 f000209] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.354 f000210] [hud::render] frame: 211
+[19:47:27.354 f000210] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.354 f000210] [hud_rendering_system::render, entity] id: 9
+[19:47:27.354 f000210] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.371 f000211] [hud::render] frame: 212
+[19:47:27.371 f000211] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.371 f000211] [hud_rendering_system::render, entity] id: 9
+[19:47:27.371 f000211] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.388 f000212] [hud::render] frame: 213
+[19:47:27.388 f000212] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.388 f000212] [hud_rendering_system::render, entity] id: 9
+[19:47:27.388 f000212] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.404 f000213] [hud::render] frame: 214
+[19:47:27.404 f000213] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.404 f000213] [hud_rendering_system::render, entity] id: 9
+[19:47:27.404 f000213] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.421 f000214] [hud::render] frame: 215
+[19:47:27.421 f000214] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.421 f000214] [hud_rendering_system::render, entity] id: 9
+[19:47:27.421 f000214] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.438 f000215] [hud::render] frame: 216
+[19:47:27.438 f000215] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.438 f000215] [hud_rendering_system::render, entity] id: 9
+[19:47:27.438 f000215] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.454 f000216] [hud::render] frame: 217
+[19:47:27.454 f000216] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.454 f000216] [hud_rendering_system::render, entity] id: 9
+[19:47:27.454 f000216] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.471 f000217] [hud::render] frame: 218
+[19:47:27.471 f000217] [hud_rendering_system::render] hud components: 1, view_frame: (426.329803, 239.810516)
+[19:47:27.471 f000217] [hud_rendering_system::render, entity] id: 9
+[19:47:27.471 f000217] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.488 f000218] [hud::render] frame: 219
+[19:47:27.488 f000218] [hud_rendering_system::render] hud components: 1, view_frame: (411.071991, 231.227997)
+[19:47:27.488 f000218] [hud_rendering_system::render, entity] id: 9
+[19:47:27.488 f000218] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.505 f000219] [hud::render] frame: 220
+[19:47:27.505 f000219] [hud_rendering_system::render] hud components: 1, view_frame: (394.916138, 222.140305)
+[19:47:27.505 f000219] [hud_rendering_system::render, entity] id: 9
+[19:47:27.505 f000219] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.521 f000220] [hud::render] frame: 221
+[19:47:27.521 f000220] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.521 f000220] [hud_rendering_system::render, entity] id: 9
+[19:47:27.521 f000220] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.538 f000221] [hud::render] frame: 222
+[19:47:27.538 f000221] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.538 f000221] [hud_rendering_system::render, entity] id: 9
+[19:47:27.538 f000221] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.554 f000222] [hud::render] frame: 223
+[19:47:27.554 f000222] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.554 f000222] [hud_rendering_system::render, entity] id: 9
+[19:47:27.554 f000222] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.571 f000223] [hud::render] frame: 224
+[19:47:27.571 f000223] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.571 f000223] [hud_rendering_system::render, entity] id: 9
+[19:47:27.571 f000223] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.588 f000224] [hud::render] frame: 225
+[19:47:27.588 f000224] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.588 f000224] [hud_rendering_system::render, entity] id: 9
+[19:47:27.588 f000224] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.604 f000225] [hud::render] frame: 226
+[19:47:27.604 f000225] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.604 f000225] [hud_rendering_system::render, entity] id: 9
+[19:47:27.605 f000225] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.621 f000226] [hud::render] frame: 227
+[19:47:27.621 f000226] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.621 f000226] [hud_rendering_system::render, entity] id: 9
+[19:47:27.621 f000226] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.638 f000227] [hud::render] frame: 228
+[19:47:27.638 f000227] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.638 f000227] [hud_rendering_system::render, entity] id: 9
+[19:47:27.638 f000227] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.654 f000228] [hud::render] frame: 229
+[19:47:27.654 f000228] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.654 f000228] [hud_rendering_system::render, entity] id: 9
+[19:47:27.654 f000228] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.671 f000229] [hud::render] frame: 230
+[19:47:27.671 f000229] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.671 f000229] [hud_rendering_system::render, entity] id: 9
+[19:47:27.671 f000229] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.688 f000230] [hud::render] frame: 231
+[19:47:27.688 f000230] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.688 f000230] [hud_rendering_system::render, entity] id: 9
+[19:47:27.688 f000230] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.705 f000231] [hud::render] frame: 232
+[19:47:27.705 f000231] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.705 f000231] [hud_rendering_system::render, entity] id: 9
+[19:47:27.705 f000231] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.721 f000232] [hud::render] frame: 233
+[19:47:27.721 f000232] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.721 f000232] [hud_rendering_system::render, entity] id: 9
+[19:47:27.721 f000232] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.738 f000233] [hud::render] frame: 234
+[19:47:27.738 f000233] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.738 f000233] [hud_rendering_system::render, entity] id: 9
+[19:47:27.738 f000233] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.755 f000234] [hud::render] frame: 235
+[19:47:27.755 f000234] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.755 f000234] [hud_rendering_system::render, entity] id: 9
+[19:47:27.755 f000234] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.771 f000235] [hud::render] frame: 236
+[19:47:27.771 f000235] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.771 f000235] [hud_rendering_system::render, entity] id: 9
+[19:47:27.771 f000235] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.788 f000236] [hud::render] frame: 237
+[19:47:27.788 f000236] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.788 f000236] [hud_rendering_system::render, entity] id: 9
+[19:47:27.788 f000236] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.805 f000237] [hud::render] frame: 238
+[19:47:27.805 f000237] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.805 f000237] [hud_rendering_system::render, entity] id: 9
+[19:47:27.805 f000237] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.821 f000238] [hud::render] frame: 239
+[19:47:27.821 f000238] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.821 f000238] [hud_rendering_system::render, entity] id: 9
+[19:47:27.821 f000238] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.838 f000239] [hud::render] frame: 240
+[19:47:27.838 f000239] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.838 f000239] [hud_rendering_system::render, entity] id: 9
+[19:47:27.838 f000239] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.855 f000240] [hud::render] frame: 241
+[19:47:27.855 f000240] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.855 f000240] [hud_rendering_system::render, entity] id: 9
+[19:47:27.855 f000240] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.871 f000241] [hud::render] frame: 242
+[19:47:27.871 f000241] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.871 f000241] [hud_rendering_system::render, entity] id: 9
+[19:47:27.871 f000241] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.888 f000242] [hud::render] frame: 243
+[19:47:27.888 f000242] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.888 f000242] [hud_rendering_system::render, entity] id: 9
+[19:47:27.888 f000242] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.905 f000243] [hud::render] frame: 244
+[19:47:27.905 f000243] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.905 f000243] [hud_rendering_system::render, entity] id: 9
+[19:47:27.905 f000243] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.921 f000244] [hud::render] frame: 245
+[19:47:27.921 f000244] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.921 f000244] [hud_rendering_system::render, entity] id: 9
+[19:47:27.921 f000244] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.938 f000245] [hud::render] frame: 246
+[19:47:27.938 f000245] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.938 f000245] [hud_rendering_system::render, entity] id: 9
+[19:47:27.938 f000245] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.955 f000246] [hud::render] frame: 247
+[19:47:27.955 f000246] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.955 f000246] [hud_rendering_system::render, entity] id: 9
+[19:47:27.955 f000246] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.971 f000247] [hud::render] frame: 248
+[19:47:27.971 f000247] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.971 f000247] [hud_rendering_system::render, entity] id: 9
+[19:47:27.971 f000247] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:27.988 f000248] [hud::render] frame: 249
+[19:47:27.988 f000248] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:27.988 f000248] [hud_rendering_system::render, entity] id: 9
+[19:47:27.988 f000248] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.005 f000249] [hud::render] frame: 250
+[19:47:28.005 f000249] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.005 f000249] [hud_rendering_system::render, entity] id: 9
+[19:47:28.005 f000249] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.021 f000250] [hud::render] frame: 251
+[19:47:28.021 f000250] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.021 f000250] [hud_rendering_system::render, entity] id: 9
+[19:47:28.021 f000250] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.038 f000251] [hud::render] frame: 252
+[19:47:28.038 f000251] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.038 f000251] [hud_rendering_system::render, entity] id: 9
+[19:47:28.038 f000251] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.055 f000252] [hud::render] frame: 253
+[19:47:28.055 f000252] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.055 f000252] [hud_rendering_system::render, entity] id: 9
+[19:47:28.055 f000252] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.071 f000253] [hud::render] frame: 254
+[19:47:28.071 f000253] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.071 f000253] [hud_rendering_system::render, entity] id: 9
+[19:47:28.071 f000253] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.088 f000254] [hud::render] frame: 255
+[19:47:28.088 f000254] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.088 f000254] [hud_rendering_system::render, entity] id: 9
+[19:47:28.088 f000254] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.105 f000255] [hud::render] frame: 256
+[19:47:28.105 f000255] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.105 f000255] [hud_rendering_system::render, entity] id: 9
+[19:47:28.105 f000255] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.121 f000256] [hud::render] frame: 257
+[19:47:28.121 f000256] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.121 f000256] [hud_rendering_system::render, entity] id: 9
+[19:47:28.121 f000256] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.138 f000257] [hud::render] frame: 258
+[19:47:28.138 f000257] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.138 f000257] [hud_rendering_system::render, entity] id: 9
+[19:47:28.138 f000257] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.155 f000258] [hud::render] frame: 259
+[19:47:28.155 f000258] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.155 f000258] [hud_rendering_system::render, entity] id: 9
+[19:47:28.155 f000258] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.171 f000259] [hud::render] frame: 260
+[19:47:28.171 f000259] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.171 f000259] [hud_rendering_system::render, entity] id: 9
+[19:47:28.171 f000259] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.188 f000260] [hud::render] frame: 261
+[19:47:28.188 f000260] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.188 f000260] [hud_rendering_system::render, entity] id: 9
+[19:47:28.188 f000260] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.205 f000261] [hud::render] frame: 262
+[19:47:28.205 f000261] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.205 f000261] [hud_rendering_system::render, entity] id: 9
+[19:47:28.205 f000261] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.221 f000262] [hud::render] frame: 263
+[19:47:28.221 f000262] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.221 f000262] [hud_rendering_system::render, entity] id: 9
+[19:47:28.221 f000262] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.238 f000263] [hud::render] frame: 264
+[19:47:28.238 f000263] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.238 f000263] [hud_rendering_system::render, entity] id: 9
+[19:47:28.238 f000263] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.255 f000264] [hud::render] frame: 265
+[19:47:28.255 f000264] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.255 f000264] [hud_rendering_system::render, entity] id: 9
+[19:47:28.255 f000264] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.271 f000265] [hud::render] frame: 266
+[19:47:28.271 f000265] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.271 f000265] [hud_rendering_system::render, entity] id: 9
+[19:47:28.271 f000265] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.288 f000266] [hud::render] frame: 267
+[19:47:28.288 f000266] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.288 f000266] [hud_rendering_system::render, entity] id: 9
+[19:47:28.288 f000266] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.305 f000267] [hud::render] frame: 268
+[19:47:28.305 f000267] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.305 f000267] [hud_rendering_system::render, entity] id: 9
+[19:47:28.305 f000267] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.321 f000268] [hud::render] frame: 269
+[19:47:28.321 f000268] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.321 f000268] [hud_rendering_system::render, entity] id: 9
+[19:47:28.321 f000268] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.338 f000269] [hud::render] frame: 270
+[19:47:28.338 f000269] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.338 f000269] [hud_rendering_system::render, entity] id: 9
+[19:47:28.338 f000269] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.355 f000270] [hud::render] frame: 271
+[19:47:28.355 f000270] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.355 f000270] [hud_rendering_system::render, entity] id: 9
+[19:47:28.355 f000270] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.371 f000271] [hud::render] frame: 272
+[19:47:28.371 f000271] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.371 f000271] [hud_rendering_system::render, entity] id: 9
+[19:47:28.371 f000271] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.388 f000272] [hud::render] frame: 273
+[19:47:28.388 f000272] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.388 f000272] [hud_rendering_system::render, entity] id: 9
+[19:47:28.388 f000272] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.405 f000273] [hud::render] frame: 274
+[19:47:28.405 f000273] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.405 f000273] [hud_rendering_system::render, entity] id: 9
+[19:47:28.405 f000273] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.421 f000274] [hud::render] frame: 275
+[19:47:28.421 f000274] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.421 f000274] [hud_rendering_system::render, entity] id: 9
+[19:47:28.421 f000274] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.438 f000275] [hud::render] frame: 276
+[19:47:28.438 f000275] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.438 f000275] [hud_rendering_system::render, entity] id: 9
+[19:47:28.438 f000275] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.455 f000276] [hud::render] frame: 277
+[19:47:28.455 f000276] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.455 f000276] [hud_rendering_system::render, entity] id: 9
+[19:47:28.455 f000276] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.471 f000277] [hud::render] frame: 278
+[19:47:28.471 f000277] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.471 f000277] [hud_rendering_system::render, entity] id: 9
+[19:47:28.471 f000277] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.488 f000278] [hud::render] frame: 279
+[19:47:28.488 f000278] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.488 f000278] [hud_rendering_system::render, entity] id: 9
+[19:47:28.488 f000278] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.505 f000279] [hud::render] frame: 280
+[19:47:28.505 f000279] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.505 f000279] [hud_rendering_system::render, entity] id: 9
+[19:47:28.505 f000279] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.521 f000280] [hud::render] frame: 281
+[19:47:28.521 f000280] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.521 f000280] [hud_rendering_system::render, entity] id: 9
+[19:47:28.521 f000280] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.538 f000281] [hud::render] frame: 282
+[19:47:28.538 f000281] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.538 f000281] [hud_rendering_system::render, entity] id: 9
+[19:47:28.538 f000281] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.555 f000282] [hud::render] frame: 283
+[19:47:28.555 f000282] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.555 f000282] [hud_rendering_system::render, entity] id: 9
+[19:47:28.555 f000282] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.571 f000283] [hud::render] frame: 284
+[19:47:28.572 f000283] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.572 f000283] [hud_rendering_system::render, entity] id: 9
+[19:47:28.572 f000283] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.588 f000284] [hud::render] frame: 285
+[19:47:28.588 f000284] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.588 f000284] [hud_rendering_system::render, entity] id: 9
+[19:47:28.588 f000284] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.605 f000285] [hud::render] frame: 286
+[19:47:28.605 f000285] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.605 f000285] [hud_rendering_system::render, entity] id: 9
+[19:47:28.605 f000285] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.622 f000286] [hud::render] frame: 287
+[19:47:28.622 f000286] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.622 f000286] [hud_rendering_system::render, entity] id: 9
+[19:47:28.622 f000286] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.638 f000287] [hud::render] frame: 288
+[19:47:28.638 f000287] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.638 f000287] [hud_rendering_system::render, entity] id: 9
+[19:47:28.638 f000287] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.655 f000288] [hud::render] frame: 289
+[19:47:28.655 f000288] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.655 f000288] [hud_rendering_system::render, entity] id: 9
+[19:47:28.655 f000288] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.671 f000289] [hud::render] frame: 290
+[19:47:28.672 f000289] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.672 f000289] [hud_rendering_system::render, entity] id: 9
+[19:47:28.672 f000289] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.688 f000290] [hud::render] frame: 291
+[19:47:28.688 f000290] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.688 f000290] [hud_rendering_system::render, entity] id: 9
+[19:47:28.688 f000290] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.705 f000291] [hud::render] frame: 292
+[19:47:28.705 f000291] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.705 f000291] [hud_rendering_system::render, entity] id: 9
+[19:47:28.705 f000291] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.721 f000292] [hud::render] frame: 293
+[19:47:28.722 f000292] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.722 f000292] [hud_rendering_system::render, entity] id: 9
+[19:47:28.722 f000292] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.738 f000293] [hud::render] frame: 294
+[19:47:28.738 f000293] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.738 f000293] [hud_rendering_system::render, entity] id: 9
+[19:47:28.738 f000293] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.755 f000294] [hud::render] frame: 295
+[19:47:28.755 f000294] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.755 f000294] [hud_rendering_system::render, entity] id: 9
+[19:47:28.755 f000294] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.771 f000295] [hud::render] frame: 296
+[19:47:28.772 f000295] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.772 f000295] [hud_rendering_system::render, entity] id: 9
+[19:47:28.772 f000295] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.788 f000296] [hud::render] frame: 297
+[19:47:28.788 f000296] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.788 f000296] [hud_rendering_system::render, entity] id: 9
+[19:47:28.788 f000296] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.805 f000297] [hud::render] frame: 298
+[19:47:28.805 f000297] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.805 f000297] [hud_rendering_system::render, entity] id: 9
+[19:47:28.805 f000297] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.821 f000298] [hud::render] frame: 299
+[19:47:28.822 f000298] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.822 f000298] [hud_rendering_system::render, entity] id: 9
+[19:47:28.822 f000298] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.838 f000299] [hud::render] frame: 300
+[19:47:28.838 f000299] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.838 f000299] [hud_rendering_system::render, entity] id: 9
+[19:47:28.838 f000299] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.855 f000300] [hud::render] frame: 301
+[19:47:28.855 f000300] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.855 f000300] [hud_rendering_system::render, entity] id: 9
+[19:47:28.855 f000300] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.871 f000301] [hud::render] frame: 302
+[19:47:28.871 f000301] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.872 f000301] [hud_rendering_system::render, entity] id: 9
+[19:47:28.872 f000301] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.888 f000302] [hud::render] frame: 303
+[19:47:28.888 f000302] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.888 f000302] [hud_rendering_system::render, entity] id: 9
+[19:47:28.888 f000302] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.905 f000303] [hud::render] frame: 304
+[19:47:28.905 f000303] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.905 f000303] [hud_rendering_system::render, entity] id: 9
+[19:47:28.905 f000303] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.921 f000304] [hud::render] frame: 305
+[19:47:28.922 f000304] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.922 f000304] [hud_rendering_system::render, entity] id: 9
+[19:47:28.922 f000304] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.938 f000305] [hud::render] frame: 306
+[19:47:28.938 f000305] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.938 f000305] [hud_rendering_system::render, entity] id: 9
+[19:47:28.938 f000305] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.955 f000306] [hud::render] frame: 307
+[19:47:28.955 f000306] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.955 f000306] [hud_rendering_system::render, entity] id: 9
+[19:47:28.955 f000306] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.971 f000307] [hud::render] frame: 308
+[19:47:28.972 f000307] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.972 f000307] [hud_rendering_system::render, entity] id: 9
+[19:47:28.972 f000307] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:28.988 f000308] [hud::render] frame: 309
+[19:47:28.988 f000308] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:28.988 f000308] [hud_rendering_system::render, entity] id: 9
+[19:47:28.988 f000308] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.005 f000309] [hud::render] frame: 310
+[19:47:29.005 f000309] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.005 f000309] [hud_rendering_system::render, entity] id: 9
+[19:47:29.005 f000309] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.021 f000310] [hud::render] frame: 311
+[19:47:29.021 f000310] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.021 f000310] [hud_rendering_system::render, entity] id: 9
+[19:47:29.022 f000310] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.038 f000311] [hud::render] frame: 312
+[19:47:29.038 f000311] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.038 f000311] [hud_rendering_system::render, entity] id: 9
+[19:47:29.038 f000311] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.055 f000312] [hud::render] frame: 313
+[19:47:29.055 f000312] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.055 f000312] [hud_rendering_system::render, entity] id: 9
+[19:47:29.055 f000312] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.071 f000313] [hud::render] frame: 314
+[19:47:29.072 f000313] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.072 f000313] [hud_rendering_system::render, entity] id: 9
+[19:47:29.072 f000313] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.088 f000314] [hud::render] frame: 315
+[19:47:29.088 f000314] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.088 f000314] [hud_rendering_system::render, entity] id: 9
+[19:47:29.088 f000314] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.105 f000315] [hud::render] frame: 316
+[19:47:29.105 f000315] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.105 f000315] [hud_rendering_system::render, entity] id: 9
+[19:47:29.105 f000315] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.121 f000316] [hud::render] frame: 317
+[19:47:29.122 f000316] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.122 f000316] [hud_rendering_system::render, entity] id: 9
+[19:47:29.122 f000316] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.138 f000317] [hud::render] frame: 318
+[19:47:29.138 f000317] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.138 f000317] [hud_rendering_system::render, entity] id: 9
+[19:47:29.138 f000317] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.155 f000318] [hud::render] frame: 319
+[19:47:29.155 f000318] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.155 f000318] [hud_rendering_system::render, entity] id: 9
+[19:47:29.155 f000318] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.171 f000319] [hud::render] frame: 320
+[19:47:29.172 f000319] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.172 f000319] [hud_rendering_system::render, entity] id: 9
+[19:47:29.172 f000319] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.188 f000320] [hud::render] frame: 321
+[19:47:29.188 f000320] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.188 f000320] [hud_rendering_system::render, entity] id: 9
+[19:47:29.188 f000320] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.205 f000321] [hud::render] frame: 322
+[19:47:29.205 f000321] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.205 f000321] [hud_rendering_system::render, entity] id: 9
+[19:47:29.205 f000321] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.221 f000322] [hud::render] frame: 323
+[19:47:29.221 f000322] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.222 f000322] [hud_rendering_system::render, entity] id: 9
+[19:47:29.222 f000322] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.238 f000323] [hud::render] frame: 324
+[19:47:29.238 f000323] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.238 f000323] [hud_rendering_system::render, entity] id: 9
+[19:47:29.238 f000323] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.255 f000324] [hud::render] frame: 325
+[19:47:29.255 f000324] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.255 f000324] [hud_rendering_system::render, entity] id: 9
+[19:47:29.255 f000324] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.271 f000325] [hud::render] frame: 326
+[19:47:29.271 f000325] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.272 f000325] [hud_rendering_system::render, entity] id: 9
+[19:47:29.272 f000325] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.288 f000326] [hud::render] frame: 327
+[19:47:29.289 f000326] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.289 f000326] [hud_rendering_system::render, entity] id: 9
+[19:47:29.289 f000326] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.305 f000327] [hud::render] frame: 328
+[19:47:29.305 f000327] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.305 f000327] [hud_rendering_system::render, entity] id: 9
+[19:47:29.305 f000327] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.321 f000328] [hud::render] frame: 329
+[19:47:29.321 f000328] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.322 f000328] [hud_rendering_system::render, entity] id: 9
+[19:47:29.322 f000328] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.338 f000329] [hud::render] frame: 330
+[19:47:29.339 f000329] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.339 f000329] [hud_rendering_system::render, entity] id: 9
+[19:47:29.339 f000329] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.355 f000330] [hud::render] frame: 331
+[19:47:29.355 f000330] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.355 f000330] [hud_rendering_system::render, entity] id: 9
+[19:47:29.355 f000330] [hud_rendering_system::render, selectable] id: 9, is_selected: 0
+[19:47:29.372 f000331] [hud::render] frame: 332
+[19:47:29.372 f000331] [hud_rendering_system::render] hud components: 1, view_frame: (320.000000, 180.000000)
+[19:47:29.372 f000331] [hud_rendering_system::render, entity] id: 9
+[19:47:29.372 f000331] [hud_rendering_system::render, selectable] id: 9, is_selected: 0

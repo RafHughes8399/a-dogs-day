@@ -97,18 +97,25 @@ link_libraries(raylib)
 
 add_library(raglib src/engine/raglib.cpp)
 link_libraries(raglib)
+
 add_library(debug_log_interface src/engine/logger/debug_log_interface.cpp)
 link_libraries(debug_log_interface)
 
 add_library(debug_logger src/engine/logger/debug_logger.cpp)
 link_libraries(debug_logger)
+
 add_library(events src/engine/events/events.cpp)
 link_libraries(events)
 
 add_library(queries src/engine/queries/queries.cpp)
 link_libraries(queries)
+
 add_library(item_stack src/engine/structures/item_stack.cpp)
 link_libraries(item_stack)
+
+add_library(recipe src/engine/structures/recipe.cpp)
+link_libraries(recipe)
+
 add_library(factories
             src/entities/factories/dog_factory.cpp
             src/entities/factories/station_factory.cpp
@@ -137,7 +144,9 @@ add_library(components
   src/engine/components/selectable_component.cpp
   src/engine/components/state_machine_component.cpp
   src/engine/components/storage_component.cpp
-  src/engine/components/food_component.cpp)
+  src/engine/components/food_component.cpp
+  src/engine/components/recipes_component.cpp
+  src/engine/components/hud_component.cpp)
 link_libraries(components)
 
 add_library(systems
@@ -155,7 +164,9 @@ add_library(systems
   src/engine/systems/selection_system.cpp
   src/engine/systems/animation_system.cpp
   src/engine/systems/state_machine_system.cpp
-  src/engine/systems/item_system.cpp)
+  src/engine/systems/item_system.cpp
+  src/engine/systems/hud.cpp
+  src/engine/systems/hud_rendering_system.cpp)
 link_libraries(systems)
 
 add_library(animation src/rendering/animation.cpp src/rendering/animation_builders.cpp)
@@ -199,7 +210,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
-  raglib events queries states components systems animation sprite item menu hud hitbox texture
+  raglib events queries states recipe components systems animation sprite item menu hud hitbox texture
   entities factories render_layer quadtree graph debug_log_interface debug_logger game ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
@@ -240,6 +251,7 @@ add_executable(tests
   tests/waiter_idling_scenarios.cpp
   tests/interaction_scenarios.cpp
   tests/state_machine_scenarios.cpp
+  tests/hud_scenarios.cpp
 )
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the

@@ -2,6 +2,11 @@
 #include "config.h"
 #include "entity.h"
 #include "testing_helpers.hpp"
+#include <raylib.h>
+
+Camera2D& game::game::get_camera(){
+    return rendering_.get_camera();
+}
 void game::game::init(){
     // toggle subscribes the log handler, so it has to come first or every step
     // below logs into nothing
@@ -40,6 +45,8 @@ void game::game::init(){
     for(int lasagna = 0; lasagna < game_config::counter_start_stock; ++lasagna){
         systems::item_system::get_instance().place_item(counter, entity_config::foods::lasagna);
     }
+    systems::item_system::get_instance().place_item(counter, entity_config::foods::espresso);
+    systems::item_system::get_instance().place_item(counter, entity_config::foods::cutlets);
     auto food_items = component_managers::storage_manager_.get_component(counter)->size();
     /** a bit messy but we're going to create some items for the food counter to store */
     debug::log("[game::init, build counter]: id " + std::to_string(counter) + " with food items:  " + std::to_string(food_items));
@@ -47,6 +54,9 @@ void game::game::init(){
     lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 10});
     lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
     lifespan_.create_table(entity_config::tables::tiled_table,Vector2{level_config::edge_weight * 10, level_config::edge_weight * 8});
+   
+   lifespan_.create_stove(Vector2{level_config::edge_weight * 14, level_config::edge_weight * 8});
+   
     //* ------------------------------------------------- WAITER CREATE---------------------------------------------------------------------
     lifespan_.create_waiter_dog(entity_config::waiters::gianluca, Vector2 {level_config::edge_weight * 13, level_config::edge_weight * 6});
     lifespan_.create_waiter_dog(entity_config::waiters::lionel, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 9});
@@ -89,6 +99,7 @@ void game::game::update(float delta){
     interaction_.update(delta);
     state_machine_.update(delta);
     animation_.update(delta);
+    hud_.update(delta);
 
     frame_count_++;
     if(frame_count_ == game_config::twenty_seconds){
@@ -100,6 +111,7 @@ void game::game::update(float delta){
 void game::game::render(float delta){
     (void) delta;
     rendering_.render(frame_count_);
+    hud_.render(frame_count_);
     DrawFPS(25, 25);
     return;
 }

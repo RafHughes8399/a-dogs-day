@@ -128,20 +128,20 @@ SCENARIO("pushing onto a counter whose head is a different item swaps the sprite
         push(counter_id, entity_config::foods::lasagna);
         REQUIRE(food_slot(counter_id)->get_active_index() == entity_config::foods::lasagna);
 
-        WHEN("a coffee is pushed on top"){
-            push(counter_id, entity_config::foods::coffee);
+        WHEN("a espresso is pushed on top"){
+            push(counter_id, entity_config::foods::espresso);
 
             THEN("the stack holds two items"){
                 REQUIRE(storage_of(counter_id)->size() == 2);
-                REQUIRE(storage_of(counter_id)->head().get_id() == entity_config::foods::coffee);
+                REQUIRE(storage_of(counter_id)->head().get_id() == entity_config::foods::espresso);
                 REQUIRE(storage_of(counter_id)->head().get_count() == 1);
             }
             THEN("the slot count is unchanged - the index moves, not the slot"){
                 REQUIRE(slot_count(counter_id) == 2);
             }
-            THEN("the food slot renders coffee"){
+            THEN("the food slot renders espresso"){
                 REQUIRE(food_slot(counter_id)->get_active_index()
-                    == entity_config::foods::coffee);
+                    == entity_config::foods::espresso);
             }
             THEN("the draw offset survives the swap"){
                 auto offset = food_slot(counter_id)->get_active_sprite().get_draw_position_offset();
@@ -184,21 +184,21 @@ SCENARIO("popping a counter whose count does not reach zero keeps the item",
 
 SCENARIO("popping the last of an item drops to the item beneath it",
     "[counter][storage][pop]"){
-    GIVEN("a counter holding a lasagna with a coffee on top"){
+    GIVEN("a counter holding a lasagna with a espresso on top"){
         testing::ecs_test_game game;
         auto counter_id = game.create_food_counter(counter_spot);
         push(counter_id, entity_config::foods::lasagna);
-        push(counter_id, entity_config::foods::coffee);
+        push(counter_id, entity_config::foods::espresso);
         REQUIRE(storage_of(counter_id)->size() == 2);
 
-        WHEN("the coffee is taken"){
+        WHEN("the espresso is taken"){
             auto taken = pop(counter_id);
 
-            THEN("the take reports the coffee"){
+            THEN("the take reports the espresso"){
                 REQUIRE(taken.has_value());
-                REQUIRE(taken.value() == entity_config::foods::coffee);
+                REQUIRE(taken.value() == entity_config::foods::espresso);
             }
-            THEN("the coffee item is popped, leaving the lasagna"){
+            THEN("the espresso item is popped, leaving the lasagna"){
                 REQUIRE(storage_of(counter_id)->size() == 1);
                 REQUIRE(storage_of(counter_id)->head().get_id() == entity_config::foods::lasagna);
             }
@@ -234,13 +234,13 @@ SCENARIO("popping a counter empty removes the food slot", "[counter][storage][po
                 REQUIRE(food_slot(counter_id) == nullptr);
             }
             AND_WHEN("food is pushed again"){
-                push(counter_id, entity_config::foods::coffee);
+                push(counter_id, entity_config::foods::espresso);
 
                 THEN("the slot is rebuilt at counter_food"){
                     REQUIRE(slot_count(counter_id) == 2);
                     REQUIRE(food_slot(counter_id) != nullptr);
                     REQUIRE(food_slot(counter_id)->get_active_index()
-                        == entity_config::foods::coffee);
+                        == entity_config::foods::espresso);
                 }
                 THEN("the rebuilt sprite still carries the draw offset"){
                     auto offset = food_slot(counter_id)->get_active_sprite().get_draw_position_offset();
@@ -332,13 +332,13 @@ SCENARIO("an item id with no sprite is stored but not drawn", "[counter][storage
                 REQUIRE(food_slot(counter_id) == nullptr);
             }
             AND_WHEN("a real food is pushed on top"){
-                push(counter_id, entity_config::foods::coffee);
+                push(counter_id, entity_config::foods::espresso);
 
-                THEN("the slot appears at counter_food and renders coffee"){
+                THEN("the slot appears at counter_food and renders espresso"){
                     REQUIRE(slot_count(counter_id) == 2);
                     REQUIRE(food_slot(counter_id) != nullptr);
                     REQUIRE(food_slot(counter_id)->get_active_index()
-                        == entity_config::foods::coffee);
+                        == entity_config::foods::espresso);
                 }
             }
         }

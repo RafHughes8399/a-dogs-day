@@ -75,6 +75,31 @@ hitbox::hitbox hitbox_builders::build_stove_hitbox(Vector2 position){
         entity_config::stove_attributes[entity_config::attributes::frame_width],
         entity_config::stove_attributes[entity_config::attributes::frame_height]);
 }
+hitbox::hitbox hitbox_builders::build_oven_hitbox(Vector2 position){
+    return build_hitbox(position,
+        entity_config::oven_attributes[entity_config::attributes::frame_width],
+        entity_config::oven_attributes[entity_config::attributes::frame_height]);
+}
+hitbox::hitbox hitbox_builders::build_espresso_station_hitbox(Vector2 position){
+    return build_hitbox(position,
+        entity_config::espresso_station_attributes[entity_config::attributes::frame_width],
+        entity_config::espresso_station_attributes[entity_config::attributes::frame_height]);
+}
+hitbox::hitbox hitbox_builders::build_mini_fridge_hitbox(Vector2 position){
+    return build_hitbox(position,
+        entity_config::mini_fridge_attributes[entity_config::attributes::frame_width],
+        entity_config::mini_fridge_attributes[entity_config::attributes::frame_height]);
+}
+hitbox::hitbox hitbox_builders::build_bush_hitbox(Vector2 position){
+    return build_hitbox(position,
+        entity_config::bush_attributes[entity_config::attributes::frame_width],
+        entity_config::bush_attributes[entity_config::attributes::frame_height]);
+}
+hitbox::hitbox hitbox_builders::build_chopping_board_hitbox(Vector2 position){
+    return build_hitbox(position,
+        entity_config::chopping_board_attributes[entity_config::attributes::frame_width],
+        entity_config::chopping_board_attributes[entity_config::attributes::frame_height]);
+}
 hitbox::hitbox hitbox_builders::build_food_hitbox(Vector2 position){
     return build_hitbox(position, entity_config::food_width, entity_config::food_height);
 }

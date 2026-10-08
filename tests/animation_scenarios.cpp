@@ -64,7 +64,7 @@ namespace {
         events::global_dispatcher_.process_events(0.0f);
     }
 
-    const size_t slot = entity_config::dog_sprite_slots::dog_head;
+    const size_t slot = entity_config::dog_sprite_slots::dog_body;
 
     const float part_width = 20.0f;
     const float part_height = 24.0f;

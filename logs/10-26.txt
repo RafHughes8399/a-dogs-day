@@ -1,0 +1,203 @@
+
+cooking stations
+we have the stove, the oven, the coffee station, the mini fridge, the bush, and the chopping board
+that's quite extensive, a fair list. a sufficient list
+
+what does a cooking station need ? 
+-> a list of food items that the station can prepare [ defined as config listys, like interactor interactee]
+-> station components [food id -> food builder call, will need a food factory]
+-> varied sizes, will define as needed, for now keep the basic station sizes
+-> state machine unworked <-> worked [adjusts update behaviour essentially
+-> std::optional<size t> selected_food_id]
+
+what does a cooking station do
+-> prepare food
+    -> a consequence the dog interaction and the user selection [ user selection can follow, that is a part of other infrastructure to be built]
+-> store food
+    -> storage component simple enough - ish, going to be slightly more complex than that. should store numbers  
+    -> 
+
+
+what interactions are there that would involve the 
+-> player dog interactor cooking station interactee [on interaction work station, on stop interaction unwork station]
+-> and then the hud element but that is sort of its own slice and a  half 
+
+
+-> currently we just need to build the storing and food builder capcity and then define the dog interaction with it. and then the hud component ties it together with actually triggering the food selction to build
+-> becuase we woill need some kind of niche storage to track this here, each food you can cook should track the number of that food, so every build call you increment for the food_id 
+-> and then every time you export,  you clear  that number, simples, so we can sepearte the food into a struct of id, builder, count . that can be our little struct
+-> AND DURATION, FOOD ITEMS NEED A DURATION TO COOK which can be a value read from config 
+
+ok and the state machine is relatively simple, just a switch flick on interaction
+and selected food id is how you pick what to build
+
+
+
+more concretely:
+recipe  : 
+    food id, 
+    count
+    duration_
+    elapsed
+
+    cook() // incremenets the duration 
+    get_id()
+    get_count()
+    materialise() // the creating of the actual food entities to place on a counter, would create some like event or something i think wit hthe id, coutn and position
+    // that way the systems can actually build 
+
+cooking stations have a recipes component that holds a list of recipes
+amongst the rest of the station components 
+
+will need a recipe manager for sure ? yeah to interact, and access the recipes
+
+
+ok lets go station by station again and then recipe by recipe
+stove,
+    -> 
+the oven,
+  
+the coffee station,
+   
+   
+the mini fridge,
+    
+    
+the bush,
+     
+and the chopping board
+
+so the first necssary slice is the recipe structure the food factory exists already
+-> the recipe would need the builder when exporting, and it would build x times where x is the count, so 
+its slightly different but still retains the outline previsouly identified 
+-> doesn't need the builder i think 
+
+
+ok so we need the recipe for the cooking station which can assign foods that a station can make 
+
+the recipe doesnt need a system. it is the cooking station udpate that would then be like if (active, recipes->[selected_recipe]->cook()
+
+
+ok so the base builder is done, now we need to:
+    -> define the ecs builders for the stations 
+    -> define the attributes for the stations
+    -> define the textures for the stations 
+    -> define the sprite and hitbox builders for the stations 
+    -> define the factory builders for the statsions
+    -> define the lifespane system builders for the stations 
+    -> define the dog station interaction behaviorus 
+    -> and define the state machine for the station [worked / unworked]
+    -> then define the recipes for each station
+    -> then split the dog art 
+    -> then add station art
+
+    -> stations change appearance as you unlock recipes
+
+    thats a nice little slice, thats the construction adn the setup given what we currently have
+t
+
+    -> we've got to do the sove
+
+    -> actually define the interaciton behaviour
+    -> basic basic art
+    -> definfethe interaciton cleanup [ i think interactions in general will need to be extended to have a parallel on interaction finish
+     currently just the teardown occurs but no meaningful state change occurs]
+
+     -> i could define another parrelel, no because i dont know what interaction is being performed 
+     -> i do have the interactor and i do have the interactee
+     -> so you can type check 
+     -> or you can just emit an interaction ended event, then the state machine can call the necessary transitions
+     -> like it can typecheck for what the entity is and then call the necessary transition ? i think that could work, its a simple enough switch case
+     -> like end of the day its not that huge of a system so this solution can work
+
+     then boom you can test
+
+     -. or maybe check the type of the ineteractable during the teardown adn then emit the event if it is a cooking station
+     -> either way the check has to exist somewhere 
+
+     -> CHECK THE STATION INTERACTABLE BUILD IS IT BEING GIVEN THE INTERACTIONS ? ?? ? ?? ?  
+
+    -> for now recipe cook duratiosn are all the same, for ismplicity of just getting the build off the ground, 
+    can change in the future if need be
+     -> define the recipes, can just be enum definitions for now  X 
+     -> actually define the interaction state change X 
+     -> scaffold the nine sprite for the hud element
+        -> what does this look like, read an article
+            -> the four corners are fixed in size
+            -> the centre scales both x and y
+            -> the top and bottom scale on x 
+            -> the left and right scale on y n  
+
+
+            -> essentially the hud sprite needs to be scaled WITH DRAWTEXTUREPRO
+            -> the hud needs the base scaled sprite, then the hud elements [buttons, text, icons, etc]
+            -> 
+
+            -> huds are eventually attached to an entity ? as a hud component ? 
+            -> or are they relegated some own thing. they should be their own thing otherwise they may get mixed up with the entities in the quadtrree
+            -> or should just have their own, like they operate on their own layer, 
+            -> there is the hud and the entities. they giuve each other interfaces to interact with
+            -> but the hud should be treated sepeartely at the end of the day
+            -> the hud component can jsut store the details and send the requests to show and hide the hud 
+            -> and then the hud system can be seperately responsible for determining clicks and user interactions
+            -> to then perform certain actions. but then it may need to be tied top an entity in some circumstances
+
+
+            -> kind of like interactions in a wayi suppose
+            -> first we can just define the nine-sprite that is all we need for now
+            -> that is what we know is needed
+
+
+            -> ok we've already given the ability of a sprite to scale
+            -> so now we just define the nine-sprite
+            -> nine sprite organises nine indvidual sprites, and draws them at their offset based 
+            on their position
+     -> split the dog art, setup that building and rendering
+    -> ray gui icons ? 
+
+    -> need to build the hud elements
+        -> the art for the hud elements
+        -> then the specific sizes for each entity
+        -> then attaching it to an entity 
+        -> and the conditional rendering
+    -> need to attach them to entities
+    -> need to be able to interact with them via the cursor
+    -> need to be able to perform some function
+     
+
+     -> ok simple basic implementation for now for the hud manager, just the rendering side of it
+     -> selection system needs to trigger the hud state change for whatever the entity is when select and unselect is called
+     -> maybe the hud element can jsut have a flag, like its simple enough and there wont be that many so its fine right ? like 
+     otherwise all i can think of is like a state machien for the hud but that is an over-engineered flag essentially 
+        -> is it sufficient t
+
+        -> define the hud rectnalgles in the config 
+        -> then assign to the builder
+
+    [ --------- here as of 7 / 10 ------------ ]
+    -> fix visual issue with hud nine sprite
+    -> resize for the station, should be able to fit 3 - 4 recipes [so if each food icon is 0.6, maybe we can scale down to 0.25 and then we can make it 1.25 * 1.25 edge to have like a buffer ] in the future if > 4 recipes, we just paginate
+    -> raylib random isntead of the rand generator c++ x 
+    -> refactor to use camera2D so you can have zoom   x 
+        -> the render system should own the camera  x 
+        -> although if the hud system needs it to then a pointer could work 
+        -> no the render system owns the camera, and then provides accessors
+        -> i would say the hud render system 
+
+        -> change move frame to be move_camera which then recalcuates the view_frame and when zoom also
+        -> exapnd control config to support scroll input detectio x n
+        -> bound camera movement and camera zooming  x 
+    -> zoom controls with scroll wheel x 
+    -> storing hud elements in their own spatial system, one level above and separate from other entities to avoid misclicks 
+    -> and split the dog art, i know you dont want to but you need to x
+    
+    -> resize elements so it can fit a page of recipes, assign to all stations, should be built with the same dimesions considering they are the same
+    -> define hud spatial system , should be relatively copy pastable and then have left click check for hud clicks too 
+    -> dog art split x 
+    -> no the hud spatial system doesnt really actually work without buttons and stuff to click on
+    -> so we need those things first ok lets 
+    [ ------------- this is a fiar slice to stop at for the current branch ---------]
+
+    -> then buttons [maybe this is where the clickable component comes in, because you can then define an on_click behaviour]
+    -> a button is an entity with a positional, renderable, collision and clickable. it is attached to a hud element
+    -> maybe should be its own structure like a nine_sprite ? 

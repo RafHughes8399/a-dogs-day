@@ -7,8 +7,8 @@
 #include "texture.h"
 #include "debug_log_interface.h"
 sprite::sprite sprite_builders::build_sprite(Texture2D texture, float frame_width, float frame_height, float frames, float animations,
-    Vector2 draw_position_offset, Color tint){
-    return sprite::sprite(texture, frame_width, frame_height, frames, animations, draw_position_offset, tint);
+    Vector2 draw_position_offset){
+    return sprite::sprite(texture, frame_width, frame_height, frames, animations, draw_position_offset);
 }
 sprite::sprite sprite_builders::build_cursor_sprite(){
     auto cursor_texture = textures::textures_.get_texture(textures::cursor, entity_config::cursor_path);
@@ -53,18 +53,14 @@ std::vector<std::vector<sprite::sprite>> sprite_builders::build_dog_part_layers(
     const int texture_keys[entity_config::dog_sprite_slots_size][entity_config::dog_part_directions_size],
     float expected_total_width){
     std::vector<std::vector<sprite::sprite>> layers;
-    float cursor = 0.0f;
-    float anchor = 0.0f;
 
     for(size_t slot = 0; slot < entity_config::dog_sprite_slots_size; ++slot){
         const auto& part = parts[slot];
         auto width = part.attributes[entity_config::attributes::frame_width];
-        if(part.advances){
-            anchor = cursor;
-            cursor += width;
-        }
-        auto x_left = anchor + part.offset.x;
+        auto x_left = part.offset.x;
         auto x_right = expected_total_width - x_left - width;
+        assert(x_left >= 0.0f and x_left + width <= expected_total_width + 0.01f
+            and "dog part must sit inside the across hitbox width");
 
         auto frame_height = part.attributes[entity_config::attributes::frame_height];
 
@@ -77,8 +73,6 @@ std::vector<std::vector<sprite::sprite>> sprite_builders::build_dog_part_layers(
             Vector2{x_right, part.offset.y}));
         layers.push_back(std::move(directions));
     }
-    assert(std::fabs(cursor - expected_total_width) < 0.01f
-        and "dog part widths must sum to the across hitbox width");
     return layers;
 }
 std::vector<sprite::sprite> sprite_builders::build_gianluca_sprites(){
@@ -97,14 +91,12 @@ std::vector<sprite::sprite> sprite_builders::build_lionel_sprites(){
         entity_config::lionel_right_path, entity_config::lionel_attributes));
     return sprites;
 }
-sprite::sprite sprite_builders::build_test_decoration_sprite(const float attributes[entity_config::attributes::size], Color tint){
+sprite::sprite sprite_builders::build_test_decoration_sprite(const float attributes[entity_config::attributes::size]){
     return build_sprite(textures::textures_.get_texture(textures::test_decoration, entity_config::test_decoration_path),
         attributes[entity_config::attributes::frame_width],
         attributes[entity_config::attributes::frame_height],
         attributes[entity_config::attributes::frames],
-        attributes[entity_config::attributes::animations],
-        Vector2Zero(),
-        tint);
+        attributes[entity_config::attributes::animations]);
 }
 sprite::sprite sprite_builders::build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size],
     Vector2 draw_position_offset){
@@ -128,7 +120,7 @@ sprite::sprite sprite_builders::build_gargoyle(){
         return build_decoration_sprite(textures::gargoyle_void, entity_config::gargoyle_void_decoration_path, entity_config::gargoyle_decoration_attributes);
 }
 sprite::sprite sprite_builders::build_table_sprite(){
-    return build_test_decoration_sprite(entity_config::table_attributes, RED);
+    return build_test_decoration_sprite(entity_config::table_attributes);
 }
     sprite::sprite sprite_builders::build_dining_table_sprite(){
         return build_decoration_sprite(textures::dining_table, entity_config::dining_table_station_path, entity_config::dining_table_attributes);
@@ -140,29 +132,80 @@ sprite::sprite sprite_builders::build_table_sprite(){
         return build_decoration_sprite(textures::food_counter, entity_config::food_counter_station_path, entity_config::food_counter_attributes);
     }
 sprite::sprite sprite_builders::build_dishwasher_sprite(){
-    return build_test_decoration_sprite(entity_config::dishwasher_attributes, PURPLE);
+    return build_test_decoration_sprite(entity_config::dishwasher_attributes);
 }
 sprite::sprite sprite_builders::build_stove_sprite(){
-    return build_test_decoration_sprite(entity_config::stove_attributes, ORANGE);
+    return build_decoration_sprite(textures::stove, entity_config::stove_station_path, entity_config::stove_attributes);
+}
+sprite::sprite sprite_builders::build_oven_sprite(){
+    return build_decoration_sprite(textures::oven, entity_config::oven_station_path, entity_config::oven_attributes);
+}
+sprite::sprite sprite_builders::build_espresso_station_sprite(){
+    return build_decoration_sprite(textures::espresso_station, entity_config::espresso_station_path, entity_config::espresso_station_attributes);
+}
+sprite::sprite sprite_builders::build_mini_fridge_sprite(){
+    return build_decoration_sprite(textures::mini_fridge, entity_config::mini_fridge_station_path, entity_config::mini_fridge_attributes);
+}
+sprite::sprite sprite_builders::build_bush_sprite(){
+    return build_decoration_sprite(textures::bush, entity_config::bush_station_path, entity_config::bush_attributes);
+}
+sprite::sprite sprite_builders::build_chopping_board_sprite(){
+    return build_decoration_sprite(textures::chopping_board, entity_config::chopping_board_station_path, entity_config::chopping_board_attributes);
 }
 sprite::sprite sprite_builders::build_food_sprite(){
-    return build_test_decoration_sprite(entity_config::test_food_attributes, RED);
+    return build_test_decoration_sprite(entity_config::test_food_attributes);
 }
 sprite::sprite sprite_builders::build_lasagna_sprite(){
     return build_decoration_sprite(textures::lasagna,
         entity_config::lasagna_food_path, entity_config::lasagna_attributes,
         entity_config::food_draw_offset);
 }
-sprite::sprite sprite_builders::build_coffee_sprite(){
-    return build_decoration_sprite(textures::coffee,
-        entity_config::coffee_food_path, entity_config::coffee_attributes,
+sprite::sprite sprite_builders::build_espresso_sprite(){
+    return build_decoration_sprite(textures::espresso,
+        entity_config::espresso_food_path, entity_config::espresso_attributes,
+        entity_config::food_draw_offset);
+}
+sprite::sprite sprite_builders::build_cutlets_sprite(){
+    return build_decoration_sprite(textures::cutlets,
+        entity_config::cutlets_food_path, entity_config::cutlets_attributes,
         entity_config::food_draw_offset);
 }
 std::vector<sprite::sprite> sprite_builders::build_food_sprites(){
     std::vector<sprite::sprite> sprites;
     sprites.push_back(build_lasagna_sprite());
-    sprites.push_back(build_coffee_sprite());
+    sprites.push_back(build_espresso_sprite());
+    sprites.push_back(build_cutlets_sprite());
     return sprites;
+}
+sprite::sprite sprite_builders::build_nine_corner_piece(){
+    return build_sprite(textures::textures_.get_texture(textures::nine_sprite_corner, hud_config::nine_sprite_corner_path), hud_config::nine_sprite_corner_width, hud_config::nine_sprite_corner_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
+}
+sprite::sprite sprite_builders::build_nine_centre_piece(){
+    return build_sprite(textures::textures_.get_texture(textures::nine_sprite_centre, hud_config::nine_sprite_centre_path), hud_config::nine_sprite_centre_width, hud_config::nine_sprite_centre_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
+}
+sprite::sprite sprite_builders::build_nine_vertical_piece(){
+    return build_sprite(textures::textures_.get_texture(textures::nine_sprite_vertical, hud_config::nine_sprite_vertical_path), hud_config::nine_sprite_corner_width, hud_config::nine_sprite_centre_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
+}
+sprite::sprite sprite_builders::build_nine_horizontal_piece(){
+    return build_sprite(textures::textures_.get_texture(textures::nine_sprite_horizontal, hud_config::nine_sprite_horizontal_path), hud_config::nine_sprite_centre_width, hud_config::nine_sprite_corner_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
+}
+sprite::nine_sprite sprite_builders::build_stove_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
+}
+sprite::nine_sprite sprite_builders::build_oven_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
+}
+sprite::nine_sprite sprite_builders::build_espresso_station_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
+}
+sprite::nine_sprite sprite_builders::build_mini_fridge_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
+}
+sprite::nine_sprite sprite_builders::build_bush_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
+}
+sprite::nine_sprite sprite_builders::build_chopping_board_nine_sprite(){
+    return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
 }
 sprite::sprite sprite_builders::build_background_sprite(){
     // TODO * load all the images, then patch them to add everything 
@@ -170,7 +213,6 @@ sprite::sprite sprite_builders::build_background_sprite(){
     std::string file_name_base = "../sprites/background-tile-";
     std::string file_extension = ".png";
     Image base = LoadImage(entity_config::background_path);
-    Rectangle base_rectangle = Rectangle{0.0f, 0.0f, static_cast<float>(base.width), static_cast<float>(base.height)};
     // * an inline load image here will suffice, its a one off, could be a helper if we need it to be
     for(size_t i = 1; i <= level_config::num_tiles; ++i){
         std::string path = file_name_base + std::to_string(i) + file_extension;

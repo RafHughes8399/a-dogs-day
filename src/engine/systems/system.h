@@ -11,6 +11,7 @@
 #include "render_layer.h"
 #include <array>
 #include <functional>
+#include <raymath.h>
 #include <utility>
 #include <raylib.h>
 #include "graph.h"
@@ -124,7 +125,7 @@ namespace systems{
             ~state_machine_system(){
                 event_interface::unsubscribe<events::dog_started_path>(started_path_handler_);
                 event_interface::unsubscribe<events::dog_completed_path>(completed_path_handler_);
-                event_interface::unsubscribe<events::interaction_started>(interaction_started_handler_);
+                event_interface::unsubscribe<events::player_work_station>(player_work_station_handler_);
                 event_interface::unsubscribe<events::interaction_finished>(interaction_finished_handler_);
                 event_interface::unsubscribe<events::order_served>(order_served_handler_);
                 event_interface::unsubscribe<events::food_dropped>(food_dropped_handler_);
@@ -144,7 +145,7 @@ namespace systems{
 
             void on_started_path(const events::dog_started_path& event);
             void on_completed_path(const events::dog_completed_path& event);
-            void on_interaction_started(const events::interaction_started& event);
+            void on_player_work_station(const events::player_work_station& event);
             void on_interaction_finished(const events::interaction_finished& event);
             void on_order_served(const events::order_served& event);
             void on_food_dropped(const events::food_dropped& event);
@@ -164,7 +165,7 @@ namespace systems{
             state_machine_system()
             : started_path_handler_([this](const events::dog_started_path& event) -> void{on_started_path(event);}),
             completed_path_handler_([this](const events::dog_completed_path& event) -> void{on_completed_path(event);}),
-            interaction_started_handler_([this](const events::interaction_started& event) -> void{on_interaction_started(event);}),
+            player_work_station_handler_([this](const events::player_work_station& event) -> void{on_player_work_station(event);}),
             interaction_finished_handler_([this](const events::interaction_finished& event) -> void{on_interaction_finished(event);}),
             order_served_handler_([this](const events::order_served& event) -> void{on_order_served(event);}),
             food_dropped_handler_([this](const events::food_dropped& event) -> void{on_food_dropped(event);}),
@@ -173,7 +174,7 @@ namespace systems{
             customer_left_handler_([this](const events::customer_dog_left& event) -> void{on_customer_left(event);}){
                 event_interface::subscribe<events::dog_started_path>(started_path_handler_);
                 event_interface::subscribe<events::dog_completed_path>(completed_path_handler_);
-                event_interface::subscribe<events::interaction_started>(interaction_started_handler_);
+                event_interface::subscribe<events::player_work_station>(player_work_station_handler_);
                 event_interface::subscribe<events::interaction_finished>(interaction_finished_handler_);
                 event_interface::subscribe<events::order_served>(order_served_handler_);
                 event_interface::subscribe<events::food_dropped>(food_dropped_handler_);
@@ -185,7 +186,7 @@ namespace systems{
 
             events::event_handler<events::dog_started_path> started_path_handler_;
             events::event_handler<events::dog_completed_path> completed_path_handler_;
-            events::event_handler<events::interaction_started> interaction_started_handler_;
+            events::event_handler<events::player_work_station> player_work_station_handler_;
             events::event_handler<events::interaction_finished> interaction_finished_handler_;
             events::event_handler<events::order_served> order_served_handler_;
             events::event_handler<events::food_dropped> food_dropped_handler_;
@@ -259,6 +260,7 @@ namespace systems{
 
             void build_control_map();
             void check_inputs(size_t id, std::vector<game_config::input>& controls, float delta);
+            void check_mouse_scroll(float time_delta);
             void dispatch(int key, int action, size_t id, float delta);
 
             // the actions, mirroring player::controls' default scheme
@@ -275,7 +277,7 @@ namespace systems{
             void select_dog();
             void switch_dog();
             void toggle_debug_logger();
-
+            void mouse_scroll(Vector2 scroll_delta, float time_delta);
             // * keyed on {key_, action_}, not the key alone - KEY_E is both
             // * key_hold_actions::edit_mode and key_press_actions::exit_edit, and
             // * MOUSE_BUTTON_LEFT is 0, which is also a legal KEY_* value, so a
@@ -351,6 +353,15 @@ namespace systems{
 
             size_t create_counter(size_t counter, Vector2 position);
             void destroy_counter(size_t id);
+
+            size_t create_cooking_station(size_t cooking_station, Vector2 position);
+            void destroy_cooking_station(size_t id);
+            size_t create_stove(Vector2 position);
+            size_t create_oven(Vector2 position);
+            size_t create_espresso_station(Vector2 position);
+            size_t create_mini_fridge(Vector2 position);
+            size_t create_bush(Vector2 position);
+            size_t create_chopping_board(Vector2 position);
 
             size_t create_food(size_t food, Vector2 position);
             void destroy_food(size_t id);
@@ -430,7 +441,8 @@ namespace systems{
                 customer_table_sit,
                 waiter_table_serve,
                 waiter_counter_pickup, 
-                waiter_counter_place_down
+                waiter_counter_place_down,
+            player_station_cook
             }), interactions_to_process_(),
             move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
             remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
@@ -449,6 +461,7 @@ namespace systems{
             static void waiter_table_serve(size_t interactor, size_t interactee, float delta);
             static void waiter_counter_pickup(size_t interactor, size_t interactee, float delta);
             static void waiter_counter_place_down(size_t interactor, size_t interactee, float delta);
+            static void player_station_cook(size_t interactor, size_t interactee, float delta);
             std::array<std::function<void(size_t, size_t, float)>, interaction_config::size> defined_interactions_;
             std::vector<interaction> interactions_to_process_;
             events::event_handler<events::move_entity> move_entity_handler_;
@@ -713,16 +726,19 @@ namespace systems{
             void render(int frame);
             void on_created_entity(const events::create_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
-            void move_frame(Vector2 move_delta);
+            void recalibrate_view_frame();
+            void move_camera(Vector2 move_delta);
+            void adjust_zoom(float zoom_delta);
             Vector2 screen_to_world(Vector2 screen_position);
             // teardown between test scenarios - the singleton outlives them
             void clear();
+            Rectangle get_view_frame(){
+                return view_frame_;
+            }
+            Camera2D& get_camera();
 #ifdef DOG_DAYS_TESTING
             render_layer::ecs_layer& get_layer(size_t layer){
                 return render_layers_[layer];
-            }
-            Rectangle get_view_frame(){
-                return view_frame_;
             }
 #endif
         private:
@@ -732,12 +748,18 @@ namespace systems{
                 : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
                 remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
                 view_frame_(Rectangle{0.0f, 0.0f, level_config::screen_width, level_config::screen_height}),
-                render_layers_(){
+                render_layers_(), camera_({0}){
                     event_interface::subscribe<events::create_entity>(create_entity_handler_);
                     event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
+                    camera_.offset = Vector2 {level_config::screen_width / 2, level_config::screen_height / 2};
+                    camera_.target = camera_.offset;
+                    camera_.rotation = 0.0f;
+                    camera_.zoom = 1.0f;
+                    recalibrate_view_frame();
                 }
 
             bool is_entity_in_frame(size_t id, Rectangle view_frame);
+            void clamp_target();
 
             events::event_handler<events::create_entity> create_entity_handler_;
             events::event_handler<events::remove_entity> remove_entity_handler_;
@@ -747,6 +769,7 @@ namespace systems{
 
             Rectangle view_frame_;
             render_layer::ecs_layer render_layers_[level_config::draw_layers::size];
+            Camera2D camera_;
     };
     class selection_system{
         // owns which entity is currently selected

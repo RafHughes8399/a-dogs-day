@@ -269,7 +269,7 @@ agent-owned toil sequence rather than the object-owned script as the eventual fo
 | | Option | Precedent | Fit |
 |---|---|---|---|
 | **A** | `interaction_system` binds, emits `dog_reached_station`, legacy `level`/`maitre_d`/`expediter` do the rest | the plan as written; the repo's own legacy path | smallest step; the ECS learns nothing; behaviour stays outside it |
-| **B** | Bind writes a one-frame `interaction_started` / `interaction_ended` marker component; downstream ECS systems query it. Fact event kept for the legacy seam | `WantsToMelee`; ECS event components; Overwatch | idiomatic; testable by inspecting components rather than trapping events; needs a one-frame clear pass |
+| **B** | Bind writes a one-frame `player_work_station` / `interaction_ended` marker component; downstream ECS systems query it. Fact event kept for the legacy seam | `WantsToMelee`; ECS event components; Overwatch | idiomatic; testable by inspecting components rather than trapping events; needs a one-frame clear pass |
 | **C** | `interactable_component` carries a behaviour id / tag; the system looks it up and dispatches | UE Behavior Definition; The Sims; Clockwork Empires | data-driven, but needs a registry — and both cited precedents report high cost |
 | **D** | Actor carries a job/toil sequence; "use station X" is one step; `state_machine_component` becomes the driver | RimWorld JobDriver; Minecraft Brain | best long-run fit for a management sim; largest step; subsumes B |
 | **E** | Spawn a short-lived *interaction entity* holding (actor, target, verb, elapsed) | occasional ECS practice; nearest published cousin is UE's claim handle | makes the interaction inspectable and gives duration a natural home; adds an entity lifetime to manage |

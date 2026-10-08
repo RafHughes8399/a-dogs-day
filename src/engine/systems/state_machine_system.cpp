@@ -11,10 +11,20 @@ void systems::state_machine_system::update(float delta){
 void systems::state_machine_system::transition(size_t entity, int transition,
     std::optional<size_t> payload){
     auto* component = component_managers::state_machine_manager_.get_component(entity);
-    if(component == nullptr){ return; }
+    if(component == nullptr){
+        debug::log("[state_machine_system::transition] entity: " + std::to_string(entity)
+            + ", transition: " + std::to_string(transition)
+            + " - NO STATE MACHINE, skipped");
+        return;
+    }
 
     auto& machine = component->get_machine();
-    if(not machine.can_transition(transition)){ return; }
+    if(not machine.can_transition(transition)){
+        debug::log("[state_machine_system::transition] entity: " + std::to_string(entity)
+            + ", transition: " + std::to_string(transition)
+            + " - NO EDGE out of state: " + std::to_string(machine.current()) + ", state unchanged");
+        return;
+    }
 
     auto previous = machine.current();
     // *this function handles the transition to and on transition to 
@@ -46,11 +56,26 @@ void systems::state_machine_system::on_started_path(const events::dog_started_pa
 void systems::state_machine_system::on_completed_path(const events::dog_completed_path& event){
     transition(event.get_id(), dog_config::path_finished);
 }
-void systems::state_machine_system::on_interaction_started(const events::interaction_started& event){
-    transition(event.get_interactor_id(), dog_config::interaction_started);
+void systems::state_machine_system::on_player_work_station(const events::player_work_station& event){
+    debug::log("[state_machine_system::on_player_work_station] START - interactor: "
+        + std::to_string(event.get_interactor_id())
+        + ", interactee: " + std::to_string(event.get_interactee_id()));
+    transition(event.get_interactor_id(), dog_config::player_work_station);
+    transition(event.get_interactee_id(), station_config::player_engaged);
 }
 void systems::state_machine_system::on_interaction_finished(const events::interaction_finished& event){
+    debug::log("[state_machine_system::on_interaction_finished] CLEANUP - interactor: "
+        + std::to_string(event.get_interactor_id())
+        + ", interactee: " + std::to_string(event.get_interactee_id()));
     transition(event.get_interactor_id(), dog_config::interaction_finished);
+    auto* interactable = component_managers::interactable_manager_.get_component(event.get_interactee_id());
+    if(interactable and interactable->has_interactor()){
+        debug::log("[state_machine_system::on_interaction_finished] CLEANUP - interactee: "
+            + std::to_string(event.get_interactee_id())
+            + " still has an interactor, player_disengaged NOT sent");
+        return;
+    }
+    transition(event.get_interactee_id(), station_config::player_disengaged);
 }
 void systems::state_machine_system::on_order_served(const events::order_served& event){
     transition(event.get_waiter_id(), dog_config::order_served);

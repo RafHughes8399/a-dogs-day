@@ -50,3 +50,6 @@ void state_machine::state_machine::update(size_t entity, float delta){
     if(current_ >= graph_.size()){ return; }
     graph_[current_].get_state().update(entity, delta);
 }
+
+
+

@@ -86,5 +86,6 @@ namespace state_machine_builders{
     state_machine::state_machine build_player_state_machine();
     state_machine::state_machine build_customer_state_machine();
     state_machine::state_machine build_waiter_state_machine();
+    state_machine::state_machine build_cooking_station_state_machine();
 }
 #endif

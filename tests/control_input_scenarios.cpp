@@ -64,10 +64,6 @@ namespace {
         return level_config::world_y - level_config::screen_height;
     }
 
-    float half_span_hold(float span, float speed){
-        return (span * 0.5f) / speed;
-    }
-
     game_config::input key_press_of(int key){
         return game_config::input{key, game_config::key_press};
     }
@@ -436,11 +432,10 @@ SCENARIO("a held arrow key moves the view frame within the world", "[ecs][contro
         }
 
         WHEN("right is held for a hold that lands short of the far edge"){
-            float delta = half_span_hold(frame_span_x(), level_config::frame_move.x);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), player_id, delta);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), player_id, 1.0f);
 
-            THEN("the frame travels one hold of frame_move, on x only"){
-                REQUIRE(game.view_frame().x == level_config::frame_move.x * delta);
+            THEN("the frame travels one hold of camera_move_speed, on x only"){
+                REQUIRE(game.view_frame().x == camera_config::camera_move_speed);
                 REQUIRE(game.view_frame().y == 0.0f);
             }
             THEN("the frame's far edge is still inside the world"){
@@ -449,11 +444,10 @@ SCENARIO("a held arrow key moves the view frame within the world", "[ecs][contro
         }
 
         WHEN("down is held for a hold that lands short of the far edge"){
-            float delta = half_span_hold(frame_span_y(), level_config::frame_move.y);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, delta);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
 
             THEN("the frame travels on y only"){
-                REQUIRE(game.view_frame().y == level_config::frame_move.y * delta);
+                REQUIRE(game.view_frame().y == camera_config::camera_move_speed);
                 REQUIRE(game.view_frame().x == 0.0f);
             }
             THEN("the frame's bottom edge is still inside the world"){
@@ -462,21 +456,19 @@ SCENARIO("a held arrow key moves the view frame within the world", "[ecs][contro
         }
 
         WHEN("down is held over several frames"){
-            float delta = half_span_hold(frame_span_y(), level_config::frame_move.y) * 0.5f;
             for(int frame = 0; frame < 2; ++frame){
-                controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, delta);
+                controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
             }
 
             THEN("the travel accumulates"){
-                float step = level_config::frame_move.y * delta;
+                float step = camera_config::camera_move_speed;
                 REQUIRE(game.view_frame().y == step + step);
             }
         }
 
         WHEN("down then up are held for the same duration"){
-            float delta = half_span_hold(frame_span_y(), level_config::frame_move.y);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, delta);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, delta);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, 1.0f);
 
             THEN("the frame is back where it started"){
                 REQUIRE(game.view_frame().y == 0.0f);
@@ -484,13 +476,13 @@ SCENARIO("a held arrow key moves the view frame within the world", "[ecs][contro
         }
 
         WHEN("each direction is held in turn from a mid-world position"){
-            float delta = half_span_hold(frame_span_y(), level_config::frame_move.y);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, delta);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
             float mid = game.view_frame().y;
 
             THEN("up subtracts what down added"){
-                controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, delta * 0.5f);
-                REQUIRE(game.view_frame().y == mid - (level_config::frame_move.y * (delta * 0.5f)));
+                controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, 1.0f);
+                REQUIRE(game.view_frame().y == mid - camera_config::camera_move_speed);
             }
         }
     }
@@ -520,7 +512,7 @@ SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][vie
 
         WHEN("right is held long past the far edge"){
             hold_until_clamped(controls_config::key_hold_actions::move_right, player_id,
-                frame_span_x(), level_config::frame_move.x);
+                frame_span_x(), camera_config::camera_move_speed);
 
             THEN("it clamps to the world's width less the frame's own width"){
                 REQUIRE(game.view_frame().x == frame_span_x());
@@ -535,7 +527,7 @@ SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][vie
 
         WHEN("down is held long past the bottom edge"){
             hold_until_clamped(controls_config::key_hold_actions::move_down, player_id,
-                frame_span_y(), level_config::frame_move.y);
+                frame_span_y(), camera_config::camera_move_speed);
 
             THEN("it clamps to the world's height less the frame's own height"){
                 REQUIRE(game.view_frame().y == frame_span_y());
@@ -546,7 +538,7 @@ SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][vie
         }
 
         WHEN("a single enormous move is asked for"){
-            frame().move_frame(Vector2{level_config::world_x * 10.0f, level_config::world_y * 10.0f});
+            frame().move_camera(Vector2{level_config::world_x * 10.0f, level_config::world_y * 10.0f});
 
             THEN("both axes clamp to the far edge"){
                 REQUIRE(game.view_frame().x == frame_span_x());
@@ -555,7 +547,7 @@ SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][vie
         }
 
         WHEN("a single enormous negative move is asked for"){
-            frame().move_frame(Vector2{-level_config::world_x * 10.0f, -level_config::world_y * 10.0f});
+            frame().move_camera(Vector2{-level_config::world_x * 10.0f, -level_config::world_y * 10.0f});
 
             THEN("both axes clamp to the origin"){
                 REQUIRE(game.view_frame().x == 0.0f);
@@ -565,13 +557,13 @@ SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][vie
 
         WHEN("the frame is driven onto the far edge and then back"){
             hold_until_clamped(controls_config::key_hold_actions::move_down, player_id,
-                frame_span_y(), level_config::frame_move.y);
+                frame_span_y(), camera_config::camera_move_speed);
             REQUIRE(game.view_frame().y == frame_span_y());
 
             controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, 1.0f);
 
             THEN("it comes off the edge by exactly one second of travel"){
-                REQUIRE(game.view_frame().y == frame_span_y() - level_config::frame_move.y);
+                REQUIRE(game.view_frame().y == frame_span_y() - camera_config::camera_move_speed);
             }
         }
     }
@@ -582,7 +574,7 @@ SCENARIO("the view frame does not leak between scenarios", "[ecs][controls][view
         {
             testing::ecs_test_game game;
             hold_until_clamped(controls_config::key_hold_actions::move_down, 0,
-                frame_span_y(), level_config::frame_move.y);
+                frame_span_y(), camera_config::camera_move_speed);
             REQUIRE(game.view_frame().y == frame_span_y());
         }
 
@@ -688,8 +680,7 @@ SCENARIO("a panned view frame maps the mouse onto the world under it", "[ecs][co
         auto khiri_id = game.create_khiri();
         auto& rendering = systems::rendering_system::get_instance();
 
-        float delta = half_span_hold(frame_span_x(), level_config::frame_move.x);
-        controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), player_id, delta);
+        controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), player_id, 1.0f);
         auto frame = game.view_frame();
         REQUIRE(frame.x > 0.0f);
 

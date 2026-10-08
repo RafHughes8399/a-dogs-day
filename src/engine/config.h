@@ -12,38 +12,14 @@
 #include <cstddef>
 #include <raymath.h>
 #include <vector>
-namespace type_config{
-    // * an ordered run of world positions to walk through. Lives here rather
-    // * than inside any one class so the graph, the query layer, the movement
-    // * component and the dogs all name the same type.
-    using path = std::vector<Vector2>;
-}
-namespace interaction_config{
-    enum interactions{
-        customer_table_sit = 0,
-        waiter_table_serve,
-        waiter_counter_pickup,
-        waiter_counter_place_down,
-        size
-    };
-    // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- // 
-    inline std::vector<size_t> waiter_dog_interactor = {
-        waiter_table_serve,
-        waiter_counter_pickup,
-        waiter_counter_place_down,
-    };
-    inline std::vector<size_t> customer_dog_interactor = {
-        customer_table_sit
-    };
-    // * ------------------- STATION INTERACTEE INTERACTIONS ----------------------------- //
-    inline std::vector<size_t> table_interactee = {
-        customer_table_sit,
-        waiter_table_serve,
-    };
-    inline std::vector<size_t> counter_interactee = {
-        waiter_counter_pickup,
-        waiter_counter_place_down
-    };
+
+namespace camera_config{
+        // subject to change 
+    inline const float zoom_min = 0.9f;
+    inline const float zoom_max = 7.2f;
+
+    inline const float camera_move_speed = 11.0f; // per second ? 
+    inline const float camera_zoom_speed = 0.1f;
 }
 namespace game_config {
     // * keyboard and mouse actions are separate enums, and `control`/`mouse_input`
@@ -101,13 +77,10 @@ namespace game_config {
     /** Frames to ignore edit-hold after exiting edit (prevents instant re-enter). */
     inline const int edit_cooldown = static_cast<int>(frames * 0.5);
     inline const int empty_entity = -1;
-}
-namespace player_config{
-    inline const int max_bones = 999999;
-    inline const int max_level = 50;
-}
-namespace feature_flag_config{
-    inline const bool automatic_arrivals = false;
+
+
+    inline const int cook_speed = 2;
+
 }
 namespace level_config{
     // world dimensions
@@ -115,16 +88,14 @@ namespace level_config{
     inline const float screen_height = static_cast<float>(game_config::window_height);
     inline const float edge_weight = 64.0f; // placeholder
     
-    // TODO the background tiles should be 768 * 768, so the original frame of the tile  is 256 * 256
-    // TODO and the world should bcome a square, and then the tiles become 4  to fill it out
     inline const size_t num_tiles = 16;
     inline const float tile_width = 768.0f;
     inline const float tile_height = 768.0f;
 
     inline float world_x = 3072.0f;
     inline float world_y = 3072.0f;
-    inline const size_t tile_rows = world_y / tile_height;
-    inline const size_t tile_columns = world_x / tile_width;
+    inline const size_t tile_rows = static_cast<size_t>(world_y / tile_height);
+    inline const size_t tile_columns = static_cast<size_t>(world_x / tile_width);
     
     inline float graph_x = 0.0f;
     inline float footpath_overhang = 3 * edge_weight;
@@ -194,86 +165,6 @@ namespace level_config{
         Vector2{1,1}    // all   (index 4) - see TODO above, no sprite for this
     };
 
-}
-namespace graph_config{
-    inline const int empty_node = -1;
-}
-namespace cafe_config{
-    enum queue_sides{
-        left = 0,
-        right
-    };
-    inline const int queue_width_edges = 3;
-    inline const int queue_x_edges = 1;
-    inline const int queue_y_buffer_edges = 1;
-    inline const int queue_y_edges = level_config::screen_edges_y - (2 * queue_y_buffer_edges);
-    inline const float queue_gap_edges = 2.0f;
-    inline const float queue_arrival_s = 120.0f;
-    inline const float queue_left_window_s = 30.0f;
-    inline const int queue_left_trigger = 3;
-    // How long a customer stays in the eating state before leaving (seconds).
-    inline const float eating_duration_s = 10.0f;
-    // How long a pickup/placement animation holds a dog still (seconds). One
-    // value for all four until one of them needs to differ.
-    inline const float animation_duration_s = 0.5f;
-    inline const int customer_dog_type = 0;
-    inline const Vector2 queue_dir = Vector2{0.0f, 1.0f};
-    inline const Vector2 customer_spawn_positions[2] = {
-        Vector2{queue_x_edges * level_config::edge_weight, 0 - (2.0f * level_config::edge_weight)},
-        Vector2{queue_x_edges * level_config::edge_weight, level_config::screen_height + (2.0f * level_config::edge_weight)}
-    };
-    inline const float queue_width = queue_width_edges * level_config::edge_weight;
-    inline const float queue_height = level_config::screen_height;
-
-    inline const int queue_midpoint_y_edges = level_config::screen_edges_y / 2;
-    inline const float queue_midpoint_y = queue_midpoint_y_edges * level_config::edge_weight;
-    inline const Vector2 left_queue_head = Vector2{
-        queue_x_edges * level_config::edge_weight,
-        queue_midpoint_y - level_config::edge_weight
-    };
-    inline const Vector2 right_queue_head = Vector2{
-        queue_x_edges * level_config::edge_weight,
-        queue_midpoint_y + level_config::edge_weight
-    };
-    
-    inline const int queue_capacity = queue_y_edges;
-    inline const std::vector<Vector2> left_queue_positions = [](){
-        auto positions = std::vector<Vector2>{};
-        positions.reserve(static_cast<size_t>(queue_capacity));
-        for(int index = 0; index < queue_capacity; ++index){
-            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
-            positions.push_back(Vector2{left_queue_head.x, left_queue_head.y - offset});
-        }
-        return positions;
-    }();
-    inline const std::vector<Vector2> right_queue_positions = [](){
-        auto positions = std::vector<Vector2>{};
-        positions.reserve(static_cast<size_t>(queue_capacity));
-        for(int index = 0; index < queue_capacity; ++index){
-            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
-            positions.push_back(Vector2{right_queue_head.x, right_queue_head.y + offset});
-        }
-        return positions;
-    }();
-    inline const Rectangle queue_debug_bounds = Rectangle{
-        0.0f,
-        0.0f,
-        queue_width,
-        queue_height
-    };
-    // * halfway up the cafe, on the seam the two zones share - x in
-    // * [cafe_x, footpath_x + footpath_width) sits inside both areas, and
-    // * level_config::cafe_x is the one grid column both graphs hold a node
-    // * for, so a path can end here from the footpath and start here into the cafe
-    inline const Vector2 cafe_entrance = Vector2{
-        level_config::cafe_x,
-        level_config::cafe_y + level_config::cafe_height * 0.5f
-    };
-    inline const Vector2 cafe_exit = Vector2{cafe_entrance.x, -2.0f * level_config::edge_weight};
-    
-}
-namespace station_config{
-    inline const float station_reach = level_config::edge_weight * 0.25f;
 }
 namespace animation_config{
     inline constexpr int default_play_speed = 6;
@@ -387,6 +278,176 @@ namespace animation_config{
             size
         };
     }
+    namespace station{
+        enum tags{
+            idle = 0,
+            active,
+            size
+        };
+    }
+}
+namespace cafe_config{
+    enum queue_sides{
+        left = 0,
+        right
+    };
+    inline const int queue_width_edges = 3;
+    inline const int queue_x_edges = 1;
+    inline const int queue_y_buffer_edges = 1;
+    inline const int queue_y_edges = level_config::screen_edges_y - (2 * queue_y_buffer_edges);
+    inline const float queue_gap_edges = 2.0f;
+    inline const float queue_arrival_s = 120.0f;
+    inline const float queue_left_window_s = 30.0f;
+    inline const int queue_left_trigger = 3;
+    // How long a customer stays in the eating state before leaving (seconds).
+    inline const float eating_duration_s = 10.0f;
+    // How long a pickup/placement animation holds a dog still (seconds). One
+    // value for all four until one of them needs to differ.
+    inline const float animation_duration_s = 0.5f;
+    inline const int customer_dog_type = 0;
+    inline const Vector2 queue_dir = Vector2{0.0f, 1.0f};
+    inline const Vector2 customer_spawn_positions[2] = {
+        Vector2{queue_x_edges * level_config::edge_weight, 0 - (2.0f * level_config::edge_weight)},
+        Vector2{queue_x_edges * level_config::edge_weight, level_config::screen_height + (2.0f * level_config::edge_weight)}
+    };
+    inline const float queue_width = queue_width_edges * level_config::edge_weight;
+    inline const float queue_height = level_config::screen_height;
+
+    inline const int queue_midpoint_y_edges = level_config::screen_edges_y / 2;
+    inline const float queue_midpoint_y = queue_midpoint_y_edges * level_config::edge_weight;
+    inline const Vector2 left_queue_head = Vector2{
+        queue_x_edges * level_config::edge_weight,
+        queue_midpoint_y - level_config::edge_weight
+    };
+    inline const Vector2 right_queue_head = Vector2{
+        queue_x_edges * level_config::edge_weight,
+        queue_midpoint_y + level_config::edge_weight
+    };
+    
+    inline const int queue_capacity = queue_y_edges;
+    inline const std::vector<Vector2> left_queue_positions = [](){
+        auto positions = std::vector<Vector2>{};
+        positions.reserve(static_cast<size_t>(queue_capacity));
+        for(int index = 0; index < queue_capacity; ++index){
+            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
+            positions.push_back(Vector2{left_queue_head.x, left_queue_head.y - offset});
+        }
+        return positions;
+    }();
+    inline const std::vector<Vector2> right_queue_positions = [](){
+        auto positions = std::vector<Vector2>{};
+        positions.reserve(static_cast<size_t>(queue_capacity));
+        for(int index = 0; index < queue_capacity; ++index){
+            auto offset = static_cast<float>(index) * queue_gap_edges * level_config::edge_weight;
+            positions.push_back(Vector2{right_queue_head.x, right_queue_head.y + offset});
+        }
+        return positions;
+    }();
+    inline const Rectangle queue_debug_bounds = Rectangle{
+        0.0f,
+        0.0f,
+        queue_width,
+        queue_height
+    };
+    // * halfway up the cafe, on the seam the two zones share - x in
+    // * [cafe_x, footpath_x + footpath_width) sits inside both areas, and
+    // * level_config::cafe_x is the one grid column both graphs hold a node
+    // * for, so a path can end here from the footpath and start here into the cafe
+    inline const Vector2 cafe_entrance = Vector2{
+        level_config::cafe_x,
+        level_config::cafe_y + level_config::cafe_height * 0.5f
+    };
+    inline const Vector2 cafe_exit = Vector2{cafe_entrance.x, -2.0f * level_config::edge_weight};
+    
+}
+namespace controls_config{
+    // controls 
+    inline std::vector<int> mouse_controls = std::vector<int>{MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT};
+    enum key_press_actions{
+        dog_switch = KEY_F,
+        shop_open = KEY_S,
+        inventory_open = KEY_I,
+        menu_open = KEY_TAB,
+        quests_open = KEY_Q,
+        map_open = KEY_M,
+        back = KEY_ESCAPE,
+        exit_edit = KEY_E,
+        debug_toggle = KEY_J
+    };
+    enum key_hold_actions{
+        edit_mode = KEY_E,
+        move_down = KEY_DOWN,
+        move_up  = KEY_UP,
+        move_left = KEY_LEFT,
+        move_right = KEY_RIGHT
+    };
+    // ? antiicpating the need for multiple control schemes, one for the home level, and one for the 
+    // ? resource collecting levels 
+}
+namespace debug_logger_config{
+    inline const char* log_directory = "../debug_logs";
+    inline const float logger_height_ratio = 0.6f;
+    inline const float logger_y_position_scalar = 1.0f - logger_height_ratio;
+    inline const int backdrop_opacity = 102;
+    inline const Color backdrop = Color{28, 28, 28, backdrop_opacity};
+    inline const Color text = Color{245, 240, 225, 255};
+    // max_messages lines at line_height must fit inside the backdrop, which is
+    // logger_height_ratio of the screen less padding_y top and bottom
+    inline const int font_size = 20;
+    inline const int line_height = 30;
+    inline const int padding_x = 18;
+    inline const int padding_y = 16;
+    inline const size_t max_messages = 20;
+}
+namespace dog_config{
+    inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
+    inline const int eating_duration = game_config::frames * 10;
+    inline const float customer_spawn_interval = 20.0f;
+    inline const float dog_reach = level_config::edge_weight * 0.3f;
+
+    inline const float waiter_idle_bounds_edges = 3.0f;
+    inline const size_t waiter_idle_min_points = 2;
+    inline const size_t waiter_idle_max_points = 4;
+    inline const size_t waiter_wander_odds = 6;
+    inline const size_t waiter_idle_max_attempts = 3;
+
+    enum waiter_dog_types{
+        basic = 0,
+        size
+    };
+    enum customer_dog_types{
+        fred = 0,
+        john
+    };
+    enum player_dog_states{
+        player_idle = 0,
+        player_walking,
+        player_interacting,
+        player_states_size
+    };
+    enum customer_dog_states{
+        customer_walking = 0,
+        customer_sitting,
+        customer_eating,
+        customer_states_size
+    };
+    enum waiter_dog_states{
+        waiter_stationary = 0,
+        waiter_idle,
+        waiter_carrying,
+        waiter_states_size
+    };
+    enum state_transitions{
+        path_created = events::ids::dog_started_path_id,
+        path_finished = events::ids::dog_path_complete,
+        player_work_station = events::ids::player_work_station_id,
+        interaction_finished = events::ids::interaction_finished_id,
+        order_served = events::ids::order_served_id,
+        food_dropped = events::ids::food_dropped_id,
+        food_collected = events::ids::waiter_collected_food_id,
+        meal_finished = events::ids::customer_finished_meal_id,
+        customer_leaving = events::ids::customer_left
+    };
 }
 namespace entity_config{
     inline const char* player_dog_debug_id_prefix = "pd_";
@@ -433,9 +494,40 @@ namespace entity_config{
         food_counter = 0,
         counters_size
     };
+    enum cooking_stations{
+        stove = 0,
+        oven,
+        espresso_station,
+        mini_fridge,
+        bush,
+        chopping_board,
+        cooking_stations_size
+    };
     enum foods{
         lasagna = 0,
-        coffee,
+        bone_biscuits,
+
+        espresso,
+        pup_cup,
+        
+        cutlets,
+        boiled_chicken,
+        risotto,
+        carbonara,
+
+        bird,
+        sausage_on_a_stick,
+        pork_knuckles,
+        lemongrass,
+
+        charpoocherie_board,
+        cheddar,
+        parmigiano,
+        shishamo,
+        rabbit_foot,
+
+        brisket_leftovers,
+        steak_leftovers,
         foods_size
     };
     enum counter_sprite_slots{
@@ -444,10 +536,10 @@ namespace entity_config{
         counter_sprite_slots_size
     };
     enum dog_sprite_slots{
-        dog_head = 0,
-        dog_face,
-        dog_body,
+        dog_body = 0,
         dog_tail,
+        dog_head,
+        dog_face,
         dog_sprite_slots_size
     };
     enum dog_part_directions{
@@ -459,12 +551,10 @@ namespace entity_config{
 
     
     // * authored in left-facing space; the right-facing sprite mirrors x across
-    // * the dog's across width. advances == false anchors the part to the
-    // * preceding advancing part, and its offset.x is relative to that anchor.
+    // * the dog's across width. offset is measured from the left edge of the across width.
     struct dog_part{
         const float* attributes;
         Vector2 offset;
-        bool advances;
         const char* left_path;
         const char* right_path;
     };
@@ -478,14 +568,14 @@ namespace entity_config{
     // * ------------------------ PLAYER DOG PATHS  --------------------------------------- *//
     inline const char* khiri_left_path = "../sprites/khiri_left.png";
     inline const char* khiri_right_path = "../sprites/khiri_right.png";
-    inline const char* khiri_head_left_path = "../sprites/khiri_head_left.png";
-    inline const char* khiri_head_right_path = "../sprites/khiri_head_right.png";
-    inline const char* khiri_face_left_path = "../sprites/khiri_face_left.png";
-    inline const char* khiri_face_right_path = "../sprites/khiri_face_right.png";
-    inline const char* khiri_body_left_path = "../sprites/khiri_body_left.png";
-    inline const char* khiri_body_right_path = "../sprites/khiri_body_right.png";
-    inline const char* khiri_tail_left_path = "../sprites/khiri_tail_left.png";
-    inline const char* khiri_tail_right_path = "../sprites/khiri_tail_right.png";
+    inline const char* khiri_head_left_path = "../sprites/player-dogs/khiri-left-head.png";
+    inline const char* khiri_head_right_path = "../sprites/player-dogs/khiri-right-head.png";
+    inline const char* khiri_face_left_path = "../sprites/player-dogs/khiri-left-face.png";
+    inline const char* khiri_face_right_path = "../sprites/player-dogs/khiri-right-face.png";
+    inline const char* khiri_body_left_path = "../sprites/player-dogs/khiri-left-body.png";
+    inline const char* khiri_body_right_path = "../sprites/player-dogs/khiri-right-body.png";
+    inline const char* khiri_tail_left_path = "../sprites/player-dogs/khiri-left-tail.png";
+    inline const char* khiri_tail_right_path = "../sprites/player-dogs/khiri-right-tail.png";
 
     inline const char* khiri_left_outline_path = "../sprites/khiri_left_outline.png";
     inline const char* khiri_right_outline_path = "../sprites/khiri_right_outline.png";
@@ -493,38 +583,38 @@ namespace entity_config{
 
     inline const char* mack_left_path = "../sprites/mack_left.png";
     inline const char* mack_right_path = "../sprites/mack_right.png";
-    inline const char* mack_head_left_path = "../sprites/mack_head_left.png";
-    inline const char* mack_head_right_path = "../sprites/mack_head_right.png";
-    inline const char* mack_face_left_path = "../sprites/mack_face_left.png";
-    inline const char* mack_face_right_path = "../sprites/mack_face_right.png";
-    inline const char* mack_body_left_path = "../sprites/mack_body_left.png";
-    inline const char* mack_body_right_path = "../sprites/mack_body_right.png";
-    inline const char* mack_tail_left_path = "../sprites/mack_tail_left.png";
-    inline const char* mack_tail_right_path = "../sprites/mack_tail_right.png";
+    inline const char* mack_head_left_path = "../sprites/player-dogs/mack-left-head.png";
+    inline const char* mack_head_right_path = "../sprites/player-dogs/mack-right-head.png";
+    inline const char* mack_face_left_path = "../sprites/player-dogs/mack-left-face.png";
+    inline const char* mack_face_right_path = "../sprites/player-dogs/mack-right-face.png";
+    inline const char* mack_body_left_path = "../sprites/player-dogs/mack-left-body.png";
+    inline const char* mack_body_right_path = "../sprites/player-dogs/mack-right-body.png";
+    inline const char* mack_tail_left_path = "../sprites/player-dogs/mack-left-tail.png";
+    inline const char* mack_tail_right_path = "../sprites/player-dogs/mack-right-tail.png";
 
     inline const char* mack_left_outline_path = "../sprites/mack_left_outline.png";
     inline const char* mack_right_outline_path = "../sprites/mack_right_outline.png";
     // * ------------------------ WAITER DOG PATHS --------------------------------------- *//
     inline const char* gianluca_left_path = "../sprites/gianluca-left.png";
     inline const char* gianluca_right_path = "../sprites/gianluca-right.png";
-    inline const char* gianluca_head_left_path = "../sprites/gianluca_head_left.png";
-    inline const char* gianluca_head_right_path = "../sprites/gianluca_head_right.png";
-    inline const char* gianluca_face_left_path = "../sprites/gianluca_face_left.png";
-    inline const char* gianluca_face_right_path = "../sprites/gianluca_face_right.png";
-    inline const char* gianluca_body_left_path = "../sprites/gianluca_body_left.png";
-    inline const char* gianluca_body_right_path = "../sprites/gianluca_body_right.png";
-    inline const char* gianluca_tail_left_path = "../sprites/gianluca_tail_left.png";
-    inline const char* gianluca_tail_right_path = "../sprites/gianluca_tail_right.png";
+    inline const char* gianluca_head_left_path = "../sprites/player-dogs/gianluca-left-head.png";
+    inline const char* gianluca_head_right_path = "../sprites/player-dogs/gianluca-right-head.png";
+    inline const char* gianluca_face_left_path = "../sprites/player-dogs/gianluca-left-face.png";
+    inline const char* gianluca_face_right_path = "../sprites/player-dogs/gianluca-right-face.png";
+    inline const char* gianluca_body_left_path = "../sprites/player-dogs/gianluca-left-body.png";
+    inline const char* gianluca_body_right_path = "../sprites/player-dogs/gianluca-right-body.png";
+    inline const char* gianluca_tail_left_path = "../sprites/player-dogs/gianluca-left-tail.png";
+    inline const char* gianluca_tail_right_path = "../sprites/player-dogs/gianluca-right-tail.png";
     inline const char* lionel_left_path = "../sprites/lionel-left.png";
     inline const char* lionel_right_path = "../sprites/lionel-right.png";
-    inline const char* lionel_head_left_path = "../sprites/lionel_head_left.png";
-    inline const char* lionel_head_right_path = "../sprites/lionel_head_right.png";
-    inline const char* lionel_face_left_path = "../sprites/lionel_face_left.png";
-    inline const char* lionel_face_right_path = "../sprites/lionel_face_right.png";
-    inline const char* lionel_body_left_path = "../sprites/lionel_body_left.png";
-    inline const char* lionel_body_right_path = "../sprites/lionel_body_right.png";
-    inline const char* lionel_tail_left_path = "../sprites/lionel_tail_left.png";
-    inline const char* lionel_tail_right_path = "../sprites/lionel_tail_right.png";
+    inline const char* lionel_head_left_path = "../sprites/player-dogs/lionel-left-head.png";
+    inline const char* lionel_head_right_path = "../sprites/player-dogs/lionel-right-head.png";
+    inline const char* lionel_face_left_path = "../sprites/player-dogs/lionel-left-face.png";
+    inline const char* lionel_face_right_path = "../sprites/player-dogs/lionel-right-face.png";
+    inline const char* lionel_body_left_path = "../sprites/player-dogs/lionel-left-body.png";
+    inline const char* lionel_body_right_path = "../sprites/player-dogs/lionel-right-body.png";
+    inline const char* lionel_tail_left_path = "../sprites/player-dogs/lionel-left-tail.png";
+    inline const char* lionel_tail_right_path = "../sprites/player-dogs/lionel-right-tail.png";
     // * ------------------------ DECORATION PATHS --------------------------------------- *//
     
     inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
@@ -538,11 +628,18 @@ namespace entity_config{
     inline const char* dining_table_station_path = "../sprites/dining-table.png";
     inline const char* tiled_table_station_path ="../sprites/tiled-table.png";
     inline const char* food_counter_station_path = "";
+    inline const char* stove_station_path = "../sprites/stove.png";
+    inline const char* oven_station_path = "../sprites/oven.png";
+    inline const char* espresso_station_path = "../sprites/espresso-station.png";
+    inline const char* mini_fridge_station_path = "../sprites/mini-fridge.png";
+    inline const char* bush_station_path = "../sprites/bush.png";
+    inline const char* chopping_board_station_path = "../sprites/chopping-board.png";
     
     
     // * ------------------------ FOOD PATHS --------------------------------------- *//
     inline const char* lasagna_food_path = "../sprites/lasagna.png";
-    inline const char* coffee_food_path = "../sprites/coffee.png";
+    inline const char* espresso_food_path = "../sprites/espresso.png";
+    inline const char* cutlets_food_path = "../sprites/cutlets.png";
     
     // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
     enum attributes{
@@ -570,49 +667,49 @@ namespace entity_config{
 
     // TODO (06 / 09 / 26) placeholder splits - advancing widths sum to the matching
     // across width, but the proportions are guesses pending the part art
-    inline const float khiri_head_attributes[attributes::size] = {level_config::edge_weight * 0.60f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float khiri_head_attributes[attributes::size] = {35.0f, 62.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float khiri_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float khiri_body_attributes[attributes::size] = {level_config::edge_weight * 1.00f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float khiri_tail_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float khiri_body_attributes[attributes::size] = {88.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float khiri_tail_attributes[attributes::size] = {18.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float mack_head_attributes[attributes::size] = {level_config::edge_weight * 0.60f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float mack_head_attributes[attributes::size] = {30.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float mack_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float mack_body_attributes[attributes::size] = {level_config::edge_weight * 1.00f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float mack_tail_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float mack_body_attributes[attributes::size] = {92.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float mack_tail_attributes[attributes::size] = {16.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float gianluca_head_attributes[attributes::size] = {level_config::edge_weight * 0.70f, level_config::edge_weight * 0.91f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float gianluca_head_attributes[attributes::size] = {27.0f, 58.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float gianluca_face_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.35f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float gianluca_body_attributes[attributes::size] = {level_config::edge_weight * 1.10f, level_config::edge_weight * 0.91f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float gianluca_tail_attributes[attributes::size] = {level_config::edge_weight * 0.45f, level_config::edge_weight * 0.60f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float gianluca_body_attributes[attributes::size] = {117.0f, 58.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float gianluca_tail_attributes[attributes::size] = {4.0f, 58.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float lionel_head_attributes[attributes::size] = {level_config::edge_weight * 0.50f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float lionel_head_attributes[attributes::size] = {35.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float lionel_face_attributes[attributes::size] = {level_config::edge_weight * 0.30f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float lionel_body_attributes[attributes::size] = {level_config::edge_weight * 0.90f, level_config::edge_weight * 0.75f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float lionel_tail_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.50f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float lionel_body_attributes[attributes::size] = {90.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float lionel_tail_attributes[attributes::size] = {7.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
     inline const dog_part khiri_parts[dog_sprite_slots_size] = {
-        {khiri_head_attributes, Vector2{0.0f, 0.0f}, true, khiri_head_left_path, khiri_head_right_path},
-        {khiri_face_attributes, Vector2{level_config::edge_weight * 0.15f, level_config::edge_weight * 0.15f}, false, khiri_face_left_path, khiri_face_right_path},
-        {khiri_body_attributes, Vector2{0.0f, 0.0f}, true, khiri_body_left_path, khiri_body_right_path},
-        {khiri_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.15f}, true, khiri_tail_left_path, khiri_tail_right_path}};
+        {khiri_body_attributes, Vector2{26.0f, 0.0f}, khiri_body_left_path, khiri_body_right_path},
+        {khiri_tail_attributes, Vector2{110.0f, 0.0f}, khiri_tail_left_path, khiri_tail_right_path},
+        {khiri_head_attributes, Vector2{0.0f, -14.0f}, khiri_head_left_path, khiri_head_right_path},
+        {khiri_face_attributes, Vector2{level_config::edge_weight * 0.15f, level_config::edge_weight * 0.15f}, khiri_face_left_path, khiri_face_right_path}};
 
     inline const dog_part mack_parts[dog_sprite_slots_size] = {
-        {mack_head_attributes, Vector2{0.0f, 0.0f}, true, mack_head_left_path, mack_head_right_path},
-        {mack_face_attributes, Vector2{level_config::edge_weight * 0.15f, level_config::edge_weight * 0.15f}, false, mack_face_left_path, mack_face_right_path},
-        {mack_body_attributes, Vector2{0.0f, 0.0f}, true, mack_body_left_path, mack_body_right_path},
-        {mack_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.15f}, true, mack_tail_left_path, mack_tail_right_path}};
+        {mack_body_attributes, Vector2{21.0f, 0.0f}, mack_body_left_path, mack_body_right_path},
+        {mack_tail_attributes, Vector2{112.0f, 0.0f}, mack_tail_left_path, mack_tail_right_path},
+        {mack_head_attributes, Vector2{0.0f, 0.0f}, mack_head_left_path, mack_head_right_path},
+        {mack_face_attributes, Vector2{level_config::edge_weight * 0.15f, level_config::edge_weight * 0.15f}, mack_face_left_path, mack_face_right_path}};
 
     inline const dog_part gianluca_parts[dog_sprite_slots_size] = {
-        {gianluca_head_attributes, Vector2{0.0f, 0.0f}, true, gianluca_head_left_path, gianluca_head_right_path},
-        {gianluca_face_attributes, Vector2{level_config::edge_weight * 0.18f, level_config::edge_weight * 0.18f}, false, gianluca_face_left_path, gianluca_face_right_path},
-        {gianluca_body_attributes, Vector2{0.0f, 0.0f}, true, gianluca_body_left_path, gianluca_body_right_path},
-        {gianluca_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.18f}, true, gianluca_tail_left_path, gianluca_tail_right_path}};
+        {gianluca_body_attributes, Vector2{0.0f, 0.0f}, gianluca_body_left_path, gianluca_body_right_path},
+        {gianluca_tail_attributes, Vector2{140.0f, 0.0f}, gianluca_tail_left_path, gianluca_tail_right_path},
+        {gianluca_head_attributes, Vector2{0.0f, 0.0f}, gianluca_head_left_path, gianluca_head_right_path},
+        {gianluca_face_attributes, Vector2{level_config::edge_weight * 0.18f, level_config::edge_weight * 0.18f}, gianluca_face_left_path, gianluca_face_right_path}};
 
     inline const dog_part lionel_parts[dog_sprite_slots_size] = {
-        {lionel_head_attributes, Vector2{0.0f, 0.0f}, true, lionel_head_left_path, lionel_head_right_path},
-        {lionel_face_attributes, Vector2{level_config::edge_weight * 0.12f, level_config::edge_weight * 0.15f}, false, lionel_face_left_path, lionel_face_right_path},
-        {lionel_body_attributes, Vector2{0.0f, 0.0f}, true, lionel_body_left_path, lionel_body_right_path},
-        {lionel_tail_attributes, Vector2{0.0f, level_config::edge_weight * 0.15f}, true, lionel_tail_left_path, lionel_tail_right_path}};
+        {lionel_body_attributes, Vector2{16.0f, 0.0f}, lionel_body_left_path, lionel_body_right_path},
+        {lionel_tail_attributes, Vector2{105.0f, 0.0f}, lionel_tail_left_path, lionel_tail_right_path},
+        {lionel_head_attributes, Vector2{0.0f, 0.0f}, lionel_head_left_path, lionel_head_right_path},
+        {lionel_face_attributes, Vector2{level_config::edge_weight * 0.12f, level_config::edge_weight * 0.15f}, lionel_face_left_path, lionel_face_right_path}};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
     inline const float pavlov_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 2.75f, 1.0f, 1.0f}; // TODO update values (24/08/26)
@@ -626,18 +723,17 @@ namespace entity_config{
     inline const float food_counter_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float dishwasher_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float stove_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float oven_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float espresso_station_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float mini_fridge_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float bush_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+    inline const float chopping_board_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
-    inline const float lasagna_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
-    inline const float coffee_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
+    inline const float lasagna_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float espresso_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float cutlets_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
     
-    
-    
-    
-    
-    // * legacy entities::station capacity. the ECS stations size their capacity
-    // * off the slot offset lists below instead.
-    inline const size_t food_counter_capacity = 3;
     inline const Vector2 station_slot_left  = Vector2Zero();
     inline const Vector2 station_slot_right = Vector2Zero(); 
     inline const Vector2 station_slot_up    = Vector2Zero();
@@ -648,82 +744,17 @@ namespace entity_config{
     inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
     inline const Vector2 food_carry_offset = {level_config::edge_weight * 0.25f, 0.0f};
 }
-namespace dog_config{
-    inline const Vector2 dog_move_speed = {level_config::edge_weight, level_config::edge_weight};
-    inline const int eating_duration = game_config::frames * 10;
-    inline const float customer_spawn_interval = 20.0f;
-    inline const float dog_reach = level_config::edge_weight * 0.3f;
-
-    inline const float waiter_idle_bounds_edges = 3.0f;
-    inline const size_t waiter_idle_min_points = 2;
-    inline const size_t waiter_idle_max_points = 4;
-    inline const size_t waiter_wander_odds = 6;
-    inline const size_t waiter_idle_max_attempts = 3;
-
-    enum waiter_dog_types{
-        basic = 0,
-        size
-    };
-    enum customer_dog_types{
-        fred = 0,
-        john
-    };
-    enum player_dog_states{
-        player_idle = 0,
-        player_walking,
-        player_interacting,
-        player_states_size
-    };
-    enum customer_dog_states{
-        customer_walking = 0,
-        customer_sitting,
-        customer_eating,
-        customer_states_size
-    };
-    enum waiter_dog_states{
-        waiter_stationary = 0,
-        waiter_idle,
-        waiter_carrying,
-        waiter_states_size
-    };
-    enum state_transitions{
-        path_created = events::ids::dog_started_path_id,
-        path_finished = events::ids::dog_path_complete,
-        interaction_started = events::ids::interaction_started_id,
-        interaction_finished = events::ids::interaction_finished_id,
-        order_served = events::ids::order_served_id,
-        food_dropped = events::ids::food_dropped_id,
-        food_collected = events::ids::waiter_collected_food_id,
-        meal_finished = events::ids::customer_finished_meal_id,
-        customer_leaving = events::ids::customer_left
-    };
+namespace feature_flag_config{
+    inline const bool automatic_arrivals = false;
 }
-namespace controls_config{
-    // controls 
-    inline std::vector<int> mouse_controls = std::vector<int>{MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT};
-    enum key_press_actions{
-        dog_switch = KEY_F,
-        shop_open = KEY_S,
-        inventory_open = KEY_I,
-        menu_open = KEY_TAB,
-        quests_open = KEY_Q,
-        map_open = KEY_M,
-        back = KEY_ESCAPE,
-        exit_edit = KEY_E,
-        debug_toggle = KEY_J
-    };
-    enum key_hold_actions{
-        edit_mode = KEY_E,
-        move_down = KEY_DOWN,
-        move_up  = KEY_UP,
-        move_left = KEY_LEFT,
-        move_right = KEY_RIGHT
-    };
-    // ? antiicpating the need for multiple control schemes, one for the home level, and one for the 
-    // ? resource collecting levels 
+namespace food_config{
+    inline const uint8_t cook_duration = 20;
+}
+namespace graph_config{
+    inline const int empty_node = -1;
 }
 namespace hud_config{
-    // TODO (25 / 8 / 26) change values pending test
+
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
     inline Color red_decoration_highlight = Color {255, 255, 0, opacity};
@@ -735,20 +766,135 @@ namespace hud_config{
     
     inline const float edit_wheel_attributes[entity_config::attributes::size] = {35.0f, 35.0f, static_cast<float>(game_config::hold_duration),  1.0f}; // for now, pending animation play speed implementation , frames is 90
 
+    inline const float nine_sprite_corner_width = level_config::edge_weight * 0.5;
+    inline const float nine_sprite_corner_height = level_config::edge_weight * 0.5;
+    inline const Vector2 nine_sprite_corner = {nine_sprite_corner_width, nine_sprite_corner_height};
+    inline const float nine_sprite_centre_width = level_config::edge_weight;
+    inline const float nine_sprite_centre_height = level_config::edge_weight;
+    inline const Vector2 nine_sprite_centre{nine_sprite_centre_width, nine_sprite_centre_height};
+
+    inline const Vector2 nine_sprite_horizontal = {nine_sprite_centre_width, nine_sprite_corner_height};
+    inline const Vector2 nine_sprite_vertical = {nine_sprite_corner_width, nine_sprite_centre_height};
+
+
+    inline const Vector2 top_left_corner_offset = {};
+    inline const Vector2 top_right_corner_offset = {};
+    inline const Vector2 bottom_left_corner_offset = {};
+    inline const Vector2 bottom_right_corner_offset = {};
+
+    inline const float nine_sprite_frames = 1.0f;
+    inline const float nine_sprite_animations = 1.0f; 
+
+    inline const char* nine_sprite_corner_path = "../sprites/hud/nine_sprite_corner.png";
+    inline const char* nine_sprite_centre_path = "../sprites/hud/nine_sprite_centre.png";
+    inline const char* nine_sprite_horizontal_path = "../sprites/hud/nine_sprite_horizontal.png";
+    inline const char* nine_sprite_vertical_path = "../sprites/hud/nine_sprite_vertical.png";
+
+    inline const float recipe_icon_width = entity_config::food_width * 0.8;
+    inline const float recipe_icon_height = recipe_icon_width;
+    inline const float reicpe_icon_width_buffer = entity_config::food_width * 0.2;
+    inline const float recipe_icon_height_buffer = reicpe_icon_width_buffer;
+
+    inline const int recipe_rows = 2;
+    inline const int recipe_columns = 2;
+    inline const Rectangle cook_station_hud_sprite = {0.0f, 0.0f, 
+        recipe_columns * (recipe_icon_width + reicpe_icon_width_buffer),
+        recipe_rows * (recipe_icon_height + recipe_icon_height_buffer) };
+    inline const Vector2 cook_station_hud_offset = {entity_config::station_width - (entity_config::station_width / 4), entity_config::station_height  * -0.5f};
 }
-namespace debug_logger_config{
-    inline const char* log_directory = "../debug_logs";
-    inline const float logger_height_ratio = 0.6f;
-    inline const float logger_y_position_scalar = 1.0f - logger_height_ratio;
-    inline const int backdrop_opacity = 102;
-    inline const Color backdrop = Color{28, 28, 28, backdrop_opacity};
-    inline const Color text = Color{245, 240, 225, 255};
-    // max_messages lines at line_height must fit inside the backdrop, which is
-    // logger_height_ratio of the screen less padding_y top and bottom
-    inline const int font_size = 20;
-    inline const int line_height = 30;
-    inline const int padding_x = 18;
-    inline const int padding_y = 16;
-    inline const size_t max_messages = 20;
+namespace interaction_config{
+    enum interactions{
+        customer_table_sit = 0,
+        waiter_table_serve,
+        waiter_counter_pickup,
+        waiter_counter_place_down,
+        player_station_cook,
+        size
+    };
+    // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- // 
+    inline std::vector<size_t> waiter_dog_interactor = {
+        waiter_table_serve,
+        waiter_counter_pickup,
+        waiter_counter_place_down,
+    };
+    inline std::vector<size_t> customer_dog_interactor = {
+        customer_table_sit
+    };
+
+    inline std::vector<size_t> player_dog_interactor =  {
+        player_station_cook
+    };
+    
+    // * ------------------- STATION INTERACTEE INTERACTIONS ----------------------------- //
+    inline std::vector<size_t> table_interactee = {
+        customer_table_sit,
+        waiter_table_serve,
+    };
+    inline std::vector<size_t> counter_interactee = {
+        waiter_counter_pickup,
+        waiter_counter_place_down
+    };
+
+    inline std::vector<size_t> cooking_station_interactee = {
+        player_station_cook
+    };
+}
+namespace player_config{
+    inline const int max_bones = 999999;
+    inline const int max_level = 50;
+}
+namespace station_config{
+
+    inline const float station_reach = level_config::edge_weight * 0.25f;
+
+    enum cook_station_states{
+        station_idle = 0,
+        station_active,
+        station_states_size
+    };
+    enum state_transitions{
+        player_engaged = events::ids::player_engaged_id,
+        player_disengaged = events::ids::player_disengaged_id
+    };
+
+
+    inline std::vector<int> stove_recipes = {
+        entity_config::foods::cutlets,
+        entity_config::foods::boiled_chicken,
+        entity_config::foods::risotto,
+        entity_config::foods::carbonara,
+    };
+    inline std::vector<int> oven_recipes = {
+        entity_config::foods::lasagna,
+        entity_config::foods::bone_biscuits
+    };
+    inline std::vector<int> espresso_station_recipes = {
+        entity_config::foods::espresso,
+        entity_config::foods::pup_cup
+    };
+    inline std::vector<int> bush_recipes = {
+        entity_config::foods::bird,
+        entity_config::foods::sausage_on_a_stick,
+        entity_config::foods::lemongrass,
+        entity_config::foods::pork_knuckles,
+    };
+    inline std::vector<int> chopping_board_recipes = {
+        entity_config::foods::charpoocherie_board,
+        entity_config::foods::cheddar,
+        entity_config::foods::parmigiano,
+        entity_config::foods::shishamo,
+        entity_config::foods::rabbit_foot
+    
+    };
+    inline std::vector<int> fridge_recipes = {
+        entity_config::foods::brisket_leftovers,        
+        entity_config::foods::steak_leftovers
+    };
+}
+namespace type_config{
+    // * an ordered run of world positions to walk through. Lives here rather
+    // * than inside any one class so the graph, the query layer, the movement
+    // * component and the dogs all name the same type.
+    using path = std::vector<Vector2>;
 }
 #endif

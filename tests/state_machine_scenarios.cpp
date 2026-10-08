@@ -54,7 +54,7 @@ SCENARIO("a machine follows the edges out of its current state", "[state_machine
                 REQUIRE(machine.current() == dog_config::player_idle);
             }
             THEN("an interaction takes it to interacting"){
-                machine.transition(0, dog_config::interaction_started);
+                machine.transition(0, dog_config::player_work_station);
                 REQUIRE(machine.current() == dog_config::player_interacting);
             }
         }
@@ -79,7 +79,7 @@ SCENARIO("the customer machine walks its service cycle", "[state_machine]"){
         }
 
         WHEN("it is seated, served, and finishes its meal"){
-            machine.transition(0, dog_config::interaction_started);
+            machine.transition(0, dog_config::player_work_station);
             REQUIRE(machine.current() == dog_config::customer_sitting);
 
             machine.transition(0, dog_config::order_served);
@@ -93,7 +93,7 @@ SCENARIO("the customer machine walks its service cycle", "[state_machine]"){
         }
 
         WHEN("it is seated and leaves before it is served"){
-            machine.transition(0, dog_config::interaction_started);
+            machine.transition(0, dog_config::player_work_station);
             machine.transition(0, dog_config::customer_leaving);
 
             THEN("it walks out"){
@@ -116,7 +116,7 @@ SCENARIO("the waiter machine goes straight from idle to carrying", "[state_machi
             machine.transition(0, dog_config::path_created);
             REQUIRE(machine.current() == dog_config::waiter_idle);
 
-            machine.transition(0, dog_config::interaction_started);
+            machine.transition(0, dog_config::player_work_station);
             REQUIRE(machine.current() == dog_config::waiter_idle);
 
             machine.transition(0, dog_config::food_collected, 42);
@@ -131,7 +131,7 @@ SCENARIO("the waiter machine goes straight from idle to carrying", "[state_machi
             }
             THEN("reaching the table keeps it carrying, and serving leaves it standing"){
                 machine.transition(0, dog_config::path_finished);
-                machine.transition(0, dog_config::interaction_started);
+                machine.transition(0, dog_config::player_work_station);
                 REQUIRE(machine.current() == dog_config::waiter_carrying);
 
                 machine.transition(0, dog_config::order_served);
@@ -273,7 +273,7 @@ SCENARIO("the system transitions the entity the event names", "[state_machine]")
         }
 
         WHEN("an interaction starts for the customer"){
-            raise<events::interaction_started>(customer_id, khiri_id);
+            raise<events::player_work_station>(customer_id, khiri_id);
 
             THEN("the interactor is the one that transitions"){
                 REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
@@ -300,7 +300,7 @@ SCENARIO("a seated customer eats for as long as the config says", "[state_machin
         systems::npc_system::get_instance().register_customer(customer_id);
 
         game.claim(customer_id, table_id);
-        raise<events::interaction_started>(customer_id, table_id);
+        raise<events::player_work_station>(customer_id, table_id);
         REQUIRE(game.state_of(customer_id).value() == dog_config::customer_sitting);
 
         WHEN("an order is served at a different table"){
@@ -342,7 +342,7 @@ SCENARIO("a waiter carries the food the event handed it", "[state_machine]"){
         auto counter_id = game.create_food_counter(Vector2{400.0f, 400.0f});
 
         raise<events::dog_started_path>(waiter_id);
-        raise<events::interaction_started>(waiter_id, counter_id);
+        raise<events::player_work_station>(waiter_id, counter_id);
         REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_idle);
 
         WHEN("it collects a named food entity"){
@@ -365,6 +365,30 @@ SCENARIO("a waiter carries the food the event handed it", "[state_machine]"){
             THEN("it carries nothing in particular"){
                 REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_carrying);
                 REQUIRE_FALSE(game.carried_item_of(waiter_id).has_value());
+            }
+        }
+    }
+}
+
+SCENARIO("working a cooking station transitions the player and the station", "[state_machine]"){
+    GIVEN("a walking player dog and an idle cooking station"){
+        testing::ecs_test_game game;
+        auto khiri_id = game.create_khiri();
+        auto station_id = game.create_cooking_station(entity_config::stove,
+            Vector2{level_config::cafe_x + 640.0f, level_config::cafe_y + 640.0f});
+        raise<events::dog_started_path>(khiri_id);
+
+        REQUIRE(game.state_of(khiri_id).value() == dog_config::player_walking);
+        REQUIRE(game.state_of(station_id).value() == station_config::station_idle);
+
+        WHEN("the player works the station"){
+            raise<events::player_work_station>(khiri_id, station_id);
+
+            THEN("the player is interacting"){
+                REQUIRE(game.state_of(khiri_id).value() == dog_config::player_interacting);
+            }
+            THEN("the station is active"){
+                REQUIRE(game.state_of(station_id).value() == station_config::station_active);
             }
         }
     }
