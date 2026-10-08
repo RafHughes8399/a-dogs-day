@@ -20,10 +20,7 @@ namespace hud_systems{
         private:
             hud_rendering_system() = default;
     };
-
-
     // storing hud elements 
-
     // processing hud behaviours
     // and then the hud as a whole that has the instances of the 
     class hud {

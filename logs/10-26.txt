@@ -189,12 +189,13 @@ t
         -> bound camera movement and camera zooming  x 
     -> zoom controls with scroll wheel x 
     -> storing hud elements in their own spatial system, one level above and separate from other entities to avoid misclicks 
-    -> and split the dog art, i know you dont want to but you need to
+    -> and split the dog art, i know you dont want to but you need to x
     
-    
-    -> resize elements, assign to all stations
-    -> define hud spatial system
-    -> dog art split
+    -> resize elements so it can fit a page of recipes, assign to all stations, should be built with the same dimesions considering they are the same
+    -> define hud spatial system , should be relatively copy pastable and then have left click check for hud clicks too 
+    -> dog art split x 
+    -> no the hud spatial system doesnt really actually work without buttons and stuff to click on
+    -> so we need those things first ok lets 
     [ ------------- this is a fiar slice to stop at for the current branch ---------]
 
     -> then buttons [maybe this is where the clickable component comes in, because you can then define an on_click behaviour]

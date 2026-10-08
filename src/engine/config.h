@@ -88,8 +88,6 @@ namespace level_config{
     inline const float screen_height = static_cast<float>(game_config::window_height);
     inline const float edge_weight = 64.0f; // placeholder
     
-    // TODO the background tiles should be 768 * 768, so the original frame of the tile  is 256 * 256
-    // TODO and the world should bcome a square, and then the tiles become 4  to fill it out
     inline const size_t num_tiles = 16;
     inline const float tile_width = 768.0f;
     inline const float tile_height = 768.0f;
@@ -736,13 +734,6 @@ namespace entity_config{
     inline const float espresso_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
     inline const float cutlets_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
     
-    
-    
-    
-    
-    // * legacy entities::station capacity. the ECS stations size their capacity
-    // * off the slot offset lists below instead.
-    inline const size_t food_counter_capacity = 3;
     inline const Vector2 station_slot_left  = Vector2Zero();
     inline const Vector2 station_slot_right = Vector2Zero(); 
     inline const Vector2 station_slot_up    = Vector2Zero();
@@ -763,7 +754,7 @@ namespace graph_config{
     inline const int empty_node = -1;
 }
 namespace hud_config{
-    // TODO (25 / 8 / 26) change values pending test
+
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
     inline Color red_decoration_highlight = Color {255, 255, 0, opacity};
@@ -799,8 +790,17 @@ namespace hud_config{
     inline const char* nine_sprite_horizontal_path = "../sprites/hud/nine_sprite_horizontal.png";
     inline const char* nine_sprite_vertical_path = "../sprites/hud/nine_sprite_vertical.png";
 
-    inline const Rectangle cook_station_hud_sprite = {0.0f, 0.0f, entity_config::station_width * 1.0f, entity_config::station_height * 0.75f };
-    inline const Vector2 cook_station_hud_offset = {entity_config::station_width, 0.0f};
+    inline const float recipe_icon_width = entity_config::food_width * 0.8;
+    inline const float recipe_icon_height = recipe_icon_width;
+    inline const float reicpe_icon_width_buffer = entity_config::food_width * 0.2;
+    inline const float recipe_icon_height_buffer = reicpe_icon_width_buffer;
+
+    inline const int recipe_rows = 2;
+    inline const int recipe_columns = 2;
+    inline const Rectangle cook_station_hud_sprite = {0.0f, 0.0f, 
+        recipe_columns * (recipe_icon_width + reicpe_icon_width_buffer),
+        recipe_rows * (recipe_icon_height + recipe_icon_height_buffer) };
+    inline const Vector2 cook_station_hud_offset = {entity_config::station_width - (entity_config::station_width / 4), entity_config::station_height  * -0.5f};
 }
 namespace interaction_config{
     enum interactions{
