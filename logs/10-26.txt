@@ -220,7 +220,7 @@ t
             -> page icons
             -> text
             -> count
-    -> hud element builders 
+    -> hud element builders , 
             -> recipe icons
             -> page navigation
             -> page count
@@ -244,4 +244,25 @@ t
         -> 
     -> cosmetics and animations
 
+    ok that's a fair outline, we can manage that
+    // !!!!!!!!!!!!!!!! BUTTONS: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
+    buttons are a built hud element that are not nine sprites. they have their own sprite\
     
+    the question becomes can we treat hud elements as entities in the scheme of like regular systems but instead they ust go into their own spatial system
+    enitty is added to the spatial system through the lifespan create entity call 
+
+    could store a hud quadtree alongisde a entity quadtree, and then just the ids are mixed in. it kind of bloats searching i suppose but like not by much.
+    its either that or we sort of redefine certain systems and components and it exists alongside . or we define differetn managers ? yeah i think we just define different managers, one manager for hud, one for entity
+    that gives the separation of the ids and the reuse of the components. wooooooooooooooooooo because hud elements do or will have renderables and we have solved the scaling problem so we are chilling in that regard
+
+    ok so we define new managers, and then expand the systems to allow for the hud behaviour and define new ones where needed like the dog systems. that centralises things i suppose
+
+
+    ok then the button is comprised of:
+    -> renderable
+    ->positional
+    -> collision
+    
+    -> clickable [NOT SELECTABLE, THEYU DIFFEER, CLICABLE MUST COME WITH AN ON_CLUCK BEHAVIOUR]
+    
+    -> and then it is the hud element that is built to contain some buttons and the nine sprite, etc.
