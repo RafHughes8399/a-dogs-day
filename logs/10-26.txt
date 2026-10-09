@@ -201,3 +201,94 @@ t
     -> then buttons [maybe this is where the clickable component comes in, because you can then define an on_click behaviour]
     -> a button is an entity with a positional, renderable, collision and clickable. it is attached to a hud element
     -> maybe should be its own structure like a nine_sprite ? 
+    -> they kind of need to live in their own like space
+
+    -> the hud elements can be built in the same way as entities are
+        -> we can define components and refer to them through their ids
+        -> same builders, manangers and systems, just like parralel
+    -> should be a hud component like a
+    -> then 
+
+    so we have entity components and hud components and then we can build specific hud pieces
+    what is currently the 
+
+
+    small roadmap intermission:
+    -> hud framework 
+            -> the nine sprite base stuff x 
+            -> buttons 
+            -> page icons
+            -> text
+            -> count
+    -> hud element builders , 
+            -> recipe icons
+            -> page navigation
+            -> page count
+            -> item counts,
+            etc.
+    -> some  interface between the hud and the entity systems
+        -> need some way to bridge between the two. i.e maybe events would suffice, or something event adjacent
+    -> test the user interaction with the cooking stations
+    -> perhaps then take a moment to clean up dog movmenet and a bit of a bug bash
+
+    -> not sure where decoraton and station movement - like player moving where they are placed, and storage ended up post refactor. i think that's a pretty important one 
+        -> need to define the constraints of the behaviour, i.e would we allow for it to be adjusted while its in use
+        -> i would say maybe yes if there is say a dog pathfinding to a station but like no if its being directly interacted with
+            -> so there would be in-flight recalibration that is required but interaction acts like a lock 
+    
+    -> currency and levelling
+        -> recipes have a value
+        -> items have a cost and a level requirement 
+        -> purchasing and serving nets experience
+    -> inventory and shop
+        -> 
+    -> cosmetics and animations
+
+    ok that's a fair outline, we can manage that
+
+
+    // !!!!!!!!!!!!!!!! BUTTONS: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
+    buttons are a built hud element that are not nine sprites. they have their own sprite\
+    
+    the question becomes can we treat hud elements as entities in the scheme of like regular systems but instead they ust go into their own spatial system
+    enitty is added to the spatial system through the lifespan create entity call 
+
+    could store a hud quadtree alongisde a entity quadtree, and then just the ids are mixed in. it kind of bloats searching i suppose but like not by much.
+    its either that or we sort of redefine certain systems and components and it exists alongside . or we define differetn managers ? yeah i think we just define different managers, one manager for hud, one for entity
+    that gives the separation of the ids and the reuse of the components. wooooooooooooooooooo because hud elements do or will have renderables and we have solved the scaling problem so we are chilling in that regard
+
+    ok so we define new managers, and then expand the systems to allow for the hud behaviour and define new ones where needed like the dog systems. that centralises things i suppose
+
+
+    ok then the button is comprised of:
+    -> renderable
+    ->positional
+    -> collision
+    
+    -> clickable [NOT SELECTABLE, THEYU DIFFEER, CLICABLE MUST COME WITH AN ON_CLUCK BEHAVIOUR]
+    
+    -> and then it is the hud element that is built to contain some buttons and the nine sprite, etc.
+    -> ok so first we can do some like file restructuring. subfolders in components/
+        -> components/shared
+        -> components/entity
+        -> components/hud
+    -> then separate the managers and helpers into. their own .hpp files in the root components/ folder
+    
+    -> all shared components will need their own entity and hud managers
+    -> entity components only need the entity manager, hud components only need the hud manager
+
+    -> then the shared systems can just be extended to handle the hud components
+
+
+    so for this current slice we have two things 
+    -> extend components, managers and systems to hud
+    -> reorganise files for structure and readability improvements
+    -> make the clickable component and setup checking for when an entity with such a compoentn is clicked - should be an extension to left and right click function
+    -> define builders and factories for buttons
+    -> define builders and factories for hud elements
+
+    -> build the hud elements and assign them to entities
+    -> then test 
+
+    button needs:
+    -> position, rednerable, collision, clickable 
