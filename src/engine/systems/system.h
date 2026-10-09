@@ -4,7 +4,7 @@
 #include "config.h"
 #include "entity.h"
 #include "events.h"
-#include "dog_behavioural_systems.h"
+#include "dog_systems/dog_behavioural_systems.h"
 #include "factories.hpp"
 #include "quadtree.h"
 #include "events_interface.h"

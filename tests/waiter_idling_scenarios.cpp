@@ -5,7 +5,7 @@
 
 #include "component.h"
 #include "config.h"
-#include "dog_behavioural_systems.h"
+#include "dog_systems/dog_behavioural_systems.h"
 #include "ecs_test_game.h"
 #include "raylib.h"
 #include "raymath.h"

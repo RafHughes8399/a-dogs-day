@@ -1,7 +1,7 @@
 #include "component.h"
 #include "config.h"
 #include "debug_log_interface.h"
-#include "dog_behavioural_systems.h"
+#include "dog_systems/dog_behavioural_systems.h"
 #include "entity_events.h"
 #include "events_interface.h"
 #include "raglib.h"

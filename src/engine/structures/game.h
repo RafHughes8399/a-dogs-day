@@ -8,7 +8,7 @@
 
 #include "debug_log_interface.h"
 #include "debug_logger.h"
-#include "hud_systems.hpp"
+#include "shared_systems/hud_systems.hpp"
 #include "system.h"
 #include <raylib.h>
 namespace game{

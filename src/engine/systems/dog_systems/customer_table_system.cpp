@@ -1,4 +1,4 @@
-#include "dog_behavioural_systems.h"
+#include "dog_systems/dog_behavioural_systems.h"
 #include "component.h"
 #include "config.h"
 #include "debug_log_interface.h"

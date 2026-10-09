@@ -132,41 +132,41 @@ add_library(components
   src/engine/components/component_managers.cpp
   src/engine/components/component_builders.cpp
   src/engine/components/component_helpers.cpp
-  src/engine/components/carrier_component.cpp
-  src/engine/components/collision_component.cpp
-  src/engine/components/interactable_component.cpp
-  src/engine/components/interactor_component.cpp
-  src/engine/components/key_input_component.cpp
-  src/engine/components/mouse_input_component.cpp
-  src/engine/components/movement_component.cpp
-  src/engine/components/position_component.cpp
-  src/engine/components/renderable_component.cpp
-  src/engine/components/selectable_component.cpp
-  src/engine/components/state_machine_component.cpp
-  src/engine/components/storage_component.cpp
-  src/engine/components/food_component.cpp
-  src/engine/components/recipes_component.cpp
-  src/engine/components/hud_component.cpp)
+  src/engine/components/entity_components/carrier_component.cpp
+  src/engine/components/entity_components/food_component.cpp
+  src/engine/components/entity_components/interactable_component.cpp
+  src/engine/components/entity_components/interactor_component.cpp
+  src/engine/components/entity_components/key_input_component.cpp
+  src/engine/components/entity_components/mouse_input_component.cpp
+  src/engine/components/entity_components/movement_component.cpp
+  src/engine/components/entity_components/recipes_component.cpp
+  src/engine/components/entity_components/selectable_component.cpp
+  src/engine/components/entity_components/storage_component.cpp
+  src/engine/components/shared_components/collision_component.cpp
+  src/engine/components/shared_components/position_component.cpp
+  src/engine/components/shared_components/renderable_component.cpp
+  src/engine/components/shared_components/state_machine_component.cpp
+  src/engine/components/hud_components/hud_component.cpp)
 link_libraries(components)
 
 add_library(systems
-  src/engine/systems/movement_system.cpp
-  src/engine/systems/carrier_system.cpp
-  src/engine/systems/rendering_system.cpp
-  src/engine/systems/spatial_system.cpp
-  src/engine/systems/collision_system.cpp
-  src/engine/systems/interaction_system.cpp
-  src/engine/systems/control_input_system.cpp
-  src/engine/systems/entity_lifespan_system.cpp
-  src/engine/systems/npc_system.cpp
-  src/engine/systems/customer_table_system.cpp
-  src/engine/systems/waiter_idling_system.cpp
-  src/engine/systems/selection_system.cpp
-  src/engine/systems/animation_system.cpp
-  src/engine/systems/state_machine_system.cpp
-  src/engine/systems/item_system.cpp
-  src/engine/systems/hud.cpp
-  src/engine/systems/hud_rendering_system.cpp)
+  src/engine/systems/entity_systems/movement_system.cpp
+  src/engine/systems/entity_systems/carrier_system.cpp
+  src/engine/systems/shared_systems/rendering_system.cpp
+  src/engine/systems/shared_systems/spatial_system.cpp
+  src/engine/systems/shared_systems/collision_system.cpp
+  src/engine/systems/entity_systems/interaction_system.cpp
+  src/engine/systems/entity_systems/control_input_system.cpp
+  src/engine/systems/entity_systems/entity_lifespan_system.cpp
+  src/engine/systems/dog_systems/npc_system.cpp
+  src/engine/systems/dog_systems/customer_table_system.cpp
+  src/engine/systems/dog_systems/waiter_idling_system.cpp
+  src/engine/systems/entity_systems/selection_system.cpp
+  src/engine/systems/shared_systems/animation_system.cpp
+  src/engine/systems/shared_systems/state_machine_system.cpp
+  src/engine/systems/entity_systems/item_system.cpp
+  src/engine/systems/shared_systems/hud.cpp
+  src/engine/systems/shared_systems/hud_rendering_system.cpp)
 link_libraries(systems)
 
 add_library(animation src/rendering/animation.cpp src/rendering/animation_builders.cpp)
@@ -175,7 +175,7 @@ link_libraries(animation)
 add_library(sprite src/rendering/sprite.cpp src/rendering/sprite_builders.cpp)
 link_libraries(sprite)
 
-add_library(item src/entities/items.cpp)
+add_library(item src/engine/structures/items.cpp)
 link_libraries(item)
 
 add_library(menu src/interfaces/menus.cpp)
@@ -184,7 +184,7 @@ link_libraries(menu)
 add_library(hud src/interfaces/hud.cpp)
 link_libraries(hud)
 
-add_library(hitbox src/entities/hitbox.cpp src/entities/hitbox_builders.cpp)
+add_library(hitbox src/engine/structures/hitbox.cpp src/engine/structures/hitbox_builders.cpp)
 link_libraries(hitbox)
 
 add_library(texture src/rendering/texture.cpp)
@@ -193,7 +193,7 @@ link_libraries(texture)
 add_library(entities src/entities/ecs_builders.cpp)
 link_libraries(entities)
 
-add_library(render_layer src/engine/render_layer.cpp)
+add_library(render_layer src/engine/structures/render_layer.cpp)
 link_libraries(render_layer)
 
 add_library(quadtree src/engine/structures/quadtree.cpp)
@@ -202,7 +202,7 @@ link_libraries(quadtree)
 add_library(graph src/engine/structures/graph.cpp src/engine/structures/path.cpp)
 link_libraries(graph)
 
-add_library(game src/engine/game.cpp)
+add_library(game src/engine/structures/game.cpp)
 link_libraries(game)
 
 
