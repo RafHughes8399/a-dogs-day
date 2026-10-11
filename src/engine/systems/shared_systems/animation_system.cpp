@@ -1,7 +1,8 @@
 #include "system.h"
+#include "component_managers.hpp"
 
 void systems::animation_system::play(size_t entity, const std::vector<sprite_animation>& animations){
-    auto* renderable = component_managers::renderable_manager_.get_component(entity);
+    auto* renderable = component_managers::entity_renderable_manager_.get_component(entity);
     if(renderable == nullptr){ return; }
 
     for(const auto& anim : animations){
@@ -29,7 +30,7 @@ void systems::animation_system::play(size_t entity, sprite_animation animation){
 }
 
 void systems::animation_system::stop(size_t entity){
-    auto* renderable = component_managers::renderable_manager_.get_component(entity);
+    auto* renderable = component_managers::entity_renderable_manager_.get_component(entity);
     if(renderable == nullptr){ return; }
 
     for(auto& slot : renderable->get_layers()){
@@ -43,7 +44,7 @@ void systems::animation_system::stop(size_t entity){
 }
 
 void systems::animation_system::stop(size_t entity, size_t sprite_slot){
-    auto* renderable = component_managers::renderable_manager_.get_component(entity);
+    auto* renderable = component_managers::entity_renderable_manager_.get_component(entity);
     if(renderable == nullptr){ return; }
 
     if(auto* slot = renderable->get_body(sprite_slot)){

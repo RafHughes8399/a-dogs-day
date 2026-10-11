@@ -801,6 +801,12 @@ namespace hud_config{
         recipe_columns * (recipe_icon_width + reicpe_icon_width_buffer),
         recipe_rows * (recipe_icon_height + recipe_icon_height_buffer) };
     inline const Vector2 cook_station_hud_offset = {entity_config::station_width - (entity_config::station_width / 4), entity_config::station_height  * -0.5f};
+
+    enum click_actions{
+        select_recipe = 0,
+        change_page,
+        size
+    };
 }
 namespace interaction_config{
     enum interactions{

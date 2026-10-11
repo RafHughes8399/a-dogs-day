@@ -3,6 +3,8 @@
 #include "entity.h"
 #include "testing_helpers.hpp"
 #include <raylib.h>
+#include "component_managers.hpp"
+#include "component_helpers.hpp"
 
 Camera2D& game::game::get_camera(){
     return rendering_.get_camera();
@@ -47,7 +49,7 @@ void game::game::init(){
     }
     systems::item_system::get_instance().place_item(counter, entity_config::foods::espresso);
     systems::item_system::get_instance().place_item(counter, entity_config::foods::cutlets);
-    auto food_items = component_managers::storage_manager_.get_component(counter)->size();
+    auto food_items = component_managers::entity_storage_manager_.get_component(counter)->size();
     /** a bit messy but we're going to create some items for the food counter to store */
     debug::log("[game::init, build counter]: id " + std::to_string(counter) + " with food items:  " + std::to_string(food_items));
     // this is injected here for testing purposes. not possible in the real game
@@ -75,10 +77,10 @@ void game::game::init(){
         ecs_entities::build_pavlov(id, Vector2{level_config::edge_weight * 12, level_config::edge_weight * 30});
     }, level_config::draw_layers::decoration);
     debug::log("[game::init, done] built "
-        + std::to_string(component_helpers::num_registered_components(khiri_id))
+        + std::to_string(component_helpers::num_registered_entity_components(khiri_id))
         + " components on khiri");
     debug::log("[game::init, done] built "
-        + std::to_string(component_helpers::num_registered_components(mack_id))
+        + std::to_string(component_helpers::num_registered_entity_components(mack_id))
         + " components on mack");
 
     return;

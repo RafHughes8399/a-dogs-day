@@ -1,6 +1,7 @@
 #include "system.h"
 #include <iostream>
 #include <string>
+#include "component_helpers.hpp"
 
 // ---------------- id allocation ----------------
 size_t systems::entity_lifespan_system::next_id(){
@@ -20,7 +21,8 @@ void systems::entity_lifespan_system::destroy(size_t entity_id){
     events::remove_entity removed{entity_id};
     event_interface::execute_event(removed);
 
-    component_helpers::unregister_all_components(entity_id);
+    component_helpers::unregister_all_entity_components(entity_id);
+    component_helpers::unregister_all_hud_components(entity_id);
     recycled_ids_.push(entity_id);
 }
 

@@ -6,6 +6,7 @@
 #include <raymath.h>
 #include <vector>
 #include "component.h"
+#include "component_managers.hpp"
 namespace render_layer{
     // TODO (25 / 8 / 26) RENAME AFTER REFACTOR IS COMPLETE - replaces layer once level is gone.
     // same shape as layer, holding ids - a stale entry is skipped via a null
@@ -30,8 +31,8 @@ namespace render_layer{
             template<typename UnaryPred>
             void draw(UnaryPred p, Vector2 frame_position, int frame, bool hitbox_debug = false){
                 for(auto entity_id : entities_){
-                    auto* renderable = component_managers::renderable_manager_.get_component(entity_id);
-                    auto* position = component_managers::positional_manager_.get_component(entity_id);
+                    auto* renderable = component_managers::entity_renderable_manager_.get_component(entity_id);
+                    auto* position = component_managers::entity_positional_manager_.get_component(entity_id);
                     if(renderable == nullptr or position == nullptr){ continue; }
                     if(not p(entity_id)){ continue; }
 
@@ -41,9 +42,9 @@ namespace render_layer{
                         body.get_active_sprite().render(draw_position, frame);
                     }
                     if(hitbox_debug){
-                        auto* hitbox = component_managers::collision_manager_.get_component(entity_id);
-                        auto* interactor = component_managers::interactor_manager_.get_component(entity_id);
-                        auto* interactable = component_managers::interactable_manager_.get_component(entity_id);
+                        auto* hitbox = component_managers::entity_collision_manager_.get_component(entity_id);
+                        auto* interactor = component_managers::entity_interactor_manager_.get_component(entity_id);
+                        auto* interactable = component_managers::entity_interactable_manager_.get_component(entity_id);
                         if(hitbox) {
                             auto box = hitbox->get_hitbox_component().get_hitbox().get_box();
                             auto box_position = Vector2Subtract({box.x, box.y}, frame_position);

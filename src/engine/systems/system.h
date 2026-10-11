@@ -1,6 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 #include "component.h"
+#include "component_managers.hpp"
 #include "config.h"
 #include "entity.h"
 #include "events.h"
@@ -156,7 +157,7 @@ namespace systems{
             }
 #ifdef DOG_DAYS_TESTING
             std::optional<size_t> state_of(size_t entity){
-                auto* component = component_managers::state_machine_manager_.get_component(entity);
+                auto* component = component_managers::entity_state_machine_manager_.get_component(entity);
                 if(component == nullptr){ return std::nullopt; }
                 return component->get_machine().current();
             }

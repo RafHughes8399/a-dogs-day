@@ -1,6 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 
 #include "component.h"
+#include "component_managers.hpp"
+#include "component_helpers.hpp"
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
@@ -35,11 +37,11 @@ namespace{
     void insert_collidable(tree::ecs_quadtree& tree, size_t entity_id, Vector2 position){
         std::vector<hitbox::hitbox> hitboxes{
             hitbox::hitbox(Rectangle{position.x, position.y, k_entity_size, k_entity_size})};
-        component_helpers::register_collision_component(entity_id,
-            component_builders::build_collision_component(
-                component_builders::build_hitbox_component(hitboxes, 0)));
+        component_helpers::register_entity_collision_component(entity_id,
+            component_builders::build_entity_collision_component(
+                component_builders::build_entity_hitbox_component(hitboxes, 0)));
 
-        auto* collision = component_managers::collision_manager_.get_component(entity_id);
+        auto* collision = component_managers::entity_collision_manager_.get_component(entity_id);
         tree.insert(entity_id, collision->get_hitbox_component().get_hitbox());
     }
 
@@ -49,14 +51,14 @@ namespace{
         float reach = k_interaction_reach){
         std::vector<hitbox::hitbox> hitboxes{
             hitbox::hitbox(Rectangle{position.x, position.y, k_entity_size, k_entity_size})};
-        component_helpers::register_collision_component(entity_id,
-            component_builders::build_collision_component(
-                component_builders::build_hitbox_component(hitboxes, 0)));
+        component_helpers::register_entity_collision_component(entity_id,
+            component_builders::build_entity_collision_component(
+                component_builders::build_entity_hitbox_component(hitboxes, 0)));
         std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets{};
-        component_helpers::register_interactable_component(entity_id,
-            component_builders::build_interactable_component(reach, slot_offsets));
+        component_helpers::register_entity_interactable_component(entity_id,
+            component_builders::build_entity_interactable_component(reach, slot_offsets));
 
-        auto* collision = component_managers::collision_manager_.get_component(entity_id);
+        auto* collision = component_managers::entity_collision_manager_.get_component(entity_id);
         tree.insert(entity_id, collision->get_hitbox_component().get_hitbox());
     }
 
@@ -68,13 +70,13 @@ namespace{
         float reach = k_interaction_reach){
         std::vector<hitbox::hitbox> hitboxes{
             hitbox::hitbox(Rectangle{position.x, position.y, k_entity_size, k_entity_size})};
-        component_helpers::register_collision_component(entity_id,
-            component_builders::build_collision_component(
-                component_builders::build_hitbox_component(hitboxes, 0)));
-        component_helpers::register_interactor_component(entity_id,
-            component_builders::build_interactor_component(reach));
+        component_helpers::register_entity_collision_component(entity_id,
+            component_builders::build_entity_collision_component(
+                component_builders::build_entity_hitbox_component(hitboxes, 0)));
+        component_helpers::register_entity_interactor_component(entity_id,
+            component_builders::build_entity_interactor_component(reach));
 
-        auto* collision = component_managers::collision_manager_.get_component(entity_id);
+        auto* collision = component_managers::entity_collision_manager_.get_component(entity_id);
         tree.insert(entity_id, collision->get_hitbox_component().get_hitbox());
     }
 }
@@ -397,7 +399,7 @@ SCENARIO("an interaction check follows an interactor as it moves",
         REQUIRE(tree.check_interaction(asker_id, probe) == static_cast<int>(target_id));
 
         WHEN("it is moved into the other quadrant"){
-            auto* collision = component_managers::collision_manager_.get_component(target_id);
+            auto* collision = component_managers::entity_collision_manager_.get_component(target_id);
             collision->get_hitbox_component().get_hitbox().update(Vector2{100.0f, 100.0f});
             tree.move(target_id, collision->get_hitbox_component().get_hitbox());
 

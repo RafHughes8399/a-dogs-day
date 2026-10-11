@@ -2,6 +2,8 @@
 
 #include "ecs_test_game.h"
 #include "component.h"
+#include "component_managers.hpp"
+#include "component_helpers.hpp"
 #include "config.h"
 #include "testing_helpers.hpp"
 
@@ -9,17 +11,17 @@ namespace {
     const Vector2 counter_spot{level_config::edge_weight * 8, level_config::edge_weight * 8};
 
     components::renderable_component::body* food_slot(size_t counter_id){
-        auto* renderable = component_managers::renderable_manager_.get_component(counter_id);
+        auto* renderable = component_managers::entity_renderable_manager_.get_component(counter_id);
         return renderable == nullptr
             ? nullptr
             : renderable->get_body(entity_config::counter_sprite_slots::counter_food);
     }
     size_t slot_count(size_t counter_id){
-        auto* renderable = component_managers::renderable_manager_.get_component(counter_id);
+        auto* renderable = component_managers::entity_renderable_manager_.get_component(counter_id);
         return renderable == nullptr ? 0 : renderable->num_bodys();
     }
     components::storage_component* storage_of(size_t counter_id){
-        return component_managers::storage_manager_.get_component(counter_id);
+        return component_managers::entity_storage_manager_.get_component(counter_id);
     }
     void push(size_t counter_id, size_t food_id){
         component_helpers::add_stored_item(counter_id,
@@ -50,7 +52,7 @@ SCENARIO("a counter is built empty with only its body sprite", "[counter][storag
                 REQUIRE(food_slot(counter_id) == nullptr);
             }
             THEN("the body slot is at index counter_body"){
-                auto* renderable = component_managers::renderable_manager_.get_component(counter_id);
+                auto* renderable = component_managers::entity_renderable_manager_.get_component(counter_id);
                 REQUIRE(renderable->get_body(
                     entity_config::counter_sprite_slots::counter_body) != nullptr);
             }
@@ -86,7 +88,7 @@ SCENARIO("pushing food onto an empty counter creates the food slot", "[counter][
                 REQUIRE(offset.y == entity_config::food_draw_offset.y);
             }
             THEN("the body slot is untouched"){
-                auto* renderable = component_managers::renderable_manager_.get_component(counter_id);
+                auto* renderable = component_managers::entity_renderable_manager_.get_component(counter_id);
                 REQUIRE(renderable->get_body(
                     entity_config::counter_sprite_slots::counter_body)->get_active_index() == 0);
             }
@@ -283,7 +285,7 @@ SCENARIO("a moved counter carries its stored food with it", "[counter][storage][
         auto counter_id = game.create_food_counter(counter_spot);
         push(counter_id, entity_config::foods::lasagna);
 
-        auto* position = component_managers::positional_manager_.get_component(counter_id);
+        auto* position = component_managers::entity_positional_manager_.get_component(counter_id);
         REQUIRE(position != nullptr);
         REQUIRE(position->get_position().x == counter_spot.x);
 

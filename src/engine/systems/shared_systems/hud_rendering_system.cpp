@@ -1,7 +1,8 @@
-#include "shared_systems/hud_systems.hpp"
+#include "hud_systems/hud_systems.hpp"
 #include "debug_log_interface.h"
 #include "system.h"
 #include <string>
+#include "component_managers.hpp"
 
 void hud_systems::hud_rendering_system::render(int frame){
     auto view_frame = systems::rendering_system::get_instance().get_view_frame();
@@ -13,7 +14,7 @@ void hud_systems::hud_rendering_system::render(int frame){
         debug::log("[hud_rendering_system::render, entity] id: " + std::to_string(id));
 
         // check selected, if so, draw the component
-        auto selectable_component = component_managers::selectable_manager_.get_component(id);
+        auto selectable_component = component_managers::entity_selectable_manager_.get_component(id);
         if(not selectable_component){
             debug::log("[hud_rendering_system::render, skipped] id: " + std::to_string(id) + ", no selectable component");
             continue;
@@ -22,7 +23,7 @@ void hud_systems::hud_rendering_system::render(int frame){
             + ", is_selected: " + std::to_string(selectable_component->is_selected()));
         
         if(selectable_component->is_selected()){
-            auto position_component = component_managers::positional_manager_.get_component(id);
+            auto position_component = component_managers::entity_positional_manager_.get_component(id);
             if(not position_component){
                 debug::log("[hud_rendering_system::render, skipped] id: " + std::to_string(id) + ", no position component");
                 continue;

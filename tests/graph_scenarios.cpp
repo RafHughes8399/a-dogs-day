@@ -5,6 +5,7 @@
 
 #include "ecs_test_game.h"
 #include "component.h"
+#include "component_managers.hpp"
 #include "raymath.h"
 
 SCENARIO("the level graph follows an entity's lifetime", "[ecs][graph][movement]"){
@@ -307,7 +308,7 @@ SCENARIO("a path created with a destination entity resolves to one of its intera
         auto dog_id = game.create_mack(); // mack_start is left of the table on x
 
         WHEN("the dog is sent to the table by entity id"){
-            auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+            auto* interactable = component_managers::entity_interactable_manager_.get_component(table_id);
             REQUIRE(interactable != nullptr);
             auto left_offset = interactable->get_slot_offset(level_config::directions::left);
             REQUIRE(left_offset.has_value());
@@ -502,17 +503,17 @@ SCENARIO("a checkpointed route still carries its destination entity on the last 
 
 namespace {
     size_t sprite_index_of(size_t entity_id){
-        auto* renderable = component_managers::renderable_manager_.get_component(entity_id);
+        auto* renderable = component_managers::entity_renderable_manager_.get_component(entity_id);
         REQUIRE(renderable != nullptr);
         return renderable->get_layers().front().get_active_index();
     }
     Vector2 heading_of(size_t entity_id){
-        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        auto* movement = component_managers::entity_movement_manager_.get_component(entity_id);
         REQUIRE(movement != nullptr);
         return movement->get_direction_scalar();
     }
     Vector2 position_of(size_t entity_id){
-        auto* position = component_managers::positional_manager_.get_component(entity_id);
+        auto* position = component_managers::entity_positional_manager_.get_component(entity_id);
         REQUIRE(position != nullptr);
         return position->get_position();
     }

@@ -292,3 +292,11 @@ t
 
     button needs:
     -> position, rednerable, collision, clickable 
+
+    i need to distinguish language some more 
+        -> a hud element is a button, a background, an icon, etc.
+        -> hud components are used to build hud_element 
+        -> a hud for an entity or a meny is a hud_element
+
+        -> these hud elements are built and then managed by the systems 9
+

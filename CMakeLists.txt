@@ -146,7 +146,9 @@ add_library(components
   src/engine/components/shared_components/position_component.cpp
   src/engine/components/shared_components/renderable_component.cpp
   src/engine/components/shared_components/state_machine_component.cpp
-  src/engine/components/hud_components/hud_component.cpp)
+  src/engine/components/hud_components/hud_component.cpp
+  src/engine/components/hud_components/clickable_component.cpp
+  src/engine/components/hud_components/owner_component.cpp)
 link_libraries(components)
 
 add_library(systems
@@ -165,7 +167,8 @@ add_library(systems
   src/engine/systems/shared_systems/animation_system.cpp
   src/engine/systems/shared_systems/state_machine_system.cpp
   src/engine/systems/entity_systems/item_system.cpp
-  src/engine/systems/shared_systems/hud.cpp
+  src/engine/systems/hud_systems/hud.cpp
+  src/engine/systems/hud_systems/click_system.cpp
   src/engine/systems/shared_systems/hud_rendering_system.cpp)
 link_libraries(systems)
 

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "component.h"
+#include "component_managers.hpp"
 #include "config.h"
 #include "dog_systems/dog_behavioural_systems.h"
 #include "ecs_test_game.h"
@@ -25,7 +26,7 @@ namespace{
     }
 
     void clear_paths(size_t id){
-        auto* movement = component_managers::movement_manager_.get_component(id);
+        auto* movement = component_managers::entity_movement_manager_.get_component(id);
         REQUIRE(movement != nullptr);
         movement->clear_paths();
     }
@@ -84,7 +85,7 @@ SCENARIO("a waiter reads as idle only when it is neither walking nor interacting
 
         WHEN("it is interacting with a table"){
             auto table_id = game.create_table(in_cafe(1280.0f, 1280.0f));
-            auto* interactor = component_managers::interactor_manager_.get_component(waiter_id);
+            auto* interactor = component_managers::entity_interactor_manager_.get_component(waiter_id);
             REQUIRE(interactor != nullptr);
             interactor->interact_with(table_id);
 

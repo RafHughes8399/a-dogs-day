@@ -1,5 +1,6 @@
 #include "dog_systems/dog_behavioural_systems.h"
 #include "component.h"
+#include "component_managers.hpp"
 #include "config.h"
 #include "debug_log_interface.h"
 #include "dog_events.h"
@@ -13,7 +14,7 @@
 
 namespace {
     std::string position_of(size_t id){
-        auto* position = component_managers::positional_manager_.get_component(id);
+        auto* position = component_managers::entity_positional_manager_.get_component(id);
         if(position == nullptr){ return "no position component"; }
         return raglib::vector_to_string(position->get_position());
     }
@@ -52,7 +53,7 @@ bool dbs::customer_table_system::free_tables(){
 int dbs::customer_table_system::pick_customer(){
     for(auto customer : customers_){
         if(holds_reservation(customer)){ continue; }
-        auto interactor = component_managers::interactor_manager_.get_component(customer);
+        auto interactor = component_managers::entity_interactor_manager_.get_component(customer);
         if(interactor and not interactor->is_interacting()){
             return static_cast<int>(customer);
         }
@@ -62,7 +63,7 @@ int dbs::customer_table_system::pick_customer(){
 int dbs::customer_table_system::pick_table(){
     for(auto table : tables_){
         if(table.status() != table_status::available){ continue; }
-        if(component_managers::interactable_manager_.get_component(table.id()) == nullptr){ continue; }
+        if(component_managers::entity_interactable_manager_.get_component(table.id()) == nullptr){ continue; }
         return static_cast<int>(table.id());
     }
     return game_config::empty_entity;
@@ -123,7 +124,7 @@ void dbs::customer_table_system::send_customer_to_exit(size_t customer_id){
     event_interface::queue_event(create_path_event);
 }
 std::optional<size_t> dbs::customer_table_system::customer_at(size_t table_id){
-    auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+    auto* interactable = component_managers::entity_interactable_manager_.get_component(table_id);
     if(interactable == nullptr){ return std::nullopt; }
     for(auto slot : interactable->get_interactors()){
         if(slot.has_value() and std::ranges::find(customers_, slot.value()) != customers_.end()){
@@ -148,9 +149,9 @@ void dbs::customer_table_system::customer_cleanup(){
     for(auto customer : customers_){
         // * a customer holding a table has arrived somewhere on purpose - an
         // * empty path queue means seated, not finished
-        auto interactor = component_managers::interactor_manager_.get_component(customer);
+        auto interactor = component_managers::entity_interactor_manager_.get_component(customer);
         if(interactor and interactor->is_interacting()){ continue; }
-        auto movement = component_managers::movement_manager_.get_component(customer);
+        auto movement = component_managers::entity_movement_manager_.get_component(customer);
         if(movement and movement->get_paths().empty()){
             departed.push_back(customer);
         }

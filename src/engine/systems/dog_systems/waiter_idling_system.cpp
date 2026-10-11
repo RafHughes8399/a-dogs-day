@@ -1,4 +1,5 @@
 #include "component.h"
+#include "component_managers.hpp"
 #include "config.h"
 #include "debug_log_interface.h"
 #include "dog_systems/dog_behavioural_systems.h"
@@ -30,15 +31,15 @@ void dbs::waiter_idling_system::clear(){
 
 
 bool dbs::waiter_idling_system::is_idle(size_t waiter){
-    auto state = component_managers::state_machine_manager_.get_component(waiter);
+    auto state = component_managers::entity_state_machine_manager_.get_component(waiter);
     if(state == nullptr or state->get_machine().current() != dog_config::waiter_stationary){ return false; }
-    auto interactor = component_managers::interactor_manager_.get_component(waiter);
+    auto interactor = component_managers::entity_interactor_manager_.get_component(waiter);
     if(interactor and interactor->is_interacting()){ return false; }
-    auto movement_component = component_managers::movement_manager_.get_component(waiter);
+    auto movement_component = component_managers::entity_movement_manager_.get_component(waiter);
     return movement_component != nullptr and movement_component->get_paths().empty();
 }
 std::optional<Rectangle> dbs::waiter_idling_system::determine_idle_bounds(size_t waiter){
-    auto position_component = component_managers::positional_manager_.get_component(waiter);
+    auto position_component = component_managers::entity_positional_manager_.get_component(waiter);
     if(position_component == nullptr){ return std::nullopt; }
 
     auto position = position_component->get_position();
@@ -92,8 +93,8 @@ void dbs::waiter_idling_system::order_points(Vector2 from, std::vector<Vector2>&
     }
 }
 bool dbs::waiter_idling_system::build_paths(size_t waiter, size_t points, Rectangle bounds){
-    auto movement = component_managers::movement_manager_.get_component(waiter);
-    auto position = component_managers::positional_manager_.get_component(waiter);
+    auto movement = component_managers::entity_movement_manager_.get_component(waiter);
+    auto position = component_managers::entity_positional_manager_.get_component(waiter);
     if(movement == nullptr or position == nullptr){ return false; }
 
     auto candidates = walkable_positions(bounds);

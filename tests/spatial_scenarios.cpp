@@ -2,6 +2,7 @@
 
 #include "ecs_test_game.h"
 #include "component.h"
+#include "component_managers.hpp"
 #include "raymath.h"
 
 // the world spans the whole pathing graph - [0,-192] to [3072,2240] - over
@@ -96,7 +97,7 @@ SCENARIO("update_position carries the hitbox with the position", "[ecs][spatial]
                 REQUIRE(box.height == original.height);
             }
             THEN("the position component agrees with the hitbox"){
-                auto* position = component_managers::positional_manager_.get_component(cursor_id);
+                auto* position = component_managers::entity_positional_manager_.get_component(cursor_id);
                 REQUIRE(position->get_position().x == 300.0f);
                 REQUIRE(position->get_position().y == 300.0f);
             }
@@ -188,7 +189,7 @@ SCENARIO("a filtered collision check skips candidates the caller does not want",
             level_config::graph_y + 500.0f};
         auto table = game.create_table(table_position);
 
-        auto* interactable = component_managers::interactable_manager_.get_component(table);
+        auto* interactable = component_managers::entity_interactable_manager_.get_component(table);
         REQUIRE(interactable != nullptr);
         auto seat_offset = interactable->get_slot_offset(level_config::directions::left);
         REQUIRE(seat_offset.has_value());
@@ -203,7 +204,7 @@ SCENARIO("a filtered collision check skips candidates the caller does not want",
         WHEN("the click asks only for interactables"){
             auto hit = systems::spatial_system::get_instance().check_collision_with(nobody, click,
                 [](size_t candidate) -> bool {
-                    return component_managers::interactable_manager_.get_component(candidate) != nullptr;
+                    return component_managers::entity_interactable_manager_.get_component(candidate) != nullptr;
                 });
 
             THEN("the table answers, not the customer sitting over it"){
@@ -214,7 +215,7 @@ SCENARIO("a filtered collision check skips candidates the caller does not want",
         WHEN("nothing under the click matches the filter"){
             auto hit = systems::spatial_system::get_instance().check_collision_with(nobody, click,
                 [](size_t candidate) -> bool {
-                    return component_managers::storage_manager_.get_component(candidate) != nullptr;
+                    return component_managers::entity_storage_manager_.get_component(candidate) != nullptr;
                 });
 
             THEN("the check reports empty rather than the nearest miss"){

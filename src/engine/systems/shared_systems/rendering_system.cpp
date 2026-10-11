@@ -1,4 +1,5 @@
 #include "component.h"
+#include "component_managers.hpp"
 #include "config.h"
 #include "system.h"
 #include <algorithm>
@@ -8,7 +9,7 @@
 
 // ---------------- helpers ----------------
 bool systems::rendering_system::is_entity_in_frame(size_t id, Rectangle view_frame){
-    auto* collision = component_managers::collision_manager_.get_component(id);
+    auto* collision = component_managers::entity_collision_manager_.get_component(id);
     // nothing to cull against - draw it rather than hide it
     if(collision == nullptr){ return true; }
 

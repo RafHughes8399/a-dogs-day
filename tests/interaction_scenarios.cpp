@@ -3,6 +3,8 @@
 #include <vector>
 
 #include "component.h"
+#include "component_managers.hpp"
+#include "component_helpers.hpp"
 #include "config.h"
 #include "ecs_test_game.h"
 #include "raylib.h"
@@ -43,12 +45,12 @@ namespace{
     }
 
     bool claims(size_t dog_id, size_t entity_id){
-        auto* interactor = component_managers::interactor_manager_.get_component(dog_id);
+        auto* interactor = component_managers::entity_interactor_manager_.get_component(dog_id);
         return interactor != nullptr and interactor->get_target() == entity_id;
     }
 
     std::optional<size_t> carried_by(size_t dog_id){
-        auto* carrier = component_managers::carrier_manager_.get_component(dog_id);
+        auto* carrier = component_managers::entity_carrier_manager_.get_component(dog_id);
         return carrier == nullptr ? std::nullopt : carrier->get_carried_entity();
     }
 
@@ -123,10 +125,10 @@ SCENARIO("carried food stays on the side the carrier faces",
         auto& carrier = systems::carrier_system::get_instance();
         auto waiter_id = game.create_waiter_dog(in_cafe(320.0f, 320.0f));
         auto food_id = game.create_food(in_cafe(320.0f, 320.0f));
-        component_managers::carrier_manager_.get_component(waiter_id)->set_carried_entity(food_id);
+        component_managers::entity_carrier_manager_.get_component(waiter_id)->set_carried_entity(food_id);
 
         auto face = [&](size_t direction){
-            component_managers::movement_manager_.get_component(waiter_id)
+            component_managers::entity_movement_manager_.get_component(waiter_id)
                 ->set_direction_scalar(level_config::direction_scalars[direction]);
             component_helpers::set_facing_index(waiter_id, direction);
             carrier.update(0.0f);
@@ -231,7 +233,7 @@ SCENARIO("moving a claimed interactor raises an interaction for it and its targe
         testing::ecs_test_game game;
         auto decoration_id = game.create_test_decoration(in_cafe(320.0f, 320.0f));
         auto customer_id = game.create_customer_dog(in_cafe(640.0f, 640.0f));
-        component_managers::interactor_manager_.get_component(customer_id)
+        component_managers::entity_interactor_manager_.get_component(customer_id)
             ->interact_with(decoration_id);
 
         WHEN("it moves"){
@@ -532,7 +534,7 @@ SCENARIO("a waiter carries food from the counter to a seated customer",
                 REQUIRE(game.has_food(food_id.value()));
                 REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_carrying);
                 REQUIRE(game.carried_item_of(waiter_id) == food_id);
-                REQUIRE(component_managers::storage_manager_.get_component(counter_id)->head().get_count() == 1);
+                REQUIRE(component_managers::entity_storage_manager_.get_component(counter_id)->head().get_count() == 1);
             }
 
             AND_WHEN("it walks the food to the table"){
@@ -555,9 +557,9 @@ SCENARIO("a waiter carries food from the counter to a seated customer",
                         REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_stationary);
                     }
                     THEN("the food sits on the table at the draw offset, hitbox and all"){
-                        auto* table_position = component_managers::positional_manager_.get_component(table_id);
+                        auto* table_position = component_managers::entity_positional_manager_.get_component(table_id);
                         auto expected = Vector2Add(table_position->get_position(), entity_config::food_draw_offset);
-                        auto* food_position = component_managers::positional_manager_.get_component(food_id.value());
+                        auto* food_position = component_managers::entity_positional_manager_.get_component(food_id.value());
                         REQUIRE(Vector2Equals(food_position->get_position(), expected));
                         auto food_box = game.hitbox_of(food_id.value());
                         REQUIRE(Vector2Equals(Vector2{food_box.x, food_box.y}, expected));
@@ -565,9 +567,9 @@ SCENARIO("a waiter carries food from the counter to a seated customer",
                     THEN("the food stays put once the waiter walks away"){
                         game.path_to(waiter_id, in_cafe(640.0f, 1536.0f));
                         game.tick_until([](){ return false; }, 60);
-                        auto* table_position = component_managers::positional_manager_.get_component(table_id);
+                        auto* table_position = component_managers::entity_positional_manager_.get_component(table_id);
                         auto expected = Vector2Add(table_position->get_position(), entity_config::food_draw_offset);
-                        REQUIRE(Vector2Equals(component_managers::positional_manager_.get_component(food_id.value())->get_position(), expected));
+                        REQUIRE(Vector2Equals(component_managers::entity_positional_manager_.get_component(food_id.value())->get_position(), expected));
                     }
                     THEN("the seated customer starts eating"){
                         REQUIRE(game.state_of(customer_id).value() == dog_config::customer_eating);
@@ -592,7 +594,7 @@ SCENARIO("a waiter carries food from the counter to a seated customer",
                 THEN("the food is stored again and the waiter is left standing"){
                     REQUIRE_FALSE(carried_by(waiter_id).has_value());
                     REQUIRE_FALSE(game.has_food(food_id.value()));
-                    REQUIRE(component_managers::storage_manager_.get_component(counter_id)->head().get_count() == 2);
+                    REQUIRE(component_managers::entity_storage_manager_.get_component(counter_id)->head().get_count() == 2);
                     REQUIRE(game.state_of(waiter_id).value() == dog_config::waiter_stationary);
                 }
             }

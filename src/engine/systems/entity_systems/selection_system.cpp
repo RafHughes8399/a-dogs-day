@@ -1,4 +1,5 @@
 #include "component.h"
+#include "component_managers.hpp"
 #include "system.h"
 
 // ---------------- event handlers ----------------
@@ -16,7 +17,7 @@ void systems::selection_system::update(float delta){
 
 // ---------------- selection ----------------
 void systems::selection_system::select(size_t entity_id){
-    auto* selectable = component_managers::selectable_manager_.get_component(entity_id);
+    auto* selectable = component_managers::entity_selectable_manager_.get_component(entity_id);
     if(selectable == nullptr){ return; }
 
     deselect();
@@ -26,7 +27,7 @@ void systems::selection_system::select(size_t entity_id){
 
 void systems::selection_system::deselect(){
     if(selected_ == game_config::empty_entity){ return; }
-    if(auto* selectable = component_managers::selectable_manager_.get_component(static_cast<size_t>(selected_))){
+    if(auto* selectable = component_managers::entity_selectable_manager_.get_component(static_cast<size_t>(selected_))){
         selectable->unselect();
     }
     selected_ = game_config::empty_entity;

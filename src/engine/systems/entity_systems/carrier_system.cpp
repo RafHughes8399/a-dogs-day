@@ -1,9 +1,10 @@
 #include "component.h"
+#include "component_managers.hpp"
 #include "system.h"
 #include <raymath.h>
 
 Vector2 systems::carrier_system::mouth_offset(size_t carrier){
-    auto hitbox = component_managers::collision_manager_.get_component(carrier);
+    auto hitbox = component_managers::entity_collision_manager_.get_component(carrier);
     if(not hitbox) {return Vector2Zero();}
     auto& hitboxes = hitbox->get_hitbox_component();
     auto dog_box = hitboxes.get_hitbox().get_box();
@@ -16,14 +17,14 @@ Vector2 systems::carrier_system::mouth_offset(size_t carrier){
 
 void systems::carrier_system::update(float delta){
     (void) delta;
-    for(auto& [id, carrier] : component_managers::carrier_manager_){
+    for(auto& [id, carrier] : component_managers::entity_carrier_manager_){
         auto* current_position = carrier.get_current_position();
         if(current_position == nullptr){ continue; }
 
         auto carried_entity = carrier.get_carried_entity();
         if(not carried_entity.has_value()){ continue; }
 
-        auto* carried_position = component_managers::positional_manager_.get_component(carried_entity.value());
+        auto* carried_position = component_managers::entity_positional_manager_.get_component(carried_entity.value());
         if(carried_position == nullptr){ continue; }
 
         auto target = Vector2Add(*current_position, mouth_offset(id));

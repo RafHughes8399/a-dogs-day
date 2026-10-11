@@ -1,8 +1,9 @@
 #include "system.h"
+#include "component_managers.hpp"
 
 // ---------------- helpers ----------------
 hitbox::hitbox* systems::spatial_system::bounds_for(size_t entity_id){
-    auto* collision = component_managers::collision_manager_.get_component(entity_id);
+    auto* collision = component_managers::entity_collision_manager_.get_component(entity_id);
     if(collision == nullptr){ return nullptr; }
     return &collision->get_hitbox_component().get_hitbox();
 }

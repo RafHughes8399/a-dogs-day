@@ -1,4 +1,5 @@
 #include "component.h"
+#include "component_managers.hpp"
 #include "config.h"
 #include "debug_log_interface.h"
 #include "debug_logger.h"
@@ -13,7 +14,7 @@
 
 namespace {
     bool is_interactable(size_t entity_id){
-        return component_managers::interactable_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_interactable_manager_.get_component(entity_id) != nullptr;
     }
 }
 
@@ -73,17 +74,17 @@ void systems::control_input_system::dispatch(int key, int action, size_t id, flo
 
 void systems::control_input_system::update(float delta){
     // * check key components
-    for(auto it = component_managers::control_manager_.begin(); it != component_managers::control_manager_.end(); ++it){
+    for(auto it = component_managers::entity_control_manager_.begin(); it != component_managers::entity_control_manager_.end(); ++it){
         size_t id = static_cast<size_t>(*&it->first);
         auto inputs = it->second.get_inputs();
         check_inputs(id, inputs, delta);
     }
     // * check mouse components
-    for(auto it = component_managers::mouse_input_manager_.begin(); it != component_managers::mouse_input_manager_.end(); ++it){
+    for(auto it = component_managers::entity_mouse_input_manager_.begin(); it != component_managers::entity_mouse_input_manager_.end(); ++it){
         size_t id = static_cast<size_t>(*&it->first);
         auto inputs = it->second.get_inputs();
         auto cursor_position = rendering_system::get_instance().screen_to_world(GetMousePosition());
-        auto* position = component_managers::positional_manager_.get_component(id);
+        auto* position = component_managers::entity_positional_manager_.get_component(id);
         if(position != nullptr and not Vector2Equals(position->get_position(), cursor_position)){
             systems::movement_system::get_instance().update_position(id, cursor_position);
         }
@@ -191,7 +192,7 @@ void systems::control_input_system::move_view_frame(Vector2 direction_scalar, fl
 
 
 void systems::control_input_system::left_click(size_t id){
-    auto* cursor = component_managers::positional_manager_.get_component(id);
+    auto* cursor = component_managers::entity_positional_manager_.get_component(id);
     if(cursor == nullptr){ return; }
     auto click_position = cursor->get_position();
     debug::log("[control_input_system::left_click, clicked] asked by: "
@@ -218,7 +219,7 @@ void systems::control_input_system::left_click(size_t id){
 // ? maybe extendable to waiters too ? if i wanted to change how the waiter interaction stuff goes
 // ! not sure where this should go right now. i think maybe a type system ? ceebs to implement that right now though
 void systems::control_input_system::right_click(size_t id){
-    auto* cursor = component_managers::positional_manager_.get_component(id);
+    auto* cursor = component_managers::entity_positional_manager_.get_component(id);
     if(cursor == nullptr){ return; }
     auto click_position = cursor->get_position();
     debug::log("[control_input_system::right_click, clicked] asked by: "
@@ -231,7 +232,7 @@ void systems::control_input_system::right_click(size_t id){
         return;
     }
     auto selected_id = static_cast<size_t>(selected);
-    auto* selectable = component_managers::selectable_manager_.get_component(selected_id);
+    auto* selectable = component_managers::entity_selectable_manager_.get_component(selected_id);
     if(not helpers::is_dog(selectable->get_kind())){
         debug::log("[control_input_system::right_click, selection is not a player dog] id: "
             + std::to_string(selected_id)

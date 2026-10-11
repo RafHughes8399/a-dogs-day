@@ -1,16 +1,17 @@
 #include "config.h"
 #include "dog_events.h"
 #include "system.h"
+#include "component_managers.hpp"
 
 void systems::state_machine_system::update(float delta){
-    for(auto& [entity, component] : component_managers::state_machine_manager_){
+    for(auto& [entity, component] : component_managers::entity_state_machine_manager_){
         component.get_machine().update(entity, delta);
     }
 }
 
 void systems::state_machine_system::transition(size_t entity, int transition,
     std::optional<size_t> payload){
-    auto* component = component_managers::state_machine_manager_.get_component(entity);
+    auto* component = component_managers::entity_state_machine_manager_.get_component(entity);
     if(component == nullptr){
         debug::log("[state_machine_system::transition] entity: " + std::to_string(entity)
             + ", transition: " + std::to_string(transition)
@@ -37,7 +38,7 @@ void systems::state_machine_system::transition(size_t entity, int transition,
 }
 
 void systems::state_machine_system::play_state_animation(size_t entity){
-    auto* component = component_managers::state_machine_manager_.get_component(entity);
+    auto* component = component_managers::entity_state_machine_manager_.get_component(entity);
     if(component == nullptr){ return; }
 
     auto* current = component->get_machine().get_current_state();
@@ -68,7 +69,7 @@ void systems::state_machine_system::on_interaction_finished(const events::intera
         + std::to_string(event.get_interactor_id())
         + ", interactee: " + std::to_string(event.get_interactee_id()));
     transition(event.get_interactor_id(), dog_config::interaction_finished);
-    auto* interactable = component_managers::interactable_manager_.get_component(event.get_interactee_id());
+    auto* interactable = component_managers::entity_interactable_manager_.get_component(event.get_interactee_id());
     if(interactable and interactable->has_interactor()){
         debug::log("[state_machine_system::on_interaction_finished] CLEANUP - interactee: "
             + std::to_string(event.get_interactee_id())

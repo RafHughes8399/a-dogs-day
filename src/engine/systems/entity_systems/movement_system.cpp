@@ -1,4 +1,6 @@
 #include "component.h"
+#include "component_managers.hpp"
+#include "component_helpers.hpp"
 #include "debug_log_interface.h"
 #include "entity_events.h"
 #include "events_interface.h"
@@ -15,10 +17,10 @@ void systems::movement_system::update(float delta){
     // decoration or some other entity is moved, as that would trigger possibly many unnecessary recalculations
 
     // definitely should recalc when the destination entity is moved though
-    for(auto it = component_managers::movement_manager_.begin(); it != component_managers::movement_manager_.end(); ++it){
+    for(auto it = component_managers::entity_movement_manager_.begin(); it != component_managers::entity_movement_manager_.end(); ++it){
         size_t id = it->first;
-        auto* movement = component_managers::movement_manager_.get_component(id);
-        auto* position = component_managers::positional_manager_.get_component(id);
+        auto* movement = component_managers::entity_movement_manager_.get_component(id);
+        auto* position = component_managers::entity_positional_manager_.get_component(id);
         if(movement == nullptr or position == nullptr){ continue; }
         if(movement->get_paths().empty()){ continue; }
 
@@ -78,7 +80,7 @@ void systems::movement_system::determine_direction(size_t id, components::moveme
 void systems::movement_system::on_created_entity(const events::create_entity& event){
     size_t entity_id = event.get_id();
     if(component_helpers::is_mouse_positioned(entity_id)){ return; }
-    if(auto* collision = component_managers::collision_manager_.get_component(entity_id); collision != nullptr){
+    if(auto* collision = component_managers::entity_collision_manager_.get_component(entity_id); collision != nullptr){
         auto box = collision->get_hitbox_component().get_hitbox().get_box();
         for(auto* graph : graphs()){
             graph->update_entity(box, static_cast<int>(entity_id));
@@ -103,8 +105,8 @@ void systems::movement_system::on_create_path_to_entity_event(const events::crea
 
 void systems::movement_system::create_path_to(size_t entity_id, Vector2 destination,
     const std::vector<Vector2>& checkpoints, path::assignment mode){
-    auto* movement = component_managers::movement_manager_.get_component(entity_id);
-    auto* position = component_managers::positional_manager_.get_component(entity_id);
+    auto* movement = component_managers::entity_movement_manager_.get_component(entity_id);
+    auto* position = component_managers::entity_positional_manager_.get_component(entity_id);
     if(movement == nullptr or position == nullptr){ return; }
 
     auto source = (mode == path::append and not movement->get_paths().empty())
@@ -131,15 +133,15 @@ void systems::movement_system::create_path_to(size_t entity_id, Vector2 destinat
 
 void systems::movement_system::create_path_to_entity(size_t entity_id, size_t destination_entity,
     const std::vector<Vector2>& checkpoints, path::assignment mode){
-    auto* movement = component_managers::movement_manager_.get_component(entity_id);
-    auto* position = component_managers::positional_manager_.get_component(entity_id);
+    auto* movement = component_managers::entity_movement_manager_.get_component(entity_id);
+    auto* position = component_managers::entity_positional_manager_.get_component(entity_id);
     if(movement == nullptr or position == nullptr){ return; }
 
     auto source = (mode == path::append and not movement->get_paths().empty())
         ? movement->get_paths().back().get_destination()
         : position->get_position();
 
-    auto* destination_position = component_managers::positional_manager_.get_component(destination_entity);
+    auto* destination_position = component_managers::entity_positional_manager_.get_component(destination_entity);
     if(destination_position == nullptr){
         debug::log("[movement_system::create_path_to_entity] destination entity has no position, entity: "
             + std::to_string(destination_entity) + " - route abandoned");
@@ -150,7 +152,7 @@ void systems::movement_system::create_path_to_entity(size_t entity_id, size_t de
     // * the interaction offset moves the destination to a free slot around the
     // * entity, not onto the entity itself - a dog pathing to the table's own
     // * position would be pathing into an occupied, unwalkable node
-    auto interactable = component_managers::interactable_manager_.get_component(destination_entity);
+    auto interactable = component_managers::entity_interactable_manager_.get_component(destination_entity);
     if(interactable){
         auto interaction_offset = interactable->get_interaction_offset(source, destination);
         if(interaction_offset.has_value()){
@@ -241,7 +243,7 @@ bool systems::movement_system::build_leg(Vector2 source, Vector2 direction, Vect
 
 void systems::movement_system::on_destroyed_entity(const events::remove_entity& event){
     if(component_helpers::is_mouse_positioned(event.get_id())){ return; }
-    if(auto* collision = component_managers::collision_manager_.get_component(event.get_id()); collision != nullptr){
+    if(auto* collision = component_managers::entity_collision_manager_.get_component(event.get_id()); collision != nullptr){
         auto box = collision->get_hitbox_component().get_hitbox().get_box();
         for(auto* graph : graphs()){
             graph->remove_entity(box, static_cast<int>(event.get_id()));
@@ -280,7 +282,7 @@ std::optional<path::path> systems::movement_system::create_path(Vector2 source, 
 }
 // ---------------- position writes ----------------
 void systems::movement_system::update_position(size_t id, Vector2 new_position){
-    auto* position = component_managers::positional_manager_.get_component(id);
+    auto* position = component_managers::entity_positional_manager_.get_component(id);
     if(position == nullptr){ return; }
     position->set_position(new_position);
 
@@ -288,7 +290,7 @@ void systems::movement_system::update_position(size_t id, Vector2 new_position){
     // write - every variant, so a later facing change lands somewhere correct
     Rectangle pre_move{};
     Rectangle post_move{};
-    if(auto* collision = component_managers::collision_manager_.get_component(id)){
+    if(auto* collision = component_managers::entity_collision_manager_.get_component(id)){
         pre_move = collision->get_hitbox_component().get_hitbox().get_box();
         for(auto& box : collision->get_hitbox_component().get_hitboxes()){
             box.update(new_position);

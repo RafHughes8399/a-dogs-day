@@ -1,4 +1,5 @@
 #include "component.h"
+#include "component_managers.hpp"
 #include "config.h"
 #include "debug_log_interface.h"
 #include "debug_logger.h"
@@ -21,8 +22,8 @@ std::vector<size_t> systems::interaction_system::interaction::get_performable_in
 }
 std::vector<size_t> systems::interaction_system::interaction::determine_performable_interactions(){
     std::vector<size_t> interactions = {};
-    auto interactor = component_managers::interactor_manager_.get_component(interactor_);
-    auto interactee = component_managers::interactable_manager_.get_component(interactee_);
+    auto interactor = component_managers::entity_interactor_manager_.get_component(interactor_);
+    auto interactee = component_managers::entity_interactable_manager_.get_component(interactee_);
     if(interactor and interactee){
         debug::log("[interaciotn system, determine performable interactions]: interactor interactions " + std::to_string(interactor->get_interactions().size()));
         debug::log("[interaciotn system, determine performable interactions]: interactee interactions " + std::to_string(interactee->get_interactions().size()));
@@ -38,10 +39,10 @@ std::vector<size_t> systems::interaction_system::interaction::determine_performa
 }
 
 bool systems::interaction_system::in_reach(size_t interactor_id, size_t interactable_id){
-    auto* interactor = component_managers::interactor_manager_.get_component(interactor_id);
-    auto* interactable = component_managers::interactable_manager_.get_component(interactable_id);
-    auto* interactor_collision = component_managers::collision_manager_.get_component(interactor_id);
-    auto* interactable_collision = component_managers::collision_manager_.get_component(interactable_id);
+    auto* interactor = component_managers::entity_interactor_manager_.get_component(interactor_id);
+    auto* interactable = component_managers::entity_interactable_manager_.get_component(interactable_id);
+    auto* interactor_collision = component_managers::entity_collision_manager_.get_component(interactor_id);
+    auto* interactable_collision = component_managers::entity_collision_manager_.get_component(interactable_id);
     if(not (interactor and interactable and interactor_collision and interactable_collision)){ return false; }
 
     Rectangle interactor_box = interactor->get_interaction_box(
@@ -51,8 +52,8 @@ bool systems::interaction_system::in_reach(size_t interactor_id, size_t interact
     return CheckCollisionRecs(interactor_box, interactable_box);
 }
 bool systems::interaction_system::establish_handhsake(size_t interactor_id, size_t interactable_id){
-    auto interactor = component_managers::interactor_manager_.get_component(interactor_id);
-    auto interactable = component_managers::interactable_manager_.get_component(interactable_id);
+    auto interactor = component_managers::entity_interactor_manager_.get_component(interactor_id);
+    auto interactable = component_managers::entity_interactable_manager_.get_component(interactable_id);
     if(not (interactor and interactable)) {
         return false;
     }
@@ -62,12 +63,12 @@ bool systems::interaction_system::establish_handhsake(size_t interactor_id, size
     return true;
 }
 void systems::interaction_system::teardown_handshake(size_t interactor_id, size_t interactable_id){
-    auto interactor = component_managers::interactor_manager_.get_component(interactor_id);
-    auto interactable = component_managers::interactable_manager_.get_component(interactable_id);
+    auto interactor = component_managers::entity_interactor_manager_.get_component(interactor_id);
+    auto interactable = component_managers::entity_interactable_manager_.get_component(interactable_id);
     if(interactable){ interactable->release(interactor_id); }
     if(interactor){ interactor->stop_interacting(); }
-    auto interactor_state = component_managers::state_machine_manager_.get_component(interactor_id);
-    auto interactable_state = component_managers::state_machine_manager_.get_component(interactable_id);
+    auto interactor_state = component_managers::entity_state_machine_manager_.get_component(interactor_id);
+    auto interactable_state = component_managers::entity_state_machine_manager_.get_component(interactable_id);
     debug::log("[interaction_system::teardown_handshake] CLEANUP - interactor: " + std::to_string(interactor_id)
         + " in state: " + (interactor_state ? std::to_string(interactor_state->get_machine().current()) : std::string("none"))
         + ", interactee: " + std::to_string(interactable_id)
@@ -90,7 +91,7 @@ void systems::interaction_system::waiter_table_serve(size_t waiter, size_t table
     (void) delta;
     debug::log("waiter table serve interaction attempt");
     // ! again the waiter must be carrying to serve
-    auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
+    auto waiter_state = component_managers::entity_state_machine_manager_.get_component(waiter);
     if(not waiter_state or waiter_state->get_machine().get_current_state()->get_state_id() != dog_config::waiter_carrying){
         debug::log("[waiter table serve attempt: ] - state is not carrying, cannot serve");
         debug::log("[waiter table serve attempt: ] - state is " + std::to_string(waiter_state->get_machine().get_current_state()->get_state_id()));
@@ -99,7 +100,7 @@ void systems::interaction_system::waiter_table_serve(size_t waiter, size_t table
     }
     
     // get the table
-    auto table_position = component_managers::positional_manager_.get_component(table);
+    auto table_position = component_managers::entity_positional_manager_.get_component(table);
     if(not table_position) {
         debug::log("[waiter table serve attempt: ] - no table position");
         return;
@@ -107,7 +108,7 @@ void systems::interaction_system::waiter_table_serve(size_t waiter, size_t table
     
     auto food_place_position = Vector2Add(table_position->get_position(), entity_config::food_draw_offset);
     
-    auto waiter_carrier = component_managers::carrier_manager_.get_component(waiter);
+    auto waiter_carrier = component_managers::entity_carrier_manager_.get_component(waiter);
     if(not waiter_carrier or not waiter_carrier->is_carrying()){ 
         debug::log("[waiter table serve attempt: ] - no waiter carrier, or waiter is not carrying");
         return;
@@ -140,7 +141,7 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
     // * and the update the food position's accordingly
     // ! first state check guard, only perform this if not carrying !!!!!!!!
     // ! cannot pick up if carrying ! must place  down instead !
-    auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
+    auto waiter_state = component_managers::entity_state_machine_manager_.get_component(waiter);
     if(not waiter_state){
         debug::log("[waiter counter pickup interaction] no waiter state");
         return;
@@ -149,7 +150,7 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
         debug::log("[waiter counter pickup interaction] waiter is in the carrying state, cannot pickup");
         return; 
     }
-    auto* waiter_position = component_managers::positional_manager_.get_component(waiter);
+    auto* waiter_position = component_managers::entity_positional_manager_.get_component(waiter);
     if(not waiter_position){ 
         debug::log("[waiter counter pickup interaction] no waiter position ");
         return; 
@@ -166,7 +167,7 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
 
 
     // * update the carrier component
-    auto waiter_carrier = component_managers::carrier_manager_.get_component(waiter);
+    auto waiter_carrier = component_managers::entity_carrier_manager_.get_component(waiter);
     if(waiter_carrier){
         waiter_carrier->set_carried_entity(food_id);
         waiter_carrier->set_previous_position(waiter_position->get_position());
@@ -181,7 +182,7 @@ void systems::interaction_system::waiter_counter_place_down(size_t waiter, size_
     (void) delta;
     // ! first guard ! check that is carrying ! cannot put down if not carrying ! 
     debug::log("waiter-counter place down interaction attempt");
-    auto waiter_state = component_managers::state_machine_manager_.get_component(waiter);
+    auto waiter_state = component_managers::entity_state_machine_manager_.get_component(waiter);
     if(not waiter_state){
         debug::log("[waiter-counter place down interaction] - no waiter state");
         return;
@@ -194,7 +195,7 @@ void systems::interaction_system::waiter_counter_place_down(size_t waiter, size_
         return;
     }
     // * 1. get the carried item
-    auto waiter_carrier = component_managers::carrier_manager_.get_component(waiter);
+    auto waiter_carrier = component_managers::entity_carrier_manager_.get_component(waiter);
     if(not waiter_carrier) {
         debug::log("[waiter-counter place down interaction] - no waiter carrier");
         return;
@@ -206,12 +207,12 @@ void systems::interaction_system::waiter_counter_place_down(size_t waiter, size_
     }
     auto food_entity_id = food_entity_opt.value();
     // * 2. get the counter storage item
-    auto counter_storage = component_managers::storage_manager_.get_component(counter);
+    auto counter_storage = component_managers::entity_storage_manager_.get_component(counter);
     if(not counter_storage){
         debug::log("[waiter-counter place down interaction] - no counter storage");
         return;
     }
-    auto food = component_managers::food_manager_.get_component(food_entity_id);
+    auto food = component_managers::entity_food_manager_.get_component(food_entity_id);
     if(not food){
         debug::log("[waiter-counter place down interaction] - carried entity is not food");
         return;
@@ -230,12 +231,12 @@ void systems::interaction_system::player_station_cook(size_t player_dog, size_t 
     (void) delta;
     debug::log("player-cook station work interaction attempt");
     // need to state transition the player and the cook station
-    auto player_state = component_managers::state_machine_manager_.get_component(player_dog);
+    auto player_state = component_managers::entity_state_machine_manager_.get_component(player_dog);
     if(not player_state) {
         debug::log("[player-cook station work interaction] - no player state machine, player: " + std::to_string(player_dog));
         return;
     }
-    auto cook_station_state = component_managers::state_machine_manager_.get_component(cook_station);
+    auto cook_station_state = component_managers::entity_state_machine_manager_.get_component(cook_station);
     if(not cook_station_state) {
         debug::log("[player-cook station work interaction] - no cook station state machine, station: " + std::to_string(cook_station));
         return;
@@ -277,7 +278,7 @@ void systems::interaction_system::process_interaction(interaction& interaction, 
 
 void systems::interaction_system::on_moved_entity(const events::move_entity& event){
     auto interactor_id = event.get_id();
-    auto* interactor = component_managers::interactor_manager_.get_component(interactor_id);
+    auto* interactor = component_managers::entity_interactor_manager_.get_component(interactor_id);
     if(interactor == nullptr){ return; }
 
     auto target = interactor->get_target();
@@ -297,7 +298,7 @@ void systems::interaction_system::on_moved_entity(const events::move_entity& eve
 }
 void systems::interaction_system::on_path_finished(const events::dog_completed_path& event){
     auto dog_id = event.get_id();
-    auto* interactor = component_managers::interactor_manager_.get_component(dog_id);
+    auto* interactor = component_managers::entity_interactor_manager_.get_component(dog_id);
     if(interactor == nullptr){
         debug::log("[interaction_system::on_path_finished] dog: " + std::to_string(dog_id)
             + " has no interactor component - no interaction");
