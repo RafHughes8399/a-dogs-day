@@ -13,16 +13,10 @@ void hud_systems::hud_rendering_system::render(int frame){
         auto& hud_component = it->second;
         debug::log("[hud_rendering_system::render, entity] id: " + std::to_string(id));
 
-        // check selected, if so, draw the component
-        auto selectable_component = component_managers::entity_selectable_manager_.get_component(id);
-        if(not selectable_component){
-            debug::log("[hud_rendering_system::render, skipped] id: " + std::to_string(id) + ", no selectable component");
-            continue;
-        }
-        debug::log("[hud_rendering_system::render, selectable] id: " + std::to_string(id)
-            + ", is_selected: " + std::to_string(selectable_component->is_selected()));
-        
-        if(selectable_component->is_selected()){
+        debug::log("[hud_rendering_system::render, active] id: " + std::to_string(id)
+            + ", is_active: " + std::to_string(hud_component.is_active()));
+
+        if(hud_component.is_active()){
             auto position_component = component_managers::entity_positional_manager_.get_component(id);
             if(not position_component){
                 debug::log("[hud_rendering_system::render, skipped] id: " + std::to_string(id) + ", no position component");
@@ -38,6 +32,16 @@ void hud_systems::hud_rendering_system::render(int frame){
                 + "), offset: (" + std::to_string(offset.x) + ", " + std::to_string(offset.y)
                 + "), screen: (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")");
             hud_component.get_base().render(position, frame);
+            for(auto element : hud_component.get_elements()){
+                auto* element_position = component_managers::hud_positional_manager_.get_component(element);
+                auto* element_renderable = component_managers::hud_renderable_manager_.get_component(element);
+                if(element_position == nullptr or element_renderable == nullptr){ continue; }
+                auto element_screen = GetWorldToScreen2D(element_position->get_position(),
+                    systems::rendering_system::get_instance().get_camera());
+                for(auto& body : element_renderable->get_layers()){
+                    body.get_active_sprite().render(element_screen, frame);
+                }
+            }
         }
     }
 }

@@ -16,6 +16,7 @@
 #include <utility>
 #include <raylib.h>
 #include "graph.h"
+#include "hud_systems/hud_systems.hpp"
 #include "path.h"
 /**
     if components manage, organise and hold the data, then systems define the behaivours to act on those pieces of data. we define the following systems:
@@ -357,6 +358,7 @@ namespace systems{
 
             size_t create_cooking_station(size_t cooking_station, Vector2 position);
             void destroy_cooking_station(size_t id);
+            void create_cooking_station_hud(size_t owner);
             size_t create_stove(Vector2 position);
             size_t create_oven(Vector2 position);
             size_t create_espresso_station(Vector2 position);
@@ -367,6 +369,8 @@ namespace systems{
             size_t create_food(size_t food, Vector2 position);
             void destroy_food(size_t id);
             void destroy(size_t entity_id);
+            size_t create_hud_element(size_t owner, std::function<void(size_t)> build);
+            void destroy_hud_element(size_t hud_id);
             void update(float delta);
             // teardown between test scenarios - the singleton outlives them
             void clear(){
@@ -896,6 +900,7 @@ namespace systems{
         interaction_system::get_instance().clear();
         animation_system::get_instance().clear();
         state_machine_system::get_instance().clear();
+        hud_systems::hud_spatial_system::get_instance().clear();
     }
 
     // hold a refernece to the glboal managers that they need to process things

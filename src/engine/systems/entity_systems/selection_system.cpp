@@ -23,12 +23,17 @@ void systems::selection_system::select(size_t entity_id){
     deselect();
     selectable->select();
     selected_ = static_cast<int>(entity_id);
+    events::entity_selected selected{entity_id};
+    event_interface::execute_event(selected);
 }
 
 void systems::selection_system::deselect(){
     if(selected_ == game_config::empty_entity){ return; }
-    if(auto* selectable = component_managers::entity_selectable_manager_.get_component(static_cast<size_t>(selected_))){
+    auto deselected_id = static_cast<size_t>(selected_);
+    if(auto* selectable = component_managers::entity_selectable_manager_.get_component(deselected_id)){
         selectable->unselect();
     }
     selected_ = game_config::empty_entity;
+    events::entity_deselected deselected{deselected_id};
+    event_interface::execute_event(deselected);
 }

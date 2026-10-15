@@ -445,3 +445,45 @@ SCENARIO("an interaction box straddling a quadrant split still finds what it rea
         }
     }
 }
+
+SCENARIO("a tree reads bounds from the collision manager it was built with",
+        "[quadtree][ecs][collision][hud]"){
+    GIVEN("a tree over the hud collision manager, holding one hud box and one entity box"){
+        collision_component_guard components;
+        tree::ecs_quadtree tree(test_world(), 1, component_managers::hud_collision_manager_);
+
+        const size_t hud_id = 1;
+        const size_t entity_id = 2;
+        std::vector<hitbox::hitbox> hud_hitboxes{
+            hitbox::hitbox(Rectangle{300.0f, 300.0f, k_entity_size, k_entity_size})};
+        component_helpers::register_hud_collision_component(hud_id,
+            component_builders::build_hud_collision_component(
+                component_builders::build_hud_hitbox_component(hud_hitboxes, 0)));
+        tree.insert(hud_id,
+            component_managers::hud_collision_manager_.get_component(hud_id)->get_hitbox_component().get_hitbox());
+
+        std::vector<hitbox::hitbox> entity_hitboxes{
+            hitbox::hitbox(Rectangle{50.0f, 50.0f, k_entity_size, k_entity_size})};
+        component_helpers::register_entity_collision_component(entity_id,
+            component_builders::build_entity_collision_component(
+                component_builders::build_entity_hitbox_component(entity_hitboxes, 0)));
+        tree.insert(entity_id,
+            component_managers::entity_collision_manager_.get_component(entity_id)->get_hitbox_component().get_hitbox());
+
+        WHEN("a position inside the hud box is checked"){
+            auto hit = tree.check_collision(static_cast<size_t>(game_config::empty_entity), Vector2{308.0f, 308.0f});
+
+            THEN("the hud id comes back"){
+                REQUIRE(hit == static_cast<int>(hud_id));
+            }
+        }
+
+        WHEN("a position inside the entity box is checked"){
+            auto hit = tree.check_collision(static_cast<size_t>(game_config::empty_entity), Vector2{58.0f, 58.0f});
+
+            THEN("nothing is reported, because the hud manager holds no box for it"){
+                REQUIRE(hit == game_config::empty_entity);
+            }
+        }
+    }
+}

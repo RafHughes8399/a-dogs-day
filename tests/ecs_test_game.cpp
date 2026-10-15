@@ -18,7 +18,8 @@ namespace testing{
       movement_(systems::movement_system::get_instance()),
       interaction_(systems::interaction_system::get_instance()),
       state_machine_(systems::state_machine_system::get_instance()),
-      animation_(systems::animation_system::get_instance()){
+      animation_(systems::animation_system::get_instance()),
+      hud_(hud_systems::hud::get_instance()){
         // one hidden window for the whole run, same as test_game - the builders
         // LoadTexture and the shared cache has to stay valid across scenarios
         if(not IsWindowReady()){

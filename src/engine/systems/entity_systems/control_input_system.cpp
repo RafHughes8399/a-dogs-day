@@ -58,6 +58,8 @@ void systems::control_input_system::check_inputs(size_t id, std::vector<game_con
         }
     }
 }
+// TODO (15 / 10 / 26) zoom disabled - update no longer calls this. the hud is drawn at a fixed
+// screen size but its hitboxes are world space, so any zoom other than 1 splits them apart
 void systems::control_input_system::check_mouse_scroll(float time_delta){
     if(not Vector2Equals(GetMouseWheelMoveV(), Vector2Zero())){
         mouse_scroll(GetMouseWheelMoveV(), time_delta);
@@ -92,7 +94,7 @@ void systems::control_input_system::update(float delta){
         check_inputs(id, inputs, delta);
     }
     // * and check for scroll inputs
-    check_mouse_scroll(delta);
+    // check_mouse_scroll(delta);
 }
 
 // ------------------------------- control map ------------------------------- //
@@ -198,6 +200,7 @@ void systems::control_input_system::left_click(size_t id){
     debug::log("[control_input_system::left_click, clicked] asked by: "
         + std::to_string(id)
         + ", position: " + raglib::vector_to_string(click_position));
+    if(hud_systems::click_system::get_instance().click(click_position)){ return; }
 
     int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
     if(entity_id == game_config::empty_entity){
@@ -225,6 +228,7 @@ void systems::control_input_system::right_click(size_t id){
     debug::log("[control_input_system::right_click, clicked] asked by: "
         + std::to_string(id)
         + ", position: " + raglib::vector_to_string(click_position));
+    if(hud_systems::click_system::get_instance().click(click_position)){ return; }
 
     int selected = selection_system::get_instance().selected();
     if(selected == game_config::empty_entity){
@@ -265,6 +269,7 @@ void systems::control_input_system::right_click(size_t id){
         + ", destination: " + raglib::vector_to_string(click_position));
 }
 
+// TODO (15 / 10 / 26) zoom disabled - unreachable while check_mouse_scroll is out of update
 void systems::control_input_system::mouse_scroll(Vector2 scroll_delta, float time_delta){
     // you actually dont need to know scroll delta, you do for y for direction
     (void) time_delta;

@@ -148,7 +148,7 @@ class hud_component {
 public:
     ~hud_component() = default;
     hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero())
-    : active_(false), base_(base), offset_(offset){}
+    : elements_(), active_(false), base_(base), offset_(offset){}
     hud_component(const hud_component& other) = default;
     hud_component(hud_component&& other) = default;
 
@@ -159,8 +159,12 @@ public:
     void set_active(bool active);
     sprite::nine_sprite& get_base();
     Vector2 get_offset() const;
+    const std::vector<size_t>& get_elements() const;
+    void add_element(size_t hud_id);
+    void remove_element(size_t hud_id);
 
 private:
+    std::vector<size_t> elements_;
     bool active_;
     sprite::nine_sprite base_;
     Vector2 offset_;

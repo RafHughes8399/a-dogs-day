@@ -169,6 +169,7 @@ add_library(systems
   src/engine/systems/entity_systems/item_system.cpp
   src/engine/systems/hud_systems/hud.cpp
   src/engine/systems/hud_systems/click_system.cpp
+  src/engine/systems/hud_systems/hud_spatial_system.cpp
   src/engine/systems/shared_systems/hud_rendering_system.cpp)
 link_libraries(systems)
 
@@ -193,7 +194,7 @@ link_libraries(hitbox)
 add_library(texture src/rendering/texture.cpp)
 link_libraries(texture)
 
-add_library(entities src/entities/ecs_builders.cpp)
+add_library(entities src/entities/ecs_builders.cpp src/hud/button_builders.cpp)
 link_libraries(entities)
 
 add_library(render_layer src/engine/structures/render_layer.cpp)
@@ -230,6 +231,7 @@ foreach(target IN LISTS PROJECT_TARGETS)
     src/engine/queries
     src/engine/structures
     src/engine/systems
+    src/hud
     src/interfaces
   )
   target_include_directories(${target} SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)
@@ -271,6 +273,7 @@ target_include_directories(tests PRIVATE
   src/engine/queries
   src/engine/structures
   src/engine/systems
+  src/hud
   src/interfaces
 )
 target_include_directories(tests SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)

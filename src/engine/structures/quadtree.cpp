@@ -14,7 +14,7 @@ enum positions{
 
 // ---------------- ecs_quadtree - node geometry ----------------
 hitbox::hitbox* tree::ecs_quadtree::bounds_for(size_t entity_id){
-    auto* collision = component_managers::entity_collision_manager_.get_component(entity_id);
+    auto* collision = collisions_.get_component(entity_id);
     if(collision == nullptr){ return nullptr; }
     return &collision->get_hitbox_component().get_hitbox();
 }
@@ -231,7 +231,7 @@ int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 
     for(size_t entity : tree->entities_){
         if(entity == id){ continue; }
         if(not filter(entity)){ continue; }
-        auto entity_collision_component = component_managers::entity_collision_manager_.get_component(entity);
+        auto entity_collision_component = collisions_.get_component(entity);
         if(entity_collision_component == nullptr){ continue; }
         auto entity_bounds = entity_collision_component->get_hitbox_component().get_hitbox().get_box();
         if(CheckCollisionPointRec(position, entity_bounds)){
@@ -257,7 +257,7 @@ int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Rectangl
     for(size_t entity : tree->entities_){
         if(entity == id){ continue; }
         if(not filter(entity)){ continue; }
-        auto entity_collision_component = component_managers::entity_collision_manager_.get_component(entity);
+        auto entity_collision_component = collisions_.get_component(entity);
         if(entity_collision_component == nullptr){ continue; }
         auto entity_bounds = entity_collision_component->get_hitbox_component().get_hitbox().get_box();
         if(CheckCollisionRecs(box, entity_bounds)){
