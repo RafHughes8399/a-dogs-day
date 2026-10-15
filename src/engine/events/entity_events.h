@@ -43,6 +43,70 @@ namespace events{
 			const size_t id_;
 
 	};
+	class create_hud_element : public event{
+		public:
+			create_hud_element(size_t id, size_t owner)
+			: event(ids::create_hud_element_id), id_(id), owner_(owner){}
+
+			static int get_static_type(){
+				return ids::create_hud_element_id;
+			}
+			size_t get_id() const{
+				return id_;
+			}
+			size_t get_owner() const{
+				return owner_;
+			}
+		private:
+			const size_t id_;
+			const size_t owner_;
+	};
+	class remove_hud_element : public event{
+		public:
+			remove_hud_element(size_t id, size_t owner)
+			: event(ids::remove_hud_element_id), id_(id), owner_(owner){}
+
+			static int get_static_type(){
+				return ids::remove_hud_element_id;
+			}
+			size_t get_id() const{
+				return id_;
+			}
+			size_t get_owner() const{
+				return owner_;
+			}
+		private:
+			const size_t id_;
+			const size_t owner_;
+	};
+	class entity_selected : public event{
+		public:
+			entity_selected(size_t id)
+			: event(ids::entity_selected_id), id_(id){}
+
+			static int get_static_type(){
+				return ids::entity_selected_id;
+			}
+			size_t get_id() const{
+				return id_;
+			}
+		private:
+			const size_t id_;
+	};
+	class entity_deselected : public event{
+		public:
+			entity_deselected(size_t id)
+			: event(ids::entity_deselected_id), id_(id){}
+
+			static int get_static_type(){
+				return ids::entity_deselected_id;
+			}
+			size_t get_id() const{
+				return id_;
+			}
+		private:
+			const size_t id_;
+	};
 }
 
 #endif

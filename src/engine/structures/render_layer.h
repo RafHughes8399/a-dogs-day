@@ -1,0 +1,79 @@
+#ifndef RENDER_LAYER_H
+#define RENDER_LAYER_H
+
+#include <algorithm>
+#include <raylib.h>
+#include <raymath.h>
+#include <vector>
+#include "component.h"
+#include "component_managers.hpp"
+namespace render_layer{
+    // TODO (25 / 8 / 26) RENAME AFTER REFACTOR IS COMPLETE - replaces layer once level is gone.
+    // same shape as layer, holding ids - a stale entry is skipped via a null
+    // component lookup rather than dereferenced
+    class ecs_layer{
+        public:
+            ~ecs_layer() = default;
+            ecs_layer() = default;
+            ecs_layer(const ecs_layer& other) = default;
+            ecs_layer(ecs_layer&& other) = default;
+
+            ecs_layer& operator=(const ecs_layer& other) = default;
+            ecs_layer& operator=(ecs_layer&& other) = default;
+
+            void add_entity(size_t entity_id);
+            void remove_entity(size_t entity_id);
+            void remove_entities(const std::vector<size_t>& entity_ids);
+            void clear(){
+                entities_.clear();
+            }
+
+            template<typename UnaryPred>
+            void draw(UnaryPred p, Vector2 frame_position, int frame, bool hitbox_debug = false){
+                for(auto entity_id : entities_){
+                    auto* renderable = component_managers::entity_renderable_manager_.get_component(entity_id);
+                    auto* position = component_managers::entity_positional_manager_.get_component(entity_id);
+                    if(renderable == nullptr or position == nullptr){ continue; }
+                    if(not p(entity_id)){ continue; }
+
+                    auto draw_position = Vector2Subtract(position->get_position(), frame_position);
+                    // body, outlines and cosmetics all draw at the same position
+                    for(auto & body : renderable->get_layers()){
+                        body.get_active_sprite().render(draw_position, frame);
+                    }
+                    if(hitbox_debug){
+                        auto* hitbox = component_managers::entity_collision_manager_.get_component(entity_id);
+                        auto* interactor = component_managers::entity_interactor_manager_.get_component(entity_id);
+                        auto* interactable = component_managers::entity_interactable_manager_.get_component(entity_id);
+                        if(hitbox) {
+                            auto box = hitbox->get_hitbox_component().get_hitbox().get_box();
+                            auto box_position = Vector2Subtract({box.x, box.y}, frame_position);
+                            DrawRectangleLines(static_cast<int>(box_position.x), static_cast<int>(box_position.y), static_cast<int>(box.width), static_cast<int>(box.height), GREEN);
+                            if(interactor){
+                                auto interaction_box = interactor->get_interaction_box(box);
+                                auto interaction_box_position = Vector2Subtract({interaction_box.x, interaction_box.y}, frame_position);
+                                DrawRectangleLines(static_cast<int>(interaction_box_position.x), static_cast<int>(interaction_box_position.y), static_cast<int>(interaction_box.width), static_cast<int>(interaction_box.height), ORANGE);
+                            }
+                            if(interactable){
+                                auto interaction_box = interactable->get_interaction_box(box);
+                                auto interaction_box_position = Vector2Subtract({interaction_box.x, interaction_box.y}, frame_position);
+                                DrawRectangleLines(static_cast<int>(interaction_box_position.x), static_cast<int>(interaction_box_position.y), static_cast<int>(interaction_box.width), static_cast<int>(interaction_box.height), ORANGE);
+                            }
+                        }
+                    }
+                }
+            }
+#ifdef DOG_DAYS_TESTING
+            size_t size() const{
+                return entities_.size();
+            }
+            bool contains(size_t entity_id) const{
+                return std::find(entities_.begin(), entities_.end(), entity_id) != entities_.end();
+            }
+#endif
+        private:
+            std::vector<size_t> entities_;
+    };
+}
+
+#endif

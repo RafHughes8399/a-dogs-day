@@ -134,6 +134,7 @@ namespace testing{
             systems::interaction_system& interaction_;
             systems::state_machine_system& state_machine_;
             systems::animation_system& animation_;
+            hud_systems::hud& hud_;
     };
 
 } // namespace testing

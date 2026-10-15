@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "component.h"
+#include "component_managers.hpp"
 #include "config.h"
 #include "ecs_test_game.h"
 #include "raylib.h"
@@ -29,8 +30,8 @@ namespace{
 
     // both halves of the handshake, the way a real claim would land
     void seat(size_t dog_id, size_t table_id){
-        auto* interactable = component_managers::interactable_manager_.get_component(table_id);
-        auto* interactor = component_managers::interactor_manager_.get_component(dog_id);
+        auto* interactable = component_managers::entity_interactable_manager_.get_component(table_id);
+        auto* interactor = component_managers::entity_interactor_manager_.get_component(dog_id);
         REQUIRE(interactable != nullptr);
         REQUIRE(interactor != nullptr);
         REQUIRE(interactable->claim(dog_id));
@@ -51,7 +52,7 @@ namespace{
     }
 
     bool claimed_by(size_t table_id, size_t dog_id){
-        auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+        auto* interactable = component_managers::entity_interactable_manager_.get_component(table_id);
         if(interactable == nullptr){ return false; }
         for(auto slot : interactable->get_interactors()){
             if(slot.has_value() and slot.value() == dog_id){ return true; }
@@ -60,7 +61,7 @@ namespace{
     }
 
     std::optional<size_t> target_of(size_t dog_id){
-        auto* interactor = component_managers::interactor_manager_.get_component(dog_id);
+        auto* interactor = component_managers::entity_interactor_manager_.get_component(dog_id);
         return interactor == nullptr ? std::nullopt : interactor->get_target();
     }
 }
@@ -246,7 +247,7 @@ SCENARIO("a table takes two claims to fill", "[ecs][npc][customer_arrival][pick_
 
         auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
         arrival.register_table(table_id);
-        auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+        auto* interactable = component_managers::entity_interactable_manager_.get_component(table_id);
 
         THEN("build_table opened a left and a right slot and nothing else"){
             REQUIRE(interactable->get_slot_offset(level_config::directions::left).has_value());
@@ -530,7 +531,7 @@ SCENARIO("removing an entity undoes both halves of the claim",
         seat(first_id, table_id);
         seat(second_id, table_id);
 
-        auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+        auto* interactable = component_managers::entity_interactable_manager_.get_component(table_id);
         REQUIRE_FALSE(interactable->can_accept_interactor());
         REQUIRE(claimed_by(table_id, first_id));
         REQUIRE(target_of(first_id) == table_id);

@@ -2,6 +2,7 @@
 
 #include "ecs_test_game.h"
 #include "component.h"
+#include "component_managers.hpp"
 #include "events.h"
 #include "events_interface.h"
 #include "menus.h"
@@ -237,7 +238,7 @@ SCENARIO("a left click selects the entity under the cursor", "[ecs][controls][se
                 REQUIRE(selection().selected() == static_cast<int>(khiri_id));
             }
             THEN("its selectable component agrees"){
-                auto* selectable = component_managers::selectable_manager_.get_component(khiri_id);
+                auto* selectable = component_managers::entity_selectable_manager_.get_component(khiri_id);
                 REQUIRE(selectable != nullptr);
                 REQUIRE(selectable->is_selected());
             }
@@ -261,7 +262,7 @@ SCENARIO("a left click selects the entity under the cursor", "[ecs][controls][se
                 REQUIRE(selection().selected() == game_config::empty_entity);
             }
             THEN("the component is no longer selected"){
-                auto* selectable = component_managers::selectable_manager_.get_component(khiri_id);
+                auto* selectable = component_managers::entity_selectable_manager_.get_component(khiri_id);
                 REQUIRE(selectable != nullptr);
                 REQUIRE_FALSE(selectable->is_selected());
             }
@@ -346,7 +347,7 @@ SCENARIO("a right click over a seated customer still targets the table underneat
         auto table_position = Vector2{click.x - 8.0f, click.y - 60.0f};
         auto table_id = game.create_table(table_position);
 
-        auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+        auto* interactable = component_managers::entity_interactable_manager_.get_component(table_id);
         REQUIRE(interactable != nullptr);
         auto seat_offset = interactable->get_slot_offset(level_config::directions::left);
         REQUIRE(seat_offset.has_value());

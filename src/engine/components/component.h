@@ -71,7 +71,23 @@ private:
     Vector2* current_position_;
     std::optional<size_t> carried_entity_;
 };
+class clickable_component{
+    public:
+        ~clickable_component() = default;
+        clickable_component(size_t action, int payload = 0)
+        : action_(action), payload_(payload){}
+        clickable_component(const clickable_component& other) = default;
+        clickable_component(clickable_component&& other) = default;
 
+        clickable_component& operator=(const clickable_component& other) = default;
+        clickable_component& operator=(clickable_component&& other) = default;
+
+        size_t get_action() const;
+        int get_payload() const;
+    private:
+        size_t action_;
+        int payload_;
+};
 class collision_component {
 public:
   class hitbox_component {
@@ -132,7 +148,7 @@ class hud_component {
 public:
     ~hud_component() = default;
     hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero())
-    : active_(false), base_(base), offset_(offset){}
+    : elements_(), active_(false), base_(base), offset_(offset){}
     hud_component(const hud_component& other) = default;
     hud_component(hud_component&& other) = default;
 
@@ -143,8 +159,12 @@ public:
     void set_active(bool active);
     sprite::nine_sprite& get_base();
     Vector2 get_offset() const;
+    const std::vector<size_t>& get_elements() const;
+    void add_element(size_t hud_id);
+    void remove_element(size_t hud_id);
 
 private:
+    std::vector<size_t> elements_;
     bool active_;
     sprite::nine_sprite base_;
     Vector2 offset_;
@@ -281,6 +301,22 @@ private:
     std::queue<path::path> paths_;
     Vector2 move_speed_;
     Vector2 direction_scalar_;
+};
+
+class owner_component {
+public:
+    ~owner_component() = default;
+    owner_component(size_t owner)
+    : owner_(owner){}
+    owner_component(const owner_component& other) = default;
+    owner_component(owner_component&& other) = default;
+
+    owner_component& operator=(const owner_component& other) = default;
+    owner_component& operator=(owner_component&& other) = default;
+
+    size_t get_owner() const;
+private:
+    size_t owner_;
 };
 
 // * where a thing is, and nothing else. every system asks this - spatial,
@@ -437,169 +473,42 @@ class storage_component {
 
 } // namespace components
 
-namespace component_managers {
-    template <typename C> // C for component
-class component_manager {
-public:
-   ~component_manager() = default;
-   component_manager() = default;
-   component_manager(const component_manager& other) = default;
-   component_manager(component_manager&& other) = default;
-
-   component_manager& operator=(const component_manager& other) = default;
-   component_manager& operator=(component_manager&& other) = default;
-
-   // insert_or_assign - operator[] needs a default ctor some components lack
-   void register_component(size_t entity, C component){
-        components_.erase(entity);
-        components_.emplace(entity, std::move(component));
-   }
-   // * only need to unregister components when the entity is removed from the game
-   void unregister_component(size_t entity){
-        components_.erase(entity);
-   }
-   // get component for an entity
-   C* get_component(size_t entity){
-        auto component_it = components_.find(entity);
-        return component_it != components_.end() ? &component_it->second : nullptr;
-   }
-   auto begin(){return components_.begin();}
-   auto end(){return components_.end();}
-   auto cbegin() const {return components_.cbegin();}
-   auto cend() const {return components_.cend();}
-   bool contains(size_t entity) const{
-        return components_.find(entity) != components_.end();
-   }
-   size_t size() const{
-        return components_.size();
-   }
-   // the managers are globals, so the test harness needs a way back to empty
-   // between scenarios
-   void clear(){
-        components_.clear();
-   }
-   
-private:
-    // * one entity to one component. Where an entity needs several of something
-    // * (sprites, states) the component itself holds the list - see
-    // * renderable_component and state_machine_component.
-    std::unordered_map<size_t, C> components_;
-};
-
-// * one manager instance per component type, defined in component_managers.cpp.
-// * these live in their own namespace so call sites read
-// * component_managers::renderable_manager_ rather than components::renderable_manager_,
-// * which would blur the storage layer into the data layer.
-extern component_manager<components::carrier_component> carrier_manager_;
-extern component_manager<components::collision_component> collision_manager_;
-extern component_manager<components::food_component> food_manager_;
-extern component_manager<components::hud_component> hud_manager_;
-extern component_manager<components::key_input_component> control_manager_;
-extern component_manager<components::interactable_component> interactable_manager_;
-extern component_manager<components::interactor_component> interactor_manager_;
-extern component_manager<components::mouse_input_component> mouse_input_manager_;
-extern component_manager<components::movement_component> movement_manager_;
-extern component_manager<components::position_component> positional_manager_;
-extern component_manager<components::recipes_component> recipes_manager_;
-extern component_manager<components::renderable_component> renderable_manager_;
-extern component_manager<components::selectable_component> selectable_manager_;
-extern component_manager<components::state_machine_component> state_machine_manager_;
-extern component_manager<components::storage_component> storage_manager_;
-} // namespace component_managers
-
 namespace component_builders{
-    components::position_component build_positional_component(Vector2 position);
-    components::movement_component build_movement_component(Vector2 move_speed,
+    components::position_component build_entity_positional_component(Vector2 position);
+    components::movement_component build_entity_movement_component(Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
-    components::renderable_component::body build_body(std::vector<sprite::sprite>& sprites, size_t index);
-    components::renderable_component build_renderable_component(
+    components::renderable_component::body build_entity_body(std::vector<sprite::sprite>& sprites, size_t index);
+    components::renderable_component build_entity_renderable_component(
         std::vector<components::renderable_component::body>& bodys);
 
-    components::collision_component::hitbox_component build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
-    components::collision_component build_collision_component(
+    components::collision_component::hitbox_component build_entity_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
+    components::collision_component build_entity_collision_component(
         components::collision_component::hitbox_component hitbox);
 
-    components::interactor_component build_interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt, std::vector<size_t> interactions = {});
-    components::interactable_component build_interactable_component(float reach,
+    components::interactor_component build_entity_interactor_component(float reach, std::optional<size_t> entity_id = std::nullopt, std::vector<size_t> interactions = {});
+    components::interactable_component build_entity_interactable_component(float reach,
         const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions = {});
-    components::key_input_component build_key_input_component(std::vector<game_config::input>& controls);
-    components::mouse_input_component build_mouse_input_component(std::vector<game_config::input>& inputs);
-    components::state_machine_component build_state_machine_component(state_machine::state_machine machine);
-    components::selectable_component build_selectable_component(size_t kind);
-    components::storage_component build_storage_component();
-    components::food_component build_food_component(size_t item_id);
-    components::carrier_component build_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
-    components::recipes_component build_recipes_component(std::vector<recipe::recipe>& recipes);
+    components::key_input_component build_entity_key_input_component(std::vector<game_config::input>& controls);
+    components::mouse_input_component build_entity_mouse_input_component(std::vector<game_config::input>& inputs);
+    components::state_machine_component build_entity_state_machine_component(state_machine::state_machine machine);
+    components::selectable_component build_entity_selectable_component(size_t kind);
+    components::storage_component build_entity_storage_component();
+    components::food_component build_entity_food_component(size_t item_id);
+    components::carrier_component build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
+    components::recipes_component build_entity_recipes_component(std::vector<recipe::recipe>& recipes);
     components::hud_component build_hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
-}
-// thin forwarders to the right manager; defined in component_helpers.cpp
-namespace component_helpers{
-    void register_positional_component(size_t entity_id, components::position_component component);
-    void register_movement_component(size_t entity_id, components::movement_component component);
-    void register_renderable_component(size_t entity_id, components::renderable_component component);
-    void register_collision_component(size_t entity_id, components::collision_component component);
-    void register_interactor_component(size_t entity_id, components::interactor_component component);
-    void register_interactable_component(size_t entity_id, components::interactable_component component);
-    void register_key_input_component(size_t entity_id, components::key_input_component component);
-    void register_mouse_input_component(size_t entity_id, components::mouse_input_component component);
-    void register_state_machine_component(size_t entity_id, components::state_machine_component component);
-    void register_selectable_component(size_t entity_id, components::selectable_component component);
-    void register_storage_component(size_t entity_id, components::storage_component component);
-    void register_food_component(size_t entity_id, components::food_component component);
-    void register_carrier_component(size_t entity_id, components::carrier_component component);
-    void register_recipes_component(size_t entity_id, components::recipes_component component);
-    void register_hud_component(size_t entity_id, components::hud_component component);
 
-
-    void add_positional_component(size_t entity_id, Vector2 position);
-    void add_movement_component(size_t entity_id, Vector2 move_speed,
-        Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
-        std::queue<path::path> paths = {});
-    void add_recipes_component(size_t entity_id, std::vector<recipe::recipe>& recipes);
-    void add_hud_component(size_t entity_id, sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
-    void add_renderable_component(size_t entity_id,
+    components::position_component build_hud_positional_component(Vector2 position);
+    components::renderable_component::body build_hud_body(std::vector<sprite::sprite>& sprites, size_t index);
+    components::renderable_component build_hud_renderable_component(
         std::vector<components::renderable_component::body>& bodys);
-    void add_collision_component(size_t entity_id,
+    components::collision_component::hitbox_component build_hud_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
+    components::collision_component build_hud_collision_component(
         components::collision_component::hitbox_component hitbox);
-    void add_interactor_component(size_t entity_id, float reach,
-        std::optional<size_t> target_entity_id = std::nullopt, std::vector<size_t> interactions = {});
-    void add_interactable_component(size_t entity_id, float reach,
-        const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions = {});
-    void add_key_input_component(size_t entity_id, std::vector<game_config::input>& controls);
-    void add_mouse_input_component(size_t entity_id, std::vector<game_config::input>& inputs);
-    void add_state_machine_component(size_t entity_id, state_machine::state_machine machine);
-    void add_selectable_component(size_t entity_id, size_t kind);
-    void add_storage_component(size_t entity_id);
-    void add_food_component(size_t entity_id, size_t item_id);
-    void add_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
-    void add_stored_item(size_t entity_id, size_t slot, size_t item_id);
-    std::optional<size_t> take_stored_item(size_t entity_id, size_t slot);
-    void update_item_sprite(size_t entity_id, size_t slot);
-
-    void create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions);
-    bool is_mouse_positioned(size_t entity_id);
-    void set_facing_index(size_t entity_id, size_t index);
-    void set_active_index(size_t entity_id, size_t slot, size_t index);
-
-    void unregister_positional_component(size_t entity_id);
-    void unregister_movement_component(size_t entity_id);
-    void unregister_recipes_component(size_t entity_id);
-    void unregister_renderable_component(size_t entity_id);
-    void unregister_collision_component(size_t entity_id);
-    void unregister_interactor_component(size_t entity_id);
-    void unregister_interactable_component(size_t entity_id);
-    void unregister_key_input_component(size_t entity_id);
-    void unregister_mouse_input_component(size_t entity_id);
-    void unregister_state_machine_component(size_t entity_id);
-    void unregister_selectable_component(size_t entity_id);
-    void unregister_storage_component(size_t entity_id);
-    void unregister_food_component(size_t entity_id);
-    void unregister_carrier_component(size_t entity_id);
-    void unregister_hud_component(size_t entity_id);
-    void unregister_all_components(size_t entity_id);
-
-    size_t num_registered_components(size_t entity_id);
-    void clear_all_components();
+    components::state_machine_component build_hud_state_machine_component(state_machine::state_machine machine);
+    components::clickable_component build_hud_clickable_component(size_t action, int payload = 0);
+    components::owner_component build_hud_owner_component(size_t owner);
 }
+
 #endif

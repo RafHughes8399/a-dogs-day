@@ -1,56 +1,81 @@
 #include "component.h"
 
-components::position_component component_builders::build_positional_component(Vector2 position){
+components::position_component component_builders::build_entity_positional_component(Vector2 position){
     return components::position_component(position);
 }
 
 // * direction defaults to right, paths default to empty list {}
-components::movement_component component_builders::build_movement_component(Vector2 move_speed, Vector2 direction_scalar, std::queue<path::path> paths){
+components::movement_component component_builders::build_entity_movement_component(Vector2 move_speed, Vector2 direction_scalar, std::queue<path::path> paths){
     return components::movement_component(move_speed, direction_scalar, paths);
 }
-components::renderable_component::body component_builders::build_body(std::vector<sprite::sprite>& sprites, size_t index){
+components::renderable_component::body component_builders::build_entity_body(std::vector<sprite::sprite>& sprites, size_t index){
     return components::renderable_component::body(sprites, index);
 }
-components::renderable_component component_builders::build_renderable_component(std::vector<components::renderable_component::body>& bodys){
+components::renderable_component component_builders::build_entity_renderable_component(std::vector<components::renderable_component::body>& bodys){
     return components::renderable_component(bodys);
 }
-components::collision_component::hitbox_component component_builders::build_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index){
+components::collision_component::hitbox_component component_builders::build_entity_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index){
     return components::collision_component::hitbox_component(hitboxes, index);
 }
-components::collision_component component_builders::build_collision_component(components::collision_component::hitbox_component hitboxes){
+components::collision_component component_builders::build_entity_collision_component(components::collision_component::hitbox_component hitboxes){
     return components::collision_component(std::move(hitboxes));
 }
-components::interactor_component component_builders::build_interactor_component(float reach, std::optional<size_t> entity_id, std::vector<size_t> interactions){
+components::interactor_component component_builders::build_entity_interactor_component(float reach, std::optional<size_t> entity_id, std::vector<size_t> interactions){
     return components::interactor_component(reach, entity_id, interactions);
 }
-components::interactable_component component_builders::build_interactable_component(float reach,
+components::interactable_component component_builders::build_entity_interactable_component(float reach,
     const std::array<std::optional<Vector2>, DIRECTIONS>& slot_offsets, std::vector<size_t> interactions){
     return components::interactable_component(reach, slot_offsets, interactions);
 }
-components::key_input_component component_builders::build_key_input_component(std::vector<game_config::input>& controls){
+components::key_input_component component_builders::build_entity_key_input_component(std::vector<game_config::input>& controls){
     return components::key_input_component(controls);
 }
-components::mouse_input_component component_builders::build_mouse_input_component(std::vector<game_config::input>& inputs){
+components::mouse_input_component component_builders::build_entity_mouse_input_component(std::vector<game_config::input>& inputs){
     return components::mouse_input_component(inputs);
 }
-components::state_machine_component component_builders::build_state_machine_component(state_machine::state_machine machine){
+components::state_machine_component component_builders::build_entity_state_machine_component(state_machine::state_machine machine){
     return components::state_machine_component(std::move(machine));
 }
-components::selectable_component component_builders::build_selectable_component(size_t kind){
+components::selectable_component component_builders::build_entity_selectable_component(size_t kind){
     return components::selectable_component(kind);
 }
-components::storage_component component_builders::build_storage_component(){
+components::storage_component component_builders::build_entity_storage_component(){
     return components::storage_component(item_stack::item_stack());
 }
-components::food_component component_builders::build_food_component(size_t item_id){
+components::food_component component_builders::build_entity_food_component(size_t item_id){
     return components::food_component(item_id);
 }
-components::carrier_component component_builders::build_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity){
+components::carrier_component component_builders::build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity){
     return components::carrier_component(previous_position, current_position, carried_entity);
 }
-components::recipes_component component_builders::build_recipes_component(std::vector<recipe::recipe>& recipes){
+components::recipes_component component_builders::build_entity_recipes_component(std::vector<recipe::recipe>& recipes){
     return components::recipes_component(recipes);
 }
 components::hud_component component_builders::build_hud_component(sprite::nine_sprite& base, Vector2 offset){
     return components::hud_component(base, offset);
+}
+
+components::position_component component_builders::build_hud_positional_component(Vector2 position){
+    return components::position_component(position);
+}
+components::renderable_component::body component_builders::build_hud_body(std::vector<sprite::sprite>& sprites, size_t index){
+    return components::renderable_component::body(sprites, index);
+}
+components::renderable_component component_builders::build_hud_renderable_component(std::vector<components::renderable_component::body>& bodys){
+    return components::renderable_component(bodys);
+}
+components::collision_component::hitbox_component component_builders::build_hud_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index){
+    return components::collision_component::hitbox_component(hitboxes, index);
+}
+components::collision_component component_builders::build_hud_collision_component(components::collision_component::hitbox_component hitboxes){
+    return components::collision_component(std::move(hitboxes));
+}
+components::state_machine_component component_builders::build_hud_state_machine_component(state_machine::state_machine machine){
+    return components::state_machine_component(std::move(machine));
+}
+components::clickable_component component_builders::build_hud_clickable_component(size_t action, int payload){
+    return components::clickable_component(action, payload);
+}
+components::owner_component component_builders::build_hud_owner_component(size_t owner){
+    return components::owner_component(owner);
 }
