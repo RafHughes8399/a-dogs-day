@@ -300,3 +300,9 @@ t
 
         -> these hud elements are built and then managed by the systems 9
 
+
+    the hud component is a thing that an entity has 
+    entity has a hud component. 
+
+    hud component has a list of hte hud elements ids that are attached to this entity. [like the nine sprite base, the buttons etc,]
+    hud ocmponent also tracks activity, and calls their specific updates through the hud system. the hyd system is the system for the hud component
