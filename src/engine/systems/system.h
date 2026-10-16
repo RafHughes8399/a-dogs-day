@@ -326,6 +326,7 @@ namespace systems{
                 // executed, never queued - listeners must see the entity this frame
                 events::create_entity created{id, layer};
                 event_interface::execute_event(created);
+                create_decoration_hud(id);
                 return id;
             }
             size_t create(std::function<void(size_t, Vector2)> build, Vector2 position, size_t layer){
@@ -334,6 +335,7 @@ namespace systems{
                 // executed, never queued - listeners must see the entity this frame
                 events::create_entity created{id, layer};
                 event_interface::execute_event(created);
+                create_decoration_hud(id);
                 return id;
             }
             size_t create(std::function<void(size_t, size_t, Vector2)> build, size_t entity, Vector2 position, size_t layer){
@@ -342,6 +344,7 @@ namespace systems{
                 // executed, never queued - listeners must see the entity this frame
                 events::create_entity created{id, layer};
                 event_interface::execute_event(created);
+                create_decoration_hud(id);
                 return id;
             }
             size_t create_customer_dog();
@@ -358,6 +361,7 @@ namespace systems{
 
             size_t create_cooking_station(size_t cooking_station, Vector2 position);
             void destroy_cooking_station(size_t id);
+            void create_decoration_hud(size_t owner);
             void create_cooking_station_hud(size_t owner);
             size_t create_stove(Vector2 position);
             size_t create_oven(Vector2 position);

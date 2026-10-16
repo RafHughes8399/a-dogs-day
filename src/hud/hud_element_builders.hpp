@@ -11,6 +11,10 @@
 namespace button_builders {
     void build_button(size_t id, Vector2 position, sprite::sprite& sprite, hitbox::hitbox& hitbox,
         size_t action, int payload = 0);
+    void build_decoration_button(size_t id, Vector2 position, sprite::sprite& sprite, size_t action);
+    void build_move_decoration_button(size_t id, Vector2 position);
+    void build_sell_decoration_button(size_t id, Vector2 position);
+    void build_to_storage_decoration_button(size_t id, Vector2 position);
     void build_recipe_button(size_t id, Vector2 position, int recipe, sprite::sprite& sprite);
     void build_recipe_button(size_t food, size_t id, Vector2 position, int recipe);
     void build_lasagna_button(size_t id, Vector2 position, int recipe);

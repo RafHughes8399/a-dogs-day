@@ -94,10 +94,16 @@ namespace hud_systems{
         : defined_clicks_(){
             defined_clicks_[hud_config::click_actions::select_recipe] = select_recipe;
             defined_clicks_[hud_config::click_actions::change_page] = change_page;
+            defined_clicks_[hud_config::click_actions::move_decoration] = move_decoration;
+            defined_clicks_[hud_config::click_actions::sell_decoration] = sell_decoration;
+            defined_clicks_[hud_config::click_actions::store_decoration] = store_decoration;
         }
 
         static void select_recipe(size_t button, int payload);
         static void change_page(size_t button, int payload);
+        static void move_decoration(size_t button, int payload);
+        static void sell_decoration(size_t button, int payload);
+        static void store_decoration(size_t button, int payload);
         std::array<std::function<void(size_t, int)>, hud_config::click_actions::size> defined_clicks_;
     };
     // storing hud elements 

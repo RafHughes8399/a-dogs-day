@@ -189,6 +189,18 @@ sprite::sprite sprite_builders::build_nine_vertical_piece(){
 sprite::sprite sprite_builders::build_nine_horizontal_piece(){
     return build_sprite(textures::textures_.get_texture(textures::nine_sprite_horizontal, hud_config::nine_sprite_horizontal_path), hud_config::nine_sprite_centre_width, hud_config::nine_sprite_corner_height, hud_config::nine_sprite_frames, hud_config::nine_sprite_animations);
 }
+sprite::nine_sprite sprite_builders::build_decoration_nine_sprite(Rectangle frame){
+    return sprite::nine_sprite(frame, WHITE, hud_config::decoration_hud_corner_scale);
+}
+sprite::sprite sprite_builders::build_move_decoration_button_sprite(){
+    return build_test_decoration_sprite(hud_config::decoration_button_attributes);
+}
+sprite::sprite sprite_builders::build_sell_decoration_button_sprite(){
+    return build_test_decoration_sprite(hud_config::decoration_button_attributes);
+}
+sprite::sprite sprite_builders::build_to_storage_decoration_button_sprite(){
+    return build_test_decoration_sprite(hud_config::decoration_button_attributes);
+}
 sprite::nine_sprite sprite_builders::build_stove_nine_sprite(){
     return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
 }

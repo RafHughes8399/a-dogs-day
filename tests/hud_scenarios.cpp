@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
 
 #include <vector>
 
@@ -222,6 +223,11 @@ namespace {
     const std::vector<size_t>& elements_of(size_t owner){
         return component_managers::hud_manager_.get_component(owner)->get_elements();
     }
+
+    std::vector<size_t> recipe_buttons_of(size_t owner){
+        const auto& elements = elements_of(owner);
+        return std::vector<size_t>(elements.begin() + hud_config::decoration_hud_button_count, elements.end());
+    }
 }
 
 SCENARIO("a hud element is created against an owner with a hud", "[hud][lifespan]"){
@@ -330,11 +336,12 @@ SCENARIO("a cooking station is built with a recipe button per recipe", "[hud][bu
         auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
         const Vector2 position{level_config::graph_x + 64.0f, level_config::graph_y + 64.0f};
         auto stove = lifespan.create_stove(position);
-        const auto& buttons = elements_of(stove);
+        const auto buttons = recipe_buttons_of(stove);
 
-        THEN("it owns four buttons, all in the hud tree"){
+        THEN("it owns four recipe buttons on top of its three decoration buttons, all in the hud tree"){
             REQUIRE(buttons.size() == 4);
-            REQUIRE(hud_spatial.tracked_count() == 4);
+            REQUIRE(elements_of(stove).size() == 7);
+            REQUIRE(hud_spatial.tracked_count() == 7);
         }
         THEN("each button selects the recipe at its own index"){
             for(size_t index = 0; index < buttons.size(); ++index){
@@ -397,7 +404,7 @@ SCENARIO("a cooking station is built with a recipe button per recipe", "[hud][bu
 
         THEN("only the first page of buttons is built"){
             REQUIRE(station_config::chopping_board_recipes.size() > 4);
-            REQUIRE(elements_of(board).size() == 4);
+            REQUIRE(recipe_buttons_of(board).size() == 4);
         }
     }
 }
@@ -465,7 +472,7 @@ SCENARIO("clicking a hud button runs its action and keeps the selection", "[hud]
         auto stove = lifespan.create_stove(Vector2{level_config::graph_x + 64.0f, level_config::graph_y + 64.0f});
         auto cursor = game.create_cursor();
         selection.select(stove);
-        auto button = elements_of(stove)[2];
+        auto button = recipe_buttons_of(stove)[2];
         game.move_entity(cursor, centre_of(button));
         auto* recipes = component_managers::entity_recipes_manager_.get_component(stove);
         auto third_food = recipes->get_selected_recipes()[2].get_food_id();
@@ -497,7 +504,7 @@ SCENARIO("clicking a hud button runs its action and keeps the selection", "[hud]
         testing::ecs_test_game game;
         auto& lifespan = systems::entity_lifespan_system::get_instance();
         auto stove = lifespan.create_stove(Vector2{level_config::graph_x + 64.0f, level_config::graph_y + 64.0f});
-        auto button = elements_of(stove)[2];
+        auto button = recipe_buttons_of(stove)[2];
         auto* recipes = component_managers::entity_recipes_manager_.get_component(stove);
         auto first_food = recipes->get_selected_recipe().get_food_id();
 
@@ -585,6 +592,233 @@ SCENARIO("every food has its own recipe button builder", "[hud][button]"){
             THEN("nothing is built"){
                 REQUIRE(component_helpers::num_registered_hud_components(200) == 0);
             }
+        }
+    }
+}
+
+namespace {
+    size_t create_gargoyle_at(Vector2 position){
+        return systems::entity_lifespan_system::get_instance().create([position](size_t id){
+            ecs_entities::build_gargoyle(id, position);
+        }, level_config::draw_layers::decoration);
+    }
+
+    size_t create_poker_table_at(Vector2 position){
+        return systems::entity_lifespan_system::get_instance().create([position](size_t id){
+            ecs_entities::build_poker_table(id, position);
+        }, level_config::draw_layers::decoration);
+    }
+
+    Rectangle hitbox_box_of(size_t id){
+        return component_managers::entity_collision_manager_.get_component(id)
+            ->get_hitbox_component().get_hitbox().get_box();
+    }
+
+    Rectangle panel_frame_of(size_t id){
+        auto& panel = component_managers::hud_manager_.get_component(id)->get_panels()[0];
+        return panel.get_base().get_frame();
+    }
+
+    Vector2 panel_origin_of(size_t id){
+        auto& panel = component_managers::hud_manager_.get_component(id)->get_panels()[0];
+        auto position = component_managers::entity_positional_manager_.get_component(id)->get_position();
+        return Vector2Add(position, panel.get_offset());
+    }
+
+    Rectangle box_of_button(size_t button){
+        return component_managers::hud_collision_manager_.get_component(button)
+            ->get_hitbox_component().get_hitbox().get_box();
+    }
+}
+
+SCENARIO("a decoration is built with a selectable and a hud of three buttons", "[hud][decoration]"){
+    GIVEN("a gargoyle"){
+        testing::ecs_test_game game;
+        auto gargoyle = create_gargoyle_at(Vector2{level_config::graph_x + 256.0f, level_config::graph_y + 256.0f});
+
+        THEN("it is a selectable decoration"){
+            REQUIRE(game.selectable_kind_of(gargoyle) == entity_config::selectable_kinds::decoration_kind);
+        }
+        THEN("it is 1.5 edges tall"){
+            REQUIRE(hitbox_box_of(gargoyle).height == Catch::Approx(level_config::edge_weight * 1.5f));
+        }
+        THEN("it has one panel and three buttons, in the order move, sell, store"){
+            REQUIRE(component_managers::hud_manager_.get_component(gargoyle)->get_panels().size() == 1);
+            auto& buttons = elements_of(gargoyle);
+            REQUIRE(buttons.size() == 3);
+            std::vector<size_t> actions{hud_config::click_actions::move_decoration,
+                hud_config::click_actions::sell_decoration, hud_config::click_actions::store_decoration};
+            for(size_t index = 0; index < buttons.size(); ++index){
+                CAPTURE(index);
+                REQUIRE(component_managers::hud_clickable_manager_.get_component(buttons[index])->get_action()
+                    == actions[index]);
+            }
+        }
+        THEN("the hud starts closed"){
+            REQUIRE_FALSE(component_managers::hud_manager_.get_component(gargoyle)->is_active());
+        }
+    }
+}
+
+SCENARIO("the decoration hud panel sits outside the left edge", "[hud][decoration]"){
+    GIVEN("a gargoyle, whose hitbox is shorter than the panel minimum"){
+        testing::ecs_test_game game;
+        auto gargoyle = create_gargoyle_at(Vector2{level_config::graph_x + 256.0f, level_config::graph_y + 256.0f});
+        auto box = hitbox_box_of(gargoyle);
+        auto frame = panel_frame_of(gargoyle);
+        auto origin = panel_origin_of(gargoyle);
+
+        THEN("the panel is as tall as the minimum fitting three buttons"){
+            REQUIRE(frame.height == Catch::Approx(hud_config::decoration_hud_min_height));
+            REQUIRE(frame.width == Catch::Approx(hud_config::decoration_hud_width));
+        }
+        THEN("the panel ends the edge gap before the hitbox"){
+            REQUIRE(origin.x + frame.width + hud_config::decoration_hud_edge_gap == Catch::Approx(box.x));
+        }
+        THEN("the panel is centred on the hitbox vertically"){
+            REQUIRE(origin.y + frame.height / 2.0f == Catch::Approx(box.y + box.height / 2.0f));
+        }
+    }
+
+    GIVEN("a poker table, which is tall enough for the sixty percent rule"){
+        testing::ecs_test_game game;
+        auto table = create_poker_table_at(Vector2{level_config::graph_x + 512.0f, level_config::graph_y + 256.0f});
+        auto box = hitbox_box_of(table);
+        auto frame = panel_frame_of(table);
+
+        THEN("the panel is sixty percent of the hitbox height"){
+            REQUIRE(box.height * hud_config::decoration_hud_height_ratio > hud_config::decoration_hud_min_height);
+            REQUIRE(frame.height == Catch::Approx(box.height * hud_config::decoration_hud_height_ratio));
+        }
+    }
+}
+
+SCENARIO("the decoration buttons are spaced evenly down the panel", "[hud][decoration]"){
+    GIVEN("a gargoyle and a poker table"){
+        testing::ecs_test_game game;
+        auto gargoyle = create_gargoyle_at(Vector2{level_config::graph_x + 256.0f, level_config::graph_y + 256.0f});
+        auto table = create_poker_table_at(Vector2{level_config::graph_x + 512.0f, level_config::graph_y + 256.0f});
+
+        THEN("the gaps above, between and below the buttons are all equal"){
+            for(auto owner : {gargoyle, table}){
+                auto frame = panel_frame_of(owner);
+                auto origin = panel_origin_of(owner);
+                auto& buttons = elements_of(owner);
+                std::vector<float> gaps;
+                gaps.push_back(box_of_button(buttons[0]).y - origin.y);
+                for(size_t index = 1; index < buttons.size(); ++index){
+                    auto previous = box_of_button(buttons[index - 1]);
+                    gaps.push_back(box_of_button(buttons[index]).y - (previous.y + previous.height));
+                }
+                auto last = box_of_button(buttons.back());
+                gaps.push_back(origin.y + frame.height - (last.y + last.height));
+                CAPTURE(owner);
+                REQUIRE(gaps.size() == 4);
+                for(auto gap : gaps){
+                    REQUIRE(gap == Catch::Approx(gaps[0]));
+                }
+                REQUIRE(gaps[0] > 0.0f);
+            }
+        }
+        THEN("every button is the configured size and centred horizontally in the panel"){
+            for(auto owner : {gargoyle, table}){
+                auto frame = panel_frame_of(owner);
+                auto origin = panel_origin_of(owner);
+                for(auto button : elements_of(owner)){
+                    auto box = box_of_button(button);
+                    REQUIRE(box.width == Catch::Approx(hud_config::decoration_hud_button_size));
+                    REQUIRE(box.height == Catch::Approx(hud_config::decoration_hud_button_size));
+                    REQUIRE(box.x + box.width / 2.0f == Catch::Approx(origin.x + frame.width / 2.0f));
+                }
+            }
+        }
+    }
+}
+
+SCENARIO("a cooking station keeps both its decoration panel and its recipe panel", "[hud][decoration]"){
+    GIVEN("a stove"){
+        testing::ecs_test_game game;
+        auto stove = systems::entity_lifespan_system::get_instance().create_stove(
+            Vector2{level_config::graph_x + 256.0f, level_config::graph_y + 256.0f});
+
+        THEN("its hud has two panels"){
+            REQUIRE(component_managers::hud_manager_.get_component(stove)->get_panels().size() == 2);
+        }
+        THEN("the decoration buttons come first and the recipe buttons after"){
+            auto& elements = elements_of(stove);
+            for(size_t index = 0; index < elements.size(); ++index){
+                auto action = component_managers::hud_clickable_manager_.get_component(elements[index])->get_action();
+                CAPTURE(index);
+                if(index < static_cast<size_t>(hud_config::decoration_hud_button_count)){
+                    REQUIRE(action != hud_config::click_actions::select_recipe);
+                }
+                else{
+                    REQUIRE(action == hud_config::click_actions::select_recipe);
+                }
+            }
+        }
+    }
+}
+
+SCENARIO("clicking a decoration button is consumed and changes nothing yet", "[hud][decoration][click]"){
+    GIVEN("a selected gargoyle and the cursor over each of its buttons"){
+        testing::ecs_test_game game;
+        auto& selection = systems::selection_system::get_instance();
+        auto& controls = systems::control_input_system::get_instance();
+        auto gargoyle = create_gargoyle_at(Vector2{level_config::graph_x + 256.0f, level_config::graph_y + 256.0f});
+        auto cursor = game.create_cursor();
+        selection.select(gargoyle);
+        REQUIRE(component_managers::hud_manager_.get_component(gargoyle)->is_active());
+
+        THEN("each click is consumed by the hud and the gargoyle stays selected"){
+            for(auto button : elements_of(gargoyle)){
+                game.move_entity(cursor, centre_of(button));
+                controls.simulate_input(game_config::input{MOUSE_BUTTON_LEFT, game_config::mouse_press}, cursor);
+                CAPTURE(button);
+                REQUIRE(selection.selected() == static_cast<int>(gargoyle));
+                REQUIRE(component_managers::hud_manager_.get_component(gargoyle)->is_active());
+            }
+        }
+        THEN("the hud follows the gargoyle when it moves"){
+            auto before = centre_of(elements_of(gargoyle)[0]);
+            const Vector2 shift{level_config::edge_weight * 3.0f, level_config::edge_weight * 2.0f};
+            auto position = component_managers::entity_positional_manager_.get_component(gargoyle)->get_position();
+            game.move_entity(gargoyle, Vector2Add(position, shift));
+            REQUIRE(Vector2Equals(centre_of(elements_of(gargoyle)[0]), Vector2Add(before, shift)));
+        }
+    }
+}
+
+SCENARIO("a nine sprite can shrink its corners to fit a narrower frame", "[hud][nine]"){
+    GIVEN("a frame as wide as two half-size corners"){
+        testing::ecs_test_game game;
+        const float half = 0.5f;
+        auto frame = Rectangle{0.0f, 0.0f, 32.0f, base_height};
+        auto shrunk = sprite::nine_sprite(frame, WHITE, half);
+        auto full = sprite::nine_sprite(frame, WHITE);
+
+        THEN("the corner scale is kept"){
+            REQUIRE(shrunk.get_corner_scale() == Catch::Approx(half));
+            REQUIRE(full.get_corner_scale() == Catch::Approx(1.0f));
+        }
+        THEN("the shrunk sprite has no negative centre scale"){
+            REQUIRE(shrunk.get_scale().x >= 0.0f);
+            REQUIRE(shrunk.get_scale().y >= 0.0f);
+        }
+        THEN("the full-corner sprite goes negative in that frame"){
+            REQUIRE(full.get_scale().x < 0.0f);
+        }
+    }
+
+    GIVEN("a decoration panel"){
+        testing::ecs_test_game game;
+        auto gargoyle = create_gargoyle_at(Vector2{level_config::graph_x + 256.0f, level_config::graph_y + 256.0f});
+
+        THEN("it is 32 wide with half-size corners"){
+            auto& base = component_managers::hud_manager_.get_component(gargoyle)->get_panels()[0].get_base();
+            REQUIRE(base.get_frame().width == Catch::Approx(32.0f));
+            REQUIRE(base.get_corner_scale() == Catch::Approx(hud_config::decoration_hud_corner_scale));
+            REQUIRE(base.get_scale().x >= 0.0f);
         }
     }
 }

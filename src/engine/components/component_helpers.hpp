@@ -34,6 +34,7 @@ namespace component_helpers{
         std::queue<path::path> paths = {});
     void add_entity_recipes_component(size_t entity_id, std::vector<recipe::recipe>& recipes);
     void add_hud_component(size_t entity_id, sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
+    void add_hud_panel(size_t entity_id, sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
     void add_hud_positional_component(size_t hud_id, Vector2 position);
     void add_hud_renderable_component(size_t hud_id,
         std::vector<components::renderable_component::body>& bodys);

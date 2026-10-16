@@ -7,11 +7,17 @@ bool components::hud_component::is_active() const{
 void components::hud_component::set_active(bool active){
     active_ = active;
 }
-sprite::nine_sprite& components::hud_component::get_base(){
+sprite::nine_sprite& components::hud_component::panel::get_base(){
     return base_;
 }
-Vector2 components::hud_component::get_offset() const{
+Vector2 components::hud_component::panel::get_offset() const{
     return offset_;
+}
+std::vector<components::hud_component::panel>& components::hud_component::get_panels(){
+    return panels_;
+}
+void components::hud_component::add_panel(sprite::nine_sprite& base, Vector2 offset){
+    panels_.emplace_back(base, offset);
 }
 const std::vector<size_t>& components::hud_component::get_elements() const{
     return elements_;

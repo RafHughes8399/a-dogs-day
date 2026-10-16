@@ -50,48 +50,48 @@ void sprite::sprite::render(Vector2 position, int frame, Vector2 scale, float ro
 
 //* ----------------------- nine_sprite ----------------------- *//
 
-sprite::nine_sprite::nine_sprite(Rectangle frame, Color tint)
+sprite::nine_sprite::nine_sprite(Rectangle frame, Color tint, float corner_scale)
     : corner_piece_(sprite_builders::build_nine_corner_piece()),
     centre_piece_(sprite_builders::build_nine_centre_piece()),
     vertical_piece_(sprite_builders::build_nine_vertical_piece()),
     horizontal_piece_(sprite_builders::build_nine_horizontal_piece()),
     frame_(frame),
     tint_(tint),
-    scale_(Vector2One()){
+    scale_(Vector2One()),
+    corner_scale_(corner_scale){
         // * scale needs to be calculated
         // * IT DEPENDS ON THE BASE DIMENSIONS WE DEFINE AND THE FRAME THAT IS PASSED IN 
         // * THE CENTRE PEICE IS SCALED BY BOTH, THE CENTRE PIECE IS INDENTED BY THE CORNERS ON BOTH DIMENSIONS * 2
         //  so it is essentially frame.x - corner width * 2 / centre_width, and then frame.y 0 - corner-height * 2 / centre height
-        scale_.x = (frame.width - (2 * hud_config::nine_sprite_corner_width)) / hud_config::nine_sprite_centre_width;
-        scale_.y = (frame.height - (2 * hud_config::nine_sprite_corner_height)) / hud_config::nine_sprite_centre_height; 
+        scale_.x = (frame.width - (2 * hud_config::nine_sprite_corner_width * corner_scale_)) / hud_config::nine_sprite_centre_width;
+        scale_.y = (frame.height - (2 * hud_config::nine_sprite_corner_height * corner_scale_)) / hud_config::nine_sprite_centre_height; 
     }
 
 void sprite::nine_sprite::render(Vector2 position, int frame){
     auto draw = [&](sprite& piece, Vector2 at, Vector2 piece_scale, float rotation) -> void{
         piece.render(at, frame, piece_scale, rotation, tint_);
     };
-    // draw corners
-        // top left, top right, bottom left bottom right
-        //corner will be drawn as top left. so its just a horizontal and vertical flip []
+    const Vector2 corner_scale{corner_scale_, corner_scale_};
+    const float corner_width = hud_config::nine_sprite_corner_width * corner_scale_;
+    const float corner_height = hud_config::nine_sprite_corner_height * corner_scale_;
     // * top left
-    draw(corner_piece_, position, Vector2One(), 0.0f);
+    draw(corner_piece_, position, corner_scale, 0.0f);
     // * top right, 
-    draw(corner_piece_, {position.x + frame_.width, position.y}, Vector2One(), 90.0f);
+    draw(corner_piece_, {position.x + frame_.width, position.y}, corner_scale, 90.0f);
     // * bottom left
-    draw(corner_piece_, {position.x, position.y + frame_.height}, Vector2One(), 270.0f);
+    draw(corner_piece_, {position.x, position.y + frame_.height}, corner_scale, 270.0f);
     // * bottom right
-    draw(corner_piece_, {position.x + frame_.width, position.y + frame_.height}, Vector2One(), 180.0f);
-    // can come from config values
+    draw(corner_piece_, {position.x + frame_.width, position.y + frame_.height}, corner_scale, 180.0f);
     // * vertical left
-    draw(vertical_piece_, {position.x, position.y + hud_config::nine_sprite_corner_height}, {1.0f,scale_.y}, 0.0f);
+    draw(vertical_piece_, {position.x, position.y + corner_height}, {corner_scale_, scale_.y}, 0.0f);
     // * vertical right
-    draw(vertical_piece_, {position.x + frame_.width, position.y + frame_.height - hud_config::nine_sprite_corner_height}, {1.0f, scale_.y}, 180.0f);
+    draw(vertical_piece_, {position.x + frame_.width, position.y + frame_.height - corner_height}, {corner_scale_, scale_.y}, 180.0f);
     // * horizontal top 
-    draw(horizontal_piece_, {position.x + hud_config::nine_sprite_corner_width, position.y}, {scale_.x, 1.0f}, 0.0f);
+    draw(horizontal_piece_, {position.x + corner_width, position.y}, {scale_.x, corner_scale_}, 0.0f);
     // * horizontal bottom 
-    draw(horizontal_piece_, {position.x + frame_.width - hud_config::nine_sprite_corner_width, position.y + frame_.height}, {scale_.x, 1.0f}, 180.0f);
+    draw(horizontal_piece_, {position.x + frame_.width - corner_width, position.y + frame_.height}, {scale_.x, corner_scale_}, 180.0f);
     // * centre
-    draw(centre_piece_, {position.x + hud_config::nine_sprite_corner_width, position.y + hud_config::nine_sprite_corner_height}, scale_, 0.0f);
+    draw(centre_piece_, {position.x + corner_width, position.y + corner_height}, scale_, 0.0f);
 }
 // ----------------------- spriteset ----------------------- //
 

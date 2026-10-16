@@ -10,10 +10,12 @@ void hud_systems::hud_rendering_system::render(int frame){
 
         auto position_component = component_managers::entity_positional_manager_.get_component(id);
         if(not position_component){ continue; }
-        auto position = GetWorldToScreen2D(
-            Vector2Add(position_component->get_position(), hud_component.get_offset()),
-            systems::rendering_system::get_instance().get_camera());
-        hud_component.get_base().render(position, frame);
+        for(auto& panel : hud_component.get_panels()){
+            auto position = GetWorldToScreen2D(
+                Vector2Add(position_component->get_position(), panel.get_offset()),
+                systems::rendering_system::get_instance().get_camera());
+            panel.get_base().render(position, frame);
+        }
         for(auto element : hud_component.get_elements()){
             auto* element_position = component_managers::hud_positional_manager_.get_component(element);
             auto* element_renderable = component_managers::hud_renderable_manager_.get_component(element);

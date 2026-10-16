@@ -146,9 +146,29 @@ private:
 
 class hud_component {
 public:
+    class panel {
+    public:
+        ~panel() = default;
+        panel(sprite::nine_sprite& base, Vector2 offset)
+        : base_(base), offset_(offset){}
+        panel(const panel& other) = default;
+        panel(panel&& other) = default;
+
+        panel& operator=(const panel& other) = delete;
+        panel& operator=(panel&& other) = delete;
+
+        sprite::nine_sprite& get_base();
+        Vector2 get_offset() const;
+    private:
+        sprite::nine_sprite base_;
+        Vector2 offset_;
+    };
+
     ~hud_component() = default;
     hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero())
-    : elements_(), active_(false), base_(base), offset_(offset){}
+    : elements_(), active_(false), panels_(){
+        panels_.emplace_back(base, offset);
+    }
     hud_component(const hud_component& other) = default;
     hud_component(hud_component&& other) = default;
 
@@ -157,8 +177,8 @@ public:
 
     bool is_active() const;
     void set_active(bool active);
-    sprite::nine_sprite& get_base();
-    Vector2 get_offset() const;
+    std::vector<panel>& get_panels();
+    void add_panel(sprite::nine_sprite& base, Vector2 offset);
     const std::vector<size_t>& get_elements() const;
     void add_element(size_t hud_id);
     void remove_element(size_t hud_id);
@@ -166,8 +186,7 @@ public:
 private:
     std::vector<size_t> elements_;
     bool active_;
-    sprite::nine_sprite base_;
-    Vector2 offset_;
+    std::vector<panel> panels_;
 };
 
 class interactable_component {
