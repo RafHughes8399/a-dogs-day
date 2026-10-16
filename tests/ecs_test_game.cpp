@@ -3,6 +3,8 @@
 #include "ecs_test_game.h"
 
 #include "component.h"
+#include "component_managers.hpp"
+#include "component_helpers.hpp"
 #include "events.h"
 #include "events_interface.h"
 #include "system_events.h"
@@ -16,7 +18,8 @@ namespace testing{
       movement_(systems::movement_system::get_instance()),
       interaction_(systems::interaction_system::get_instance()),
       state_machine_(systems::state_machine_system::get_instance()),
-      animation_(systems::animation_system::get_instance()){
+      animation_(systems::animation_system::get_instance()),
+      hud_(hud_systems::hud::get_instance()){
         // one hidden window for the whole run, same as test_game - the builders
         // LoadTexture and the shared cache has to stay valid across scenarios
         if(not IsWindowReady()){
@@ -45,9 +48,9 @@ namespace testing{
 
     size_t ecs_test_game::create_renderable(size_t layer, Vector2 position){
         return lifespan_.create([position](size_t id){
-            component_helpers::register_positional_component(id,
-                component_builders::build_positional_component(position));
-            component_helpers::register_renderable_component(id,
+            component_helpers::register_entity_positional_component(id,
+                component_builders::build_entity_positional_component(position));
+            component_helpers::register_entity_renderable_component(id,
                 components::renderable_component());
         }, layer);
     }
@@ -156,19 +159,19 @@ namespace testing{
     }
 
     std::vector<Vector2> ecs_test_game::current_path_waypoints(size_t entity_id){
-        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        auto* movement = component_managers::entity_movement_manager_.get_component(entity_id);
         if(movement == nullptr or movement->get_paths().empty()){ return {}; }
         return movement->get_current_path().get_positions();
     }
 
     size_t ecs_test_game::queued_path_count(size_t entity_id){
-        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        auto* movement = component_managers::entity_movement_manager_.get_component(entity_id);
         return movement == nullptr ? 0 : movement->get_paths().size();
     }
 
     std::vector<Vector2> ecs_test_game::path_destinations(size_t entity_id){
         std::vector<Vector2> destinations;
-        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        auto* movement = component_managers::entity_movement_manager_.get_component(entity_id);
         if(movement == nullptr){ return destinations; }
         auto paths = movement->get_paths();
         while(not paths.empty()){
@@ -201,84 +204,84 @@ namespace testing{
     }
 
     size_t ecs_test_game::num_components(size_t entity_id){
-        return component_helpers::num_registered_components(entity_id);
+        return component_helpers::num_registered_entity_components(entity_id);
     }
 
     bool ecs_test_game::has_position(size_t entity_id){
-        return component_managers::positional_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_positional_manager_.get_component(entity_id) != nullptr;
     }
 
     bool ecs_test_game::has_renderable(size_t entity_id){
-        return component_managers::renderable_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_renderable_manager_.get_component(entity_id) != nullptr;
     }
 
     bool ecs_test_game::has_controls(size_t entity_id){
-        return component_managers::control_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_control_manager_.get_component(entity_id) != nullptr;
     }
 
     bool ecs_test_game::has_collision(size_t entity_id){
-        return component_managers::collision_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_collision_manager_.get_component(entity_id) != nullptr;
     }
 
     bool ecs_test_game::has_mouse_input(size_t entity_id){
-        return component_managers::mouse_input_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_mouse_input_manager_.get_component(entity_id) != nullptr;
     }
 
     bool ecs_test_game::has_movement(size_t entity_id){
-        return component_managers::movement_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_movement_manager_.get_component(entity_id) != nullptr;
     }
 
     bool ecs_test_game::has_path(size_t entity_id){
-        auto* movement = component_managers::movement_manager_.get_component(entity_id);
+        auto* movement = component_managers::entity_movement_manager_.get_component(entity_id);
         return movement != nullptr and not movement->get_paths().empty();
     }
 
     float ecs_test_game::facing_x_of(size_t entity_id){
-        return component_managers::movement_manager_.get_component(entity_id)
+        return component_managers::entity_movement_manager_.get_component(entity_id)
             ->get_direction_scalar().x;
     }
 
     bool ecs_test_game::has_selectable(size_t entity_id){
-        return component_managers::selectable_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_selectable_manager_.get_component(entity_id) != nullptr;
     }
     bool ecs_test_game::has_interactor(size_t entity_id){
-        return component_managers::interactor_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_interactor_manager_.get_component(entity_id) != nullptr;
     }
     bool ecs_test_game::has_storage(size_t entity_id){
-        return component_managers::storage_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_storage_manager_.get_component(entity_id) != nullptr;
     }
     bool ecs_test_game::has_recipes(size_t entity_id){
-        return component_managers::recipes_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_recipes_manager_.get_component(entity_id) != nullptr;
     }
     bool ecs_test_game::has_food(size_t entity_id){
-        return component_managers::food_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_food_manager_.get_component(entity_id) != nullptr;
     }
     std::optional<size_t> ecs_test_game::food_item_of(size_t entity_id){
-        auto* component = component_managers::food_manager_.get_component(entity_id);
+        auto* component = component_managers::entity_food_manager_.get_component(entity_id);
         if(component == nullptr){ return std::nullopt; }
         return component->get_item_id();
     }
     bool ecs_test_game::has_state_machine(size_t entity_id){
-        return component_managers::state_machine_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_state_machine_manager_.get_component(entity_id) != nullptr;
     }
     std::optional<size_t> ecs_test_game::state_of(size_t entity_id){
-        auto* component = component_managers::state_machine_manager_.get_component(entity_id);
+        auto* component = component_managers::entity_state_machine_manager_.get_component(entity_id);
         if(component == nullptr){ return std::nullopt; }
         return component->get_machine().current();
     }
     std::optional<size_t> ecs_test_game::carried_item_of(size_t entity_id){
-        auto* component = component_managers::state_machine_manager_.get_component(entity_id);
+        auto* component = component_managers::entity_state_machine_manager_.get_component(entity_id);
         if(component == nullptr){ return std::nullopt; }
 
         auto* carrying = dynamic_cast<state::carrying_state*>(component->get_machine().get_current_state());
         return carrying != nullptr ? carrying->get_carried_item() : std::nullopt;
     }
     bool ecs_test_game::has_interactable(size_t entity_id){
-        return component_managers::interactable_manager_.get_component(entity_id) != nullptr;
+        return component_managers::entity_interactable_manager_.get_component(entity_id) != nullptr;
     }
 
     size_t ecs_test_game::selectable_kind_of(size_t entity_id){
-        return component_managers::selectable_manager_.get_component(entity_id)->get_kind();
+        return component_managers::entity_selectable_manager_.get_component(entity_id)->get_kind();
     }
 
     bool ecs_test_game::is_tracked(size_t entity_id){
@@ -298,7 +301,7 @@ namespace testing{
     }
 
     Rectangle ecs_test_game::hitbox_of(size_t entity_id){
-        auto* collision = component_managers::collision_manager_.get_component(entity_id);
+        auto* collision = component_managers::entity_collision_manager_.get_component(entity_id);
         return collision->get_hitbox_component().get_hitbox().get_box();
     }
 
@@ -328,8 +331,8 @@ namespace testing{
     }
 
     void ecs_test_game::claim(size_t interactor, size_t interactee){
-        auto* interactable = component_managers::interactable_manager_.get_component(interactee);
-        auto* actor = component_managers::interactor_manager_.get_component(interactor);
+        auto* interactable = component_managers::entity_interactable_manager_.get_component(interactee);
+        auto* actor = component_managers::entity_interactor_manager_.get_component(interactor);
         REQUIRE(interactable != nullptr);
         REQUIRE(actor != nullptr);
         REQUIRE(interactable->claim(interactor));
@@ -337,8 +340,8 @@ namespace testing{
     }
 
     void ecs_test_game::unclaim(size_t interactor, size_t interactee){
-        auto* interactable = component_managers::interactable_manager_.get_component(interactee);
-        auto* actor = component_managers::interactor_manager_.get_component(interactor);
+        auto* interactable = component_managers::entity_interactable_manager_.get_component(interactee);
+        auto* actor = component_managers::entity_interactor_manager_.get_component(interactor);
         if(interactable != nullptr){ interactable->release(interactor); }
         if(actor != nullptr){ actor->stop_interacting(); }
     }
@@ -376,21 +379,27 @@ namespace testing{
     }
 
     size_t ecs_test_game::total_components(){
-        return component_managers::positional_manager_.size()
-             + component_managers::movement_manager_.size()
-             + component_managers::renderable_manager_.size()
-             + component_managers::collision_manager_.size()
-             + component_managers::interactor_manager_.size()
-             + component_managers::interactable_manager_.size()
-             + component_managers::control_manager_.size()
-             + component_managers::mouse_input_manager_.size()
-             + component_managers::state_machine_manager_.size()
-             + component_managers::selectable_manager_.size()
-             + component_managers::storage_manager_.size()
-             + component_managers::food_manager_.size()
-             + component_managers::carrier_manager_.size()
-             + component_managers::recipes_manager_.size()
-             + component_managers::hud_manager_.size();
+        return component_managers::entity_positional_manager_.size()
+             + component_managers::entity_movement_manager_.size()
+             + component_managers::entity_renderable_manager_.size()
+             + component_managers::entity_collision_manager_.size()
+             + component_managers::entity_interactor_manager_.size()
+             + component_managers::entity_interactable_manager_.size()
+             + component_managers::entity_control_manager_.size()
+             + component_managers::entity_mouse_input_manager_.size()
+             + component_managers::entity_state_machine_manager_.size()
+             + component_managers::entity_selectable_manager_.size()
+             + component_managers::entity_storage_manager_.size()
+             + component_managers::entity_food_manager_.size()
+             + component_managers::entity_carrier_manager_.size()
+             + component_managers::entity_recipes_manager_.size()
+             + component_managers::hud_manager_.size()
+             + component_managers::hud_positional_manager_.size()
+             + component_managers::hud_renderable_manager_.size()
+             + component_managers::hud_collision_manager_.size()
+             + component_managers::hud_state_machine_manager_.size()
+             + component_managers::hud_clickable_manager_.size()
+             + component_managers::hud_owner_manager_.size();
     }
 
 } // namespace testing

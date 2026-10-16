@@ -1,19 +1,25 @@
-#include "component.h"
+#include "component_managers.hpp"
 
 namespace component_managers {
-component_manager<components::carrier_component> carrier_manager_;
-component_manager<components::collision_component> collision_manager_;
-component_manager<components::key_input_component> control_manager_;
-component_manager<components::food_component> food_manager_;
+component_manager<components::carrier_component> entity_carrier_manager_;
+component_manager<components::collision_component> entity_collision_manager_;
+component_manager<components::key_input_component> entity_control_manager_;
+component_manager<components::food_component> entity_food_manager_;
 component_manager<components::hud_component> hud_manager_;
-component_manager<components::interactable_component> interactable_manager_;
-component_manager<components::interactor_component> interactor_manager_;
-component_manager<components::mouse_input_component> mouse_input_manager_;
-component_manager<components::movement_component> movement_manager_;
-component_manager<components::position_component> positional_manager_;
-component_manager<components::recipes_component> recipes_manager_;
-component_manager<components::renderable_component> renderable_manager_;
-component_manager<components::selectable_component> selectable_manager_;
-component_manager<components::state_machine_component> state_machine_manager_;
-component_manager<components::storage_component> storage_manager_;
+component_manager<components::interactable_component> entity_interactable_manager_;
+component_manager<components::interactor_component> entity_interactor_manager_;
+component_manager<components::mouse_input_component> entity_mouse_input_manager_;
+component_manager<components::movement_component> entity_movement_manager_;
+component_manager<components::position_component> entity_positional_manager_;
+component_manager<components::recipes_component> entity_recipes_manager_;
+component_manager<components::renderable_component> entity_renderable_manager_;
+component_manager<components::selectable_component> entity_selectable_manager_;
+component_manager<components::state_machine_component> entity_state_machine_manager_;
+component_manager<components::storage_component> entity_storage_manager_;
+component_manager<components::position_component> hud_positional_manager_;
+component_manager<components::renderable_component> hud_renderable_manager_;
+component_manager<components::collision_component> hud_collision_manager_;
+component_manager<components::state_machine_component> hud_state_machine_manager_;
+component_manager<components::clickable_component> hud_clickable_manager_;
+component_manager<components::owner_component> hud_owner_manager_;
 } // namespace component_managers

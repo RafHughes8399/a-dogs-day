@@ -3,6 +3,8 @@
 
 #include "ecs_test_game.h"
 #include "component.h"
+#include "component_managers.hpp"
+#include "component_helpers.hpp"
 
 SCENARIO("creating an entity allocates an id and announces it", "[ecs][lifespan]"){
     GIVEN("a fresh ecs world"){
@@ -58,7 +60,7 @@ SCENARIO("building an entity registers its components", "[ecs][components]"){
                 REQUIRE(game.num_components(entity_id) == 2);
             }
             THEN("the position component holds what it was built with"){
-                auto* position = component_managers::positional_manager_.get_component(entity_id);
+                auto* position = component_managers::entity_positional_manager_.get_component(entity_id);
                 REQUIRE(position != nullptr);
                 REQUIRE(position->get_position().x == 64.0f);
                 REQUIRE(position->get_position().y == 128.0f);
@@ -169,24 +171,24 @@ SCENARIO("building the cursor registers its components", "[ecs][components][curs
                 REQUIRE(game.layer_contains(level_config::draw_layers::cursor, cursor_id));
             }
             THEN("it has one sprite slot and one hitbox variant, both at index 0"){
-                auto* renderable = component_managers::renderable_manager_.get_component(cursor_id);
+                auto* renderable = component_managers::entity_renderable_manager_.get_component(cursor_id);
                 REQUIRE(renderable != nullptr);
                 REQUIRE(renderable->get_layers().size() == 1);
                 REQUIRE(renderable->get_layers()[0].get_active_index() == 0);
 
-                auto* collision = component_managers::collision_manager_.get_component(cursor_id);
+                auto* collision = component_managers::entity_collision_manager_.get_component(cursor_id);
                 REQUIRE(collision != nullptr);
                 REQUIRE(collision->get_hitbox_component().get_hitboxes().size() == 1);
                 REQUIRE(collision->get_hitbox_component().get_hitbox_index() == 0);
             }
             THEN("its hitbox is the size cursor_attributes asks for"){
-                auto* collision = component_managers::collision_manager_.get_component(cursor_id);
+                auto* collision = component_managers::entity_collision_manager_.get_component(cursor_id);
                 auto box = collision->get_hitbox_component().get_hitbox().get_box();
                 REQUIRE(box.width == entity_config::cursor_attributes[entity_config::attributes::frame_width]);
                 REQUIRE(box.height == entity_config::cursor_attributes[entity_config::attributes::frame_height]);
             }
             THEN("it binds both mouse buttons"){
-                auto* mouse = component_managers::mouse_input_manager_.get_component(cursor_id);
+                auto* mouse = component_managers::entity_mouse_input_manager_.get_component(cursor_id);
                 REQUIRE(mouse != nullptr);
                 REQUIRE(mouse->get_inputs().size() == game_config::cursor_controls.size());
             }
@@ -287,8 +289,8 @@ SCENARIO("a facing with no matching sprite variant is ignored", "[ecs][component
         testing::ecs_test_game game;
         auto khiri_id = game.create_khiri();
 
-        auto* renderable = component_managers::renderable_manager_.get_component(khiri_id);
-        auto* collision = component_managers::collision_manager_.get_component(khiri_id);
+        auto* renderable = component_managers::entity_renderable_manager_.get_component(khiri_id);
+        auto* collision = component_managers::entity_collision_manager_.get_component(khiri_id);
         REQUIRE(renderable != nullptr);
         REQUIRE(collision != nullptr);
         REQUIRE(renderable->get_layers().front().num_sprites() == 2);
@@ -364,7 +366,7 @@ SCENARIO("npc dogs build with the same components as a player dog", "[ecs][compo
                     == entity_config::selectable_kinds::customer_dog_kind);
             }
             THEN("it stands where it was built"){
-                auto* position = component_managers::positional_manager_.get_component(customer_id);
+                auto* position = component_managers::entity_positional_manager_.get_component(customer_id);
                 REQUIRE(position->get_position().x == spawn.x);
                 REQUIRE(position->get_position().y == spawn.y);
             }
@@ -443,7 +445,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                     == entity_config::selectable_kinds::station_kind);
             }
             THEN("it offers left and right interaction slots only"){
-                auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+                auto* interactable = component_managers::entity_interactable_manager_.get_component(table_id);
                 REQUIRE(interactable != nullptr);
 
                 auto left = interactable->get_slot_offset(level_config::directions::left);
@@ -471,7 +473,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.num_components(counter_id) == 6);
             }
             THEN("it offers left and right interaction slots only"){
-                auto* interactable = component_managers::interactable_manager_.get_component(counter_id);
+                auto* interactable = component_managers::entity_interactable_manager_.get_component(counter_id);
                 REQUIRE(interactable != nullptr);
 
                 auto left = interactable->get_slot_offset(level_config::directions::left);
@@ -509,7 +511,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                     == entity_config::selectable_kinds::station_kind);
             }
             THEN("it offers left and right interaction slots only"){
-                auto* interactable = component_managers::interactable_manager_.get_component(station_id);
+                auto* interactable = component_managers::entity_interactable_manager_.get_component(station_id);
                 REQUIRE(interactable != nullptr);
 
                 auto left = interactable->get_slot_offset(level_config::directions::left);
@@ -536,7 +538,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.num_components(dishwasher_id) == 5);
             }
             THEN("it offers left and right interaction slots only"){
-                auto* interactable = component_managers::interactable_manager_.get_component(dishwasher_id);
+                auto* interactable = component_managers::entity_interactable_manager_.get_component(dishwasher_id);
                 REQUIRE(interactable != nullptr);
 
                 auto left = interactable->get_slot_offset(level_config::directions::left);
@@ -610,7 +612,7 @@ SCENARIO("a station's graph footprint and interaction offsets follow it when it 
             }
 
             AND_WHEN("a dog is sent to the table by entity id, using its current position"){
-                auto* interactable = component_managers::interactable_manager_.get_component(table_id);
+                auto* interactable = component_managers::entity_interactable_manager_.get_component(table_id);
                 REQUIRE(interactable != nullptr);
                 auto left_offset = interactable->get_slot_offset(level_config::directions::left);
                 auto right_offset = interactable->get_slot_offset(level_config::directions::right);

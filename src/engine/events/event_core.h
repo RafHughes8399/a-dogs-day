@@ -55,6 +55,10 @@ namespace events{
 		customer_finished_meal_id,
         player_engaged_id,
         player_disengaged_id,
+		create_hud_element_id,
+		remove_hud_element_id,
+		entity_selected_id,
+		entity_deselected_id,
 		size
 	};
 	class event{

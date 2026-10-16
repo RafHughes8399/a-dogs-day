@@ -2,6 +2,7 @@
 
 #include "ecs_test_game.h"
 #include "component.h"
+#include "component_helpers.hpp"
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
@@ -75,8 +76,8 @@ namespace {
         sprites.push_back(sprite::sprite(Texture2D{},
             animation_builders::build_dog_head_animations(part_width, part_height)));
         std::vector<components::renderable_component::body> layers = {
-            component_builders::build_body(sprites, 0)};
-        component_helpers::add_renderable_component(id, layers);
+            component_builders::build_entity_body(sprites, 0)};
+        component_helpers::add_entity_renderable_component(id, layers);
         return id;
     }
 }

@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include "component.h"
+#include "component_managers.hpp"
 #include "config.h"
 #include "hitbox.h"
 #include "queries.h"
@@ -55,6 +56,7 @@ namespace tree{
     private:
         int max_depth_;
         std::unique_ptr<node> root_;
+        component_managers::component_manager<components::collision_component>& collisions_;
 
         // an entity with no collision component has no bounds and is not indexed
         hitbox::hitbox* bounds_for(size_t entity_id);
@@ -93,8 +95,10 @@ namespace tree{
 
         public:
         ~ecs_quadtree() = default;
-        ecs_quadtree(raglib::bounding_box_2 root_bounds, int depth=MAX_DEPTH)
-        : max_depth_(depth), root_(std::make_unique<node>()) {
+        ecs_quadtree(raglib::bounding_box_2 root_bounds, int depth=MAX_DEPTH,
+            component_managers::component_manager<components::collision_component>& collisions
+                = component_managers::entity_collision_manager_)
+        : max_depth_(depth), root_(std::make_unique<node>()), collisions_(collisions) {
             root_->bounds_ = root_bounds;
             root_->life_ = 0;
             root_->depth_ = 0;

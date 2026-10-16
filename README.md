@@ -7,13 +7,14 @@ an 2D dog-themed cafe simulator game
 - player dog control
 - cameara navigation 
 - decoration and station building, rendering and selection
-### in progress
 - station construction and interactions
-- food storage
+- food storage 
 - waiter construction and control
+### in progress
+- hud elements and user interaction with entities
+- menus
 ## near future
 - food preparation
-- menus and hud
 - shop and level arrangement
 - inventory management and economy
 ## further down the line
@@ -28,8 +29,8 @@ other components of the engine designed and developed by me. structures of note 
 - quad tree spatial partitioning for collision and interaction detection
 - entity component system
 - view frame render culling 
-- typed interaction handling [in progress]
-- 9-slicing sprites [todo]
+- typed interaction handling
+- 9-slicing sprites
 
 
 ### ai usage
