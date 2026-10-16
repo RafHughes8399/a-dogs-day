@@ -1,3 +1,4 @@
+#include "hud_layout.hpp"
 #include "component.h"
 #include "component_managers.hpp"
 #include "component_helpers.hpp"
@@ -163,6 +164,12 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
     std::vector<hitbox::hitbox> hitboxes = {decoration_hitbox};
     component_helpers::add_entity_collision_component(id,
         component_builders::build_entity_hitbox_component(hitboxes, 0));
+
+    component_helpers::add_entity_selectable_component(id,
+        entity_config::selectable_kinds::decoration_kind);
+    auto panel = hud_layout::decoration_panel(decoration_hitbox.get_box());
+    auto hud_sprite = sprite_builders::build_decoration_nine_sprite(Rectangle{0.0f, 0.0f, panel.width, panel.height});
+    component_helpers::add_hud_component(id, hud_sprite, Vector2{panel.x - position.x, panel.y - position.y});
 }
     void ecs_entities::build_test_decoration(size_t id, Vector2 position){
         build_decoration(id, position,
@@ -211,7 +218,7 @@ void ecs_entities::build_cooking_station(size_t id, Vector2 position,
         component_helpers::add_entity_recipes_component(id, recipes);
         component_helpers::add_entity_state_machine_component(id,
             state_machine_builders::build_cooking_station_state_machine());
-        component_helpers::add_hud_component(id, hud_sprite, hud_config::cook_station_hud_offset);
+        component_helpers::add_hud_panel(id, hud_sprite, hud_config::cook_station_hud_offset);
     }
     void ecs_entities::build_counter(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,

@@ -53,7 +53,7 @@ namespace sprite{
     class nine_sprite {
     public:
         ~nine_sprite() = default;
-        nine_sprite(Rectangle frame, Color tint);
+        nine_sprite(Rectangle frame, Color tint, float corner_scale = 1.0f);
         nine_sprite(const nine_sprite& other) = default;
         nine_sprite(nine_sprite&& other) = default;
     
@@ -72,6 +72,9 @@ namespace sprite{
         Color get_tint() const{
             return tint_;
         }
+        float get_corner_scale() const{
+            return corner_scale_;
+        }
 #endif
     private:
         sprite corner_piece_;
@@ -81,6 +84,7 @@ namespace sprite{
         Rectangle frame_;
         Color tint_;
         Vector2 scale_;
+        float corner_scale_;
     };
     class spriteset{
         public:
@@ -184,6 +188,10 @@ namespace sprite_builders{
     sprite::sprite build_nine_vertical_piece();
     sprite::sprite build_nine_horizontal_piece();
 
+    sprite::nine_sprite build_decoration_nine_sprite(Rectangle frame);
+    sprite::sprite build_move_decoration_button_sprite();
+    sprite::sprite build_sell_decoration_button_sprite();
+    sprite::sprite build_to_storage_decoration_button_sprite();
     sprite::nine_sprite build_stove_nine_sprite();
     sprite::nine_sprite build_oven_nine_sprite();
     sprite::nine_sprite build_espresso_station_nine_sprite();

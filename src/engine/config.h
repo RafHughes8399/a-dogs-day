@@ -711,7 +711,7 @@ namespace entity_config{
         {lionel_head_attributes, Vector2{0.0f, 0.0f}, lionel_head_left_path, lionel_head_right_path},
         {lionel_face_attributes, Vector2{level_config::edge_weight * 0.12f, level_config::edge_weight * 0.15f}, lionel_face_left_path, lionel_face_right_path}};
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
-    inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, 70.0f, 1.0f, 1.0f};
+    inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, level_config::edge_weight * 1.5f, 1.0f, 1.0f};
     inline const float pavlov_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 2.75f, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
@@ -802,9 +802,24 @@ namespace hud_config{
         recipe_rows * (recipe_icon_height + recipe_icon_height_buffer) };
     inline const Vector2 cook_station_hud_offset = {entity_config::station_width - (entity_config::station_width / 4), entity_config::station_height  * -0.5f};
 
+    inline const float decoration_hud_height_ratio = 0.6f;
+    inline const float decoration_hud_corner_scale = 0.5f;
+    inline const float decoration_hud_width = nine_sprite_corner_width * 2.0f * decoration_hud_corner_scale;
+    inline const float decoration_hud_edge_gap = level_config::edge_weight * 0.0625f;
+    inline const float decoration_hud_button_size = 20.0f;
+    inline const float decoration_hud_button_buffer = level_config::edge_weight * 0.0625f;
+    inline const int decoration_hud_button_count = 3;
+    inline const float decoration_hud_min_height = decoration_hud_button_count * decoration_hud_button_size
+        + (decoration_hud_button_count + 1) * decoration_hud_button_buffer;
+    inline const float decoration_button_attributes[entity_config::attributes::size] = {
+        decoration_hud_button_size, decoration_hud_button_size, 1.0f, 1.0f};
+
     enum click_actions{
         select_recipe = 0,
         change_page,
+        move_decoration,
+        sell_decoration,
+        store_decoration,
         size
     };
 }

@@ -3,6 +3,7 @@
 #include <string>
 #include "component_helpers.hpp"
 #include "hud_element_builders.hpp"
+#include "hud_layout.hpp"
 #include <algorithm>
 
 // ---------------- id allocation ----------------
@@ -129,6 +130,26 @@ void systems::entity_lifespan_system::destroy_cooking_station(size_t id){
     debug::log("[entity_lifespan_system::destroy_cooking_station] removing cooking station id: "
         + std::to_string(id));
     destroy(id);
+}
+void systems::entity_lifespan_system::create_decoration_hud(size_t owner){
+    auto* selectable = component_managers::entity_selectable_manager_.get_component(owner);
+    auto* collision = component_managers::entity_collision_manager_.get_component(owner);
+    if(component_managers::hud_manager_.get_component(owner) == nullptr
+        or selectable == nullptr or collision == nullptr){ return; }
+    if(selectable->get_kind() != entity_config::selectable_kinds::decoration_kind
+        and selectable->get_kind() != entity_config::selectable_kinds::station_kind){ return; }
+
+    using button_builder = void (*)(size_t, Vector2);
+    const std::array<button_builder, hud_config::decoration_hud_button_count> builders{
+        &button_builders::build_move_decoration_button,
+        &button_builders::build_sell_decoration_button,
+        &button_builders::build_to_storage_decoration_button};
+    auto panel = hud_layout::decoration_panel(collision->get_hitbox_component().get_hitbox().get_box());
+    for(size_t index = 0; index < builders.size(); ++index){
+        auto position = hud_layout::decoration_button_position(panel, index);
+        auto builder = builders[index];
+        create_hud_element(owner, [builder, position](size_t id){ builder(id, position); });
+    }
 }
 void systems::entity_lifespan_system::create_cooking_station_hud(size_t owner){
     auto* recipes = component_managers::entity_recipes_manager_.get_component(owner);

@@ -122,3 +122,20 @@ void button_builders::build_steak_leftovers_button(size_t id, Vector2 position, 
     auto sprite = sprite_builders::build_food_sprite();
     build_recipe_button(id, position, recipe, sprite);
 }
+void button_builders::build_decoration_button(size_t id, Vector2 position, sprite::sprite& sprite, size_t action){
+    auto hitbox = hitbox::hitbox(Rectangle{position.x, position.y,
+        hud_config::decoration_hud_button_size, hud_config::decoration_hud_button_size});
+    build_button(id, position, sprite, hitbox, action);
+}
+void button_builders::build_move_decoration_button(size_t id, Vector2 position){
+    auto sprite = sprite_builders::build_move_decoration_button_sprite();
+    build_decoration_button(id, position, sprite, hud_config::click_actions::move_decoration);
+}
+void button_builders::build_sell_decoration_button(size_t id, Vector2 position){
+    auto sprite = sprite_builders::build_sell_decoration_button_sprite();
+    build_decoration_button(id, position, sprite, hud_config::click_actions::sell_decoration);
+}
+void button_builders::build_to_storage_decoration_button(size_t id, Vector2 position){
+    auto sprite = sprite_builders::build_to_storage_decoration_button_sprite();
+    build_decoration_button(id, position, sprite, hud_config::click_actions::store_decoration);
+}

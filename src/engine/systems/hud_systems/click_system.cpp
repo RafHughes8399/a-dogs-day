@@ -20,3 +20,15 @@ void hud_systems::click_system::change_page(size_t button, int payload){
     (void) button;
     (void) payload;
 }
+void hud_systems::click_system::move_decoration(size_t button, int payload){
+    (void) button;
+    (void) payload;
+}
+void hud_systems::click_system::sell_decoration(size_t button, int payload){
+    (void) button;
+    (void) payload;
+}
+void hud_systems::click_system::store_decoration(size_t button, int payload){
+    (void) button;
+    (void) payload;
+}
