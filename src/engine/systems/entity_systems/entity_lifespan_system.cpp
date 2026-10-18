@@ -169,7 +169,7 @@ void systems::entity_lifespan_system::create_cooking_station_hud(size_t owner){
                 + row * (hud_config::recipe_icon_height + hud_config::recipe_icon_height_buffer)};
         auto food = recipes->get_selected_recipes()[recipe].get_food_id();
         create_hud_element(owner, [food, button_position, recipe](size_t id){
-            button_builders::build_recipe_button(food, id, button_position, static_cast<int>(recipe));
+            button_builders::build_recipe_button(food, id, button_position, recipe);
         });
     }
 }

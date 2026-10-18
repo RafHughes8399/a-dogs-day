@@ -73,7 +73,7 @@ components::collision_component component_builders::build_hud_collision_componen
 components::state_machine_component component_builders::build_hud_state_machine_component(state_machine::state_machine machine){
     return components::state_machine_component(std::move(machine));
 }
-components::clickable_component component_builders::build_hud_clickable_component(size_t action, int payload){
+components::clickable_component component_builders::build_hud_clickable_component(size_t action, components::click_payload payload){
     return components::clickable_component(action, payload);
 }
 components::owner_component component_builders::build_hud_owner_component(size_t owner){

@@ -156,7 +156,7 @@ void component_helpers::add_hud_state_machine_component(size_t hud_id, state_mac
     register_hud_state_machine_component(hud_id,
         component_builders::build_hud_state_machine_component(std::move(machine)));
 }
-void component_helpers::add_hud_clickable_component(size_t hud_id, size_t action, int payload){
+void component_helpers::add_hud_clickable_component(size_t hud_id, size_t action, components::click_payload payload){
     register_hud_clickable_component(hud_id,
         component_builders::build_hud_clickable_component(action, payload));
 }

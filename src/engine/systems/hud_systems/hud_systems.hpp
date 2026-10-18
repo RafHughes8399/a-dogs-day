@@ -99,12 +99,12 @@ namespace hud_systems{
             defined_clicks_[hud_config::click_actions::store_decoration] = store_decoration;
         }
 
-        static void select_recipe(size_t button, int payload);
-        static void change_page(size_t button, int payload);
-        static void move_decoration(size_t button, int payload);
-        static void sell_decoration(size_t button, int payload);
-        static void store_decoration(size_t button, int payload);
-        std::array<std::function<void(size_t, int)>, hud_config::click_actions::size> defined_clicks_;
+        static void select_recipe(size_t button, const components::click_payload& payload);
+        static void change_page(size_t button, const components::click_payload& payload);
+        static void move_decoration(size_t button, const components::click_payload& payload);
+        static void sell_decoration(size_t button, const components::click_payload& payload);
+        static void store_decoration(size_t button, const components::click_payload& payload);
+        std::array<std::function<void(size_t, const components::click_payload&)>, hud_config::click_actions::size> defined_clicks_;
     };
     // storing hud elements 
     // processing hud behaviours

@@ -212,13 +212,17 @@ link_libraries(graph)
 add_library(game src/engine/structures/game.cpp)
 link_libraries(game)
 
+add_library(colour_replacer src/tools/colour_replacer.cpp)
+add_executable(colour-replacer src/tools/colour_replacer_main.cpp)
+target_link_libraries(colour-replacer colour_replacer)
+
 
 add_executable(${PROJECT_NAME} src/dog_days.cpp)
 
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
   raglib events queries states recipe components systems animation sprite item menu hud store hitbox texture
-  entities factories render_layer quadtree graph debug_log_interface debug_logger game ${PROJECT_NAME}
+  entities factories render_layer quadtree graph debug_log_interface debug_logger game colour_replacer colour-replacer ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})
@@ -236,6 +240,7 @@ foreach(target IN LISTS PROJECT_TARGETS)
     src/engine/systems
     src/hud
     src/interfaces
+    src/tools
   )
   target_include_directories(${target} SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)
 endforeach()
@@ -260,8 +265,9 @@ add_executable(tests
   tests/interaction_scenarios.cpp
   tests/state_machine_scenarios.cpp
   tests/hud_scenarios.cpp
+  tests/colour_replacer_scenarios.cpp
 )
-target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(tests PRIVATE colour_replacer Catch2::Catch2WithMain)
 # Test code needs the game's headers (and raylib), but deliberately NOT the
 # strict MY_COMPILE_OPTIONS - those would fire inside Catch2 / raylib headers.
 target_include_directories(tests PRIVATE
@@ -278,6 +284,7 @@ target_include_directories(tests PRIVATE
   src/engine/systems
   src/hud
   src/interfaces
+  src/tools
 )
 target_include_directories(tests SYSTEM PRIVATE ${raylib_SOURCE_DIR}/src)
 # Compile the DOG_DAYS_TESTING-guarded accessors (spec step 5) into this

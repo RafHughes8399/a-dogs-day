@@ -349,7 +349,9 @@ SCENARIO("a cooking station is built with a recipe button per recipe", "[hud][bu
                 CAPTURE(index);
                 REQUIRE(clickable != nullptr);
                 REQUIRE(clickable->get_action() == hud_config::click_actions::select_recipe);
-                REQUIRE(clickable->get_payload() == static_cast<int>(index));
+                auto* choice = std::get_if<components::recipe_choice>(&clickable->get_payload());
+                REQUIRE(choice != nullptr);
+                REQUIRE(choice->get_recipe_id() == index);
             }
         }
         THEN("each button has a position, a renderable and a hud box"){
@@ -570,12 +572,14 @@ SCENARIO("every food has its own recipe button builder", "[hud][button]"){
         THEN("each one is a select-recipe button carrying its recipe index"){
             for(size_t food = 0; food < food_count; ++food){
                 auto id = 100 + food;
-                button_builders::build_recipe_button(food, id, position, static_cast<int>(food));
+                button_builders::build_recipe_button(food, id, position, food);
                 auto* clickable = component_managers::hud_clickable_manager_.get_component(id);
                 CAPTURE(food);
                 REQUIRE(clickable != nullptr);
                 REQUIRE(clickable->get_action() == hud_config::click_actions::select_recipe);
-                REQUIRE(clickable->get_payload() == static_cast<int>(food));
+                auto* choice = std::get_if<components::recipe_choice>(&clickable->get_payload());
+                REQUIRE(choice != nullptr);
+                REQUIRE(choice->get_recipe_id() == food);
                 REQUIRE(component_managers::hud_renderable_manager_.get_component(id) != nullptr);
                 REQUIRE(component_managers::hud_collision_manager_.get_component(id) != nullptr);
             }

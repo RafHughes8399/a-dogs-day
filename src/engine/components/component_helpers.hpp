@@ -41,7 +41,7 @@ namespace component_helpers{
     void add_hud_collision_component(size_t hud_id,
         components::collision_component::hitbox_component hitbox);
     void add_hud_state_machine_component(size_t hud_id, state_machine::state_machine machine);
-    void add_hud_clickable_component(size_t hud_id, size_t action, int payload = 0);
+    void add_hud_clickable_component(size_t hud_id, size_t action, components::click_payload payload = {});
     void add_hud_owner_component(size_t hud_id, size_t owner);
     void add_entity_renderable_component(size_t entity_id,
         std::vector<components::renderable_component::body>& bodys);
