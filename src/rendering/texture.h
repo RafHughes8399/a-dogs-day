@@ -87,6 +87,9 @@ namespace textures{
         nine_sprite_centre,
         nine_sprite_vertical,
         nine_sprite_horizontal,
+        to_storage_button,
+        move_decoration_button,
+        sell_decoration_button,
         size
         // and so on
     };

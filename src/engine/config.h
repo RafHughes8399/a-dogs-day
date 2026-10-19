@@ -519,7 +519,9 @@ namespace entity_config{
         sausage_on_a_stick,
         pork_knuckles,
         lemongrass,
-
+        mutton,
+        muttoff,
+        prozac,
         charpoocherie_board,
         cheddar,
         parmigiano,
@@ -782,7 +784,9 @@ namespace hud_config{
     // hud elements paths 
     inline const char* cursor_edit_progres_wheel = "../sprites/edit_wheel.png";
     inline const char* edit_grid = "../sprites/edit_grid.png";
-    
+    inline const char* move_decoration_path = "../sprites/hud/move-decoration.png";
+    inline const char* store_decoration_path = "../sprites/hud/store-decoration.png";
+    inline const char* sell_decoration_path = "../sprites/hud/sell-decoration.png";
     inline const float edit_wheel_attributes[entity_config::attributes::size] = {35.0f, 35.0f, static_cast<float>(game_config::hold_duration),  1.0f}; // for now, pending animation play speed implementation , frames is 90
 
     inline const float nine_sprite_corner_width = level_config::edge_weight * 0.5;
@@ -906,7 +910,8 @@ namespace station_config{
     };
     inline std::vector<int> oven_recipes = {
         entity_config::foods::lasagna,
-        entity_config::foods::bone_biscuits
+        entity_config::foods::bone_biscuits,
+        entity_config::foods::mutton,
     };
     inline std::vector<int> espresso_station_recipes = {
         entity_config::foods::espresso,
@@ -924,11 +929,13 @@ namespace station_config{
         entity_config::foods::parmigiano,
         entity_config::foods::shishamo,
         entity_config::foods::rabbit_foot
-    
+        
     };
     inline std::vector<int> fridge_recipes = {
         entity_config::foods::brisket_leftovers,        
-        entity_config::foods::steak_leftovers
+        entity_config::foods::steak_leftovers,
+        entity_config::foods::muttoff,
+        entity_config::foods::prozac,
     };
 }
 namespace type_config{

@@ -183,20 +183,26 @@ namespace sprite_builders{
     sprite::sprite build_cutlets_sprite();
     std::vector<sprite::sprite> build_food_sprites();
 
+    // * ------------------------------- button spirtes ------------------------- * //
+    sprite::sprite build_button_sprite(size_t texutre_id, const char* button_path);
+    sprite::sprite build_move_decoration_button_sprite();
+    sprite::sprite build_sell_decoration_button_sprite();
+    sprite::sprite build_to_storage_decoration_button_sprite();
+    
     sprite::sprite build_nine_corner_piece();
     sprite::sprite build_nine_centre_piece();
     sprite::sprite build_nine_vertical_piece();
     sprite::sprite build_nine_horizontal_piece();
 
     sprite::nine_sprite build_decoration_nine_sprite(Rectangle frame);
-    sprite::sprite build_move_decoration_button_sprite();
-    sprite::sprite build_sell_decoration_button_sprite();
-    sprite::sprite build_to_storage_decoration_button_sprite();
+
     sprite::nine_sprite build_stove_nine_sprite();
     sprite::nine_sprite build_oven_nine_sprite();
     sprite::nine_sprite build_espresso_station_nine_sprite();
     sprite::nine_sprite build_mini_fridge_nine_sprite();
     sprite::nine_sprite build_bush_nine_sprite();
     sprite::nine_sprite build_chopping_board_nine_sprite();
+
+    
 }
 #endif

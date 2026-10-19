@@ -192,15 +192,7 @@ sprite::sprite sprite_builders::build_nine_horizontal_piece(){
 sprite::nine_sprite sprite_builders::build_decoration_nine_sprite(Rectangle frame){
     return sprite::nine_sprite(frame, WHITE, hud_config::decoration_hud_corner_scale);
 }
-sprite::sprite sprite_builders::build_move_decoration_button_sprite(){
-    return build_test_decoration_sprite(hud_config::decoration_button_attributes);
-}
-sprite::sprite sprite_builders::build_sell_decoration_button_sprite(){
-    return build_test_decoration_sprite(hud_config::decoration_button_attributes);
-}
-sprite::sprite sprite_builders::build_to_storage_decoration_button_sprite(){
-    return build_test_decoration_sprite(hud_config::decoration_button_attributes);
-}
+
 sprite::nine_sprite sprite_builders::build_stove_nine_sprite(){
     return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
 }
@@ -254,4 +246,18 @@ sprite::sprite sprite_builders::build_background_sprite(){
         entity_config::background_attributes[entity_config::attributes::frame_height],
         entity_config::background_attributes[entity_config::attributes::frames],
         entity_config::background_attributes[entity_config::attributes::animations]);
+}
+
+sprite::sprite sprite_builders::build_button_sprite(size_t texture_id, const char *button_path){
+    return build_sprite(textures::textures_.get_texture(texture_id, button_path), hud_config::decoration_button_attributes[entity_config::attributes::frame_width], 
+         hud_config::decoration_button_attributes[entity_config::attributes::frame_height],  hud_config::decoration_button_attributes[entity_config::attributes::frames],  hud_config::decoration_button_attributes[entity_config::attributes::animations]);
+}
+sprite::sprite sprite_builders::build_move_decoration_button_sprite(){
+    return build_button_sprite(textures::move_decoration_button, hud_config::move_decoration_path);
+}
+sprite::sprite sprite_builders::build_sell_decoration_button_sprite(){
+    return build_button_sprite(textures::sell_decoration_button, hud_config::sell_decoration_path);
+}
+sprite::sprite sprite_builders::build_to_storage_decoration_button_sprite(){
+    return build_button_sprite(textures::to_storage_button, hud_config::store_decoration_path);
 }
