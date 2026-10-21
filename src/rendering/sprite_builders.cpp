@@ -116,6 +116,9 @@ sprite::sprite sprite_builders::build_poker_table(){
 sprite::sprite sprite_builders::build_dog_painting(){
     return build_decoration_sprite(textures::dog_painting, entity_config::dog_painting_decoration_path, entity_config::dog_painting_attributes);
 }
+sprite::sprite sprite_builders::build_frangipani(){
+    return build_decoration_sprite(textures::frangipani, entity_config::frangipani_decoration_path, entity_config::frangipani_attributes);
+}
 sprite::sprite sprite_builders::build_gargoyle(){
         return build_decoration_sprite(textures::gargoyle_void, entity_config::gargoyle_void_decoration_path, entity_config::gargoyle_decoration_attributes);
 }
@@ -128,6 +131,22 @@ sprite::sprite sprite_builders::build_table_sprite(){
     sprite::sprite sprite_builders::build_tiled_table_sprite(){
         return build_decoration_sprite(textures::tiled_table, entity_config::tiled_table_station_path, entity_config::tiled_table_attributes);
     }
+    sprite::sprite sprite_builders::build_test_table(){
+        return sprite_builders::build_decoration_sprite(textures::table_test, entity_config::tiled_table_test_path, entity_config::tiled_table_attributes);
+    }
+    sprite::sprite sprite_builders::build_tiled_table_orange_sprite(){
+        return sprite_builders::build_decoration_sprite(textures::tiled_table_orange, entity_config::tiled_table_orange_path, entity_config::tiled_table_attributes);
+    }
+    sprite::sprite sprite_builders::build_tiled_table_red_sprite(){
+        return sprite_builders::build_decoration_sprite(textures::tiled_table_red, entity_config::tiled_table_red_path, entity_config::tiled_table_attributes);
+    }
+    sprite::sprite sprite_builders::build_tiled_table_green_sprite(){
+        return sprite_builders::build_decoration_sprite(textures::tiled_table_green, entity_config::tiled_table_green_path, entity_config::tiled_table_attributes);
+    }
+    sprite::sprite sprite_builders::build_tiled_table_blue_sprite(){
+        return sprite_builders::build_decoration_sprite(textures::tiled_table_blue, entity_config::tiled_table_blue_path, entity_config::tiled_table_attributes);
+    }
+
     sprite::sprite sprite_builders::build_food_counter_sprite(){
         return build_decoration_sprite(textures::food_counter, entity_config::food_counter_station_path, entity_config::food_counter_attributes);
     }

@@ -55,6 +55,11 @@ hitbox::hitbox hitbox_builders::build_dog_painting_hitbox(Vector2 position){
         entity_config::dog_painting_attributes[entity_config::attributes::frame_width],
         entity_config::dog_painting_attributes[entity_config::attributes::frame_height]);
 }
+hitbox::hitbox hitbox_builders::build_frangipani_hitbox(Vector2 position){
+    return build_hitbox(position,
+        entity_config::frangipani_attributes[entity_config::attributes::frame_width],
+        entity_config::frangipani_attributes[entity_config::attributes::frame_height]);
+}
 hitbox::hitbox hitbox_builders::build_table_hitbox(Vector2 position){
     return build_hitbox(position,
         entity_config::table_attributes[entity_config::attributes::frame_width],

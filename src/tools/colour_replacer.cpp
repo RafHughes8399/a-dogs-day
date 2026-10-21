@@ -113,7 +113,7 @@ std::vector<std::string> colour_replacement::replace_images(const std::vector<st
     std::vector<std::string> written;
     if(destinations.empty()){ return written; }
     for(const auto& path : paths){
-        colour_replacer replacer(path, build_colour_map(bases, destinations), destinations.front());
+        colour_replacer replacer(path, build_colour_map(bases, destinations), destinations.back());
         replacer.replace();
         if(replacer.export_copy()){
             written.push_back(replacer.get_output_path());
@@ -123,21 +123,21 @@ std::vector<std::string> colour_replacement::replace_images(const std::vector<st
 }
 
 std::vector<std::string> colour_replacement::tiled_table_replacement(const std::vector<Color>& destinations){
-    return replace_images({entity_config::tiled_table_station_path}, entity_config::tiled_table_base_colours, destinations);
+    return replace_images({entity_config::tiled_table_station_path}, colour_config::tiled_table_base_colours, destinations);
 }
 
 std::vector<std::string> colour_replacement::khiri_dog_replacement(const std::vector<Color>& destinations){
-    return replace_images(dog_part_paths(entity_config::khiri_parts), entity_config::khiri_base_colours, destinations);
+    return replace_images(dog_part_paths(entity_config::khiri_parts), colour_config::khiri_base_colours, destinations);
 }
 
 std::vector<std::string> colour_replacement::mack_dog_replacement(const std::vector<Color>& destinations){
-    return replace_images(dog_part_paths(entity_config::mack_parts), entity_config::mack_base_colours, destinations);
+    return replace_images(dog_part_paths(entity_config::mack_parts), colour_config::mack_base_colours, destinations);
 }
 
 std::vector<std::string> colour_replacement::gianluca_dog_replacement(const std::vector<Color>& destinations){
-    return replace_images(dog_part_paths(entity_config::gianluca_parts), entity_config::gianluca_base_colours, destinations);
+    return replace_images(dog_part_paths(entity_config::gianluca_parts), colour_config::gianluca_base_colours, destinations);
 }
 
 std::vector<std::string> colour_replacement::lionel_dog_replacement(const std::vector<Color>& destinations){
-    return replace_images(dog_part_paths(entity_config::lionel_parts), entity_config::lionel_base_colours, destinations);
+    return replace_images(dog_part_paths(entity_config::lionel_parts), colour_config::lionel_base_colours, destinations);
 }

@@ -246,7 +246,7 @@ void systems::interaction_system::player_station_cook(size_t player_dog, size_t 
         + " (interacting is " + std::to_string(dog_config::player_interacting) + ")"
         + ", station: " + std::to_string(cook_station)
         + " in state: " + std::to_string(cook_station_state->get_machine().current())
-        + " (active is " + std::to_string(station_config::station_active) + ")");
+        + " (active is " + std::to_string(state_machine_config::station_active) + ")");
 }
 // * ----------------------------------------------------- INTERACTIONS ------------------------------------------------------- * // 
 // TODO (25 / 8 / 26) stub - the loop calls this every frame, nothing to do yet

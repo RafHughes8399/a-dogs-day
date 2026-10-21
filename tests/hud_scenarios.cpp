@@ -405,7 +405,7 @@ SCENARIO("a cooking station is built with a recipe button per recipe", "[hud][bu
             Vector2{level_config::graph_x + 64.0f, level_config::graph_y + 64.0f});
 
         THEN("only the first page of buttons is built"){
-            REQUIRE(station_config::chopping_board_recipes.size() > 4);
+            REQUIRE(recipe_config::chopping_board_recipes.size() > 4);
             REQUIRE(recipe_buttons_of(board).size() == 4);
         }
     }

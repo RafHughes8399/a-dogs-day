@@ -379,7 +379,7 @@ SCENARIO("working a cooking station transitions the player and the station", "[s
         raise<events::dog_started_path>(khiri_id);
 
         REQUIRE(game.state_of(khiri_id).value() == dog_config::player_walking);
-        REQUIRE(game.state_of(station_id).value() == station_config::station_idle);
+        REQUIRE(game.state_of(station_id).value() == state_machine_config::station_idle);
 
         WHEN("the player works the station"){
             raise<events::player_work_station>(khiri_id, station_id);
@@ -388,7 +388,7 @@ SCENARIO("working a cooking station transitions the player and the station", "[s
                 REQUIRE(game.state_of(khiri_id).value() == dog_config::player_interacting);
             }
             THEN("the station is active"){
-                REQUIRE(game.state_of(station_id).value() == station_config::station_active);
+                REQUIRE(game.state_of(station_id).value() == state_machine_config::station_active);
             }
         }
     }
