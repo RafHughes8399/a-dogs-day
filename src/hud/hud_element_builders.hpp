@@ -23,6 +23,10 @@ namespace button_builders {
     void build_espresso_button(size_t id, Vector2 position, size_t recipe);
     void build_pup_cup_button(size_t id, Vector2 position, size_t recipe);
     void build_cutlets_button(size_t id, Vector2 position, size_t recipe);
+    void build_mutton_button(size_t id, Vector2 position, size_t recipe);
+    void build_muttoff_button(size_t id, Vector2 position, size_t recipe);
+    void build_prozac_button(size_t id, Vector2 position, size_t recipe);
+    void build_escargot_button(size_t id, Vector2 position, size_t recipe);
     void build_boiled_chicken_button(size_t id, Vector2 position, size_t recipe);
     void build_risotto_button(size_t id, Vector2 position, size_t recipe);
     void build_carbonara_button(size_t id, Vector2 position, size_t recipe);

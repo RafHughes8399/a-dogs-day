@@ -115,6 +115,10 @@ namespace entity_config{
     inline const char* lasagna_food_path = "../sprites/lasagna.png";
     inline const char* espresso_food_path = "../sprites/espresso.png";
     inline const char* cutlets_food_path = "../sprites/cutlets.png";
+    inline const char* mutton_food_path = "../sprites/mutton.png"; // TODO art not made yet
+    inline const char* muttoff_food_path = "../sprites/muttoff.png"; // TODO art not made yet
+    inline const char* prozac_food_path = "../sprites/prozac.png"; // TODO art not made yet
+    inline const char* escargot_food_path = "../sprites/escargot.png"; // TODO art not made yet
 
     inline const float station_width = level_config::edge_weight * 1.5f;
     inline const float station_height = level_config::edge_weight * 1.5f;
@@ -199,6 +203,10 @@ namespace entity_config{
     inline const float lasagna_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
     inline const float espresso_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
     inline const float cutlets_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float mutton_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float muttoff_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float prozac_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
+    inline const float escargot_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};
 
     inline const Vector2 station_slot_left  = Vector2Zero();
     inline const Vector2 station_slot_right = Vector2Zero();

@@ -10,6 +10,7 @@ namespace recipe_config{
         entity_config::foods::boiled_chicken,
         entity_config::foods::risotto,
         entity_config::foods::carbonara,
+        entity_config::foods::escargot,
     };
     inline std::vector<int> oven_recipes = {
         entity_config::foods::lasagna,

@@ -37,6 +37,9 @@ void button_builders::build_recipe_button(size_t food, size_t id, Vector2 positi
         case entity_config::foods::sausage_on_a_stick: build_sausage_on_a_stick_button(id, position, recipe); return;
         case entity_config::foods::pork_knuckles: build_pork_knuckles_button(id, position, recipe); return;
         case entity_config::foods::lemongrass: build_lemongrass_button(id, position, recipe); return;
+        case entity_config::foods::mutton: build_mutton_button(id, position, recipe); return;
+        case entity_config::foods::muttoff: build_muttoff_button(id, position, recipe); return;
+        case entity_config::foods::prozac: build_prozac_button(id, position, recipe); return;
         case entity_config::foods::charpoocherie_board: build_charpoocherie_board_button(id, position, recipe); return;
         case entity_config::foods::cheddar: build_cheddar_button(id, position, recipe); return;
         case entity_config::foods::parmigiano: build_parmigiano_button(id, position, recipe); return;
@@ -44,6 +47,7 @@ void button_builders::build_recipe_button(size_t food, size_t id, Vector2 positi
         case entity_config::foods::rabbit_foot: build_rabbit_foot_button(id, position, recipe); return;
         case entity_config::foods::brisket_leftovers: build_brisket_leftovers_button(id, position, recipe); return;
         case entity_config::foods::steak_leftovers: build_steak_leftovers_button(id, position, recipe); return;
+        case entity_config::foods::escargot: build_escargot_button(id, position, recipe); return;
         default: return;
     }
 }
@@ -65,6 +69,22 @@ void button_builders::build_pup_cup_button(size_t id, Vector2 position, size_t r
 }
 void button_builders::build_cutlets_button(size_t id, Vector2 position, size_t recipe){
     auto sprite = sprite_builders::build_cutlets_sprite();
+    build_recipe_button(id, position, recipe, sprite);
+}
+void button_builders::build_mutton_button(size_t id, Vector2 position, size_t recipe){
+    auto sprite = sprite_builders::build_mutton_sprite();
+    build_recipe_button(id, position, recipe, sprite);
+}
+void button_builders::build_muttoff_button(size_t id, Vector2 position, size_t recipe){
+    auto sprite = sprite_builders::build_muttoff_sprite();
+    build_recipe_button(id, position, recipe, sprite);
+}
+void button_builders::build_prozac_button(size_t id, Vector2 position, size_t recipe){
+    auto sprite = sprite_builders::build_prozac_sprite();
+    build_recipe_button(id, position, recipe, sprite);
+}
+void button_builders::build_escargot_button(size_t id, Vector2 position, size_t recipe){
+    auto sprite = sprite_builders::build_escargot_sprite();
     build_recipe_button(id, position, recipe, sprite);
 }
 void button_builders::build_boiled_chicken_button(size_t id, Vector2 position, size_t recipe){

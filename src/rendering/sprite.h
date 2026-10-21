@@ -187,6 +187,10 @@ namespace sprite_builders{
     sprite::sprite build_lasagna_sprite();
     sprite::sprite build_espresso_sprite();
     sprite::sprite build_cutlets_sprite();
+    sprite::sprite build_mutton_sprite();
+    sprite::sprite build_muttoff_sprite();
+    sprite::sprite build_prozac_sprite();
+    sprite::sprite build_escargot_sprite();
     std::vector<sprite::sprite> build_food_sprites();
 
     // * ------------------------------- button spirtes ------------------------- * //

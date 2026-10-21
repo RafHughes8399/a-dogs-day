@@ -562,12 +562,12 @@ SCENARIO("a hud follows its owner when the owner moves", "[hud][move]"){
         }
     }
 }
-
+ 
 SCENARIO("every food has its own recipe button builder", "[hud][button]"){
     GIVEN("a recipe button built for each food"){
         testing::ecs_test_game game;
         const Vector2 position{level_config::graph_x + 32.0f, level_config::graph_y + 32.0f};
-        const size_t food_count = static_cast<size_t>(entity_config::foods::steak_leftovers) + 1;
+        const size_t food_count = static_cast<size_t>(entity_config::foods::foods_size);
 
         THEN("each one is a select-recipe button carrying its recipe index"){
             for(size_t food = 0; food < food_count; ++food){
@@ -588,7 +588,7 @@ SCENARIO("every food has its own recipe button builder", "[hud][button]"){
 
     GIVEN("a food id past the end of the foods"){
         testing::ecs_test_game game;
-        const size_t unknown = static_cast<size_t>(entity_config::foods::steak_leftovers) + 1;
+        const size_t unknown = static_cast<size_t>(entity_config::foods::foods_size);
 
         WHEN("a recipe button is built for it"){
             button_builders::build_recipe_button(unknown, 200, Vector2Zero(), 0);

@@ -223,6 +223,7 @@ namespace entity_config{
 
         brisket_leftovers,
         steak_leftovers,
+        escargot,
         foods_size
     };
     enum counter_sprite_slots{

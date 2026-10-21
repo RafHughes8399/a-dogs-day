@@ -189,6 +189,26 @@ sprite::sprite sprite_builders::build_cutlets_sprite(){
         entity_config::cutlets_food_path, entity_config::cutlets_attributes,
         entity_config::food_draw_offset);
 }
+sprite::sprite sprite_builders::build_mutton_sprite(){
+    return build_decoration_sprite(textures::mutton,
+        entity_config::mutton_food_path, entity_config::mutton_attributes,
+        entity_config::food_draw_offset);
+}
+sprite::sprite sprite_builders::build_muttoff_sprite(){
+    return build_decoration_sprite(textures::muttoff,
+        entity_config::muttoff_food_path, entity_config::muttoff_attributes,
+        entity_config::food_draw_offset);
+}
+sprite::sprite sprite_builders::build_prozac_sprite(){
+    return build_decoration_sprite(textures::prozac,
+        entity_config::prozac_food_path, entity_config::prozac_attributes,
+        entity_config::food_draw_offset);
+}
+sprite::sprite sprite_builders::build_escargot_sprite(){
+    return build_decoration_sprite(textures::escargot,
+        entity_config::escargot_food_path, entity_config::escargot_attributes,
+        entity_config::food_draw_offset);
+}
 std::vector<sprite::sprite> sprite_builders::build_food_sprites(){
     std::vector<sprite::sprite> sprites;
     sprites.push_back(build_lasagna_sprite());
