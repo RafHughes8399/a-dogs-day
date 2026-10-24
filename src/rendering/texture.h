@@ -100,6 +100,7 @@ namespace textures{
         to_storage_button,
         move_decoration_button,
         sell_decoration_button,
+        ficus_lytra,
         size
         // and so on
     };

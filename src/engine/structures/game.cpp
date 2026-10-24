@@ -80,7 +80,7 @@ void game::game::init(){
     lifespan_.create_waiter_dog(entity_config::waiters::gianluca, Vector2 {level_config::edge_weight * 13, level_config::edge_weight * 6});
     lifespan_.create_waiter_dog(entity_config::waiters::lionel, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 9});
 
-    // * and some decorations
+    // * ----------------- DECORATIONS CREATE ------------------------------------------- // and some decorations
     lifespan_.create([](size_t id)-> void {
         ecs_entities::build_gargoyle(id, Vector2{level_config::edge_weight * 7,level_config::edge_weight *2});
     }, level_config::draw_layers::decoration);
@@ -102,7 +102,9 @@ void game::game::init(){
     debug::log("[game::init, done] built "
         + std::to_string(component_helpers::num_registered_entity_components(mack_id))
         + " components on mack");
-
+    lifespan_.create([](size_t id)-> void {
+        ecs_entities::build_ficus_lytra(id, Vector2{level_config::edge_weight * 30,level_config::edge_weight * 19});
+    }, level_config::draw_layers::decoration);
     return;
 }
 

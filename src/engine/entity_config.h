@@ -88,7 +88,8 @@ namespace entity_config{
     // * ------------------------ DECORATION PATHS --------------------------------------- *//
 
     inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
-    inline const char* frangipani_decoration_path = "../sprites/frangipani.png";
+    inline const char* ficus_lytra_decoration_path = "../sprites/plants/ficus-lytra.png";
+    inline const char* frangipani_decoration_path = "../sprites/plants/frangipani.png";
     inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle-void.png";
     inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
     inline const char* pavlov_path = "../sprites/pavlov.png";
@@ -184,7 +185,8 @@ namespace entity_config{
     inline const float pavlov_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 2.75f, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
-    inline const float frangipani_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 2.5f, 3.0f, 1.0f}; // TODO update values once exported
+    inline const float frangipani_attributes[attributes::size] = {level_config::edge_weight *  1.3125f, level_config::edge_weight * 1.75f, 3.0f, 1.0f}; // TODO update values once exported
+    inline const float ficus_lytra_attributes[attributes::size] = {level_config::edge_weight * 0.75f, level_config::edge_weight * 1.75f, 3.0f, 1.0f};
 
     inline const float table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float dining_table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};

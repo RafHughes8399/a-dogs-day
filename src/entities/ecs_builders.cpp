@@ -198,11 +198,14 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
         sprite_builders::build_dog_painting(),
         hitbox_builders::build_dog_painting_hitbox(position));
     }
+    void ecs_entities::build_ficus_lytra(size_t id, Vector2 position){
+        build_decoration(id, position, sprite_builders::build_ficus_lytra(), hitbox_builders::build_ficus_lytra_hitbox(position));
+    }
     void ecs_entities::build_frangipani(size_t id, Vector2 position){
         build_decoration(id, position,
         sprite_builders::build_frangipani(),
         hitbox_builders::build_frangipani_hitbox(position));
-        systems::animation_system::get_instance().play(id, systems::animation_system::sprite_animation{0, 0, true});
+        //systems::animation_system::get_instance().play(id, systems::animation_system::sprite_animation{0, 0, true});
     }
 
 void ecs_entities::build_station(size_t id, Vector2 position,

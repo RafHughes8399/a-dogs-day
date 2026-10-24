@@ -163,6 +163,7 @@ namespace sprite_builders{
     sprite::sprite build_pavlov();
     sprite::sprite build_poker_table();
     sprite::sprite build_dog_painting();
+    sprite::sprite build_ficus_lytra();
     sprite::sprite build_frangipani();
     sprite::sprite build_gargoyle();
 

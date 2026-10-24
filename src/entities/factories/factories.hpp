@@ -133,5 +133,7 @@ namespace factories{
     private:
         std::array<std::function<void(size_t, Vector2)>, entity_config::foods_size> food_builders_;
     };
-}
+
+    // TODO: decoration factory
+} 
 #endif

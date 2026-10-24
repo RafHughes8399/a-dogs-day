@@ -116,6 +116,9 @@ sprite::sprite sprite_builders::build_poker_table(){
 sprite::sprite sprite_builders::build_dog_painting(){
     return build_decoration_sprite(textures::dog_painting, entity_config::dog_painting_decoration_path, entity_config::dog_painting_attributes);
 }
+sprite::sprite sprite_builders:: build_ficus_lytra(){
+    return build_decoration_sprite(textures::ficus_lytra, entity_config::ficus_lytra_decoration_path,  entity_config::ficus_lytra_attributes);
+}
 sprite::sprite sprite_builders::build_frangipani(){
     return build_decoration_sprite(textures::frangipani, entity_config::frangipani_decoration_path, entity_config::frangipani_attributes);
 }
