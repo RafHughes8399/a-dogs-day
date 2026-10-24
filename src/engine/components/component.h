@@ -9,6 +9,7 @@
 #include <stddef.h>
 #include <unordered_map>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include "config.h"
@@ -71,10 +72,27 @@ private:
     Vector2* current_position_;
     std::optional<size_t> carried_entity_;
 };
+class recipe_choice{
+    public:
+        explicit recipe_choice(size_t recipe_id)
+        : recipe_id_(recipe_id){}
+        size_t get_recipe_id() const;
+    private:
+        size_t recipe_id_;
+};
+class page_turn{
+    public:
+        explicit page_turn(int direction)
+        : direction_(direction){}
+        int get_direction() const;
+    private:
+        int direction_;
+};
+using click_payload = std::variant<std::monostate, recipe_choice, page_turn>;
 class clickable_component{
     public:
         ~clickable_component() = default;
-        clickable_component(size_t action, int payload = 0)
+        clickable_component(size_t action, click_payload payload = {})
         : action_(action), payload_(payload){}
         clickable_component(const clickable_component& other) = default;
         clickable_component(clickable_component&& other) = default;
@@ -83,10 +101,10 @@ class clickable_component{
         clickable_component& operator=(clickable_component&& other) = default;
 
         size_t get_action() const;
-        int get_payload() const;
+        const click_payload& get_payload() const;
     private:
         size_t action_;
-        int payload_;
+        click_payload payload_;
 };
 class collision_component {
 public:
@@ -146,9 +164,29 @@ private:
 
 class hud_component {
 public:
+    class panel {
+    public:
+        ~panel() = default;
+        panel(sprite::nine_sprite& base, Vector2 offset)
+        : base_(base), offset_(offset){}
+        panel(const panel& other) = default;
+        panel(panel&& other) = default;
+
+        panel& operator=(const panel& other) = delete;
+        panel& operator=(panel&& other) = delete;
+
+        sprite::nine_sprite& get_base();
+        Vector2 get_offset() const;
+    private:
+        sprite::nine_sprite base_;
+        Vector2 offset_;
+    };
+
     ~hud_component() = default;
     hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero())
-    : elements_(), active_(false), base_(base), offset_(offset){}
+    : elements_(), active_(false), panels_(){
+        panels_.emplace_back(base, offset);
+    }
     hud_component(const hud_component& other) = default;
     hud_component(hud_component&& other) = default;
 
@@ -157,8 +195,8 @@ public:
 
     bool is_active() const;
     void set_active(bool active);
-    sprite::nine_sprite& get_base();
-    Vector2 get_offset() const;
+    std::vector<panel>& get_panels();
+    void add_panel(sprite::nine_sprite& base, Vector2 offset);
     const std::vector<size_t>& get_elements() const;
     void add_element(size_t hud_id);
     void remove_element(size_t hud_id);
@@ -166,8 +204,7 @@ public:
 private:
     std::vector<size_t> elements_;
     bool active_;
-    sprite::nine_sprite base_;
-    Vector2 offset_;
+    std::vector<panel> panels_;
 };
 
 class interactable_component {
@@ -507,7 +544,7 @@ namespace component_builders{
     components::collision_component build_hud_collision_component(
         components::collision_component::hitbox_component hitbox);
     components::state_machine_component build_hud_state_machine_component(state_machine::state_machine machine);
-    components::clickable_component build_hud_clickable_component(size_t action, int payload = 0);
+    components::clickable_component build_hud_clickable_component(size_t action, components::click_payload payload = {});
     components::owner_component build_hud_owner_component(size_t owner);
 }
 

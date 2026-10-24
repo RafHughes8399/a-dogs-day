@@ -5,6 +5,9 @@
 #include <raylib.h>
 #include "component_managers.hpp"
 #include "component_helpers.hpp"
+#include <algorithm>
+#include <array>
+#include <random>
 
 Camera2D& game::game::get_camera(){
     return rendering_.get_camera();
@@ -56,14 +59,28 @@ void game::game::init(){
     lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 10});
     lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
     lifespan_.create_table(entity_config::tables::tiled_table,Vector2{level_config::edge_weight * 10, level_config::edge_weight * 8});
-   
+    lifespan_.create_table(entity_config::tables::test_table,Vector2{level_config::edge_weight * 20, level_config::edge_weight * 8});
+
+    std::array<size_t, 4> coloured_tables = {
+        entity_config::tables::tiled_table_orange, entity_config::tables::tiled_table_red,
+        entity_config::tables::tiled_table_green, entity_config::tables::tiled_table_blue};
+    std::array<Vector2, 4> coloured_table_slots = {
+        Vector2{level_config::edge_weight * 30, level_config::edge_weight * 6},
+        Vector2{level_config::edge_weight * 40, level_config::edge_weight * 6},
+        Vector2{level_config::edge_weight * 30, level_config::edge_weight * 22},
+        Vector2{level_config::edge_weight * 40, level_config::edge_weight * 22}};
+    std::shuffle(coloured_tables.begin(), coloured_tables.end(), std::mt19937{std::random_device{}()});
+    for(size_t slot = 0; slot < coloured_tables.size(); ++slot){
+        lifespan_.create_table(coloured_tables[slot], coloured_table_slots[slot]);
+    }
+
    lifespan_.create_stove(Vector2{level_config::edge_weight * 14, level_config::edge_weight * 8});
    
     //* ------------------------------------------------- WAITER CREATE---------------------------------------------------------------------
     lifespan_.create_waiter_dog(entity_config::waiters::gianluca, Vector2 {level_config::edge_weight * 13, level_config::edge_weight * 6});
     lifespan_.create_waiter_dog(entity_config::waiters::lionel, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 9});
 
-    // * and some decorations
+    // * ----------------- DECORATIONS CREATE ------------------------------------------- // and some decorations
     lifespan_.create([](size_t id)-> void {
         ecs_entities::build_gargoyle(id, Vector2{level_config::edge_weight * 7,level_config::edge_weight *2});
     }, level_config::draw_layers::decoration);
@@ -72,6 +89,9 @@ void game::game::init(){
     }, level_config::draw_layers::decoration);
     lifespan_.create([](size_t id)-> void {
         ecs_entities::build_dog_painting(id, Vector2{level_config::edge_weight * 9,level_config::edge_weight * 4});
+    }, level_config::draw_layers::decoration);
+    lifespan_.create([](size_t id)-> void {
+        ecs_entities::build_frangipani(id, Vector2{level_config::edge_weight * 24,level_config::edge_weight * 14});
     }, level_config::draw_layers::decoration);
     lifespan_.create([](size_t id) -> void{
         ecs_entities::build_pavlov(id, Vector2{level_config::edge_weight * 12, level_config::edge_weight * 30});
@@ -82,7 +102,9 @@ void game::game::init(){
     debug::log("[game::init, done] built "
         + std::to_string(component_helpers::num_registered_entity_components(mack_id))
         + " components on mack");
-
+    lifespan_.create([](size_t id)-> void {
+        ecs_entities::build_ficus_lytra(id, Vector2{level_config::edge_weight * 30,level_config::edge_weight * 19});
+    }, level_config::draw_layers::decoration);
     return;
 }
 

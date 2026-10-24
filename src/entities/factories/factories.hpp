@@ -81,6 +81,11 @@ namespace factories{
             :table_builders_({
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_dining_table(id, position);},
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table(id, position);},
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_test_table(id, position);},
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table_orange(id, position);},
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table_red(id, position);},
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table_green(id, position);},
+                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table_blue(id, position);},
             }), counter_builders_({
                 [](size_t id, Vector2 position) -> void{ecs_entities::build_food_counter(id, position);},
             }), cooking_station_builders_({
@@ -128,5 +133,7 @@ namespace factories{
     private:
         std::array<std::function<void(size_t, Vector2)>, entity_config::foods_size> food_builders_;
     };
-}
+
+    // TODO: decoration factory
+} 
 #endif

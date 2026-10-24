@@ -53,7 +53,7 @@ namespace sprite{
     class nine_sprite {
     public:
         ~nine_sprite() = default;
-        nine_sprite(Rectangle frame, Color tint);
+        nine_sprite(Rectangle frame, Color tint, float corner_scale = 1.0f);
         nine_sprite(const nine_sprite& other) = default;
         nine_sprite(nine_sprite&& other) = default;
     
@@ -72,6 +72,9 @@ namespace sprite{
         Color get_tint() const{
             return tint_;
         }
+        float get_corner_scale() const{
+            return corner_scale_;
+        }
 #endif
     private:
         sprite corner_piece_;
@@ -81,6 +84,7 @@ namespace sprite{
         Rectangle frame_;
         Color tint_;
         Vector2 scale_;
+        float corner_scale_;
     };
     class spriteset{
         public:
@@ -159,12 +163,19 @@ namespace sprite_builders{
     sprite::sprite build_pavlov();
     sprite::sprite build_poker_table();
     sprite::sprite build_dog_painting();
+    sprite::sprite build_ficus_lytra();
+    sprite::sprite build_frangipani();
     sprite::sprite build_gargoyle();
 
     // *-------------------- station sprites --------------------* //
     sprite::sprite build_table_sprite();
     sprite::sprite build_dining_table_sprite();
     sprite::sprite build_tiled_table_sprite();
+    sprite::sprite build_test_table();
+    sprite::sprite build_tiled_table_orange_sprite();
+    sprite::sprite build_tiled_table_red_sprite();
+    sprite::sprite build_tiled_table_green_sprite();
+    sprite::sprite build_tiled_table_blue_sprite();
     sprite::sprite build_food_counter_sprite();
     sprite::sprite build_dishwasher_sprite();
     sprite::sprite build_stove_sprite();
@@ -177,12 +188,24 @@ namespace sprite_builders{
     sprite::sprite build_lasagna_sprite();
     sprite::sprite build_espresso_sprite();
     sprite::sprite build_cutlets_sprite();
+    sprite::sprite build_mutton_sprite();
+    sprite::sprite build_muttoff_sprite();
+    sprite::sprite build_prozac_sprite();
+    sprite::sprite build_escargot_sprite();
     std::vector<sprite::sprite> build_food_sprites();
 
+    // * ------------------------------- button spirtes ------------------------- * //
+    sprite::sprite build_button_sprite(size_t texutre_id, const char* button_path);
+    sprite::sprite build_move_decoration_button_sprite();
+    sprite::sprite build_sell_decoration_button_sprite();
+    sprite::sprite build_to_storage_decoration_button_sprite();
+    
     sprite::sprite build_nine_corner_piece();
     sprite::sprite build_nine_centre_piece();
     sprite::sprite build_nine_vertical_piece();
     sprite::sprite build_nine_horizontal_piece();
+
+    sprite::nine_sprite build_decoration_nine_sprite(Rectangle frame);
 
     sprite::nine_sprite build_stove_nine_sprite();
     sprite::nine_sprite build_oven_nine_sprite();
@@ -190,5 +213,7 @@ namespace sprite_builders{
     sprite::nine_sprite build_mini_fridge_nine_sprite();
     sprite::nine_sprite build_bush_nine_sprite();
     sprite::nine_sprite build_chopping_board_nine_sprite();
+
+    
 }
 #endif

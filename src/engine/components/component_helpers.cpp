@@ -131,6 +131,13 @@ void component_helpers::add_hud_component(size_t entity_id, sprite::nine_sprite&
     register_hud_component(entity_id,
         component_builders::build_hud_component(base, offset));
 }
+void component_helpers::add_hud_panel(size_t entity_id, sprite::nine_sprite& base, Vector2 offset){
+    if(auto* hud = component_managers::hud_manager_.get_component(entity_id)){
+        hud->add_panel(base, offset);
+        return;
+    }
+    add_hud_component(entity_id, base, offset);
+}
 void component_helpers::add_hud_positional_component(size_t hud_id, Vector2 position){
     register_hud_positional_component(hud_id,
         component_builders::build_hud_positional_component(position));
@@ -149,7 +156,7 @@ void component_helpers::add_hud_state_machine_component(size_t hud_id, state_mac
     register_hud_state_machine_component(hud_id,
         component_builders::build_hud_state_machine_component(std::move(machine)));
 }
-void component_helpers::add_hud_clickable_component(size_t hud_id, size_t action, int payload){
+void component_helpers::add_hud_clickable_component(size_t hud_id, size_t action, components::click_payload payload){
     register_hud_clickable_component(hud_id,
         component_builders::build_hud_clickable_component(action, payload));
 }

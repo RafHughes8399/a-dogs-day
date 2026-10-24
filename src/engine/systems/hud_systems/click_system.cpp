@@ -9,14 +9,27 @@ bool hud_systems::click_system::click(Vector2 position){
     defined_clicks_[clickable->get_action()](hud_id, clickable->get_payload());
     return true;
 }
-void hud_systems::click_system::select_recipe(size_t button, int payload){
+void hud_systems::click_system::select_recipe(size_t button, const components::click_payload& payload){
     auto* owner = component_managers::hud_owner_manager_.get_component(button);
-    if(owner == nullptr or payload < 0){ return; }
+    auto* choice = std::get_if<components::recipe_choice>(&payload);
+    if(owner == nullptr or choice == nullptr){ return; }
     auto* recipes = component_managers::entity_recipes_manager_.get_component(owner->get_owner());
     if(recipes == nullptr){ return; }
-    recipes->select_recipe(static_cast<size_t>(payload));
+    recipes->select_recipe(choice->get_recipe_id());
 }
-void hud_systems::click_system::change_page(size_t button, int payload){
+void hud_systems::click_system::change_page(size_t button, const components::click_payload& payload){
+    (void) button;
+    (void) payload;
+}
+void hud_systems::click_system::move_decoration(size_t button, const components::click_payload& payload){
+    (void) button;
+    (void) payload;
+}
+void hud_systems::click_system::sell_decoration(size_t button, const components::click_payload& payload){
+    (void) button;
+    (void) payload;
+}
+void hud_systems::click_system::store_decoration(size_t button, const components::click_payload& payload){
     (void) button;
     (void) payload;
 }

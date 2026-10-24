@@ -69,6 +69,8 @@ namespace ecs_entities {
         void build_pavlov(size_t id, Vector2 position);
         void build_poker_table(size_t id, Vector2 position);
         void build_dog_painting(size_t id, Vector2 position);
+        void build_ficus_lytra(size_t id, Vector2 position);
+        void build_frangipani(size_t id, Vector2 position);
 
     void build_station(size_t id, Vector2 position,
         sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
@@ -82,6 +84,11 @@ namespace ecs_entities {
         void build_table(size_t id, Vector2 position, sprite::sprite table_sprite);
             void build_dining_table(size_t id, Vector2 position);
             void build_tiled_table(size_t id, Vector2 position);
+            void build_test_table(size_t id, Vector2 position);
+            void build_tiled_table_orange(size_t id, Vector2 position);
+            void build_tiled_table_red(size_t id, Vector2 position);
+            void build_tiled_table_green(size_t id, Vector2 position);
+            void build_tiled_table_blue(size_t id, Vector2 position);
         void build_dishwasher(size_t id, Vector2 position);
             void build_stove(size_t id, Vector2 position);
             void build_oven(size_t id, Vector2 position);

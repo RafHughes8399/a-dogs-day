@@ -62,7 +62,7 @@ void systems::state_machine_system::on_player_work_station(const events::player_
         + std::to_string(event.get_interactor_id())
         + ", interactee: " + std::to_string(event.get_interactee_id()));
     transition(event.get_interactor_id(), dog_config::player_work_station);
-    transition(event.get_interactee_id(), station_config::player_engaged);
+    transition(event.get_interactee_id(), state_machine_config::player_engaged);
 }
 void systems::state_machine_system::on_interaction_finished(const events::interaction_finished& event){
     debug::log("[state_machine_system::on_interaction_finished] CLEANUP - interactor: "
@@ -76,7 +76,7 @@ void systems::state_machine_system::on_interaction_finished(const events::intera
             + " still has an interactor, player_disengaged NOT sent");
         return;
     }
-    transition(event.get_interactee_id(), station_config::player_disengaged);
+    transition(event.get_interactee_id(), state_machine_config::player_disengaged);
 }
 void systems::state_machine_system::on_order_served(const events::order_served& event){
     transition(event.get_waiter_id(), dog_config::order_served);
