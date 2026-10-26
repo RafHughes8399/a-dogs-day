@@ -5,59 +5,22 @@
 #include <vector>
 // multi purpose item stack, usable for food counters and displaying inventory
 // operates like a stack, under the hood uses an array, with a stack limit
+#include "items.h"
 #define STACK_LIMIT 64 // because [unint8] 
 namespace item_stack{
-    class item{
-        public:
-            ~item() = default;
-            item(size_t item_id, std::uint8_t count = 1)
-            :item_id_(item_id), count_(count){}
-
-            item(const item& other) = default;
-            item(item&& other) = default;
-
-            item& operator=(const item& other) = default;
-            item& operator=(item&& other) = default;
-            item& operator++(){
-                ++count_;
-                return *this;
-            }
-            item operator++(int){
-                auto temp = *this;
-                ++count_;
-                return temp;
-            }
-            item& operator--(){
-                --count_;
-                return *this;
-            }
-            item operator--(int){
-                auto temp = *this;
-                --count_;
-                return temp;
-            }
-            friend bool operator==(const item& a, const item& b){
-                return a.item_id_ == b.item_id_ and a.count_ == b.count_;
-            }
-            size_t get_id();
-            std::uint8_t get_count();
-        private:
-            size_t item_id_;
-            std::uint8_t count_;
-    };
     class item_stack{
         public:
             ~item_stack() = default;
             item_stack()
             :items_({}) {}
             
-            item_stack(std::vector<item>& items)
+            item_stack(std::vector<items::item>& items)
             :items_(items){}
 
             item_stack(std::vector<size_t> item_ids)
             : item_stack(){
                 for(size_t& id : item_ids){
-                    items_.push_back(item(id));
+                    items_.push_back(items::item(id));
                 }
             }
             item_stack(const item_stack& other) = default;
@@ -71,7 +34,7 @@ namespace item_stack{
             // total is the number of total items - does consider count
             size_t total() const;
             bool empty() const;
-            item& head();
+            items::item& head();
             void pop();
             void push(size_t item_id);
 
@@ -79,7 +42,7 @@ namespace item_stack{
             size_t take();
             void place(size_t item_id);
         private:
-            std::vector<item> items_;
+            std::vector<items::item> items_;
     };
     
 }

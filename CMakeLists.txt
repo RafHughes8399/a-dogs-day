@@ -221,7 +221,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
-  raglib events queries states recipe components systems animation sprite item menu hud store hitbox texture
+  raglib events queries states recipe components systems animation sprite item item_stack menu hud store hitbox texture
   entities factories render_layer quadtree graph debug_log_interface debug_logger game colour_replacer colour-replacer ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)

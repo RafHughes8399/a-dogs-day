@@ -306,3 +306,10 @@ t
 
     hud component has a list of hte hud elements ids that are attached to this entity. [like the nine sprite base, the buttons etc,]
     hud ocmponent also tracks activity, and calls their specific updates through the hud system. the hyd system is the system for the hud component
+
+
+
+
+    ok lets properly figure out the inventory and shop because they work similarly
+
+    

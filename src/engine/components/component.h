@@ -500,7 +500,7 @@ class storage_component {
 
     bool empty() const;
     size_t size() const;
-    item_stack::item& head();
+    items::item& head();
     size_t take();
     void place(size_t item_id);
 
