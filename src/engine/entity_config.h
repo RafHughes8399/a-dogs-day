@@ -192,6 +192,7 @@ namespace entity_config{
     inline const char* frangipani_decoration_path = "../sprites/plants/frangipani.png";
     inline const char* gargoyle_void_decoration_path = "../sprites/gargoyle-void.png";
     inline const char* gargoyle_sick_of_it_decoration_path = "../sprites/gargoyle_sick_of_it.png";
+    inline const char* polish_cow_path = "../sprites/polish-cow.png";
     inline const char* pavlov_path = "../sprites/pavlov.png";
     inline const char* poker_table_decoration_path = "../sprites/dog-poker.png";
     inline const char* test_decoration_path ="../sprites/test_decoration.png";
@@ -284,9 +285,11 @@ namespace entity_config{
         {lionel_head_attributes, Vector2{0.0f, 0.0f}, lionel_head_left_path, lionel_head_right_path},
         {lionel_face_attributes, Vector2{level_config::edge_weight * 0.12f, level_config::edge_weight * 0.15f}, lionel_face_left_path, lionel_face_right_path}};
 
+    
     inline const float test_decoration_attributes[attributes::size] =  {level_config::edge_weight * 2.0f, level_config::edge_weight * 2.0f, 1.0f, 1.0f}; // TODO update values (25 / 8 / 26)
     inline const float gargoyle_decoration_attributes[attributes::size] = {40.0f, level_config::edge_weight * 1.5f, 1.0f, 1.0f};
     inline const float pavlov_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 2.75f, 1.0f, 1.0f}; // TODO update values (24/08/26)
+    inline const float polish_cow_attributes[attributes::size] = {level_config::edge_weight * 2.03125f, level_config::edge_weight * 2.34375f, 1.0f, 1.0f};
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float frangipani_attributes[attributes::size] = {level_config::edge_weight *  1.96875f, level_config::edge_weight * 2.625f, 3.0f, 1.0f}; // TODO update values once exported
@@ -304,6 +307,7 @@ namespace entity_config{
     inline const float mini_fridge_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float bush_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float chopping_board_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
+
     // food is a small one-tile entity; it reuses the test_decoration texture for now.
     inline const float test_food_attributes[attributes::size] = {level_config::edge_weight, level_config::edge_weight, 1.0f, 1.0f};
     inline const float lasagna_attributes[attributes::size] = {42.0f, 42.0f, 1.0f, 1.0f};

@@ -67,6 +67,7 @@ namespace ecs_entities {
         //  */
         void build_gargoyle(size_t id, Vector2 position);
         void build_pavlov(size_t id, Vector2 position);
+        void build_polish_cow(size_t id, Vector2 position);
         void build_poker_table(size_t id, Vector2 position);
         void build_dog_painting(size_t id, Vector2 position);
         void build_ficus_lytra(size_t id, Vector2 position);

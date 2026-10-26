@@ -110,6 +110,9 @@ sprite::sprite sprite_builders::build_decoration_sprite(size_t texture_id, const
 sprite::sprite sprite_builders::build_pavlov(){
     return sprite_builders::build_decoration_sprite(textures::pavlov, entity_config::pavlov_path, entity_config::pavlov_attributes);
 }
+sprite::sprite sprite_builders::build_polish_cow(){
+    return sprite_builders::build_decoration_sprite(textures::polish_cow, entity_config::polish_cow_path, entity_config::polish_cow_attributes);
+}
 sprite::sprite sprite_builders::build_poker_table(){
     return build_decoration_sprite(textures::poker_table, entity_config::poker_table_decoration_path, entity_config::poker_table_attributes);
 }

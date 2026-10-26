@@ -188,6 +188,9 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
     void ecs_entities::build_pavlov(size_t id, Vector2 position){
         build_decoration(id, position, sprite_builders::build_pavlov(), hitbox_builders::build_pavlov_hitbox(position));
     }
+    void ecs_entities::build_polish_cow(size_t id, Vector2 position){
+        build_decoration(id, position, sprite_builders::build_polish_cow(), hitbox_builders::build_polish_cow_hitbox(position));
+    }
     void ecs_entities::build_poker_table(size_t id, Vector2 position){
         build_decoration(id, position, 
             sprite_builders::build_poker_table(), 

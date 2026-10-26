@@ -105,6 +105,9 @@ void game::game::init(){
     lifespan_.create([](size_t id)-> void {
         ecs_entities::build_ficus_lytra(id, Vector2{level_config::edge_weight * 30,level_config::edge_weight * 19});
     }, level_config::draw_layers::decoration);
+    lifespan_.create([](size_t id)-> void {
+        ecs_entities::build_polish_cow(id, Vector2{level_config::edge_weight * 18,level_config::edge_weight * 28});
+    }, level_config::draw_layers::decoration);
     return;
 }
 

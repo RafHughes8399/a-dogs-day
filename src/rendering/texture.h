@@ -101,6 +101,7 @@ namespace textures{
         move_decoration_button,
         sell_decoration_button,
         ficus_lytra,
+        polish_cow,
         size
         // and so on
     };
