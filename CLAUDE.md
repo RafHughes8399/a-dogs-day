@@ -120,7 +120,7 @@ entities::entity  (base: body/hitbox/sprite, position, id, debug_id)
   -> decoration                (placeable; subscribes to cursor while being carried)
        -> station                (station_state: unworked/worked; enter/leave/is_interacting by dog id)
             -> table              (table_state: available/reserved/occupied)
-            -> food_counter        (FILO food stack with reservation counting)
+            -> wooden_food_counter        (FILO food stack with reservation counting)
             -> dishwasher          (stub: no .cpp, not registered in CMakeLists, not wired to any system)
   -> cursor                    (state: in_menus/editing/carrying_decoration; interaction_strategy: default/left_click/right_click)
   -> food

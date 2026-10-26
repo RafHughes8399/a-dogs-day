@@ -104,7 +104,7 @@ SCENARIO("an interaction pairs the ids it was built from",
     }
     GIVEN("a station carrying no participation list"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(in_cafe(320.0f, 320.0f));
+        auto counter_id = game.create_wooden_food_counter(in_cafe(320.0f, 320.0f));
         auto customer_id = game.create_customer_dog(in_cafe(640.0f, 640.0f));
 
         WHEN("an interaction is built against it"){
@@ -443,7 +443,7 @@ SCENARIO("a dog arriving on either slot of a station is in reach of it",
         "[ecs][interaction][reach]"){
     GIVEN("a stocked counter and a waiter to its right"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(in_cafe(640.0f, 640.0f));
+        auto counter_id = game.create_wooden_food_counter(in_cafe(640.0f, 640.0f));
         auto waiter_id = game.create_waiter_dog(in_cafe(1152.0f, 640.0f));
         helpers::add_items_to_counter(counter_id, entity_config::foods::lasagna, 1);
 
@@ -467,7 +467,7 @@ SCENARIO("a dog arriving on either slot of a station is in reach of it",
 
     GIVEN("a stocked counter and a waiter to its left"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(in_cafe(640.0f, 640.0f));
+        auto counter_id = game.create_wooden_food_counter(in_cafe(640.0f, 640.0f));
         auto waiter_id = game.create_waiter_dog(in_cafe(128.0f, 640.0f));
         helpers::add_items_to_counter(counter_id, entity_config::foods::lasagna, 1);
 
@@ -499,7 +499,7 @@ SCENARIO("a dog arriving on either slot of a station is in reach of it",
 
     GIVEN("a dog one reach short of a station"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(in_cafe(640.0f, 640.0f));
+        auto counter_id = game.create_wooden_food_counter(in_cafe(640.0f, 640.0f));
         auto counter_box = game.hitbox_of(counter_id);
         auto waiter_id = game.create_waiter_dog(in_cafe(640.0f, 640.0f));
         game.move_entity(waiter_id, Vector2{counter_box.x + counter_box.width
@@ -515,7 +515,7 @@ SCENARIO("a waiter carries food from the counter to a seated customer",
         "[ecs][interaction][service]"){
     GIVEN("a stocked counter, a table, a waiter and a customer seated at the table"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(in_cafe(640.0f, 640.0f));
+        auto counter_id = game.create_wooden_food_counter(in_cafe(640.0f, 640.0f));
         auto table_id = game.create_table(in_cafe(1280.0f, 1024.0f));
         auto waiter_id = game.create_waiter_dog(in_cafe(640.0f, 1024.0f));
         auto customer_id = game.create_customer_dog(in_cafe(1792.0f, 1024.0f));

@@ -176,7 +176,7 @@ namespace sprite_builders{
     sprite::sprite build_tiled_table_red_sprite();
     sprite::sprite build_tiled_table_green_sprite();
     sprite::sprite build_tiled_table_blue_sprite();
-    sprite::sprite build_food_counter_sprite();
+    sprite::sprite build_wooden_food_counter_sprite();
     sprite::sprite build_dishwasher_sprite();
     sprite::sprite build_stove_sprite();
     sprite::sprite build_oven_sprite();

@@ -78,7 +78,7 @@ namespace textures{
         tiled_table_red,
         tiled_table_green,
         tiled_table_blue,
-        food_counter,
+        wooden_food_counter,
         stove,
         oven,
         espresso_station,

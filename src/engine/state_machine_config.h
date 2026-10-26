@@ -1,10 +1,17 @@
 #ifndef STATE_MACHINE_CONFIG_H
 #define STATE_MACHINE_CONFIG_H
 
-#include "enum_config.h"
+#include "events/event_core.h"
 
-// state_machine_config's enum values (station_idle, station_active,
-// player_engaged, player_disengaged) live in enum_config.h alongside every
-// other enum; this header exists so call sites can include the
-// state-machine-specific config without pulling in every other domain's enums.
+namespace state_machine_config{
+    enum cook_station_states{
+        station_idle = 0,
+        station_active,
+        station_states_size
+    };
+    enum state_transitions{
+        player_engaged = events::ids::player_engaged_id,
+        player_disengaged = events::ids::player_disengaged_id
+    };
+}
 #endif

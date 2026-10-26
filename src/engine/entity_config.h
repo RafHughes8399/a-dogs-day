@@ -3,11 +3,111 @@
 
 #include "animation_config.h"
 #include "cafe_config.h"
-#include "enum_config.h"
 #include "raylib.h"
 #include "raymath.h"
 
 namespace entity_config{
+    enum selectable_kinds{
+        player_dog_kind = 0,
+        decoration_kind,
+        station_kind,
+        customer_dog_kind,
+        waiter_dog_kind,
+        selectable_kinds_size
+    };
+
+    enum customers{
+        tex = 0,
+        customers_size
+    };
+    enum special_customers{
+        garfield = customers_size,
+        cumulative_customers_size
+    };
+    enum waiters{
+        gianluca = 0,
+        lionel,
+        waiters_size
+    };
+    enum tables{
+        dining_table = 0,
+        tiled_table,
+        test_table,
+        tiled_table_orange,
+        tiled_table_red,
+        tiled_table_green,
+        tiled_table_blue,
+        tables_size
+    };
+    enum counters{
+        wooden_food_counter = 0,
+        counters_size
+    };
+    enum cooking_stations{
+        stove = 0,
+        oven,
+        espresso_station,
+        mini_fridge,
+        bush,
+        chopping_board,
+        cooking_stations_size
+    };
+    enum foods{
+        lasagna = 0,
+        bone_biscuits,
+
+        espresso,
+        pup_cup,
+
+        cutlets,
+        boiled_chicken,
+        risotto,
+        carbonara,
+
+        bird,
+        sausage_on_a_stick,
+        pork_knuckles,
+        lemongrass,
+        mutton,
+        muttoff,
+        prozac,
+        charpoocherie_board,
+        cheddar,
+        parmigiano,
+        shishamo,
+        rabbit_foot,
+
+        brisket_leftovers,
+        steak_leftovers,
+        escargot,
+        foods_size
+    };
+    enum counter_sprite_slots{
+        counter_body = 0,
+        counter_food,
+        counter_sprite_slots_size
+    };
+    enum dog_sprite_slots{
+        dog_body = 0,
+        dog_tail,
+        dog_head,
+        dog_face,
+        dog_sprite_slots_size
+    };
+    enum dog_part_directions{
+        dog_part_left = 0,
+        dog_part_right,
+        dog_part_directions_size
+    };
+    // sprite attributes, stored as an array of four numbers [frame width, frame height, frames, animations]
+    enum attributes{
+        frame_width = 0,
+        frame_height,
+        frames,
+        animations,
+        size
+    };
+
     inline const char* player_dog_debug_id_prefix = "pd_";
     inline const char* customer_dog_debug_id_prefix = "cd_";
     inline const char* npc_dog_debug_id_prefix = "npc_";
@@ -104,7 +204,7 @@ namespace entity_config{
     inline const char* tiled_table_red_path = "../sprites/tiled-table_630802.png";
     inline const char* tiled_table_green_path = "../sprites/tiled-table_1a2f03.png";
     inline const char* tiled_table_blue_path = "../sprites/tiled-table_032b59.png";
-    inline const char* food_counter_station_path = "";
+    inline const char* food_counter_station_path = "../sprites/wooden-counter.png";
     inline const char* stove_station_path = "../sprites/stove.png";
     inline const char* oven_station_path = "../sprites/oven.png";
     inline const char* espresso_station_path = "../sprites/espresso-station.png";
@@ -125,6 +225,10 @@ namespace entity_config{
     inline const float station_height = level_config::edge_weight * 1.5f;
     inline const float food_width = level_config::edge_weight * 0.6f;
     inline const float food_height = level_config::edge_weight * 0.6f;
+
+    // where stored food is drawn relative to the counter origin.
+    inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.65f, level_config::edge_weight * 0.25f};
+    inline const Vector2 food_carry_offset = {level_config::edge_weight * 0.25f, 0.0f};
 
     inline const float background_attributes[attributes::size] = {level_config::world_x, level_config::world_y, 1.0f, 1.0f};
     inline const float cursor_attributes[attributes::size] = {25.0f, 25.0f, 1.0f, 2.0f};
@@ -185,8 +289,8 @@ namespace entity_config{
     inline const float pavlov_attributes[attributes::size] = {level_config::edge_weight * 1.5f, level_config::edge_weight * 2.75f, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float poker_table_attributes[attributes::size] = {level_config::edge_weight * 5, level_config::edge_weight * 3, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
-    inline const float frangipani_attributes[attributes::size] = {level_config::edge_weight *  1.3125f, level_config::edge_weight * 1.75f, 3.0f, 1.0f}; // TODO update values once exported
-    inline const float ficus_lytra_attributes[attributes::size] = {level_config::edge_weight * 0.75f, level_config::edge_weight * 1.75f, 3.0f, 1.0f};
+    inline const float frangipani_attributes[attributes::size] = {level_config::edge_weight *  1.96875f, level_config::edge_weight * 2.625f, 3.0f, 1.0f}; // TODO update values once exported
+    inline const float ficus_lytra_attributes[attributes::size] = {level_config::edge_weight * 1.125f, level_config::edge_weight * 2.625f, 3.0f, 1.0f};
 
     inline const float table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float dining_table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
@@ -214,8 +318,6 @@ namespace entity_config{
     inline const Vector2 station_slot_right = Vector2Zero();
 
     inline const float station_reach = level_config::edge_weight * 0.5f;
-    // where stored food is drawn relative to the counter origin.
-    inline const Vector2 food_draw_offset = {level_config::edge_weight * 0.5f, level_config::edge_weight * 0.5f};
-    inline const Vector2 food_carry_offset = {level_config::edge_weight * 0.25f, 0.0f};
+
 }
 #endif

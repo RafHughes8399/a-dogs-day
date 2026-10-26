@@ -53,7 +53,7 @@ namespace testing{
             size_t create_waiter_dog(Vector2 position, size_t layer = level_config::draw_layers::dogs);
             size_t create_test_decoration(Vector2 position, size_t layer = level_config::draw_layers::decoration);
             size_t create_table(Vector2 position, size_t layer = level_config::draw_layers::stations);
-            size_t create_food_counter(Vector2 position, size_t layer = level_config::draw_layers::stations);
+            size_t create_wooden_food_counter(Vector2 position, size_t layer = level_config::draw_layers::stations);
             size_t create_dishwasher(Vector2 position, size_t layer = level_config::draw_layers::stations);
             size_t create_cooking_station(size_t cooking_station, Vector2 position, size_t layer = level_config::draw_layers::stations);
             size_t create_food(Vector2 position, size_t layer = level_config::draw_layers::decoration);

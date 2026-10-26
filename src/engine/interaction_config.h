@@ -1,11 +1,19 @@
 #ifndef INTERACTION_CONFIG_H
 #define INTERACTION_CONFIG_H
 
-#include "enum_config.h"
 #include <cstddef>
 #include <vector>
 
 namespace interaction_config{
+    enum interactions{
+        customer_table_sit = 0,
+        waiter_table_serve,
+        waiter_counter_pickup,
+        waiter_counter_place_down,
+        player_station_cook,
+        size
+    };
+
     // * ---------------------- DOG INTERACTOR INTERACTIONS ------------------------- //
     inline std::vector<size_t> waiter_dog_interactor = {
         interactions::waiter_table_serve,

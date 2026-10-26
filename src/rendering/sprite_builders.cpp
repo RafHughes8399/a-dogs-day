@@ -150,8 +150,8 @@ sprite::sprite sprite_builders::build_table_sprite(){
         return sprite_builders::build_decoration_sprite(textures::tiled_table_blue, entity_config::tiled_table_blue_path, entity_config::tiled_table_attributes);
     }
 
-    sprite::sprite sprite_builders::build_food_counter_sprite(){
-        return build_decoration_sprite(textures::food_counter, entity_config::food_counter_station_path, entity_config::food_counter_attributes);
+    sprite::sprite sprite_builders::build_wooden_food_counter_sprite(){
+        return build_decoration_sprite(textures::wooden_food_counter, entity_config::food_counter_station_path, entity_config::food_counter_attributes);
     }
 sprite::sprite sprite_builders::build_dishwasher_sprite(){
     return build_test_decoration_sprite(entity_config::dishwasher_attributes);

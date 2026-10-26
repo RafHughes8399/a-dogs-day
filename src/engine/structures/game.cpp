@@ -46,7 +46,7 @@ void game::game::init(){
     debug::log("[game::init, built mack] id " + std::to_string(mack_id));
 
     //* -------------------------------------------------- STATION CREATE --------------------------------------------------------------------
-    auto counter = lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 5});
+    auto counter = lifespan_.create_counter(entity_config::counters::wooden_food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 5});
     for(int lasagna = 0; lasagna < game_config::counter_start_stock; ++lasagna){
         systems::item_system::get_instance().place_item(counter, entity_config::foods::lasagna);
     }
@@ -56,7 +56,7 @@ void game::game::init(){
     /** a bit messy but we're going to create some items for the food counter to store */
     debug::log("[game::init, build counter]: id " + std::to_string(counter) + " with food items:  " + std::to_string(food_items));
     // this is injected here for testing purposes. not possible in the real game
-    lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 10});
+    lifespan_.create_counter(entity_config::counters::wooden_food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 10});
     lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
     lifespan_.create_table(entity_config::tables::tiled_table,Vector2{level_config::edge_weight * 10, level_config::edge_weight * 8});
     lifespan_.create_table(entity_config::tables::test_table,Vector2{level_config::edge_weight * 20, level_config::edge_weight * 8});
