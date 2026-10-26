@@ -51,6 +51,7 @@ namespace hitbox_builders{
     hitbox::hitbox build_test_decoration_hitbox(Vector2 position);
     hitbox::hitbox build_gargoyle_hitbox(Vector2 position);
     hitbox::hitbox build_pavlov_hitbox(Vector2 position);
+    hitbox::hitbox build_polish_cow_hitbox(Vector2 position);
     hitbox::hitbox build_poker_table_hitbox(Vector2 position);
     hitbox::hitbox build_dog_painting_hitbox(Vector2 position);
     hitbox::hitbox build_ficus_lytra_hitbox(Vector2 position);

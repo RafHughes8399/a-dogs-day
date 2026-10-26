@@ -1,13 +1,41 @@
 #ifndef CAFE_CONFIG_H
 #define CAFE_CONFIG_H
 
-#include "enum_config.h"
 #include "game_config.h"
 #include "raylib.h"
 #include <cstddef>
 #include <vector>
 
 namespace level_config{
+    enum draw_layers{
+        background = 0,
+        decoration,
+        stations,
+        dogs,
+        hud,
+        cursor,
+        size
+    };
+
+    // these indices are shared with the direction-ordered sprite arrays
+    // (dog::set_direction_index indexes body_/head_ with a directions value), so
+    // an entry here without a matching sprite is a trap for whoever adds an
+    // animation next.
+    // TODO (25 / 8 / 26) drop 'all' - it was an attempt at an omnidirectional cursor
+    // TODO direction, but {1,1} is not a unit vector so it moves ~1.41x too fast
+    // TODO when multiplied by move_speed, it has no sprite, and level_graph::
+    // TODO position_to_node snaps it identically to 'right'. an entity with no
+    // TODO facing wants no direction at all - i.e. no movement_component. see
+    // TODO the note above ecs_entities::build_cursor.
+    enum directions{
+        left = 0,
+        right,
+        up,
+        down,
+        all,
+        directions_size
+    };
+
     // world dimensions
     inline const float screen_width = static_cast<float>(game_config::window_width);
     inline const float screen_height = static_cast<float>(game_config::window_height);

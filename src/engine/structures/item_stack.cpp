@@ -1,11 +1,6 @@
 #include "item_stack.hpp"
 
-size_t item_stack::item::get_id(){
-    return item_id_;
-}
-std::uint8_t item_stack::item::get_count(){
-    return count_;
-}
+
 
 // size is the number of item objects - does not consider count 
 size_t item_stack::item_stack::size() const{
@@ -23,7 +18,7 @@ bool item_stack::item_stack::empty() const {
     return size() == 0;
 }
 // ? i think you've got these mixed up, they should be accessing the back not the front
-item_stack::item& item_stack::item_stack::head(){
+items::item& item_stack::item_stack::head(){
     return items_.back();
 }
 void item_stack::item_stack::pop(){
@@ -33,7 +28,7 @@ void item_stack::item_stack::pop(){
 }
 void item_stack::item_stack::push(size_t item_id){
    if(empty()){
-        items_.push_back(item(item_id));
+        items_.push_back(items::item(item_id));
    }
    else{
     auto& h = head();
@@ -41,7 +36,7 @@ void item_stack::item_stack::push(size_t item_id){
         ++h;
     }
     else{
-        items_.push_back(item(item_id));
+        items_.push_back(items::item(item_id));
     }
    }
 }

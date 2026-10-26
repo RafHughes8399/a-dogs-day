@@ -103,9 +103,9 @@ namespace testing{
         }, layer);
     }
 
-    size_t ecs_test_game::create_food_counter(Vector2 position, size_t layer){
+    size_t ecs_test_game::create_wooden_food_counter(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_food_counter(id, position);
+            ecs_entities::build_wooden_food_counter(id, position);
         }, layer);
     }
 

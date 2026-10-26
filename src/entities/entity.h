@@ -67,6 +67,7 @@ namespace ecs_entities {
         //  */
         void build_gargoyle(size_t id, Vector2 position);
         void build_pavlov(size_t id, Vector2 position);
+        void build_polish_cow(size_t id, Vector2 position);
         void build_poker_table(size_t id, Vector2 position);
         void build_dog_painting(size_t id, Vector2 position);
         void build_ficus_lytra(size_t id, Vector2 position);
@@ -80,7 +81,7 @@ namespace ecs_entities {
         float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets,
         std::vector<recipe::recipe> recipes, sprite::nine_sprite hud_sprite);
         void build_counter(size_t id, Vector2 position, sprite::sprite counter_sprite);
-            void build_food_counter(size_t id, Vector2 position);
+            void build_wooden_food_counter(size_t id, Vector2 position);
         void build_table(size_t id, Vector2 position, sprite::sprite table_sprite);
             void build_dining_table(size_t id, Vector2 position);
             void build_tiled_table(size_t id, Vector2 position);

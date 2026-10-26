@@ -3,7 +3,6 @@
 
 #include <cstddef>
 #include <unordered_map>
-
 namespace inventory {
     class inventory {
     public:

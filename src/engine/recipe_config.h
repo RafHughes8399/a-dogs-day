@@ -1,7 +1,7 @@
 #ifndef RECIPE_CONFIG_H
 #define RECIPE_CONFIG_H
 
-#include "enum_config.h"
+#include "entity_config.h"
 #include <vector>
 
 namespace recipe_config{

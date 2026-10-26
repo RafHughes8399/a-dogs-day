@@ -339,7 +339,7 @@ SCENARIO("a waiter carries the food the event handed it", "[state_machine]"){
     GIVEN("a waiter that has reached a counter"){
         testing::ecs_test_game game;
         auto waiter_id = game.create_waiter_dog(Vector2{300.0f, 300.0f});
-        auto counter_id = game.create_food_counter(Vector2{400.0f, 400.0f});
+        auto counter_id = game.create_wooden_food_counter(Vector2{400.0f, 400.0f});
 
         raise<events::dog_started_path>(waiter_id);
         raise<events::player_work_station>(waiter_id, counter_id);
