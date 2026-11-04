@@ -33,5 +33,18 @@ questions for the robot:
 
 
  then setup thepage navigation and item page elements. 
+    page nav needs the left and right navigation buttons 
+    and then dots for each page
+
+    item page needs the size of the page, the border, the vert and horiz spacing 
+    and then the buttons / icons that it would store
  then build the inventory interface
  then test viewing the stored items
+
+
+ then the changes to cursor and setting up the moving deocrations
+ the cursor needs a state machien to adjust click behaviour 
+
+ then we can do placing from inventory to the game
+
+ simples right ? 
