@@ -6,3 +6,32 @@ then there is the inevntory interface which handles the drawing, rendering, inte
 and then you need the item_entity_adaptor - or maybe not its just one line through the lifespan system. 
 
 start simple. make the clicking of the button storethe decoration
+
+questions for the robot:
+ what is the relationship between an entity and its hud
+ can the hud know what entity it is attached to
+ do we have an item compoentn
+
+ if the answer is no we should implement
+
+ then we need more structured hud components, kind of like the nine sprite i assume that deifne like spacing and counts nad 
+ formatting that can be scaled and 
+ so like a nine sprite but for:
+ -> inventory page items
+
+ 
+ -> page navigation element 
+
+
+ so an entity has a hud componetn which has a list of ids of. the elements attached to it
+ hud elements exist and are managed by the hud system. i think they need an entity component if they are attached to an entity 
+ to know what the id of the entity is so they can access things and modify things
+ and then entities if they dont already need a type compoennt which gives them the id of whatever they are to translate it to an item
+ maybe an item id component or something
+
+ then when the button is pressed, we can resolve the item and store it properly 
+
+
+ then setup thepage navigation and item page elements. 
+ then build the inventory interface
+ then test viewing the stored items

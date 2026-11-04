@@ -57,3 +57,17 @@ bool inventory::inventory::empty() const{
 const std::map<size_t, std::vector<items::item>>& inventory::inventory::get_items(){
     return items_;
 }
+
+void inventory::inventory_interface::add_page(){
+
+}
+void inventory::inventory_interface::remove_page(){
+
+}
+
+void inventory::inventory_interface::next_page(){
+
+}
+void inventory::inventory_interface::previous_page(){
+    
+}

@@ -45,6 +45,11 @@ namespace inventory {
             // get items on page
             // add page / remove page 
             // next page / prev page. could be an iterator. this is a case where it makes sens
+            void next_page();
+            void previous_page();
+
+            void add_page();
+            void remove_page();
         private:
             // a list of inventory pages essentially
             inventory inventory_;
