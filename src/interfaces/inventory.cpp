@@ -1,25 +1,59 @@
 #include "inventory.hpp"
-
+#include "items.h"
+#include <algorithm>
+#define  MAX_COUNT 64
 void inventory::inventory::add(size_t item_id, size_t count){
-    if(count == 0){ return; }
-    items_[item_id] += count;
+    auto & items = items_[item_id];
+    if(items.empty()) {
+        items.emplace_back(items::item(item_id, count));
+    }
+    for(auto & item : items){
+        if(item.get_id() == item_id ){
+            if(item.get_count() + count > MAX_COUNT){
+                items.emplace_back(items::item(item_id, count));
+            }
+            else{
+                item.adjust_count(count);
+            }
+        }
+    }
 }
 bool inventory::inventory::remove(size_t item_id, size_t count){
-    auto item = items_.find(item_id);
-    if(item == items_.end() or item->second < count){ return false; }
-    item->second -= count;
-    if(item->second == 0){
-        items_.erase(item);
+    auto & items = items_[item_id];
+    bool removed = false;
+    auto it = items.end();
+    while (it != items.begin() && count > 0) {
+        --it; 
+        if (count >= it->get_count()) {
+            count -= it->get_count();
+            it = items.erase(it);
+            removed = true;
+        } else {
+            it->adjust_count(count);
+            count = 0;
+            removed = true;
+            break;
+        }
     }
-    return true;
+    return removed;
+}
+std::optional<size_t> inventory::inventory::take(size_t item_id){
+    if(remove(item_id, 1)){
+        return item_id;
+    }
+    return std::nullopt;
 }
 size_t inventory::inventory::count(size_t item_id) const{
-    auto item = items_.find(item_id);
-    return item == items_.end() ? 0 : item->second;
+    size_t count = 0;
+    auto items = items_.at(item_id);
+    std::for_each(items.begin(), items.end(), [&count](const auto& item) -> void {
+        count += item.get_count();
+        });
+    return count;
 }
 bool inventory::inventory::empty() const{
-    return items_.empty();
+    return items_.size() == 0;
 }
-const std::unordered_map<size_t, size_t>& inventory::inventory::contents() const{
+const std::map<size_t, std::vector<items::item>>& inventory::inventory::get_items(){
     return items_;
 }

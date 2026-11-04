@@ -1,0 +1,8 @@
+
+so the inventory interface exists as the underlying storage and accessing of items
+
+then there is the inevntory interface which handles the drawing, rendering, interacting
+
+and then you need the item_entity_adaptor - or maybe not its just one line through the lifespan system. 
+
+start simple. make the clicking of the button storethe decoration

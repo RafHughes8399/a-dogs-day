@@ -24,6 +24,12 @@ void hud_systems::click_system::change_page(size_t button, const components::cli
 void hud_systems::click_system::move_decoration(size_t button, const components::click_payload& payload){
     (void) button;
     (void) payload;
+    // dont need a payload
+    // the hud element id, i think we need a way for the hud element to know what entity it is attached to 
+    // that way we can grab the entity and then from the entity get the item id that it is 
+
+    // then trigger a store inventory event with the data
+
 }
 void hud_systems::click_system::sell_decoration(size_t button, const components::click_payload& payload){
     (void) button;

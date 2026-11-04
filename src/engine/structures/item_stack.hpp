@@ -44,6 +44,5 @@ namespace item_stack{
         private:
             std::vector<items::item> items_;
     };
-    
 }
 #endif

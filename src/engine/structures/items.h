@@ -41,7 +41,9 @@ namespace items{
                 return a.item_id_ == b.item_id_ and a.count_ == b.count_;
             }
             size_t get_id();
-            std::uint8_t get_count();
+            std::uint8_t get_count() const;
+            bool is_full();
+            void adjust_count(size_t delta);
         private:
             size_t item_id_;
             std::uint8_t count_;
