@@ -108,6 +108,9 @@ void game::game::init(){
     lifespan_.create([](size_t id)-> void {
         ecs_entities::build_polish_cow(id, Vector2{level_config::edge_weight * 18,level_config::edge_weight * 28});
     }, level_config::draw_layers::decoration);
+    lifespan_.create([](size_t id)-> void {
+        ecs_entities::build_conversation_pit(id, Vector2{level_config::edge_weight * 22,level_config::edge_weight * 26});
+    }, level_config::draw_layers::decoration);
     return;
 }
 

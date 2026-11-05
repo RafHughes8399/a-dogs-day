@@ -107,6 +107,18 @@ sprite::sprite sprite_builders::build_decoration_sprite(size_t texture_id, const
     attributes[entity_config::attributes::animations],
     draw_position_offset);
 }
+sprite::sprite sprite_builders::build_conversation_pit(){
+    return sprite_builders::build_decoration_sprite(textures::conversation_pit, entity_config::conversation_pit_path, entity_config::conversation_pit_attributes);
+}
+sprite::sprite sprite_builders::build_javier_ceo(){
+    return sprite_builders::build_decoration_sprite(textures::javier_ceo, entity_config::javier_ceo_path, entity_config::javier_ceo_attributes);
+}
+sprite::sprite sprite_builders::build_sam_and_max(){
+    return sprite_builders::build_decoration_sprite(textures::sam_and_max, entity_config::sam_and_max_path, entity_config::sam_and_max_attributes);
+}
+sprite::sprite sprite_builders::build_gromit_knitting(){
+    return sprite_builders::build_decoration_sprite(textures::gromit_knitting, entity_config::gromit_knitting_path, entity_config::gromit_knitting_attributes);
+}
 sprite::sprite sprite_builders::build_pavlov(){
     return sprite_builders::build_decoration_sprite(textures::pavlov, entity_config::pavlov_path, entity_config::pavlov_attributes);
 }

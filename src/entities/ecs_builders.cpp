@@ -179,6 +179,12 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
         component_helpers::add_entity_selectable_component(id,
             entity_config::selectable_kinds::decoration_kind);
     }
+    void ecs_entities::build_conversation_pit(size_t id, Vector2 position){
+        build_decoration(id, position,
+            sprite_builders::build_conversation_pit(),
+            hitbox_builders::build_conversation_pit_hitbox(position));
+        // a clickable component perhaps ? 
+    }
     void ecs_entities::build_gargoyle(size_t id, Vector2 position){
         build_decoration(id, position,
             sprite_builders::build_gargoyle(),

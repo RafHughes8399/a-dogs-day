@@ -102,6 +102,11 @@ namespace textures{
         sell_decoration_button,
         ficus_lytra,
         polish_cow,
+        conversation_pit,
+        lone_mouse,
+        javier_ceo,
+        sam_and_max,
+        gromit_knitting,
         size
         // and so on
     };

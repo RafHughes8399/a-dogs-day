@@ -65,6 +65,7 @@ namespace ecs_entities {
         //**
         // void build_gargoyle();
         //  */
+        void build_conversation_pit(size_t id, Vector2 position);
         void build_gargoyle(size_t id, Vector2 position);
         void build_pavlov(size_t id, Vector2 position);
         void build_polish_cow(size_t id, Vector2 position);
