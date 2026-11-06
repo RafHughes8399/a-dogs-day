@@ -160,13 +160,17 @@ namespace sprite_builders{
     // *-------------------- deocration sprites --------------------* //
     sprite::sprite build_decoration_sprite(size_t texture_id, const char* decoration_path, const float attributes[entity_config::attributes::size],
         Vector2 draw_position_offset = Vector2Zero());
+    sprite::sprite build_conversation_pit();
     sprite::sprite build_pavlov();
+    sprite::sprite build_polish_cow();
     sprite::sprite build_poker_table();
     sprite::sprite build_dog_painting();
     sprite::sprite build_ficus_lytra();
     sprite::sprite build_frangipani();
     sprite::sprite build_gargoyle();
-
+    sprite::sprite build_sam_and_max();
+    sprite::sprite build_javier_ceo();
+    sprite::sprite build_gromit_knitting();
     // *-------------------- station sprites --------------------* //
     sprite::sprite build_table_sprite();
     sprite::sprite build_dining_table_sprite();
@@ -176,7 +180,7 @@ namespace sprite_builders{
     sprite::sprite build_tiled_table_red_sprite();
     sprite::sprite build_tiled_table_green_sprite();
     sprite::sprite build_tiled_table_blue_sprite();
-    sprite::sprite build_food_counter_sprite();
+    sprite::sprite build_wooden_food_counter_sprite();
     sprite::sprite build_dishwasher_sprite();
     sprite::sprite build_stove_sprite();
     sprite::sprite build_oven_sprite();

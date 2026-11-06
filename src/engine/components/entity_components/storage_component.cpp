@@ -6,7 +6,7 @@ bool components::storage_component::empty() const{
 size_t components::storage_component::size() const{
     return items_.size();
 }
-item_stack::item& components::storage_component::head(){
+items::item& components::storage_component::head(){
     return items_.head();
 }
 size_t components::storage_component::take(){

@@ -107,8 +107,23 @@ sprite::sprite sprite_builders::build_decoration_sprite(size_t texture_id, const
     attributes[entity_config::attributes::animations],
     draw_position_offset);
 }
+sprite::sprite sprite_builders::build_conversation_pit(){
+    return sprite_builders::build_decoration_sprite(textures::conversation_pit, entity_config::conversation_pit_path, entity_config::conversation_pit_attributes);
+}
+sprite::sprite sprite_builders::build_javier_ceo(){
+    return sprite_builders::build_decoration_sprite(textures::javier_ceo, entity_config::javier_ceo_path, entity_config::javier_ceo_attributes);
+}
+sprite::sprite sprite_builders::build_sam_and_max(){
+    return sprite_builders::build_decoration_sprite(textures::sam_and_max, entity_config::sam_and_max_path, entity_config::sam_and_max_attributes);
+}
+sprite::sprite sprite_builders::build_gromit_knitting(){
+    return sprite_builders::build_decoration_sprite(textures::gromit_knitting, entity_config::gromit_knitting_path, entity_config::gromit_knitting_attributes);
+}
 sprite::sprite sprite_builders::build_pavlov(){
     return sprite_builders::build_decoration_sprite(textures::pavlov, entity_config::pavlov_path, entity_config::pavlov_attributes);
+}
+sprite::sprite sprite_builders::build_polish_cow(){
+    return sprite_builders::build_decoration_sprite(textures::polish_cow, entity_config::polish_cow_path, entity_config::polish_cow_attributes);
 }
 sprite::sprite sprite_builders::build_poker_table(){
     return build_decoration_sprite(textures::poker_table, entity_config::poker_table_decoration_path, entity_config::poker_table_attributes);
@@ -150,8 +165,8 @@ sprite::sprite sprite_builders::build_table_sprite(){
         return sprite_builders::build_decoration_sprite(textures::tiled_table_blue, entity_config::tiled_table_blue_path, entity_config::tiled_table_attributes);
     }
 
-    sprite::sprite sprite_builders::build_food_counter_sprite(){
-        return build_decoration_sprite(textures::food_counter, entity_config::food_counter_station_path, entity_config::food_counter_attributes);
+    sprite::sprite sprite_builders::build_wooden_food_counter_sprite(){
+        return build_decoration_sprite(textures::wooden_food_counter, entity_config::food_counter_station_path, entity_config::food_counter_attributes);
     }
 sprite::sprite sprite_builders::build_dishwasher_sprite(){
     return build_test_decoration_sprite(entity_config::dishwasher_attributes);

@@ -3,11 +3,19 @@
 
 #include "cafe_config.h"
 #include "entity_config.h"
-#include "enum_config.h"
 #include "game_config.h"
 #include "raylib.h"
 
 namespace hud_config{
+    enum click_actions{
+        select_recipe = 0,
+        change_page,
+        move_decoration,
+        sell_decoration,
+        store_decoration,
+        size
+    };
+
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
     inline Color red_decoration_highlight = Color {255, 255, 0, opacity};

@@ -464,7 +464,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
         }
 
         WHEN("a food counter is built"){
-            auto counter_id = game.create_food_counter(spot);
+            auto counter_id = game.create_wooden_food_counter(spot);
 
             THEN("it carries the station component set"){
                 REQUIRE(game.has_selectable(counter_id));

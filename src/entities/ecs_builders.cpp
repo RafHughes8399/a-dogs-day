@@ -179,6 +179,12 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
         component_helpers::add_entity_selectable_component(id,
             entity_config::selectable_kinds::decoration_kind);
     }
+    void ecs_entities::build_conversation_pit(size_t id, Vector2 position){
+        build_decoration(id, position,
+            sprite_builders::build_conversation_pit(),
+            hitbox_builders::build_conversation_pit_hitbox(position));
+        // a clickable component perhaps ? 
+    }
     void ecs_entities::build_gargoyle(size_t id, Vector2 position){
         build_decoration(id, position,
             sprite_builders::build_gargoyle(),
@@ -187,6 +193,9 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
     }
     void ecs_entities::build_pavlov(size_t id, Vector2 position){
         build_decoration(id, position, sprite_builders::build_pavlov(), hitbox_builders::build_pavlov_hitbox(position));
+    }
+    void ecs_entities::build_polish_cow(size_t id, Vector2 position){
+        build_decoration(id, position, sprite_builders::build_polish_cow(), hitbox_builders::build_polish_cow_hitbox(position));
     }
     void ecs_entities::build_poker_table(size_t id, Vector2 position){
         build_decoration(id, position, 
@@ -239,8 +248,8 @@ void ecs_entities::build_cooking_station(size_t id, Vector2 position,
              std::nullopt, std::nullopt}, interaction_config::counter_interactee);
         component_helpers::add_entity_storage_component(id);
     }
-        void ecs_entities::build_food_counter(size_t id, Vector2 position){
-            build_counter(id, position, sprite_builders::build_food_counter_sprite());
+        void ecs_entities::build_wooden_food_counter(size_t id, Vector2 position){
+            build_counter(id, position, sprite_builders::build_wooden_food_counter_sprite());
         }
     void ecs_entities::build_table(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,

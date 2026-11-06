@@ -1,0 +1,57 @@
+
+so the inventory interface exists as the underlying storage and accessing of items
+
+then there is the inevntory interface which handles the drawing, rendering, interacting
+
+and then you need the item_entity_adaptor - or maybe not its just one line through the lifespan system. 
+
+start simple. make the clicking of the button storethe decoration
+
+questions for the robot:
+ what is the relationship between an entity and its hud
+ can the hud know what entity it is attached to
+ do we have an item compoentn
+
+ if the answer is no we should implement
+
+ then we need more structured hud components, kind of like the nine sprite i assume that deifne like spacing and counts nad 
+ formatting that can be scaled and 
+ so like a nine sprite but for:
+ -> inventory page items
+
+ 
+ -> page navigation element 
+
+
+ so an entity has a hud componetn which has a list of ids of. the elements attached to it
+ hud elements exist and are managed by the hud system. i think they need an entity component if they are attached to an entity 
+ to know what the id of the entity is so they can access things and modify things
+ and then entities if they dont already need a type compoennt which gives them the id of whatever they are to translate it to an item
+ maybe an item id component or something - yeah that is needed
+
+ then when the button is pressed, we can resolve the item and store it properly 
+the decoration and food enums need to be sequential / cumulative. yeah in sequence so 
+food starts where decorations end or the other way around whichever is defined first. otherwise the resolution could 
+would not work as 0 could be the 0th decoration or the 0th food
+
+hmm or maybe not. or you just need to know when to transfer food and when to transfer decos. but that can happen at the individual call site which solves this problem
+
+
+lifespane will need to be extended with create decoration 
+and then a decoration factory will be needed
+ then setup thepage navigation and item page elements. 
+    page nav needs the left and right navigation buttons 
+    and then dots for each page
+
+    item page needs the size of the page, the border, the vert and horiz spacing 
+    and then the buttons / icons that it would store
+ then build the inventory interface
+ then test viewing the stored items
+
+
+ then the changes to cursor and setting up the moving deocrations
+ the cursor needs a state machien to adjust click behaviour 
+
+ then we can do placing from inventory to the game
+
+ simples right ? 
