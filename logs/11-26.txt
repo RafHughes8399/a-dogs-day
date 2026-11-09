@@ -48,3 +48,21 @@ questions for the robot:
  then we can do placing from inventory to the game
 
  simples right ? 
+
+
+ -> item component for entities to know what item / decoration they are 
+ -> entity component for the hud so they know what entity they belong to 
+ -> item page and page navigator hud element classes [class, builder]
+    -> comprised of a button, or buttons,
+    -> a hud element [the count]
+    -> you kjnow what fuck the count in the inventory, we going tf2 style, but deafult sorted alphabetically
+    ->
+ -> inventory page combining those two things
+ -> then the ninventory comprised of pages. the pages are built on request ? or built on construction and then refresh on request ? refreshed. or 
+ -> maybe a change log is stored and the updates are made when the inventory is opened and then the change log clears when the invenotry ioens
+    -> i like that idea
+-> link the menu nav key to open the inventory 
+ -> then adjust the invenotyr [and the assocaited item mayubne a sub class item which count is enforced to be one ]
+ -> and then wire the button to store the item in the inventory
+
+ -> ok that is actionable. one day perhaps. one proper day
