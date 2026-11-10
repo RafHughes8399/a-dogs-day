@@ -61,6 +61,8 @@ and then a decoration factory will be needed
  -> entity component for the hud so they know what entity they belong to  x this is the owner component
  -> will need an item encyclopedia for looking up the name and the price
  -> that could be the item system ? it would store that - that can come later though
+    -> new inventory item
+    -> inventory to sort by name on insert, or 
  -> item page and page navigator hud element classes [class, builder]
     -> comprised of a button, or buttons,
     -> a hud element [the count]

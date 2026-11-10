@@ -3,36 +3,74 @@
 
 #include "items.h"
 #include <cstddef>
-#include <map>
-#include <unordered_map>
 #include <vector>
+#include "page_navigator.hpp"
+#include "item_page.hpp"
 namespace inventory {
     class inventory {
     public:
-        ~inventory() = default;
-        inventory() = default;
-        inventory(const inventory& other) = default;
-        inventory(inventory&& other) = default;
+        struct item_node{
+            items::inventory_item item;
+            item_node* prev;
+            item_node* next;
 
-        inventory& operator=(const inventory& other) = default;
-        inventory& operator=(inventory&& other) = default;
+            item_node(items::inventory_item item, item_node* prev = nullptr, item_node* next = nullptr)
+            :item(item), prev(prev), next(next){}
+        };
 
-        void add(size_t item_id, size_t count = 1);
-        bool remove(size_t item_id, size_t count = 1);
+        ~inventory(){
+            auto* current = head_;
+            while(current != nullptr){
+                auto* next = current->next;
+                delete current;
+                current = next;
+            }
+        }
+        inventory()
+        :head_(nullptr){}
+        inventory(items::inventory_item head_item)
+        :head_(new item_node(head_item)){}
+        inventory(const inventory& other) = delete;
+        inventory(inventory&& other) noexcept
+        :head_(other.head_){
+            other.head_ = nullptr;
+        }
+
+        inventory& operator=(const inventory& other) = delete;
+        inventory& operator=(inventory&& other) noexcept{
+            if(this != &other){
+                auto* current = head_;
+                while(current != nullptr){
+                    auto* next = current->next;
+                    delete current;
+                    current = next;
+                }
+                head_ = other.head_;
+                other.head_ = nullptr;
+            }
+            return *this;
+        }
+
+        bool add(size_t item_id);
+        bool remove(size_t item_id);
         std::optional<size_t> take(size_t item_id);
-        
-        size_t count(size_t item_id) const;
+
         bool empty() const;
-        const std::map<size_t, std::vector<items::item>>& get_items();
+        item_node* get_items();
     private:
-        std::map<size_t, std::vector<items::item>> items_;
+        item_node* find(size_t item_id);
+        item_node* head_;
     };
     class inventory_interface{
         private:
             class inventory_page{
                 public:
+                    ~inventory_page() = default;
+                    inventory_page(size_t page_num);
                 private:
                     size_t page_num_;
+                    page_navigator page_naviagtor_;
+                    item_page items_;
                     // page navigation hud element
                     // stored items hud element 
                     // like a recipe button an item button needs a count compoennt attached to it too
@@ -45,6 +83,11 @@ namespace inventory {
             // get items on page
             // add page / remove page 
             // next page / prev page. could be an iterator. this is a case where it makes sens
+
+            void store_item(size_t item_id);
+            void take_item(size_t item_id);
+            void update(float delta);
+            void render();
             void next_page();
             void previous_page();
 

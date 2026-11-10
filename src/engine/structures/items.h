@@ -8,36 +8,36 @@
 #include "events_interface.h"
 #include "sprite.h"
 namespace items{
-    class item{
+    class food_item{
         public:
-            ~item() = default;
-            item(size_t item_id, std::uint8_t count = 1)
+            ~food_item() = default;
+            food_item(size_t item_id, std::uint8_t count = 1)
             :item_id_(item_id), count_(count){}
 
-            item(const item& other) = default;
-            item(item&& other) = default;
+            food_item(const food_item& other) = default;
+            food_item(food_item&& other) = default;
 
-            item& operator=(const item& other) = default;
-            item& operator=(item&& other) = default;
-            item& operator++(){
+            food_item& operator=(const food_item& other) = default;
+            food_item& operator=(food_item&& other) = default;
+            food_item& operator++(){
                 ++count_;
                 return *this;
             }
-            item operator++(int){
+            food_item operator++(int){
                 auto temp = *this;
                 ++count_;
                 return temp;
             }
-            item& operator--(){
+            food_item& operator--(){
                 --count_;
                 return *this;
             }
-            item operator--(int){
+            food_item operator--(int){
                 auto temp = *this;
                 --count_;
                 return temp;
             }
-            friend bool operator==(const item& a, const item& b){
+            friend bool operator==(const food_item& a, const food_item& b){
                 return a.item_id_ == b.item_id_ and a.count_ == b.count_;
             }
             size_t get_id();
@@ -46,6 +46,29 @@ namespace items{
             void adjust_count(size_t delta);
         private:
             size_t item_id_;
+            std::uint8_t count_;
+    };
+    // todo DEFINE A SUBCLASS ITEM WHERE COUNT IS JUST ONE, I SUPPOSE THOUGH IT IS A COMPLEETLY DICFFERNT
+    // ITEM IMPLEMENTATION SO WE SHOULD HONOUR THAT
+
+    // * new item with the id, the name and the price ? yeah
+    class inventory_item{
+        public:
+            ~inventory_item() = default;
+            // TODO update inventory item construction - name_/sell_price_ default until a catalog/lookup exists
+            inventory_item(size_t item_id, std::uint8_t count = 1)
+            :item_id_(item_id), name_(""), sell_price_(0), count_(count){}
+
+            inventory_item(const inventory_item& other) = default;
+            inventory_item(inventory_item&& other) = default;
+
+            size_t get_id() const;
+            std::uint8_t get_count() const;
+            void adjust_count(size_t delta);
+        private:
+            const size_t item_id_;
+            const std::string name_;
+            const int sell_price_;
             std::uint8_t count_;
     };
 /**
@@ -158,4 +181,4 @@ class item_builder{
             extern item_builder i_builder_;
             */
 }
-#endif 
+#endif

@@ -14,13 +14,13 @@ namespace item_stack{
             item_stack()
             :items_({}) {}
             
-            item_stack(std::vector<items::item>& items)
+            item_stack(std::vector<items::food_item>& items)
             :items_(items){}
 
             item_stack(std::vector<size_t> item_ids)
             : item_stack(){
                 for(size_t& id : item_ids){
-                    items_.push_back(items::item(id));
+                    items_.push_back(items::food_item(id));
                 }
             }
             item_stack(const item_stack& other) = default;
@@ -34,7 +34,7 @@ namespace item_stack{
             // total is the number of total items - does consider count
             size_t total() const;
             bool empty() const;
-            items::item& head();
+            items::food_item& head();
             void pop();
             void push(size_t item_id);
 
@@ -42,7 +42,7 @@ namespace item_stack{
             size_t take();
             void place(size_t item_id);
         private:
-            std::vector<items::item> items_;
+            std::vector<items::food_item> items_;
     };
 }
 #endif

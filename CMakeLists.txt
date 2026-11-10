@@ -174,7 +174,8 @@ add_library(systems
   src/engine/systems/hud_systems/hud_spatial_system.cpp
   src/engine/systems/shared_systems/hud_rendering_system.cpp)
 link_libraries(systems)
-
+add_library(interface_elements src/hud/elements/page_navigator.cpp src/hud/elements/item_page.cpp)
+link_libraries(interface_elements)
 add_library(animation src/rendering/animation.cpp src/rendering/animation_builders.cpp)
 link_libraries(animation)
 
@@ -224,7 +225,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
   raglib events queries states recipe components systems animation sprite item item_stack menu hud store hitbox texture
-  entities factories render_layer quadtree graph debug_log_interface debug_logger game colour_replacer colour-replacer ${PROJECT_NAME}
+  entities factories render_layer quadtree graph debug_log_interface debug_logger game colour_replacer colour-replacer interface_elements ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})
@@ -241,6 +242,7 @@ foreach(target IN LISTS PROJECT_TARGETS)
     src/engine/structures
     src/engine/systems
     src/hud
+    src/hud/elements
     src/interfaces
     src/tools
   )
@@ -285,6 +287,7 @@ target_include_directories(tests PRIVATE
   src/engine/structures
   src/engine/systems
   src/hud
+  src/hud/elements
   src/interfaces
   src/tools
 )

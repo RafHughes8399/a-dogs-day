@@ -517,7 +517,7 @@ class storage_component {
 
     bool empty() const;
     size_t size() const;
-    items::item& head();
+    items::food_item& head();
     size_t take();
     void place(size_t item_id);
 

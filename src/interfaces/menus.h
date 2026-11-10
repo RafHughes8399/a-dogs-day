@@ -43,7 +43,7 @@ namespace menus{
 
             void render() override;
         private:
-            std::vector<std::unique_ptr<items::item>> items_;
+            std::vector<std::unique_ptr<items::food_item>> items_;
             
 
     };

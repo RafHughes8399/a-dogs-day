@@ -18,7 +18,7 @@ bool item_stack::item_stack::empty() const {
     return size() == 0;
 }
 // ? i think you've got these mixed up, they should be accessing the back not the front
-items::item& item_stack::item_stack::head(){
+items::food_item& item_stack::item_stack::head(){
     return items_.back();
 }
 void item_stack::item_stack::pop(){
@@ -28,7 +28,7 @@ void item_stack::item_stack::pop(){
 }
 void item_stack::item_stack::push(size_t item_id){
    if(empty()){
-        items_.push_back(items::item(item_id));
+        items_.push_back(items::food_item(item_id));
    }
    else{
     auto& h = head();
@@ -36,7 +36,7 @@ void item_stack::item_stack::push(size_t item_id){
         ++h;
     }
     else{
-        items_.push_back(items::item(item_id));
+        items_.push_back(items::food_item(item_id));
     }
    }
 }
