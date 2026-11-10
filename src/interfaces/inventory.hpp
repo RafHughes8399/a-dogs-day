@@ -1,6 +1,5 @@
-#ifndef INVENTORY_HPP
-#define INVENTORY_HPP
-
+#ifndef INVENTORY_H
+#define INVENTORY_H
 #include "items.h"
 #include <cstddef>
 #include <vector>
@@ -13,29 +12,35 @@ namespace inventory {
             items::inventory_item item;
             item_node* prev;
             item_node* next;
-
             item_node(items::inventory_item item, item_node* prev = nullptr, item_node* next = nullptr)
             :item(item), prev(prev), next(next){}
         };
-
-        ~inventory(){
-            auto* current = head_;
-            while(current != nullptr){
-                auto* next = current->next;
-                delete current;
-                current = next;
-            }
+    class inventory_page{
+    public:
+    ~inventory_page() = default;
+    inventory_page(size_t page_num);
+    private:
+        size_t page_num_;
+        page_navigator page_naviagtor_;
+        item_page items_;
+    };
+    ~inventory(){
+        auto* current = head_;
+        while(current != nullptr){
+            auto* next = current->next;
+            delete current;
+            current = next;
         }
-        inventory()
-        :head_(nullptr){}
-        inventory(items::inventory_item head_item)
-        :head_(new item_node(head_item)){}
-        inventory(const inventory& other) = delete;
-        inventory(inventory&& other) noexcept
-        :head_(other.head_){
+    }
+    inventory()
+        :head_(nullptr), current_page_(0), pages_({}){}
+    inventory(items::inventory_item head_item)
+        :head_(new item_node(head_item)), current_page_(0), pages_({}){}
+    inventory(const inventory& other) = delete;
+    inventory(inventory&& other) noexcept
+        :head_(other.head_), current_page_(other.current_page_), pages_(other.pages_){
             other.head_ = nullptr;
-        }
-
+    }
         inventory& operator=(const inventory& other) = delete;
         inventory& operator=(inventory&& other) noexcept{
             if(this != &other){
@@ -50,54 +55,24 @@ namespace inventory {
             }
             return *this;
         }
-
-        bool add(size_t item_id);
-        bool remove(size_t item_id);
+        bool store_item(size_t item_id);
+        bool take_item(size_t item_id);
         std::optional<size_t> take(size_t item_id);
-
         bool empty() const;
         item_node* get_items();
+
+        void render();
+        void next_page();
+        void previous_page();
+            
+        void add_page();
+        void remove_page();
     private:
         item_node* find(size_t item_id);
         item_node* head_;
-    };
-    class inventory_interface{
-        private:
-            class inventory_page{
-                public:
-                    ~inventory_page() = default;
-                    inventory_page(size_t page_num);
-                private:
-                    size_t page_num_;
-                    page_navigator page_naviagtor_;
-                    item_page items_;
-                    // page navigation hud element
-                    // stored items hud element 
-                    // like a recipe button an item button needs a count compoennt attached to it too
-            };
-        public:
-            // store item 
-            // take item
-            // render 
-            // update
-            // get items on page
-            // add page / remove page 
-            // next page / prev page. could be an iterator. this is a case where it makes sens
-
-            void store_item(size_t item_id);
-            void take_item(size_t item_id);
-            void update(float delta);
-            void render();
-            void next_page();
-            void previous_page();
-
-            void add_page();
-            void remove_page();
-        private:
-            // a list of inventory pages essentially
-            inventory inventory_;
-            std::vector<inventory_page> pages_;
-            size_t current_page_;
+        std::vector<inventory_page> pages_;
+        size_t current_page_;
     };
 }
 #endif
+            

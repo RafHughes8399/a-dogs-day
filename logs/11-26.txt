@@ -85,3 +85,7 @@ and then a decoration factory will be needed
  -> and then wire the button to store the item in the inventory
 
  -> ok that is actionable. one day perhaps. one proper day
+
+
+ -> store inventory event  needs two listeners. one the lifespan system to destroy the entity
+ and two the inventory interface to store the item

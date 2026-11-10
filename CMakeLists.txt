@@ -191,7 +191,7 @@ link_libraries(menu)
 add_library(hud src/interfaces/hud.cpp)
 link_libraries(hud)
 
-add_library(store src/interfaces/inventory.cpp src/interfaces/shop.cpp)
+add_library(store src/interfaces/inventory.cpp src/interfaces/inventory_system.cpp src/interfaces/shop.cpp)
 link_libraries(store)
 
 add_library(hitbox src/engine/structures/hitbox.cpp src/engine/structures/hitbox_builders.cpp)

@@ -304,14 +304,19 @@ namespace systems{
                 static entity_lifespan_system instance;
                 return instance;
             }
-            ~entity_lifespan_system() = default;
+            ~entity_lifespan_system(){
+                event_interface::unsubscribe<events::store_decoration>(store_decoration_handler_);
+            }
             entity_lifespan_system(const entity_lifespan_system& other) = delete;
             entity_lifespan_system(entity_lifespan_system&& other) = delete;
 
             entity_lifespan_system& operator=(const entity_lifespan_system& other) = delete;
             entity_lifespan_system& operator=(entity_lifespan_system&& other) = delete;
         private:
-            entity_lifespan_system() = default;
+            entity_lifespan_system()
+            : store_decoration_handler_([this](const events::store_decoration& event) -> void{on_stored_decoration(event);}){
+                event_interface::subscribe<events::store_decoration>(store_decoration_handler_);
+            }
         public:
 
             // allocate -> build -> announce, so nothing can be built without
@@ -375,6 +380,7 @@ namespace systems{
 
             size_t create_decoration(size_t decoration, Vector2 position);
             void destroy_decoration(size_t id);
+            void on_stored_decoration(const events::store_decoration& event);
             void destroy(size_t entity_id);
             size_t create_hud_element(size_t owner, std::function<void(size_t)> build);
             void destroy_hud_element(size_t hud_id);
@@ -393,6 +399,8 @@ namespace systems{
             factories::station_factory station_factory_;
             factories::food_factory food_factory_;
             factories::decoration_factory decoration_factory_;
+
+            events::event_handler<events::store_decoration> store_decoration_handler_;
     };
     class interaction_system{
         // for behavioural interactions

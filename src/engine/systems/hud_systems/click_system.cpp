@@ -1,14 +1,27 @@
 #include "hud_systems/hud_systems.hpp"
+#include "debug_log_interface.h"
+#include <string>
 
-// ! THESE FUNCTIONS SHOULD TRIGGER EVENTS ? I THINK MOST OF THEM SHOULD 
+// ! THESE FUNCTIONS SHOULD TRIGGER EVENTS ? I THINK MOST OF THEM SHOULD
 
 
 bool hud_systems::click_system::click(Vector2 position){
+    debug::log("[click_system::click] position: " + std::to_string(position.x) + ", " + std::to_string(position.y));
     auto hit = hud_spatial_system::get_instance().check_collision_with(position);
+    debug::log("[click_system::click] collision check hit: " + std::to_string(hit));
     if(hit == game_config::empty_entity){ return false; }
     auto hud_id = static_cast<size_t>(hit);
     auto* clickable = component_managers::hud_clickable_manager_.get_component(hud_id);
-    if(clickable == nullptr or clickable->get_action() >= defined_clicks_.size()){ return true; }
+    if(clickable == nullptr){
+        debug::log("[click_system::click] no clickable component on hud_id: " + std::to_string(hud_id));
+        return true;
+    }
+    debug::log("[click_system::click] clickable component action: " + std::to_string(clickable->get_action()));
+    if(clickable->get_action() >= defined_clicks_.size()){
+        debug::log("[click_system::click] action index out of range for defined_clicks_, size: " + std::to_string(defined_clicks_.size()));
+        return true;
+    }
+    debug::log("[click_system::click] invoking defined click behaviour, action: " + std::to_string(clickable->get_action()) + " hud_id: " + std::to_string(hud_id));
     defined_clicks_[clickable->get_action()](hud_id, clickable->get_payload());
     return true;
 }

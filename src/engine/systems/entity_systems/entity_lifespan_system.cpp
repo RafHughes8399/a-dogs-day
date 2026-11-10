@@ -20,8 +20,11 @@ size_t systems::entity_lifespan_system::next_id(){
 
 // ---------------- lifecycle ----------------
 void systems::entity_lifespan_system::destroy(size_t entity_id){
+    debug::log("[entity_lifespan_system::destroy, before] entity_id: " + std::to_string(entity_id));
     if(auto* hud = component_managers::hud_manager_.get_component(entity_id)){
         auto elements = hud->get_elements();
+        debug::log("[entity_lifespan_system::destroy] entity_id: " + std::to_string(entity_id)
+            + " tearing down " + std::to_string(elements.size()) + " hud elements");
         for(auto element : elements){
             destroy_hud_element(element);
         }
@@ -33,6 +36,8 @@ void systems::entity_lifespan_system::destroy(size_t entity_id){
     component_helpers::unregister_all_entity_components(entity_id);
     component_helpers::unregister_all_hud_components(entity_id);
     recycled_ids_.push(entity_id);
+    debug::log("[entity_lifespan_system::destroy, after] entity_id: " + std::to_string(entity_id)
+        + " components unregistered, id recycled");
 }
 
 size_t systems::entity_lifespan_system::create_hud_element(size_t owner, std::function<void(size_t)> build){
@@ -210,5 +215,11 @@ size_t systems::entity_lifespan_system::create_decoration(size_t decoration, Vec
     return id;
 }
 void systems::entity_lifespan_system::destroy_decoration(size_t id){
+    debug::log("[entity_lifespan_system::destroy_decoration] id: " + std::to_string(id));
     destroy(id);
+}
+void systems::entity_lifespan_system::on_stored_decoration(const events::store_decoration& event){
+    debug::log("[entity_lifespan_system::on_stored_decoration] received store_decoration event, entity_id: "
+        + std::to_string(event.get_entity_id()) + ", item_id: " + std::to_string(event.get_item_id()));
+    destroy_decoration(event.get_entity_id());
 }
