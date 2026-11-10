@@ -417,7 +417,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.has_renderable(decoration_id));
                 REQUIRE(game.has_collision(decoration_id));
                 REQUIRE(game.has_selectable(decoration_id));
-                REQUIRE(game.num_components(decoration_id) == 5);
+                REQUIRE(game.num_components(decoration_id) == 6);
             }
             THEN("it answers to the decoration kind"){
                 REQUIRE(game.selectable_kind_of(decoration_id)

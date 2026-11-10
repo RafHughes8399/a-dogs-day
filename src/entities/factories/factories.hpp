@@ -134,6 +134,32 @@ namespace factories{
         std::array<std::function<void(size_t, Vector2)>, entity_config::foods_size> food_builders_;
     };
 
-    // TODO: decoration factory
-} 
+    class decoration_factory {
+    public:
+        ~decoration_factory() = default;
+        decoration_factory()
+        :decoration_builders_({
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_test_decoration(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_conversation_pit(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_gargoyle(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_pavlov(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_polish_cow(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_poker_table(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_dog_painting(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_ficus_lytra(id, position);},
+            [](size_t id, Vector2 position) -> void{ecs_entities::build_frangipani(id, position);}
+        }){
+
+        }
+        decoration_factory(const decoration_factory& other) = default;
+        decoration_factory(decoration_factory&& other) = default;
+
+        decoration_factory& operator=(const decoration_factory& other) = default;
+        decoration_factory& operator=(decoration_factory&& other) = default;
+
+        void build_decoration(size_t decoration, size_t entity_id, Vector2 position);
+    private:
+        std::array<std::function<void(size_t, Vector2)>, entity_config::decorations_size> decoration_builders_;
+    };
+}
 #endif

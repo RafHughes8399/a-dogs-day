@@ -8,6 +8,7 @@ component_manager<components::food_component> entity_food_manager_;
 component_manager<components::hud_component> hud_manager_;
 component_manager<components::interactable_component> entity_interactable_manager_;
 component_manager<components::interactor_component> entity_interactor_manager_;
+component_manager<components::item_component> entity_item_manager_;
 component_manager<components::mouse_input_component> entity_mouse_input_manager_;
 component_manager<components::movement_component> entity_movement_manager_;
 component_manager<components::position_component> entity_positional_manager_;

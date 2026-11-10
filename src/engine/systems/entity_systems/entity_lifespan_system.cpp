@@ -202,3 +202,13 @@ size_t systems::entity_lifespan_system::create_food(size_t food, Vector2 positio
 void systems::entity_lifespan_system::destroy_food(size_t id){
     destroy(id);
 }
+
+size_t systems::entity_lifespan_system::create_decoration(size_t decoration, Vector2 position){
+    auto id = create([this](size_t decoration, size_t entity_id, Vector2 position) -> void{
+        decoration_factory_.build_decoration(decoration, entity_id, position); },
+        decoration, position, level_config::draw_layers::decoration);
+    return id;
+}
+void systems::entity_lifespan_system::destroy_decoration(size_t id){
+    destroy(id);
+}

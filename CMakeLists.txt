@@ -119,7 +119,8 @@ link_libraries(recipe)
 add_library(factories
             src/entities/factories/dog_factory.cpp
             src/entities/factories/station_factory.cpp
-            src/entities/factories/food_factory.cpp)
+            src/entities/factories/food_factory.cpp
+            src/entities/factories/decoration_factory.cpp)
 link_libraries(factories)
 add_library(states
   src/engine/structures/state.cpp
@@ -136,6 +137,7 @@ add_library(components
   src/engine/components/entity_components/food_component.cpp
   src/engine/components/entity_components/interactable_component.cpp
   src/engine/components/entity_components/interactor_component.cpp
+  src/engine/components/entity_components/item_component.cpp
   src/engine/components/entity_components/key_input_component.cpp
   src/engine/components/entity_components/mouse_input_component.cpp
   src/engine/components/entity_components/movement_component.cpp

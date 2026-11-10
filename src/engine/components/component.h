@@ -274,6 +274,23 @@ class interactor_component {
         std::vector<size_t> interactions_;
 };
 
+class item_component {
+public:
+    ~item_component() = default;
+    item_component(const size_t item_id)
+    : item_id_(item_id){}
+    item_component(const item_component& other) = default;
+    item_component(item_component&& other) = default;
+
+    item_component& operator=(const item_component& other) = delete;
+    item_component& operator=(item_component&& other) = delete;
+
+    size_t get_item() const;
+private:
+    const size_t item_id_; 
+};
+
+
 // * player control input component - keyboard bindings only. Mouse input is
 // * mouse_input_component; see the note there for why they are not one type.
 class key_input_component{
@@ -532,6 +549,7 @@ namespace component_builders{
     components::selectable_component build_entity_selectable_component(size_t kind);
     components::storage_component build_entity_storage_component();
     components::food_component build_entity_food_component(size_t item_id);
+    components::item_component build_entity_item_component(size_t item_id);
     components::carrier_component build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
     components::recipes_component build_entity_recipes_component(std::vector<recipe::recipe>& recipes);
     components::hud_component build_hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero());

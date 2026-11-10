@@ -83,8 +83,17 @@ namespace entity_config{
         foods_size
     };
     enum decorations{
-        // TODO fill out 
-    }; 
+        test_decoration = 0,
+        conversation_pit,
+        gargoyle,
+        pavlov,
+        polish_cow,
+        poker_table,
+        dog_painting,
+        ficus_lytra,
+        frangipani,
+        decorations_size
+    };
     enum counter_sprite_slots{
         counter_body = 0,
         counter_food,

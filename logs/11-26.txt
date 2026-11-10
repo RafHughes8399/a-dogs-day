@@ -57,13 +57,23 @@ and then a decoration factory will be needed
  simples right ? 
 
 
- -> item component for entities to know what item / decoration they are 
- -> entity component for the hud so they know what entity they belong to 
+ -> item component for entities to know what item / decoration they are x 
+ -> entity component for the hud so they know what entity they belong to  x this is the owner component
+ -> will need an item encyclopedia for looking up the name and the price
+ -> that could be the item system ? it would store that - that can come later though
  -> item page and page navigator hud element classes [class, builder]
     -> comprised of a button, or buttons,
     -> a hud element [the count]
-    -> you kjnow what fuck the count in the inventory, we going tf2 style, but deafult sorted alphabetically
-    ->
+    -> you kjnow what fuck the count in the inventory, we going tf2 style,
+    -> but deafult sorted alphabetically
+    -> so the inventory interface needs a sort method. the item needs a name then too
+
+    so a page nav component has two buttons 
+    the left page nav button and the right page nav button, these need to be built and defined as buttons
+    then it will also need the page num sprite, which is built like a nien sprite; in the sense that it has a number of page dots and an offset between the page dots
+    these two values will be taken as paramters based on its specific usage 
+    each dot has two frames, one base one coloured in or highlighted, the latter is the "current page" indicator
+    
  -> inventory page combining those two things
  -> then the ninventory comprised of pages. the pages are built on request ? or built on construction and then refresh on request ? refreshed. or 
  -> maybe a change log is stored and the updates are made when the inventory is opened and then the change log clears when the invenotry ioens

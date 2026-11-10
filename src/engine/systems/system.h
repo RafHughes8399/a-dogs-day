@@ -372,6 +372,9 @@ namespace systems{
 
             size_t create_food(size_t food, Vector2 position);
             void destroy_food(size_t id);
+
+            size_t create_decoration(size_t decoration, Vector2 position);
+            void destroy_decoration(size_t id);
             void destroy(size_t entity_id);
             size_t create_hud_element(size_t owner, std::function<void(size_t)> build);
             void destroy_hud_element(size_t hud_id);
@@ -389,6 +392,7 @@ namespace systems{
             factories::dog_factory dog_factory_;
             factories::station_factory station_factory_;
             factories::food_factory food_factory_;
+            factories::decoration_factory decoration_factory_;
     };
     class interaction_system{
         // for behavioural interactions

@@ -81,36 +81,28 @@ void game::game::init(){
     lifespan_.create_waiter_dog(entity_config::waiters::lionel, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 9});
 
     // * ----------------- DECORATIONS CREATE ------------------------------------------- // and some decorations
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_gargoyle(id, Vector2{level_config::edge_weight * 7,level_config::edge_weight *2});
-    }, level_config::draw_layers::decoration);
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_poker_table(id, Vector2{level_config::edge_weight * 10,level_config::edge_weight *20});
-    }, level_config::draw_layers::decoration);
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_dog_painting(id, Vector2{level_config::edge_weight * 9,level_config::edge_weight * 4});
-    }, level_config::draw_layers::decoration);
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_frangipani(id, Vector2{level_config::edge_weight * 24,level_config::edge_weight * 14});
-    }, level_config::draw_layers::decoration);
-    lifespan_.create([](size_t id) -> void{
-        ecs_entities::build_pavlov(id, Vector2{level_config::edge_weight * 12, level_config::edge_weight * 30});
-    }, level_config::draw_layers::decoration);
+    lifespan_.create_decoration(entity_config::decorations::gargoyle,
+        Vector2{level_config::edge_weight * 7,level_config::edge_weight *2});
+    lifespan_.create_decoration(entity_config::decorations::poker_table,
+        Vector2{level_config::edge_weight * 10,level_config::edge_weight *20});
+    lifespan_.create_decoration(entity_config::decorations::dog_painting,
+        Vector2{level_config::edge_weight * 9,level_config::edge_weight * 4});
+    lifespan_.create_decoration(entity_config::decorations::frangipani,
+        Vector2{level_config::edge_weight * 24,level_config::edge_weight * 14});
+    lifespan_.create_decoration(entity_config::decorations::pavlov,
+        Vector2{level_config::edge_weight * 12, level_config::edge_weight * 30});
     debug::log("[game::init, done] built "
         + std::to_string(component_helpers::num_registered_entity_components(khiri_id))
         + " components on khiri");
     debug::log("[game::init, done] built "
         + std::to_string(component_helpers::num_registered_entity_components(mack_id))
         + " components on mack");
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_ficus_lytra(id, Vector2{level_config::edge_weight * 30,level_config::edge_weight * 19});
-    }, level_config::draw_layers::decoration);
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_polish_cow(id, Vector2{level_config::edge_weight * 18,level_config::edge_weight * 28});
-    }, level_config::draw_layers::decoration);
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_conversation_pit(id, Vector2{level_config::edge_weight * 22,level_config::edge_weight * 26});
-    }, level_config::draw_layers::decoration);
+    lifespan_.create_decoration(entity_config::decorations::ficus_lytra,
+        Vector2{level_config::edge_weight * 30,level_config::edge_weight * 19});
+    lifespan_.create_decoration(entity_config::decorations::polish_cow,
+        Vector2{level_config::edge_weight * 18,level_config::edge_weight * 28});
+    lifespan_.create_decoration(entity_config::decorations::conversation_pit,
+        Vector2{level_config::edge_weight * 22,level_config::edge_weight * 26});
     return;
 }
 
