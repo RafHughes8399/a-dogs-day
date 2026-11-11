@@ -382,6 +382,7 @@ namespace systems{
             void destroy_decoration(size_t id);
             void on_stored_decoration(const events::store_decoration& event);
             void destroy(size_t entity_id);
+            size_t create_hud_root(std::function<void(size_t)> build);
             size_t create_hud_element(size_t owner, std::function<void(size_t)> build);
             void destroy_hud_element(size_t hud_id);
             void update(float delta);

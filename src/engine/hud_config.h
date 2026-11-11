@@ -13,7 +13,15 @@ namespace hud_config{
         move_decoration,
         sell_decoration,
         store_decoration,
+        select_item,
         size
+    };
+    enum button_kinds{
+        move_decoration_button = 0,
+        sell_decoration_button,
+        store_decoration_button,
+        inventory_item_button,
+        button_kinds_size
     };
 
     inline unsigned char opacity = 120;

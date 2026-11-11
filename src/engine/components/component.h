@@ -88,7 +88,15 @@ class page_turn{
     private:
         int direction_;
 };
-using click_payload = std::variant<std::monostate, recipe_choice, page_turn>;
+class item_choice{
+    public:
+        explicit item_choice(size_t item_id)
+        : item_id_(item_id){}
+        size_t get_item_id() const;
+    private:
+        size_t item_id_;
+};
+using click_payload = std::variant<std::monostate, recipe_choice, page_turn, item_choice>;
 class clickable_component{
     public:
         ~clickable_component() = default;

@@ -52,6 +52,11 @@ size_t systems::entity_lifespan_system::create_hud_element(size_t owner, std::fu
     event_interface::execute_event(created);
     return id;
 }
+size_t systems::entity_lifespan_system::create_hud_root(std::function<void(size_t)> build){
+    auto id = next_id();
+    build(id);
+    return id;
+}
 void systems::entity_lifespan_system::destroy_hud_element(size_t hud_id){
     auto* owner_component = component_managers::hud_owner_manager_.get_component(hud_id);
     if(owner_component == nullptr){ return; }

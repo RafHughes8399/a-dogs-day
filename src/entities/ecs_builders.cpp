@@ -226,6 +226,11 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
         //systems::animation_system::get_instance().play(id, systems::animation_system::sprite_animation{0, 0, true});
     }
 
+void ecs_entities::build_hud_root(size_t id, Vector2 position, sprite::nine_sprite& panel){
+    component_helpers::add_entity_positional_component(id, position);
+    component_helpers::add_hud_component(id, panel);
+}
+
 void ecs_entities::build_station(size_t id, Vector2 position,
     sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
     float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> offsets, std::vector<size_t> interactable_interactions){

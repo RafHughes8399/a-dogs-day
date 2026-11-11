@@ -77,6 +77,8 @@ namespace ecs_entities {
     void build_station(size_t id, Vector2 position,
         sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
         float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets, std::vector<size_t> interactable_interactions = {});
+
+    void build_hud_root(size_t id, Vector2 position, sprite::nine_sprite& panel);
     void build_cooking_station(size_t id, Vector2 position,
         sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
         float station_reach, std::array<std::optional<Vector2>, DIRECTIONS> slot_offsets,

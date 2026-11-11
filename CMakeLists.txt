@@ -120,7 +120,8 @@ add_library(factories
             src/entities/factories/dog_factory.cpp
             src/entities/factories/station_factory.cpp
             src/entities/factories/food_factory.cpp
-            src/entities/factories/decoration_factory.cpp)
+            src/entities/factories/decoration_factory.cpp
+            src/entities/factories/button_factory.cpp)
 link_libraries(factories)
 add_library(states
   src/engine/structures/state.cpp

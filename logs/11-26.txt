@@ -89,3 +89,76 @@ and then a decoration factory will be needed
 
  -> store inventory event  needs two listeners. one the lifespan system to destroy the entity
  and two the inventory interface to store the item
+
+
+
+ok couple of things 
+1. button hover states based on cursor movement and position. if collides with multiple, get the one that it collides more with
+2. i think the cursor should be smaller \
+3. it should also render above the hud not behind it
+4. whatever that note about click states for interacting with menus compared to the rest of the game
+
+this is essentially changes to the cursor, can be its own thing 
+
+
+however that can be its own thing. for now lets do the following 
+1. port over the menu graph, can be the interface system that then holds the inventory system. a system of 
+systems . the same graph logic can persist
+2. assets for the buttons and the pane for the menu, then initialise
+3. logic for storing itmes or rather displaying items on the page:
+    -> because they are all different shapes and sizes i thought we could make this fun and more interesting.
+    like a dredge style display or slots; whatever you want the word to be.
+        ok so each page  has a two-deimensoinal grid based on its size. each cell is edge * edge ? 
+        i should scale everything to be at most quarter multiples of edges
+    ->  so then the "algorithm" at the high level is to identify the shape of cells that the decoration needs
+        and then find a suitable place for it.
+        -> i mean we could quadtree it. could we quadtree it ? 
+        -> or we keep track of the most recently inserted and then place next to it
+        -> or we store as a graph and then you pick a node and then check if it and the necessary neighbours can fit the deocrations
+            -> if can fit place, if not, then check the next, closest free node
+        -> or the inventory maintains a ext position to place. but if that fails then what 
+
+ok the choice is two dimensional grid where the item holds its offset and we read that.
+so each item now needs to to store its size. then wehn isnerting we check a node. if it can fit then you insert at that node and 
+mark the taken cells too 
+
+store the last_inserted index, and then start from there, if you can;t fit. do a wider scan
+for simplicity we are going to scale each item back by 50%. each cell is half an edge weight 
+
+so the items need their size to be known on creation. maybe an item builder is necessary
+
+item builder and we can define the price, the size, and the name. switch case on the decoration enum ? its not the best 
+solution but it will do atp lets just go
+
+
+-> item builder to build items
+-> items expanded to store the name and the sizing
+
+-> item page to store with a grid, grid is based on the page_dimensions, which are a constant defined and adjusted by the scale 
+-> the scale depends on the resolution difference from the base
+
+-> invenotry store and take need to change to be interfaces to the page, the page is where the item should fundamenbtally exist
+
+
+ok that's relkativelyt straightforward
+we adjust the inventory item definition 
+we create a decoration item factory. althoiught maybe not we can just adjust the decoration factory and the component it stores
+and then when we store it we just adjust the data that is sent
+so we just need a price component really because we have the size already
+and the name component
+and then storing and taking need to adjust to cehck if the inventory can fit on the currentpage, if it can no worries, if not, create a new page because we will
+always be looking at the last page when storing
+
+yeah so the name and price component
+then updates to the decoration facotry and builders to make these these
+then updates to the store deocaraiont event to carry the name and the size 
+then updates to the inventory store to place it on the page
+
+then the page storing logic
+TODO:::::::::
+so store inventory should get the last page and try to store it there. if that fails. then create a new page and store it on that
+
+
+and finally builders for everything so it can be synthesized. 
+-> builders for an inventory page, builders for an item page, builders for a page navigator if not already existing
+-> and who would these be triggered by ? the inventory system ? i think so, yeah the system would be responsible for this

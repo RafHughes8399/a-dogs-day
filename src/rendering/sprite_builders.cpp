@@ -318,3 +318,16 @@ sprite::sprite sprite_builders::build_sell_decoration_button_sprite(){
 sprite::sprite sprite_builders::build_to_storage_decoration_button_sprite(){
     return build_button_sprite(textures::to_storage_button, hud_config::store_decoration_path);
 }
+sprite::sprite sprite_builders::build_item_sprite(size_t item_id){
+    switch(item_id){
+        case entity_config::decorations::conversation_pit: return build_conversation_pit();
+        case entity_config::decorations::gargoyle: return build_gargoyle();
+        case entity_config::decorations::pavlov: return build_pavlov();
+        case entity_config::decorations::polish_cow: return build_polish_cow();
+        case entity_config::decorations::poker_table: return build_poker_table();
+        case entity_config::decorations::dog_painting: return build_dog_painting();
+        case entity_config::decorations::ficus_lytra: return build_ficus_lytra();
+        case entity_config::decorations::frangipani: return build_frangipani();
+        default: return build_test_decoration_sprite(entity_config::test_decoration_attributes);
+    }
+}

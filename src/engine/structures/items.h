@@ -1,9 +1,11 @@
 #ifndef ITEMS_H
 #define ITEMS_H
 
+#include <array>
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility>
 #include "events.h"
 #include "events_interface.h"
 #include "sprite.h"
@@ -52,24 +54,43 @@ namespace items{
     // ITEM IMPLEMENTATION SO WE SHOULD HONOUR THAT
 
     // * new item with the id, the name and the price ? yeah
-    class inventory_item{
+    class item_definition{
         public:
-            ~inventory_item() = default;
-            // TODO update inventory item construction - name_/sell_price_ default until a catalog/lookup exists
-            inventory_item(size_t item_id, std::uint8_t count = 1)
-            :item_id_(item_id), name_(""), sell_price_(0), count_(count){}
+            ~item_definition() = default;
+            item_definition(std::string name, int price, Vector2 size)
+            :name_(std::move(name)), price_(price), size_(size){}
 
-            inventory_item(const inventory_item& other) = default;
-            inventory_item(inventory_item&& other) = default;
+            item_definition(const item_definition& other) = default;
+            item_definition(item_definition&& other) = default;
 
-            size_t get_id() const;
-            std::uint8_t get_count() const;
-            void adjust_count(size_t delta);
+            const std::string& get_name() const;
+            int get_price() const;
+            Vector2 get_size() const;
         private:
-            const size_t item_id_;
-            const std::string name_;
-            const int sell_price_;
-            std::uint8_t count_;
+            std::string name_;
+            int price_;
+            Vector2 size_;
+    };
+    class item_encyclopedia{
+        public:
+            static item_encyclopedia& get_instance(){
+                static item_encyclopedia instance;
+                return instance;
+            }
+            ~item_encyclopedia() = default;
+            item_encyclopedia(const item_encyclopedia& other) = delete;
+            item_encyclopedia(item_encyclopedia&& other) = delete;
+
+            item_encyclopedia& operator=(const item_encyclopedia& other) = delete;
+            item_encyclopedia& operator=(item_encyclopedia&& other) = delete;
+
+            const item_definition& definition_of(size_t item_id) const;
+        private:
+            item_encyclopedia()
+            :definitions_(build_definitions()){}
+
+            static std::array<item_definition, entity_config::decorations_size> build_definitions();
+            const std::array<item_definition, entity_config::decorations_size> definitions_;
     };
 /**
 

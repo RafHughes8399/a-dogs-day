@@ -37,6 +37,10 @@ void hud_systems::click_system::change_page(size_t button, const components::cli
     (void) button;
     (void) payload;
 }
+void hud_systems::click_system::select_item(size_t button, const components::click_payload& payload){
+    (void) button;
+    (void) payload;
+}
 void hud_systems::click_system::move_decoration(size_t button, const components::click_payload& payload){
     (void) payload;
     // dont need a payload
