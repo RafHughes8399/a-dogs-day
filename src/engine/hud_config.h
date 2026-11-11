@@ -21,8 +21,13 @@ namespace hud_config{
         sell_decoration_button,
         store_decoration_button,
         inventory_item_button,
+        previous_page_button,
+        next_page_button,
         button_kinds_size
     };
+    inline const Rectangle inventory_page_frame = Rectangle{100.0f, 100.0f, 800.0f, 800.0f};
+    inline const float page_nav_button_size = 20.0f;
+    inline const float page_nav_button_buffer = 8.0f;
 
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};

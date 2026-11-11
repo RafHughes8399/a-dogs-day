@@ -169,14 +169,13 @@ add_library(systems
   src/engine/systems/entity_systems/selection_system.cpp
   src/engine/systems/shared_systems/animation_system.cpp
   src/engine/systems/shared_systems/state_machine_system.cpp
-  src/engine/systems/entity_systems/item_system.cpp
+  src/engine/systems/entity_systems/food_item_system.cpp
+  src/engine/systems/entity_systems/inventory_system.cpp
   src/engine/systems/hud_systems/hud.cpp
   src/engine/systems/hud_systems/click_system.cpp
   src/engine/systems/hud_systems/hud_spatial_system.cpp
   src/engine/systems/shared_systems/hud_rendering_system.cpp)
 link_libraries(systems)
-add_library(interface_elements src/hud/elements/page_navigator.cpp src/hud/elements/item_page.cpp)
-link_libraries(interface_elements)
 add_library(animation src/rendering/animation.cpp src/rendering/animation_builders.cpp)
 link_libraries(animation)
 
@@ -192,7 +191,7 @@ link_libraries(menu)
 add_library(hud src/interfaces/hud.cpp)
 link_libraries(hud)
 
-add_library(store src/interfaces/inventory.cpp src/interfaces/inventory_system.cpp src/interfaces/shop.cpp)
+add_library(store src/interfaces/inventory.cpp src/interfaces/shop.cpp)
 link_libraries(store)
 
 add_library(hitbox src/engine/structures/hitbox.cpp src/engine/structures/hitbox_builders.cpp)
@@ -201,7 +200,7 @@ link_libraries(hitbox)
 add_library(texture src/rendering/texture.cpp)
 link_libraries(texture)
 
-add_library(entities src/entities/ecs_builders.cpp src/hud/button_builders.cpp)
+add_library(entities src/entities/ecs_builders.cpp src/hud/button_builders.cpp src/hud/page_builders.cpp)
 link_libraries(entities)
 
 add_library(render_layer src/engine/structures/render_layer.cpp)
@@ -226,7 +225,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
   raglib events queries states recipe components systems animation sprite item item_stack menu hud store hitbox texture
-  entities factories render_layer quadtree graph debug_log_interface debug_logger game colour_replacer colour-replacer interface_elements ${PROJECT_NAME}
+  entities factories render_layer quadtree graph debug_log_interface debug_logger game colour_replacer colour-replacer ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
   target_compile_options(${target} PRIVATE ${MY_COMPILE_OPTIONS})

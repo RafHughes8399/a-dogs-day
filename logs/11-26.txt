@@ -162,3 +162,15 @@ so store inventory should get the last page and try to store it there. if that f
 and finally builders for everything so it can be synthesized. 
 -> builders for an inventory page, builders for an item page, builders for a page navigator if not already existing
 -> and who would these be triggered by ? the inventory system ? i think so, yeah the system would be responsible for this
+
+
+-> revive the menu graph implementation and controls
+-> test that the inventory can be opened and an empty item page is rendered
+\
+
+
+lets just build and empty inventory
+
+the system should trigger this on init. and pass the ids into the invenoitry object it holds
+this hsould create and empty invenotry page.
+the insert take, and storage logic shopuld be handelde primarily by the system as it can manage and create things appropraitely

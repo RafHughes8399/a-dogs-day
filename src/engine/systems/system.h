@@ -17,6 +17,7 @@
 #include <raylib.h>
 #include "graph.h"
 #include "hud_systems/hud_systems.hpp"
+#include "inventory.hpp"
 #include "path.h"
 /**
     if components manage, organise and hold the data, then systems define the behaivours to act on those pieces of data. we define the following systems:
@@ -537,18 +538,18 @@ namespace systems{
 
     // * what about the table ? it can just exist on the table, it doesnt need ot be placed down on a storage
     // * component i think ?
-    class item_system {
+    class food_item_system {
     public:
-        static item_system& get_instance(){
-            static item_system instance;
+        static food_item_system& get_instance(){
+            static food_item_system instance;
             return instance;
         }
-        ~item_system() = default;
-        item_system(const item_system& other) = default;
-        item_system(item_system&& other) = default;
+        ~food_item_system() = default;
+        food_item_system(const food_item_system& other) = default;
+        food_item_system(food_item_system&& other) = default;
         
-        item_system& operator=(const item_system& other) = default;
-        item_system& operator=(item_system&& other) = default;
+        food_item_system& operator=(const food_item_system& other) = default;
+        food_item_system& operator=(food_item_system&& other) = default;
         
 
         // * current shape is to return the size_t of the created item entity
@@ -556,8 +557,38 @@ namespace systems{
         void place_item(size_t counter_id, size_t item);
         
         private:
-            item_system() = default;
+            food_item_system() = default;
             // don't think i need to track the counters 
+    };
+    class inventory_system {
+    public:
+        static inventory_system& get_instance(){
+            static inventory_system instance;
+            return instance;
+        }
+        ~inventory_system(){
+            event_interface::unsubscribe<events::store_decoration>(store_decoration_handler_);
+        }
+        inventory_system(const inventory_system& other) = delete;
+        inventory_system(inventory_system&& other) = delete;
+
+        inventory_system& operator=(const inventory_system& other) = delete;
+        inventory_system& operator=(inventory_system&& other) = delete;
+
+        void on_stored_decoration(const events::store_decoration& event);
+        inventory::inventory& get_inventory(){
+            return inventory_;
+        }
+    private:
+        inventory_system()
+        : store_decoration_handler_([this](const events::store_decoration& event) -> void{on_stored_decoration(event);}){
+            event_interface::subscribe<events::store_decoration>(store_decoration_handler_);
+        }
+        bool store_item(size_t item_id);
+        size_t build_page();
+        std::optional<size_t> request_button(size_t owner, size_t kind, Vector2 position, size_t subject = 0);
+        inventory::inventory inventory_;
+        events::event_handler<events::store_decoration> store_decoration_handler_;
     };
     class movement_system{
         // the level graph and pathfinding

@@ -14,7 +14,9 @@ namespace factories{
             [](size_t id, Vector2 position, size_t) -> void{button_builders::build_move_decoration_button(id, position);},
             [](size_t id, Vector2 position, size_t) -> void{button_builders::build_sell_decoration_button(id, position);},
             [](size_t id, Vector2 position, size_t) -> void{button_builders::build_to_storage_decoration_button(id, position);},
-            [](size_t id, Vector2 position, size_t subject) -> void{button_builders::build_inventory_item_button(id, position, subject);}
+            [](size_t id, Vector2 position, size_t subject) -> void{button_builders::build_inventory_item_button(id, position, subject);},
+            [](size_t id, Vector2 position, size_t) -> void{button_builders::build_page_navigation_button(id, position, -1);},
+            [](size_t id, Vector2 position, size_t) -> void{button_builders::build_page_navigation_button(id, position, 1);}
         }){
 
         }

@@ -45,4 +45,7 @@ namespace button_builders {
     void build_page_navigation_button(size_t id, Vector2 position, int direction);
 
 }
+namespace page_builders {
+    void build_inventory_page(size_t id, Rectangle frame);
+}
 #endif
