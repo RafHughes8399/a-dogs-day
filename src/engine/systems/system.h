@@ -579,6 +579,10 @@ namespace systems{
         inventory::inventory& get_inventory(){
             return inventory_;
         }
+        void init();
+        std::optional<size_t> take_item(size_t item_id);
+        void next_page();
+        void previous_page();
     private:
         inventory_system()
         : store_decoration_handler_([this](const events::store_decoration& event) -> void{on_stored_decoration(event);}){
@@ -587,6 +591,7 @@ namespace systems{
         bool store_item(size_t item_id);
         size_t build_page();
         std::optional<size_t> request_button(size_t owner, size_t kind, Vector2 position, size_t subject = 0);
+        std::optional<Vector2> find_free_position(size_t page, Vector2 size);
         inventory::inventory inventory_;
         events::event_handler<events::store_decoration> store_decoration_handler_;
     };

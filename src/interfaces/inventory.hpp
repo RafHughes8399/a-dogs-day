@@ -13,11 +13,8 @@ namespace inventory {
         }
         inventory(const inventory& other) = delete;
         inventory(inventory&& other) = default;
-        bool take_item(size_t item_id);
-        std::optional<size_t> take(size_t item_id);
         bool empty() const;
 
-        void render();
         void next_page();
         void previous_page();
 

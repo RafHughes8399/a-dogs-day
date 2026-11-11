@@ -4,17 +4,8 @@
 #include <algorithm>
 #include <string>
 
-bool inventory::inventory::take_item(size_t item_id){
-
-}
-std::optional<size_t> inventory::inventory::take(size_t item_id){
-
-}
 bool inventory::inventory::empty() const{
     return pages_.empty();
-}
-void inventory::inventory::render(){
-
 }
 void inventory::inventory::next_page(){
 

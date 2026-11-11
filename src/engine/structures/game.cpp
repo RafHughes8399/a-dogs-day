@@ -103,6 +103,7 @@ void game::game::init(){
         Vector2{level_config::edge_weight * 18,level_config::edge_weight * 28});
     lifespan_.create_decoration(entity_config::decorations::conversation_pit,
         Vector2{level_config::edge_weight * 22,level_config::edge_weight * 26});
+    inventory_.init();
     return;
 }
 

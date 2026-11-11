@@ -12,8 +12,25 @@ void systems::inventory_system::on_stored_decoration(const events::store_decorat
 }
 bool systems::inventory_system::store_item(size_t item_id){
     (void) item_id;
-    if(inventory_.empty()){ build_page(); }
     return false;
+}
+std::optional<size_t> systems::inventory_system::take_item(size_t item_id){
+    (void) item_id;
+    return std::nullopt;
+}
+void systems::inventory_system::init(){
+    build_page();
+}
+void systems::inventory_system::next_page(){
+
+}
+void systems::inventory_system::previous_page(){
+
+}
+std::optional<Vector2> systems::inventory_system::find_free_position(size_t page, Vector2 size){
+    (void) page;
+    (void) size;
+    return std::nullopt;
 }
 std::optional<size_t> systems::inventory_system::request_button(size_t owner, size_t kind, Vector2 position, size_t subject){
     queries::create_hud_button_query query(owner, kind, position, subject);
