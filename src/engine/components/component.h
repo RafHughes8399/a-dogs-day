@@ -508,7 +508,12 @@ private:
     state_machine::state_machine machine_;
 };
 
+class inventory_storage_component{
+    public:
+    private:
+};
 // for the table, the waiter, and the counter and the kitchen station
+// RENAME FOR CLARITY
 class storage_component {
   // ? current idea for the storage component is for stations to store food,
   // ? tables to store foood

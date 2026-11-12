@@ -44,6 +44,8 @@ namespace button_builders {
     void build_steak_leftovers_button(size_t id, Vector2 position, size_t recipe);
     void build_page_navigation_button(size_t id, Vector2 position, int direction);
 
+    // decoration button builders
+
 }
 namespace page_builders {
     void build_menu_page(size_t id, Rectangle frame);

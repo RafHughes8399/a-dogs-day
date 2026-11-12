@@ -178,3 +178,8 @@ the insert take, and storage logic shopuld be handelde primarily by the system a
 
 ok so we neeed a menu_vaigation system to open and close menus. foir now they can just activate an ddecative the hud elements essentially
 yeah it changes the active status of the hud component
+
+art for the buttons, art for the mouse and art for the pothos and monsterra
+art for the succulent table and the jade plant
+
+and the storing logic, then we can wrap this up. ok storing for now 

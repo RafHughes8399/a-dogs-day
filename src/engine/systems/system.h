@@ -592,7 +592,6 @@ namespace systems{
     };
 
     class menu_navigation_system{
-        // needs to listen for key press events and then adjust the hud elements and change the cursor state
         public:
             static menu_navigation_system& get_instance(){
                 static menu_navigation_system instance;
