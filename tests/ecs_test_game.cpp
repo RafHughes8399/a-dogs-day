@@ -103,9 +103,9 @@ namespace testing{
         }, layer);
     }
 
-    size_t ecs_test_game::create_food_counter(Vector2 position, size_t layer){
+    size_t ecs_test_game::create_wooden_food_counter(Vector2 position, size_t layer){
         return lifespan_.create([position](size_t id){
-            ecs_entities::build_food_counter(id, position);
+            ecs_entities::build_wooden_food_counter(id, position);
         }, layer);
     }
 
@@ -391,6 +391,7 @@ namespace testing{
              + component_managers::entity_selectable_manager_.size()
              + component_managers::entity_storage_manager_.size()
              + component_managers::entity_food_manager_.size()
+             + component_managers::entity_item_manager_.size()
              + component_managers::entity_carrier_manager_.size()
              + component_managers::entity_recipes_manager_.size()
              + component_managers::hud_manager_.size()

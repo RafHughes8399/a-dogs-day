@@ -109,34 +109,34 @@ void systems::control_input_system::update(float delta){
 // * swap means swapping the component's bindings. edit_mode / exit_edit stay
 // * unbound until that is settled.
 void systems::control_input_system::build_control_map(){
-    control_function_map_[{controls_config::key_press_actions::dog_switch, game_config::key_press}] =
+    control_function_map_[{game_config::key_press_actions::dog_switch, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; switch_dog();};
-    control_function_map_[{controls_config::key_press_actions::shop_open, game_config::key_press}] =
+    control_function_map_[{game_config::key_press_actions::shop_open, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_shop();};
-    control_function_map_[{controls_config::key_press_actions::inventory_open, game_config::key_press}] =
+    control_function_map_[{game_config::key_press_actions::inventory_open, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_inventory();};
-    control_function_map_[{controls_config::key_press_actions::menu_open, game_config::key_press}] =
+    control_function_map_[{game_config::key_press_actions::menu_open, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_menu();};
-    control_function_map_[{controls_config::key_press_actions::quests_open, game_config::key_press}] =
+    control_function_map_[{game_config::key_press_actions::quests_open, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_quests();};
-    control_function_map_[{controls_config::key_press_actions::map_open, game_config::key_press}] =
+    control_function_map_[{game_config::key_press_actions::map_open, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_map();};
-    control_function_map_[{controls_config::key_press_actions::back, game_config::key_press}] =
+    control_function_map_[{game_config::key_press_actions::back, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; back();};
-    control_function_map_[{controls_config::key_press_actions::debug_toggle, game_config::key_press}] =
+    control_function_map_[{game_config::key_press_actions::debug_toggle, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; toggle_debug_logger();};
 
     // the four game_config::player_controls binds
-    control_function_map_[{controls_config::key_hold_actions::move_up, game_config::key_hold}] =
+    control_function_map_[{game_config::key_hold_actions::move_up, game_config::key_hold}] =
         [this](size_t id, float delta) -> void {(void) id;
             move_view_frame(level_config::direction_scalars[level_config::directions::up], delta);};
-    control_function_map_[{controls_config::key_hold_actions::move_down, game_config::key_hold}] =
+    control_function_map_[{game_config::key_hold_actions::move_down, game_config::key_hold}] =
         [this](size_t id, float delta) -> void {(void) id;
             move_view_frame(level_config::direction_scalars[level_config::directions::down], delta);};
-    control_function_map_[{controls_config::key_hold_actions::move_left, game_config::key_hold}] =
+    control_function_map_[{game_config::key_hold_actions::move_left, game_config::key_hold}] =
         [this](size_t id, float delta) -> void {(void) id;
             move_view_frame(level_config::direction_scalars[level_config::directions::left], delta);};
-    control_function_map_[{controls_config::key_hold_actions::move_right, game_config::key_hold}] =
+    control_function_map_[{game_config::key_hold_actions::move_right, game_config::key_hold}] =
         [this](size_t id, float delta) -> void {(void) id;
             move_view_frame(level_config::direction_scalars[level_config::directions::right], delta);};
 
@@ -157,22 +157,22 @@ void systems::control_input_system::queue_key_press(int key){
 }
 
 void systems::control_input_system::back(){
-    queue_key_press(controls_config::key_press_actions::back);
+    queue_key_press(game_config::key_press_actions::back);
 }
 void systems::control_input_system::open_inventory(){
-    queue_key_press(controls_config::key_press_actions::inventory_open);
+    queue_key_press(game_config::key_press_actions::inventory_open);
 }
 void systems::control_input_system::open_map(){
-    queue_key_press(controls_config::key_press_actions::map_open);
+    queue_key_press(game_config::key_press_actions::map_open);
 }
 void systems::control_input_system::open_menu(){
-    queue_key_press(controls_config::key_press_actions::menu_open);
+    queue_key_press(game_config::key_press_actions::menu_open);
 }
 void systems::control_input_system::open_quests(){
-    queue_key_press(controls_config::key_press_actions::quests_open);
+    queue_key_press(game_config::key_press_actions::quests_open);
 }
 void systems::control_input_system::open_shop(){
-    queue_key_press(controls_config::key_press_actions::shop_open);
+    queue_key_press(game_config::key_press_actions::shop_open);
 }
 void systems::control_input_system::toggle_debug_logger(){
     debug::logger::get_instance().toggle();

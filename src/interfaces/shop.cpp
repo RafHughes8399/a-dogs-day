@@ -25,10 +25,9 @@ bool shop::shop::can_buy(size_t item_id, int level, int funds) const{
     (void) funds;
     return false;
 }
-bool shop::shop::buy(size_t item_id, int level, int& funds, inventory::inventory& into){
+bool shop::shop::buy(size_t item_id, int level, int& funds){
     (void) item_id;
     (void) level;
     (void) funds;
-    (void) into;
     return false;
 }

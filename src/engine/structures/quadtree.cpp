@@ -1,8 +1,10 @@
 #include "quadtree.h"
 #include "component.h"
 #include "component_managers.hpp"
+#include "debug_log_interface.h"
 #include "raglib.h"
 #include <raylib.h>
+#include <string>
 enum positions{
     top_right = 0,
     top_left = 1,
@@ -228,13 +230,32 @@ bool tree::ecs_quadtree::is_leaf(std::unique_ptr<node>& tree) {
 int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Vector2 position, size_t id,
     const std::function<bool(size_t)>& filter){
     if(not tree) {return game_config::empty_entity;}
+    debug::log("[ecs_quadtree::is_there_collision, node] depth: " + std::to_string(tree->depth_)
+        + ", bounds: {" + std::to_string(tree->bounds_.min.x) + ", " + std::to_string(tree->bounds_.min.y)
+        + "} -> {" + std::to_string(tree->bounds_.max.x) + ", " + std::to_string(tree->bounds_.max.y)
+        + "}, entities here: " + std::to_string(tree->entities_.size()));
     for(size_t entity : tree->entities_){
-        if(entity == id){ continue; }
-        if(not filter(entity)){ continue; }
+        if(entity == id){
+            debug::log("[ecs_quadtree::is_there_collision, entity] " + std::to_string(entity) + " skipped, is the querying id");
+            continue;
+        }
+        if(not filter(entity)){
+            debug::log("[ecs_quadtree::is_there_collision, entity] " + std::to_string(entity) + " skipped, filter rejected it");
+            continue;
+        }
         auto entity_collision_component = collisions_.get_component(entity);
-        if(entity_collision_component == nullptr){ continue; }
+        if(entity_collision_component == nullptr){
+            debug::log("[ecs_quadtree::is_there_collision, entity] " + std::to_string(entity) + " skipped, no collision component");
+            continue;
+        }
         auto entity_bounds = entity_collision_component->get_hitbox_component().get_hitbox().get_box();
-        if(CheckCollisionPointRec(position, entity_bounds)){
+        bool hit = CheckCollisionPointRec(position, entity_bounds);
+        debug::log("[ecs_quadtree::is_there_collision, entity] " + std::to_string(entity)
+            + " bounds: {" + std::to_string(entity_bounds.x) + ", " + std::to_string(entity_bounds.y)
+            + ", " + std::to_string(entity_bounds.width) + ", " + std::to_string(entity_bounds.height)
+            + "} vs position: {" + std::to_string(position.x) + ", " + std::to_string(position.y)
+            + "} hit: " + std::to_string(hit));
+        if(hit){
             return static_cast<int>(entity);
         }
     }

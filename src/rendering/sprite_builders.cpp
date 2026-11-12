@@ -107,8 +107,23 @@ sprite::sprite sprite_builders::build_decoration_sprite(size_t texture_id, const
     attributes[entity_config::attributes::animations],
     draw_position_offset);
 }
+sprite::sprite sprite_builders::build_conversation_pit(){
+    return sprite_builders::build_decoration_sprite(textures::conversation_pit, entity_config::conversation_pit_path, entity_config::conversation_pit_attributes);
+}
+sprite::sprite sprite_builders::build_javier_ceo(){
+    return sprite_builders::build_decoration_sprite(textures::javier_ceo, entity_config::javier_ceo_path, entity_config::javier_ceo_attributes);
+}
+sprite::sprite sprite_builders::build_sam_and_max(){
+    return sprite_builders::build_decoration_sprite(textures::sam_and_max, entity_config::sam_and_max_path, entity_config::sam_and_max_attributes);
+}
+sprite::sprite sprite_builders::build_gromit_knitting(){
+    return sprite_builders::build_decoration_sprite(textures::gromit_knitting, entity_config::gromit_knitting_path, entity_config::gromit_knitting_attributes);
+}
 sprite::sprite sprite_builders::build_pavlov(){
     return sprite_builders::build_decoration_sprite(textures::pavlov, entity_config::pavlov_path, entity_config::pavlov_attributes);
+}
+sprite::sprite sprite_builders::build_polish_cow(){
+    return sprite_builders::build_decoration_sprite(textures::polish_cow, entity_config::polish_cow_path, entity_config::polish_cow_attributes);
 }
 sprite::sprite sprite_builders::build_poker_table(){
     return build_decoration_sprite(textures::poker_table, entity_config::poker_table_decoration_path, entity_config::poker_table_attributes);
@@ -150,8 +165,8 @@ sprite::sprite sprite_builders::build_table_sprite(){
         return sprite_builders::build_decoration_sprite(textures::tiled_table_blue, entity_config::tiled_table_blue_path, entity_config::tiled_table_attributes);
     }
 
-    sprite::sprite sprite_builders::build_food_counter_sprite(){
-        return build_decoration_sprite(textures::food_counter, entity_config::food_counter_station_path, entity_config::food_counter_attributes);
+    sprite::sprite sprite_builders::build_wooden_food_counter_sprite(){
+        return build_decoration_sprite(textures::wooden_food_counter, entity_config::food_counter_station_path, entity_config::food_counter_attributes);
     }
 sprite::sprite sprite_builders::build_dishwasher_sprite(){
     return build_test_decoration_sprite(entity_config::dishwasher_attributes);
@@ -234,6 +249,9 @@ sprite::sprite sprite_builders::build_nine_horizontal_piece(){
 sprite::nine_sprite sprite_builders::build_decoration_nine_sprite(Rectangle frame){
     return sprite::nine_sprite(frame, WHITE, hud_config::decoration_hud_corner_scale);
 }
+sprite::nine_sprite sprite_builders::build_menu_page_nine_sprite(Rectangle frame){
+    return sprite::nine_sprite(frame, WHITE, hud_config::decoration_hud_corner_scale);
+}
 
 sprite::nine_sprite sprite_builders::build_stove_nine_sprite(){
     return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);
@@ -302,4 +320,17 @@ sprite::sprite sprite_builders::build_sell_decoration_button_sprite(){
 }
 sprite::sprite sprite_builders::build_to_storage_decoration_button_sprite(){
     return build_button_sprite(textures::to_storage_button, hud_config::store_decoration_path);
+}
+sprite::sprite sprite_builders::build_item_sprite(size_t item_id){
+    switch(item_id){
+        case entity_config::decorations::conversation_pit: return build_conversation_pit();
+        case entity_config::decorations::gargoyle: return build_gargoyle();
+        case entity_config::decorations::pavlov: return build_pavlov();
+        case entity_config::decorations::polish_cow: return build_polish_cow();
+        case entity_config::decorations::poker_table: return build_poker_table();
+        case entity_config::decorations::dog_painting: return build_dog_painting();
+        case entity_config::decorations::ficus_lytra: return build_ficus_lytra();
+        case entity_config::decorations::frangipani: return build_frangipani();
+        default: return build_test_decoration_sprite(entity_config::test_decoration_attributes);
+    }
 }

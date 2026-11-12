@@ -6,7 +6,6 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "enum_config.h"
 #include "camera_config.h"
 #include "game_config.h"
 #include "cafe_config.h"

@@ -1,167 +1,158 @@
 #ifndef ITEMS_H
 #define ITEMS_H
 
+#include <array>
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility>
 #include "events.h"
 #include "events_interface.h"
 #include "sprite.h"
 namespace items{
-    class item {
+    class food_item{
         public:
-            virtual ~item() = default;
-            item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name)
-            : id_(id), icon_(icon), sprite_(sprite), name_(name){}
-            item(const item& other) = default;
-            item(item&& other) = default;
+            ~food_item() = default;
+            food_item(size_t item_id, std::uint8_t count = 1)
+            :item_id_(item_id), count_(count){}
 
-            item& operator=(const item& other) = delete;
-            item& operator=(item&& other) = delete;
+            food_item(const food_item& other) = default;
+            food_item(food_item&& other) = default;
 
+            food_item& operator=(const food_item& other) = default;
+            food_item& operator=(food_item&& other) = default;
+            food_item& operator++(){
+                ++count_;
+                return *this;
+            }
+            food_item operator++(int){
+                auto temp = *this;
+                ++count_;
+                return temp;
+            }
+            food_item& operator--(){
+                --count_;
+                return *this;
+            }
+            food_item operator--(int){
+                auto temp = *this;
+                --count_;
+                return temp;
+            }
+            friend bool operator==(const food_item& a, const food_item& b){
+                return a.item_id_ == b.item_id_ and a.count_ == b.count_;
+            }
+            size_t get_id();
+            std::uint8_t get_count() const;
+            bool is_full();
+            void adjust_count(size_t delta);
+        private:
+            size_t item_id_;
+            std::uint8_t count_;
+    };
+    // todo DEFINE A SUBCLASS ITEM WHERE COUNT IS JUST ONE, I SUPPOSE THOUGH IT IS A COMPLEETLY DICFFERNT
+    // ITEM IMPLEMENTATION SO WE SHOULD HONOUR THAT
 
-            protected:
-            size_t id_;
-            sprite::sprite icon_; // the store / inventory icon
-            sprite::spriteset sprite_; // the actual sprite with all four directions,  
+    // * new item with the id, the name and the price ? yeah
+    class item_definition{
+        public:
+            ~item_definition() = default;
+            item_definition(std::string name, int price, Vector2 size)
+            :name_(std::move(name)), price_(price), size_(size){}
+
+            item_definition(const item_definition& other) = default;
+            item_definition(item_definition&& other) = default;
+
+            const std::string& get_name() const;
+            int get_price() const;
+            Vector2 get_size() const;
+        private:
             std::string name_;
-        };
-    class inventory_item : public item{
-        public:
-        private:
-            //int quantity_;                             
-    };
-    class shop_item : public item {
-        public:
-            // changes the appearnce of the item, and the functionality of 
-            // the assocaited "buy button"
-            class access_state{
-                public:
-                    virtual ~access_state() = default;
-                    access_state() = default;
-
-                    access_state(access_state&& other) = default;
-                    virtual bool can_buy() = 0;
-                    virtual bool is_locked() = 0;
-                private:
-            };
-            class locked : public access_state{
-                public:
-                    locked() : access_state(){}
-                    bool can_buy() override { return false;}
-                    bool is_locked() override { return true;}
-                    private:
-                };
-                class unlocked : public access_state{
-                    public:
-                    unlocked() : access_state(){}
-                    bool can_buy() override { return true;}
-                    bool is_locked() override { return false;}
-                    private:
-
-            };
-
-            ~shop_item() override {
-                event_interface::unsubscribe<events::level_up>(level_up_handler_);
-            }
-            shop_item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name, int price, int level_req)
-            : item(id, icon, sprite, name), level_up_handler_([this](const events::level_up& event)->void {on_level_up_event(event);}),
-            price_(price), level_requirement_(level_req), locked_state_(std::make_unique<locked>()){
-                event_interface::subscribe<events::level_up>(level_up_handler_);
-
-            }
-
-            // copy and move
-
-
-            bool can_buy();
-            bool is_locked();
-
-            void on_level_up_event(const events::level_up& event);
-
-        private:
-            // listen for level_up events
-            events::event_handler<events::level_up> level_up_handler_;
             int price_;
-            int level_requirement_;
-            std::unique_ptr<access_state> locked_state_;
+            Vector2 size_;
     };
-
-    /**
-     * how can i pair the icon with the spriteset
-     * 
-     * to turn an item into an entity
-     * 
-     * 
-     * maybe somewhere there exists an id to spriteset map
-     * when you assign the item an id, you pull the spriteset from that map ?
-     * or maybe, a sprite icon (new sprite class) has a field for the spriteset
-     * then you assign when the icon is built
-     * 
-     * use pavlov as an example
-     * 
-     * 
-     * 
-     */
-    class item_builder{
+    class item_encyclopedia{
         public:
-            std::unique_ptr<item> build_item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name);
-            std::unique_ptr<item> build_shop_item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name, int price, int level_req);
+            static item_encyclopedia& get_instance(){
+                static item_encyclopedia instance;
+                return instance;
+            }
+            ~item_encyclopedia() = default;
+            item_encyclopedia(const item_encyclopedia& other) = delete;
+            item_encyclopedia(item_encyclopedia&& other) = delete;
 
+            item_encyclopedia& operator=(const item_encyclopedia& other) = delete;
+            item_encyclopedia& operator=(item_encyclopedia&& other) = delete;
 
-            // decorations 
-                // furniture
-                std::unique_ptr<shop_item> build_torn_couch();
-                std::unique_ptr<shop_item> build_intact_couch();
-                std::unique_ptr<shop_item> build_leaning_tower_dog_bowls();
+            const item_definition& definition_of(size_t item_id) const;
+        private:
+            item_encyclopedia()
+            :definitions_(build_definitions()){}
 
-            
-                // food and plants
-                std::unique_ptr<shop_item> build_cheese_shelf();
-                std::unique_ptr<shop_item> build_cured_meat_shelf();
-                std::unique_ptr<shop_item> build_shishamo_tank();
+            static std::array<item_definition, entity_config::decorations_size> build_definitions();
+            const std::array<item_definition, entity_config::decorations_size> definitions_;
+    };
+/**
 
-                std::unique_ptr<shop_item> build_food_cart();
-                
-                std::unique_ptr<shop_item> build_lemongrass_plant_a();
-                std::unique_ptr<shop_item> build_lemongrass_plant_b();
-                std::unique_ptr<shop_item> build_frangipani_tree();
-                std::unique_ptr<shop_item> build_succulent_tree();
-                std::unique_ptr<shop_item> build_propogation_a();
-                std::unique_ptr<shop_item> build_propogation_b();
-                std::unique_ptr<shop_item> build_propogation_c();
-                std::unique_ptr<shop_item> build_herb_garden();
-                
-                // statues and people
-                std::unique_ptr<shop_item> build_pavlov();
-                std::unique_ptr<shop_item> build_gargoyle_a();
-                std::unique_ptr<shop_item> build_gargoyle_b();
-                std::unique_ptr<shop_item> build_gargoyle_c();
-                std::unique_ptr<shop_item> build_cantina_band();
-                
-                
-                // other items
-                std::unique_ptr<shop_item> build_koi_pond();
-                std::unique_ptr<shop_item> dog_poker_table();
-                std::unique_ptr<shop_item> dog_digsite();
+class item_builder{
+    public:
+    std::unique_ptr<item> build_item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name);
+    std::unique_ptr<item> build_shop_item(size_t id, sprite::sprite icon, sprite::spriteset sprite, std::string name, int price, int level_req);
+    
+    
+    // decorations 
+    // furniture
+    std::unique_ptr<shop_item> build_torn_couch();
+    std::unique_ptr<shop_item> build_intact_couch();
+    std::unique_ptr<shop_item> build_leaning_tower_dog_bowls();
+    
+    
+    // food and plants
+    std::unique_ptr<shop_item> build_cheese_shelf();
+    std::unique_ptr<shop_item> build_cured_meat_shelf();
+    std::unique_ptr<shop_item> build_shishamo_tank();
+    
+    std::unique_ptr<shop_item> build_food_cart();
+    
+    std::unique_ptr<shop_item> build_lemongrass_plant_a();
+    std::unique_ptr<shop_item> build_lemongrass_plant_b();
+    std::unique_ptr<shop_item> build_frangipani_tree();
+    std::unique_ptr<shop_item> build_succulent_tree();
+    std::unique_ptr<shop_item> build_propogation_a();
+    std::unique_ptr<shop_item> build_propogation_b();
+    std::unique_ptr<shop_item> build_propogation_c();
+    std::unique_ptr<shop_item> build_herb_garden();
+    
+    // statues and people
+    std::unique_ptr<shop_item> build_pavlov();
+    std::unique_ptr<shop_item> build_gargoyle_a();
+    std::unique_ptr<shop_item> build_gargoyle_b();
+    std::unique_ptr<shop_item> build_gargoyle_c();
+    std::unique_ptr<shop_item> build_cantina_band();
+    
+    
+    // other items
+    std::unique_ptr<shop_item> build_koi_pond();
+    std::unique_ptr<shop_item> dog_poker_table();
+    std::unique_ptr<shop_item> dog_digsite();
+    
+    
+    // dog cosmetics
+    std::unique_ptr<shop_item> build_jester_hat();
+    std::unique_ptr<shop_item> build_crown();
+    std::unique_ptr<shop_item> build_beholder_eyes();
+    std::unique_ptr<shop_item> build_tarrasque_spines();
+    
+    std::unique_ptr<shop_item> build_eyepatch();
+    std::unique_ptr<shop_item> build_pirate_hat_and_hook();
 
-
-            // dog cosmetics
-                std::unique_ptr<shop_item> build_jester_hat();
-                std::unique_ptr<shop_item> build_crown();
-                std::unique_ptr<shop_item> build_beholder_eyes();
-                std::unique_ptr<shop_item> build_tarrasque_spines();
-                
-                std::unique_ptr<shop_item> build_eyepatch();
-                std::unique_ptr<shop_item> build_pirate_hat_and_hook();
-
-
+    
                 std::unique_ptr<shop_item> build_valkyire_armour();
                 std::unique_ptr<shop_item> build_cerberus_heads();
                 std::unique_ptr<shop_item> build_medusa_snakes();
                 std::unique_ptr<shop_item> build_hermes_wings();
                 
-
+                
                 std::unique_ptr<shop_item> build_bloody_knife();
                 std::unique_ptr<shop_item> build_jason_mask();
                 std::unique_ptr<shop_item> build_vampire_fangs();
@@ -177,9 +168,9 @@ namespace items{
                 
                 std::unique_ptr<shop_item> build_rugby_helmet();
                 std::unique_ptr<shop_item> build_boxing_wraps();
-
-
-
+                
+                
+                
                 std::unique_ptr<shop_item> build_bee_companion();
                 std::unique_ptr<shop_item> build_toy_ghost_companion();
                 
@@ -194,20 +185,21 @@ namespace items{
                 std::unique_ptr<shop_item> build_stove();
                 std::unique_ptr<shop_item> build_freezer();
                 std::unique_ptr<shop_item> snack_cupboard();
-
+                
                 // tableware
-
+                
                 // serving islands
-
-    };
-
-    // an interface to manage, convert, and move items 
-    class item_manager{
-        public:
-            void buy_item(size_t id);
-            std::unique_ptr<inventory_item> shop_to_inventory_item();
-        private:
-    };
-    extern item_builder i_builder_;
+                
+            };
+            
+            // an interface to manage, convert, and move items 
+            class item_manager{
+                public:
+                void buy_item(size_t id);
+                std::unique_ptr<inventory_item> shop_to_inventory_item();
+                private:
+            };
+            extern item_builder i_builder_;
+            */
 }
-#endif 
+#endif

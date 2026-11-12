@@ -81,15 +81,15 @@ namespace graph{
             int row_length_;
             Rectangle area_;
             bool answers_queries_;
-            queries::query_handler<queries::can_place_decoration, bool> can_place_decoration_handler_;
-            queries::query_handler<queries::path_query, std::vector<Vector2>> path_query_handler_;
+            queries::query_handler<queries::can_place_decoration> can_place_decoration_handler_;
+            queries::query_handler<queries::path_query> path_query_handler_;
             std::vector<std::pair<node, std::vector<edge>>> graph_;
             
             public:
             ~level_graph(){
                 if(not answers_queries_){ return; }
-                query_interface::unsubscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
-                query_interface::unsubscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
+                query_interface::unsubscribe<queries::can_place_decoration>();
+                query_interface::unsubscribe<queries::path_query>();
             }
             level_graph(int width, int height)
             : level_graph(Rectangle{0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)}, true){}
@@ -99,15 +99,15 @@ namespace graph{
             row_length_(static_cast<int>(std::ceil(area.width / level_config::edge_weight))),
             area_(area),
             answers_queries_(answer_queries),
-            can_place_decoration_handler_([this](const queries::can_place_decoration& query) -> bool {return can_place_decoration(query);}),
-            path_query_handler_([this](const queries::path_query& query) -> std::vector<Vector2> {return get_path(query);}),
+            can_place_decoration_handler_([this](const queries::can_place_decoration& query) -> queries::query_result {return can_place_decoration(query);}),
+            path_query_handler_([this](const queries::path_query& query) -> queries::query_result {return get_path(query);}),
             graph_({}){
                 // ! columns is x, rows is y
                 build_nodes();
                 build_edges();
                 if(not answers_queries_){ return; }
-                query_interface::subscribe<queries::can_place_decoration>(queries::bool_executor_, can_place_decoration_handler_);
-                query_interface::subscribe<queries::path_query>(queries::path_executor_, path_query_handler_);
+                query_interface::subscribe<queries::can_place_decoration>(can_place_decoration_handler_);
+                query_interface::subscribe<queries::path_query>(path_query_handler_);
             }
 
             level_graph(const level_graph& other) = delete;

@@ -45,6 +45,10 @@ hitbox::hitbox hitbox_builders::build_pavlov_hitbox(Vector2 position){
     return build_hitbox(position, entity_config::pavlov_attributes[entity_config::attributes::frame_width],
     entity_config::pavlov_attributes[entity_config::attributes::frame_height]);
 }
+hitbox::hitbox hitbox_builders::build_polish_cow_hitbox(Vector2 position){
+    return build_hitbox(position, entity_config::polish_cow_attributes[entity_config::attributes::frame_width],
+    entity_config::polish_cow_attributes[entity_config::attributes::frame_height]);
+}
 hitbox::hitbox hitbox_builders::build_poker_table_hitbox(Vector2 position){
     return build_hitbox(position,
         entity_config::poker_table_attributes[entity_config::attributes::frame_width],
@@ -60,6 +64,19 @@ hitbox::hitbox hitbox_builders::build_ficus_lytra_hitbox(Vector2 position){
         entity_config::ficus_lytra_attributes[entity_config::attributes::frame_width], 
         entity_config::ficus_lytra_attributes[entity_config::attributes::frame_height] 
     );
+}
+    
+hitbox::hitbox hitbox_builders::build_conversation_pit_hitbox(Vector2 position){
+    return build_hitbox(position, entity_config::conversation_pit_attributes[entity_config::attributes::frame_width], entity_config::conversation_pit_attributes[entity_config::attributes::frame_height]);
+}
+hitbox::hitbox hitbox_builders::build_sam_and_max_hitbox(Vector2 position){
+    return build_hitbox(position, entity_config::sam_and_max_attributes[entity_config::attributes::frame_width], entity_config::sam_and_max_attributes[entity_config::attributes::frame_height]);
+}
+hitbox::hitbox hitbox_builders::build_javier_ceo_hitbox(Vector2 position){
+    return build_hitbox(position, entity_config::javier_ceo_attributes[entity_config::attributes::frame_width], entity_config::javier_ceo_attributes[entity_config::attributes::frame_height]);
+}
+hitbox::hitbox hitbox_builders::build_gromit_knitting_hitbox(Vector2 position){
+    return build_hitbox(position, entity_config::gromit_knitting_attributes[entity_config::attributes::frame_width], entity_config::gromit_knitting_attributes[entity_config::attributes::frame_height]);
 }
 hitbox::hitbox hitbox_builders::build_frangipani_hitbox(Vector2 position){
     return build_hitbox(position,

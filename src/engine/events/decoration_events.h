@@ -47,6 +47,43 @@ namespace events{
 			const int edit_progress_;
 
 	};
+    class store_decoration : public event {
+    public:
+        store_decoration(const size_t entity_id, const size_t item_id)
+         :event(ids::store_decoration_id), entity_id_(entity_id), item_id_(item_id){}
+		
+        static int get_static_type(){
+            return ids::store_decoration_id;
+		}
+        size_t get_entity_id() const{
+            return entity_id_;
+        }
+        size_t get_item_id() const{
+            return item_id_;
+        }
+    private:
+        const size_t entity_id_;
+        const size_t item_id_;
+
+    };
+    class sell_decoration : public event {
+    public:
+        sell_decoration( const size_t entity_id,  const size_t sell_price)
+        :event(ids::sell_decoration_id), entity_id_(entity_id), sell_price_(sell_price){}
+
+        static int get_static_type(){
+            return ids::sell_decoration_id;
+        }
+        size_t get_entity_id() const {
+            return entity_id_;
+        }
+        size_t get_sell_price() const {
+            return sell_price_;
+        }
+    private:
+        const size_t entity_id_;
+        const size_t sell_price_;
+    };
 }
 
 #endif

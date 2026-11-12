@@ -1,6 +1,7 @@
 #include "component_helpers.hpp"
 #include "hitbox.h"
 #include "hud_element_builders.hpp"
+#include "items.h"
 #include "sprite.h"
 
 void button_builders::build_button(size_t id, Vector2 position, sprite::sprite& sprite, hitbox::hitbox& hitbox,
@@ -159,4 +160,18 @@ void button_builders::build_sell_decoration_button(size_t id, Vector2 position){
 void button_builders::build_to_storage_decoration_button(size_t id, Vector2 position){
     auto sprite = sprite_builders::build_to_storage_decoration_button_sprite();
     build_decoration_button(id, position, sprite, hud_config::click_actions::store_decoration);
+}
+void button_builders::build_inventory_item_button(size_t id, Vector2 position, size_t item_id){
+    auto sprite = sprite_builders::build_item_sprite(item_id);
+    auto size = items::item_encyclopedia::get_instance().definition_of(item_id).get_size();
+    auto hitbox = hitbox::hitbox(Rectangle{position.x, position.y, size.x, size.y});
+    build_button(id, position, sprite, hitbox, hud_config::click_actions::select_item,
+        components::item_choice{item_id});
+}
+void button_builders::build_page_navigation_button(size_t id, Vector2 position, int direction){
+    auto sprite = sprite_builders::build_to_storage_decoration_button_sprite();
+    auto hitbox = hitbox::hitbox(Rectangle{position.x, position.y,
+        hud_config::page_nav_button_size, hud_config::page_nav_button_size});
+    build_button(id, position, sprite, hitbox, hud_config::click_actions::change_page,
+        components::page_turn{direction});
 }

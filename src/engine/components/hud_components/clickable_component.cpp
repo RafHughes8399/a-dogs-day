@@ -12,3 +12,6 @@ size_t components::recipe_choice::get_recipe_id() const{
 int components::page_turn::get_direction() const{
     return direction_;
 }
+size_t components::item_choice::get_item_id() const{
+    return item_id_;
+}

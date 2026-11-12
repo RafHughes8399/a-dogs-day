@@ -15,11 +15,11 @@ namespace factories{
             ~dog_factory() = default;
             dog_factory()
             :customer_dogs_({}), customer_builders_({
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_tex(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_garfield(id, position);}
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_tex(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_garfield(id, position);}
             }), waiter_builders_({
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_gianluca(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_lionel(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_gianluca(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_lionel(id, position);},
             }),
              customer_spawn_positions_({
                 Vector2{level_config::edge_weight,
@@ -79,22 +79,22 @@ namespace factories{
             ~station_factory() = default;
             station_factory()
             :table_builders_({
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_dining_table(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_test_table(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table_orange(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table_red(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table_green(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_tiled_table_blue(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_dining_table(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_tiled_table(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_test_table(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_tiled_table_orange(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_tiled_table_red(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_tiled_table_green(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_tiled_table_blue(id, position);},
             }), counter_builders_({
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_food_counter(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_wooden_food_counter(id, position);},
             }), cooking_station_builders_({
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_stove(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_oven(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_espresso_station(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_mini_fridge(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_bush(id, position);},
-                [](size_t id, Vector2 position) -> void{ecs_entities::build_chopping_board(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_stove(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_oven(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_espresso_station(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_mini_fridge(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_bush(id, position);},
+                [](size_t id, Vector2 position) -> void {ecs_entities::build_chopping_board(id, position);},
             }){
 
             }
@@ -117,9 +117,9 @@ namespace factories{
         ~food_factory() = default;
         food_factory()
         :food_builders_({
-            [](size_t id, Vector2 position) -> void{ecs_entities::build_lasagna(id, position);},
-            [](size_t id, Vector2 position) -> void{ecs_entities::build_espresso(id, position);},
-            [](size_t id, Vector2 position) -> void{ecs_entities::build_cutlets(id, position);}
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_lasagna(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_espresso(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_cutlets(id, position);}
         }){
 
         }
@@ -134,6 +134,32 @@ namespace factories{
         std::array<std::function<void(size_t, Vector2)>, entity_config::foods_size> food_builders_;
     };
 
-    // TODO: decoration factory
-} 
+    class decoration_factory {
+    public:
+        ~decoration_factory() = default;
+        decoration_factory()
+        :decoration_builders_({
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_test_decoration(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_conversation_pit(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_gargoyle(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_pavlov(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_polish_cow(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_poker_table(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_dog_painting(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_ficus_lytra(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_frangipani(id, position);}
+        }){
+
+        }
+        decoration_factory(const decoration_factory& other) = default;
+        decoration_factory(decoration_factory&& other) = default;
+
+        decoration_factory& operator=(const decoration_factory& other) = default;
+        decoration_factory& operator=(decoration_factory&& other) = default;
+
+        void build_decoration(size_t decoration, size_t entity_id, Vector2 position);
+    private:
+        std::array<std::function<void(size_t, Vector2)>, entity_config::decorations_size> decoration_builders_;
+    };
+}
 #endif

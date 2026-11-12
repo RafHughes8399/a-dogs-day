@@ -3,11 +3,33 @@
 
 #include "cafe_config.h"
 #include "entity_config.h"
-#include "enum_config.h"
 #include "game_config.h"
 #include "raylib.h"
 
 namespace hud_config{
+    enum click_actions{
+        select_recipe = 0,
+        change_page,
+        move_decoration,
+        sell_decoration,
+        store_decoration,
+        select_item,
+        size
+    };
+    enum button_kinds{
+        move_decoration_button = 0,
+        sell_decoration_button,
+        store_decoration_button,
+        inventory_item_button,
+        previous_page_button,
+        next_page_button,
+        button_kinds_size
+    };
+    inline const Rectangle inventory_page_frame = Rectangle{100.0f, 100.0f, 800.0f, 800.0f};
+    inline const Rectangle menu_frame = Rectangle{400.0f, 400.0f, 200.0f, 200.0f};
+    inline const float page_nav_button_size = 20.0f;
+    inline const float page_nav_button_buffer = 8.0f;
+
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
     inline Color red_decoration_highlight = Color {255, 255, 0, opacity};

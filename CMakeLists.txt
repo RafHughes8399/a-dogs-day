@@ -119,7 +119,10 @@ link_libraries(recipe)
 add_library(factories
             src/entities/factories/dog_factory.cpp
             src/entities/factories/station_factory.cpp
-            src/entities/factories/food_factory.cpp)
+            src/entities/factories/food_factory.cpp
+            src/entities/factories/decoration_factory.cpp
+            src/entities/factories/button_factory.cpp
+            src/entities/factories/menu_factory.cpp)
 link_libraries(factories)
 add_library(states
   src/engine/structures/state.cpp
@@ -136,6 +139,7 @@ add_library(components
   src/engine/components/entity_components/food_component.cpp
   src/engine/components/entity_components/interactable_component.cpp
   src/engine/components/entity_components/interactor_component.cpp
+  src/engine/components/entity_components/item_component.cpp
   src/engine/components/entity_components/key_input_component.cpp
   src/engine/components/entity_components/mouse_input_component.cpp
   src/engine/components/entity_components/movement_component.cpp
@@ -166,13 +170,14 @@ add_library(systems
   src/engine/systems/entity_systems/selection_system.cpp
   src/engine/systems/shared_systems/animation_system.cpp
   src/engine/systems/shared_systems/state_machine_system.cpp
-  src/engine/systems/entity_systems/item_system.cpp
+  src/engine/systems/entity_systems/food_item_system.cpp
+  src/engine/systems/entity_systems/inventory_system.cpp
+  src/engine/systems/entity_systems/menu_navigation_system.cpp
   src/engine/systems/hud_systems/hud.cpp
   src/engine/systems/hud_systems/click_system.cpp
   src/engine/systems/hud_systems/hud_spatial_system.cpp
   src/engine/systems/shared_systems/hud_rendering_system.cpp)
 link_libraries(systems)
-
 add_library(animation src/rendering/animation.cpp src/rendering/animation_builders.cpp)
 link_libraries(animation)
 
@@ -188,7 +193,7 @@ link_libraries(menu)
 add_library(hud src/interfaces/hud.cpp)
 link_libraries(hud)
 
-add_library(store src/interfaces/inventory.cpp src/interfaces/shop.cpp)
+add_library(store src/interfaces/shop.cpp)
 link_libraries(store)
 
 add_library(hitbox src/engine/structures/hitbox.cpp src/engine/structures/hitbox_builders.cpp)
@@ -197,7 +202,7 @@ link_libraries(hitbox)
 add_library(texture src/rendering/texture.cpp)
 link_libraries(texture)
 
-add_library(entities src/entities/ecs_builders.cpp src/hud/button_builders.cpp)
+add_library(entities src/entities/ecs_builders.cpp src/hud/button_builders.cpp src/hud/page_builders.cpp)
 link_libraries(entities)
 
 add_library(render_layer src/engine/structures/render_layer.cpp)
@@ -221,7 +226,7 @@ add_executable(${PROJECT_NAME} src/dog_days.cpp)
 
 target_link_libraries(${PROJECT_NAME} raylib)
 set(PROJECT_TARGETS
-  raglib events queries states recipe components systems animation sprite item menu hud store hitbox texture
+  raglib events queries states recipe components systems animation sprite item item_stack menu hud store hitbox texture
   entities factories render_layer quadtree graph debug_log_interface debug_logger game colour_replacer colour-replacer ${PROJECT_NAME}
 )
 foreach(target IN LISTS PROJECT_TARGETS)
@@ -239,6 +244,7 @@ foreach(target IN LISTS PROJECT_TARGETS)
     src/engine/structures
     src/engine/systems
     src/hud
+    src/hud/elements
     src/interfaces
     src/tools
   )
@@ -283,6 +289,7 @@ target_include_directories(tests PRIVATE
   src/engine/structures
   src/engine/systems
   src/hud
+  src/hud/elements
   src/interfaces
   src/tools
 )

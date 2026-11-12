@@ -2,6 +2,85 @@
 #define ANIMATION_CONFIG_H
 
 namespace animation_config{
+    // * sheet rows, one enum per dog sprite slot. indices 0 - shared_size are the
+    // * same animation on every part, so a whole-body action plays with one index
+    // * across all four slots; part-specific rows start at shared_size.
+    // * index 0 is what a freshly built sprite shows - a sprite's active animation
+    // * starts there - so it is the resting row on every part.
+    enum shared{
+        idle = 0,
+        downward_dog,
+        eating,
+        walking,
+        sitting,
+        interacting,
+        carrying,
+        shared_size
+    };
+    namespace tail{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
+            wag = shared::shared_size,
+            size
+        };
+    }
+    namespace body{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
+            pawing = shared::shared_size,
+            size
+        };
+    }
+    namespace head{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
+            pinned_back = shared::shared_size,
+            one_up,
+            bouncing,
+            size
+        };
+    }
+    namespace face{
+        enum tags{
+            idle = shared::idle,
+            downward_dog = shared::downward_dog,
+            eating = shared::eating,
+            walking = shared::walking,
+            sitting = shared::sitting,
+            interacting = shared::interacting,
+            carrying = shared::carrying,
+            sniffing = shared::shared_size,
+            panting,
+            licking,
+            size
+        };
+    }
+    namespace station{
+        enum tags{
+            idle = 0,
+            active,
+            size
+        };
+    }
+
     inline constexpr int default_play_speed = 6;
 
     inline constexpr int idle_frames = 4;

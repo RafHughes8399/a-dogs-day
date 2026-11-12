@@ -45,6 +45,9 @@ components::storage_component component_builders::build_entity_storage_component
 components::food_component component_builders::build_entity_food_component(size_t item_id){
     return components::food_component(item_id);
 }
+components::item_component component_builders::build_entity_item_component(size_t item_id){
+    return components::item_component(item_id);
+}
 components::carrier_component component_builders::build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity){
     return components::carrier_component(previous_position, current_position, carried_entity);
 }

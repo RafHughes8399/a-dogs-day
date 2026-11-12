@@ -10,6 +10,9 @@
 #include "events.h"
 #include "events_interface.h"
 #include "quadtree.h"
+#include "button_factory.hpp"
+#include "queries.h"
+#include "query_interface.h"
 namespace hud_systems{
     class hud_spatial_system {
     public:
@@ -42,9 +45,9 @@ namespace hud_systems{
             Vector2{level_config::graph_x, level_config::graph_y},
             Vector2{level_config::graph_x + level_config::graph_width,
                 level_config::footpath_y + level_config::footpath_height}})
-        : create_hud_element_handler_([this](const events::create_hud_element& event) -> void{on_created_hud_element(event);}),
-          remove_hud_element_handler_([this](const events::remove_hud_element& event) -> void{on_removed_hud_element(event);}),
-          move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
+        : create_hud_element_handler_([this](const events::create_hud_element& event) -> void {on_created_hud_element(event);}),
+          remove_hud_element_handler_([this](const events::remove_hud_element& event) -> void {on_removed_hud_element(event);}),
+          move_entity_handler_([this](const events::move_entity& event) -> void {on_moved_entity(event);}),
           elements_(world_bounds, MAX_DEPTH, component_managers::hud_collision_manager_){
             event_interface::subscribe<events::create_hud_element>(create_hud_element_handler_);
             event_interface::subscribe<events::remove_hud_element>(remove_hud_element_handler_);
@@ -97,6 +100,7 @@ namespace hud_systems{
             defined_clicks_[hud_config::click_actions::move_decoration] = move_decoration;
             defined_clicks_[hud_config::click_actions::sell_decoration] = sell_decoration;
             defined_clicks_[hud_config::click_actions::store_decoration] = store_decoration;
+            defined_clicks_[hud_config::click_actions::select_item] = select_item;
         }
 
         static void select_recipe(size_t button, const components::click_payload& payload);
@@ -104,6 +108,7 @@ namespace hud_systems{
         static void move_decoration(size_t button, const components::click_payload& payload);
         static void sell_decoration(size_t button, const components::click_payload& payload);
         static void store_decoration(size_t button, const components::click_payload& payload);
+        static void select_item(size_t button, const components::click_payload& payload);
         std::array<std::function<void(size_t, const components::click_payload&)>, hud_config::click_actions::size> defined_clicks_;
     };
     // storing hud elements 
@@ -118,6 +123,7 @@ namespace hud_systems{
         ~hud(){
             event_interface::unsubscribe<events::entity_selected>(entity_selected_handler_);
             event_interface::unsubscribe<events::entity_deselected>(entity_deselected_handler_);
+            query_interface::unsubscribe<queries::create_hud_button_query>();
         }
         hud(const hud& other) = delete;
         hud(hud&& other) = delete;
@@ -130,21 +136,27 @@ namespace hud_systems{
         void render(int frame);
         void on_entity_selected(const events::entity_selected& event);
         void on_entity_deselected(const events::entity_deselected& event);
+        queries::query_result on_create_hud_button(const queries::create_hud_button_query& query);
 
     private:
         hud()
-        : entity_selected_handler_([this](const events::entity_selected& event) -> void{on_entity_selected(event);}),
-          entity_deselected_handler_([this](const events::entity_deselected& event) -> void{on_entity_deselected(event);}),
+        : entity_selected_handler_([this](const events::entity_selected& event) -> void {on_entity_selected(event);}),
+          entity_deselected_handler_([this](const events::entity_deselected& event) -> void {on_entity_deselected(event);}),
           hud_rendering_(hud_rendering_system::get_instance()),
-          clicks_(click_system::get_instance()){
+          clicks_(click_system::get_instance()),
+          buttons_(),
+          create_hud_button_handler_([this](const queries::create_hud_button_query& query) -> queries::query_result {return on_create_hud_button(query);}){
             event_interface::subscribe<events::entity_selected>(entity_selected_handler_);
             event_interface::subscribe<events::entity_deselected>(entity_deselected_handler_);
+            query_interface::subscribe<queries::create_hud_button_query>(create_hud_button_handler_);
         }
 
         events::event_handler<events::entity_selected> entity_selected_handler_;
         events::event_handler<events::entity_deselected> entity_deselected_handler_;
         hud_rendering_system& hud_rendering_;
         click_system& clicks_;
+        factories::button_factory buttons_;
+        queries::query_handler<queries::create_hud_button_query> create_hud_button_handler_;
     };
 }
 #endif
