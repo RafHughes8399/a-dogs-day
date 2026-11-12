@@ -121,7 +121,8 @@ add_library(factories
             src/entities/factories/station_factory.cpp
             src/entities/factories/food_factory.cpp
             src/entities/factories/decoration_factory.cpp
-            src/entities/factories/button_factory.cpp)
+            src/entities/factories/button_factory.cpp
+            src/entities/factories/menu_factory.cpp)
 link_libraries(factories)
 add_library(states
   src/engine/structures/state.cpp
@@ -171,6 +172,7 @@ add_library(systems
   src/engine/systems/shared_systems/state_machine_system.cpp
   src/engine/systems/entity_systems/food_item_system.cpp
   src/engine/systems/entity_systems/inventory_system.cpp
+  src/engine/systems/entity_systems/menu_navigation_system.cpp
   src/engine/systems/hud_systems/hud.cpp
   src/engine/systems/hud_systems/click_system.cpp
   src/engine/systems/hud_systems/hud_spatial_system.cpp
@@ -191,7 +193,7 @@ link_libraries(menu)
 add_library(hud src/interfaces/hud.cpp)
 link_libraries(hud)
 
-add_library(store src/interfaces/inventory.cpp src/interfaces/shop.cpp)
+add_library(store src/interfaces/shop.cpp)
 link_libraries(store)
 
 add_library(hitbox src/engine/structures/hitbox.cpp src/engine/structures/hitbox_builders.cpp)

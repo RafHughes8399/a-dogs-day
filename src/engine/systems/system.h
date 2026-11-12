@@ -17,8 +17,9 @@
 #include <raylib.h>
 #include "graph.h"
 #include "hud_systems/hud_systems.hpp"
-#include "inventory.hpp"
 #include "path.h"
+#include "menus.h"
+#include "menu_factory.hpp"
 /**
     if components manage, organise and hold the data, then systems define the behaivours to act on those pieces of data. we define the following systems:
     animation system - provides an interface to play and pause animations
@@ -93,7 +94,7 @@ namespace systems{
                 int frames_remaining;
             };
             animation_system()
-            : remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}){
+            : remove_entity_handler_([this](const events::remove_entity& event) -> void {on_destroyed_entity(event);}){
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
             }
             std::vector<animation> current_animations_;
@@ -166,15 +167,15 @@ namespace systems{
 #endif
         private:
             state_machine_system()
-            : started_path_handler_([this](const events::dog_started_path& event) -> void{on_started_path(event);}),
-            completed_path_handler_([this](const events::dog_completed_path& event) -> void{on_completed_path(event);}),
-            player_work_station_handler_([this](const events::player_work_station& event) -> void{on_player_work_station(event);}),
-            interaction_finished_handler_([this](const events::interaction_finished& event) -> void{on_interaction_finished(event);}),
-            order_served_handler_([this](const events::order_served& event) -> void{on_order_served(event);}),
-            food_dropped_handler_([this](const events::food_dropped& event) -> void{on_food_dropped(event);}),
-            collected_food_handler_([this](const events::waiter_collected_food& event) -> void{on_collected_food(event);}),
-            finished_meal_handler_([this](const events::customer_finished_meal& event) -> void{on_finished_meal(event);}),
-            customer_left_handler_([this](const events::customer_dog_left& event) -> void{on_customer_left(event);}){
+            : started_path_handler_([this](const events::dog_started_path& event) -> void {on_started_path(event);}),
+            completed_path_handler_([this](const events::dog_completed_path& event) -> void {on_completed_path(event);}),
+            player_work_station_handler_([this](const events::player_work_station& event) -> void {on_player_work_station(event);}),
+            interaction_finished_handler_([this](const events::interaction_finished& event) -> void {on_interaction_finished(event);}),
+            order_served_handler_([this](const events::order_served& event) -> void {on_order_served(event);}),
+            food_dropped_handler_([this](const events::food_dropped& event) -> void {on_food_dropped(event);}),
+            collected_food_handler_([this](const events::waiter_collected_food& event) -> void {on_collected_food(event);}),
+            finished_meal_handler_([this](const events::customer_finished_meal& event) -> void {on_finished_meal(event);}),
+            customer_left_handler_([this](const events::customer_dog_left& event) -> void {on_customer_left(event);}){
                 event_interface::subscribe<events::dog_started_path>(started_path_handler_);
                 event_interface::subscribe<events::dog_completed_path>(completed_path_handler_);
                 event_interface::subscribe<events::player_work_station>(player_work_station_handler_);
@@ -315,7 +316,7 @@ namespace systems{
             entity_lifespan_system& operator=(entity_lifespan_system&& other) = delete;
         private:
             entity_lifespan_system()
-            : store_decoration_handler_([this](const events::store_decoration& event) -> void{on_stored_decoration(event);}){
+            : store_decoration_handler_([this](const events::store_decoration& event) -> void {on_stored_decoration(event);}){
                 event_interface::subscribe<events::store_decoration>(store_decoration_handler_);
             }
         public:
@@ -467,9 +468,9 @@ namespace systems{
                 waiter_counter_place_down,
             player_station_cook
             }), interactions_to_process_(),
-            move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
-            remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
-            dog_completed_path_handler_([this](const events::dog_completed_path& event) -> void{on_path_finished(event);}){
+            move_entity_handler_([this](const events::move_entity& event) -> void {on_moved_entity(event);}),
+            remove_entity_handler_([this](const events::remove_entity& event) -> void {on_destroyed_entity(event);}),
+            dog_completed_path_handler_([this](const events::dog_completed_path& event) -> void {on_path_finished(event);}){
                 event_interface::subscribe<events::move_entity>(move_entity_handler_);
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
                 event_interface::subscribe<events::dog_completed_path>(dog_completed_path_handler_);
@@ -576,24 +577,52 @@ namespace systems{
         inventory_system& operator=(inventory_system&& other) = delete;
 
         void on_stored_decoration(const events::store_decoration& event);
-        inventory::inventory& get_inventory(){
-            return inventory_;
-        }
         void init();
         std::optional<size_t> take_item(size_t item_id);
-        void next_page();
-        void previous_page();
     private:
         inventory_system()
-        : store_decoration_handler_([this](const events::store_decoration& event) -> void{on_stored_decoration(event);}){
+        : store_decoration_handler_([this](const events::store_decoration& event) -> void {on_stored_decoration(event);}){
             event_interface::subscribe<events::store_decoration>(store_decoration_handler_);
         }
         bool store_item(size_t item_id);
         size_t build_page();
         std::optional<size_t> request_button(size_t owner, size_t kind, Vector2 position, size_t subject = 0);
         std::optional<Vector2> find_free_position(size_t page, Vector2 size);
-        inventory::inventory inventory_;
         events::event_handler<events::store_decoration> store_decoration_handler_;
+    };
+
+    class menu_navigation_system{
+        // needs to listen for key press events and then adjust the hud elements and change the cursor state
+        public:
+            static menu_navigation_system& get_instance(){
+                static menu_navigation_system instance;
+                return instance;
+            }
+            ~menu_navigation_system(){
+                event_interface::unsubscribe<events::key_press>(key_press_handler_);
+            }
+            menu_navigation_system(const menu_navigation_system& other) = delete;
+            menu_navigation_system(menu_navigation_system&& other) = delete;
+
+            menu_navigation_system& operator=(const menu_navigation_system& other) = delete;
+            menu_navigation_system& operator=(menu_navigation_system&& other) = delete;
+
+            void init();
+            void on_key_press(const events::key_press& event);
+            void add_root(size_t menu, size_t root);
+            void next_page();
+            void previous_page();
+            const std::vector<size_t>& pages_of(size_t menu);
+        private:
+            menu_navigation_system()
+            : key_press_handler_([this](const events::key_press& event) -> void {on_key_press(event);}), menus_(), factory_(){
+                event_interface::subscribe<events::key_press>(key_press_handler_);
+            }
+            void show(size_t menu);
+            void hide(size_t menu);
+            events::event_handler<events::key_press> key_press_handler_;
+            menus::menu_graph menus_;
+            factories::menu_factory factory_;
     };
     class movement_system{
         // the level graph and pathfinding
@@ -670,11 +699,11 @@ namespace systems{
             // update the graph nodes
         private:
             movement_system()
-            : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
-            move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
-            remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
-            create_path_to_handler_([this](const events::create_path_to& event) -> void{on_create_path_to_event(event);}),
-            create_path_to_entity_handler_([this](const events::create_path_to_entity& event) -> void{on_create_path_to_entity_event(event);}),
+            : create_entity_handler_([this](const events::create_entity& event) -> void {on_created_entity(event);}),
+            move_entity_handler_([this](const events::move_entity& event) -> void {on_moved_entity(event);}),
+            remove_entity_handler_([this](const events::remove_entity& event) -> void {on_destroyed_entity(event);}),
+            create_path_to_handler_([this](const events::create_path_to& event) -> void {on_create_path_to_event(event);}),
+            create_path_to_entity_handler_([this](const events::create_path_to_entity& event) -> void {on_create_path_to_entity_event(event);}),
 
             cafe_(Rectangle{level_config::cafe_x, level_config::cafe_y, level_config::cafe_width, level_config::cafe_height}, false),
             footpath_(Rectangle{level_config::footpath_x, level_config::footpath_y, level_config::footpath_width, level_config::footpath_height}, false){
@@ -803,8 +832,8 @@ namespace systems{
             // the background is an entity on the background layer now, so nothing
             // here needs raylib running at construction
             rendering_system()
-                : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
-                remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+                : create_entity_handler_([this](const events::create_entity& event) -> void {on_created_entity(event);}),
+                remove_entity_handler_([this](const events::remove_entity& event) -> void {on_destroyed_entity(event);}),
                 view_frame_(Rectangle{0.0f, 0.0f, level_config::screen_width, level_config::screen_height}),
                 render_layers_(), camera_({0}){
                     event_interface::subscribe<events::create_entity>(create_entity_handler_);
@@ -841,7 +870,7 @@ namespace systems{
             }
         private:
             selection_system()
-            : remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+            : remove_entity_handler_([this](const events::remove_entity& event) -> void {on_destroyed_entity(event);}),
             selected_(game_config::empty_entity){
                 event_interface::subscribe<events::remove_entity>(remove_entity_handler_);
             }
@@ -888,9 +917,9 @@ namespace systems{
                 Vector2{level_config::graph_x, level_config::graph_y},
                 Vector2{level_config::graph_x + level_config::graph_width,
                     level_config::footpath_y + level_config::footpath_height}})
-                : create_entity_handler_([this](const events::create_entity& event) -> void{on_created_entity(event);}),
-                move_entity_handler_([this](const events::move_entity& event) -> void{on_moved_entity(event);}),
-                remove_entity_handler_([this](const events::remove_entity& event) -> void{on_destroyed_entity(event);}),
+                : create_entity_handler_([this](const events::create_entity& event) -> void {on_created_entity(event);}),
+                move_entity_handler_([this](const events::move_entity& event) -> void {on_moved_entity(event);}),
+                remove_entity_handler_([this](const events::remove_entity& event) -> void {on_destroyed_entity(event);}),
                 entities_(world_bounds){
                     event_interface::subscribe<events::create_entity>(create_entity_handler_);
                     event_interface::subscribe<events::move_entity>(move_entity_handler_);

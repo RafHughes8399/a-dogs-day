@@ -35,12 +35,12 @@ void game::game::init(){
     debug::log("[game::init, built player] id " + std::to_string(player_id)
         + " holding cursor " + std::to_string(cursor_id));
 
-    auto khiri_id = lifespan_.create([](size_t id) -> void{
+    auto khiri_id = lifespan_.create([](size_t id) -> void {
         ecs_entities::build_khiri(id);
     }, level_config::dogs);
     debug::log("[game::init, built khiri] id " + std::to_string(khiri_id));
 
-    auto mack_id = lifespan_.create([](size_t id) -> void{
+    auto mack_id = lifespan_.create([](size_t id) -> void {
         ecs_entities::build_mack(id);
     }, level_config::dogs);
     debug::log("[game::init, built mack] id " + std::to_string(mack_id));
@@ -103,6 +103,7 @@ void game::game::init(){
         Vector2{level_config::edge_weight * 18,level_config::edge_weight * 28});
     lifespan_.create_decoration(entity_config::decorations::conversation_pit,
         Vector2{level_config::edge_weight * 22,level_config::edge_weight * 26});
+    menu_navigation_.init();
     inventory_.init();
     return;
 }

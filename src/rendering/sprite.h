@@ -219,6 +219,9 @@ namespace sprite_builders{
     sprite::nine_sprite build_bush_nine_sprite();
     sprite::nine_sprite build_chopping_board_nine_sprite();
 
+    sprite::nine_sprite build_menu_page_nine_sprite(Rectangle frame);
+
+
     
 }
 #endif

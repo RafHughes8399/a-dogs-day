@@ -26,7 +26,7 @@ namespace{
     };
 
     std::function<void(size_t, size_t, float)> record_into(recorder& log){
-        return [&log](size_t interactor, size_t interactee, float delta) -> void{
+        return [&log](size_t interactor, size_t interactee, float delta) -> void {
             log.interactors_.push_back(interactor);
             log.interactees_.push_back(interactee);
             log.deltas_.push_back(delta);

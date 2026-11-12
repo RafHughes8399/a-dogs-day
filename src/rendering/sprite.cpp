@@ -68,7 +68,7 @@ sprite::nine_sprite::nine_sprite(Rectangle frame, Color tint, float corner_scale
     }
 
 void sprite::nine_sprite::render(Vector2 position, int frame){
-    auto draw = [&](sprite& piece, Vector2 at, Vector2 piece_scale, float rotation) -> void{
+    auto draw = [&](sprite& piece, Vector2 at, Vector2 piece_scale, float rotation) -> void {
         piece.render(at, frame, piece_scale, rotation, tint_);
     };
     const Vector2 corner_scale{corner_scale_, corner_scale_};

@@ -21,12 +21,6 @@ std::optional<size_t> systems::inventory_system::take_item(size_t item_id){
 void systems::inventory_system::init(){
     build_page();
 }
-void systems::inventory_system::next_page(){
-
-}
-void systems::inventory_system::previous_page(){
-
-}
 std::optional<Vector2> systems::inventory_system::find_free_position(size_t page, Vector2 size){
     (void) page;
     (void) size;
@@ -41,7 +35,7 @@ std::optional<size_t> systems::inventory_system::request_button(size_t owner, si
 size_t systems::inventory_system::build_page(){
     auto frame = hud_config::inventory_page_frame;
     auto root = entity_lifespan_system::get_instance().create_hud_root(
-        [frame](size_t id) -> void{ page_builders::build_inventory_page(id, frame); });
+        [frame](size_t id) -> void { page_builders::build_menu_page(id, frame); });
     auto buffer = hud_config::page_nav_button_buffer;
     auto size = hud_config::page_nav_button_size;
     auto bottom = frame.y + frame.height - size - buffer;
@@ -49,6 +43,6 @@ size_t systems::inventory_system::build_page(){
         Vector2{frame.x + buffer, bottom});
     request_button(root, hud_config::button_kinds::next_page_button,
         Vector2{frame.x + frame.width - size - buffer, bottom});
-    inventory_.add_page(root);
+    menu_navigation_system::get_instance().add_root(menus::menu_ids::inventory, root);
     return root;
 }

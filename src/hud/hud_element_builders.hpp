@@ -46,6 +46,6 @@ namespace button_builders {
 
 }
 namespace page_builders {
-    void build_inventory_page(size_t id, Rectangle frame);
+    void build_menu_page(size_t id, Rectangle frame);
 }
 #endif

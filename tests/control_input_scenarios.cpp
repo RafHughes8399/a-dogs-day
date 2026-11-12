@@ -119,12 +119,12 @@ SCENARIO("the control map covers every binding the config hands out", "[ecs][con
         }
         THEN("a binding is matched on the action as well as the key"){
             // KEY_UP is bound as a hold, so the same key as a press is a miss
-            REQUIRE(controls().is_bound(controls_config::key_hold_actions::move_up, game_config::key_hold));
-            REQUIRE_FALSE(controls().is_bound(controls_config::key_hold_actions::move_up, game_config::key_press));
+            REQUIRE(controls().is_bound(game_config::key_hold_actions::move_up, game_config::key_hold));
+            REQUIRE_FALSE(controls().is_bound(game_config::key_hold_actions::move_up, game_config::key_press));
         }
         THEN("the edit bindings are deliberately unbound"){
-            REQUIRE_FALSE(controls().is_bound(controls_config::key_hold_actions::edit_mode, game_config::key_hold));
-            REQUIRE_FALSE(controls().is_bound(controls_config::key_press_actions::exit_edit, game_config::key_press));
+            REQUIRE_FALSE(controls().is_bound(game_config::key_hold_actions::edit_mode, game_config::key_hold));
+            REQUIRE_FALSE(controls().is_bound(game_config::key_press_actions::exit_edit, game_config::key_press));
         }
     }
 }
@@ -136,18 +136,18 @@ SCENARIO("a simulated key press runs its action", "[ecs][controls]"){
         auto player_id = game.create_player(cursor_id);
 
         std::vector<int> announced;
-        listener<events::key_press> keys([&announced](const events::key_press& event) -> void{
+        listener<events::key_press> keys([&announced](const events::key_press& event) -> void {
             announced.push_back(event.get_key());
         });
 
         WHEN("each menu key is pressed"){
             const std::vector<int> menu_keys = {
-                controls_config::key_press_actions::shop_open,
-                controls_config::key_press_actions::inventory_open,
-                controls_config::key_press_actions::menu_open,
-                controls_config::key_press_actions::quests_open,
-                controls_config::key_press_actions::map_open,
-                controls_config::key_press_actions::back
+                game_config::key_press_actions::shop_open,
+                game_config::key_press_actions::inventory_open,
+                game_config::key_press_actions::menu_open,
+                game_config::key_press_actions::quests_open,
+                game_config::key_press_actions::map_open,
+                game_config::key_press_actions::back
             };
             for(const auto& key : menu_keys){
                 controls().simulate_input(key_press_of(key), player_id);
@@ -170,7 +170,7 @@ SCENARIO("a simulated key press runs its action", "[ecs][controls]"){
 
         WHEN("a bound key arrives under the wrong action"){
             // move_up is a hold binding - as a press it matches nothing
-            controls().simulate_input(key_press_of(controls_config::key_hold_actions::move_up), player_id);
+            controls().simulate_input(key_press_of(game_config::key_hold_actions::move_up), player_id);
             flush();
 
             THEN("nothing is announced"){
@@ -187,7 +187,7 @@ SCENARIO("switching dogs flips the selection and announces it", "[ecs][controls]
         auto player_id = game.create_player(cursor_id);
 
         std::vector<size_t> selected;
-        listener<events::selected_dog> dogs([&selected](const events::selected_dog& event) -> void{
+        listener<events::selected_dog> dogs([&selected](const events::selected_dog& event) -> void {
             selected.push_back(event.get_id());
         });
 
@@ -196,7 +196,7 @@ SCENARIO("switching dogs flips the selection and announces it", "[ecs][controls]
         }
 
         WHEN("the switch key is pressed"){
-            controls().simulate_input(key_press_of(controls_config::key_press_actions::dog_switch), player_id);
+            controls().simulate_input(key_press_of(game_config::key_press_actions::dog_switch), player_id);
             flush();
 
             THEN("the other dog is selected and announced"){
@@ -205,7 +205,7 @@ SCENARIO("switching dogs flips the selection and announces it", "[ecs][controls]
             }
 
             WHEN("it is pressed again"){
-                controls().simulate_input(key_press_of(controls_config::key_press_actions::dog_switch), player_id);
+                controls().simulate_input(key_press_of(game_config::key_press_actions::dog_switch), player_id);
                 flush();
 
                 THEN("the selection flips back"){
@@ -282,7 +282,7 @@ SCENARIO("a right click paths the selected player dog to the clicked position",
 
         std::vector<size_t> path_for;
         std::vector<Vector2> path_to;
-        listener<events::create_path_to> paths([&](const events::create_path_to& event) -> void{
+        listener<events::create_path_to> paths([&](const events::create_path_to& event) -> void {
             path_for.push_back(event.get_id());
             path_to.push_back(event.get_destination());
         });
@@ -368,12 +368,12 @@ SCENARIO("a right click over a seated customer still targets the table underneat
         std::vector<size_t> path_for;
         std::vector<size_t> path_to_entity;
         listener<events::create_path_to_entity> entity_paths(
-            [&](const events::create_path_to_entity& event) -> void{
+            [&](const events::create_path_to_entity& event) -> void {
                 path_for.push_back(event.get_id());
                 path_to_entity.push_back(event.get_destination_entity());
             });
         std::vector<Vector2> bare_paths;
-        listener<events::create_path_to> positions([&](const events::create_path_to& event) -> void{
+        listener<events::create_path_to> positions([&](const events::create_path_to& event) -> void {
             bare_paths.push_back(event.get_destination());
         });
 
@@ -404,7 +404,7 @@ SCENARIO("the selection does not leak between scenarios", "[ecs][controls]"){
         {
             testing::ecs_test_game game;
             auto cursor_id = game.create_cursor();
-            controls().simulate_input(key_press_of(controls_config::key_press_actions::dog_switch), cursor_id);
+            controls().simulate_input(key_press_of(game_config::key_press_actions::dog_switch), cursor_id);
             flush();
             REQUIRE(controls().get_selected_dog() == level_config::khiri_id);
         }
@@ -433,7 +433,7 @@ SCENARIO("a held arrow key moves the view frame within the world", "[ecs][contro
         }
 
         WHEN("right is held for a hold that lands short of the far edge"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_right), player_id, 1.0f);
 
             THEN("the frame travels one hold of camera_move_speed, on x only"){
                 REQUIRE(game.view_frame().x == camera_config::camera_move_speed);
@@ -445,7 +445,7 @@ SCENARIO("a held arrow key moves the view frame within the world", "[ecs][contro
         }
 
         WHEN("down is held for a hold that lands short of the far edge"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_down), player_id, 1.0f);
 
             THEN("the frame travels on y only"){
                 REQUIRE(game.view_frame().y == camera_config::camera_move_speed);
@@ -458,7 +458,7 @@ SCENARIO("a held arrow key moves the view frame within the world", "[ecs][contro
 
         WHEN("down is held over several frames"){
             for(int frame = 0; frame < 2; ++frame){
-                controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
+                controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_down), player_id, 1.0f);
             }
 
             THEN("the travel accumulates"){
@@ -468,8 +468,8 @@ SCENARIO("a held arrow key moves the view frame within the world", "[ecs][contro
         }
 
         WHEN("down then up are held for the same duration"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_down), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_up), player_id, 1.0f);
 
             THEN("the frame is back where it started"){
                 REQUIRE(game.view_frame().y == 0.0f);
@@ -477,12 +477,12 @@ SCENARIO("a held arrow key moves the view frame within the world", "[ecs][contro
         }
 
         WHEN("each direction is held in turn from a mid-world position"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_down), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_down), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_down), player_id, 1.0f);
             float mid = game.view_frame().y;
 
             THEN("up subtracts what down added"){
-                controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, 1.0f);
+                controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_up), player_id, 1.0f);
                 REQUIRE(game.view_frame().y == mid - camera_config::camera_move_speed);
             }
         }
@@ -496,7 +496,7 @@ SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][vie
         auto player_id = game.create_player(cursor_id);
 
         WHEN("left is held at the origin"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_left), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_left), player_id, 1.0f);
 
             THEN("the frame clamps rather than going negative"){
                 REQUIRE(game.view_frame().x == 0.0f);
@@ -504,7 +504,7 @@ SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][vie
         }
 
         WHEN("up is held at the origin"){
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_up), player_id, 1.0f);
 
             THEN("the frame clamps rather than going negative"){
                 REQUIRE(game.view_frame().y == 0.0f);
@@ -512,7 +512,7 @@ SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][vie
         }
 
         WHEN("right is held long past the far edge"){
-            hold_until_clamped(controls_config::key_hold_actions::move_right, player_id,
+            hold_until_clamped(game_config::key_hold_actions::move_right, player_id,
                 frame_span_x(), camera_config::camera_move_speed);
 
             THEN("it clamps to the world's width less the frame's own width"){
@@ -527,7 +527,7 @@ SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][vie
         }
 
         WHEN("down is held long past the bottom edge"){
-            hold_until_clamped(controls_config::key_hold_actions::move_down, player_id,
+            hold_until_clamped(game_config::key_hold_actions::move_down, player_id,
                 frame_span_y(), camera_config::camera_move_speed);
 
             THEN("it clamps to the world's height less the frame's own height"){
@@ -557,11 +557,11 @@ SCENARIO("the view frame clamps at the edges of the world", "[ecs][controls][vie
         }
 
         WHEN("the frame is driven onto the far edge and then back"){
-            hold_until_clamped(controls_config::key_hold_actions::move_down, player_id,
+            hold_until_clamped(game_config::key_hold_actions::move_down, player_id,
                 frame_span_y(), camera_config::camera_move_speed);
             REQUIRE(game.view_frame().y == frame_span_y());
 
-            controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_up), player_id, 1.0f);
+            controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_up), player_id, 1.0f);
 
             THEN("it comes off the edge by exactly one second of travel"){
                 REQUIRE(game.view_frame().y == frame_span_y() - camera_config::camera_move_speed);
@@ -574,7 +574,7 @@ SCENARIO("the view frame does not leak between scenarios", "[ecs][controls][view
     GIVEN("a world where the frame was driven off the origin"){
         {
             testing::ecs_test_game game;
-            hold_until_clamped(controls_config::key_hold_actions::move_down, 0,
+            hold_until_clamped(game_config::key_hold_actions::move_down, 0,
                 frame_span_y(), camera_config::camera_move_speed);
             REQUIRE(game.view_frame().y == frame_span_y());
         }
@@ -602,6 +602,9 @@ SCENARIO("menu keys navigate the menu graph", "[controls][menus]"){
     GIVEN("a fresh ecs world and a menu graph listening"){
         testing::ecs_test_game game;
         menus::menu_graph menus;
+        listener<events::key_press> navigation([&menus](const events::key_press& event) -> void {
+            menus.navigate(event.get_key());
+        });
 
         THEN("it starts on the blank menu"){
             REQUIRE(menus.current_ == blank_menu);
@@ -609,12 +612,12 @@ SCENARIO("menu keys navigate the menu graph", "[controls][menus]"){
 
         WHEN("each menu key is pressed from blank"){
             const std::vector<std::pair<int, size_t>> routes = {
-                {controls_config::key_press_actions::menu_open,      tab_menu},
-                {controls_config::key_press_actions::shop_open,      shop_menu},
-                {controls_config::key_press_actions::quests_open,    quest_menu},
-                {controls_config::key_press_actions::inventory_open, inventory_menu},
-                {controls_config::key_press_actions::map_open,       map_menu},
-                {controls_config::key_press_actions::back,           pause_menu}
+                {game_config::key_press_actions::menu_open,      tab_menu},
+                {game_config::key_press_actions::shop_open,      shop_menu},
+                {game_config::key_press_actions::quests_open,    quest_menu},
+                {game_config::key_press_actions::inventory_open, inventory_menu},
+                {game_config::key_press_actions::map_open,       map_menu},
+                {game_config::key_press_actions::back,           pause_menu}
             };
 
             THEN("each opens its own menu, and back returns to blank"){
@@ -622,38 +625,38 @@ SCENARIO("menu keys navigate the menu graph", "[controls][menus]"){
                     press(route.first);
                     REQUIRE(menus.current_ == route.second);
 
-                    press(controls_config::key_press_actions::back);
+                    press(game_config::key_press_actions::back);
                     REQUIRE(menus.current_ == blank_menu);
                 }
             }
         }
 
         WHEN("a menu is open"){
-            press(controls_config::key_press_actions::shop_open);
+            press(game_config::key_press_actions::shop_open);
             REQUIRE(menus.current_ == shop_menu);
 
             THEN("another menu's key does nothing - the only edge out is back"){
-                press(controls_config::key_press_actions::map_open);
+                press(game_config::key_press_actions::map_open);
                 REQUIRE(menus.current_ == shop_menu);
 
-                press(controls_config::key_press_actions::inventory_open);
+                press(game_config::key_press_actions::inventory_open);
                 REQUIRE(menus.current_ == shop_menu);
             }
             THEN("its own key does not re-enter it either"){
-                press(controls_config::key_press_actions::shop_open);
+                press(game_config::key_press_actions::shop_open);
                 REQUIRE(menus.current_ == shop_menu);
             }
             THEN("back leaves to blank, and a second back opens pause"){
-                press(controls_config::key_press_actions::back);
+                press(game_config::key_press_actions::back);
                 REQUIRE(menus.current_ == blank_menu);
 
-                press(controls_config::key_press_actions::back);
+                press(game_config::key_press_actions::back);
                 REQUIRE(menus.current_ == pause_menu);
             }
         }
 
         WHEN("a key with no edge is pressed from blank"){
-            press(controls_config::key_press_actions::dog_switch);
+            press(game_config::key_press_actions::dog_switch);
 
             THEN("the menu does not move"){
                 REQUIRE(menus.current_ == blank_menu);
@@ -661,10 +664,10 @@ SCENARIO("menu keys navigate the menu graph", "[controls][menus]"){
         }
 
         WHEN("menus are opened and closed repeatedly"){
-            press(controls_config::key_press_actions::menu_open);
-            press(controls_config::key_press_actions::back);
-            press(controls_config::key_press_actions::map_open);
-            press(controls_config::key_press_actions::back);
+            press(game_config::key_press_actions::menu_open);
+            press(game_config::key_press_actions::back);
+            press(game_config::key_press_actions::map_open);
+            press(game_config::key_press_actions::back);
 
             THEN("the graph ends where it started"){
                 REQUIRE(menus.current_ == blank_menu);
@@ -681,7 +684,7 @@ SCENARIO("a panned view frame maps the mouse onto the world under it", "[ecs][co
         auto khiri_id = game.create_khiri();
         auto& rendering = systems::rendering_system::get_instance();
 
-        controls().simulate_input(key_hold_of(controls_config::key_hold_actions::move_right), player_id, 1.0f);
+        controls().simulate_input(key_hold_of(game_config::key_hold_actions::move_right), player_id, 1.0f);
         auto frame = game.view_frame();
         REQUIRE(frame.x > 0.0f);
 

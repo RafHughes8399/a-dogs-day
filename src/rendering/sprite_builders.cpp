@@ -249,6 +249,9 @@ sprite::sprite sprite_builders::build_nine_horizontal_piece(){
 sprite::nine_sprite sprite_builders::build_decoration_nine_sprite(Rectangle frame){
     return sprite::nine_sprite(frame, WHITE, hud_config::decoration_hud_corner_scale);
 }
+sprite::nine_sprite sprite_builders::build_menu_page_nine_sprite(Rectangle frame){
+    return sprite::nine_sprite(frame, WHITE, hud_config::decoration_hud_corner_scale);
+}
 
 sprite::nine_sprite sprite_builders::build_stove_nine_sprite(){
     return sprite::nine_sprite(hud_config::cook_station_hud_sprite, WHITE);

@@ -26,6 +26,7 @@ namespace hud_config{
         button_kinds_size
     };
     inline const Rectangle inventory_page_frame = Rectangle{100.0f, 100.0f, 800.0f, 800.0f};
+    inline const Rectangle menu_frame = Rectangle{400.0f, 400.0f, 200.0f, 200.0f};
     inline const float page_nav_button_size = 20.0f;
     inline const float page_nav_button_buffer = 8.0f;
 

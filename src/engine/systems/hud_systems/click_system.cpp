@@ -1,5 +1,6 @@
 #include "hud_systems/hud_systems.hpp"
 #include "debug_log_interface.h"
+#include "system.h"
 #include <string>
 
 // ! THESE FUNCTIONS SHOULD TRIGGER EVENTS ? I THINK MOST OF THEM SHOULD
@@ -35,7 +36,13 @@ void hud_systems::click_system::select_recipe(size_t button, const components::c
 }
 void hud_systems::click_system::change_page(size_t button, const components::click_payload& payload){
     (void) button;
-    (void) payload;
+    auto* turn = std::get_if<components::page_turn>(&payload);
+    if(turn == nullptr){ return; }
+    if(turn->get_direction() < 0){
+        systems::menu_navigation_system::get_instance().previous_page();
+        return;
+    }
+    systems::menu_navigation_system::get_instance().next_page();
 }
 void hud_systems::click_system::select_item(size_t button, const components::click_payload& payload){
     (void) button;

@@ -77,7 +77,7 @@ void systems::entity_lifespan_system::update(float delta){
     return;
 }
 size_t systems::entity_lifespan_system::create_customer_dog(){
-    auto id = create([this](size_t id) -> void{ dog_factory_.build_customer_dog(id); },
+    auto id = create([this](size_t id) -> void { dog_factory_.build_customer_dog(id); },
         level_config::draw_layers::dogs);
     npc_system::get_instance().register_customer(id);
     return id;
@@ -89,7 +89,7 @@ void systems::entity_lifespan_system::destroy_customer_dog(size_t entity_id){
 size_t systems::entity_lifespan_system::create_waiter_dog(size_t waiter, Vector2 position){
     std::cout << "[entity_lifespan_system::create_waiter_dog] enter waiter=" << waiter
         << " position=(" << position.x << "," << position.y << ")" << std::endl;
-    auto id = create([this](size_t waiter_type, size_t entity_id, Vector2 position) -> void{
+    auto id = create([this](size_t waiter_type, size_t entity_id, Vector2 position) -> void {
         std::cout << "[entity_lifespan_system::create_waiter_dog] build lambda"
             << " waiter_type=" << waiter_type << " entity_id=" << entity_id << std::endl;
         dog_factory_.build_waiter_dog(waiter_type, entity_id, position); },
@@ -106,7 +106,7 @@ size_t systems::entity_lifespan_system::create_waiter_dog(size_t waiter, Vector2
         npc_system::get_instance().unregister_waiter(entity_id);
 }
 size_t systems::entity_lifespan_system::create_table(size_t entity, Vector2 position){
-    auto id = create([this](size_t id, size_t entity, Vector2 position) -> void{ station_factory_.build_table(id, entity, position); },
+    auto id = create([this](size_t id, size_t entity, Vector2 position) -> void { station_factory_.build_table(id, entity, position); },
         entity, position, level_config::draw_layers::stations);
     npc_system::get_instance().register_table(id);
     return id;
@@ -117,7 +117,7 @@ void systems::entity_lifespan_system::destroy_table(size_t id){
 }
 
 size_t systems::entity_lifespan_system::create_counter(size_t counter, Vector2 position){
-    auto id = create([this](size_t id, size_t counter, Vector2 position) -> void{ station_factory_.build_counter(id, counter, position); },
+    auto id = create([this](size_t id, size_t counter, Vector2 position) -> void { station_factory_.build_counter(id, counter, position); },
         counter, position, level_config::draw_layers::stations);
     return id;
 }
@@ -126,7 +126,7 @@ void systems::entity_lifespan_system::destroy_counter(size_t id){
 }
 
 size_t systems::entity_lifespan_system::create_cooking_station(size_t cooking_station, Vector2 position){
-    auto id = create([this](size_t cooking_station, size_t entity_id, Vector2 position) -> void{
+    auto id = create([this](size_t cooking_station, size_t entity_id, Vector2 position) -> void {
         station_factory_.build_cooking_station(cooking_station, entity_id, position); },
         cooking_station, position, level_config::draw_layers::stations);
     create_cooking_station_hud(id);
@@ -204,7 +204,7 @@ size_t systems::entity_lifespan_system::create_chopping_board(Vector2 position){
 
 size_t systems::entity_lifespan_system::create_food(size_t food, Vector2 position){
     debug::log("[entity_lifespan_system, create food]: create food: " + std::to_string(food) + " at posiiton " + std::to_string(position.x) + ", " + std::to_string(position.y));
-    auto id = create([this](size_t food, size_t entity_id, Vector2 position) -> void{
+    auto id = create([this](size_t food, size_t entity_id, Vector2 position) -> void {
         food_factory_.build_food(food, entity_id, position); },
         food, position, level_config::draw_layers::dogs);
     return id;
@@ -214,7 +214,7 @@ void systems::entity_lifespan_system::destroy_food(size_t id){
 }
 
 size_t systems::entity_lifespan_system::create_decoration(size_t decoration, Vector2 position){
-    auto id = create([this](size_t decoration, size_t entity_id, Vector2 position) -> void{
+    auto id = create([this](size_t decoration, size_t entity_id, Vector2 position) -> void {
         decoration_factory_.build_decoration(decoration, entity_id, position); },
         decoration, position, level_config::draw_layers::decoration);
     return id;

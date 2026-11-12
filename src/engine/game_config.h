@@ -25,13 +25,40 @@ namespace game_config {
         int key_;
         int action_;
     };
+
+    enum key_press_actions{
+        dog_switch = KEY_F,
+        shop_open = KEY_S,
+        inventory_open = KEY_I,
+        menu_open = KEY_TAB,
+        quests_open = KEY_Q,
+        map_open = KEY_M,
+        back = KEY_ESCAPE,
+        exit_edit = KEY_E,
+        debug_toggle = KEY_J,
+        pause = KEY_P
+    };
+    enum key_hold_actions{
+        edit_mode = KEY_E,
+        move_down = KEY_DOWN,
+        move_up  = KEY_UP,
+        move_left = KEY_LEFT,
+        move_right = KEY_RIGHT
+    };
+
     inline const int counter_start_stock = 2;
     inline std::vector<input> player_controls = {
         {KEY_LEFT, key_hold},
         {KEY_RIGHT, key_hold},
         {KEY_DOWN, key_hold},
         {KEY_UP, key_hold},
-        {KEY_J, key_press}
+        {KEY_J, key_press},
+        {inventory_open, key_press},
+        {shop_open, key_press},
+        {quests_open, key_press},
+        {map_open, key_press},
+        {back, key_press},
+
     };
     // * the cursor's bindings. Note there is no entry for pointer movement -
     // * that is not a binding, it is ambient device state, and holding a
@@ -51,24 +78,5 @@ namespace game_config {
 
     inline const int cook_speed = 2;
 }
-namespace controls_config{
-    enum key_press_actions{
-        dog_switch = KEY_F,
-        shop_open = KEY_S,
-        inventory_open = KEY_I,
-        menu_open = KEY_TAB,
-        quests_open = KEY_Q,
-        map_open = KEY_M,
-        back = KEY_ESCAPE,
-        exit_edit = KEY_E,
-        debug_toggle = KEY_J
-    };
-    enum key_hold_actions{
-        edit_mode = KEY_E,
-        move_down = KEY_DOWN,
-        move_up  = KEY_UP,
-        move_left = KEY_LEFT,
-        move_right = KEY_RIGHT
-    };
-}
+
 #endif
