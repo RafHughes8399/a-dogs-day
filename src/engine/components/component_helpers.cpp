@@ -69,6 +69,9 @@ void component_helpers::register_hud_clickable_component(size_t hud_id, componen
 void component_helpers::register_hud_owner_component(size_t hud_id, components::owner_component component){
     component_managers::hud_owner_manager_.register_component(hud_id, std::move(component));
 }
+void component_helpers::register_hud_inventory_storage_component(size_t hud_id, components::inventory_storage_component component){
+    component_managers::hud_inventory_storage_manager_.register_component(hud_id, std::move(component));
+}
 void component_helpers::add_entity_positional_component(size_t entity_id, Vector2 position){
     register_entity_positional_component(entity_id,
         component_builders::build_entity_positional_component(position));
@@ -170,6 +173,10 @@ void component_helpers::add_hud_clickable_component(size_t hud_id, size_t action
 void component_helpers::add_hud_owner_component(size_t hud_id, size_t owner){
     register_hud_owner_component(hud_id,
         component_builders::build_hud_owner_component(owner));
+}
+void component_helpers::add_hud_inventory_storage_component(size_t hud_id){
+    register_hud_inventory_storage_component(hud_id,
+        component_builders::build_hud_inventory_storage_component());
 }
 
 void component_helpers::create_offset_position_list(Rectangle box, std::array<std::optional<Vector2>, DIRECTIONS>& positions){
@@ -345,6 +352,9 @@ void component_helpers::unregister_hud_clickable_component(size_t hud_id){
 void component_helpers::unregister_hud_owner_component(size_t hud_id){
     component_managers::hud_owner_manager_.unregister_component(hud_id);
 }
+void component_helpers::unregister_hud_inventory_storage_component(size_t hud_id){
+    component_managers::hud_inventory_storage_manager_.unregister_component(hud_id);
+}
 
 // blanket teardown - erase on a missing key is a no-op, so this is correct
 // for every entity kind without tracking what a builder registered
@@ -373,6 +383,7 @@ void component_helpers::unregister_all_hud_components(size_t hud_id){
     unregister_hud_state_machine_component(hud_id);
     unregister_hud_clickable_component(hud_id);
     unregister_hud_owner_component(hud_id);
+    unregister_hud_inventory_storage_component(hud_id);
 }
 
 // total components registered across every manager
@@ -404,6 +415,7 @@ size_t component_helpers::num_registered_hud_components(size_t hud_id){
     count += component_managers::hud_state_machine_manager_.get_component(hud_id) != nullptr ? 1u : 0u;
     count += component_managers::hud_clickable_manager_.get_component(hud_id) != nullptr ? 1u : 0u;
     count += component_managers::hud_owner_manager_.get_component(hud_id) != nullptr ? 1u : 0u;
+    count += component_managers::hud_inventory_storage_manager_.get_component(hud_id) != nullptr ? 1u : 0u;
     return count;
 }
 
@@ -419,6 +431,7 @@ void component_helpers::clear_all_hud_components(){
     component_managers::hud_state_machine_manager_.clear();
     component_managers::hud_clickable_manager_.clear();
     component_managers::hud_owner_manager_.clear();
+    component_managers::hud_inventory_storage_manager_.clear();
 }
 void component_helpers::clear_all_entity_components(){
     component_managers::entity_positional_manager_.clear();

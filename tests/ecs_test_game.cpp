@@ -400,7 +400,8 @@ namespace testing{
              + component_managers::hud_collision_manager_.size()
              + component_managers::hud_state_machine_manager_.size()
              + component_managers::hud_clickable_manager_.size()
-             + component_managers::hud_owner_manager_.size();
+             + component_managers::hud_owner_manager_.size()
+             + component_managers::hud_inventory_storage_manager_.size();
     }
 
 } // namespace testing

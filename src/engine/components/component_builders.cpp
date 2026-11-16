@@ -61,8 +61,9 @@ components::hud_component component_builders::build_hud_component(sprite::nine_s
 components::position_component component_builders::build_hud_positional_component(Vector2 position){
     return components::position_component(position);
 }
-components::renderable_component::body component_builders::build_hud_body(std::vector<sprite::sprite>& sprites, size_t index){
-    return components::renderable_component::body(sprites, index);
+components::renderable_component::body component_builders::build_hud_body(std::vector<sprite::sprite>& sprites, size_t index,
+    Vector2 scale, Vector2 offset){
+    return components::renderable_component::body(sprites, index, scale, offset);
 }
 components::renderable_component component_builders::build_hud_renderable_component(std::vector<components::renderable_component::body>& bodys){
     return components::renderable_component(bodys);
@@ -81,4 +82,7 @@ components::clickable_component component_builders::build_hud_clickable_componen
 }
 components::owner_component component_builders::build_hud_owner_component(size_t owner){
     return components::owner_component(owner);
+}
+components::inventory_storage_component component_builders::build_hud_inventory_storage_component(){
+    return components::inventory_storage_component();
 }

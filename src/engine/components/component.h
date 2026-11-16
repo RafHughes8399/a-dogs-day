@@ -90,11 +90,11 @@ class page_turn{
 };
 class item_choice{
     public:
-        explicit item_choice(size_t item_id)
-        : item_id_(item_id){}
-        size_t get_item_id() const;
+        explicit item_choice(size_t definition_id)
+        : definition_id_(definition_id){}
+        size_t get_definition_id() const;
     private:
-        size_t item_id_;
+        size_t definition_id_;
 };
 using click_payload = std::variant<std::monostate, recipe_choice, page_turn, item_choice>;
 class clickable_component{
@@ -430,8 +430,9 @@ public:
   public:
     ~body() = default;
     // TODO (25 / 8 / 26) fix magic number what is 0
-    body(std::vector<sprite::sprite> &sprites, size_t index = 0)
-        : sprites_(sprites), active_index_(index) {}
+    body(std::vector<sprite::sprite> &sprites, size_t index = 0,
+        Vector2 scale = Vector2One(), Vector2 offset = Vector2Zero())
+        : sprites_(sprites), active_index_(index), scale_(scale), offset_(offset) {}
     body(const body& other) = default;
     body(body&& other) = default;
 
@@ -443,11 +444,15 @@ public:
       size_t get_active_index() const;
       size_t num_sprites() const;
       void set_index(size_t index);
+      Vector2 get_scale() const;
+      Vector2 get_offset() const;
 
   private:
     // * holds all the parts of the dog
     std::vector<sprite::sprite> sprites_;
     size_t active_index_;
+    Vector2 scale_;
+    Vector2 offset_;
   };
 
   ~renderable_component() = default;
@@ -510,7 +515,30 @@ private:
 
 class inventory_storage_component{
     public:
+        ~inventory_storage_component() = default;
+        inventory_storage_component()
+        :placements_({}),
+         cursor_x_(hud_config::inventory_page_frame.x + hud_config::page_nav_button_buffer),
+         row_y_(hud_config::inventory_page_frame.y + hud_config::page_nav_button_buffer),
+         row_height_(0.0f){}
+
+        inventory_storage_component(const inventory_storage_component& other) = default;
+        inventory_storage_component(inventory_storage_component&& other) = default;
+
+        inventory_storage_component& operator=(const inventory_storage_component& other) = default;
+        inventory_storage_component& operator=(inventory_storage_component&& other) = default;
+
+        bool empty() const;
+        size_t size() const;
+
+        std::optional<Vector2> place(size_t definition_id, Vector2 footprint);
+        size_t take_item(size_t item_id);
     private:
+        // i think the storage needs to be more like interesting ?
+        std::vector<std::pair<size_t, Rectangle>> placements_;
+        float cursor_x_;
+        float row_y_;
+        float row_height_;
 };
 // for the table, the waiter, and the counter and the kitchen station
 // RENAME FOR CLARITY
@@ -561,6 +589,7 @@ namespace component_builders{
     components::state_machine_component build_entity_state_machine_component(state_machine::state_machine machine);
     components::selectable_component build_entity_selectable_component(size_t kind);
     components::storage_component build_entity_storage_component();
+    components::inventory_storage_component build_hud_inventory_storage_component();
     components::food_component build_entity_food_component(size_t item_id);
     components::item_component build_entity_item_component(size_t item_id);
     components::carrier_component build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
@@ -568,7 +597,8 @@ namespace component_builders{
     components::hud_component build_hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
 
     components::position_component build_hud_positional_component(Vector2 position);
-    components::renderable_component::body build_hud_body(std::vector<sprite::sprite>& sprites, size_t index);
+    components::renderable_component::body build_hud_body(std::vector<sprite::sprite>& sprites, size_t index,
+        Vector2 scale = Vector2One(), Vector2 offset = Vector2Zero());
     components::renderable_component build_hud_renderable_component(
         std::vector<components::renderable_component::body>& bodys);
     components::collision_component::hitbox_component build_hud_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);

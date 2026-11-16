@@ -306,19 +306,14 @@ namespace systems{
                 static entity_lifespan_system instance;
                 return instance;
             }
-            ~entity_lifespan_system(){
-                event_interface::unsubscribe<events::store_decoration>(store_decoration_handler_);
-            }
+            ~entity_lifespan_system() = default;
             entity_lifespan_system(const entity_lifespan_system& other) = delete;
             entity_lifespan_system(entity_lifespan_system&& other) = delete;
 
             entity_lifespan_system& operator=(const entity_lifespan_system& other) = delete;
             entity_lifespan_system& operator=(entity_lifespan_system&& other) = delete;
         private:
-            entity_lifespan_system()
-            : store_decoration_handler_([this](const events::store_decoration& event) -> void {on_stored_decoration(event);}){
-                event_interface::subscribe<events::store_decoration>(store_decoration_handler_);
-            }
+            entity_lifespan_system() = default;
         public:
 
             // allocate -> build -> announce, so nothing can be built without
@@ -382,19 +377,18 @@ namespace systems{
 
             size_t create_decoration(size_t decoration, Vector2 position);
             void destroy_decoration(size_t id);
-            void on_stored_decoration(const events::store_decoration& event);
             void destroy(size_t entity_id);
-            size_t create_hud_root(std::function<void(size_t)> build);
-            size_t create_hud_element(size_t owner, std::function<void(size_t)> build);
-            void destroy_hud_element(size_t hud_id);
             void update(float delta);
+            // ids are centrally allocated/recycled here even for hud elements,
+            // which hud_systems::hud_lifespan_system builds and tears down
+            size_t next_id();
+            void recycle(size_t id);
             // teardown between test scenarios - the singleton outlives them
             void clear(){
                 recycled_ids_ = {};
                 fresh_id_ = 0;
             }
         private:
-            size_t next_id();
             std::queue<size_t> recycled_ids_;
             size_t fresh_id_ = 0;
 
@@ -402,8 +396,6 @@ namespace systems{
             factories::station_factory station_factory_;
             factories::food_factory food_factory_;
             factories::decoration_factory decoration_factory_;
-
-            events::event_handler<events::store_decoration> store_decoration_handler_;
     };
     class interaction_system{
         // for behavioural interactions
@@ -584,10 +576,7 @@ namespace systems{
         : store_decoration_handler_([this](const events::store_decoration& event) -> void {on_stored_decoration(event);}){
             event_interface::subscribe<events::store_decoration>(store_decoration_handler_);
         }
-        bool store_item(size_t item_id);
-        size_t build_page();
-        std::optional<size_t> request_button(size_t owner, size_t kind, Vector2 position, size_t subject = 0);
-        std::optional<Vector2> find_free_position(size_t page, Vector2 size);
+        bool store_item(size_t definition_id);
         events::event_handler<events::store_decoration> store_decoration_handler_;
     };
 

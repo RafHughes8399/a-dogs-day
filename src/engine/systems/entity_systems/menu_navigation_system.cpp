@@ -3,7 +3,7 @@
 void systems::menu_navigation_system::init(){
     for(size_t menu = 0; menu < static_cast<size_t>(menus::menu_ids_size); ++menu){
         if(not factory_.has_root(menu)){ continue; }
-        auto root = entity_lifespan_system::get_instance().create_hud_root(
+        auto root = hud_systems::hud_lifespan_system::get_instance().create_menu_page(
             [this, menu](size_t id) -> void { factory_.build_menu(menu, id); });
         menus_.add_root(menu, root);
     }

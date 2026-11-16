@@ -1,5 +1,8 @@
 #include "items.h"
+#include "hud_config.h"
+#include <algorithm>
 #include <array>
+#include <cmath>
 
 size_t items::food_item::get_id(){
     return item_id_;
@@ -52,6 +55,25 @@ std::array<items::item_definition, entity_config::decorations_size> items::item_
             entity_config::frangipani_attributes[entity_config::attributes::frame_height]})
     };
 }
-const items::item_definition& items::item_encyclopedia::definition_of(size_t item_id) const{
-    return definitions_.at(item_id);
+const items::item_definition& items::item_encyclopedia::definition_of(size_t definition_id) const{
+    return definitions_.at(definition_id);
+}
+Vector2 items::inventory_layout::get_size() const{
+    return size_;
+}
+float items::inventory_layout::get_scale() const{
+    return scale_;
+}
+Vector2 items::inventory_layout::get_footprint() const{
+    return Vector2{size_.x + hud_config::inventory_item_border, size_.y + hud_config::inventory_item_border};
+}
+items::inventory_layout items::inventory_layout_of(size_t definition_id){
+    auto size = item_encyclopedia::get_instance().definition_of(definition_id).get_size();
+    auto dominant = std::max(size.x, size.y);
+    auto t = std::clamp((dominant - hud_config::inventory_scale_threshold)
+        / (hud_config::inventory_scale_reference - hud_config::inventory_scale_threshold), 0.0f, 1.0f);
+    auto eased = t * t * (3.0f - 2.0f * t);
+    auto scale = dominant <= hud_config::inventory_scale_threshold ? 1.0f
+        : std::lerp(hud_config::inventory_scale_max, hud_config::inventory_scale_min, eased);
+    return inventory_layout(Vector2{size.x * scale, size.y * scale}, scale);
 }

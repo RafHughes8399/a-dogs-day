@@ -9,7 +9,10 @@
 #include "config.h"
 #include "hud_element_builders.hpp"
 #include "hud_systems/hud_systems.hpp"
+#include "entity_config.h"
+#include "items.h"
 #include "sprite.h"
+#include "system.h"
 
 namespace {
 
@@ -216,7 +219,7 @@ namespace {
     }
 
     size_t create_boxed_element(size_t owner, Vector2 position){
-        return systems::entity_lifespan_system::get_instance().create_hud_element(owner,
+        return hud_systems::hud_lifespan_system::get_instance().create_element(owner,
             [position](size_t id){ register_hud_box(id, position); });
     }
 
@@ -233,7 +236,6 @@ namespace {
 SCENARIO("a hud element is created against an owner with a hud", "[hud][lifespan]"){
     GIVEN("an owner entity with a hud component"){
         testing::ecs_test_game game;
-        auto& lifespan = systems::entity_lifespan_system::get_instance();
         auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
         auto owner = create_hud_owner();
         const Vector2 position{level_config::graph_x + 32.0f, level_config::graph_y + 32.0f};
@@ -261,7 +263,7 @@ SCENARIO("a hud element is created against an owner with a hud", "[hud][lifespan
 
         WHEN("an element is created then destroyed"){
             auto element = create_boxed_element(owner, position);
-            lifespan.destroy_hud_element(element);
+            hud_systems::hud_lifespan_system::get_instance().destroy_element(element);
 
             THEN("the owner no longer lists it"){
                 REQUIRE(elements_of(owner).empty());
@@ -281,12 +283,12 @@ SCENARIO("a hud element is created against an owner with a hud", "[hud][lifespan
 
     GIVEN("an owner entity with no hud component"){
         testing::ecs_test_game game;
-        auto& lifespan = systems::entity_lifespan_system::get_instance();
         auto owner = game.create_empty(level_config::draw_layers::stations);
 
         WHEN("an element is created for it"){
             bool built = false;
-            auto element = lifespan.create_hud_element(owner, [&built](size_t){ built = true; });
+            auto element = hud_systems::hud_lifespan_system::get_instance().create_element(owner,
+                [&built](size_t){ built = true; });
 
             THEN("nothing is built and the empty sentinel comes back"){
                 REQUIRE_FALSE(built);
@@ -823,6 +825,129 @@ SCENARIO("a nine sprite can shrink its corners to fit a narrower frame", "[hud][
             REQUIRE(base.get_frame().width == Catch::Approx(32.0f));
             REQUIRE(base.get_corner_scale() == Catch::Approx(hud_config::decoration_hud_corner_scale));
             REQUIRE(base.get_scale().x >= 0.0f);
+        }
+    }
+}
+
+SCENARIO("a decoration under the scale threshold keeps its size and gains the border", "[hud][inventory][layout]"){
+    GIVEN("the test decoration, whose largest side is under the threshold"){
+        auto size = items::item_encyclopedia::get_instance().definition_of(entity_config::decorations::test_decoration).get_size();
+        auto layout = items::inventory_layout_of(entity_config::decorations::test_decoration);
+
+        THEN("it is drawn unscaled"){
+            REQUIRE(layout.get_scale() == 1.0f);
+            REQUIRE(layout.get_size().x == size.x);
+            REQUIRE(layout.get_size().y == size.y);
+        }
+        THEN("its footprint is the size plus the border on each axis"){
+            REQUIRE(layout.get_footprint().x == size.x + hud_config::inventory_item_border);
+            REQUIRE(layout.get_footprint().y == size.y + hud_config::inventory_item_border);
+        }
+    }
+}
+
+SCENARIO("a decoration over the reference size is shrunk to the minimum scale", "[hud][inventory][layout]"){
+    GIVEN("the poker table, whose largest side is at the reference size"){
+        auto size = items::item_encyclopedia::get_instance().definition_of(entity_config::decorations::poker_table).get_size();
+        auto layout = items::inventory_layout_of(entity_config::decorations::poker_table);
+
+        THEN("it is drawn at the minimum scale"){
+            REQUIRE(layout.get_scale() == Catch::Approx(hud_config::inventory_scale_min));
+            REQUIRE(layout.get_size().x == Catch::Approx(size.x * hud_config::inventory_scale_min));
+        }
+    }
+}
+
+SCENARIO("a decoration between the threshold and the reference is shrunk by less than the maximum", "[hud][inventory][layout]"){
+    GIVEN("the pavlov, whose largest side sits between the threshold and the reference"){
+        auto layout = items::inventory_layout_of(entity_config::decorations::pavlov);
+
+        THEN("its scale is below the start of the curve and above the minimum"){
+            REQUIRE(layout.get_scale() < hud_config::inventory_scale_max);
+            REQUIRE(layout.get_scale() > hud_config::inventory_scale_min);
+        }
+    }
+}
+
+SCENARIO("inventory items wrap onto a new row and stop at the bottom of the page", "[hud][inventory][placement]"){
+    GIVEN("an empty inventory storage"){
+        testing::ecs_test_game game;
+        components::inventory_storage_component storage;
+        auto origin = hud_config::inventory_page_anchor;
+        auto full_width = hud_config::inventory_page_frame.width - 2.0f * hud_config::page_nav_button_buffer;
+
+        WHEN("a small item is placed"){
+            auto first = storage.place(entity_config::decorations::test_decoration, Vector2{40.0f, 40.0f});
+            THEN("it goes to the top left of the content area"){
+                REQUIRE(first.has_value());
+                REQUIRE(first->x == Catch::Approx(hud_config::page_nav_button_buffer));
+                REQUIRE(first->y == Catch::Approx(hud_config::page_nav_button_buffer));
+            }
+            THEN("the next small item sits beside it with the gap between"){
+                auto second = storage.place(entity_config::decorations::test_decoration, Vector2{40.0f, 40.0f});
+                REQUIRE(second.has_value());
+                REQUIRE(second->x == Catch::Approx(first->x + 40.0f + hud_config::inventory_item_buffer));
+                REQUIRE(second->y == Catch::Approx(first->y));
+            }
+        }
+        WHEN("items as wide as the content are placed until the page is full"){
+            auto first = storage.place(entity_config::decorations::test_decoration, Vector2{full_width, 300.0f});
+            auto second = storage.place(entity_config::decorations::test_decoration, Vector2{full_width, 300.0f});
+            auto third = storage.place(entity_config::decorations::test_decoration, Vector2{full_width, 300.0f});
+            THEN("each row starts below the previous one with the gap between"){
+                REQUIRE(first.has_value());
+                REQUIRE(second.has_value());
+                REQUIRE(second->y == Catch::Approx(first->y + 300.0f + hud_config::inventory_item_buffer));
+            }
+            THEN("the item that would pass the bottom is refused"){
+                REQUIRE_FALSE(third.has_value());
+            }
+        }
+        WHEN("an item wider than the content is placed"){
+            auto oversized = storage.place(entity_config::decorations::test_decoration, Vector2{full_width + 1.0f, 40.0f});
+            THEN("it is refused"){
+                REQUIRE_FALSE(oversized.has_value());
+            }
+        }
+        (void) origin;
+    }
+}
+
+SCENARIO("an inventory page stays pinned to the view when the camera pans", "[hud][inventory][camera]"){
+    GIVEN("an inventory page built at the current view with its buttons"){
+        testing::ecs_test_game game;
+        hud_systems::hud::get_instance();
+        hud_systems::hud_spatial_system::get_instance();
+        auto& rendering = systems::rendering_system::get_instance();
+        auto root = hud_systems::hud_lifespan_system::get_instance().create_inventory_menu(hud_config::inventory_page_frame);
+        auto* root_position = component_managers::entity_positional_manager_.get_component(root);
+        auto* hud = component_managers::hud_manager_.get_component(root);
+        REQUIRE(root_position != nullptr);
+        REQUIRE(hud != nullptr);
+        REQUIRE(hud->get_elements().size() >= 2);
+        auto button = hud->get_elements().front();
+        auto* button_position = component_managers::hud_positional_manager_.get_component(button);
+        REQUIRE(button_position != nullptr);
+
+        WHEN("the camera pans"){
+            auto target_before = rendering.get_camera().target;
+            auto root_before = root_position->get_position();
+            auto button_before = button_position->get_position();
+            rendering.move_camera(Vector2{40.0f, 30.0f});
+            auto target_after = rendering.get_camera().target;
+            REQUIRE((target_after.x != target_before.x or target_after.y != target_before.y));
+
+            THEN("the page is still at the same place on screen"){
+                auto anchor = GetScreenToWorld2D(hud_config::inventory_page_anchor, rendering.get_camera());
+                REQUIRE(root_position->get_position().x == Catch::Approx(anchor.x));
+                REQUIRE(root_position->get_position().y == Catch::Approx(anchor.y));
+            }
+            THEN("its buttons move by the same amount as the page"){
+                auto root_delta = Vector2Subtract(root_position->get_position(), root_before);
+                auto button_delta = Vector2Subtract(button_position->get_position(), button_before);
+                REQUIRE(button_delta.x == Catch::Approx(root_delta.x));
+                REQUIRE(button_delta.y == Catch::Approx(root_delta.y));
+            }
         }
     }
 }

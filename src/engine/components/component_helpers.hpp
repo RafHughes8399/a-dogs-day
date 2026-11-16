@@ -27,6 +27,7 @@ namespace component_helpers{
     void register_hud_state_machine_component(size_t hud_id, components::state_machine_component component);
     void register_hud_clickable_component(size_t hud_id, components::clickable_component component);
     void register_hud_owner_component(size_t hud_id, components::owner_component component);
+    void register_hud_inventory_storage_component(size_t hud_id, components::inventory_storage_component component);
 
 
     void add_entity_positional_component(size_t entity_id, Vector2 position);
@@ -44,6 +45,7 @@ namespace component_helpers{
     void add_hud_state_machine_component(size_t hud_id, state_machine::state_machine machine);
     void add_hud_clickable_component(size_t hud_id, size_t action, components::click_payload payload = {});
     void add_hud_owner_component(size_t hud_id, size_t owner);
+    void add_hud_inventory_storage_component(size_t hud_id);
     void add_entity_renderable_component(size_t entity_id,
         std::vector<components::renderable_component::body>& bodys);
     void add_entity_collision_component(size_t entity_id,
@@ -91,6 +93,7 @@ namespace component_helpers{
     void unregister_hud_state_machine_component(size_t hud_id);
     void unregister_hud_clickable_component(size_t hud_id);
     void unregister_hud_owner_component(size_t hud_id);
+    void unregister_hud_inventory_storage_component(size_t hud_id);
     void unregister_all_entity_components(size_t entity_id);
     void unregister_all_hud_components(size_t hud_id);
 

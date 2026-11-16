@@ -23,4 +23,5 @@ component_manager<components::collision_component> hud_collision_manager_;
 component_manager<components::state_machine_component> hud_state_machine_manager_;
 component_manager<components::clickable_component> hud_clickable_manager_;
 component_manager<components::owner_component> hud_owner_manager_;
+component_manager<components::inventory_storage_component> hud_inventory_storage_manager_;
 } // namespace component_managers

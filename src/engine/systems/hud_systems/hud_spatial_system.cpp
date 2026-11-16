@@ -1,6 +1,23 @@
 #include "hud_systems/hud_systems.hpp"
 #include "debug_log_interface.h"
+#include "system.h"
+#include "menus.h"
 #include <string>
+
+void hud_systems::hud_spatial_system::on_camera_moved(const events::camera_moved& event){
+    (void) event;
+    auto& camera = systems::rendering_system::get_instance().get_camera();
+    auto target = GetScreenToWorld2D(hud_config::inventory_page_anchor, camera);
+    auto pages = systems::menu_navigation_system::get_instance().pages_of(menus::menu_ids::inventory);
+    for(auto root : pages){
+        auto* position = component_managers::entity_positional_manager_.get_component(root);
+        auto* hud = component_managers::hud_manager_.get_component(root);
+        if(position == nullptr or hud == nullptr){ continue; }
+        auto delta = Vector2Subtract(target, position->get_position());
+        position->set_position(target);
+        move_hud(*hud, delta);
+    }
+}
 
 void hud_systems::hud_spatial_system::on_created_hud_element(const events::create_hud_element& event){
     track(event.get_id());

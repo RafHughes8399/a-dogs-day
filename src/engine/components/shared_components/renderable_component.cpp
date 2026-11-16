@@ -16,6 +16,12 @@ size_t components::renderable_component::body::num_sprites() const{
 void components::renderable_component::body::set_index(size_t index){
     active_index_ = index;
 }
+Vector2 components::renderable_component::body::get_scale() const{
+    return scale_;
+}
+Vector2 components::renderable_component::body::get_offset() const{
+    return offset_;
+}
 std::vector<components::renderable_component::body>& components::renderable_component::get_layers(){
     return body_;
 }

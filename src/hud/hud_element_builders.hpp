@@ -11,12 +11,13 @@
 
 namespace button_builders {
     void build_button(size_t id, Vector2 position, sprite::sprite& sprite, hitbox::hitbox& hitbox,
-        size_t action, components::click_payload payload = {});
+        size_t action, components::click_payload payload = {},
+        Vector2 scale = Vector2One(), Vector2 offset = Vector2Zero());
     void build_decoration_button(size_t id, Vector2 position, sprite::sprite& sprite, size_t action);
     void build_move_decoration_button(size_t id, Vector2 position);
     void build_sell_decoration_button(size_t id, Vector2 position);
     void build_to_storage_decoration_button(size_t id, Vector2 position);
-    void build_inventory_item_button(size_t id, Vector2 position, size_t item_id);
+    void build_inventory_item_button(size_t id, Vector2 position, size_t definition_id);
     void build_recipe_button(size_t id, Vector2 position, size_t recipe, sprite::sprite& sprite);
     void build_recipe_button(size_t food, size_t id, Vector2 position, size_t recipe);
     void build_lasagna_button(size_t id, Vector2 position, size_t recipe);
@@ -49,5 +50,6 @@ namespace button_builders {
 }
 namespace page_builders {
     void build_menu_page(size_t id, Rectangle frame);
+    void build_inventory_menu(size_t id, Rectangle frame, Vector2 position);
 }
 #endif

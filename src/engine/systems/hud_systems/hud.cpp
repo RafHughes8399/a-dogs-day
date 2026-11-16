@@ -24,7 +24,7 @@ queries::query_result hud_systems::hud::on_create_hud_button(const queries::crea
     auto kind = query.get_kind();
     auto position = query.get_position();
     auto subject = query.get_subject();
-    auto id = systems::entity_lifespan_system::get_instance().create_hud_element(query.get_owner(),
+    auto id = hud_systems::hud_lifespan_system::get_instance().create_element(query.get_owner(),
         [this, kind, position, subject](size_t button) -> void { buttons_.build_button(kind, button, position, subject); });
     return queries::query_result{std::in_place_type<size_t>, id};
 }

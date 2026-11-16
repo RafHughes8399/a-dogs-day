@@ -183,3 +183,20 @@ art for the buttons, art for the mouse and art for the pothos and monsterra
 art for the succulent table and the jade plant
 
 and the storing logic, then we can wrap this up. ok storing for now 
+
+dwqdqwdqwdqw9p'80oihJ:>?KLNM< Z
+dqwerfwef
+
+
+manages the items. in so far as the item definition not necessaryily the entity.
+
+no actually it is the id of the button. we can just keep it that way all we need to know is the position at construct time 
+
+so storing creates teh button, takiung destroys it
+
+i think it can be as simple as deciding the next position upon inster,m based on the current insert and the dimnensions
+
+
+within the page storage insert construct the button
+'
+i guess the only thing is where exactly do we get teh values that can fit on the page. the inventory system ? i suppose it could hold a referenec

@@ -61,6 +61,7 @@ namespace events{
 		entity_deselected_id,
         store_decoration_id, 
         sell_decoration_id,
+		camera_moved_id,
 		size
 	};
 	class event{

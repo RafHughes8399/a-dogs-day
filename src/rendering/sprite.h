@@ -203,7 +203,7 @@ namespace sprite_builders{
     sprite::sprite build_move_decoration_button_sprite();
     sprite::sprite build_sell_decoration_button_sprite();
     sprite::sprite build_to_storage_decoration_button_sprite();
-    sprite::sprite build_item_sprite(size_t item_id);
+    sprite::sprite build_item_sprite(size_t definition_id);
 
     sprite::sprite build_nine_corner_piece();
     sprite::sprite build_nine_centre_piece();

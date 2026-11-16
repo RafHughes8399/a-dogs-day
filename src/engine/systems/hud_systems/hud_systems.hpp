@@ -24,6 +24,7 @@ namespace hud_systems{
             event_interface::unsubscribe<events::create_hud_element>(create_hud_element_handler_);
             event_interface::unsubscribe<events::remove_hud_element>(remove_hud_element_handler_);
             event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
+            event_interface::unsubscribe<events::camera_moved>(camera_moved_handler_);
         }
         hud_spatial_system(const hud_spatial_system& other) = delete;
         hud_spatial_system(hud_spatial_system&& other) = delete;
@@ -34,6 +35,7 @@ namespace hud_systems{
         void on_created_hud_element(const events::create_hud_element& event);
         void on_removed_hud_element(const events::remove_hud_element& event);
         void on_moved_entity(const events::move_entity& event);
+        void on_camera_moved(const events::camera_moved& event);
         void track(size_t hud_id);
         void untrack(size_t hud_id);
         bool is_tracked(size_t hud_id);
@@ -48,16 +50,19 @@ namespace hud_systems{
         : create_hud_element_handler_([this](const events::create_hud_element& event) -> void {on_created_hud_element(event);}),
           remove_hud_element_handler_([this](const events::remove_hud_element& event) -> void {on_removed_hud_element(event);}),
           move_entity_handler_([this](const events::move_entity& event) -> void {on_moved_entity(event);}),
+          camera_moved_handler_([this](const events::camera_moved& event) -> void {on_camera_moved(event);}),
           elements_(world_bounds, MAX_DEPTH, component_managers::hud_collision_manager_){
             event_interface::subscribe<events::create_hud_element>(create_hud_element_handler_);
             event_interface::subscribe<events::remove_hud_element>(remove_hud_element_handler_);
             event_interface::subscribe<events::move_entity>(move_entity_handler_);
+            event_interface::subscribe<events::camera_moved>(camera_moved_handler_);
         }
         void move_hud(components::hud_component& hud, Vector2 delta);
 
         events::event_handler<events::create_hud_element> create_hud_element_handler_;
         events::event_handler<events::remove_hud_element> remove_hud_element_handler_;
         events::event_handler<events::move_entity> move_entity_handler_;
+        events::event_handler<events::camera_moved> camera_moved_handler_;
         tree::ecs_quadtree elements_;
     };
 
@@ -111,9 +116,34 @@ namespace hud_systems{
         static void select_item(size_t button, const components::click_payload& payload);
         std::array<std::function<void(size_t, const components::click_payload&)>, hud_config::click_actions::size> defined_clicks_;
     };
-    // storing hud elements 
+    // owns hud entity creation/destruction - the hud-side counterpart to
+    // systems::entity_lifespan_system, which is the sole id allocator both sides
+    // call into
+    class hud_lifespan_system {
+    public:
+        static hud_lifespan_system& get_instance(){
+            static hud_lifespan_system instance;
+            return instance;
+        }
+        ~hud_lifespan_system() = default;
+        hud_lifespan_system(const hud_lifespan_system& other) = delete;
+        hud_lifespan_system(hud_lifespan_system&& other) = delete;
+
+        hud_lifespan_system& operator=(const hud_lifespan_system& other) = delete;
+        hud_lifespan_system& operator=(hud_lifespan_system&& other) = delete;
+
+        size_t create_menu_page(std::function<void(size_t)> build);
+        size_t create_inventory_menu(Rectangle frame);
+        size_t create_element(size_t owner, std::function<void(size_t)> build);
+        void destroy_element(size_t hud_id);
+        void destroy_elements_of(size_t owner);
+        std::optional<size_t> request_button(size_t owner, size_t kind, Vector2 position, size_t subject = 0);
+    private:
+        hud_lifespan_system() = default;
+    };
+    // storing hud elements
     // processing hud behaviours
-    // and then the hud as a whole that has the instances of the 
+    // and then the hud as a whole that has the instances of the
     class hud {
     public:
         static hud& get_instance(){

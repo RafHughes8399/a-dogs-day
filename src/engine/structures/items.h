@@ -84,7 +84,7 @@ namespace items{
             item_encyclopedia& operator=(const item_encyclopedia& other) = delete;
             item_encyclopedia& operator=(item_encyclopedia&& other) = delete;
 
-            const item_definition& definition_of(size_t item_id) const;
+            const item_definition& definition_of(size_t definition_id) const;
         private:
             item_encyclopedia()
             :definitions_(build_definitions()){}
@@ -92,6 +92,26 @@ namespace items{
             static std::array<item_definition, entity_config::decorations_size> build_definitions();
             const std::array<item_definition, entity_config::decorations_size> definitions_;
     };
+    class inventory_layout{
+        public:
+            ~inventory_layout() = default;
+            inventory_layout(Vector2 size, float scale)
+            :size_(size), scale_(scale){}
+
+            inventory_layout(const inventory_layout& other) = default;
+            inventory_layout(inventory_layout&& other) = default;
+
+            inventory_layout& operator=(const inventory_layout& other) = default;
+            inventory_layout& operator=(inventory_layout&& other) = default;
+
+            Vector2 get_size() const;
+            float get_scale() const;
+            Vector2 get_footprint() const;
+        private:
+            Vector2 size_;
+            float scale_;
+    };
+    inventory_layout inventory_layout_of(size_t definition_id);
 /**
 
 class item_builder{
