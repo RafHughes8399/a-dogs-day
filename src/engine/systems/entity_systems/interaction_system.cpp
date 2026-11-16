@@ -156,7 +156,7 @@ void systems::interaction_system::waiter_counter_pickup(size_t waiter, size_t co
         return; 
     }
 
-    auto food_opt = item_system::get_instance().take_item(counter);
+    auto food_opt = food_item_system::get_instance().take_item(counter);
     if(not food_opt.has_value()){ 
         debug::log("[waiter counter pickup interaction] no food on the counter ");
         return; 
@@ -218,7 +218,7 @@ void systems::interaction_system::waiter_counter_place_down(size_t waiter, size_
         return;
     }
     // * 3. place the item oin the stroage component
-    item_system::get_instance().place_item(counter, food->get_item_id());
+    food_item_system::get_instance().place_item(counter, food->get_item_id());
     // * 4. clean up the carrier component
     waiter_carrier->drop();
     // * 5 destroy the food and tranision the state

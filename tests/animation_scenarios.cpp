@@ -45,7 +45,7 @@ namespace {
     class finished_recorder{
         public:
             finished_recorder()
-            : listener_([this](const events::animation_finished& event) -> void{
+            : listener_([this](const events::animation_finished& event) -> void {
                 count_++;
                 last_id_ = event.get_id();
                 last_slot_ = event.get_sprite_slot();

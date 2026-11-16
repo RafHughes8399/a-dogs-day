@@ -3,11 +3,42 @@
 
 #include "cafe_config.h"
 #include "entity_config.h"
-#include "enum_config.h"
 #include "game_config.h"
 #include "raylib.h"
 
 namespace hud_config{
+    enum click_actions{
+        select_recipe = 0,
+        change_page,
+        move_decoration,
+        sell_decoration,
+        store_decoration,
+        select_item,
+        size
+    };
+    enum button_kinds{
+        move_decoration_button = 0,
+        sell_decoration_button,
+        store_decoration_button,
+        inventory_item_button,
+        previous_page_button,
+        next_page_button,
+        button_kinds_size
+    };
+    inline const Rectangle menu_frame = Rectangle{400.0f, 400.0f, 200.0f, 200.0f};
+    inline const float page_nav_button_size = 20.0f;
+    inline const float page_nav_button_buffer = 8.0f;
+    inline const float inventory_page_height = 800.0f;
+    inline const Vector2 inventory_page_anchor = Vector2{page_nav_button_buffer, page_nav_button_buffer};
+    inline const Rectangle inventory_page_frame = Rectangle{0.0f, 0.0f,
+        level_config::screen_width - 2.0f * page_nav_button_buffer, inventory_page_height};
+    inline const float inventory_item_buffer = 8.0f;
+    inline const float inventory_item_border = 16.0f;
+    inline const float inventory_scale_max = 0.9f;
+    inline const float inventory_scale_min = 0.5f;
+    inline const float inventory_scale_threshold = level_config::edge_weight * 2.0f;
+    inline const float inventory_scale_reference = level_config::edge_weight * 5.0f;
+
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};
     inline Color red_decoration_highlight = Color {255, 255, 0, opacity};

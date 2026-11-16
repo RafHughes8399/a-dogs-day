@@ -263,7 +263,7 @@ namespace hud{
         hud build_pause_menu_hud();
         button build_button();
         // builder picks the strategy
-        std::unique_ptr<hud_element> build_item_hud_element(items::item& item);
+        std::unique_ptr<hud_element> build_item_hud_element(items::food_item& item);
         std::unique_ptr<hud_element> build_edit_wheel();
 
         std::unique_ptr<hud_element> build_decoration_grid();

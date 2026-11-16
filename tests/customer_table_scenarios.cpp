@@ -342,7 +342,7 @@ SCENARIO("picking a table with a single registered table", "[ecs][npc][customer_
 
         WHEN("another station sits inside the one registered table's interaction box"){
             auto table_id = game.create_table(in_cafe(320.0f, 320.0f));
-            game.create_food_counter(in_cafe(320.0f + k_neighbour_gap, 320.0f));
+            game.create_wooden_food_counter(in_cafe(320.0f + k_neighbour_gap, 320.0f));
             arrival.register_table(table_id);
 
             THEN("it is still picked - stations do not occupy one another"){

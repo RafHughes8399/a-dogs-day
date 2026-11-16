@@ -45,6 +45,9 @@ components::storage_component component_builders::build_entity_storage_component
 components::food_component component_builders::build_entity_food_component(size_t item_id){
     return components::food_component(item_id);
 }
+components::item_component component_builders::build_entity_item_component(size_t item_id){
+    return components::item_component(item_id);
+}
 components::carrier_component component_builders::build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity){
     return components::carrier_component(previous_position, current_position, carried_entity);
 }
@@ -58,8 +61,9 @@ components::hud_component component_builders::build_hud_component(sprite::nine_s
 components::position_component component_builders::build_hud_positional_component(Vector2 position){
     return components::position_component(position);
 }
-components::renderable_component::body component_builders::build_hud_body(std::vector<sprite::sprite>& sprites, size_t index){
-    return components::renderable_component::body(sprites, index);
+components::renderable_component::body component_builders::build_hud_body(std::vector<sprite::sprite>& sprites, size_t index,
+    Vector2 scale, Vector2 offset){
+    return components::renderable_component::body(sprites, index, scale, offset);
 }
 components::renderable_component component_builders::build_hud_renderable_component(std::vector<components::renderable_component::body>& bodys){
     return components::renderable_component(bodys);
@@ -78,4 +82,7 @@ components::clickable_component component_builders::build_hud_clickable_componen
 }
 components::owner_component component_builders::build_hud_owner_component(size_t owner){
     return components::owner_component(owner);
+}
+components::inventory_storage_component component_builders::build_hud_inventory_storage_component(){
+    return components::inventory_storage_component();
 }

@@ -35,28 +35,28 @@ void game::game::init(){
     debug::log("[game::init, built player] id " + std::to_string(player_id)
         + " holding cursor " + std::to_string(cursor_id));
 
-    auto khiri_id = lifespan_.create([](size_t id) -> void{
+    auto khiri_id = lifespan_.create([](size_t id) -> void {
         ecs_entities::build_khiri(id);
     }, level_config::dogs);
     debug::log("[game::init, built khiri] id " + std::to_string(khiri_id));
 
-    auto mack_id = lifespan_.create([](size_t id) -> void{
+    auto mack_id = lifespan_.create([](size_t id) -> void {
         ecs_entities::build_mack(id);
     }, level_config::dogs);
     debug::log("[game::init, built mack] id " + std::to_string(mack_id));
 
     //* -------------------------------------------------- STATION CREATE --------------------------------------------------------------------
-    auto counter = lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 5});
+    auto counter = lifespan_.create_counter(entity_config::counters::wooden_food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 5});
     for(int lasagna = 0; lasagna < game_config::counter_start_stock; ++lasagna){
-        systems::item_system::get_instance().place_item(counter, entity_config::foods::lasagna);
+        systems::food_item_system::get_instance().place_item(counter, entity_config::foods::lasagna);
     }
-    systems::item_system::get_instance().place_item(counter, entity_config::foods::espresso);
-    systems::item_system::get_instance().place_item(counter, entity_config::foods::cutlets);
+    systems::food_item_system::get_instance().place_item(counter, entity_config::foods::espresso);
+    systems::food_item_system::get_instance().place_item(counter, entity_config::foods::cutlets);
     auto food_items = component_managers::entity_storage_manager_.get_component(counter)->size();
     /** a bit messy but we're going to create some items for the food counter to store */
     debug::log("[game::init, build counter]: id " + std::to_string(counter) + " with food items:  " + std::to_string(food_items));
     // this is injected here for testing purposes. not possible in the real game
-    lifespan_.create_counter(entity_config::counters::food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 10});
+    lifespan_.create_counter(entity_config::counters::wooden_food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 10});
     lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
     lifespan_.create_table(entity_config::tables::tiled_table,Vector2{level_config::edge_weight * 10, level_config::edge_weight * 8});
     lifespan_.create_table(entity_config::tables::test_table,Vector2{level_config::edge_weight * 20, level_config::edge_weight * 8});
@@ -81,30 +81,30 @@ void game::game::init(){
     lifespan_.create_waiter_dog(entity_config::waiters::lionel, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 9});
 
     // * ----------------- DECORATIONS CREATE ------------------------------------------- // and some decorations
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_gargoyle(id, Vector2{level_config::edge_weight * 7,level_config::edge_weight *2});
-    }, level_config::draw_layers::decoration);
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_poker_table(id, Vector2{level_config::edge_weight * 10,level_config::edge_weight *20});
-    }, level_config::draw_layers::decoration);
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_dog_painting(id, Vector2{level_config::edge_weight * 9,level_config::edge_weight * 4});
-    }, level_config::draw_layers::decoration);
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_frangipani(id, Vector2{level_config::edge_weight * 24,level_config::edge_weight * 14});
-    }, level_config::draw_layers::decoration);
-    lifespan_.create([](size_t id) -> void{
-        ecs_entities::build_pavlov(id, Vector2{level_config::edge_weight * 12, level_config::edge_weight * 30});
-    }, level_config::draw_layers::decoration);
+    lifespan_.create_decoration(entity_config::decorations::gargoyle,
+        Vector2{level_config::edge_weight * 7,level_config::edge_weight *2});
+    lifespan_.create_decoration(entity_config::decorations::poker_table,
+        Vector2{level_config::edge_weight * 10,level_config::edge_weight *20});
+    lifespan_.create_decoration(entity_config::decorations::dog_painting,
+        Vector2{level_config::edge_weight * 9,level_config::edge_weight * 4});
+    lifespan_.create_decoration(entity_config::decorations::frangipani,
+        Vector2{level_config::edge_weight * 24,level_config::edge_weight * 14});
+    lifespan_.create_decoration(entity_config::decorations::pavlov,
+        Vector2{level_config::edge_weight * 12, level_config::edge_weight * 30});
     debug::log("[game::init, done] built "
         + std::to_string(component_helpers::num_registered_entity_components(khiri_id))
         + " components on khiri");
     debug::log("[game::init, done] built "
         + std::to_string(component_helpers::num_registered_entity_components(mack_id))
         + " components on mack");
-    lifespan_.create([](size_t id)-> void {
-        ecs_entities::build_ficus_lytra(id, Vector2{level_config::edge_weight * 30,level_config::edge_weight * 19});
-    }, level_config::draw_layers::decoration);
+    lifespan_.create_decoration(entity_config::decorations::ficus_lytra,
+        Vector2{level_config::edge_weight * 30,level_config::edge_weight * 19});
+    lifespan_.create_decoration(entity_config::decorations::polish_cow,
+        Vector2{level_config::edge_weight * 18,level_config::edge_weight * 28});
+    lifespan_.create_decoration(entity_config::decorations::conversation_pit,
+        Vector2{level_config::edge_weight * 22,level_config::edge_weight * 26});
+    menu_navigation_.init();
+    inventory_.init();
     return;
 }
 

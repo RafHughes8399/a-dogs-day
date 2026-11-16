@@ -62,6 +62,7 @@ extern component_manager<components::food_component> entity_food_manager_;
 extern component_manager<components::key_input_component> entity_control_manager_;
 extern component_manager<components::interactable_component> entity_interactable_manager_;
 extern component_manager<components::interactor_component> entity_interactor_manager_;
+extern component_manager<components::item_component> entity_item_manager_;
 extern component_manager<components::mouse_input_component> entity_mouse_input_manager_;
 extern component_manager<components::movement_component> entity_movement_manager_;
 extern component_manager<components::position_component> entity_positional_manager_;
@@ -78,6 +79,7 @@ extern component_manager<components::collision_component> hud_collision_manager_
 extern component_manager<components::state_machine_component> hud_state_machine_manager_;
 extern component_manager<components::clickable_component> hud_clickable_manager_;
 extern component_manager<components::owner_component> hud_owner_manager_;
+extern component_manager<components::inventory_storage_component> hud_inventory_storage_manager_;
 } // namespace component_managers
 
 #endif

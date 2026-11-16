@@ -1,14 +1,15 @@
 #include "component_helpers.hpp"
 #include "hitbox.h"
 #include "hud_element_builders.hpp"
+#include "items.h"
 #include "sprite.h"
 
 void button_builders::build_button(size_t id, Vector2 position, sprite::sprite& sprite, hitbox::hitbox& hitbox,
-    size_t action, components::click_payload payload){
+    size_t action, components::click_payload payload, Vector2 scale, Vector2 offset){
     component_helpers::add_hud_positional_component(id, position);
 
     std::vector<sprite::sprite> sprites{sprite};
-    std::vector<components::renderable_component::body> bodys{component_builders::build_hud_body(sprites, 0)};
+    std::vector<components::renderable_component::body> bodys{component_builders::build_hud_body(sprites, 0, scale, offset)};
     component_helpers::add_hud_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes{hitbox};
@@ -159,4 +160,21 @@ void button_builders::build_sell_decoration_button(size_t id, Vector2 position){
 void button_builders::build_to_storage_decoration_button(size_t id, Vector2 position){
     auto sprite = sprite_builders::build_to_storage_decoration_button_sprite();
     build_decoration_button(id, position, sprite, hud_config::click_actions::store_decoration);
+}
+void button_builders::build_inventory_item_button(size_t id, Vector2 position, size_t definition_id){
+    auto layout = items::inventory_layout_of(definition_id);
+    auto sprite = sprite_builders::build_item_sprite(definition_id);
+    auto footprint = layout.get_footprint();
+    auto border = hud_config::inventory_item_border * 0.5f;
+    auto hitbox = hitbox::hitbox(Rectangle{position.x, position.y, footprint.x, footprint.y});
+    build_button(id, position, sprite, hitbox, hud_config::click_actions::select_item,
+        components::item_choice{definition_id}, Vector2{layout.get_scale(), layout.get_scale()},
+        Vector2{border, border});
+}
+void button_builders::build_page_navigation_button(size_t id, Vector2 position, int direction){
+    auto sprite = sprite_builders::build_to_storage_decoration_button_sprite();
+    auto hitbox = hitbox::hitbox(Rectangle{position.x, position.y,
+        hud_config::page_nav_button_size, hud_config::page_nav_button_size});
+    build_button(id, position, sprite, hitbox, hud_config::click_actions::change_page,
+        components::page_turn{direction});
 }

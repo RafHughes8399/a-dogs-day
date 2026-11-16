@@ -18,14 +18,14 @@ size_t systems::entity_lifespan_system::next_id(){
 
 // create() is a template - defined in system.h.
 
+void systems::entity_lifespan_system::recycle(size_t id){
+    recycled_ids_.push(id);
+}
+
 // ---------------- lifecycle ----------------
 void systems::entity_lifespan_system::destroy(size_t entity_id){
-    if(auto* hud = component_managers::hud_manager_.get_component(entity_id)){
-        auto elements = hud->get_elements();
-        for(auto element : elements){
-            destroy_hud_element(element);
-        }
-    }
+    debug::log("[entity_lifespan_system::destroy, before] entity_id: " + std::to_string(entity_id));
+    hud_systems::hud_lifespan_system::get_instance().destroy_elements_of(entity_id);
     // executed before the components go, so listeners can still read them
     events::remove_entity removed{entity_id};
     event_interface::execute_event(removed);
@@ -33,32 +33,8 @@ void systems::entity_lifespan_system::destroy(size_t entity_id){
     component_helpers::unregister_all_entity_components(entity_id);
     component_helpers::unregister_all_hud_components(entity_id);
     recycled_ids_.push(entity_id);
-}
-
-size_t systems::entity_lifespan_system::create_hud_element(size_t owner, std::function<void(size_t)> build){
-    if(component_managers::hud_manager_.get_component(owner) == nullptr){
-        return static_cast<size_t>(game_config::empty_entity);
-    }
-    auto id = next_id();
-    build(id);
-    component_helpers::add_hud_owner_component(id, owner);
-    component_managers::hud_manager_.get_component(owner)->add_element(id);
-    events::create_hud_element created{id, owner};
-    event_interface::execute_event(created);
-    return id;
-}
-void systems::entity_lifespan_system::destroy_hud_element(size_t hud_id){
-    auto* owner_component = component_managers::hud_owner_manager_.get_component(hud_id);
-    if(owner_component == nullptr){ return; }
-    auto owner = owner_component->get_owner();
-    events::remove_hud_element removed{hud_id, owner};
-    event_interface::execute_event(removed);
-
-    if(auto* hud = component_managers::hud_manager_.get_component(owner)){
-        hud->remove_element(hud_id);
-    }
-    component_helpers::unregister_all_hud_components(hud_id);
-    recycled_ids_.push(hud_id);
+    debug::log("[entity_lifespan_system::destroy, after] entity_id: " + std::to_string(entity_id)
+        + " components unregistered, id recycled");
 }
 
 // TODO (25 / 8 / 26) stub - the loop calls this every frame, nothing to do yet
@@ -67,7 +43,7 @@ void systems::entity_lifespan_system::update(float delta){
     return;
 }
 size_t systems::entity_lifespan_system::create_customer_dog(){
-    auto id = create([this](size_t id) -> void{ dog_factory_.build_customer_dog(id); },
+    auto id = create([this](size_t id) -> void { dog_factory_.build_customer_dog(id); },
         level_config::draw_layers::dogs);
     npc_system::get_instance().register_customer(id);
     return id;
@@ -79,7 +55,7 @@ void systems::entity_lifespan_system::destroy_customer_dog(size_t entity_id){
 size_t systems::entity_lifespan_system::create_waiter_dog(size_t waiter, Vector2 position){
     std::cout << "[entity_lifespan_system::create_waiter_dog] enter waiter=" << waiter
         << " position=(" << position.x << "," << position.y << ")" << std::endl;
-    auto id = create([this](size_t waiter_type, size_t entity_id, Vector2 position) -> void{
+    auto id = create([this](size_t waiter_type, size_t entity_id, Vector2 position) -> void {
         std::cout << "[entity_lifespan_system::create_waiter_dog] build lambda"
             << " waiter_type=" << waiter_type << " entity_id=" << entity_id << std::endl;
         dog_factory_.build_waiter_dog(waiter_type, entity_id, position); },
@@ -96,7 +72,7 @@ size_t systems::entity_lifespan_system::create_waiter_dog(size_t waiter, Vector2
         npc_system::get_instance().unregister_waiter(entity_id);
 }
 size_t systems::entity_lifespan_system::create_table(size_t entity, Vector2 position){
-    auto id = create([this](size_t id, size_t entity, Vector2 position) -> void{ station_factory_.build_table(id, entity, position); },
+    auto id = create([this](size_t id, size_t entity, Vector2 position) -> void { station_factory_.build_table(id, entity, position); },
         entity, position, level_config::draw_layers::stations);
     npc_system::get_instance().register_table(id);
     return id;
@@ -107,7 +83,7 @@ void systems::entity_lifespan_system::destroy_table(size_t id){
 }
 
 size_t systems::entity_lifespan_system::create_counter(size_t counter, Vector2 position){
-    auto id = create([this](size_t id, size_t counter, Vector2 position) -> void{ station_factory_.build_counter(id, counter, position); },
+    auto id = create([this](size_t id, size_t counter, Vector2 position) -> void { station_factory_.build_counter(id, counter, position); },
         counter, position, level_config::draw_layers::stations);
     return id;
 }
@@ -116,7 +92,7 @@ void systems::entity_lifespan_system::destroy_counter(size_t id){
 }
 
 size_t systems::entity_lifespan_system::create_cooking_station(size_t cooking_station, Vector2 position){
-    auto id = create([this](size_t cooking_station, size_t entity_id, Vector2 position) -> void{
+    auto id = create([this](size_t cooking_station, size_t entity_id, Vector2 position) -> void {
         station_factory_.build_cooking_station(cooking_station, entity_id, position); },
         cooking_station, position, level_config::draw_layers::stations);
     create_cooking_station_hud(id);
@@ -148,7 +124,8 @@ void systems::entity_lifespan_system::create_decoration_hud(size_t owner){
     for(size_t index = 0; index < builders.size(); ++index){
         auto position = hud_layout::decoration_button_position(panel, index);
         auto builder = builders[index];
-        create_hud_element(owner, [builder, position](size_t id){ builder(id, position); });
+        hud_systems::hud_lifespan_system::get_instance().create_element(owner,
+            [builder, position](size_t id){ builder(id, position); });
     }
 }
 void systems::entity_lifespan_system::create_cooking_station_hud(size_t owner){
@@ -168,9 +145,10 @@ void systems::entity_lifespan_system::create_cooking_station_hud(size_t owner){
             origin.y + hud_config::recipe_icon_height_buffer * 0.5f
                 + row * (hud_config::recipe_icon_height + hud_config::recipe_icon_height_buffer)};
         auto food = recipes->get_selected_recipes()[recipe].get_food_id();
-        create_hud_element(owner, [food, button_position, recipe](size_t id){
-            button_builders::build_recipe_button(food, id, button_position, recipe);
-        });
+        hud_systems::hud_lifespan_system::get_instance().create_element(owner,
+            [food, button_position, recipe](size_t id){
+                button_builders::build_recipe_button(food, id, button_position, recipe);
+            });
     }
 }
 size_t systems::entity_lifespan_system::create_stove(Vector2 position){
@@ -194,11 +172,22 @@ size_t systems::entity_lifespan_system::create_chopping_board(Vector2 position){
 
 size_t systems::entity_lifespan_system::create_food(size_t food, Vector2 position){
     debug::log("[entity_lifespan_system, create food]: create food: " + std::to_string(food) + " at posiiton " + std::to_string(position.x) + ", " + std::to_string(position.y));
-    auto id = create([this](size_t food, size_t entity_id, Vector2 position) -> void{
+    auto id = create([this](size_t food, size_t entity_id, Vector2 position) -> void {
         food_factory_.build_food(food, entity_id, position); },
         food, position, level_config::draw_layers::dogs);
     return id;
 }
 void systems::entity_lifespan_system::destroy_food(size_t id){
+    destroy(id);
+}
+
+size_t systems::entity_lifespan_system::create_decoration(size_t decoration, Vector2 position){
+    auto id = create([this](size_t decoration, size_t entity_id, Vector2 position) -> void {
+        decoration_factory_.build_decoration(decoration, entity_id, position); },
+        decoration, position, level_config::draw_layers::decoration);
+    return id;
+}
+void systems::entity_lifespan_system::destroy_decoration(size_t id){
+    debug::log("[entity_lifespan_system::destroy_decoration] id: " + std::to_string(id));
     destroy(id);
 }

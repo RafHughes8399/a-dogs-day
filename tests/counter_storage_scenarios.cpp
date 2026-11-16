@@ -38,7 +38,7 @@ SCENARIO("a counter is built empty with only its body sprite", "[counter][storag
         testing::ecs_test_game game;
 
         WHEN("a food counter is built"){
-            auto counter_id = game.create_food_counter(counter_spot);
+            auto counter_id = game.create_wooden_food_counter(counter_spot);
 
             THEN("it carries a storage component"){
                 REQUIRE(game.has_storage(counter_id));
@@ -63,7 +63,7 @@ SCENARIO("a counter is built empty with only its body sprite", "[counter][storag
 SCENARIO("pushing food onto an empty counter creates the food slot", "[counter][storage][push]"){
     GIVEN("an empty counter"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(counter_spot);
+        auto counter_id = game.create_wooden_food_counter(counter_spot);
         REQUIRE(slot_count(counter_id) == 1);
 
         WHEN("a lasagna is pushed"){
@@ -100,7 +100,7 @@ SCENARIO("pushing onto a counter whose head is the same item stacks the count",
     "[counter][storage][push]"){
     GIVEN("a counter holding one lasagna"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(counter_spot);
+        auto counter_id = game.create_wooden_food_counter(counter_spot);
         push(counter_id, entity_config::foods::lasagna);
         REQUIRE(storage_of(counter_id)->size() == 1);
 
@@ -126,7 +126,7 @@ SCENARIO("pushing onto a counter whose head is a different item swaps the sprite
     "[counter][storage][push]"){
     GIVEN("a counter holding one lasagna"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(counter_spot);
+        auto counter_id = game.create_wooden_food_counter(counter_spot);
         push(counter_id, entity_config::foods::lasagna);
         REQUIRE(food_slot(counter_id)->get_active_index() == entity_config::foods::lasagna);
 
@@ -158,7 +158,7 @@ SCENARIO("popping a counter whose count does not reach zero keeps the item",
     "[counter][storage][pop]"){
     GIVEN("a counter holding two lasagnas as one stacked item"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(counter_spot);
+        auto counter_id = game.create_wooden_food_counter(counter_spot);
         push(counter_id, entity_config::foods::lasagna);
         push(counter_id, entity_config::foods::lasagna);
         REQUIRE(storage_of(counter_id)->head().get_count() == 2);
@@ -188,7 +188,7 @@ SCENARIO("popping the last of an item drops to the item beneath it",
     "[counter][storage][pop]"){
     GIVEN("a counter holding a lasagna with a espresso on top"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(counter_spot);
+        auto counter_id = game.create_wooden_food_counter(counter_spot);
         push(counter_id, entity_config::foods::lasagna);
         push(counter_id, entity_config::foods::espresso);
         REQUIRE(storage_of(counter_id)->size() == 2);
@@ -216,7 +216,7 @@ SCENARIO("popping the last of an item drops to the item beneath it",
 SCENARIO("popping a counter empty removes the food slot", "[counter][storage][pop]"){
     GIVEN("a counter holding a single lasagna"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(counter_spot);
+        auto counter_id = game.create_wooden_food_counter(counter_spot);
         push(counter_id, entity_config::foods::lasagna);
         REQUIRE(slot_count(counter_id) == 2);
 
@@ -258,7 +258,7 @@ SCENARIO("popping an empty counter reports nothing and changes nothing",
     "[counter][storage][pop]"){
     GIVEN("an empty counter"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(counter_spot);
+        auto counter_id = game.create_wooden_food_counter(counter_spot);
         REQUIRE(storage_of(counter_id)->empty());
 
         WHEN("a take is attempted"){
@@ -282,7 +282,7 @@ SCENARIO("popping an empty counter reports nothing and changes nothing",
 SCENARIO("a moved counter carries its stored food with it", "[counter][storage][movement]"){
     GIVEN("a counter holding a lasagna"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(counter_spot);
+        auto counter_id = game.create_wooden_food_counter(counter_spot);
         push(counter_id, entity_config::foods::lasagna);
 
         auto* position = component_managers::entity_positional_manager_.get_component(counter_id);
@@ -320,7 +320,7 @@ SCENARIO("a moved counter carries its stored food with it", "[counter][storage][
 SCENARIO("an item id with no sprite is stored but not drawn", "[counter][storage][push]"){
     GIVEN("an empty counter"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(counter_spot);
+        auto counter_id = game.create_wooden_food_counter(counter_spot);
 
         WHEN("an item id past the end of the food sprite list is pushed"){
             push(counter_id, entity_config::foods::foods_size + 5);
@@ -350,7 +350,7 @@ SCENARIO("an item id with no sprite is stored but not drawn", "[counter][storage
 SCENARIO("add_items_to_counter stocks a counter through the item system", "[counter][storage][helper]"){
     GIVEN("a fresh ecs world with an empty food counter"){
         testing::ecs_test_game game;
-        auto counter_id = game.create_food_counter(counter_spot);
+        auto counter_id = game.create_wooden_food_counter(counter_spot);
 
         REQUIRE(storage_of(counter_id)->empty());
         REQUIRE(storage_of(counter_id)->size() == 0);

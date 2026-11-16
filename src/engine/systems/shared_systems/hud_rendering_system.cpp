@@ -23,7 +23,7 @@ void hud_systems::hud_rendering_system::render(int frame){
             auto element_screen = GetWorldToScreen2D(element_position->get_position(),
                 systems::rendering_system::get_instance().get_camera());
             for(auto& body : element_renderable->get_layers()){
-                body.get_active_sprite().render(element_screen, frame);
+                body.get_active_sprite().render(Vector2Add(element_screen, body.get_offset()), frame, body.get_scale());
             }
         }
     }

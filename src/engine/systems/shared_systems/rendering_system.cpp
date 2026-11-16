@@ -78,11 +78,15 @@ void systems::rendering_system::move_camera(Vector2 move_delta){
     camera_.target = Vector2Add(camera_.target, move_delta);
     clamp_target();
     recalibrate_view_frame();
+    events::camera_moved moved{};
+    event_interface::execute_event(moved);
 }
 void systems::rendering_system::adjust_zoom(float zoom_delta){
     camera_.zoom = Clamp(expf(logf(camera_.zoom) + zoom_delta), camera_config::zoom_min,  camera_config::zoom_max);
     clamp_target();
     recalibrate_view_frame();
+    events::camera_moved moved{};
+    event_interface::execute_event(moved);
 }
 Camera2D& systems::rendering_system::get_camera(){
     return camera_;

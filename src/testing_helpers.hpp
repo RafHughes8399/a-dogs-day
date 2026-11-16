@@ -24,7 +24,7 @@ namespace helpers{
 
     inline void add_items_to_counter(size_t counter, size_t item, int count){
         for(int i = 0; i < count; ++i){
-            systems::item_system::get_instance().place_item(counter, item);
+            systems::food_item_system::get_instance().place_item(counter, item);
         }
     }
     

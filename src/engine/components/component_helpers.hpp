@@ -17,6 +17,7 @@ namespace component_helpers{
     void register_entity_selectable_component(size_t entity_id, components::selectable_component component);
     void register_entity_storage_component(size_t entity_id, components::storage_component component);
     void register_entity_food_component(size_t entity_id, components::food_component component);
+    void register_entity_item_component(size_t entity_id, components::item_component component);
     void register_entity_carrier_component(size_t entity_id, components::carrier_component component);
     void register_entity_recipes_component(size_t entity_id, components::recipes_component component);
     void register_hud_component(size_t entity_id, components::hud_component component);
@@ -26,6 +27,7 @@ namespace component_helpers{
     void register_hud_state_machine_component(size_t hud_id, components::state_machine_component component);
     void register_hud_clickable_component(size_t hud_id, components::clickable_component component);
     void register_hud_owner_component(size_t hud_id, components::owner_component component);
+    void register_hud_inventory_storage_component(size_t hud_id, components::inventory_storage_component component);
 
 
     void add_entity_positional_component(size_t entity_id, Vector2 position);
@@ -43,6 +45,7 @@ namespace component_helpers{
     void add_hud_state_machine_component(size_t hud_id, state_machine::state_machine machine);
     void add_hud_clickable_component(size_t hud_id, size_t action, components::click_payload payload = {});
     void add_hud_owner_component(size_t hud_id, size_t owner);
+    void add_hud_inventory_storage_component(size_t hud_id);
     void add_entity_renderable_component(size_t entity_id,
         std::vector<components::renderable_component::body>& bodys);
     void add_entity_collision_component(size_t entity_id,
@@ -57,6 +60,7 @@ namespace component_helpers{
     void add_entity_selectable_component(size_t entity_id, size_t kind);
     void add_entity_storage_component(size_t entity_id);
     void add_entity_food_component(size_t entity_id, size_t item_id);
+    void add_entity_item_component(size_t entity_id, size_t item_id);
     void add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
     void add_stored_item(size_t entity_id, size_t slot, size_t item_id);
     std::optional<size_t> take_stored_item(size_t entity_id, size_t slot);
@@ -80,6 +84,7 @@ namespace component_helpers{
     void unregister_entity_selectable_component(size_t entity_id);
     void unregister_entity_storage_component(size_t entity_id);
     void unregister_entity_food_component(size_t entity_id);
+    void unregister_entity_item_component(size_t entity_id);
     void unregister_entity_carrier_component(size_t entity_id);
     void unregister_hud_component(size_t entity_id);
     void unregister_hud_positional_component(size_t hud_id);
@@ -88,6 +93,7 @@ namespace component_helpers{
     void unregister_hud_state_machine_component(size_t hud_id);
     void unregister_hud_clickable_component(size_t hud_id);
     void unregister_hud_owner_component(size_t hud_id);
+    void unregister_hud_inventory_storage_component(size_t hud_id);
     void unregister_all_entity_components(size_t entity_id);
     void unregister_all_hud_components(size_t hud_id);
 

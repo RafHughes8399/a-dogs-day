@@ -6,8 +6,6 @@
 #include <utility>
 #include <vector>
 
-#include "inventory.hpp"
-
 namespace shop {
     class item_definition {
     public:
@@ -44,7 +42,7 @@ namespace shop {
 
         const std::vector<item_definition>& get_catalogue() const;
         bool can_buy(size_t item_id, int level, int funds) const;
-        bool buy(size_t item_id, int level, int& funds, inventory::inventory& into);
+        bool buy(size_t item_id, int level, int& funds);
     private:
         std::vector<item_definition> catalogue_;
     };

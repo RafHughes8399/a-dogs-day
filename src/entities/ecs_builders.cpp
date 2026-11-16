@@ -178,35 +178,58 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
             hitbox_builders::build_test_decoration_hitbox(position));
         component_helpers::add_entity_selectable_component(id,
             entity_config::selectable_kinds::decoration_kind);
+        component_helpers::add_entity_item_component(id, entity_config::decorations::test_decoration);
+    }
+    void ecs_entities::build_conversation_pit(size_t id, Vector2 position){
+        build_decoration(id, position,
+            sprite_builders::build_conversation_pit(),
+            hitbox_builders::build_conversation_pit_hitbox(position));
+        component_helpers::add_entity_item_component(id, entity_config::decorations::conversation_pit);
+        // a clickable component perhaps ?
     }
     void ecs_entities::build_gargoyle(size_t id, Vector2 position){
         build_decoration(id, position,
             sprite_builders::build_gargoyle(),
             hitbox_builders::build_gargoyle_hitbox(position));
-        // a clickable component perhaps ? 
+        component_helpers::add_entity_item_component(id, entity_config::decorations::gargoyle);
+        // a clickable component perhaps ?
     }
     void ecs_entities::build_pavlov(size_t id, Vector2 position){
         build_decoration(id, position, sprite_builders::build_pavlov(), hitbox_builders::build_pavlov_hitbox(position));
+        component_helpers::add_entity_item_component(id, entity_config::decorations::pavlov);
+    }
+    void ecs_entities::build_polish_cow(size_t id, Vector2 position){
+        build_decoration(id, position, sprite_builders::build_polish_cow(), hitbox_builders::build_polish_cow_hitbox(position));
+        component_helpers::add_entity_item_component(id, entity_config::decorations::polish_cow);
     }
     void ecs_entities::build_poker_table(size_t id, Vector2 position){
-        build_decoration(id, position, 
-            sprite_builders::build_poker_table(), 
+        build_decoration(id, position,
+            sprite_builders::build_poker_table(),
         hitbox_builders::build_poker_table_hitbox(position));
+        component_helpers::add_entity_item_component(id, entity_config::decorations::poker_table);
     }
     void ecs_entities::build_dog_painting(size_t id, Vector2 position){
         build_decoration(id, position,
         sprite_builders::build_dog_painting(),
         hitbox_builders::build_dog_painting_hitbox(position));
+        component_helpers::add_entity_item_component(id, entity_config::decorations::dog_painting);
     }
     void ecs_entities::build_ficus_lytra(size_t id, Vector2 position){
         build_decoration(id, position, sprite_builders::build_ficus_lytra(), hitbox_builders::build_ficus_lytra_hitbox(position));
+        component_helpers::add_entity_item_component(id, entity_config::decorations::ficus_lytra);
     }
     void ecs_entities::build_frangipani(size_t id, Vector2 position){
         build_decoration(id, position,
         sprite_builders::build_frangipani(),
         hitbox_builders::build_frangipani_hitbox(position));
+        component_helpers::add_entity_item_component(id, entity_config::decorations::frangipani);
         //systems::animation_system::get_instance().play(id, systems::animation_system::sprite_animation{0, 0, true});
     }
+
+void ecs_entities::build_hud_root(size_t id, Vector2 position, sprite::nine_sprite& panel){
+    component_helpers::add_entity_positional_component(id, position);
+    component_helpers::add_hud_component(id, panel);
+}
 
 void ecs_entities::build_station(size_t id, Vector2 position,
     sprite::sprite station_sprite, hitbox::hitbox station_hitbox,
@@ -239,8 +262,8 @@ void ecs_entities::build_cooking_station(size_t id, Vector2 position,
              std::nullopt, std::nullopt}, interaction_config::counter_interactee);
         component_helpers::add_entity_storage_component(id);
     }
-        void ecs_entities::build_food_counter(size_t id, Vector2 position){
-            build_counter(id, position, sprite_builders::build_food_counter_sprite());
+        void ecs_entities::build_wooden_food_counter(size_t id, Vector2 position){
+            build_counter(id, position, sprite_builders::build_wooden_food_counter_sprite());
         }
     void ecs_entities::build_table(size_t id, Vector2 position, sprite::sprite sprite){
         build_station(id, position,

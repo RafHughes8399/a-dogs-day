@@ -78,7 +78,7 @@ namespace textures{
         tiled_table_red,
         tiled_table_green,
         tiled_table_blue,
-        food_counter,
+        wooden_food_counter,
         stove,
         oven,
         espresso_station,
@@ -101,6 +101,12 @@ namespace textures{
         move_decoration_button,
         sell_decoration_button,
         ficus_lytra,
+        polish_cow,
+        conversation_pit,
+        lone_mouse,
+        javier_ceo,
+        sam_and_max,
+        gromit_knitting,
         size
         // and so on
     };

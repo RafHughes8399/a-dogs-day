@@ -1,4 +1,23 @@
 #include "hud_systems/hud_systems.hpp"
+#include "debug_log_interface.h"
+#include "system.h"
+#include "menus.h"
+#include <string>
+
+void hud_systems::hud_spatial_system::on_camera_moved(const events::camera_moved& event){
+    (void) event;
+    auto& camera = systems::rendering_system::get_instance().get_camera();
+    auto target = GetScreenToWorld2D(hud_config::inventory_page_anchor, camera);
+    auto pages = systems::menu_navigation_system::get_instance().pages_of(menus::menu_ids::inventory);
+    for(auto root : pages){
+        auto* position = component_managers::entity_positional_manager_.get_component(root);
+        auto* hud = component_managers::hud_manager_.get_component(root);
+        if(position == nullptr or hud == nullptr){ continue; }
+        auto delta = Vector2Subtract(target, position->get_position());
+        position->set_position(target);
+        move_hud(*hud, delta);
+    }
+}
 
 void hud_systems::hud_spatial_system::on_created_hud_element(const events::create_hud_element& event){
     track(event.get_id());
@@ -42,12 +61,23 @@ size_t hud_systems::hud_spatial_system::tracked_count(){
     return elements_.size();
 }
 int hud_systems::hud_spatial_system::check_collision_with(Vector2 position){
+    debug::log("[hud_spatial_system::check_collision_with] position: " + std::to_string(position.x)
+        + ", " + std::to_string(position.y) + ", tracked elements: " + std::to_string(tracked_count()));
     return elements_.check_collision(static_cast<size_t>(game_config::empty_entity), position,
         [](size_t hud_id) -> bool {
             auto* owner = component_managers::hud_owner_manager_.get_component(hud_id);
-            if(owner == nullptr){ return false; }
+            if(owner == nullptr){
+                debug::log("[hud_spatial_system::check_collision_with, filter] hud_id: " + std::to_string(hud_id)
+                    + " rejected, no owner component");
+                return false;
+            }
             auto* hud = component_managers::hud_manager_.get_component(owner->get_owner());
-            return hud != nullptr and hud->is_active();
+            bool active = hud != nullptr and hud->is_active();
+            debug::log("[hud_spatial_system::check_collision_with, filter] hud_id: " + std::to_string(hud_id)
+                + ", owner: " + std::to_string(owner->get_owner())
+                + ", hud found: " + std::to_string(hud != nullptr)
+                + ", active: " + std::to_string(active));
+            return active;
         });
 }
 void hud_systems::hud_spatial_system::clear(){
