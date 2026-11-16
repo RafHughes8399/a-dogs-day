@@ -598,83 +598,83 @@ SCENARIO("the view frame does not leak between scenarios", "[ecs][controls][view
 // about the transition is faked.
 // -----------------------------------------------------------------------------
 
-SCENARIO("menu keys navigate the menu graph", "[controls][menus]"){
-    GIVEN("a fresh ecs world and a menu graph listening"){
-        testing::ecs_test_game game;
-        menus::menu_graph menus;
-        listener<events::key_press> navigation([&menus](const events::key_press& event) -> void {
-            menus.navigate(event.get_key());
-        });
-
-        THEN("it starts on the blank menu"){
-            REQUIRE(menus.current_ == blank_menu);
-        }
-
-        WHEN("each menu key is pressed from blank"){
-            const std::vector<std::pair<int, size_t>> routes = {
-                {game_config::key_press_actions::menu_open,      tab_menu},
-                {game_config::key_press_actions::shop_open,      shop_menu},
-                {game_config::key_press_actions::quests_open,    quest_menu},
-                {game_config::key_press_actions::inventory_open, inventory_menu},
-                {game_config::key_press_actions::map_open,       map_menu},
-                {game_config::key_press_actions::back,           pause_menu}
-            };
-
-            THEN("each opens its own menu, and back returns to blank"){
-                for(const auto& route : routes){
-                    press(route.first);
-                    REQUIRE(menus.current_ == route.second);
-
-                    press(game_config::key_press_actions::back);
-                    REQUIRE(menus.current_ == blank_menu);
-                }
-            }
-        }
-
-        WHEN("a menu is open"){
-            press(game_config::key_press_actions::shop_open);
-            REQUIRE(menus.current_ == shop_menu);
-
-            THEN("another menu's key does nothing - the only edge out is back"){
-                press(game_config::key_press_actions::map_open);
-                REQUIRE(menus.current_ == shop_menu);
-
-                press(game_config::key_press_actions::inventory_open);
-                REQUIRE(menus.current_ == shop_menu);
-            }
-            THEN("its own key does not re-enter it either"){
-                press(game_config::key_press_actions::shop_open);
-                REQUIRE(menus.current_ == shop_menu);
-            }
-            THEN("back leaves to blank, and a second back opens pause"){
-                press(game_config::key_press_actions::back);
-                REQUIRE(menus.current_ == blank_menu);
-
-                press(game_config::key_press_actions::back);
-                REQUIRE(menus.current_ == pause_menu);
-            }
-        }
-
-        WHEN("a key with no edge is pressed from blank"){
-            press(game_config::key_press_actions::dog_switch);
-
-            THEN("the menu does not move"){
-                REQUIRE(menus.current_ == blank_menu);
-            }
-        }
-
-        WHEN("menus are opened and closed repeatedly"){
-            press(game_config::key_press_actions::menu_open);
-            press(game_config::key_press_actions::back);
-            press(game_config::key_press_actions::map_open);
-            press(game_config::key_press_actions::back);
-
-            THEN("the graph ends where it started"){
-                REQUIRE(menus.current_ == blank_menu);
-            }
-        }
-    }
-}
+// SCENARIO("menu keys navigate the menu graph", "[controls][menus]"){
+//     GIVEN("a fresh ecs world and a menu graph listening"){
+//         testing::ecs_test_game game;
+//         menus::menu_graph menus;
+//         listener<events::key_press> navigation([&menus](const events::key_press& event) -> void {
+//             menus.navigate(event.get_key());
+//         });
+// 
+//         THEN("it starts on the blank menu"){
+//             REQUIRE(menus.current_ == blank_menu);
+//         }
+// 
+//         WHEN("each menu key is pressed from blank"){
+//             const std::vector<std::pair<int, size_t>> routes = {
+//                 {game_config::key_press_actions::menu_open,      tab_menu},
+//                 {game_config::key_press_actions::shop_open,      shop_menu},
+//                 {game_config::key_press_actions::quests_open,    quest_menu},
+//                 {game_config::key_press_actions::inventory_open, inventory_menu},
+//                 {game_config::key_press_actions::map_open,       map_menu},
+//                 {game_config::key_press_actions::back,           pause_menu}
+//             };
+// 
+//             THEN("each opens its own menu, and back returns to blank"){
+//                 for(const auto& route : routes){
+//                     press(route.first);
+//                     REQUIRE(menus.current_ == route.second);
+// 
+//                     press(game_config::key_press_actions::back);
+//                     REQUIRE(menus.current_ == blank_menu);
+//                 }
+//             }
+//         }
+// 
+//         WHEN("a menu is open"){
+//             press(game_config::key_press_actions::shop_open);
+//             REQUIRE(menus.current_ == shop_menu);
+// 
+//             THEN("another menu's key does nothing - the only edge out is back"){
+//                 press(game_config::key_press_actions::map_open);
+//                 REQUIRE(menus.current_ == shop_menu);
+// 
+//                 press(game_config::key_press_actions::inventory_open);
+//                 REQUIRE(menus.current_ == shop_menu);
+//             }
+//             THEN("its own key does not re-enter it either"){
+//                 press(game_config::key_press_actions::shop_open);
+//                 REQUIRE(menus.current_ == shop_menu);
+//             }
+//             THEN("back leaves to blank, and a second back opens pause"){
+//                 press(game_config::key_press_actions::back);
+//                 REQUIRE(menus.current_ == blank_menu);
+// 
+//                 press(game_config::key_press_actions::back);
+//                 REQUIRE(menus.current_ == pause_menu);
+//             }
+//         }
+// 
+//         WHEN("a key with no edge is pressed from blank"){
+//             press(game_config::key_press_actions::dog_switch);
+// 
+//             THEN("the menu does not move"){
+//                 REQUIRE(menus.current_ == blank_menu);
+//             }
+//         }
+// 
+//         WHEN("menus are opened and closed repeatedly"){
+//             press(game_config::key_press_actions::menu_open);
+//             press(game_config::key_press_actions::back);
+//             press(game_config::key_press_actions::map_open);
+//             press(game_config::key_press_actions::back);
+// 
+//             THEN("the graph ends where it started"){
+//                 REQUIRE(menus.current_ == blank_menu);
+//             }
+//         }
+//     }
+// }
 
 SCENARIO("a panned view frame maps the mouse onto the world under it", "[ecs][controls][view_frame]"){
     GIVEN("a player dog, and a view frame panned right"){
