@@ -663,6 +663,9 @@ namespace systems{
                 footpath_.render(frame);
             }
 #ifdef DOG_DAYS_TESTING
+            int graph_occupant_at(Vector2 position){
+                return graph_.occupant_at(position);
+            }
             size_t graph_occupied_node_count(){
                 std::set<std::pair<float, float>> cells;
                 for(auto* graph : graphs()){
