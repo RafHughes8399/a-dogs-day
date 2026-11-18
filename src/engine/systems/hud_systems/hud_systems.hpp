@@ -9,6 +9,7 @@
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
+#include "input_events.h"
 #include "quadtree.h"
 #include "button_factory.hpp"
 #include "queries.h"
@@ -25,6 +26,7 @@ namespace hud_systems{
             event_interface::unsubscribe<events::remove_hud_element>(remove_hud_element_handler_);
             event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
             event_interface::unsubscribe<events::camera_moved>(camera_moved_handler_);
+            event_interface::unsubscribe<events::cursor_moved>(cursor_moved_handler_);
         }
         hud_spatial_system(const hud_spatial_system& other) = delete;
         hud_spatial_system(hud_spatial_system&& other) = delete;
@@ -36,6 +38,7 @@ namespace hud_systems{
         void on_removed_hud_element(const events::remove_hud_element& event);
         void on_moved_entity(const events::move_entity& event);
         void on_camera_moved(const events::camera_moved& event);
+        void on_cursor_moved(const events::cursor_moved& event);
         void track(size_t hud_id);
         void untrack(size_t hud_id);
         bool is_tracked(size_t hud_id);
@@ -51,11 +54,13 @@ namespace hud_systems{
           remove_hud_element_handler_([this](const events::remove_hud_element& event) -> void {on_removed_hud_element(event);}),
           move_entity_handler_([this](const events::move_entity& event) -> void {on_moved_entity(event);}),
           camera_moved_handler_([this](const events::camera_moved& event) -> void {on_camera_moved(event);}),
+          cursor_moved_handler_([this](const events::cursor_moved& event) -> void {on_cursor_moved(event);}),
           elements_(world_bounds, MAX_DEPTH, component_managers::hud_collision_manager_){
             event_interface::subscribe<events::create_hud_element>(create_hud_element_handler_);
             event_interface::subscribe<events::remove_hud_element>(remove_hud_element_handler_);
             event_interface::subscribe<events::move_entity>(move_entity_handler_);
             event_interface::subscribe<events::camera_moved>(camera_moved_handler_);
+            event_interface::subscribe<events::cursor_moved>(cursor_moved_handler_);
         }
         void move_hud(components::hud_component& hud, Vector2 delta);
 
@@ -63,6 +68,7 @@ namespace hud_systems{
         events::event_handler<events::remove_hud_element> remove_hud_element_handler_;
         events::event_handler<events::move_entity> move_entity_handler_;
         events::event_handler<events::camera_moved> camera_moved_handler_;
+        events::event_handler<events::cursor_moved> cursor_moved_handler_;
         tree::ecs_quadtree elements_;
     };
 

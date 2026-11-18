@@ -3,6 +3,7 @@
 #define EVENTS_INPUT_EVENTS_H
 
 #include "event_core.h"
+#include "hitbox.h"
 
 namespace events{
 		// for when the cursor potentially interacts with a button on a menu, main listener is the meny graph that checks the buttons
@@ -38,6 +39,26 @@ namespace events{
 		private:
 			const int key_;
 	};
+
+	class cursor_moved : public event{
+		public:
+			cursor_moved(size_t id, Vector2 new_position)
+			:event(ids::cursor_moved_id), id_(id), new_position_(new_position){}
+				size_t get_id() const{
+					return id_;
+				}
+			
+			static int get_static_type(){
+				return ids::cursor_moved_id;
+			}
+			Vector2 get_postiion() const{
+				return new_position_;
+			}
+		private:
+			const size_t id_;
+			const Vector2 new_position_;
+	};
+
 }
 
 #endif

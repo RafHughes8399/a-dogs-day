@@ -1,5 +1,6 @@
 #include "hud_systems/hud_systems.hpp"
 #include "debug_log_interface.h"
+#include "input_events.h"
 #include "system.h"
 #include "menus.h"
 #include <string>
@@ -18,7 +19,13 @@ void hud_systems::hud_spatial_system::on_camera_moved(const events::camera_moved
         move_hud(*hud, delta);
     }
 }
+void hud_systems::hud_spatial_system::on_cursor_moved(const events::cursor_moved& event){
+    auto collision = component_managers::entity_collision_manager_.get_component(event.get_id());
+    if(not collision){ return; }
+    auto& cursor_hitbox = collision->get_hitbox_component().get_hitbox();
+    (void) cursor_hitbox;
 
+}
 void hud_systems::hud_spatial_system::on_created_hud_element(const events::create_hud_element& event){
     track(event.get_id());
 }
@@ -79,6 +86,13 @@ int hud_systems::hud_spatial_system::check_collision_with(Vector2 position){
                 + ", active: " + std::to_string(active));
             return active;
         });
+}
+int hud_systems::hud_spatial_system::check_collisions_with(Vector2 position){
+    // are there colliisions
+
+    // sort collisions
+
+    // return head;
 }
 void hud_systems::hud_spatial_system::clear(){
     elements_.clear();

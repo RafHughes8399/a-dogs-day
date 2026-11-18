@@ -13,6 +13,7 @@
 #include "component.h"
 #include "component_managers.hpp"
 #include "config.h"
+#include "game_config.h"
 #include "hitbox.h"
 #include "queries.h"
 #include "query_interface.h"
@@ -70,6 +71,8 @@ namespace tree{
             const std::function<bool(size_t)>& filter);
         int is_there_collision(std::unique_ptr<node>& tree, Rectangle box, size_t id,
             const std::function<bool(size_t)>& filter);
+        std::vector<int> are_there_collisions(std::unique_ptr<node>& tree, Rectangle box, size_t id,
+            const std::function<bool(size_t)>& filter, std::vector<int>& matches);
         int is_there_interaction(std::unique_ptr<node>& tree, Rectangle box, size_t id);
         bool node_contains_object(raglib::bounding_box_2& node, const Rectangle& object);
         bool node_contains_position(raglib::bounding_box_2& ndoe, const Vector2& position);
@@ -176,6 +179,11 @@ namespace tree{
         int check_collision(size_t id, Rectangle box,
             const std::function<bool(size_t)>& filter = any_entity){
             return is_there_collision(root_, box,  id, filter);
+        }
+        std::vector<int> check_collisions(size_t id, Rectangle box, const std::function<bool(size_t)>& filter = any_entity){
+            std::vector<int> collisions ={};
+            are_there_collisions(root_, box, id, filter, collisions);
+            return collisions;
         }
         int check_interaction(size_t id, Rectangle box){
             return is_there_interaction(root_, box, id);

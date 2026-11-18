@@ -3,6 +3,8 @@
 #include "config.h"
 #include "debug_log_interface.h"
 #include "debug_logger.h"
+#include "entity_systems.hpp"
+#include "input_events.h"
 #include "raglib.h"
 #include "system.h"
 #include "system_events.h"
@@ -89,6 +91,9 @@ void systems::control_input_system::update(float delta){
         auto* position = component_managers::entity_positional_manager_.get_component(id);
         if(position != nullptr and not Vector2Equals(position->get_position(), cursor_position)){
             systems::movement_system::get_instance().update_position(id, cursor_position);
+            // emit a cursor moved event that the hud spatial system listenes to
+                events::cursor_moved moved = {id, cursor_position};
+                event_interface::execute_event(moved);
         }
         // * check for mouse input also
         check_inputs(id, inputs, delta);
