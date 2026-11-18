@@ -40,6 +40,18 @@ namespace hud_config{
     inline const float inventory_scale_min = 0.5f;
     inline const float inventory_scale_threshold = level_config::edge_weight * 2.0f;
     inline const float inventory_scale_reference = level_config::edge_weight * 5.0f;
+    
+
+
+    inline const float  shop_page_width_buffer = inventory_page_width_buffer;
+    inline const float shop_page_height_buffer = inventory_page_height_buffer;
+    inline const Rectangle shop_page_frame = inventory_page_frame;
+
+    inline const float quest_page_width_buffer = inventory_page_width_buffer / 2;
+    inline const float quest_page_height_buffer = inventory_page_height_buffer / 2;
+    inline const float quest_page_width = 8 * level_config::edge_weight;
+    inline const Rectangle quest_page_frame = Rectangle{0.0f + quest_page_width_buffer, 0.0f + quest_page_height_buffer, quest_page_width, level_config::screen_height - (2 * quest_page_height_buffer) };
+
 
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};

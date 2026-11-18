@@ -172,7 +172,9 @@ add_library(systems
   src/engine/systems/shared_systems/animation_system.cpp
   src/engine/systems/shared_systems/state_machine_system.cpp
   src/engine/systems/entity_systems/food_item_system.cpp
-  src/engine/systems/entity_systems/inventory_system.cpp
+  src/engine/systems/interface_systems/inventory_system.cpp
+  src/engine/systems/interface_systems/quest_system.cpp
+  src/engine/systems/interface_systems/shop_system.cpp
   src/engine/systems/entity_systems/menu_navigation_system.cpp
   src/engine/systems/hud_systems/hud.cpp
   src/engine/systems/hud_systems/click_system.cpp

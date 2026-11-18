@@ -30,7 +30,10 @@ and pause the game when a menu is opened ? or keep it going ? are we doing fallo
 need to introduce builders for the screens and then a pause and unpause event
 that is triggered on menu navigation to and from the pause menu respectively
 
-i think dimensions should also be adjusted. lets give a 128 edge buffer on the width of the screeen and a 256 buffer on the height
+i think dimensions should also be adjusted. lets give a 128 edge buffer on the width of the screeen and a 256 buffer on the height. done
+
+ok so we need to build the shop menu which can be the same size. and the pause menu which is slightly different.\
+lets also humor quests. can just be a side bar on the left for now. like full height. maybe 0.3 width
 
 ## Slice 3 : Button Hovering
 need to introduce a hud collision check when the cursor moves. it should check active hud elements only and only buttons. so we need to confirm we have a way to check the active / inactive state of the hud component 

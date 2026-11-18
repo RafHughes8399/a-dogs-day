@@ -1,15 +1,18 @@
 #include "hud_config.h"
 #include "hud_systems/hud_systems.hpp"
+#include "menus.h"
 #include "system.h"
 #include "component_helpers.hpp"
 #include "hud_element_builders.hpp"
+#include <raylib.h>
 
 size_t hud_systems::hud_lifespan_system::create_menu_page(std::function<void(size_t)> build){
     auto id = systems::entity_lifespan_system::get_instance().next_id();
     build(id);
     return id;
 }
-size_t hud_systems::hud_lifespan_system::create_inventory_menu(Rectangle frame){
+size_t hud_systems::hud_lifespan_system::create_inventory_menu(){
+    auto frame = hud_config::inventory_page_frame;
     auto anchor = GetScreenToWorld2D(Vector2{hud_config::inventory_page_frame.x, hud_config::inventory_page_frame.y}, systems::rendering_system::get_instance().get_camera());
     auto root = create_menu_page([frame, anchor](size_t id) -> void { page_builders::build_inventory_menu(id, frame, anchor); });
     auto buffer = hud_config::page_nav_button_buffer;
@@ -20,6 +23,22 @@ size_t hud_systems::hud_lifespan_system::create_inventory_menu(Rectangle frame){
     request_button(root, hud_config::button_kinds::next_page_button,
         Vector2{ frame.x + frame.width - size - buffer, bottom});
     systems::menu_navigation_system::get_instance().add_root(menus::menu_ids::inventory, root);
+    return root;
+}
+size_t hud_systems::hud_lifespan_system::create_shop_menu(){
+    auto frame = hud_config::shop_page_frame;
+    auto anchor = GetScreenToWorld2D(Vector2{hud_config::shop_page_frame.x, hud_config::shop_page_frame.y}, systems::rendering_system::get_instance().get_camera());
+    auto root = create_menu_page([frame, anchor](size_t id) -> void { page_builders::build_shop_menu(id, frame, anchor); });
+
+    systems::menu_navigation_system::get_instance().add_root(menus::menu_ids::shop, root);
+    return root;
+}
+size_t hud_systems::hud_lifespan_system::create_quest_menu(){
+    auto frame = hud_config::quest_page_frame;
+    auto anchor = GetScreenToWorld2D(Vector2{hud_config::quest_page_frame.x, hud_config::quest_page_frame.y}, systems::rendering_system::get_instance().get_camera());
+    auto root = create_menu_page([frame, anchor](size_t id) -> void { page_builders::build_quest_menu(id, frame, anchor); });
+
+    systems::menu_navigation_system::get_instance().add_root(menus::menu_ids::quest, root);
     return root;
 }
 std::optional<size_t> hud_systems::hud_lifespan_system::request_button(size_t owner, size_t kind, Vector2 position, size_t subject){

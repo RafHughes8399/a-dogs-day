@@ -37,6 +37,8 @@ namespace game{
                 hud_(hud_systems::hud::get_instance()),
                 hud_spatial_(hud_systems::hud_spatial_system::get_instance()),
                 inventory_(systems::inventory_system::get_instance()),
+                shop_(systems::shop_system::get_instance()),
+                quest_(systems::quest_system::get_instance()),
                 menu_navigation_(systems::menu_navigation_system::get_instance()){}
             // systems subscribe handlers in their constructors, so they are
             // non-copyable and non-movable - and so is anything holding them.
@@ -73,6 +75,8 @@ namespace game{
             hud_systems::hud& hud_;
             hud_systems::hud_spatial_system& hud_spatial_;
             systems::inventory_system& inventory_;
+            systems::shop_system& shop_;
+            systems::quest_system& quest_;
             systems::menu_navigation_system& menu_navigation_;
     };
 }

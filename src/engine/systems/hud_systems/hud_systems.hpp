@@ -133,7 +133,9 @@ namespace hud_systems{
         hud_lifespan_system& operator=(hud_lifespan_system&& other) = delete;
 
         size_t create_menu_page(std::function<void(size_t)> build);
-        size_t create_inventory_menu(Rectangle frame);
+        size_t create_inventory_menu();
+        size_t create_shop_menu();
+        size_t create_quest_menu();
         size_t create_element(size_t owner, std::function<void(size_t)> build);
         void destroy_element(size_t hud_id);
         void destroy_elements_of(size_t owner);

@@ -919,7 +919,7 @@ SCENARIO("an inventory page stays pinned to the view when the camera pans", "[hu
         hud_systems::hud::get_instance();
         hud_systems::hud_spatial_system::get_instance();
         auto& rendering = systems::rendering_system::get_instance();
-        auto root = hud_systems::hud_lifespan_system::get_instance().create_inventory_menu(hud_config::inventory_page_frame);
+        auto root = hud_systems::hud_lifespan_system::get_instance().create_inventory_menu();
         auto* root_position = component_managers::entity_positional_manager_.get_component(root);
         auto* hud = component_managers::hud_manager_.get_component(root);
         REQUIRE(root_position != nullptr);

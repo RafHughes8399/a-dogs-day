@@ -17,7 +17,7 @@ bool systems::inventory_system::store_item(size_t definition_id){
     auto* storage = component_managers::hud_inventory_storage_manager_.get_component(page);
     auto position = storage != nullptr ? storage->place(definition_id, footprint) : std::nullopt;
     if(not position){
-        page = hud_systems::hud_lifespan_system::get_instance().create_inventory_menu(hud_config::inventory_page_frame);
+        page = hud_systems::hud_lifespan_system::get_instance().create_inventory_menu();
         storage = component_managers::hud_inventory_storage_manager_.get_component(page);
         position = storage != nullptr ? storage->place(definition_id, footprint) : std::nullopt;
     }
@@ -33,5 +33,5 @@ std::optional<size_t> systems::inventory_system::take_item(size_t item_id){
     return std::nullopt;
 }
 void systems::inventory_system::init(){
-    hud_systems::hud_lifespan_system::get_instance().create_inventory_menu(hud_config::inventory_page_frame);
+    hud_systems::hud_lifespan_system::get_instance().create_inventory_menu();
 }

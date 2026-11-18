@@ -105,6 +105,8 @@ void game::game::init(){
         Vector2{level_config::edge_weight * 22,level_config::edge_weight * 26});
     menu_navigation_.init();
     inventory_.init();
+    shop_.init();
+    quest_.init();
     return;
 }
 
