@@ -5,6 +5,14 @@ The issue describes three different slices for this work to improve the hud inte
 ## Slice 1: Cursor Rendering
 presently the cursor renders behind the hud, the fix is simple: just add a new render layer for the cursor which is placed above everything else
 
+-> the render layer stuff already exists, its just that the hud rendering system renders after the rendering system and thus 
+is drawn on top
+maybe it is best if we scrap the hud and cursor layers in the render layer setup and then do the global cursor thing
+
+yeah so we just draw the cursor layer last.
+
+ok solved.
+
 ## Slice 2 : Menu Navigation System Expansion
 
 build blank screens for each of the other menus. 
@@ -21,6 +29,8 @@ and pause the game when a menu is opened ? or keep it going ? are we doing fallo
 
 need to introduce builders for the screens and then a pause and unpause event
 that is triggered on menu navigation to and from the pause menu respectively
+
+i think dimensions should also be adjusted. lets give a 128 edge buffer on the width of the screeen and a 256 buffer on the height
 
 ## Slice 3 : Button Hovering
 need to introduce a hud collision check when the cursor moves. it should check active hud elements only and only buttons. so we need to confirm we have a way to check the active / inactive state of the hud component 

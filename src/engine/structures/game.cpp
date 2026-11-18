@@ -136,6 +136,7 @@ void game::game::render(float delta){
     (void) delta;
     rendering_.render(frame_count_);
     hud_.render(frame_count_);
+    rendering_.render_cursor(frame_count_);
     DrawFPS(25, 25);
     return;
 }

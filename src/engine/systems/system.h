@@ -663,9 +663,6 @@ namespace systems{
                 footpath_.render(frame);
             }
 #ifdef DOG_DAYS_TESTING
-            int graph_occupant_at(Vector2 position){
-                return graph_.occupant_at(position);
-            }
             size_t graph_occupied_node_count(){
                 std::set<std::pair<float, float>> cells;
                 for(auto* graph : graphs()){
@@ -802,6 +799,7 @@ namespace systems{
             rendering_system& operator=(rendering_system&& other) = delete;
 
             void render(int frame);
+            void render_cursor(int frame);
             void on_created_entity(const events::create_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
             void recalibrate_view_frame();

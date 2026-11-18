@@ -1,3 +1,4 @@
+#include "hud_config.h"
 #include "hud_systems/hud_systems.hpp"
 #include "system.h"
 #include "component_helpers.hpp"
@@ -9,15 +10,15 @@ size_t hud_systems::hud_lifespan_system::create_menu_page(std::function<void(siz
     return id;
 }
 size_t hud_systems::hud_lifespan_system::create_inventory_menu(Rectangle frame){
-    auto anchor = GetScreenToWorld2D(hud_config::inventory_page_anchor, systems::rendering_system::get_instance().get_camera());
+    auto anchor = GetScreenToWorld2D(Vector2{hud_config::inventory_page_frame.x, hud_config::inventory_page_frame.y}, systems::rendering_system::get_instance().get_camera());
     auto root = create_menu_page([frame, anchor](size_t id) -> void { page_builders::build_inventory_menu(id, frame, anchor); });
     auto buffer = hud_config::page_nav_button_buffer;
     auto size = hud_config::page_nav_button_size;
-    auto bottom = anchor.y + frame.y + frame.height - size - buffer;
+    auto bottom =  frame.y + frame.height - size - buffer;
     request_button(root, hud_config::button_kinds::previous_page_button,
-        Vector2{anchor.x + frame.x + buffer, bottom});
+        Vector2{frame.x + buffer, bottom});
     request_button(root, hud_config::button_kinds::next_page_button,
-        Vector2{anchor.x + frame.x + frame.width - size - buffer, bottom});
+        Vector2{ frame.x + frame.width - size - buffer, bottom});
     systems::menu_navigation_system::get_instance().add_root(menus::menu_ids::inventory, root);
     return root;
 }
