@@ -23,6 +23,5 @@ namespace raglib{
         return "{" + std::to_string(vector.x) + ", " + std::to_string(vector.y) + "}";
     }
 
-    Rectangle
 }
 #endif

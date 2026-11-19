@@ -1,8 +1,11 @@
+#include "game_config.h"
+#include "hud_systems.hpp"
 #include "hud_systems/hud_systems.hpp"
 #include "debug_log_interface.h"
 #include "input_events.h"
 #include "system.h"
 #include "menus.h"
+#include <algorithm>
 #include <string>
 
 void hud_systems::hud_spatial_system::on_camera_moved(const events::camera_moved& event){
@@ -18,18 +21,27 @@ void hud_systems::hud_spatial_system::on_camera_moved(const events::camera_moved
         position->set_position(target);
         move_hud(*hud, delta);
     }
+    refresh_hover();
 }
 void hud_systems::hud_spatial_system::on_cursor_moved(const events::cursor_moved& event){
-    auto collision = component_managers::entity_collision_manager_.get_component(event.get_id());
-    if(not collision){ return; }
-    auto& cursor_hitbox = collision->get_hitbox_component().get_hitbox();
-    
-    // look for collisions and then adjust the hud renderable componetn to do this
-    auto colliding_hud_element_id = check_collisions_with(event.get_id(), cursor_hitbox.get_box());
-
-    // send an event to the hud rendering system to scale the hover componet of a button
-    // todo implement the hover componetn and the event
-
+    cursor_id_ = static_cast<int>(event.get_id());
+    refresh_hover();
+}
+void hud_systems::hud_spatial_system::refresh_hover(){
+    if(cursor_id_ == game_config::empty_entity){ return; }
+    auto cursor = static_cast<size_t>(cursor_id_);
+    auto& hover = hud_systems::hover_system::get_instance();
+    auto* collision = component_managers::entity_collision_manager_.get_component(cursor);
+    if(collision == nullptr){
+        hover.unhover();
+        return;
+    }
+    auto hovered = check_collisions_with(cursor, collision->get_hitbox_component().get_hitbox().get_box());
+    if(hovered == game_config::empty_entity){
+        hover.unhover();
+        return;
+    }
+    hover.hover(static_cast<size_t>(hovered));
 }
 void hud_systems::hud_spatial_system::on_created_hud_element(const events::create_hud_element& event){
     track(event.get_id());
@@ -73,6 +85,10 @@ size_t hud_systems::hud_spatial_system::tracked_count(){
     return elements_.size();
 }
 
+bool hud_systems::hud_spatial_system::is_hoverable_element(size_t element_id){
+    return component_managers::hud_hoverable_manager_.get_component(element_id) != nullptr
+        and is_hud_element_active(element_id);
+}
 bool hud_systems::hud_spatial_system::is_hud_element_active(size_t element_id){
     auto hud_owner = component_managers::hud_owner_manager_.get_component(element_id);
     if(not hud_owner) {return false;}
@@ -91,8 +107,7 @@ int hud_systems::hud_spatial_system::check_collision_with(Vector2 position){
 int hud_systems::hud_spatial_system::check_collisions_with(size_t cursor_id, Rectangle box){
     // are there colliisions
     auto collisions = elements_.check_collisions(cursor_id, box, [this](size_t hud_id) -> bool {
-        return is_hud_element_active(hud_id);
-    
+        return is_hoverable_element(hud_id);
     });
     // sort collisions
     if(collisions.empty()) {return game_config::empty_entity;}

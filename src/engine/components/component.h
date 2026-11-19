@@ -114,6 +114,21 @@ class clickable_component{
         size_t action_;
         click_payload payload_;
 };
+class hoverable_component{
+    public:
+        ~hoverable_component() = default;
+        hoverable_component(Vector2 scale = Vector2One())
+        : scale_(scale){}
+        hoverable_component(const hoverable_component& other) = default;
+        hoverable_component(hoverable_component&& other) = default;
+
+        hoverable_component& operator=(const hoverable_component& other) = default;
+        hoverable_component& operator=(hoverable_component&& other) = default;
+
+        Vector2 get_scale() const;
+    private:
+        Vector2 scale_;
+};
 class collision_component {
 public:
   class hitbox_component {
@@ -432,7 +447,7 @@ public:
     // TODO (25 / 8 / 26) fix magic number what is 0
     body(std::vector<sprite::sprite> &sprites, size_t index = 0,
         Vector2 scale = Vector2One(), Vector2 offset = Vector2Zero())
-        : sprites_(sprites), active_index_(index), scale_(scale), offset_(offset) {}
+        : sprites_(sprites), active_index_(index), scale_(scale), base_scale_(scale), offset_(offset) {}
     body(const body& other) = default;
     body(body&& other) = default;
 
@@ -447,11 +462,15 @@ public:
       Vector2 get_scale() const;
       Vector2 get_offset() const;
 
+      void scale_by(Vector2 factor);
+      void reset_scale();
+
   private:
     // * holds all the parts of the dog
     std::vector<sprite::sprite> sprites_;
     size_t active_index_;
     Vector2 scale_;
+    Vector2 base_scale_;
     Vector2 offset_;
   };
 
@@ -470,6 +489,10 @@ public:
   void add_body(body layer);
   void remove_body(size_t index);
   void set_body(size_t index, body layer);
+
+  void scale_by(Vector2 factor);
+  void reset_scale();
+
 private:
   // * holds the different directions
   std::vector<body> body_;
@@ -607,6 +630,7 @@ namespace component_builders{
     components::state_machine_component build_hud_state_machine_component(state_machine::state_machine machine);
     components::clickable_component build_hud_clickable_component(size_t action, components::click_payload payload = {});
     components::owner_component build_hud_owner_component(size_t owner);
+    components::hoverable_component build_hud_hoverable_component(Vector2 scale);
 }
 
 #endif

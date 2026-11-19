@@ -962,6 +962,7 @@ namespace {
         component_helpers::register_hud_collision_component(hud_id,
             component_builders::build_hud_collision_component(
                 component_builders::build_hud_hitbox_component(hitboxes, 0)));
+        component_helpers::add_hud_hoverable_component(hud_id, hud_config::button_hover_scale);
     }
 
     size_t create_boxed_element_sized(size_t owner, Rectangle box){

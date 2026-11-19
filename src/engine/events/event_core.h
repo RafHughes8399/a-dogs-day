@@ -63,6 +63,7 @@ namespace events{
         sell_decoration_id,
 		camera_moved_id,
 		cursor_moved_id,
+		hover_hud_entity_id,
 		size
 	};
 	class event{
