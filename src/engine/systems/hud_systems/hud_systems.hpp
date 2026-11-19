@@ -44,6 +44,7 @@ namespace hud_systems{
         bool is_tracked(size_t hud_id);
         size_t tracked_count();
         int check_collision_with(Vector2 position);
+        int check_collisions_with(size_t id, Rectangle box);
         void clear();
     private:
         hud_spatial_system(raglib::bounding_box_2 world_bounds = raglib::bounding_box_2{
@@ -63,7 +64,8 @@ namespace hud_systems{
             event_interface::subscribe<events::cursor_moved>(cursor_moved_handler_);
         }
         void move_hud(components::hud_component& hud, Vector2 delta);
-
+        bool is_hud_element_active(size_t element_id);
+        
         events::event_handler<events::create_hud_element> create_hud_element_handler_;
         events::event_handler<events::remove_hud_element> remove_hud_element_handler_;
         events::event_handler<events::move_entity> move_entity_handler_;

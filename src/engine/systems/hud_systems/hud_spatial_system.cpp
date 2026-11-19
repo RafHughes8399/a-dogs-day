@@ -23,7 +23,12 @@ void hud_systems::hud_spatial_system::on_cursor_moved(const events::cursor_moved
     auto collision = component_managers::entity_collision_manager_.get_component(event.get_id());
     if(not collision){ return; }
     auto& cursor_hitbox = collision->get_hitbox_component().get_hitbox();
-    (void) cursor_hitbox;
+    
+    // look for collisions and then adjust the hud renderable componetn to do this
+    auto colliding_hud_element_id = check_collisions_with(event.get_id(), cursor_hitbox.get_box());
+
+    // send an event to the hud rendering system to scale the hover componet of a button
+    // todo implement the hover componetn and the event
 
 }
 void hud_systems::hud_spatial_system::on_created_hud_element(const events::create_hud_element& event){
@@ -67,31 +72,46 @@ bool hud_systems::hud_spatial_system::is_tracked(size_t hud_id){
 size_t hud_systems::hud_spatial_system::tracked_count(){
     return elements_.size();
 }
+
+bool hud_systems::hud_spatial_system::is_hud_element_active(size_t element_id){
+    auto hud_owner = component_managers::hud_owner_manager_.get_component(element_id);
+    if(not hud_owner) {return false;}
+    auto hud = component_managers::hud_manager_.get_component(hud_owner->get_owner());
+    if(not hud){return false;}
+    return hud->is_active();
+}
 int hud_systems::hud_spatial_system::check_collision_with(Vector2 position){
     debug::log("[hud_spatial_system::check_collision_with] position: " + std::to_string(position.x)
         + ", " + std::to_string(position.y) + ", tracked elements: " + std::to_string(tracked_count()));
     return elements_.check_collision(static_cast<size_t>(game_config::empty_entity), position,
-        [](size_t hud_id) -> bool {
-            auto* owner = component_managers::hud_owner_manager_.get_component(hud_id);
-            if(owner == nullptr){
-                debug::log("[hud_spatial_system::check_collision_with, filter] hud_id: " + std::to_string(hud_id)
-                    + " rejected, no owner component");
-                return false;
-            }
-            auto* hud = component_managers::hud_manager_.get_component(owner->get_owner());
-            bool active = hud != nullptr and hud->is_active();
-            debug::log("[hud_spatial_system::check_collision_with, filter] hud_id: " + std::to_string(hud_id)
-                + ", owner: " + std::to_string(owner->get_owner())
-                + ", hud found: " + std::to_string(hud != nullptr)
-                + ", active: " + std::to_string(active));
-            return active;
-        });
+        [this](size_t hud_id) -> bool {
+            return is_hud_element_active(hud_id);
+        }); 
 }
-int hud_systems::hud_spatial_system::check_collisions_with(Vector2 position){
+int hud_systems::hud_spatial_system::check_collisions_with(size_t cursor_id, Rectangle box){
     // are there colliisions
-
+    auto collisions = elements_.check_collisions(cursor_id, box, [this](size_t hud_id) -> bool {
+        return is_hud_element_active(hud_id);
+    
+    });
     // sort collisions
-
+    if(collisions.empty()) {return game_config::empty_entity;}
+    if(collisions.size() == 1) { return collisions[0];}
+    else{
+        std::sort(collisions.begin(), collisions.end(), [box](const int& a, const int& b) -> bool {
+            // looking for a  a > b comparison on size
+            auto a_collision = component_managers::hud_collision_manager_.get_component(a);
+            auto b_collision = component_managers::hud_collision_manager_.get_component(b);
+            // to maintain the order a > b - a sort in ascending order
+            if(not a_collision){return false;}
+            if(not b_collision) {return true;}
+            auto a_overlap = GetCollisionRec(box, a_collision->get_hitbox_component().get_hitbox().get_box());
+            auto b_overlap = GetCollisionRec(box, b_collision->get_hitbox_component().get_hitbox().get_box());
+            
+            return (a_overlap.width * a_overlap.height) > (b_overlap.width * b_overlap.height);
+        });
+    return collisions[0];
+    }
     // return head;
 }
 void hud_systems::hud_spatial_system::clear(){

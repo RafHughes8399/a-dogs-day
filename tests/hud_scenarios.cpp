@@ -951,3 +951,164 @@ SCENARIO("an inventory page stays pinned to the view when the camera pans", "[hu
         }
     }
 }
+
+namespace {
+    Rectangle offset_box(Vector2 origin, float x, float y, float width, float height){
+        return Rectangle{origin.x + x, origin.y + y, width, height};
+    }
+
+    void register_hud_box_sized(size_t hud_id, Rectangle box){
+        std::vector<hitbox::hitbox> hitboxes{hitbox::hitbox(box)};
+        component_helpers::register_hud_collision_component(hud_id,
+            component_builders::build_hud_collision_component(
+                component_builders::build_hud_hitbox_component(hitboxes, 0)));
+    }
+
+    size_t create_boxed_element_sized(size_t owner, Rectangle box){
+        return hud_systems::hud_lifespan_system::get_instance().create_element(owner,
+            [box](size_t id){ register_hud_box_sized(id, box); });
+    }
+
+    void activate(size_t owner){
+        component_managers::hud_manager_.get_component(owner)->set_active(true);
+    }
+}
+
+SCENARIO("check_collisions_with resolves the biggest overlap among several hud boxes", "[hud][spatial]"){
+    const Vector2 origin{level_config::graph_x + 100.0f, level_config::graph_y + 100.0f};
+    // the query box every GIVEN below collides a cursor-sized rectangle against
+    const Rectangle cursor_box{origin.x, origin.y, 60.0f, 60.0f};
+    const auto no_id = static_cast<size_t>(game_config::empty_entity);
+
+    GIVEN("no hud elements are tracked"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+
+        THEN("nothing is returned"){
+            REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == game_config::empty_entity);
+        }
+    }
+
+    GIVEN("one active hud box"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+
+        WHEN("it overlaps the query box"){
+            auto element = create_boxed_element_sized(owner, offset_box(origin, 40.0f, 40.0f, 60.0f, 60.0f));
+
+            THEN("it comes back without needing to compare anything"){
+                REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(element));
+            }
+        }
+        WHEN("it sits outside the query box"){
+            create_boxed_element_sized(owner, offset_box(origin, 200.0f, 200.0f, 60.0f, 60.0f));
+
+            THEN("nothing is returned"){
+                REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == game_config::empty_entity);
+            }
+        }
+    }
+
+    GIVEN("two active hud boxes overlapping the query box by different amounts"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+        // big: intersection with cursor_box is [origin, origin+40] on both axes -> 40 * 40 = 1600
+        const Rectangle big{offset_box(origin, -20.0f, -20.0f, 60.0f, 60.0f)};
+        // small: intersection with cursor_box is 10 wide by 10 tall -> 100
+        const Rectangle small{offset_box(origin, 50.0f, 50.0f, 60.0f, 60.0f)};
+
+        WHEN("the bigger overlap is tracked first"){
+            auto big_id = create_boxed_element_sized(owner, big);
+            create_boxed_element_sized(owner, small);
+
+            THEN("the bigger overlap wins"){
+                REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(big_id));
+            }
+        }
+        WHEN("the smaller overlap is tracked first"){
+            create_boxed_element_sized(owner, small);
+            auto big_id = create_boxed_element_sized(owner, big);
+
+            THEN("the bigger overlap still wins, so the result isn't just tracking order"){
+                REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(big_id));
+            }
+        }
+    }
+
+    GIVEN("two active hud boxes with equal overlap area but different proportions"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+        // square overlap: 20 * 20 = 400
+        auto square_id = create_boxed_element_sized(owner, offset_box(origin, 40.0f, 40.0f, 60.0f, 60.0f));
+        // oblong overlap: 40 * 10 = 400, same area, nothing like the same shape
+        auto oblong_id = create_boxed_element_sized(owner, offset_box(origin, 20.0f, 50.0f, 50.0f, 10.0f));
+
+        THEN("one of the two tied boxes is returned, not neither"){
+            auto result = hud_spatial.check_collisions_with(no_id, cursor_box);
+            REQUIRE((result == static_cast<int>(square_id) or result == static_cast<int>(oblong_id)));
+        }
+    }
+
+    GIVEN("a bigger overlap that belongs to an inactive hud, alongside a smaller overlap that is active"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto inactive_owner = create_hud_owner();
+        auto active_owner = create_hud_owner();
+        activate(active_owner);
+        // bigger overlap (1600) but its owner's hud was never activated
+        create_boxed_element_sized(inactive_owner, offset_box(origin, -20.0f, -20.0f, 60.0f, 60.0f));
+        // smaller overlap (100) on the active owner
+        auto active_element = create_boxed_element_sized(active_owner, offset_box(origin, 50.0f, 50.0f, 60.0f, 60.0f));
+
+        THEN("the inactive box is filtered out before the areas are even compared"){
+            REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(active_element));
+        }
+    }
+
+    GIVEN("a box that merely touches the query box's edge"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+        // left edge sits exactly on cursor_box's right edge - sharing an edge, not an interior
+        create_boxed_element_sized(owner, offset_box(origin, 60.0f, 0.0f, 40.0f, 40.0f));
+
+        THEN("it does not count as an overlap"){
+            REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == game_config::empty_entity);
+        }
+    }
+
+    GIVEN("a box that overlaps the query box by a single-unit sliver"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+        // one unit inside cursor_box's right edge -> 1 * 40 = 40, small but strictly positive
+        auto sliver = create_boxed_element_sized(owner, offset_box(origin, 59.0f, 0.0f, 40.0f, 40.0f));
+
+        THEN("the sliver still counts as the overlap"){
+            REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(sliver));
+        }
+    }
+
+    GIVEN("a box that fully contains the query box, alongside one that only partially overlaps it"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+        // contains cursor_box entirely, so the intersection is the whole 60 * 60 query box
+        auto container = create_boxed_element_sized(owner, offset_box(origin, -10.0f, -10.0f, 80.0f, 80.0f));
+        // partial overlap of only 100
+        create_boxed_element_sized(owner, offset_box(origin, 50.0f, 50.0f, 60.0f, 60.0f));
+
+        THEN("containment beats a partial overlap"){
+            REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(container));
+        }
+    }
+}
