@@ -132,9 +132,9 @@ void component_helpers::add_entity_item_component(size_t entity_id, size_t item_
     register_entity_item_component(entity_id,
         component_builders::build_entity_item_component(item_id));
 }
-void component_helpers::add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity){
+void component_helpers::add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity){
     register_entity_carrier_component(entity_id,
-        component_builders::build_entity_carrier_component(previous_position, current_position, carried_entity));
+        component_builders::build_entity_carrier_component(previous_position, current_position, offset,  carried_entity));
 }
 void component_helpers::add_entity_recipes_component(size_t entity_id, std::vector<recipe::recipe>& recipes){
     register_entity_recipes_component(entity_id,

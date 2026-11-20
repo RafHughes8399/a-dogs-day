@@ -75,6 +75,11 @@ the necessary decoration movement events must also be emitted.
 
 for now this can just encompass decorations. we can consider stations next
 
+
+adjust the carrier component to store the offset rather than calcualte it in real time and allow it to be set on construction so that the cursor offset and the dog mouth offset can be different
+
+then have the decoration snap to grid - to the top left
+
 ## Slice 6 : Art
 - page navigation buttons
 - lets do a pothos and a monsterra

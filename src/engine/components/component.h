@@ -51,8 +51,8 @@ namespace components {
 class carrier_component {
 public:
     ~carrier_component() = default;
-    carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt)
-    : previous_position_(previous_position), current_position_(current_position), carried_entity_(carried_entity){}
+    carrier_component(Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity = std::nullopt)
+    : previous_position_(previous_position), current_position_(current_position), carried_entity_(carried_entity), offset_(offset){}
     carrier_component(const carrier_component& other) = default;
     carrier_component(carrier_component&& other) = default;
 
@@ -62,6 +62,7 @@ public:
     Vector2 get_previous_position() const;
     void set_previous_position(Vector2 position);
     Vector2* get_current_position() const;
+    Vector2 get_offset() const;
     void set_current_position(Vector2* position);
     std::optional<size_t> get_carried_entity() const;
     void set_carried_entity(std::optional<size_t> entity_id);
@@ -69,8 +70,10 @@ public:
     void drop();
 private:
     Vector2 previous_position_;
+    Vector2 offset_;
     Vector2* current_position_;
     std::optional<size_t> carried_entity_;
+
 };
 class recipe_choice{
     public:
@@ -615,7 +618,7 @@ namespace component_builders{
     components::inventory_storage_component build_hud_inventory_storage_component();
     components::food_component build_entity_food_component(size_t item_id);
     components::item_component build_entity_item_component(size_t item_id);
-    components::carrier_component build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
+    components::carrier_component build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity = std::nullopt);
     components::recipes_component build_entity_recipes_component(std::vector<recipe::recipe>& recipes);
     components::hud_component build_hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
 

@@ -219,9 +219,7 @@ void systems::control_input_system::left_click(size_t id){
         auto carried_entity = cursor_carrier->get_carried_entity().value();
         if(systems::spatial_system::get_instance().can_place_entity(carried_entity,  id, GetMousePosition())){
             cursor_carrier->drop();
-            // and then the subsequent event that suggests the decoration has been placed. i think its move entity ? or at least 
-            // place entity
-            // this is flawed slightly because you always are interacting wit hthe cusror so you cannot palce, neeed to exlcude the cursor from
+            // TODO AND SNAP TO GRID
             
         }
     }else{
