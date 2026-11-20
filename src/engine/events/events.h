@@ -29,5 +29,5 @@
 #include "events/animation_events.h"
 #include "events/interaction_events.h"
 #include "events/camera_events.h"
-
+#include "events/hud_events.h"
 #endif

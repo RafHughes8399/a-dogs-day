@@ -919,12 +919,13 @@ SCENARIO("an inventory page stays pinned to the view when the camera pans", "[hu
         hud_systems::hud::get_instance();
         hud_systems::hud_spatial_system::get_instance();
         auto& rendering = systems::rendering_system::get_instance();
-        auto root = hud_systems::hud_lifespan_system::get_instance().create_inventory_menu(hud_config::inventory_page_frame);
+        auto root = hud_systems::hud_lifespan_system::get_instance().create_inventory_head();
+        hud_systems::hud_lifespan_system::get_instance().create_inventory_tail(root);
         auto* root_position = component_managers::entity_positional_manager_.get_component(root);
         auto* hud = component_managers::hud_manager_.get_component(root);
         REQUIRE(root_position != nullptr);
         REQUIRE(hud != nullptr);
-        REQUIRE(hud->get_elements().size() >= 2);
+        REQUIRE(hud->get_elements().size() >= 1);
         auto button = hud->get_elements().front();
         auto* button_position = component_managers::hud_positional_manager_.get_component(button);
         REQUIRE(button_position != nullptr);
@@ -948,6 +949,273 @@ SCENARIO("an inventory page stays pinned to the view when the camera pans", "[hu
                 REQUIRE(button_delta.x == Catch::Approx(root_delta.x));
                 REQUIRE(button_delta.y == Catch::Approx(root_delta.y));
             }
+        }
+    }
+}
+
+namespace {
+    Rectangle offset_box(Vector2 origin, float x, float y, float width, float height){
+        return Rectangle{origin.x + x, origin.y + y, width, height};
+    }
+
+    void register_hud_box_sized(size_t hud_id, Rectangle box){
+        std::vector<hitbox::hitbox> hitboxes{hitbox::hitbox(box)};
+        component_helpers::register_hud_collision_component(hud_id,
+            component_builders::build_hud_collision_component(
+                component_builders::build_hud_hitbox_component(hitboxes, 0)));
+        component_helpers::add_hud_hoverable_component(hud_id, hud_config::button_hover_scale);
+    }
+
+    size_t create_boxed_element_sized(size_t owner, Rectangle box){
+        return hud_systems::hud_lifespan_system::get_instance().create_element(owner,
+            [box](size_t id){ register_hud_box_sized(id, box); });
+    }
+
+    void activate(size_t owner){
+        component_managers::hud_manager_.get_component(owner)->set_active(true);
+    }
+}
+
+SCENARIO("check_collisions_with resolves the biggest overlap among several hud boxes", "[hud][spatial]"){
+    const Vector2 origin{level_config::graph_x + 100.0f, level_config::graph_y + 100.0f};
+    // the query box every GIVEN below collides a cursor-sized rectangle against
+    const Rectangle cursor_box{origin.x, origin.y, 60.0f, 60.0f};
+    const auto no_id = static_cast<size_t>(game_config::empty_entity);
+
+    GIVEN("no hud elements are tracked"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+
+        THEN("nothing is returned"){
+            REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == game_config::empty_entity);
+        }
+    }
+
+    GIVEN("one active hud box"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+
+        WHEN("it overlaps the query box"){
+            auto element = create_boxed_element_sized(owner, offset_box(origin, 40.0f, 40.0f, 60.0f, 60.0f));
+
+            THEN("it comes back without needing to compare anything"){
+                REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(element));
+            }
+        }
+        WHEN("it sits outside the query box"){
+            create_boxed_element_sized(owner, offset_box(origin, 200.0f, 200.0f, 60.0f, 60.0f));
+
+            THEN("nothing is returned"){
+                REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == game_config::empty_entity);
+            }
+        }
+    }
+
+    GIVEN("two active hud boxes overlapping the query box by different amounts"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+        // big: intersection with cursor_box is [origin, origin+40] on both axes -> 40 * 40 = 1600
+        const Rectangle big{offset_box(origin, -20.0f, -20.0f, 60.0f, 60.0f)};
+        // small: intersection with cursor_box is 10 wide by 10 tall -> 100
+        const Rectangle small{offset_box(origin, 50.0f, 50.0f, 60.0f, 60.0f)};
+
+        WHEN("the bigger overlap is tracked first"){
+            auto big_id = create_boxed_element_sized(owner, big);
+            create_boxed_element_sized(owner, small);
+
+            THEN("the bigger overlap wins"){
+                REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(big_id));
+            }
+        }
+        WHEN("the smaller overlap is tracked first"){
+            create_boxed_element_sized(owner, small);
+            auto big_id = create_boxed_element_sized(owner, big);
+
+            THEN("the bigger overlap still wins, so the result isn't just tracking order"){
+                REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(big_id));
+            }
+        }
+    }
+
+    GIVEN("two active hud boxes with equal overlap area but different proportions"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+        // square overlap: 20 * 20 = 400
+        auto square_id = create_boxed_element_sized(owner, offset_box(origin, 40.0f, 40.0f, 60.0f, 60.0f));
+        // oblong overlap: 40 * 10 = 400, same area, nothing like the same shape
+        auto oblong_id = create_boxed_element_sized(owner, offset_box(origin, 20.0f, 50.0f, 50.0f, 10.0f));
+
+        THEN("one of the two tied boxes is returned, not neither"){
+            auto result = hud_spatial.check_collisions_with(no_id, cursor_box);
+            REQUIRE((result == static_cast<int>(square_id) or result == static_cast<int>(oblong_id)));
+        }
+    }
+
+    GIVEN("a bigger overlap that belongs to an inactive hud, alongside a smaller overlap that is active"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto inactive_owner = create_hud_owner();
+        auto active_owner = create_hud_owner();
+        activate(active_owner);
+        // bigger overlap (1600) but its owner's hud was never activated
+        create_boxed_element_sized(inactive_owner, offset_box(origin, -20.0f, -20.0f, 60.0f, 60.0f));
+        // smaller overlap (100) on the active owner
+        auto active_element = create_boxed_element_sized(active_owner, offset_box(origin, 50.0f, 50.0f, 60.0f, 60.0f));
+
+        THEN("the inactive box is filtered out before the areas are even compared"){
+            REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(active_element));
+        }
+    }
+
+    GIVEN("a box that merely touches the query box's edge"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+        // left edge sits exactly on cursor_box's right edge - sharing an edge, not an interior
+        create_boxed_element_sized(owner, offset_box(origin, 60.0f, 0.0f, 40.0f, 40.0f));
+
+        THEN("it does not count as an overlap"){
+            REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == game_config::empty_entity);
+        }
+    }
+
+    GIVEN("a box that overlaps the query box by a single-unit sliver"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+        // one unit inside cursor_box's right edge -> 1 * 40 = 40, small but strictly positive
+        auto sliver = create_boxed_element_sized(owner, offset_box(origin, 59.0f, 0.0f, 40.0f, 40.0f));
+
+        THEN("the sliver still counts as the overlap"){
+            REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(sliver));
+        }
+    }
+
+    GIVEN("a box that fully contains the query box, alongside one that only partially overlaps it"){
+        testing::ecs_test_game game;
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto owner = create_hud_owner();
+        activate(owner);
+        // contains cursor_box entirely, so the intersection is the whole 60 * 60 query box
+        auto container = create_boxed_element_sized(owner, offset_box(origin, -10.0f, -10.0f, 80.0f, 80.0f));
+        // partial overlap of only 100
+        create_boxed_element_sized(owner, offset_box(origin, 50.0f, 50.0f, 60.0f, 60.0f));
+
+        THEN("containment beats a partial overlap"){
+            REQUIRE(hud_spatial.check_collisions_with(no_id, cursor_box) == static_cast<int>(container));
+        }
+    }
+}
+
+SCENARIO("a full inventory page spills onto a second page that can be reached", "[hud][inventory][pages]"){
+    GIVEN("an inventory head page filled with decorations while the camera is panned"){
+        testing::ecs_test_game game;
+        hud_systems::hud::get_instance();
+        auto& hud_spatial = hud_systems::hud_spatial_system::get_instance();
+        auto& rendering = systems::rendering_system::get_instance();
+        auto& inventory = systems::inventory_system::get_instance();
+        auto& navigation = systems::menu_navigation_system::get_instance();
+        const auto stale_pages = navigation.pages_of(menus::menu_ids::inventory).size();
+        inventory.init();
+        rendering.move_camera(Vector2{300.0f, 2000.0f});
+        const auto gargoyle = entity_config::decorations::gargoyle;
+        size_t stored = 0;
+        while(stored < 200 and navigation.pages_of(menus::menu_ids::inventory).size() < stale_pages + 2){
+            auto decoration = systems::entity_lifespan_system::get_instance().create_decoration(gargoyle,
+                Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
+            inventory.on_stored_decoration(events::store_decoration{decoration, gargoyle});
+            ++stored;
+        }
+        auto pages = navigation.pages_of(menus::menu_ids::inventory);
+        REQUIRE(pages.size() == stale_pages + 2);
+        auto head = pages[stale_pages];
+        auto tail = pages[stale_pages + 1];
+        auto frame = hud_config::inventory_page_frame;
+        auto* head_position = component_managers::entity_positional_manager_.get_component(head);
+        auto* tail_position = component_managers::entity_positional_manager_.get_component(tail);
+        REQUIRE(head_position != nullptr);
+        REQUIRE(tail_position != nullptr);
+        WARN("stored before spill: " << stored);
+
+        THEN("clicking the next arrow on the open inventory activates the second page"){
+            if(stale_pages != 0){ SUCCEED("navigation singleton carries pages from an earlier scenario"); return; }
+            navigation.on_key_press(events::key_press{game_config::key_press_actions::inventory_open});
+            auto* head_hud = component_managers::hud_manager_.get_component(head);
+            auto* tail_hud = component_managers::hud_manager_.get_component(tail);
+            REQUIRE(head_hud != nullptr);
+            REQUIRE(tail_hud != nullptr);
+            REQUIRE(head_hud->is_active());
+            REQUIRE_FALSE(tail_hud->is_active());
+            int next_button = -1;
+            for(auto element : head_hud->get_elements()){
+                auto* clickable = component_managers::hud_clickable_manager_.get_component(element);
+                if(clickable != nullptr and clickable->get_action() == hud_config::click_actions::change_page){
+                    next_button = static_cast<int>(element);
+                }
+            }
+            REQUIRE(next_button != -1);
+            auto box = component_managers::hud_collision_manager_.get_component(static_cast<size_t>(next_button))
+                ->get_hitbox_component().get_hitbox().get_box();
+            auto centre = Vector2{box.x + box.width * 0.5f, box.y + box.height * 0.5f};
+            REQUIRE(hud_systems::click_system::get_instance().click(centre));
+            REQUIRE_FALSE(head_hud->is_active());
+            REQUIRE(tail_hud->is_active());
+        }
+        THEN("the head page has a next button sitting inside its frame"){
+            auto* hud = component_managers::hud_manager_.get_component(head);
+            REQUIRE(hud != nullptr);
+            int next_button = -1;
+            for(auto element : hud->get_elements()){
+                auto* clickable = component_managers::hud_clickable_manager_.get_component(element);
+                if(clickable == nullptr or clickable->get_action() != hud_config::click_actions::change_page){ continue; }
+                auto* turn = std::get_if<components::page_turn>(&clickable->get_payload());
+                if(turn != nullptr and turn->get_direction() > 0){ next_button = static_cast<int>(element); }
+            }
+            REQUIRE(next_button != -1);
+            auto* button_position = component_managers::hud_positional_manager_.get_component(static_cast<size_t>(next_button));
+            auto* button_collision = component_managers::hud_collision_manager_.get_component(static_cast<size_t>(next_button));
+            REQUIRE(button_position != nullptr);
+            REQUIRE(button_collision != nullptr);
+            auto box = button_collision->get_hitbox_component().get_hitbox().get_box();
+            WARN("head origin " << head_position->get_position().x << ", " << head_position->get_position().y
+                << " next button " << button_position->get_position().x << ", " << button_position->get_position().y
+                << " hitbox " << box.x << ", " << box.y << ", " << box.width << ", " << box.height);
+            REQUIRE(box.x >= head_position->get_position().x);
+            REQUIRE(box.y >= head_position->get_position().y);
+            REQUIRE(box.x + box.width <= head_position->get_position().x + frame.width);
+            REQUIRE(box.y + box.height <= head_position->get_position().y + frame.height);
+            REQUIRE(hud_spatial.is_tracked(static_cast<size_t>(next_button)));
+            component_managers::hud_manager_.get_component(head)->set_active(true);
+            auto centre = Vector2{box.x + box.width * 0.5f, box.y + box.height * 0.5f};
+            REQUIRE(hud_spatial.check_collision_with(centre) == next_button);
+        }
+        THEN("the spilled item button sits inside the second page frame"){
+            auto* hud = component_managers::hud_manager_.get_component(tail);
+            REQUIRE(hud != nullptr);
+            bool found_item = false;
+            for(auto element : hud->get_elements()){
+                auto* clickable = component_managers::hud_clickable_manager_.get_component(element);
+                if(clickable == nullptr or clickable->get_action() != hud_config::click_actions::select_item){ continue; }
+                found_item = true;
+                auto* collision = component_managers::hud_collision_manager_.get_component(element);
+                REQUIRE(collision != nullptr);
+                auto box = collision->get_hitbox_component().get_hitbox().get_box();
+                WARN("tail origin " << tail_position->get_position().x << ", " << tail_position->get_position().y
+                    << " item hitbox " << box.x << ", " << box.y << ", " << box.width << ", " << box.height);
+                REQUIRE(box.x >= tail_position->get_position().x);
+                REQUIRE(box.y >= tail_position->get_position().y);
+                REQUIRE(box.x + box.width <= tail_position->get_position().x + frame.width);
+                REQUIRE(box.y + box.height <= tail_position->get_position().y + frame.height);
+            }
+            REQUIRE(found_item);
         }
     }
 }

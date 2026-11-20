@@ -17,6 +17,7 @@ void button_builders::build_button(size_t id, Vector2 position, sprite::sprite& 
         component_builders::build_hud_hitbox_component(hitboxes, 0));
 
     component_helpers::add_hud_clickable_component(id, action, payload);
+    component_helpers::add_hud_hoverable_component(id, hud_config::button_hover_scale);
 }
 void button_builders::build_recipe_button(size_t id, Vector2 position, size_t recipe, sprite::sprite& sprite){
     auto hitbox = hitbox::hitbox(Rectangle{position.x, position.y,

@@ -721,3 +721,27 @@ SCENARIO("a panned view frame maps the mouse onto the world under it", "[ecs][co
         }
     }
 }
+
+SCENARIO("the control input system learns the cursor id from the cursor created event", "[control][cursor]"){
+    GIVEN("a fresh ecs world with the control input system listening"){
+        testing::ecs_test_game game;
+        auto& input = systems::control_input_system::get_instance();
+        REQUIRE(input.get_cursor_id() == game_config::empty_entity);
+
+        WHEN("the cursor is built"){
+            auto cursor_id = game.create_cursor();
+
+            THEN("the system holds the cursor id"){
+                REQUIRE(input.get_cursor_id() == static_cast<int>(cursor_id));
+            }
+        }
+        WHEN("the system is cleared"){
+            game.create_cursor();
+            input.clear();
+
+            THEN("the cursor id is forgotten"){
+                REQUIRE(input.get_cursor_id() == game_config::empty_entity);
+            }
+        }
+    }
+}

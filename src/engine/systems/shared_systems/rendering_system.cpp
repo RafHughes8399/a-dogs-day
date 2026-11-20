@@ -41,13 +41,24 @@ void systems::rendering_system::render(int frame){
     };
 
     BeginMode2D(camera_);
-    for(size_t layer = 0; layer < level_config::draw_layers::size; ++layer){
+    for(size_t layer = 0; layer < level_config::draw_layers::cursor; ++layer){
         render_layers_[layer].draw(render_predicate,
             Vector2Zero(), frame, true);
     }
-    //movement_system::get_instance().render_graph(view_frame_);
+    movement_system::get_instance().render_graph(view_frame_);
     Rectangle queue = {0, -2* level_config::edge_weight, level_config::edge_weight * 4.5f, level_config::world_y + (4 * level_config::edge_weight)};
     DrawRectangleLines(static_cast<int>(queue.x), static_cast<int>(queue.y), static_cast<int>(queue.width), static_cast<int>(queue.height), RED);
+    EndMode2D();
+}
+
+void systems::rendering_system::render_cursor(int frame){
+    auto render_predicate = [this](size_t entity_id) -> bool {
+        return is_entity_in_frame(entity_id, view_frame_);
+    };
+
+    BeginMode2D(camera_);
+    render_layers_[level_config::draw_layers::cursor].draw(render_predicate,
+        Vector2Zero(), frame, true);
     EndMode2D();
 }
 

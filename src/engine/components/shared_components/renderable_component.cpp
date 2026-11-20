@@ -1,4 +1,6 @@
 #include "component.h"
+#include <algorithm>
+#include <raymath.h>
 #include <utility>
 
 sprite::sprite& components::renderable_component::body::get_active_sprite(){
@@ -18,6 +20,12 @@ void components::renderable_component::body::set_index(size_t index){
 }
 Vector2 components::renderable_component::body::get_scale() const{
     return scale_;
+}
+void components::renderable_component::body::scale_by(Vector2 factor){
+    scale_ = Vector2{base_scale_.x * factor.x, base_scale_.y * factor.y};
+}
+void components::renderable_component::body::reset_scale(){
+    scale_ = base_scale_;
 }
 Vector2 components::renderable_component::body::get_offset() const{
     return offset_;
@@ -41,4 +49,12 @@ void components::renderable_component::remove_body(size_t index){
 void components::renderable_component::set_body(size_t index, body layer){
     if(index >= body_.size()){ return; }
     body_[index] = std::move(layer);
+}
+
+
+void components::renderable_component::scale_by(Vector2 factor){
+    std::for_each(body_.begin(), body_.end(), [factor](auto& body) -> void { body.scale_by(factor); });
+}
+void components::renderable_component::reset_scale(){
+    std::for_each(body_.begin(), body_.end(), [](auto& body) -> void { body.reset_scale(); });
 }

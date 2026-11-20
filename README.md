@@ -10,13 +10,15 @@ an 2D dog-themed cafe simulator game
 - station construction and interactions
 - food storage 
 - waiter construction and control
+- hud elements and user interaction
+- menus and menu navigation
 ### in progress
-- hud elements and user interaction with entities
-- menus
+- button hovering and hud art
+- decoration movement
+- inventory management
 ## near future
 - food preparation
-- shop and level arrangement
-- inventory management and economy
+- shop and economy
 ## further down the line
 - dog cosmetics
 - fully fledged animations
@@ -31,7 +33,7 @@ other components of the engine designed and developed by me. structures of note 
 - view frame render culling 
 - typed interaction handling
 - 9-slicing sprites
-
+- hud component trees
 
 ### ai usage
 claude used an assitive tool to discuss designs, data strucutres, documentation and general approaches, but the final code is wrtten by hand

@@ -51,5 +51,7 @@ namespace button_builders {
 namespace page_builders {
     void build_menu_page(size_t id, Rectangle frame);
     void build_inventory_menu(size_t id, Rectangle frame, Vector2 position);
+    void build_shop_menu(size_t id, Rectangle frame, Vector2 position);
+    void build_quest_menu(size_t id, Rectangle frame, Vector2 position);
 }
 #endif

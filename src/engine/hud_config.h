@@ -25,19 +25,35 @@ namespace hud_config{
         next_page_button,
         button_kinds_size
     };
+
+    inline const Vector2 button_hover_scale = Vector2 {1.25f, 1.25f};
     inline const Rectangle menu_frame = Rectangle{400.0f, 400.0f, 200.0f, 200.0f};
-    inline const float page_nav_button_size = 20.0f;
-    inline const float page_nav_button_buffer = 8.0f;
-    inline const float inventory_page_height = 800.0f;
-    inline const Vector2 inventory_page_anchor = Vector2{page_nav_button_buffer, page_nav_button_buffer};
-    inline const Rectangle inventory_page_frame = Rectangle{0.0f, 0.0f,
-        level_config::screen_width - 2.0f * page_nav_button_buffer, inventory_page_height};
-    inline const float inventory_item_buffer = 8.0f;
+    inline const float page_nav_button_size = 20;
+    inline const float page_nav_button_buffer = level_config::edge_weight * 0.25f;
+
+    inline const float inventory_page_width_buffer = 1 * level_config::edge_weight;
+    inline const float inventory_page_height_buffer = 1 * level_config::edge_weight;
+    inline const Rectangle inventory_page_frame = Rectangle{0.0f + inventory_page_width_buffer, 0.0f + inventory_page_height_buffer,
+        level_config::screen_width - (2 * inventory_page_width_buffer), level_config::screen_height - (2* inventory_page_height_buffer)};
+    inline const Vector2 inventory_page_anchor = Vector2{inventory_page_frame.x, inventory_page_frame.y};
+    inline const float inventory_item_buffer = level_config::edge_weight;
     inline const float inventory_item_border = 16.0f;
     inline const float inventory_scale_max = 0.9f;
     inline const float inventory_scale_min = 0.5f;
     inline const float inventory_scale_threshold = level_config::edge_weight * 2.0f;
     inline const float inventory_scale_reference = level_config::edge_weight * 5.0f;
+    
+
+
+    inline const float  shop_page_width_buffer = inventory_page_width_buffer;
+    inline const float shop_page_height_buffer = inventory_page_height_buffer;
+    inline const Rectangle shop_page_frame = inventory_page_frame;
+
+    inline const float quest_page_width_buffer = inventory_page_width_buffer / 2;
+    inline const float quest_page_height_buffer = inventory_page_height_buffer / 2;
+    inline const float quest_page_width = 8 * level_config::edge_weight;
+    inline const Rectangle quest_page_frame = Rectangle{0.0f + quest_page_width_buffer, 0.0f + quest_page_height_buffer, quest_page_width, level_config::screen_height - (2 * quest_page_height_buffer) };
+
 
     inline unsigned char opacity = 120;
     inline Color green_decoration_highlight = Color {0, 255, 0, opacity};

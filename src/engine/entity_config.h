@@ -342,5 +342,9 @@ namespace entity_config{
 
     inline const float station_reach = level_config::edge_weight * 0.5f;
 
+
+
+    
+
 }
 #endif

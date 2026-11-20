@@ -37,6 +37,7 @@ void systems::menu_navigation_system::show(size_t menu){
     auto* hud = component_managers::hud_manager_.get_component(*root);
     if(hud == nullptr){ return; }
     hud->set_active(true);
+    hud_systems::hud_spatial_system::get_instance().refresh_hover();
 }
 void systems::menu_navigation_system::hide(size_t menu){
     auto root = menus_.get_node(menu).get_active_root();
@@ -44,4 +45,5 @@ void systems::menu_navigation_system::hide(size_t menu){
     auto* hud = component_managers::hud_manager_.get_component(*root);
     if(hud == nullptr){ return; }
     hud->set_active(false);
+    hud_systems::hud_spatial_system::get_instance().refresh_hover();
 }

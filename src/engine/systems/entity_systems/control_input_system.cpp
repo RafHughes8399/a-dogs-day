@@ -3,6 +3,8 @@
 #include "config.h"
 #include "debug_log_interface.h"
 #include "debug_logger.h"
+#include "entity_systems.hpp"
+#include "input_events.h"
 #include "raglib.h"
 #include "system.h"
 #include "system_events.h"
@@ -16,6 +18,11 @@ namespace {
     bool is_interactable(size_t entity_id){
         return component_managers::entity_interactable_manager_.get_component(entity_id) != nullptr;
     }
+}
+
+void systems::control_input_system::on_cursor_created(const events::cursor_created& event){
+    cursor_id_ = static_cast<int>(event.get_id());
+    debug::log("[control_input_system::on_cursor_created] cursor id: " + std::to_string(cursor_id_));
 }
 
 // ---------------- input dispatch ----------------
@@ -89,6 +96,9 @@ void systems::control_input_system::update(float delta){
         auto* position = component_managers::entity_positional_manager_.get_component(id);
         if(position != nullptr and not Vector2Equals(position->get_position(), cursor_position)){
             systems::movement_system::get_instance().update_position(id, cursor_position);
+            // emit a cursor moved event that the hud spatial system listenes to
+                events::cursor_moved moved = {id, cursor_position};
+                event_interface::execute_event(moved);
         }
         // * check for mouse input also
         check_inputs(id, inputs, delta);
@@ -202,21 +212,33 @@ void systems::control_input_system::left_click(size_t id){
         + ", position: " + raglib::vector_to_string(click_position));
     if(hud_systems::click_system::get_instance().click(click_position)){ return; }
 
-    int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
-    if(entity_id == game_config::empty_entity){
-        debug::log("[control_input_system::left_click, hit nothing] deselecting, was: "
-            + std::to_string(selection_system::get_instance().selected()));
-        selection_system::get_instance().deselect();
-        return;
-    }
-    else{
-        debug::log("[control_input_system::left_click, hit entity] selecting: "
-            + std::to_string(entity_id));
-        selection_system::get_instance().select(static_cast<size_t>(entity_id));
-        debug::log("[control_input_system::left_click, selection settled] selected: "
-            + std::to_string(selection_system::get_instance().selected()));
-    }
 
+    // check if carrying and attempt to drop the carreid entity,
+    auto cursor_carrier = component_managers::entity_carrier_manager_.get_component(id);
+    if(cursor_carrier and cursor_carrier->is_carrying()){
+        auto carried_entity = cursor_carrier->get_carried_entity().value();
+        if(systems::spatial_system::get_instance().can_place_entity(carried_entity,  id, GetMousePosition())){
+            cursor_carrier->drop();
+            // TODO AND SNAP TO GRID
+            
+        }
+    }else{
+        // otherwise check for selcting
+        int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
+        if(entity_id == game_config::empty_entity){
+            debug::log("[control_input_system::left_click, hit nothing] deselecting, was: "
+                + std::to_string(selection_system::get_instance().selected()));
+                selection_system::get_instance().deselect();
+                return;
+        }
+        else{
+                debug::log("[control_input_system::left_click, hit entity] selecting: "
+                    + std::to_string(entity_id));
+                    selection_system::get_instance().select(static_cast<size_t>(entity_id));
+                    debug::log("[control_input_system::left_click, selection settled] selected: "
+                        + std::to_string(selection_system::get_instance().selected()));
+        }
+    }
 }
 // * right click tells the selected player dog entity where to go 
 // ? maybe extendable to waiters too ? if i wanted to change how the waiter interaction stuff goes

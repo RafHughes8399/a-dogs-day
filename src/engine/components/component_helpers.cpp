@@ -66,6 +66,9 @@ void component_helpers::register_hud_state_machine_component(size_t hud_id, comp
 void component_helpers::register_hud_clickable_component(size_t hud_id, components::clickable_component component){
     component_managers::hud_clickable_manager_.register_component(hud_id, std::move(component));
 }
+void component_helpers::register_hud_hoverable_component(size_t hud_id, components::hoverable_component component){
+    component_managers::hud_hoverable_manager_.register_component(hud_id, std::move(component));
+}
 void component_helpers::register_hud_owner_component(size_t hud_id, components::owner_component component){
     component_managers::hud_owner_manager_.register_component(hud_id, std::move(component));
 }
@@ -129,9 +132,9 @@ void component_helpers::add_entity_item_component(size_t entity_id, size_t item_
     register_entity_item_component(entity_id,
         component_builders::build_entity_item_component(item_id));
 }
-void component_helpers::add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity){
+void component_helpers::add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity){
     register_entity_carrier_component(entity_id,
-        component_builders::build_entity_carrier_component(previous_position, current_position, carried_entity));
+        component_builders::build_entity_carrier_component(previous_position, current_position, offset,  carried_entity));
 }
 void component_helpers::add_entity_recipes_component(size_t entity_id, std::vector<recipe::recipe>& recipes){
     register_entity_recipes_component(entity_id,
@@ -169,6 +172,10 @@ void component_helpers::add_hud_state_machine_component(size_t hud_id, state_mac
 void component_helpers::add_hud_clickable_component(size_t hud_id, size_t action, components::click_payload payload){
     register_hud_clickable_component(hud_id,
         component_builders::build_hud_clickable_component(action, payload));
+}
+void component_helpers::add_hud_hoverable_component(size_t hud_id, Vector2 scale){
+    register_hud_hoverable_component(hud_id,
+        component_builders::build_hud_hoverable_component(scale));
 }
 void component_helpers::add_hud_owner_component(size_t hud_id, size_t owner){
     register_hud_owner_component(hud_id,
@@ -349,6 +356,9 @@ void component_helpers::unregister_hud_state_machine_component(size_t hud_id){
 void component_helpers::unregister_hud_clickable_component(size_t hud_id){
     component_managers::hud_clickable_manager_.unregister_component(hud_id);
 }
+void component_helpers::unregister_hud_hoverable_component(size_t hud_id){
+    component_managers::hud_hoverable_manager_.unregister_component(hud_id);
+}
 void component_helpers::unregister_hud_owner_component(size_t hud_id){
     component_managers::hud_owner_manager_.unregister_component(hud_id);
 }
@@ -382,6 +392,7 @@ void component_helpers::unregister_all_hud_components(size_t hud_id){
     unregister_hud_collision_component(hud_id);
     unregister_hud_state_machine_component(hud_id);
     unregister_hud_clickable_component(hud_id);
+    unregister_hud_hoverable_component(hud_id);
     unregister_hud_owner_component(hud_id);
     unregister_hud_inventory_storage_component(hud_id);
 }
@@ -414,6 +425,7 @@ size_t component_helpers::num_registered_hud_components(size_t hud_id){
     count += component_managers::hud_collision_manager_.get_component(hud_id) != nullptr ? 1u : 0u;
     count += component_managers::hud_state_machine_manager_.get_component(hud_id) != nullptr ? 1u : 0u;
     count += component_managers::hud_clickable_manager_.get_component(hud_id) != nullptr ? 1u : 0u;
+    count += component_managers::hud_hoverable_manager_.get_component(hud_id) != nullptr ? 1u : 0u;
     count += component_managers::hud_owner_manager_.get_component(hud_id) != nullptr ? 1u : 0u;
     count += component_managers::hud_inventory_storage_manager_.get_component(hud_id) != nullptr ? 1u : 0u;
     return count;
@@ -430,6 +442,7 @@ void component_helpers::clear_all_hud_components(){
     component_managers::hud_collision_manager_.clear();
     component_managers::hud_state_machine_manager_.clear();
     component_managers::hud_clickable_manager_.clear();
+    component_managers::hud_hoverable_manager_.clear();
     component_managers::hud_owner_manager_.clear();
     component_managers::hud_inventory_storage_manager_.clear();
 }

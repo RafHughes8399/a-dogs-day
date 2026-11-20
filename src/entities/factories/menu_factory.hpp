@@ -17,8 +17,8 @@ namespace factories{
             [](size_t id) -> void {page_builders::build_menu_page(id, hud_config::menu_frame);},
             nullptr,
             [](size_t id) -> void {page_builders::build_menu_page(id, hud_config::menu_frame);},
-            [](size_t id) -> void {page_builders::build_menu_page(id, hud_config::menu_frame);},
-            [](size_t id) -> void {page_builders::build_menu_page(id, hud_config::menu_frame);}
+            nullptr,
+            nullptr
         }){
 
         }

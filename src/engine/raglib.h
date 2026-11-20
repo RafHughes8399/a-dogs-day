@@ -22,5 +22,6 @@ namespace raglib{
     inline std::string vector_to_string(const Vector2& vector){
         return "{" + std::to_string(vector.x) + ", " + std::to_string(vector.y) + "}";
     }
+
 }
 #endif

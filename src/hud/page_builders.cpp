@@ -13,3 +13,11 @@ void page_builders::build_inventory_menu(size_t id, Rectangle frame, Vector2 pos
     ecs_entities::build_hud_root(id, position, panel);
     component_helpers::add_hud_inventory_storage_component(id);
 }
+void page_builders::build_shop_menu(size_t id, Rectangle frame, Vector2 position){
+    auto panel = sprite_builders::build_decoration_nine_sprite(Rectangle{0.0f, 0.0f, frame.width, frame.height});
+    ecs_entities::build_hud_root(id, position, panel);
+}
+void page_builders::build_quest_menu(size_t id, Rectangle frame, Vector2 position){
+    auto panel = sprite_builders::build_decoration_nine_sprite(Rectangle{0.0f, 0.0f, frame.width, frame.height});
+    ecs_entities::build_hud_root(id, position, panel);
+}
