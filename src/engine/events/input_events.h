@@ -40,6 +40,21 @@ namespace events{
 			const int key_;
 	};
 
+	class cursor_created : public event{
+		public:
+			cursor_created(size_t id)
+			:event(ids::cursor_created_id), id_(id){}
+
+			static int get_static_type(){
+				return ids::cursor_created_id;
+			}
+			size_t get_id() const{
+				return id_;
+			}
+		private:
+			const size_t id_;
+	};
+
 	class cursor_moved : public event{
 		public:
 			cursor_moved(size_t id, Vector2 new_position)

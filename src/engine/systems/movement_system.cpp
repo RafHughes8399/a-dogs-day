@@ -157,8 +157,6 @@ void systems::movement_system::update_position(size_t id, Vector2 new_position){
     if(position == nullptr){ return; }
     position->set_position(new_position);
 
-    // the hitbox is the position stored a second time, so it moves in the same
-    // write - every variant, so a later facing change lands somewhere correct
     Rectangle pre_move{};
     Rectangle post_move{};
     if(auto* collision = component_managers::collision_manager_.get_component(id)){
@@ -169,7 +167,6 @@ void systems::movement_system::update_position(size_t id, Vector2 new_position){
         post_move = collision->get_hitbox_component().get_hitbox().get_box();
     }
 
-    // executed, not queued - the spatial index must not lag the position by a frame
     events::move_entity moved{id, pre_move, post_move};
     event_interface::execute_event(moved);
 }

@@ -209,7 +209,9 @@ namespace systems{
                 static control_input_system instance;
                 return instance;
             }
-            ~control_input_system() = default;
+            ~control_input_system(){
+                event_interface::unsubscribe<events::cursor_created>(cursor_created_handler_);
+            }
             control_input_system(const control_input_system& other) = delete;
             control_input_system(control_input_system&& other) = delete;
 
@@ -220,6 +222,11 @@ namespace systems{
             // teardown between test scenarios - the singleton outlives them
             void clear(){
                 selected_dog_ = level_config::mack_id;
+                cursor_id_ = game_config::empty_entity;
+            }
+            void on_cursor_created(const events::cursor_created& event);
+            int get_cursor_id() const{
+                return cursor_id_;
             }
 #ifdef DOG_DAYS_TESTING
             // * raylib 5.5 has no way to inject key or button state - IsKeyPressed
@@ -242,8 +249,10 @@ namespace systems{
 #endif
         private:
             control_input_system()
-            : control_function_map_({}), selected_dog_(level_config::mack_id){
+            : control_function_map_({}), selected_dog_(level_config::mack_id),
+              cursor_created_handler_([this](const events::cursor_created& event) -> void {on_cursor_created(event);}){
                 build_control_map();
+                event_interface::subscribe<events::cursor_created>(cursor_created_handler_);
             }
 
             void build_control_map();
@@ -273,6 +282,8 @@ namespace systems{
             std::map<std::pair<int, int>, std::function<void(size_t, float)>> control_function_map_;
             // mirrors player::selected_dog_ - switch_dog flips it, right_click carries it
             size_t selected_dog_;
+            events::event_handler<events::cursor_created> cursor_created_handler_;
+            int cursor_id_ = game_config::empty_entity;
     };
     /**
     // * something of a dense comment here to explain the build relationships
@@ -849,7 +860,7 @@ namespace systems{
             void on_created_entity(const events::create_entity& event);
             void on_moved_entity(const events::move_entity& event);
             void on_destroyed_entity(const events::remove_entity& event);
-
+            bool can_place_entity(size_t entity_id, size_t cursor, Vector2 position);
             bool is_tracked(size_t entity_id){
                 return entities_.contains(entity_id);
             }

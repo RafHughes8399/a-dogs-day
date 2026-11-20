@@ -541,8 +541,8 @@ class inventory_storage_component{
         ~inventory_storage_component() = default;
         inventory_storage_component()
         :placements_({}),
-         cursor_x_(hud_config::inventory_page_frame.x + hud_config::page_nav_button_buffer),
-         row_y_(hud_config::inventory_page_frame.y + hud_config::page_nav_button_buffer),
+         cursor_x_(hud_config::page_nav_button_buffer),
+         row_y_(hud_config::page_nav_button_buffer),
          row_height_(0.0f){}
 
         inventory_storage_component(const inventory_storage_component& other) = default;

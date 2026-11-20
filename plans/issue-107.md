@@ -53,6 +53,9 @@ also need to adjust button creation on the page depending on its index. [first p
 
 the page navigation needs its on click behaviour defined. can emit a simple enough event that carries an index adjustment [ +- 1] which the inventory system listens to and adjusts its index. it should also include a bounds check even though the option is not given when the page is a head or tail, just for safety
 
+and we need to adjust button creation on pages.
+the first page should have no left button, the last page should have no right button.
+when a page no longer becomes the last page, then it needs a right button
 
 ## Slice 5 : Picking Up Decorations
 this code already exists in legacy ? that is the logic for the decoration following the cursor. i think it might but its easy enough to replicate so it's not a major concern. 

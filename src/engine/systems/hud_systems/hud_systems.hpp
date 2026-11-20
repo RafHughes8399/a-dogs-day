@@ -154,6 +154,8 @@ namespace hud_systems{
 
         size_t create_menu_page(std::function<void(size_t)> build);
         size_t create_inventory_menu();
+        size_t create_inventory_head();
+        size_t create_inventory_tail(size_t previous_tail);
         size_t create_shop_menu();
         size_t create_quest_menu();
         size_t create_element(size_t owner, std::function<void(size_t)> build);

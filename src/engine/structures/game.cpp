@@ -103,6 +103,36 @@ void game::game::init(){
         Vector2{level_config::edge_weight * 18,level_config::edge_weight * 28});
     lifespan_.create_decoration(entity_config::decorations::conversation_pit,
         Vector2{level_config::edge_weight * 22,level_config::edge_weight * 26});
+    const std::array<size_t, 8> stock_decorations = {
+        entity_config::decorations::gargoyle, entity_config::decorations::poker_table,
+        entity_config::decorations::dog_painting, entity_config::decorations::frangipani,
+        entity_config::decorations::pavlov, entity_config::decorations::ficus_lytra,
+        entity_config::decorations::polish_cow, entity_config::decorations::conversation_pit};
+    const size_t stock_copies = 5;
+    const float stock_gap = level_config::edge_weight * 0.5f;
+    const float stock_left = level_config::edge_weight * 6;
+    const float stock_right = level_config::edge_weight * 47;
+    const float stock_bottom = level_config::edge_weight * 47;
+    float stock_x = stock_left;
+    float stock_y = level_config::edge_weight * 33;
+    float stock_row_height = 0.0f;
+    size_t stock_created = 0;
+    for(size_t copy = 0; copy < stock_copies; ++copy){
+        for(auto decoration : stock_decorations){
+            auto size = items::item_encyclopedia::get_instance().definition_of(decoration).get_size();
+            if(stock_x + size.x > stock_right){
+                stock_x = stock_left;
+                stock_y += stock_row_height + stock_gap;
+                stock_row_height = 0.0f;
+            }
+            if(stock_y + size.y > stock_bottom){ continue; }
+            lifespan_.create_decoration(decoration, Vector2{stock_x, stock_y});
+            stock_x += size.x + stock_gap;
+            stock_row_height = std::max(stock_row_height, size.y);
+            ++stock_created;
+        }
+    }
+    debug::log("[game::init, stock decorations] created " + std::to_string(stock_created));
     menu_navigation_.init();
     inventory_.init();
     shop_.init();

@@ -20,6 +20,11 @@ namespace {
     }
 }
 
+void systems::control_input_system::on_cursor_created(const events::cursor_created& event){
+    cursor_id_ = static_cast<int>(event.get_id());
+    debug::log("[control_input_system::on_cursor_created] cursor id: " + std::to_string(cursor_id_));
+}
+
 // ---------------- input dispatch ----------------
 void systems::control_input_system::check_inputs(size_t id, std::vector<game_config::input>& controls, float delta){
     for(auto it = controls.begin(); it != controls.end(); ++it){
@@ -207,21 +212,35 @@ void systems::control_input_system::left_click(size_t id){
         + ", position: " + raglib::vector_to_string(click_position));
     if(hud_systems::click_system::get_instance().click(click_position)){ return; }
 
-    int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
-    if(entity_id == game_config::empty_entity){
-        debug::log("[control_input_system::left_click, hit nothing] deselecting, was: "
-            + std::to_string(selection_system::get_instance().selected()));
-        selection_system::get_instance().deselect();
-        return;
-    }
-    else{
-        debug::log("[control_input_system::left_click, hit entity] selecting: "
-            + std::to_string(entity_id));
-        selection_system::get_instance().select(static_cast<size_t>(entity_id));
-        debug::log("[control_input_system::left_click, selection settled] selected: "
-            + std::to_string(selection_system::get_instance().selected()));
-    }
 
+    // check if carrying and attempt to drop the carreid entity,
+    auto cursor_carrier = component_managers::entity_carrier_manager_.get_component(id);
+    if(cursor_carrier and cursor_carrier->is_carrying()){
+        auto carried_entity = cursor_carrier->get_carried_entity().value();
+        if(systems::spatial_system::get_instance().can_place_entity(carried_entity,  id, GetMousePosition())){
+            cursor_carrier->drop();
+            // and then the subsequent event that suggests the decoration has been placed. i think its move entity ? or at least 
+            // place entity
+            // this is flawed slightly because you always are interacting wit hthe cusror so you cannot palce, neeed to exlcude the cursor from
+            
+        }
+    }else{
+        // otherwise check for selcting
+        int entity_id = spatial_system::get_instance().check_collision_with(id, click_position);
+        if(entity_id == game_config::empty_entity){
+            debug::log("[control_input_system::left_click, hit nothing] deselecting, was: "
+                + std::to_string(selection_system::get_instance().selected()));
+                selection_system::get_instance().deselect();
+                return;
+        }
+        else{
+                debug::log("[control_input_system::left_click, hit entity] selecting: "
+                    + std::to_string(entity_id));
+                    selection_system::get_instance().select(static_cast<size_t>(entity_id));
+                    debug::log("[control_input_system::left_click, selection settled] selected: "
+                        + std::to_string(selection_system::get_instance().selected()));
+        }
+    }
 }
 // * right click tells the selected player dog entity where to go 
 // ? maybe extendable to waiters too ? if i wanted to change how the waiter interaction stuff goes

@@ -1,4 +1,6 @@
 #include "hud_config.h"
+#include "debug_log_interface.h"
+#include <string>
 #include "hud_systems/hud_systems.hpp"
 #include "menus.h"
 #include "system.h"
@@ -15,15 +17,32 @@ size_t hud_systems::hud_lifespan_system::create_inventory_menu(){
     auto frame = hud_config::inventory_page_frame;
     auto anchor = GetScreenToWorld2D(Vector2{hud_config::inventory_page_frame.x, hud_config::inventory_page_frame.y}, systems::rendering_system::get_instance().get_camera());
     auto root = create_menu_page([frame, anchor](size_t id) -> void { page_builders::build_inventory_menu(id, frame, anchor); });
-    auto buffer = hud_config::page_nav_button_buffer;
-    auto size = hud_config::page_nav_button_size;
-    auto bottom =  frame.y + frame.height - size - buffer;
-    request_button(root, hud_config::button_kinds::previous_page_button,
-        Vector2{frame.x + buffer, bottom});
-    request_button(root, hud_config::button_kinds::next_page_button,
-        Vector2{ frame.x + frame.width - size - buffer, bottom});
     systems::menu_navigation_system::get_instance().add_root(menus::menu_ids::inventory, root);
     return root;
+}
+size_t hud_systems::hud_lifespan_system::create_inventory_head(){
+    return create_inventory_menu();
+}
+size_t hud_systems::hud_lifespan_system::create_inventory_tail(size_t previous_tail){
+    size_t menu_id = create_inventory_menu();
+    auto frame = hud_config::inventory_page_frame;
+    auto size = hud_config::page_nav_button_size;
+    auto buffer = hud_config::page_nav_button_buffer;
+    auto bottom = frame.height - size - buffer;
+    auto* tail_position = component_managers::entity_positional_manager_.get_component(menu_id);
+    auto* previous_position = component_managers::entity_positional_manager_.get_component(previous_tail);
+    auto tail_origin = tail_position != nullptr ? tail_position->get_position() : Vector2Zero();
+    auto previous_origin = previous_position != nullptr ? previous_position->get_position() : Vector2Zero();
+    auto previous_button = request_button(menu_id, hud_config::button_kinds::previous_page_button,
+        Vector2Add(tail_origin, Vector2{buffer, bottom}));
+    auto next_button = request_button(previous_tail, hud_config::button_kinds::next_page_button,
+        Vector2Add(previous_origin, Vector2{frame.width - size - buffer, bottom}));
+    debug::log("[hud_lifespan_system::create_inventory_tail] new page: " + std::to_string(menu_id)
+        + ", previous tail: " + std::to_string(previous_tail)
+        + ", previous button created: " + std::to_string(previous_button.has_value())
+        + ", next button created: " + std::to_string(next_button.has_value())
+        + ", storage on new page: " + std::to_string(component_managers::hud_inventory_storage_manager_.get_component(menu_id) != nullptr));
+    return menu_id;
 }
 size_t hud_systems::hud_lifespan_system::create_shop_menu(){
     auto frame = hud_config::shop_page_frame;
