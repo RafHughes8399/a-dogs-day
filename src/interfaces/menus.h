@@ -23,22 +23,28 @@ namespace menus{
                 public:
                     ~node() = default;
                     node(size_t id)
-                    : id_(id), roots_(), active_(0){}
+                    : id_(id), roots_(1), active_(1, 0), group_(0){}
                     node(const node& other) = default;
                     node(node&& other) = default;
                     node& operator=(const node& other) = default;
                     node& operator=(node&& other) = default;
 
                     size_t get_id() const;
-                    const std::vector<size_t>& get_roots() const;
+                    const std::vector<size_t>& get_roots(size_t group = 0) const;
+                    std::vector<size_t> get_all_roots() const;
                     std::optional<size_t> get_active_root() const;
-                    void add_root(size_t root);
+                    size_t get_group() const;
+                    void set_group(size_t group);
+                    void add_root(size_t root, size_t group = 0);
                     void next_root();
                     void previous_root();
+                    void clear();
                 private:
+                    void ensure_group(size_t group);
                     size_t id_;
-                    std::vector<size_t> roots_;
-                    size_t active_;
+                    std::vector<std::vector<size_t>> roots_;
+                    std::vector<size_t> active_;
+                    size_t group_;
             };
             class edge{
                 public:
@@ -68,8 +74,9 @@ namespace menus{
             menu_graph& operator=(menu_graph&& other) = delete;
 
             size_t navigate(int key);
-            void add_root(size_t menu, size_t root);
+            void add_root(size_t menu, size_t root, size_t group = 0);
             node& get_node(size_t menu);
+            void reset();
 
             size_t current_;
         private:

@@ -15,8 +15,8 @@ void systems::menu_navigation_system::on_key_press(const events::key_press& even
     hide(old_menu);
     show(new_menu);
 }
-void systems::menu_navigation_system::add_root(size_t menu, size_t root){
-    menus_.add_root(menu, root);
+void systems::menu_navigation_system::add_root(size_t menu, size_t root, size_t group){
+    menus_.add_root(menu, root, group);
 }
 void systems::menu_navigation_system::next_page(){
     hide(menus_.current_);
@@ -28,8 +28,25 @@ void systems::menu_navigation_system::previous_page(){
     menus_.get_node(menus_.current_).previous_root();
     show(menus_.current_);
 }
-const std::vector<size_t>& systems::menu_navigation_system::pages_of(size_t menu){
-    return menus_.get_node(menu).get_roots();
+const std::vector<size_t>& systems::menu_navigation_system::pages_of(size_t menu, size_t group){
+    return menus_.get_node(menu).get_roots(group);
+}
+std::vector<size_t> systems::menu_navigation_system::all_pages_of(size_t menu){
+    return menus_.get_node(menu).get_all_roots();
+}
+void systems::menu_navigation_system::set_group(size_t menu, size_t group){
+    auto& node = menus_.get_node(menu);
+    if(node.get_group() == group){ return; }
+    auto open = menus_.current_ == menu;
+    if(open){ hide(menu); }
+    node.set_group(group);
+    if(open){ show(menu); }
+}
+size_t systems::menu_navigation_system::group_of(size_t menu){
+    return menus_.get_node(menu).get_group();
+}
+void systems::menu_navigation_system::clear(){
+    menus_.reset();
 }
 void systems::menu_navigation_system::show(size_t menu){
     auto root = menus_.get_node(menu).get_active_root();

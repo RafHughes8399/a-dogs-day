@@ -46,7 +46,7 @@ void game::game::init(){
     debug::log("[game::init, built mack] id " + std::to_string(mack_id));
 
     //* -------------------------------------------------- STATION CREATE --------------------------------------------------------------------
-    auto counter = lifespan_.create_counter(entity_config::counters::wooden_food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 5});
+    auto counter = lifespan_.create_counter(entity_config::stations::wooden_food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 5});
     for(int lasagna = 0; lasagna < game_config::counter_start_stock; ++lasagna){
         systems::food_item_system::get_instance().place_item(counter, entity_config::foods::lasagna);
     }
@@ -56,14 +56,14 @@ void game::game::init(){
     /** a bit messy but we're going to create some items for the food counter to store */
     debug::log("[game::init, build counter]: id " + std::to_string(counter) + " with food items:  " + std::to_string(food_items));
     // this is injected here for testing purposes. not possible in the real game
-    lifespan_.create_counter(entity_config::counters::wooden_food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 10});
-    lifespan_.create_table(entity_config::tables::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
-    lifespan_.create_table(entity_config::tables::tiled_table,Vector2{level_config::edge_weight * 10, level_config::edge_weight * 8});
-    lifespan_.create_table(entity_config::tables::test_table,Vector2{level_config::edge_weight * 20, level_config::edge_weight * 8});
+    lifespan_.create_counter(entity_config::stations::wooden_food_counter, Vector2{level_config::edge_weight * 20, level_config::edge_weight * 10});
+    lifespan_.create_table(entity_config::stations::dining_table, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
+    lifespan_.create_table(entity_config::stations::tiled_table,Vector2{level_config::edge_weight * 10, level_config::edge_weight * 8});
+    lifespan_.create_table(entity_config::stations::test_table,Vector2{level_config::edge_weight * 20, level_config::edge_weight * 8});
 
     std::array<size_t, 4> coloured_tables = {
-        entity_config::tables::tiled_table_orange, entity_config::tables::tiled_table_red,
-        entity_config::tables::tiled_table_green, entity_config::tables::tiled_table_blue};
+        entity_config::stations::tiled_table_orange, entity_config::stations::tiled_table_red,
+        entity_config::stations::tiled_table_green, entity_config::stations::tiled_table_blue};
     std::array<Vector2, 4> coloured_table_slots = {
         Vector2{level_config::edge_weight * 30, level_config::edge_weight * 6},
         Vector2{level_config::edge_weight * 40, level_config::edge_weight * 6},
@@ -119,7 +119,7 @@ void game::game::init(){
     size_t stock_created = 0;
     for(size_t copy = 0; copy < stock_copies; ++copy){
         for(auto decoration : stock_decorations){
-            auto size = items::item_encyclopedia::get_instance().definition_of(decoration).get_size();
+            auto size = items::item_encyclopedia::get_instance().definition_of(items::item_ref{entity_config::decoration_category, decoration}).get_size();
             if(stock_x + size.x > stock_right){
                 stock_x = stock_left;
                 stock_y += stock_row_height + stock_gap;

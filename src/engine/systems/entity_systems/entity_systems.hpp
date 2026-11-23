@@ -358,6 +358,7 @@ namespace systems{
 
             size_t create_cooking_station(size_t cooking_station, Vector2 position);
             void destroy_cooking_station(size_t id);
+            void destroy_station(size_t id);
             void create_decoration_hud(size_t owner);
             void create_cooking_station_hud(size_t owner);
             size_t create_stove(Vector2 position);

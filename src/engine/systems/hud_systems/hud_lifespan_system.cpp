@@ -13,18 +13,25 @@ size_t hud_systems::hud_lifespan_system::create_menu_page(std::function<void(siz
     build(id);
     return id;
 }
-size_t hud_systems::hud_lifespan_system::create_inventory_menu(){
+size_t hud_systems::hud_lifespan_system::create_inventory_menu(size_t category){
     auto frame = hud_config::inventory_page_frame;
     auto anchor = GetScreenToWorld2D(Vector2{hud_config::inventory_page_frame.x, hud_config::inventory_page_frame.y}, systems::rendering_system::get_instance().get_camera());
     auto root = create_menu_page([frame, anchor](size_t id) -> void { page_builders::build_inventory_menu(id, frame, anchor); });
-    systems::menu_navigation_system::get_instance().add_root(menus::menu_ids::inventory, root);
+    systems::menu_navigation_system::get_instance().add_root(menus::menu_ids::inventory, root, category);
+    auto size = hud_config::inventory_category_button_size;
+    auto buffer = hud_config::inventory_category_button_buffer;
+    for(size_t slot = 0; slot < static_cast<size_t>(entity_config::item_categories_size); ++slot){
+        auto offset = Vector2{-(size + buffer), buffer + static_cast<float>(slot) * (size + buffer)};
+        request_button(root, hud_config::button_kinds::inventory_category_button,
+            Vector2Add(anchor, offset), slot);
+    }
     return root;
 }
-size_t hud_systems::hud_lifespan_system::create_inventory_head(){
-    return create_inventory_menu();
+size_t hud_systems::hud_lifespan_system::create_inventory_head(size_t category){
+    return create_inventory_menu(category);
 }
-size_t hud_systems::hud_lifespan_system::create_inventory_tail(size_t previous_tail){
-    size_t menu_id = create_inventory_menu();
+size_t hud_systems::hud_lifespan_system::create_inventory_tail(size_t previous_tail, size_t category){
+    size_t menu_id = create_inventory_menu(category);
     auto frame = hud_config::inventory_page_frame;
     auto size = hud_config::page_nav_button_size;
     auto buffer = hud_config::page_nav_button_buffer;

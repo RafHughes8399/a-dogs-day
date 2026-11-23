@@ -72,7 +72,7 @@ size_t systems::entity_lifespan_system::create_waiter_dog(size_t waiter, Vector2
         npc_system::get_instance().unregister_waiter(entity_id);
 }
 size_t systems::entity_lifespan_system::create_table(size_t entity, Vector2 position){
-    auto id = create([this](size_t id, size_t entity, Vector2 position) -> void { station_factory_.build_table(id, entity, position); },
+    auto id = create([this](size_t id, size_t entity, Vector2 position) -> void { station_factory_.build_station(id, entity, position); },
         entity, position, level_config::draw_layers::stations);
     npc_system::get_instance().register_table(id);
     return id;
@@ -83,7 +83,7 @@ void systems::entity_lifespan_system::destroy_table(size_t id){
 }
 
 size_t systems::entity_lifespan_system::create_counter(size_t counter, Vector2 position){
-    auto id = create([this](size_t id, size_t counter, Vector2 position) -> void { station_factory_.build_counter(id, counter, position); },
+    auto id = create([this](size_t id, size_t counter, Vector2 position) -> void { station_factory_.build_station(id, counter, position); },
         counter, position, level_config::draw_layers::stations);
     return id;
 }
@@ -93,7 +93,7 @@ void systems::entity_lifespan_system::destroy_counter(size_t id){
 
 size_t systems::entity_lifespan_system::create_cooking_station(size_t cooking_station, Vector2 position){
     auto id = create([this](size_t cooking_station, size_t entity_id, Vector2 position) -> void {
-        station_factory_.build_cooking_station(cooking_station, entity_id, position); },
+        station_factory_.build_station(cooking_station, entity_id, position); },
         cooking_station, position, level_config::draw_layers::stations);
     create_cooking_station_hud(id);
     debug::log("[entity_lifespan_system::create_cooking_station] built cooking station: "
@@ -101,6 +101,18 @@ size_t systems::entity_lifespan_system::create_cooking_station(size_t cooking_st
         + ", id: " + std::to_string(id)
         + ", position: " + raglib::vector_to_string(position));
     return id;
+}
+void systems::entity_lifespan_system::destroy_station(size_t id){
+    auto* item = component_managers::entity_item_manager_.get_component(id);
+    if(item == nullptr){
+        destroy(id);
+        return;
+    }
+    auto station = item->get_ref().get_id();
+    if(entity_config::is_table_station(station)){ destroy_table(id); return; }
+    if(entity_config::is_counter_station(station)){ destroy_counter(id); return; }
+    if(entity_config::is_cooking_station(station)){ destroy_cooking_station(id); return; }
+    destroy(id);
 }
 void systems::entity_lifespan_system::destroy_cooking_station(size_t id){
     debug::log("[entity_lifespan_system::destroy_cooking_station] removing cooking station id: "
@@ -152,22 +164,22 @@ void systems::entity_lifespan_system::create_cooking_station_hud(size_t owner){
     }
 }
 size_t systems::entity_lifespan_system::create_stove(Vector2 position){
-    return create_cooking_station(entity_config::cooking_stations::stove, position);
+    return create_cooking_station(entity_config::stations::stove, position);
 }
 size_t systems::entity_lifespan_system::create_oven(Vector2 position){
-    return create_cooking_station(entity_config::cooking_stations::oven, position);
+    return create_cooking_station(entity_config::stations::oven, position);
 }
 size_t systems::entity_lifespan_system::create_espresso_station(Vector2 position){
-    return create_cooking_station(entity_config::cooking_stations::espresso_station, position);
+    return create_cooking_station(entity_config::stations::espresso_station, position);
 }
 size_t systems::entity_lifespan_system::create_mini_fridge(Vector2 position){
-    return create_cooking_station(entity_config::cooking_stations::mini_fridge, position);
+    return create_cooking_station(entity_config::stations::mini_fridge, position);
 }
 size_t systems::entity_lifespan_system::create_bush(Vector2 position){
-    return create_cooking_station(entity_config::cooking_stations::bush, position);
+    return create_cooking_station(entity_config::stations::bush, position);
 }
 size_t systems::entity_lifespan_system::create_chopping_board(Vector2 position){
-    return create_cooking_station(entity_config::cooking_stations::chopping_board, position);
+    return create_cooking_station(entity_config::stations::chopping_board, position);
 }
 
 size_t systems::entity_lifespan_system::create_food(size_t food, Vector2 position){

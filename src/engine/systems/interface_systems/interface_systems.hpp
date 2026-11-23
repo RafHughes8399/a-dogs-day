@@ -33,7 +33,7 @@ namespace systems{
         : store_decoration_handler_([this](const events::store_decoration& event) -> void {on_stored_decoration(event);}){
             event_interface::subscribe<events::store_decoration>(store_decoration_handler_);
         }
-        bool store_item(size_t definition_id);
+        bool store_item(const items::item_ref& ref);
         events::event_handler<events::store_decoration> store_decoration_handler_;
     };
     class menu_navigation_system{
@@ -53,10 +53,14 @@ namespace systems{
 
             void init();
             void on_key_press(const events::key_press& event);
-            void add_root(size_t menu, size_t root);
+            void add_root(size_t menu, size_t root, size_t group = 0);
             void next_page();
             void previous_page();
-            const std::vector<size_t>& pages_of(size_t menu);
+            const std::vector<size_t>& pages_of(size_t menu, size_t group = 0);
+            std::vector<size_t> all_pages_of(size_t menu);
+            void set_group(size_t menu, size_t group);
+            size_t group_of(size_t menu);
+            void clear();
         private:
             menu_navigation_system()
             : key_press_handler_([this](const events::key_press& event) -> void {on_key_press(event);}), menus_(), factory_(){

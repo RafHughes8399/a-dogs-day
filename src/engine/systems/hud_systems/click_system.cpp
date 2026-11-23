@@ -46,6 +46,12 @@ void hud_systems::click_system::change_page(size_t button, const components::cli
     }
     systems::menu_navigation_system::get_instance().next_page();
 }
+void hud_systems::click_system::change_category(size_t button, const components::click_payload& payload){
+    (void) button;
+    auto* choice = std::get_if<components::category_choice>(&payload);
+    if(choice == nullptr){ return; }
+    systems::menu_navigation_system::get_instance().set_group(menus::menu_ids::inventory, choice->get_category());
+}
 void hud_systems::click_system::select_item(size_t button, const components::click_payload& payload){
     (void) button;
     (void) payload;
@@ -84,6 +90,7 @@ void hud_systems::click_system::store_decoration(size_t button, const components
     // store decoration event  with the owner
     auto item = component_managers::entity_item_manager_.get_component(owner->get_owner());
     if(not item){return;}
-    std::unique_ptr<events::event> store_decoration = std::make_unique<events::store_decoration>(owner->get_owner(), item->get_item());
+    std::unique_ptr<events::event> store_decoration = std::make_unique<events::store_decoration>(owner->get_owner(),
+        item->get_ref().get_category(), item->get_ref().get_id());
     event_interface::queue_event(store_decoration);
 }

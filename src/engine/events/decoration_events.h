@@ -49,8 +49,8 @@ namespace events{
 	};
     class store_decoration : public event {
     public:
-        store_decoration(const size_t entity_id, const size_t definition_id)
-         :event(ids::store_decoration_id), entity_id_(entity_id), definition_id_(definition_id){}
+        store_decoration(const size_t entity_id, const size_t category, const size_t definition_id)
+         :event(ids::store_decoration_id), entity_id_(entity_id), category_(category), definition_id_(definition_id){}
 		
         static int get_static_type(){
             return ids::store_decoration_id;
@@ -58,11 +58,15 @@ namespace events{
         size_t get_entity_id() const{
             return entity_id_;
         }
+        size_t get_category() const{
+            return category_;
+        }
         size_t get_definition_id() const{
             return definition_id_;
         }
     private:
         const size_t entity_id_;
+        const size_t category_;
         const size_t definition_id_;
 
     };

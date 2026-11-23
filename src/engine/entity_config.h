@@ -29,7 +29,7 @@ namespace entity_config{
         lionel,
         waiters_size
     };
-    enum tables{
+    enum stations{
         dining_table = 0,
         tiled_table,
         test_table,
@@ -37,21 +37,24 @@ namespace entity_config{
         tiled_table_red,
         tiled_table_green,
         tiled_table_blue,
-        tables_size
-    };
-    enum counters{
-        wooden_food_counter = 0,
-        counters_size
-    };
-    enum cooking_stations{
-        stove = 0,
+        wooden_food_counter,
+        stove,
         oven,
         espresso_station,
         mini_fridge,
         bush,
         chopping_board,
-        cooking_stations_size
+        stations_size
     };
+    inline bool is_table_station(size_t station){
+        return station >= dining_table and station <= tiled_table_blue;
+    }
+    inline bool is_counter_station(size_t station){
+        return station == wooden_food_counter;
+    }
+    inline bool is_cooking_station(size_t station){
+        return station >= stove and station < stations_size;
+    }
     enum foods{
         lasagna = 0,
         bone_biscuits,
@@ -93,6 +96,13 @@ namespace entity_config{
         ficus_lytra,
         frangipani,
         decorations_size
+    };
+    enum item_categories{
+        decoration_category = 0,
+        station_category,
+        waiter_category,
+        customer_category,
+        item_categories_size
     };
     enum counter_sprite_slots{
         counter_body = 0,

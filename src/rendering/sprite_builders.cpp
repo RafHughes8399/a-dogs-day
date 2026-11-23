@@ -321,8 +321,27 @@ sprite::sprite sprite_builders::build_sell_decoration_button_sprite(){
 sprite::sprite sprite_builders::build_to_storage_decoration_button_sprite(){
     return build_button_sprite(textures::to_storage_button, hud_config::store_decoration_path);
 }
-sprite::sprite sprite_builders::build_item_sprite(size_t definition_id){
-    switch(definition_id){
+sprite::sprite sprite_builders::build_item_sprite(size_t category, size_t id){
+    if(category == entity_config::station_category){
+        switch(id){
+            case entity_config::stations::dining_table: return build_dining_table_sprite();
+            case entity_config::stations::tiled_table: return build_tiled_table_sprite();
+            case entity_config::stations::test_table: return build_test_table();
+            case entity_config::stations::tiled_table_orange: return build_tiled_table_orange_sprite();
+            case entity_config::stations::tiled_table_red: return build_tiled_table_red_sprite();
+            case entity_config::stations::tiled_table_green: return build_tiled_table_green_sprite();
+            case entity_config::stations::tiled_table_blue: return build_tiled_table_blue_sprite();
+            case entity_config::stations::wooden_food_counter: return build_wooden_food_counter_sprite();
+            case entity_config::stations::stove: return build_stove_sprite();
+            case entity_config::stations::oven: return build_oven_sprite();
+            case entity_config::stations::espresso_station: return build_espresso_station_sprite();
+            case entity_config::stations::mini_fridge: return build_mini_fridge_sprite();
+            case entity_config::stations::bush: return build_bush_sprite();
+            case entity_config::stations::chopping_board: return build_chopping_board_sprite();
+            default: return build_test_decoration_sprite(entity_config::test_decoration_attributes);
+        }
+    }
+    switch(id){
         case entity_config::decorations::conversation_pit: return build_conversation_pit();
         case entity_config::decorations::gargoyle: return build_gargoyle();
         case entity_config::decorations::pavlov: return build_pavlov();

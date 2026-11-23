@@ -12,7 +12,7 @@ void hud_systems::hud_spatial_system::on_camera_moved(const events::camera_moved
     (void) event;
     auto& camera = systems::rendering_system::get_instance().get_camera();
     auto target = GetScreenToWorld2D(hud_config::inventory_page_anchor, camera);
-    auto pages = systems::menu_navigation_system::get_instance().pages_of(menus::menu_ids::inventory);
+    auto pages = systems::menu_navigation_system::get_instance().all_pages_of(menus::menu_ids::inventory);
     for(auto root : pages){
         auto* position = component_managers::entity_positional_manager_.get_component(root);
         auto* hud = component_managers::hud_manager_.get_component(root);

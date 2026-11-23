@@ -10,6 +10,26 @@
 #include "events_interface.h"
 #include "sprite.h"
 namespace items{
+    class item_ref{
+        public:
+            ~item_ref() = default;
+            item_ref(size_t category, size_t id)
+            :category_(category), id_(id){}
+            item_ref(const item_ref& other) = default;
+            item_ref(item_ref&& other) = default;
+            item_ref& operator=(const item_ref& other) = default;
+            item_ref& operator=(item_ref&& other) = default;
+
+            size_t get_category() const;
+            size_t get_id() const;
+            size_t pack() const;
+            static item_ref unpack(size_t packed);
+            bool operator==(const item_ref& other) const = default;
+        private:
+            static const size_t id_bits = 16;
+            size_t category_;
+            size_t id_;
+    };
     class food_item{
         public:
             ~food_item() = default;
@@ -57,8 +77,8 @@ namespace items{
     class item_definition{
         public:
             ~item_definition() = default;
-            item_definition(std::string name, int price, Vector2 size)
-            :name_(std::move(name)), price_(price), size_(size){}
+            item_definition(std::string name, int price, Vector2 size, size_t category)
+            :name_(std::move(name)), price_(price), size_(size), category_(category){}
 
             item_definition(const item_definition& other) = default;
             item_definition(item_definition&& other) = default;
@@ -66,10 +86,12 @@ namespace items{
             const std::string& get_name() const;
             int get_price() const;
             Vector2 get_size() const;
+            size_t get_category() const;
         private:
             std::string name_;
             int price_;
             Vector2 size_;
+            size_t category_;
     };
     class item_encyclopedia{
         public:
@@ -84,13 +106,17 @@ namespace items{
             item_encyclopedia& operator=(const item_encyclopedia& other) = delete;
             item_encyclopedia& operator=(item_encyclopedia&& other) = delete;
 
-            const item_definition& definition_of(size_t definition_id) const;
+            const item_definition& definition_of(const item_ref& ref) const;
+            const item_definition& definition_of(size_t category, size_t id) const;
+            bool has_definition(const item_ref& ref) const;
         private:
             item_encyclopedia()
-            :definitions_(build_definitions()){}
+            :catalogues_(build_catalogues()){}
 
-            static std::array<item_definition, entity_config::decorations_size> build_definitions();
-            const std::array<item_definition, entity_config::decorations_size> definitions_;
+            static std::array<std::vector<item_definition>, entity_config::item_categories_size> build_catalogues();
+            static std::vector<item_definition> build_decoration_definitions();
+            static std::vector<item_definition> build_station_definitions();
+            const std::array<std::vector<item_definition>, entity_config::item_categories_size> catalogues_;
     };
     class inventory_layout{
         public:
@@ -111,7 +137,7 @@ namespace items{
             Vector2 size_;
             float scale_;
     };
-    inventory_layout inventory_layout_of(size_t definition_id);
+    inventory_layout inventory_layout_of(const item_ref& ref);
 /**
 
 class item_builder{

@@ -78,7 +78,7 @@ namespace factories{
         public:
             ~station_factory() = default;
             station_factory()
-            :table_builders_({
+            :station_builders_({
                 [](size_t id, Vector2 position) -> void {ecs_entities::build_dining_table(id, position);},
                 [](size_t id, Vector2 position) -> void {ecs_entities::build_tiled_table(id, position);},
                 [](size_t id, Vector2 position) -> void {ecs_entities::build_test_table(id, position);},
@@ -86,9 +86,7 @@ namespace factories{
                 [](size_t id, Vector2 position) -> void {ecs_entities::build_tiled_table_red(id, position);},
                 [](size_t id, Vector2 position) -> void {ecs_entities::build_tiled_table_green(id, position);},
                 [](size_t id, Vector2 position) -> void {ecs_entities::build_tiled_table_blue(id, position);},
-            }), counter_builders_({
                 [](size_t id, Vector2 position) -> void {ecs_entities::build_wooden_food_counter(id, position);},
-            }), cooking_station_builders_({
                 [](size_t id, Vector2 position) -> void {ecs_entities::build_stove(id, position);},
                 [](size_t id, Vector2 position) -> void {ecs_entities::build_oven(id, position);},
                 [](size_t id, Vector2 position) -> void {ecs_entities::build_espresso_station(id, position);},
@@ -103,14 +101,9 @@ namespace factories{
             station_factory& operator=(const station_factory& other) = default;
             station_factory& operator=(station_factory&& other) = default;
 
-            void build_station(size_t id, Vector2 position);
-            void build_table(size_t table, size_t entity_id, Vector2 position);
-            void build_counter(size_t counter, size_t entity_id, Vector2 position);
-            void build_cooking_station(size_t cooking_station, size_t entity_id, Vector2 position);
+            void build_station(size_t station, size_t entity_id, Vector2 position);
         private:
-            std::array<std::function<void(size_t, Vector2)>, entity_config::tables_size> table_builders_;
-            std::array<std::function<void(size_t, Vector2)>, entity_config::counters_size> counter_builders_;
-            std::array<std::function<void(size_t, Vector2)>, entity_config::cooking_stations_size> cooking_station_builders_;
+            std::array<std::function<void(size_t, Vector2)>, entity_config::stations_size> station_builders_;
     };
     class food_factory {
     public:

@@ -31,7 +31,6 @@ and actually do the art for the page navigators haha
 
 and expand to allow for stations and stuff, its just because they dont have a definitoin in the enyclopedia, i think it will also need to be extended to hold the category too 
 
-
 ## Creating an item from the inventory
 basic flow of this looks like:
 in on inventory_item_button click behaviour, emit an create decoration event.

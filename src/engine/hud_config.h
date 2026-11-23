@@ -14,6 +14,7 @@ namespace hud_config{
         sell_decoration,
         store_decoration,
         select_item,
+        change_category,
         size
     };
     enum button_kinds{
@@ -23,6 +24,7 @@ namespace hud_config{
         inventory_item_button,
         previous_page_button,
         next_page_button,
+        inventory_category_button,
         button_kinds_size
     };
 
@@ -30,6 +32,8 @@ namespace hud_config{
     inline const Rectangle menu_frame = Rectangle{400.0f, 400.0f, 200.0f, 200.0f};
     inline const float page_nav_button_size = 20;
     inline const float page_nav_button_buffer = level_config::edge_weight * 0.25f;
+    inline const float inventory_category_button_size = 40.0f;
+    inline const float inventory_category_button_buffer = page_nav_button_buffer;
 
     inline const float inventory_page_width_buffer = 1 * level_config::edge_weight;
     inline const float inventory_page_height_buffer = 1 * level_config::edge_weight;

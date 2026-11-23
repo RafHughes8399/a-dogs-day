@@ -1,18 +1,9 @@
 #include "factories.hpp"
-void factories::station_factory::build_station(size_t id, Vector2 position){
-    (void) id;
-    (void) position;
-    return;
-}
-void factories::station_factory::build_table(size_t table, size_t entity_id, Vector2 position){
-    auto table_builder = table_builders_[table];
-    table_builder(entity_id, position);
-}
-void factories::station_factory::build_counter(size_t counter, size_t entity_id, Vector2 position){
-    auto counter_builder = counter_builders_[counter];
-    counter_builder(entity_id, position);
-}
-void factories::station_factory::build_cooking_station(size_t cooking_station, size_t entity_id, Vector2 position){
-    auto cooking_station_builder = cooking_station_builders_[cooking_station];
-    cooking_station_builder(entity_id, position);
+#include "component_helpers.hpp"
+#include "items.h"
+void factories::station_factory::build_station(size_t station, size_t entity_id, Vector2 position){
+    if(station >= station_builders_.size()){ return; }
+    station_builders_[station](entity_id, position);
+    component_helpers::add_entity_item_component(entity_id,
+        items::item_ref{entity_config::station_category, station});
 }

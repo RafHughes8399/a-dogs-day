@@ -831,8 +831,8 @@ SCENARIO("a nine sprite can shrink its corners to fit a narrower frame", "[hud][
 
 SCENARIO("a decoration under the scale threshold keeps its size and gains the border", "[hud][inventory][layout]"){
     GIVEN("the test decoration, whose largest side is under the threshold"){
-        auto size = items::item_encyclopedia::get_instance().definition_of(entity_config::decorations::test_decoration).get_size();
-        auto layout = items::inventory_layout_of(entity_config::decorations::test_decoration);
+        auto size = items::item_encyclopedia::get_instance().definition_of(items::item_ref{entity_config::decoration_category, entity_config::decorations::test_decoration}).get_size();
+        auto layout = items::inventory_layout_of(items::item_ref{entity_config::decoration_category, entity_config::decorations::test_decoration});
 
         THEN("it is drawn unscaled"){
             REQUIRE(layout.get_scale() == 1.0f);
@@ -848,8 +848,8 @@ SCENARIO("a decoration under the scale threshold keeps its size and gains the bo
 
 SCENARIO("a decoration over the reference size is shrunk to the minimum scale", "[hud][inventory][layout]"){
     GIVEN("the poker table, whose largest side is at the reference size"){
-        auto size = items::item_encyclopedia::get_instance().definition_of(entity_config::decorations::poker_table).get_size();
-        auto layout = items::inventory_layout_of(entity_config::decorations::poker_table);
+        auto size = items::item_encyclopedia::get_instance().definition_of(items::item_ref{entity_config::decoration_category, entity_config::decorations::poker_table}).get_size();
+        auto layout = items::inventory_layout_of(items::item_ref{entity_config::decoration_category, entity_config::decorations::poker_table});
 
         THEN("it is drawn at the minimum scale"){
             REQUIRE(layout.get_scale() == Catch::Approx(hud_config::inventory_scale_min));
@@ -860,7 +860,7 @@ SCENARIO("a decoration over the reference size is shrunk to the minimum scale", 
 
 SCENARIO("a decoration between the threshold and the reference is shrunk by less than the maximum", "[hud][inventory][layout]"){
     GIVEN("the pavlov, whose largest side sits between the threshold and the reference"){
-        auto layout = items::inventory_layout_of(entity_config::decorations::pavlov);
+        auto layout = items::inventory_layout_of(items::item_ref{entity_config::decoration_category, entity_config::decorations::pavlov});
 
         THEN("its scale is below the start of the curve and above the minimum"){
             REQUIRE(layout.get_scale() < hud_config::inventory_scale_max);
@@ -1131,7 +1131,7 @@ SCENARIO("a full inventory page spills onto a second page that can be reached", 
         while(stored < 200 and navigation.pages_of(menus::menu_ids::inventory).size() < stale_pages + 2){
             auto decoration = systems::entity_lifespan_system::get_instance().create_decoration(gargoyle,
                 Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
-            inventory.on_stored_decoration(events::store_decoration{decoration, gargoyle});
+            inventory.on_stored_decoration(events::store_decoration{decoration, entity_config::decoration_category, gargoyle});
             ++stored;
         }
         auto pages = navigation.pages_of(menus::menu_ids::inventory);
