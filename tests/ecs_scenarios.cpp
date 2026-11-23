@@ -156,12 +156,12 @@ SCENARIO("building the cursor registers its components", "[ecs][components][curs
         WHEN("the cursor is built"){
             auto cursor_id = game.create_cursor();
 
-            THEN("it carries exactly the four its builder registers"){
+            THEN("it carries exactly the five its builder registers"){
                 REQUIRE(game.has_position(cursor_id));
                 REQUIRE(game.has_mouse_input(cursor_id));
                 REQUIRE(game.has_renderable(cursor_id));
                 REQUIRE(game.has_collision(cursor_id));
-                REQUIRE(game.num_components(cursor_id) == 4);
+                REQUIRE(game.num_components(cursor_id) == 5);
             }
             THEN("it takes no movement and no keyboard controls"){
                 REQUIRE_FALSE(game.has_movement(cursor_id));
@@ -202,7 +202,7 @@ SCENARIO("building the cursor registers its components", "[ecs][components][curs
 
         THEN("the cursor got its components through the player builder"){
             REQUIRE(cursor_id != player_id);
-            REQUIRE(game.num_components(cursor_id) == 4);
+            REQUIRE(game.num_components(cursor_id) == 5);
             REQUIRE(game.has_mouse_input(cursor_id));
         }
         THEN("the keyboard controls went to the player, not the cursor"){
@@ -217,13 +217,13 @@ SCENARIO("removing the cursor unregisters every component it held", "[ecs][lifes
         testing::ecs_test_game game;
         auto cursor_id = game.create_cursor();
 
-        REQUIRE(game.num_components(cursor_id) == 4);
-        REQUIRE(game.total_components() == 4);
+        REQUIRE(game.num_components(cursor_id) == 5);
+        REQUIRE(game.total_components() == 5);
 
         WHEN("it is removed"){
             game.remove(cursor_id);
 
-            THEN("all four managers dropped it"){
+            THEN("all five managers dropped it"){
                 REQUIRE_FALSE(game.has_position(cursor_id));
                 REQUIRE_FALSE(game.has_mouse_input(cursor_id));
                 REQUIRE_FALSE(game.has_renderable(cursor_id));

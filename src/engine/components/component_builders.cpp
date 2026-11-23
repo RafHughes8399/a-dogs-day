@@ -48,7 +48,7 @@ components::food_component component_builders::build_entity_food_component(size_
 components::item_component component_builders::build_entity_item_component(size_t item_id){
     return components::item_component(item_id);
 }
-components::carrier_component component_builders::build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity){
+components::carrier_component component_builders::build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<Vector2> offset, std::optional<size_t> carried_entity){
     return components::carrier_component(previous_position, current_position, offset, carried_entity);
 }
 components::recipes_component component_builders::build_entity_recipes_component(std::vector<recipe::recipe>& recipes){

@@ -123,17 +123,8 @@ void ecs_entities::build_waiter_dog(size_t id, Vector2 position,
     interaction_config::waiter_dog_interactor);
     component_helpers::add_entity_state_machine_component(id,
         state_machine_builders::build_waiter_state_machine());
-    auto hitbox = component_managers::entity_collision_manager_.get_component(id);
-    auto& hitboxes = hitbox->get_hitbox_component();
-    auto dog_box = hitboxes.get_hitbox().get_box();
-    auto side = hitboxes.get_hitbox_index() == level_config::directions::left ? -1.0f : 1.0f;
-    auto half_width = dog_box.width * 0.5f;
-    Vector2 offset = {
-        half_width + (half_width * side) - (entity_config::food_width * 0.5f) + (side * ((entity_config::food_width * 0.5f) - entity_config::food_carry_offset.x)),
-        (dog_box.height * 0.2f) - (entity_config::food_height * 0.5f) + entity_config::food_carry_offset.y};
-
     auto* waiter_position = component_managers::entity_positional_manager_.get_component(id);
-    component_helpers::add_entity_carrier_component(id, position, waiter_position->get_position_pointer(), offset);
+    component_helpers::add_entity_carrier_component(id, position, waiter_position->get_position_pointer(), std::nullopt);
 }
 
     void ecs_entities::build_gianluca(size_t id, Vector2 position){
