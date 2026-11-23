@@ -51,8 +51,8 @@ namespace components {
 class carrier_component {
 public:
     ~carrier_component() = default;
-    carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt)
-    : previous_position_(previous_position), current_position_(current_position), carried_entity_(carried_entity){}
+    carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<Vector2> offset, std::optional<size_t> carried_entity = std::nullopt)
+    : previous_position_(previous_position), current_position_(current_position), carried_entity_(carried_entity), offset_(offset){}
     carrier_component(const carrier_component& other) = default;
     carrier_component(carrier_component&& other) = default;
 
@@ -62,6 +62,7 @@ public:
     Vector2 get_previous_position() const;
     void set_previous_position(Vector2 position);
     Vector2* get_current_position() const;
+    std::optional<Vector2> get_offset() const;
     void set_current_position(Vector2* position);
     std::optional<size_t> get_carried_entity() const;
     void set_carried_entity(std::optional<size_t> entity_id);
@@ -71,6 +72,7 @@ private:
     Vector2 previous_position_;
     Vector2* current_position_;
     std::optional<size_t> carried_entity_;
+    std::optional<Vector2> offset_;
 };
 class recipe_choice{
     public:
@@ -113,6 +115,21 @@ class clickable_component{
     private:
         size_t action_;
         click_payload payload_;
+};
+class hoverable_component{
+    public:
+        ~hoverable_component() = default;
+        hoverable_component(Vector2 scale = Vector2One())
+        : scale_(scale){}
+        hoverable_component(const hoverable_component& other) = default;
+        hoverable_component(hoverable_component&& other) = default;
+
+        hoverable_component& operator=(const hoverable_component& other) = default;
+        hoverable_component& operator=(hoverable_component&& other) = default;
+
+        Vector2 get_scale() const;
+    private:
+        Vector2 scale_;
 };
 class collision_component {
 public:
@@ -432,7 +449,7 @@ public:
     // TODO (25 / 8 / 26) fix magic number what is 0
     body(std::vector<sprite::sprite> &sprites, size_t index = 0,
         Vector2 scale = Vector2One(), Vector2 offset = Vector2Zero())
-        : sprites_(sprites), active_index_(index), scale_(scale), offset_(offset) {}
+        : sprites_(sprites), active_index_(index), scale_(scale), base_scale_(scale), offset_(offset) {}
     body(const body& other) = default;
     body(body&& other) = default;
 
@@ -447,11 +464,15 @@ public:
       Vector2 get_scale() const;
       Vector2 get_offset() const;
 
+      void scale_by(Vector2 factor);
+      void reset_scale();
+
   private:
     // * holds all the parts of the dog
     std::vector<sprite::sprite> sprites_;
     size_t active_index_;
     Vector2 scale_;
+    Vector2 base_scale_;
     Vector2 offset_;
   };
 
@@ -470,6 +491,10 @@ public:
   void add_body(body layer);
   void remove_body(size_t index);
   void set_body(size_t index, body layer);
+
+  void scale_by(Vector2 factor);
+  void reset_scale();
+
 private:
   // * holds the different directions
   std::vector<body> body_;
@@ -518,8 +543,8 @@ class inventory_storage_component{
         ~inventory_storage_component() = default;
         inventory_storage_component()
         :placements_({}),
-         cursor_x_(hud_config::inventory_page_frame.x + hud_config::page_nav_button_buffer),
-         row_y_(hud_config::inventory_page_frame.y + hud_config::page_nav_button_buffer),
+         cursor_x_(hud_config::page_nav_button_buffer),
+         row_y_(hud_config::page_nav_button_buffer),
          row_height_(0.0f){}
 
         inventory_storage_component(const inventory_storage_component& other) = default;
@@ -592,7 +617,7 @@ namespace component_builders{
     components::inventory_storage_component build_hud_inventory_storage_component();
     components::food_component build_entity_food_component(size_t item_id);
     components::item_component build_entity_item_component(size_t item_id);
-    components::carrier_component build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity = std::nullopt);
+    components::carrier_component build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<Vector2> offset, std::optional<size_t> carried_entity = std::nullopt);
     components::recipes_component build_entity_recipes_component(std::vector<recipe::recipe>& recipes);
     components::hud_component build_hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
 
@@ -607,6 +632,7 @@ namespace component_builders{
     components::state_machine_component build_hud_state_machine_component(state_machine::state_machine machine);
     components::clickable_component build_hud_clickable_component(size_t action, components::click_payload payload = {});
     components::owner_component build_hud_owner_component(size_t owner);
+    components::hoverable_component build_hud_hoverable_component(Vector2 scale);
 }
 
 #endif

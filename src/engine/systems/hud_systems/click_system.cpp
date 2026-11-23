@@ -1,3 +1,5 @@
+#include "component_managers.hpp"
+#include "entity_systems/entity_systems.hpp"
 #include "hud_systems/hud_systems.hpp"
 #include "debug_log_interface.h"
 #include "system.h"
@@ -50,13 +52,15 @@ void hud_systems::click_system::select_item(size_t button, const components::cli
 }
 void hud_systems::click_system::move_decoration(size_t button, const components::click_payload& payload){
     (void) payload;
-    // dont need a payload
-    // the hud element id, i think we need a way for the hud element to know what entity it is attached to 
-    // that way we can grab the entity and then from the entity get the item id that it is 
-
-    // then trigger a store inventory event with the data
     auto owner = component_managers::hud_owner_manager_.get_component(button);
-    if(not owner) {return ;}
+    // get the cursror carrier component
+    auto cursor_id = systems::control_input_system::get_instance().get_cursor_id();
+    auto cursor_carrier = component_managers::entity_carrier_manager_.get_component(cursor_id);
+    if(not cursor_carrier or not owner) {return;}
+    cursor_carrier->set_carried_entity(owner->get_owner());
+    
+    // i think some hud chnges are needed here - i.e the grid, or maybe like an event to signal that a decoration has been picked up could be 
+    // helpful
 
 }
 void hud_systems::click_system::sell_decoration(size_t button, const components::click_payload& payload){

@@ -39,7 +39,7 @@ namespace render_layer{
                     auto draw_position = Vector2Subtract(position->get_position(), frame_position);
                     // body, outlines and cosmetics all draw at the same position
                     for(auto & body : renderable->get_layers()){
-                        body.get_active_sprite().render(draw_position, frame);
+                        body.get_active_sprite().render(draw_position, frame, body.get_scale());
                     }
                     if(hitbox_debug){
                         auto* hitbox = component_managers::entity_collision_manager_.get_component(entity_id);

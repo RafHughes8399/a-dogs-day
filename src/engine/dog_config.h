@@ -48,5 +48,6 @@ namespace dog_config{
     inline const size_t waiter_idle_max_points = 4;
     inline const size_t waiter_wander_odds = 6;
     inline const size_t waiter_idle_max_attempts = 3;
+
 }
 #endif

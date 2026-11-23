@@ -1,3 +1,5 @@
+#include "events.h"
+#include "game_config.h"
 #include "hud_systems/hud_systems.hpp"
 #include "system.h"
 #include "component_managers.hpp"
@@ -27,4 +29,20 @@ void hud_systems::hud_rendering_system::render(int frame){
             }
         }
     }
+}
+
+void hud_systems::hud_rendering_system::on_hover_event(const events::hover_hud_entity& event){
+    auto previous = event.get_previous_hovered();
+    auto current = event.get_current_hovered();
+    if(previous != game_config::empty_entity){
+        auto* previous_renderable = component_managers::hud_renderable_manager_.get_component(static_cast<size_t>(previous));
+        if(previous_renderable != nullptr){
+            previous_renderable->reset_scale();
+        }
+    }
+    if(current == game_config::empty_entity){ return; }
+    auto* current_renderable = component_managers::hud_renderable_manager_.get_component(static_cast<size_t>(current));
+    auto* hoverable = component_managers::hud_hoverable_manager_.get_component(static_cast<size_t>(current));
+    if(current_renderable == nullptr or hoverable == nullptr){ return; }
+    current_renderable->scale_by(hoverable->get_scale());
 }

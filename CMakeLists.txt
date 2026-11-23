@@ -152,6 +152,7 @@ add_library(components
   src/engine/components/shared_components/state_machine_component.cpp
   src/engine/components/hud_components/hud_component.cpp
   src/engine/components/hud_components/clickable_component.cpp
+  src/engine/components/hud_components/hoverable_component.cpp
   src/engine/components/hud_components/owner_component.cpp
   src/engine/components/hud_components/inventory_storage_component.cpp)
 link_libraries(components)
@@ -172,11 +173,14 @@ add_library(systems
   src/engine/systems/shared_systems/animation_system.cpp
   src/engine/systems/shared_systems/state_machine_system.cpp
   src/engine/systems/entity_systems/food_item_system.cpp
-  src/engine/systems/entity_systems/inventory_system.cpp
+  src/engine/systems/interface_systems/inventory_system.cpp
+  src/engine/systems/interface_systems/quest_system.cpp
+  src/engine/systems/interface_systems/shop_system.cpp
   src/engine/systems/entity_systems/menu_navigation_system.cpp
   src/engine/systems/hud_systems/hud.cpp
   src/engine/systems/hud_systems/click_system.cpp
   src/engine/systems/hud_systems/hud_spatial_system.cpp
+  src/engine/systems/hud_systems/hover_system.cpp
   src/engine/systems/hud_systems/hud_lifespan_system.cpp
   src/engine/systems/shared_systems/hud_rendering_system.cpp)
 link_libraries(systems)

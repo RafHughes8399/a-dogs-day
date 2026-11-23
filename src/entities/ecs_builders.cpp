@@ -124,7 +124,7 @@ void ecs_entities::build_waiter_dog(size_t id, Vector2 position,
     component_helpers::add_entity_state_machine_component(id,
         state_machine_builders::build_waiter_state_machine());
     auto* waiter_position = component_managers::entity_positional_manager_.get_component(id);
-    component_helpers::add_entity_carrier_component(id, position, waiter_position->get_position_pointer());
+    component_helpers::add_entity_carrier_component(id, position, waiter_position->get_position_pointer(), std::nullopt);
 }
 
     void ecs_entities::build_gianluca(size_t id, Vector2 position){
@@ -152,6 +152,10 @@ void ecs_entities::build_cursor(size_t id){
     std::vector<hitbox::hitbox> hitboxes = {hitbox_builders::build_cursor_hitbox(GetMousePosition())};
     component_helpers::add_entity_collision_component(id,
         component_builders::build_entity_hitbox_component(hitboxes, 0));
+    auto* cursor_position = component_managers::entity_positional_manager_.get_component(id);
+    component_helpers::add_entity_carrier_component(id, GetMousePosition(), cursor_position->get_position_pointer(), Vector2Zero());
+    events::cursor_created created{id};
+    event_interface::execute_event(created);
 }
 void ecs_entities::build_decoration(size_t id, Vector2 position,
     sprite::sprite decoration_sprite, hitbox::hitbox decoration_hitbox){

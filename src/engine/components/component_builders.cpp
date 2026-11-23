@@ -48,8 +48,8 @@ components::food_component component_builders::build_entity_food_component(size_
 components::item_component component_builders::build_entity_item_component(size_t item_id){
     return components::item_component(item_id);
 }
-components::carrier_component component_builders::build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<size_t> carried_entity){
-    return components::carrier_component(previous_position, current_position, carried_entity);
+components::carrier_component component_builders::build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<Vector2> offset, std::optional<size_t> carried_entity){
+    return components::carrier_component(previous_position, current_position, offset, carried_entity);
 }
 components::recipes_component component_builders::build_entity_recipes_component(std::vector<recipe::recipe>& recipes){
     return components::recipes_component(recipes);
@@ -76,6 +76,9 @@ components::collision_component component_builders::build_hud_collision_componen
 }
 components::state_machine_component component_builders::build_hud_state_machine_component(state_machine::state_machine machine){
     return components::state_machine_component(std::move(machine));
+}
+components::hoverable_component component_builders::build_hud_hoverable_component(Vector2 scale){
+    return components::hoverable_component(scale);
 }
 components::clickable_component component_builders::build_hud_clickable_component(size_t action, components::click_payload payload){
     return components::clickable_component(action, payload);

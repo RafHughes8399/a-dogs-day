@@ -1,3 +1,5 @@
+#include "entity_systems/entity_systems.hpp"
+#include "game_config.h"
 #include "system.h"
 #include "component_managers.hpp"
 
@@ -29,6 +31,13 @@ void systems::spatial_system::on_destroyed_entity(const events::remove_entity& e
     entities_.erase(event.get_id());
 }
 
+bool systems::spatial_system::can_place_entity(size_t entity_id, size_t cursor_id,  Vector2 position){
+    auto collision = component_managers::entity_collision_manager_.get_component(entity_id);
+    if(not collision) {return false;}
+    auto box = collision->get_hitbox_component().get_hitbox().get_box();
+    std::function<bool(size_t)> exlcude_cursor = [cursor_id](size_t entity) -> bool {return entity != cursor_id;}; 
+    return check_collision_with(entity_id, box, exlcude_cursor) == game_config::empty_entity;
+}
 // ---------------- frame update ----------------
 // TODO (25 / 8 / 26) stub - the tree is event driven, nothing to do per frame yet
 void systems::spatial_system::update(float delta){

@@ -7,8 +7,11 @@
 #include "component.h"
 #include "component_managers.hpp"
 #include "config.h"
+#include "event_core.h"
 #include "events.h"
 #include "events_interface.h"
+#include "game_config.h"
+#include "input_events.h"
 #include "quadtree.h"
 #include "button_factory.hpp"
 #include "queries.h"
@@ -25,6 +28,7 @@ namespace hud_systems{
             event_interface::unsubscribe<events::remove_hud_element>(remove_hud_element_handler_);
             event_interface::unsubscribe<events::move_entity>(move_entity_handler_);
             event_interface::unsubscribe<events::camera_moved>(camera_moved_handler_);
+            event_interface::unsubscribe<events::cursor_moved>(cursor_moved_handler_);
         }
         hud_spatial_system(const hud_spatial_system& other) = delete;
         hud_spatial_system(hud_spatial_system&& other) = delete;
@@ -36,11 +40,14 @@ namespace hud_systems{
         void on_removed_hud_element(const events::remove_hud_element& event);
         void on_moved_entity(const events::move_entity& event);
         void on_camera_moved(const events::camera_moved& event);
+        void on_cursor_moved(const events::cursor_moved& event);
+        void refresh_hover();
         void track(size_t hud_id);
         void untrack(size_t hud_id);
         bool is_tracked(size_t hud_id);
         size_t tracked_count();
         int check_collision_with(Vector2 position);
+        int check_collisions_with(size_t id, Rectangle box);
         void clear();
     private:
         hud_spatial_system(raglib::bounding_box_2 world_bounds = raglib::bounding_box_2{
@@ -51,19 +58,25 @@ namespace hud_systems{
           remove_hud_element_handler_([this](const events::remove_hud_element& event) -> void {on_removed_hud_element(event);}),
           move_entity_handler_([this](const events::move_entity& event) -> void {on_moved_entity(event);}),
           camera_moved_handler_([this](const events::camera_moved& event) -> void {on_camera_moved(event);}),
+          cursor_moved_handler_([this](const events::cursor_moved& event) -> void {on_cursor_moved(event);}),
           elements_(world_bounds, MAX_DEPTH, component_managers::hud_collision_manager_){
             event_interface::subscribe<events::create_hud_element>(create_hud_element_handler_);
             event_interface::subscribe<events::remove_hud_element>(remove_hud_element_handler_);
             event_interface::subscribe<events::move_entity>(move_entity_handler_);
             event_interface::subscribe<events::camera_moved>(camera_moved_handler_);
+            event_interface::subscribe<events::cursor_moved>(cursor_moved_handler_);
         }
         void move_hud(components::hud_component& hud, Vector2 delta);
-
+        bool is_hud_element_active(size_t element_id);
+        bool is_hoverable_element(size_t element_id);
+        
         events::event_handler<events::create_hud_element> create_hud_element_handler_;
         events::event_handler<events::remove_hud_element> remove_hud_element_handler_;
         events::event_handler<events::move_entity> move_entity_handler_;
         events::event_handler<events::camera_moved> camera_moved_handler_;
+        events::event_handler<events::cursor_moved> cursor_moved_handler_;
         tree::ecs_quadtree elements_;
+        int cursor_id_ = game_config::empty_entity;
     };
 
     // rendering huyd elements
@@ -73,15 +86,22 @@ namespace hud_systems{
             static hud_rendering_system instance;
             return instance;
         }
-        ~hud_rendering_system() = default;
+        ~hud_rendering_system(){
+            event_interface::unsubscribe<events::hover_hud_entity>(hover_handler_);
+        }
         hud_rendering_system(const hud_rendering_system& other) = delete;
         hud_rendering_system(hud_rendering_system&& other) = delete;
         
         hud_rendering_system& operator=(const hud_rendering_system& other) = delete;
         hud_rendering_system& operator=(hud_rendering_system&& other) = delete;
         void render(int frame);
+        void on_hover_event(const events::hover_hud_entity& event);
         private:
-            hud_rendering_system() = default;
+            hud_rendering_system()
+            : hover_handler_([this](const events::hover_hud_entity& event) -> void {on_hover_event(event);}){
+                event_interface::subscribe<events::hover_hud_entity>(hover_handler_);
+            }
+            events::event_handler<events::hover_hud_entity> hover_handler_;
     };
     class click_system {
     public:
@@ -133,7 +153,11 @@ namespace hud_systems{
         hud_lifespan_system& operator=(hud_lifespan_system&& other) = delete;
 
         size_t create_menu_page(std::function<void(size_t)> build);
-        size_t create_inventory_menu(Rectangle frame);
+        size_t create_inventory_menu();
+        size_t create_inventory_head();
+        size_t create_inventory_tail(size_t previous_tail);
+        size_t create_shop_menu();
+        size_t create_quest_menu();
         size_t create_element(size_t owner, std::function<void(size_t)> build);
         void destroy_element(size_t hud_id);
         void destroy_elements_of(size_t owner);
@@ -144,6 +168,37 @@ namespace hud_systems{
     // storing hud elements
     // processing hud behaviours
     // and then the hud as a whole that has the instances of the
+    class hover_system{
+        public:
+        static hover_system& get_instance(){
+            static hover_system instance;
+            return instance;
+        }
+        ~hover_system(){
+            event_interface::unsubscribe<events::remove_hud_element>(remove_hud_element_handler_);
+        }
+        hover_system(const hover_system& other) = delete;
+        hover_system(hover_system&& other) = delete;
+
+        hover_system& operator=(const hover_system& other) = delete;
+        hover_system& operator=(hover_system&& other) = delete;
+
+        void hover(size_t id);
+        void unhover();
+        void on_removed_hud_element(const events::remove_hud_element& event);
+
+        int hovered() const{
+            return hovered_element_id_;
+        }
+
+        private:
+            hover_system()
+            : remove_hud_element_handler_([this](const events::remove_hud_element& event) -> void {on_removed_hud_element(event);}){
+                event_interface::subscribe<events::remove_hud_element>(remove_hud_element_handler_);
+            }
+            events::event_handler<events::remove_hud_element> remove_hud_element_handler_;
+            int hovered_element_id_ = game_config::empty_entity;
+    };
     class hud {
     public:
         static hud& get_instance(){

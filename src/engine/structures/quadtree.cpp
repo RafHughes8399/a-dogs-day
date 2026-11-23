@@ -299,6 +299,30 @@ int tree::ecs_quadtree::is_there_collision(std::unique_ptr<node>& tree, Rectangl
     }
     return game_config::empty_entity;
 }
+std::vector<int> tree::ecs_quadtree::are_there_collisions(std::unique_ptr<node>& tree, Rectangle box, size_t id, const std::function<bool(size_t)>& filter,
+    std::vector<int>& matches){
+    if(not tree) {return matches;}
+    for(size_t entity : tree->entities_){
+        if(entity == id){ continue; }
+        if(not filter(entity)){ continue; }
+        auto entity_collision_component = collisions_.get_component(entity);
+        if(entity_collision_component == nullptr){ continue; }
+        auto entity_bounds = entity_collision_component->get_hitbox_component().get_hitbox().get_box();
+        if(CheckCollisionRecs(box, entity_bounds)){
+            matches.push_back(entity);
+        }
+    }
+    // node_contains_object demands full containment, so a box straddling a split
+    // matches no child at all and the descent stops here. a miss is not an
+    // acceptable broad-phase answer, so overlap - not containment - decides which
+    // children are worth searching
+    for(auto& child : tree->children_){
+        if(node_overlaps_object(child->bounds_, box)){
+            are_there_collisions(child, box, id, filter, matches);
+        }
+    }
+    return matches;
+}
 int tree::ecs_quadtree::is_there_interaction(std::unique_ptr<node>& tree, Rectangle box, size_t id){
     if(not tree){
         return game_config::empty_entity;

@@ -9,6 +9,9 @@ void components::carrier_component::set_previous_position(Vector2 position){
 Vector2* components::carrier_component::get_current_position() const{
     return current_position_;
 }
+std::optional<Vector2> components::carrier_component::get_offset() const{
+    return offset_;
+}
 void components::carrier_component::set_current_position(Vector2* position){
     current_position_ = position;
 }
