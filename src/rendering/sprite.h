@@ -142,10 +142,7 @@ namespace sprite_builders{
     sprite::sprite build_dog_sprite(int texture_key, const char* path,
         const float attributes[entity_config::attributes::size],
         Vector2 draw_position_offset = Vector2Zero());
-    sprite::sprite build_dog_part_sprite(int texture_key, const char* path,
-        const float attributes[entity_config::attributes::size],
-        std::vector<animation::animation> animations,
-        Vector2 draw_position_offset = Vector2Zero());
+    sprite::sprite build_dog_part_sprite(int texture_key, const char* path, const float attributes[entity_config::attributes::size], Vector2 draw_position_offset =  Vector2Zero());
     // one inner vector per dog_sprite_slots entry, each {left, right}
     std::vector<std::vector<sprite::sprite>> build_dog_part_layers(
         const entity_config::dog_part parts[entity_config::dog_sprite_slots_size],

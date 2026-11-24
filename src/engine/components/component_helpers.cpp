@@ -85,9 +85,9 @@ void component_helpers::add_entity_movement_component(size_t entity_id, Vector2 
         component_builders::build_entity_movement_component(move_speed, direction_scalar, std::move(paths)));
 }
 void component_helpers::add_entity_renderable_component(size_t entity_id,
-    std::vector<components::renderable_component::body>& bodys){
+    std::vector<components::renderable_component::sprite_part>& sprite){
     register_entity_renderable_component(entity_id,
-        component_builders::build_entity_renderable_component(bodys));
+        component_builders::build_entity_renderable_component(sprite));
 }
 void component_helpers::add_entity_collision_component(size_t entity_id,
     components::collision_component::hitbox_component hitbox){
@@ -156,7 +156,7 @@ void component_helpers::add_hud_positional_component(size_t hud_id, Vector2 posi
         component_builders::build_hud_positional_component(position));
 }
 void component_helpers::add_hud_renderable_component(size_t hud_id,
-    std::vector<components::renderable_component::body>& bodys){
+    std::vector<components::renderable_component::sprite_part>& bodys){
     register_hud_renderable_component(hud_id,
         component_builders::build_hud_renderable_component(bodys));
 }
@@ -255,7 +255,7 @@ void component_helpers::update_item_sprite(size_t entity_id, size_t slot){
     assert(renderable->num_bodys() == slot
         and "stored item sprite must append into its reserved slot");
     renderable->add_body(
-        component_builders::build_entity_body(item_sprites, item_id));
+        component_builders::build_entity_sprite_part(item_sprites, item_id));
 }
 // writes sprite and hitbox indices together. missing either component is fine
 void component_helpers::set_facing_index(size_t entity_id, size_t index){

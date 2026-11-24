@@ -32,13 +32,15 @@ void ecs_entities::build_player(size_t player_id, size_t cursor_id){
     build_cursor(cursor_id);
 }
 void ecs_entities::build_dog(size_t id, Vector2 position,
-    std::vector<sprite::sprite> sprites, hitbox::hitbox dog_hitbox,
-    size_t kind, float reach, std::vector<size_t> interactor_interactions){
+        const std::vector<std::vector<sprite::sprite>>& sprites, hitbox::hitbox dog_hitbox,
+        size_t kind, float reach, std::vector<size_t> interactor_interactions){
     component_helpers::add_entity_positional_component(id, position);
 
-    std::vector<components::renderable_component::body> bodys = {
-        component_builders::build_entity_body(sprites, level_config::directions::right)};
-    component_helpers::add_entity_renderable_component(id, bodys);
+    std::vector<components::renderable_component::sprite_part> body_parts;
+    for(const auto & part : sprites){
+       body_parts.push_back(component_builders::build_entity_sprite_part(part, level_config::directions::right));
+    }
+    component_helpers::add_entity_renderable_component(id, body_parts);
 
     std::vector<hitbox::hitbox> hitboxes = {dog_hitbox, dog_hitbox};
     component_helpers::add_entity_collision_component(id,
@@ -53,14 +55,25 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
     component_helpers::add_entity_interactor_component(id, reach, std::nullopt, interactor_interactions);
 }
     void ecs_entities::build_khiri(size_t id){
-        // ! left right, parallel to level_config::directions
-        std::vector<sprite::sprite> sprites;
-        sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_left,
-            entity_config::khiri_left_path, entity_config::khiri_across_attributes));
-        sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_right,
-            entity_config::khiri_right_path, entity_config::khiri_across_attributes));
+        auto tail_width = entity_config::khiri_tail_attributes[entity_config::frame_width];
+        auto body_width = entity_config::khiri_body_attributes[entity_config::frame_width];
+        auto head_width = entity_config::khiri_head_attributes[entity_config::frame_width];
 
-        build_dog(id, level_config::khiri_start, std::move(sprites),
+        auto head_left = sprite_builders::build_dog_part_sprite(textures::khiri_head_left, entity_config::khiri_head_left_path, entity_config::khiri_head_attributes, Vector2Zero());
+        auto body_left = sprite_builders::build_dog_part_sprite(textures::khiri_body_left, entity_config::khiri_body_left_path, entity_config::khiri_body_attributes, {head_width, 0});
+        auto tail_left = sprite_builders::build_dog_part_sprite(textures::khiri_tail_left, entity_config::khiri_tail_left_path, entity_config::khiri_tail_attributes, {head_width + body_width, 0});
+
+        auto tail_right = sprite_builders::build_dog_part_sprite(textures::khiri_tail_right, entity_config::khiri_tail_right_path, entity_config::khiri_tail_attributes, Vector2Zero());
+        auto body_right = sprite_builders::build_dog_part_sprite(textures::khiri_body_right, entity_config::khiri_body_right_path, entity_config::khiri_body_attributes, {tail_width, 0});
+        auto head_right = sprite_builders::build_dog_part_sprite(textures::khiri_head_right, entity_config::khiri_head_right_path, entity_config::khiri_head_attributes, {tail_width + body_width, 0});
+
+        std::vector<std::vector<sprite::sprite>> sprites = {
+            {tail_left, tail_right},
+            {body_left, body_right},
+            {head_left, head_right}
+        };
+
+        build_dog(id, level_config::khiri_start, sprites,
             hitbox_builders::build_dog_across_hitbox(level_config::khiri_start),
             entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach,
             interaction_config::player_dog_interactor);
@@ -68,13 +81,25 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
             state_machine_builders::build_player_state_machine());
     }
     void ecs_entities::build_mack(size_t id){
-        std::vector<sprite::sprite> sprites;
-        sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_left,
-            entity_config::mack_left_path, entity_config::mack_across_attributes));
-        sprites.push_back(sprite_builders::build_dog_sprite(textures::mack_right,
-            entity_config::mack_right_path, entity_config::mack_across_attributes));
+        auto tail_width = entity_config::mack_tail_attributes[entity_config::frame_width];
+        auto body_width = entity_config::mack_body_attributes[entity_config::frame_width];
+        auto head_width = entity_config::mack_head_attributes[entity_config::frame_width];
 
-        build_dog(id, level_config::mack_start, std::move(sprites),
+        auto head_left = sprite_builders::build_dog_part_sprite(textures::mack_head_left, entity_config::mack_head_left_path, entity_config::mack_head_attributes, Vector2Zero());
+        auto body_left = sprite_builders::build_dog_part_sprite(textures::mack_body_left, entity_config::mack_body_left_path, entity_config::mack_body_attributes, {head_width, 0});
+        auto tail_left = sprite_builders::build_dog_part_sprite(textures::mack_tail_left, entity_config::mack_tail_left_path, entity_config::mack_tail_attributes, {head_width + body_width, 0});
+
+        auto tail_right = sprite_builders::build_dog_part_sprite(textures::mack_tail_right, entity_config::mack_tail_right_path, entity_config::mack_tail_attributes, Vector2Zero());
+        auto body_right = sprite_builders::build_dog_part_sprite(textures::mack_body_right, entity_config::mack_body_right_path, entity_config::mack_body_attributes, {tail_width, 0});
+        auto head_right = sprite_builders::build_dog_part_sprite(textures::mack_head_right, entity_config::mack_head_right_path, entity_config::mack_head_attributes, {tail_width + body_width, 0});
+
+        std::vector<std::vector<sprite::sprite>> sprites = {
+            {tail_left, tail_right},
+            {body_left, body_right},
+            {head_left, head_right}
+        };
+
+        build_dog(id, level_config::mack_start, sprites,
             hitbox_builders::build_dog_across_hitbox(level_config::mack_start),
             entity_config::selectable_kinds::player_dog_kind, dog_config::dog_reach,
             interaction_config::player_dog_interactor);
@@ -85,7 +110,7 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
 // TODO (25 / 8 / 26) mack's art stands in until npc dog sprites exist
 // TODO (28 / 8 / 26) - update to take in a sprite 
 void ecs_entities::build_customer_dog(size_t id, Vector2 position,
-    std::vector<sprite::sprite> sprites, hitbox::hitbox customer_hitbox){
+    const std::vector<std::vector<sprite::sprite>>& sprites, hitbox::hitbox customer_hitbox){
     build_dog(id, position, std::move(sprites), customer_hitbox,
     entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach,
     interaction_config::customer_dog_interactor);
@@ -99,16 +124,45 @@ void ecs_entities::build_customer_dog(size_t id, Vector2 position,
     // build duck_hunt_dog();
     //  */
     void ecs_entities::build_tex(size_t id, Vector2 position){
-        build_customer_dog(id, position, build_mack_sprites(),
+        auto tail_width = entity_config::mack_tail_attributes[entity_config::frame_width];
+        auto body_width = entity_config::mack_body_attributes[entity_config::frame_width];
+        auto head_width = entity_config::mack_head_attributes[entity_config::frame_width];
+
+        auto head_left = sprite_builders::build_dog_part_sprite(textures::mack_head_left, entity_config::mack_head_left_path, entity_config::mack_head_attributes, Vector2Zero());
+        auto body_left = sprite_builders::build_dog_part_sprite(textures::mack_body_left, entity_config::mack_body_left_path, entity_config::mack_body_attributes, {head_width, 0});
+        auto tail_left = sprite_builders::build_dog_part_sprite(textures::mack_tail_left, entity_config::mack_tail_left_path, entity_config::mack_tail_attributes, {head_width + body_width, 0});
+
+        auto tail_right = sprite_builders::build_dog_part_sprite(textures::mack_tail_right, entity_config::mack_tail_right_path, entity_config::mack_tail_attributes, Vector2Zero());
+        auto body_right = sprite_builders::build_dog_part_sprite(textures::mack_body_right, entity_config::mack_body_right_path, entity_config::mack_body_attributes, {tail_width, 0});
+        auto head_right = sprite_builders::build_dog_part_sprite(textures::mack_head_right, entity_config::mack_head_right_path, entity_config::mack_head_attributes, {tail_width + body_width, 0});
+
+        std::vector<std::vector<sprite::sprite>> sprites = {
+            {tail_left, tail_right},
+            {body_left, body_right},
+            {head_left, head_right}
+        };
+        build_customer_dog(id, position, sprites,
             hitbox_builders::build_dog_across_hitbox(position));
     }
     void ecs_entities::build_garfield(size_t id, Vector2 position){
-            std::vector<sprite::sprite> sprites;
-            sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_left,
-                entity_config::khiri_left_path, entity_config::khiri_across_attributes));
-            sprites.push_back(sprite_builders::build_dog_sprite(textures::khiri_right,
-                entity_config::khiri_right_path, entity_config::khiri_across_attributes));
-        build_dog(id, position, std::move(sprites), hitbox_builders::build_dog_across_hitbox(position),
+        auto tail_width = entity_config::khiri_tail_attributes[entity_config::frame_width];
+        auto body_width = entity_config::khiri_body_attributes[entity_config::frame_width];
+        auto head_width = entity_config::khiri_head_attributes[entity_config::frame_width];
+
+        auto head_left = sprite_builders::build_dog_part_sprite(textures::khiri_head_left, entity_config::khiri_head_left_path, entity_config::khiri_head_attributes, Vector2Zero());
+        auto body_left = sprite_builders::build_dog_part_sprite(textures::khiri_body_left, entity_config::khiri_body_left_path, entity_config::khiri_body_attributes, {head_width, 0});
+        auto tail_left = sprite_builders::build_dog_part_sprite(textures::khiri_tail_left, entity_config::khiri_tail_left_path, entity_config::khiri_tail_attributes, {head_width + body_width, 0});
+
+        auto tail_right = sprite_builders::build_dog_part_sprite(textures::khiri_tail_right, entity_config::khiri_tail_right_path, entity_config::khiri_tail_attributes, Vector2Zero());
+        auto body_right = sprite_builders::build_dog_part_sprite(textures::khiri_body_right, entity_config::khiri_body_right_path, entity_config::khiri_body_attributes, {tail_width, 0});
+        auto head_right = sprite_builders::build_dog_part_sprite(textures::khiri_head_right, entity_config::khiri_head_right_path, entity_config::khiri_head_attributes, {tail_width + body_width, 0});
+
+        std::vector<std::vector<sprite::sprite>> sprites = {
+            {tail_left, tail_right},
+            {body_left, body_right},
+            {head_left, head_right}
+        };
+        build_dog(id, position, sprites, hitbox_builders::build_dog_across_hitbox(position),
             entity_config::selectable_kinds::customer_dog_kind, dog_config::dog_reach);
         component_helpers::add_entity_state_machine_component(id,
             state_machine_builders::build_customer_state_machine());
@@ -116,9 +170,9 @@ void ecs_entities::build_customer_dog(size_t id, Vector2 position,
 
 // TODO (28 / 8 / 26) - update to take in a sprite 
 void ecs_entities::build_waiter_dog(size_t id, Vector2 position,
-    std::vector<sprite::sprite> sprites, hitbox::hitbox waiter_hitbox){
+    const std::vector<std::vector<sprite::sprite>>& sprites, hitbox::hitbox waiter_hitbox){
     // build the dog for the base components
-    build_dog(id, position, std::move(sprites), waiter_hitbox,
+    build_dog(id, position, sprites, waiter_hitbox,
         entity_config::selectable_kinds::waiter_dog_kind, dog_config::dog_reach,
     interaction_config::waiter_dog_interactor);
     component_helpers::add_entity_state_machine_component(id,
@@ -128,12 +182,44 @@ void ecs_entities::build_waiter_dog(size_t id, Vector2 position,
 }
 
     void ecs_entities::build_gianluca(size_t id, Vector2 position){
-        build_waiter_dog(id, position, sprite_builders::build_gianluca_sprites(),
-            hitbox_builders::build_gianluca_hitbox(position));
+        auto tail_width = entity_config::gianluca_tail_attributes[entity_config::frame_width];
+        auto body_width = entity_config::gianluca_body_attributes[entity_config::frame_width];
+        auto head_width = entity_config::gianluca_head_attributes[entity_config::frame_width];
+
+        auto head_left = sprite_builders::build_dog_part_sprite(textures::gianluca_head_left, entity_config::gianluca_head_left_path, entity_config::gianluca_head_attributes, Vector2Zero());
+        auto body_left = sprite_builders::build_dog_part_sprite(textures::gianluca_body_left, entity_config::gianluca_body_left_path, entity_config::gianluca_body_attributes, {head_width, 0});
+        auto tail_left = sprite_builders::build_dog_part_sprite(textures::gianluca_tail_left, entity_config::gianluca_tail_left_path, entity_config::gianluca_tail_attributes, {head_width + body_width, 0});
+
+        auto tail_right = sprite_builders::build_dog_part_sprite(textures::gianluca_tail_right, entity_config::gianluca_tail_right_path, entity_config::gianluca_tail_attributes, Vector2Zero());
+        auto body_right = sprite_builders::build_dog_part_sprite(textures::gianluca_body_right, entity_config::gianluca_body_right_path, entity_config::gianluca_body_attributes, {tail_width, 0});
+        auto head_right = sprite_builders::build_dog_part_sprite(textures::gianluca_head_right, entity_config::gianluca_head_right_path, entity_config::gianluca_head_attributes, {tail_width + body_width, 0});
+
+        std::vector<std::vector<sprite::sprite>> sprites = {
+            {tail_left, tail_right},
+            {body_left, body_right},
+            {head_left, head_right}
+        };
+        build_waiter_dog(id, position, sprites, hitbox_builders::build_gianluca_hitbox(position));
     }
     void ecs_entities::build_lionel(size_t id, Vector2 position){
-        build_waiter_dog(id, position, sprite_builders::build_lionel_sprites(),
-            hitbox_builders::build_lionel_hitbox(position));
+        auto tail_width = entity_config::lionel_tail_attributes[entity_config::frame_width];
+        auto body_width = entity_config::lionel_body_attributes[entity_config::frame_width];
+        auto head_width = entity_config::lionel_head_attributes[entity_config::frame_width];
+
+        auto head_left = sprite_builders::build_dog_part_sprite(textures::lionel_head_left, entity_config::lionel_head_left_path, entity_config::lionel_head_attributes, Vector2Zero());
+        auto body_left = sprite_builders::build_dog_part_sprite(textures::lionel_body_left, entity_config::lionel_body_left_path, entity_config::lionel_body_attributes, {head_width, 0});
+        auto tail_left = sprite_builders::build_dog_part_sprite(textures::lionel_tail_left, entity_config::lionel_tail_left_path, entity_config::lionel_tail_attributes, {head_width + body_width, 0});
+
+        auto tail_right = sprite_builders::build_dog_part_sprite(textures::lionel_tail_right, entity_config::lionel_tail_right_path, entity_config::lionel_tail_attributes, Vector2Zero());
+        auto body_right = sprite_builders::build_dog_part_sprite(textures::lionel_body_right, entity_config::lionel_body_right_path, entity_config::lionel_body_attributes, {tail_width, 0});
+        auto head_right = sprite_builders::build_dog_part_sprite(textures::lionel_head_right, entity_config::lionel_head_right_path, entity_config::lionel_head_attributes, {tail_width + body_width, 0});
+
+        std::vector<std::vector<sprite::sprite>> sprites = {
+            {tail_left, tail_right},
+            {body_left, body_right},
+            {head_left, head_right}
+        };
+        build_waiter_dog(id, position, sprites, hitbox_builders::build_lionel_hitbox(position));
     }
 //**
 // build_saba()
@@ -146,7 +232,7 @@ void ecs_entities::build_cursor(size_t id){
     component_helpers::add_entity_positional_component(id, GetMousePosition());
     component_helpers::add_entity_mouse_input_component(id, game_config::cursor_controls);
     std::vector<sprite::sprite> sprites = {sprite_builders::build_cursor_sprite()};
-    std::vector<components::renderable_component::body> bodys = {component_builders::build_entity_body(sprites, 0)};
+    std::vector<components::renderable_component::sprite_part> bodys = {component_builders::build_entity_sprite_part(sprites, 0)};
     component_helpers::add_entity_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes = {hitbox_builders::build_cursor_hitbox(GetMousePosition())};
@@ -162,8 +248,8 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
     component_helpers::add_entity_positional_component(id, position);
 
     std::vector<sprite::sprite> sprites = {decoration_sprite};
-    std::vector<components::renderable_component::body> bodys = {
-        component_builders::build_entity_body(sprites, 0)};
+    std::vector<components::renderable_component::sprite_part> bodys = {
+        component_builders::build_entity_sprite_part(sprites, 0)};
     component_helpers::add_entity_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes = {decoration_hitbox};
@@ -378,8 +464,8 @@ void ecs_entities::build_food(size_t id, Vector2 position, sprite::sprite food_s
     component_helpers::add_entity_positional_component(id, position);
 
     std::vector<sprite::sprite> sprites = {food_sprite};
-    std::vector<components::renderable_component::body> bodys = {
-        component_builders::build_entity_body(sprites, 0)};
+    std::vector<components::renderable_component::sprite_part> bodys = {
+        component_builders::build_entity_sprite_part(sprites, 0)};
     component_helpers::add_entity_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes = {hitbox_builders::build_food_hitbox(position)};
@@ -406,6 +492,6 @@ void ecs_entities::build_background(size_t id){
     component_helpers::add_entity_positional_component(id, Vector2{0.0f, 0.0f});
     std::vector<sprite::sprite> sprites = {sprite_builders::build_background_sprite()};
     
-    std::vector<components::renderable_component::body> bodys = {component_builders::build_entity_body(sprites, 0)};
+    std::vector<components::renderable_component::sprite_part> bodys = {component_builders::build_entity_sprite_part(sprites, 0)};
     component_helpers::add_entity_renderable_component(id, bodys);
 }

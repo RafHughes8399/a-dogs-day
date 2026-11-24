@@ -32,13 +32,13 @@ namespace ecs_entities {
     // ! dog builders and destroyers
     void build_player(size_t player_id, size_t cursor_id);
     void build_dog(size_t id, Vector2 position,
-        std::vector<sprite::sprite> sprites, hitbox::hitbox dog_hitbox,
+        const std::vector<std::vector<sprite::sprite>>& sprites, hitbox::hitbox dog_hitbox,
         size_t kind, float reach, std::vector<size_t> interactor_interactions = {});
         void build_khiri(size_t id);
         void build_mack(size_t id);
 
     void build_customer_dog(size_t id, Vector2 position,
-        std::vector<sprite::sprite> sprites, hitbox::hitbox customer_hitbox);
+        const std::vector<std::vector<sprite::sprite>>& sprites, hitbox::hitbox customer_hitbox);
         void build_tex(size_t id, Vector2 position);
         void build_garfield(size_t id, Vector2 position);
         //**
@@ -51,7 +51,7 @@ namespace ecs_entities {
         //  */
 
     void build_waiter_dog(size_t id, Vector2 position,
-        std::vector<sprite::sprite> sprites, hitbox::hitbox waiter_hitbox);
+        const std::vector<std::vector<sprite::sprite>>& sprites, hitbox::hitbox waiter_hitbox);
     //**
     // build_saba()
     //  */

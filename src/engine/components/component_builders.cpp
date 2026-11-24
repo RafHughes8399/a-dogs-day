@@ -8,10 +8,10 @@ components::position_component component_builders::build_entity_positional_compo
 components::movement_component component_builders::build_entity_movement_component(Vector2 move_speed, Vector2 direction_scalar, std::queue<path::path> paths){
     return components::movement_component(move_speed, direction_scalar, paths);
 }
-components::renderable_component::body component_builders::build_entity_body(std::vector<sprite::sprite>& sprites, size_t index){
-    return components::renderable_component::body(sprites, index);
+components::renderable_component::sprite_part component_builders::build_entity_sprite_part(const std::vector<sprite::sprite>& sprites, size_t index){
+    return components::renderable_component::sprite_part(sprites, index);
 }
-components::renderable_component component_builders::build_entity_renderable_component(std::vector<components::renderable_component::body>& bodys){
+components::renderable_component component_builders::build_entity_renderable_component(std::vector<components::renderable_component::sprite_part>& bodys){
     return components::renderable_component(bodys);
 }
 components::collision_component::hitbox_component component_builders::build_entity_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index){
@@ -61,11 +61,11 @@ components::hud_component component_builders::build_hud_component(sprite::nine_s
 components::position_component component_builders::build_hud_positional_component(Vector2 position){
     return components::position_component(position);
 }
-components::renderable_component::body component_builders::build_hud_body(std::vector<sprite::sprite>& sprites, size_t index,
+components::renderable_component::sprite_part component_builders::build_hud_body(std::vector<sprite::sprite>& sprites, size_t index,
     Vector2 scale, Vector2 offset){
-    return components::renderable_component::body(sprites, index, scale, offset);
+    return components::renderable_component::sprite_part(sprites, index, scale, offset);
 }
-components::renderable_component component_builders::build_hud_renderable_component(std::vector<components::renderable_component::body>& bodys){
+components::renderable_component component_builders::build_hud_renderable_component(std::vector<components::renderable_component::sprite_part>& bodys){
     return components::renderable_component(bodys);
 }
 components::collision_component::hitbox_component component_builders::build_hud_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index){

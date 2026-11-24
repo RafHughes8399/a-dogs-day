@@ -451,18 +451,18 @@ class recipes_component{
 
 class renderable_component {
 public:
-  class body {
+  class sprite_part {
   public:
-    ~body() = default;
+    ~sprite_part() = default;
     // TODO (25 / 8 / 26) fix magic number what is 0
-    body(std::vector<sprite::sprite> &sprites, size_t index = 0,
+    sprite_part(const std::vector<sprite::sprite> &sprites, size_t index = 0,
         Vector2 scale = Vector2One(), Vector2 offset = Vector2Zero())
         : sprites_(sprites), active_index_(index), scale_(scale), base_scale_(scale), offset_(offset) {}
-    body(const body& other) = default;
-    body(body&& other) = default;
+    sprite_part(const sprite_part& other) = default;
+    sprite_part(sprite_part&& other) = default;
 
-    body& operator=(const body& other) = default;
-    body& operator=(body&& other) = default;
+    sprite_part& operator=(const sprite_part& other) = default;
+    sprite_part& operator=(sprite_part&& other) = default;
 
       sprite::sprite& get_active_sprite();
       std::vector<sprite::sprite>& get_sprites();
@@ -476,7 +476,7 @@ public:
       void reset_scale();
 
   private:
-    // * holds all the parts of the dog
+    // * this handles directions, so each part has its own direction
     std::vector<sprite::sprite> sprites_;
     size_t active_index_;
     Vector2 scale_;
@@ -485,27 +485,27 @@ public:
   };
 
   ~renderable_component() = default;
-  renderable_component(std::vector<body> layers = {})
-      : body_(std::move(layers)) {}
+  renderable_component(std::vector<sprite_part> layers = {})
+      : sprite_(std::move(layers)) {}
   renderable_component(const renderable_component& other) = default;
   renderable_component(renderable_component&& other) = default;
 
   renderable_component& operator=(const renderable_component& other) = default;
   renderable_component& operator=(renderable_component&& other) = default;
 
-  std::vector<body>& get_layers();
-  body* get_body(size_t index);
+  std::vector<sprite_part>& get_layers();
+  sprite_part* get_body(size_t index);
   size_t num_bodys() const;
-  void add_body(body layer);
+  void add_body(sprite_part layer);
   void remove_body(size_t index);
-  void set_body(size_t index, body layer);
+  void set_body(size_t index, sprite_part layer);
 
   void scale_by(Vector2 factor);
   void reset_scale();
 
 private:
-  // * holds the different directions
-  std::vector<body> body_;
+  // * body as in
+  std::vector<sprite_part> sprite_;
 
 };
 
@@ -606,9 +606,9 @@ namespace component_builders{
     components::movement_component build_entity_movement_component(Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
-    components::renderable_component::body build_entity_body(std::vector<sprite::sprite>& sprites, size_t index);
+    components::renderable_component::sprite_part build_entity_sprite_part(const std::vector<sprite::sprite>& sprites, size_t index);
     components::renderable_component build_entity_renderable_component(
-        std::vector<components::renderable_component::body>& bodys);
+        std::vector<components::renderable_component::sprite_part>& bodys);
 
     components::collision_component::hitbox_component build_entity_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
     components::collision_component build_entity_collision_component(
@@ -630,10 +630,10 @@ namespace component_builders{
     components::hud_component build_hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
 
     components::position_component build_hud_positional_component(Vector2 position);
-    components::renderable_component::body build_hud_body(std::vector<sprite::sprite>& sprites, size_t index,
+    components::renderable_component::sprite_part build_hud_body(std::vector<sprite::sprite>& sprites, size_t index,
         Vector2 scale = Vector2One(), Vector2 offset = Vector2Zero());
     components::renderable_component build_hud_renderable_component(
-        std::vector<components::renderable_component::body>& bodys);
+        std::vector<components::renderable_component::sprite_part>& bodys);
     components::collision_component::hitbox_component build_hud_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
     components::collision_component build_hud_collision_component(
         components::collision_component::hitbox_component hitbox);

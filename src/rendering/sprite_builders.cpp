@@ -26,14 +26,16 @@ sprite::sprite sprite_builders::build_dog_sprite(int texture_key, const char* pa
         attributes[entity_config::attributes::animations],
         draw_position_offset);
 }
-sprite::sprite sprite_builders::build_dog_part_sprite(int texture_key, const char* path,
-    const float attributes[entity_config::attributes::size],
-    std::vector<animation::animation> animations, Vector2 draw_position_offset){
-    assert(animations.size() == static_cast<size_t>(attributes[entity_config::attributes::animations])
-        and "a dog part needs one animation for every row its sheet declares");
-    return sprite::sprite(textures::textures_.get_texture(texture_key, path),
-        std::move(animations), draw_position_offset);
+
+sprite::sprite sprite_builders::build_dog_part_sprite(int texture_key, const char* path, const float attributes[entity_config::attributes::size], Vector2 draw_position_offset){
+    return build_sprite(textures::textures_.get_texture(texture_key, path),
+        attributes[entity_config::attributes::frame_width],
+        attributes[entity_config::attributes::frame_height],
+        attributes[entity_config::attributes::frames],
+        attributes[entity_config::attributes::animations],
+        draw_position_offset);
 }
+
 namespace{
     std::vector<animation::animation> build_part_animations(size_t slot, float frame_width, float frame_height){
         switch(slot){
@@ -66,10 +68,10 @@ std::vector<std::vector<sprite::sprite>> sprite_builders::build_dog_part_layers(
 
         std::vector<sprite::sprite> directions;
         directions.push_back(build_dog_part_sprite(texture_keys[slot][entity_config::dog_part_left],
-            part.left_path, part.attributes, build_part_animations(slot, width, frame_height),
+            part.left_path, part.attributes,
             Vector2{x_left, part.offset.y}));
         directions.push_back(build_dog_part_sprite(texture_keys[slot][entity_config::dog_part_right],
-            part.right_path, part.attributes, build_part_animations(slot, width, frame_height),
+            part.right_path, part.attributes,
             Vector2{x_right, part.offset.y}));
         layers.push_back(std::move(directions));
     }

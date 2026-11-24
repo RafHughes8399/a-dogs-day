@@ -9,7 +9,7 @@ void button_builders::build_button(size_t id, Vector2 position, sprite::sprite& 
     component_helpers::add_hud_positional_component(id, position);
 
     std::vector<sprite::sprite> sprites{sprite};
-    std::vector<components::renderable_component::body> bodys{component_builders::build_hud_body(sprites, 0, scale, offset)};
+    std::vector<components::renderable_component::sprite_part> bodys{component_builders::build_hud_body(sprites, 0, scale, offset)};
     component_helpers::add_hud_renderable_component(id, bodys);
 
     std::vector<hitbox::hitbox> hitboxes{hitbox};
