@@ -171,7 +171,7 @@ SCENARIO("a stored decoration lands on the decoration pages only", "[hud][invent
         inventory.init();
 
         WHEN("a decoration is stored"){
-            inventory.on_stored_decoration(events::store_decoration{entity_config::decoration_category, entity_config::decorations::gargoyle});
+            inventory.on_stored_item(events::store_item{entity_config::decoration_category, entity_config::decorations::gargoyle});
 
             THEN("the decoration head holds it and the other categories stay empty"){
                 for(size_t category = 0; category < entity_config::item_categories_size; ++category){
@@ -319,7 +319,7 @@ SCENARIO("a stored station lands on the station pages and leaves the map", "[hud
             std::optional<size_t> store_button;
             for(auto element : entity_hud->get_elements()){
                 auto* clickable = component_managers::hud_clickable_manager_.get_component(element);
-                if(clickable != nullptr and clickable->get_action() == hud_config::click_actions::store_decoration){ store_button = element; }
+                if(clickable != nullptr and clickable->get_action() == hud_config::click_actions::store_item){ store_button = element; }
             }
             REQUIRE(store_button.has_value());
             auto box = component_managers::hud_collision_manager_.get_component(*store_button)
@@ -361,7 +361,7 @@ SCENARIO("a stored item with no definition is ignored", "[hud][inventory][catego
         auto& navigation = systems::menu_navigation_system::get_instance();
 
         WHEN("a store arrives for an id past the end of the catalogue"){
-            inventory.on_stored_decoration(events::store_decoration{entity_config::station_category, entity_config::stations_size});
+            inventory.on_stored_item(events::store_item{entity_config::station_category, entity_config::stations_size});
 
             THEN("nothing is stored on any category"){
                 for(size_t category = 0; category < entity_config::item_categories_size; ++category){

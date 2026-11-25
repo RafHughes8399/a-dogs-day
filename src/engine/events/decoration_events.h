@@ -47,13 +47,13 @@ namespace events{
 			const int edit_progress_;
 
 	};
-    class store_decoration : public event {
+    class store_item : public event {
     public:
-        store_decoration(const size_t category, const size_t definition_id)
-         :event(ids::store_decoration_id), category_(category), definition_id_(definition_id){}
+        store_item(const size_t category, const size_t definition_id)
+         :event(ids::store_item_id), category_(category), definition_id_(definition_id){}
 		
         static int get_static_type(){
-            return ids::store_decoration_id;
+            return ids::store_item_id;
 		}
         size_t get_category() const{
             return category_;

@@ -2,6 +2,7 @@
 #include "hitbox.h"
 #include "hud_element_builders.hpp"
 #include "items.h"
+#include <algorithm>
 #include "sprite.h"
 
 void button_builders::build_button(size_t id, Vector2 position, sprite::sprite& sprite, hitbox::hitbox& hitbox,
@@ -160,18 +161,16 @@ void button_builders::build_sell_decoration_button(size_t id, Vector2 position){
 }
 void button_builders::build_to_storage_decoration_button(size_t id, Vector2 position){
     auto sprite = sprite_builders::build_to_storage_decoration_button_sprite();
-    build_decoration_button(id, position, sprite, hud_config::click_actions::store_decoration);
+    build_decoration_button(id, position, sprite, hud_config::click_actions::store_item);
 }
 void button_builders::build_inventory_item_button(size_t id, Vector2 position, size_t packed_item){
     auto ref = items::item_ref::unpack(packed_item);
-    auto layout = items::inventory_layout_of(ref);
+    auto size = items::item_encyclopedia::get_instance().definition_of(ref).get_size();
+    auto scale = hud_config::inventory_item_fit / std::max(size.x, size.y);
     auto sprite = sprite_builders::build_item_sprite(ref.get_category(), ref.get_id());
-    auto footprint = layout.get_footprint();
-    auto border = hud_config::inventory_item_border * 0.5f;
-    auto hitbox = hitbox::hitbox(Rectangle{position.x, position.y, footprint.x, footprint.y});
+    auto hitbox = hitbox::hitbox(Rectangle{position.x, position.y, size.x * scale, size.y * scale});
     build_button(id, position, sprite, hitbox, hud_config::click_actions::select_item,
-        components::item_choice{ref}, Vector2{layout.get_scale(), layout.get_scale()},
-        Vector2{border, border});
+        components::item_choice{ref}, Vector2{scale, scale});
 }
 void button_builders::build_inventory_category_button(size_t id, Vector2 position, size_t category){
     auto sprite = sprite_builders::build_to_storage_decoration_button_sprite();

@@ -218,9 +218,9 @@ void systems::control_input_system::placing_from_inventory_back(){
         auto* item = component_managers::entity_item_manager_.get_component(carried);
         if(item != nullptr){
             auto ref = item->get_ref();
-            std::unique_ptr<events::event> store_decoration = std::make_unique<events::store_decoration>(
+            std::unique_ptr<events::event> store_item = std::make_unique<events::store_item>(
                 ref.get_category(), ref.get_id());
-            event_interface::queue_event(store_decoration);
+            event_interface::queue_event(store_item);
             if(ref.get_category() == entity_config::station_category){
                 entity_lifespan_system::get_instance().destroy_station(carried);
             }

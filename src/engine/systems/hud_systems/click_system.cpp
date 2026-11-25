@@ -90,7 +90,7 @@ void hud_systems::click_system::sell_decoration(size_t button, const components:
     event_interface::queue_event(sell_decoration);
     
 }
-void hud_systems::click_system::store_decoration(size_t button, const components::click_payload& payload){
+void hud_systems::click_system::store_item(size_t button, const components::click_payload& payload){
     (void) payload;
     auto owner = component_managers::hud_owner_manager_.get_component(button);
     if(not owner) {return; }
@@ -98,9 +98,9 @@ void hud_systems::click_system::store_decoration(size_t button, const components
     auto item = component_managers::entity_item_manager_.get_component(entity);
     if(not item){return;}
     auto ref = item->get_ref();
-    std::unique_ptr<events::event> store_decoration = std::make_unique<events::store_decoration>(
+    std::unique_ptr<events::event> store_item = std::make_unique<events::store_item>(
         ref.get_category(), ref.get_id());
-    event_interface::queue_event(store_decoration);
+    event_interface::queue_event(store_item);
     if(ref.get_category() == entity_config::station_category){
         systems::entity_lifespan_system::get_instance().destroy_station(entity);
         return;

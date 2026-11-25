@@ -124,7 +124,7 @@ namespace hud_systems{
             defined_clicks_[hud_config::click_actions::change_page] = change_page;
             defined_clicks_[hud_config::click_actions::move_decoration] = move_decoration;
             defined_clicks_[hud_config::click_actions::sell_decoration] = sell_decoration;
-            defined_clicks_[hud_config::click_actions::store_decoration] = store_decoration;
+            defined_clicks_[hud_config::click_actions::store_item] = store_item;
             defined_clicks_[hud_config::click_actions::select_item] = select_item;
             defined_clicks_[hud_config::click_actions::change_category] = change_category;
         }
@@ -133,7 +133,7 @@ namespace hud_systems{
         static void change_page(size_t button, const components::click_payload& payload);
         static void move_decoration(size_t button, const components::click_payload& payload);
         static void sell_decoration(size_t button, const components::click_payload& payload);
-        static void store_decoration(size_t button, const components::click_payload& payload);
+        static void store_item(size_t button, const components::click_payload& payload);
         static void select_item(size_t button, const components::click_payload& payload);
         static void change_category(size_t button, const components::click_payload& payload);
         std::array<std::function<void(size_t, const components::click_payload&)>, hud_config::click_actions::size> defined_clicks_;

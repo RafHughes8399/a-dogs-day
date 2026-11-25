@@ -17,6 +17,7 @@
 #include "events_interface.h"
 #include "hitbox.h"
 #include "item_stack.hpp"
+#include "items.h"
 #include "path.h"
 #include "raylib.h"
 #include "raymath.h"
@@ -551,10 +552,15 @@ class inventory_storage_component{
     public:
         ~inventory_storage_component() = default;
         inventory_storage_component()
-        :placements_({}),
+        :slots_({}),
+        freed_slots_(),
+        next_free_slot_(Vector2Zero()),
          cursor_x_(hud_config::page_nav_button_buffer),
          row_y_(hud_config::page_nav_button_buffer),
-         row_height_(0.0f){}
+         row_height_(0.0f){
+            init_empty_slots(hud_config::inventory_slots_row_start, hud_config::inventory_slots_row_end,
+                hud_config::inventory_slots_column_start, hud_config::inventory_slots_column_end);
+         }
 
         inventory_storage_component(const inventory_storage_component& other) = default;
         inventory_storage_component(inventory_storage_component&& other) = default;
@@ -565,23 +571,28 @@ class inventory_storage_component{
         bool empty() const;
         size_t size() const;
 
-        std::optional<Vector2> place(size_t definition_id, Vector2 footprint);
+        Vector2 place_at(const items::item_ref& item_reference);
+        bool can_place();
         void attach_button(size_t button);
         bool take_item(size_t button);
+        void init_empty_slots(float row_start, float row_end, float column_start, float column_end);
     private:
         class placement{
             public:
                 placement(size_t definition_id, Rectangle box)
-                : definition_id_(definition_id), box_(box), button_(static_cast<size_t>(game_config::empty_entity)){}
+                : definition_id_(definition_id), box_(box), button_(game_config::empty_entity){}
                 size_t get_button() const{ return button_; }
                 void set_button(size_t button){ button_ = button; }
+                Vector2 get_position() {return {box_.x, box_.y};}
             private:
-                size_t definition_id_;
+                int definition_id_;
                 Rectangle box_;
-                size_t button_;
+                int button_;
         };
-        // i think the storage needs to be more like interesting ?
-        std::vector<placement> placements_;
+        std::vector<std::vector<placement>> slots_;
+        std::queue<Vector2> freed_slots_;
+        Vector2 next_free_slot_;
+        Vector2 last_placed_ = Vector2{0.0f, 0.0f};
         float cursor_x_;
         float row_y_;
         float row_height_;

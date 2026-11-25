@@ -321,7 +321,7 @@ sprite::sprite sprite_builders::build_sell_decoration_button_sprite(){
     return build_button_sprite(textures::sell_decoration_button, hud_config::sell_decoration_path);
 }
 sprite::sprite sprite_builders::build_to_storage_decoration_button_sprite(){
-    return build_button_sprite(textures::to_storage_button, hud_config::store_decoration_path);
+    return build_button_sprite(textures::to_storage_button, hud_config::store_item_path);
 }
 sprite::sprite sprite_builders::build_item_sprite(size_t category, size_t id){
     if(category == entity_config::station_category){

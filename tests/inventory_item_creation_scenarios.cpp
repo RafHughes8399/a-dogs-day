@@ -174,7 +174,7 @@ SCENARIO("placing an item from the inventory ends in a click or escape and retur
         inventory.init();
         auto cursor = game.create_cursor();
         systems::movement_system::get_instance().update_position(cursor, Vector2{1030.0f, 1045.0f});
-        inventory.on_stored_decoration(events::store_decoration{entity_config::decoration_category, entity_config::decorations::gargoyle});
+        inventory.on_stored_item(events::store_item{entity_config::decoration_category, entity_config::decorations::gargoyle});
         navigation.on_key_press(events::key_press{game_config::key_press_actions::inventory_open});
         auto head = navigation.pages_of(menus::menu_ids::inventory, entity_config::decoration_category)[0];
         auto* storage = component_managers::hud_inventory_storage_manager_.get_component(head);
@@ -238,7 +238,7 @@ SCENARIO("an inventory item command takes exactly the clicked button off the act
         game.create_cursor();
         const auto gargoyle = entity_config::decorations::gargoyle;
         for(int stored = 0; stored < 2; ++stored){
-            inventory.on_stored_decoration(events::store_decoration{entity_config::decoration_category, gargoyle});
+            inventory.on_stored_item(events::store_item{entity_config::decoration_category, gargoyle});
         }
         auto head = navigation.pages_of(menus::menu_ids::inventory, entity_config::decoration_category)[0];
         auto* storage = component_managers::hud_inventory_storage_manager_.get_component(head);

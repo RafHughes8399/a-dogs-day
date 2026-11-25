@@ -18,7 +18,7 @@ namespace systems{
             return instance;
         }
         ~inventory_system(){
-            event_interface::unsubscribe<events::store_decoration>(store_decoration_handler_);
+            event_interface::unsubscribe<events::store_item>(store_item_handler_);
             event_interface::unsubscribe<events::item_from_inventory>(item_from_inventory_handler_);
         }
         inventory_system(const inventory_system& other) = delete;
@@ -27,19 +27,19 @@ namespace systems{
         inventory_system& operator=(const inventory_system& other) = delete;
         inventory_system& operator=(inventory_system&& other) = delete;
 
-        void on_stored_decoration(const events::store_decoration& event);
+        void on_stored_item(const events::store_item& event);
         void on_item_from_inventory(const events::item_from_inventory& event);
         void init();
         bool take_item(size_t button);
     private:
         inventory_system()
-        : store_decoration_handler_([this](const events::store_decoration& event) -> void {on_stored_decoration(event);}),
+        : store_item_handler_([this](const events::store_item& event) -> void {on_stored_item(event);}),
           item_from_inventory_handler_([this](const events::item_from_inventory& event) -> void {on_item_from_inventory(event);}){
-            event_interface::subscribe<events::store_decoration>(store_decoration_handler_);
+            event_interface::subscribe<events::store_item>(store_item_handler_);
             event_interface::subscribe<events::item_from_inventory>(item_from_inventory_handler_);
         }
         bool store_item(const items::item_ref& ref);
-        events::event_handler<events::store_decoration> store_decoration_handler_;
+        events::event_handler<events::store_item> store_item_handler_;
         events::event_handler<events::item_from_inventory> item_from_inventory_handler_;
     };
     class menu_navigation_system{

@@ -12,7 +12,7 @@ namespace hud_config{
         change_page,
         move_decoration,
         sell_decoration,
-        store_decoration,
+        store_item,
         select_item,
         change_category,
         size
@@ -20,14 +20,15 @@ namespace hud_config{
     enum button_kinds{
         move_decoration_button = 0,
         sell_decoration_button,
-        store_decoration_button,
+        store_item_button,
         inventory_item_button,
         previous_page_button,
         next_page_button,
         inventory_category_button,
         button_kinds_size
     };
-
+    inline const Rectangle inventory_item_slot_dimensions = Rectangle {0.0, 0.0, level_config::edge_weight * 2.5f, level_config::edge_weight * 2.5f};
+    inline const float inventory_item_fit = level_config::edge_weight * 2.0f;
     inline const Vector2 button_hover_scale = Vector2 {1.25f, 1.25f};
     inline const Rectangle menu_frame = Rectangle{400.0f, 400.0f, 200.0f, 200.0f};
     inline const float page_nav_button_size = 20;
@@ -42,6 +43,12 @@ namespace hud_config{
     inline const Vector2 inventory_page_anchor = Vector2{inventory_page_frame.x, inventory_page_frame.y};
     inline const float inventory_item_buffer = level_config::edge_weight;
     inline const float inventory_item_border = 16.0f;
+    inline const float inventory_slots_row_start = page_nav_button_buffer;
+    inline const float inventory_slots_column_start = page_nav_button_buffer;
+    inline const float inventory_slots_row_end = inventory_slots_row_start
+        + static_cast<int>((inventory_page_frame.height - 2.0f * page_nav_button_buffer - (page_nav_button_size + page_nav_button_buffer)) / inventory_item_slot_dimensions.height) * inventory_item_slot_dimensions.height;
+    inline const float inventory_slots_column_end = inventory_slots_column_start
+        + static_cast<int>((inventory_page_frame.width - 2.0f * page_nav_button_buffer) / inventory_item_slot_dimensions.width) * inventory_item_slot_dimensions.width;
     inline const float inventory_scale_max = 0.9f;
     inline const float inventory_scale_min = 0.5f;
     inline const float inventory_scale_threshold = level_config::edge_weight * 2.0f;
@@ -68,7 +75,7 @@ namespace hud_config{
     inline const char* cursor_edit_progres_wheel = "../sprites/edit_wheel.png";
     inline const char* edit_grid = "../sprites/edit_grid.png";
     inline const char* move_decoration_path = "../sprites/hud/move-decoration.png";
-    inline const char* store_decoration_path = "../sprites/hud/store-decoration.png";
+    inline const char* store_item_path = "../sprites/hud/store-decoration.png";
     inline const char* sell_decoration_path = "../sprites/hud/sell-decoration.png";
     inline const float edit_wheel_attributes[entity_config::attributes::size] = {35.0f, 35.0f, static_cast<float>(game_config::hold_duration),  1.0f}; // for now, pending animation play speed implementation , frames is 90
 

@@ -5,7 +5,7 @@
 #include "debug_log_interface.h"
 #include <string>
 
-void systems::inventory_system::on_stored_decoration(const events::store_decoration& event){
+void systems::inventory_system::on_stored_item(const events::store_item& event){
     items::item_ref ref{event.get_category(), event.get_definition_id()};
     if(not items::item_encyclopedia::get_instance().has_definition(ref)){ return; }
     if(not store_item(ref)){ return; }
@@ -19,50 +19,24 @@ bool systems::inventory_system::store_item(const items::item_ref& ref){
     auto footprint = items::inventory_layout_of(ref).get_footprint();
     auto category = ref.get_category();
     auto pages = menu_navigation_system::get_instance().pages_of(menus::menu_ids::inventory, category);
-    debug::log("[inventory_system::store_item] definition_id: " + std::to_string(definition_id)
-        + ", category: " + std::to_string(category)
-        + ", footprint: " + std::to_string(footprint.x) + " x " + std::to_string(footprint.y)
-        + ", pages: " + std::to_string(pages.size()));
     if(pages.empty()){
-        debug::log("[inventory_system::store_item] no inventory pages exist, giving up");
         return false;
     }
     auto page = pages.back();
     auto* storage = component_managers::hud_inventory_storage_manager_.get_component(page);
-    debug::log("[inventory_system::store_item] trying tail page: " + std::to_string(page)
-        + ", storage component found: " + std::to_string(storage != nullptr)
-        + ", items on page: " + std::to_string(storage != nullptr ? storage->size() : 0));
-    auto position = storage != nullptr ? storage->place(definition_id, footprint) : std::nullopt;
-    if(not position){
-        debug::log("[inventory_system::store_item] tail page " + std::to_string(page)
-            + " rejected the item, creating a new tail");
+    if(not storage->can_place()){
         auto previous = page;
         page = hud_systems::hud_lifespan_system::get_instance().create_inventory_tail(page, category);
         storage = component_managers::hud_inventory_storage_manager_.get_component(page);
-        debug::log("[inventory_system::store_item] new tail page: " + std::to_string(page)
-            + " after " + std::to_string(previous) + ", storage component found: " + std::to_string(storage != nullptr)
-            + ", pages now: " + std::to_string(menu_navigation_system::get_instance().pages_of(menus::menu_ids::inventory, category).size()));
-        position = storage != nullptr ? storage->place(definition_id, footprint) : std::nullopt;
-    }
-    if(not position){
-        debug::log("[inventory_system::store_item] item does not fit even on a fresh page, giving up");
-        return false;
     }
     auto* page_position = component_managers::entity_positional_manager_.get_component(page);
-    if(page_position == nullptr){
-        debug::log("[inventory_system::store_item] page " + std::to_string(page) + " has no positional component");
+    if(not page_position or not storage){
         return false;
     }
-    auto origin = page_position->get_position();
-    auto button_position = Vector2Add(origin, *position);
+    auto button_position = Vector2Add(page_position->get_position(), storage->place_at(ref));
     auto button = hud_systems::hud_lifespan_system::get_instance().request_button(page,
         hud_config::button_kinds::inventory_item_button, button_position, ref.pack());
     if(button.has_value()){ storage->attach_button(*button); }
-    debug::log("[inventory_system::store_item] page: " + std::to_string(page)
-        + ", relative: " + std::to_string(position->x) + ", " + std::to_string(position->y)
-        + ", origin: " + std::to_string(origin.x) + ", " + std::to_string(origin.y)
-        + ", button position: " + std::to_string(button_position.x) + ", " + std::to_string(button_position.y)
-        + ", button created: " + std::to_string(button.has_value()));
     return button.has_value();
 }
 bool systems::inventory_system::take_item(size_t button){
