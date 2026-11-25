@@ -3,58 +3,58 @@
 #include <raymath.h>
 #include <utility>
 
-sprite::sprite& components::renderable_component::body::get_active_sprite(){
+sprite::sprite& components::renderable_component::sprite_part::get_active_sprite(){
     return sprites_[active_index_];
 }
-std::vector<sprite::sprite>& components::renderable_component::body::get_sprites(){
+std::vector<sprite::sprite>& components::renderable_component::sprite_part::get_sprites(){
     return sprites_;
 }
-size_t components::renderable_component::body::get_active_index() const{
+size_t components::renderable_component::sprite_part::get_active_index() const{
     return active_index_;
 }
-size_t components::renderable_component::body::num_sprites() const{
+size_t components::renderable_component::sprite_part::num_sprites() const{
     return sprites_.size();
 }
-void components::renderable_component::body::set_index(size_t index){
+void components::renderable_component::sprite_part::set_index(size_t index){
     active_index_ = index;
 }
-Vector2 components::renderable_component::body::get_scale() const{
+Vector2 components::renderable_component::sprite_part::get_scale() const{
     return scale_;
 }
-void components::renderable_component::body::scale_by(Vector2 factor){
+void components::renderable_component::sprite_part::scale_by(Vector2 factor){
     scale_ = Vector2{base_scale_.x * factor.x, base_scale_.y * factor.y};
 }
-void components::renderable_component::body::reset_scale(){
+void components::renderable_component::sprite_part::reset_scale(){
     scale_ = base_scale_;
 }
-Vector2 components::renderable_component::body::get_offset() const{
+Vector2 components::renderable_component::sprite_part::get_offset() const{
     return offset_;
 }
-std::vector<components::renderable_component::body>& components::renderable_component::get_layers(){
-    return body_;
+std::vector<components::renderable_component::sprite_part>& components::renderable_component::get_layers(){
+    return sprite_;
 }
-components::renderable_component::body* components::renderable_component::get_body(size_t index){
-    return index < body_.size() ? &body_[index] : nullptr;
+components::renderable_component::sprite_part* components::renderable_component::get_body(size_t index){
+    return index < sprite_.size() ? &sprite_[index] : nullptr;
 }
 size_t components::renderable_component::num_bodys() const{
-    return body_.size();
+    return sprite_.size();
 }
-void components::renderable_component::add_body(body layer){
-    body_.push_back(std::move(layer));
+void components::renderable_component::add_body(sprite_part layer){
+    sprite_.push_back(std::move(layer));
 }
 void components::renderable_component::remove_body(size_t index){
-    if(index >= body_.size()){ return; }
-    body_.erase(body_.begin() + static_cast<decltype(body_)::difference_type>(index));
+    if(index >= sprite_.size()){ return; }
+    sprite_.erase(sprite_.begin() + static_cast<decltype(sprite_)::difference_type>(index));
 }
-void components::renderable_component::set_body(size_t index, body layer){
-    if(index >= body_.size()){ return; }
-    body_[index] = std::move(layer);
+void components::renderable_component::set_body(size_t index, sprite_part layer){
+    if(index >= sprite_.size()){ return; }
+    sprite_[index] = std::move(layer);
 }
 
 
 void components::renderable_component::scale_by(Vector2 factor){
-    std::for_each(body_.begin(), body_.end(), [factor](auto& body) -> void { body.scale_by(factor); });
+    std::for_each(sprite_.begin(), sprite_.end(), [factor](auto& body) -> void { body.scale_by(factor); });
 }
 void components::renderable_component::reset_scale(){
-    std::for_each(body_.begin(), body_.end(), [](auto& body) -> void { body.reset_scale(); });
+    std::for_each(sprite_.begin(), sprite_.end(), [](auto& body) -> void { body.reset_scale(); });
 }

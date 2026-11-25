@@ -59,12 +59,13 @@ namespace events{
 		remove_hud_element_id,
 		entity_selected_id,
 		entity_deselected_id,
-        store_decoration_id, 
+        store_item_id, 
         sell_decoration_id,
 		camera_moved_id,
 		cursor_moved_id,
 		hover_hud_entity_id,
 		cursor_created_id,
+		item_from_inventory_id,
 		size
 	};
 	class event{

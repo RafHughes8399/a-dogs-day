@@ -27,7 +27,7 @@ bool colour_replacement::colour_order::operator()(const Color& lhs, const Color&
 }
 
 colour_replacement::colour_replacer::colour_replacer(std::string path, colour_map replacements, Color primary)
-: path_(std::move(path)), replacements_(std::move(replacements)), primary_(primary),
+: path_(std::move(path)), reslots_(std::move(replacements)), primary_(primary),
   image_(LoadImage(path_.c_str())), copy_(ImageCopy(image_)){}
 
 colour_replacement::colour_replacer::~colour_replacer(){
@@ -41,7 +41,7 @@ bool colour_replacement::colour_replacer::is_loaded() const{
 
 void colour_replacement::colour_replacer::replace(){
     if(not is_loaded()){ return; }
-    for(const auto& [base, destination] : replacements_){
+    for(const auto& [base, destination] : reslots_){
         ImageColorReplace(&copy_, base, destination);
     }
 }

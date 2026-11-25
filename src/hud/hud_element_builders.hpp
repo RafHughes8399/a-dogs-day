@@ -17,7 +17,7 @@ namespace button_builders {
     void build_move_decoration_button(size_t id, Vector2 position);
     void build_sell_decoration_button(size_t id, Vector2 position);
     void build_to_storage_decoration_button(size_t id, Vector2 position);
-    void build_inventory_item_button(size_t id, Vector2 position, size_t definition_id);
+    void build_inventory_item_button(size_t id, Vector2 position, size_t packed_item);
     void build_recipe_button(size_t id, Vector2 position, size_t recipe, sprite::sprite& sprite);
     void build_recipe_button(size_t food, size_t id, Vector2 position, size_t recipe);
     void build_lasagna_button(size_t id, Vector2 position, size_t recipe);
@@ -44,6 +44,7 @@ namespace button_builders {
     void build_brisket_leftovers_button(size_t id, Vector2 position, size_t recipe);
     void build_steak_leftovers_button(size_t id, Vector2 position, size_t recipe);
     void build_page_navigation_button(size_t id, Vector2 position, int direction);
+    void build_inventory_category_button(size_t id, Vector2 position, size_t category);
 
     // decoration button builders
 

@@ -492,7 +492,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
         }
 
         WHEN("a cooking station is built"){
-            auto cooking_station = static_cast<size_t>(GENERATE(range(0, static_cast<int>(entity_config::cooking_stations_size))));
+            auto cooking_station = static_cast<size_t>(GENERATE(range(static_cast<int>(entity_config::stove), static_cast<int>(entity_config::stations_size))));
             auto station_id = game.create_cooking_station(cooking_station, spot);
 
             THEN("it carries the station component set plus recipes, a state machine and a hud"){
@@ -504,7 +504,7 @@ SCENARIO("decorations, stations and food build their component sets", "[ecs][com
                 REQUIRE(game.has_recipes(station_id));
                 REQUIRE(game.has_state_machine(station_id));
                 REQUIRE(component_managers::hud_manager_.get_component(station_id) != nullptr);
-                REQUIRE(game.num_components(station_id) == 8);
+                REQUIRE(game.num_components(station_id) == 9);
             }
             THEN("it answers to the station kind"){
                 REQUIRE(game.selectable_kind_of(station_id)

@@ -75,8 +75,8 @@ namespace {
         std::vector<sprite::sprite> sprites;
         sprites.push_back(sprite::sprite(Texture2D{},
             animation_builders::build_dog_head_animations(part_width, part_height)));
-        std::vector<components::renderable_component::body> layers = {
-            component_builders::build_entity_body(sprites, 0)};
+        std::vector<components::renderable_component::sprite_part> layers = {
+            component_builders::build_entity_sprite_part(sprites, 0)};
         component_helpers::add_entity_renderable_component(id, layers);
         return id;
     }

@@ -269,6 +269,8 @@ add_executable(tests
   tests/animation_scenarios.cpp
   tests/control_input_scenarios.cpp
   tests/spatial_scenarios.cpp
+  tests/inventory_category_scenarios.cpp
+  tests/inventory_item_creation_scenarios.cpp
   tests/graph_scenarios.cpp
   tests/quadtree_scenarios.cpp
   tests/customer_table_scenarios.cpp

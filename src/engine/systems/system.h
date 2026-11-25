@@ -19,6 +19,7 @@ namespace systems{
         animation_system::get_instance().clear();
         state_machine_system::get_instance().clear();
         hud_systems::hud_spatial_system::get_instance().clear();
+        menu_navigation_system::get_instance().clear();
     }
 }
 

@@ -1,6 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/generators/catch_generators.hpp>
+#include <catch2/generators/catch_generators_range.hpp>
 
+#include <optional>
 #include <vector>
 
 #include "ecs_test_game.h"
@@ -653,7 +656,7 @@ SCENARIO("a decoration is built with a selectable and a hud of three buttons", "
             auto& buttons = elements_of(gargoyle);
             REQUIRE(buttons.size() == 3);
             std::vector<size_t> actions{hud_config::click_actions::move_decoration,
-                hud_config::click_actions::sell_decoration, hud_config::click_actions::store_decoration};
+                hud_config::click_actions::sell_decoration, hud_config::click_actions::store_item};
             for(size_t index = 0; index < buttons.size(); ++index){
                 CAPTURE(index);
                 REQUIRE(component_managers::hud_clickable_manager_.get_component(buttons[index])->get_action()
@@ -778,6 +781,7 @@ SCENARIO("clicking a decoration button is consumed and changes nothing yet", "[h
 
         THEN("each click is consumed by the hud and the gargoyle stays selected"){
             for(auto button : elements_of(gargoyle)){
+                if(component_managers::hud_clickable_manager_.get_component(button)->get_action() == hud_config::click_actions::store_item){ continue; }
                 game.move_entity(cursor, centre_of(button));
                 controls.simulate_input(game_config::input{MOUSE_BUTTON_LEFT, game_config::mouse_press}, cursor);
                 CAPTURE(button);
@@ -831,8 +835,8 @@ SCENARIO("a nine sprite can shrink its corners to fit a narrower frame", "[hud][
 
 SCENARIO("a decoration under the scale threshold keeps its size and gains the border", "[hud][inventory][layout]"){
     GIVEN("the test decoration, whose largest side is under the threshold"){
-        auto size = items::item_encyclopedia::get_instance().definition_of(entity_config::decorations::test_decoration).get_size();
-        auto layout = items::inventory_layout_of(entity_config::decorations::test_decoration);
+        auto size = items::item_encyclopedia::get_instance().definition_of(items::item_ref{entity_config::decoration_category, entity_config::decorations::test_decoration}).get_size();
+        auto layout = items::inventory_layout_of(items::item_ref{entity_config::decoration_category, entity_config::decorations::test_decoration});
 
         THEN("it is drawn unscaled"){
             REQUIRE(layout.get_scale() == 1.0f);
@@ -848,8 +852,8 @@ SCENARIO("a decoration under the scale threshold keeps its size and gains the bo
 
 SCENARIO("a decoration over the reference size is shrunk to the minimum scale", "[hud][inventory][layout]"){
     GIVEN("the poker table, whose largest side is at the reference size"){
-        auto size = items::item_encyclopedia::get_instance().definition_of(entity_config::decorations::poker_table).get_size();
-        auto layout = items::inventory_layout_of(entity_config::decorations::poker_table);
+        auto size = items::item_encyclopedia::get_instance().definition_of(items::item_ref{entity_config::decoration_category, entity_config::decorations::poker_table}).get_size();
+        auto layout = items::inventory_layout_of(items::item_ref{entity_config::decoration_category, entity_config::decorations::poker_table});
 
         THEN("it is drawn at the minimum scale"){
             REQUIRE(layout.get_scale() == Catch::Approx(hud_config::inventory_scale_min));
@@ -860,7 +864,7 @@ SCENARIO("a decoration over the reference size is shrunk to the minimum scale", 
 
 SCENARIO("a decoration between the threshold and the reference is shrunk by less than the maximum", "[hud][inventory][layout]"){
     GIVEN("the pavlov, whose largest side sits between the threshold and the reference"){
-        auto layout = items::inventory_layout_of(entity_config::decorations::pavlov);
+        auto layout = items::inventory_layout_of(items::item_ref{entity_config::decoration_category, entity_config::decorations::pavlov});
 
         THEN("its scale is below the start of the curve and above the minimum"){
             REQUIRE(layout.get_scale() < hud_config::inventory_scale_max);
@@ -869,47 +873,122 @@ SCENARIO("a decoration between the threshold and the reference is shrunk by less
     }
 }
 
-SCENARIO("inventory items wrap onto a new row and stop at the bottom of the page", "[hud][inventory][placement]"){
+SCENARIO("inventory items fill the slot grid row by row and reuse freed slots", "[hud][inventory][placement]"){
     GIVEN("an empty inventory storage"){
         testing::ecs_test_game game;
         components::inventory_storage_component storage;
-        auto origin = hud_config::inventory_page_anchor;
-        auto full_width = hud_config::inventory_page_frame.width - 2.0f * hud_config::page_nav_button_buffer;
+        const items::item_ref gargoyle{entity_config::decoration_category, entity_config::decorations::gargoyle};
+        auto slot = hud_config::inventory_item_slot_dimensions;
+        auto size = items::item_encyclopedia::get_instance().definition_of(gargoyle).get_size();
+        auto scale = hud_config::inventory_item_fit / std::max(size.x, size.y);
+        auto centred = Vector2{(slot.width - size.x * scale) * 0.5f, (slot.height - size.y * scale) * 0.5f};
+        auto columns = static_cast<int>((hud_config::inventory_slots_column_end - hud_config::inventory_slots_column_start) / slot.width);
+        auto rows = static_cast<int>((hud_config::inventory_slots_row_end - hud_config::inventory_slots_row_start) / slot.height);
 
-        WHEN("a small item is placed"){
-            auto first = storage.place(entity_config::decorations::test_decoration, Vector2{40.0f, 40.0f});
-            THEN("it goes to the top left of the content area"){
-                REQUIRE(first.has_value());
-                REQUIRE(first->x == Catch::Approx(hud_config::page_nav_button_buffer));
-                REQUIRE(first->y == Catch::Approx(hud_config::page_nav_button_buffer));
+        THEN("it starts empty with room for every slot"){
+            REQUIRE(storage.size() == 0);
+            REQUIRE(storage.can_place());
+        }
+        WHEN("two items are placed"){
+            auto first = storage.place_at(gargoyle);
+            storage.attach_button(10);
+            auto second = storage.place_at(gargoyle);
+            storage.attach_button(11);
+
+            THEN("the first is centred in the top left slot and the second in the slot beside it"){
+                REQUIRE(first.x == Catch::Approx(hud_config::inventory_slots_column_start + centred.x));
+                REQUIRE(first.y == Catch::Approx(hud_config::inventory_slots_row_start + centred.y));
+                REQUIRE(second.x == Catch::Approx(first.x + slot.width));
+                REQUIRE(second.y == Catch::Approx(first.y));
+                REQUIRE(storage.size() == 2);
             }
-            THEN("the next small item sits beside it with the gap between"){
-                auto second = storage.place(entity_config::decorations::test_decoration, Vector2{40.0f, 40.0f});
-                REQUIRE(second.has_value());
-                REQUIRE(second->x == Catch::Approx(first->x + 40.0f + hud_config::inventory_item_buffer));
-                REQUIRE(second->y == Catch::Approx(first->y));
+            AND_WHEN("the first item is taken"){
+                REQUIRE(storage.take_item(10));
+
+                THEN("the slot is freed and used again before any new slot"){
+                    REQUIRE(storage.size() == 1);
+                    auto reused = storage.place_at(gargoyle);
+                    storage.attach_button(12);
+                    REQUIRE(reused.x == Catch::Approx(first.x));
+                    REQUIRE(reused.y == Catch::Approx(first.y));
+                    auto next = storage.place_at(gargoyle);
+                    REQUIRE(next.x == Catch::Approx(second.x + slot.width));
+                }
             }
         }
-        WHEN("items as wide as the content are placed until the page is full"){
-            auto first = storage.place(entity_config::decorations::test_decoration, Vector2{full_width, 300.0f});
-            auto second = storage.place(entity_config::decorations::test_decoration, Vector2{full_width, 300.0f});
-            auto third = storage.place(entity_config::decorations::test_decoration, Vector2{full_width, 300.0f});
-            THEN("each row starts below the previous one with the gap between"){
-                REQUIRE(first.has_value());
-                REQUIRE(second.has_value());
-                REQUIRE(second->y == Catch::Approx(first->y + 300.0f + hud_config::inventory_item_buffer));
-            }
-            THEN("the item that would pass the bottom is refused"){
-                REQUIRE_FALSE(third.has_value());
+        WHEN("a button that holds nothing is taken"){
+            THEN("nothing is freed"){
+                REQUIRE_FALSE(storage.take_item(99));
+                REQUIRE_FALSE(storage.take_item(static_cast<size_t>(game_config::empty_entity)));
+                auto first = storage.place_at(gargoyle);
+                REQUIRE(first.x == Catch::Approx(hud_config::inventory_slots_column_start + centred.x));
             }
         }
-        WHEN("an item wider than the content is placed"){
-            auto oversized = storage.place(entity_config::decorations::test_decoration, Vector2{full_width + 1.0f, 40.0f});
-            THEN("it is refused"){
-                REQUIRE_FALSE(oversized.has_value());
+        WHEN("a full row of items is placed"){
+            Vector2 last_in_row{};
+            for(int column = 0; column < columns; ++column){
+                last_in_row = storage.place_at(gargoyle);
+                storage.attach_button(static_cast<size_t>(column));
+            }
+            auto wrapped = storage.place_at(gargoyle);
+            storage.attach_button(static_cast<size_t>(columns));
+
+            THEN("the next item starts the second row at the first column"){
+                REQUIRE(wrapped.x == Catch::Approx(hud_config::inventory_slots_column_start + centred.x));
+                REQUIRE(wrapped.y == Catch::Approx(hud_config::inventory_slots_row_start + centred.y + slot.height));
+                REQUIRE(last_in_row.x == Catch::Approx(hud_config::inventory_slots_column_start + centred.x + static_cast<float>(columns - 1) * slot.width));
             }
         }
-        (void) origin;
+        WHEN("every slot is filled"){
+            for(int index = 0; index < rows * columns; ++index){
+                REQUIRE(storage.can_place());
+                storage.place_at(gargoyle);
+                storage.attach_button(static_cast<size_t>(index));
+            }
+
+            THEN("the page is full until a slot is freed"){
+                REQUIRE_FALSE(storage.can_place());
+                REQUIRE(storage.size() == static_cast<size_t>(rows * columns));
+                REQUIRE(storage.take_item(3));
+                REQUIRE(storage.can_place());
+            }
+        }
+    }
+}
+SCENARIO("a stored item's button is scaled to the slot fit and centred in its slot", "[hud][inventory][placement]"){
+    GIVEN("an initialised inventory with the camera panned"){
+        testing::ecs_test_game game;
+        hud_systems::hud::get_instance();
+        hud_systems::hud_spatial_system::get_instance();
+        systems::rendering_system::get_instance().move_camera(Vector2{300.0f, 2000.0f});
+        auto& inventory = systems::inventory_system::get_instance();
+        auto& navigation = systems::menu_navigation_system::get_instance();
+        inventory.init();
+        auto decoration = static_cast<size_t>(GENERATE(range(0, static_cast<int>(entity_config::decorations_size))));
+        inventory.on_stored_item(events::store_item{entity_config::decoration_category, decoration});
+        auto head = navigation.pages_of(menus::menu_ids::inventory, entity_config::decoration_category)[0];
+        auto origin = component_managers::entity_positional_manager_.get_component(head)->get_position();
+        auto slot = hud_config::inventory_item_slot_dimensions;
+        auto size = items::item_encyclopedia::get_instance().definition_of(
+            items::item_ref{entity_config::decoration_category, decoration}).get_size();
+        auto scale = hud_config::inventory_item_fit / std::max(size.x, size.y);
+        std::optional<size_t> button;
+        for(auto element : component_managers::hud_manager_.get_component(head)->get_elements()){
+            auto* clickable = component_managers::hud_clickable_manager_.get_component(element);
+            if(clickable != nullptr and clickable->get_action() == hud_config::click_actions::select_item){ button = element; }
+        }
+        REQUIRE(button.has_value());
+        auto box = component_managers::hud_collision_manager_.get_component(*button)->get_hitbox_component().get_hitbox().get_box();
+
+        THEN("the hitbox is the item scaled so its larger side is the slot fit"){
+            REQUIRE(box.width == Catch::Approx(size.x * scale));
+            REQUIRE(box.height == Catch::Approx(size.y * scale));
+            REQUIRE(std::max(box.width, box.height) == Catch::Approx(hud_config::inventory_item_fit));
+        }
+        THEN("the hitbox is centred in the first slot"){
+            REQUIRE(box.x + box.width * 0.5f == Catch::Approx(origin.x + hud_config::inventory_slots_column_start + slot.width * 0.5f));
+            REQUIRE(box.y + box.height * 0.5f == Catch::Approx(origin.y + hud_config::inventory_slots_row_start + slot.height * 0.5f));
+        }
     }
 }
 
@@ -1129,9 +1208,7 @@ SCENARIO("a full inventory page spills onto a second page that can be reached", 
         const auto gargoyle = entity_config::decorations::gargoyle;
         size_t stored = 0;
         while(stored < 200 and navigation.pages_of(menus::menu_ids::inventory).size() < stale_pages + 2){
-            auto decoration = systems::entity_lifespan_system::get_instance().create_decoration(gargoyle,
-                Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
-            inventory.on_stored_decoration(events::store_decoration{decoration, gargoyle});
+            inventory.on_stored_item(events::store_item{entity_config::decoration_category, gargoyle});
             ++stored;
         }
         auto pages = navigation.pages_of(menus::menu_ids::inventory);

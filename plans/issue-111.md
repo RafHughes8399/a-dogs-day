@@ -31,7 +31,6 @@ and actually do the art for the page navigators haha
 
 and expand to allow for stations and stuff, its just because they dont have a definitoin in the enyclopedia, i think it will also need to be extended to hold the category too 
 
-
 ## Creating an item from the inventory
 basic flow of this looks like:
 in on inventory_item_button click behaviour, emit an create decoration event.
@@ -42,3 +41,28 @@ listened also by the control input system which temporarily overides the control
 so we could need a control state and then the event just updates the control state
 
 if placed down it places down simple , if esc is pressed the entity is destroyed. both roads lead back to the inventory
+
+
+## Adjusting how items are stored and placed in the inventory
+We need to define more how you say, rigid slots for each item. so that they are the same size. essentially slots
+
+the storage component should define slots. they should be 2.5 * 2.5 edges in dimension with a half edge gap on either side. so in total each slot is 3 x 3.
+
+the storage compoennt should then act like how the id assignment works. it has the next slot nad then a queue of freed slots.
+use the queue first, then if the queue is empty
+
+the next problem is sizing. there are two cases, either the sprite is less than 2.5 * 2,5 or greater. or maybe rather is it rectangular or square.
+if greater then scale it down to 2 x 2 and then place it at the offset so its centred in the slot. if less 
+
+
+just scale it to 2.5 * 2.5 and see what happens then we can adjust
+
+
+so the storage compoennt needs to know:
+-> what a slot is 
+-> what the next expected slot is 
+-> what the queue of freed slots are
+
+
+## Cleanup
+Button art, a nine sprite pane for each button ? something to make the slot more visually distinct i think is good

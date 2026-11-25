@@ -3,12 +3,17 @@
 #include "config.h"
 #include "debug_log_interface.h"
 #include "debug_logger.h"
+#include "decoration_events.h"
 #include "entity_systems.hpp"
+#include "events_interface.h"
 #include "input_events.h"
+#include "interface_systems/interface_systems.hpp"
+#include "menus.h"
 #include "raglib.h"
 #include "system.h"
 #include "system_events.h"
 #include "testing_helpers.hpp"
+#include <cmath>
 #include <cstddef>
 #include <optional>
 #include <raylib.h>
@@ -18,11 +23,22 @@ namespace {
     bool is_interactable(size_t entity_id){
         return component_managers::entity_interactable_manager_.get_component(entity_id) != nullptr;
     }
+    Vector2 snapped_to_grid(Vector2 position){
+        auto edge = level_config::edge_weight;
+        return Vector2{std::round(position.x / edge) * edge, std::round(position.y / edge) * edge};
+    }
 }
 
 void systems::control_input_system::on_cursor_created(const events::cursor_created& event){
     cursor_id_ = static_cast<int>(event.get_id());
     debug::log("[control_input_system::on_cursor_created] cursor id: " + std::to_string(cursor_id_));
+}
+
+void systems::control_input_system::on_item_from_inventory(const events::item_from_inventory& event){
+    items::item_ref ref{event.get_category(), event.get_item_id()};
+    if(not items::item_encyclopedia::get_instance().has_definition(ref)){ return; }
+    control_state_ = game_config::placing_from_inventory;
+    debug::log("[control_input_system::on_item_from_inventory] control state: placing_from_inventory");
 }
 
 // ---------------- input dispatch ----------------
@@ -76,8 +92,9 @@ void systems::control_input_system::check_mouse_scroll(float time_delta){
 // an entity can hold a binding this system has no action for - that is a scheme
 // that has not been built yet, not an error
 void systems::control_input_system::dispatch(int key, int action, size_t id, float delta){
-    auto control = control_function_map_.find({key, action});
-    if(control == control_function_map_.end()){ return; }
+    auto& map = control_function_maps_[control_state_];
+    auto control = map.find({key, action});
+    if(control == map.end()){ return; }
     control->second(id, delta);
 }
 
@@ -119,42 +136,53 @@ void systems::control_input_system::update(float delta){
 // * swap means swapping the component's bindings. edit_mode / exit_edit stay
 // * unbound until that is settled.
 void systems::control_input_system::build_control_map(){
-    control_function_map_[{game_config::key_press_actions::dog_switch, game_config::key_press}] =
+    auto& base = control_function_maps_[game_config::default_controls];
+    base[{game_config::key_press_actions::dog_switch, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; switch_dog();};
-    control_function_map_[{game_config::key_press_actions::shop_open, game_config::key_press}] =
+    base[{game_config::key_press_actions::shop_open, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_shop();};
-    control_function_map_[{game_config::key_press_actions::inventory_open, game_config::key_press}] =
+    base[{game_config::key_press_actions::inventory_open, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_inventory();};
-    control_function_map_[{game_config::key_press_actions::menu_open, game_config::key_press}] =
+    base[{game_config::key_press_actions::menu_open, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_menu();};
-    control_function_map_[{game_config::key_press_actions::quests_open, game_config::key_press}] =
+    base[{game_config::key_press_actions::quests_open, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_quests();};
-    control_function_map_[{game_config::key_press_actions::map_open, game_config::key_press}] =
+    base[{game_config::key_press_actions::map_open, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; open_map();};
-    control_function_map_[{game_config::key_press_actions::back, game_config::key_press}] =
+    base[{game_config::key_press_actions::back, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; back();};
-    control_function_map_[{game_config::key_press_actions::debug_toggle, game_config::key_press}] =
+    base[{game_config::key_press_actions::debug_toggle, game_config::key_press}] =
         [this](size_t id, float delta) -> void {(void) id; (void) delta; toggle_debug_logger();};
 
     // the four game_config::player_controls binds
-    control_function_map_[{game_config::key_hold_actions::move_up, game_config::key_hold}] =
+    base[{game_config::key_hold_actions::move_up, game_config::key_hold}] =
         [this](size_t id, float delta) -> void {(void) id;
             move_view_frame(level_config::direction_scalars[level_config::directions::up], delta);};
-    control_function_map_[{game_config::key_hold_actions::move_down, game_config::key_hold}] =
+    base[{game_config::key_hold_actions::move_down, game_config::key_hold}] =
         [this](size_t id, float delta) -> void {(void) id;
             move_view_frame(level_config::direction_scalars[level_config::directions::down], delta);};
-    control_function_map_[{game_config::key_hold_actions::move_left, game_config::key_hold}] =
+    base[{game_config::key_hold_actions::move_left, game_config::key_hold}] =
         [this](size_t id, float delta) -> void {(void) id;
             move_view_frame(level_config::direction_scalars[level_config::directions::left], delta);};
-    control_function_map_[{game_config::key_hold_actions::move_right, game_config::key_hold}] =
+    base[{game_config::key_hold_actions::move_right, game_config::key_hold}] =
         [this](size_t id, float delta) -> void {(void) id;
             move_view_frame(level_config::direction_scalars[level_config::directions::right], delta);};
 
     // the two game_config::cursor_controls binds
-    control_function_map_[{MOUSE_BUTTON_LEFT, game_config::mouse_press}] =
+    base[{MOUSE_BUTTON_LEFT, game_config::mouse_press}] =
         [this](size_t id, float delta) -> void {(void) delta; left_click(id);};
-    control_function_map_[{MOUSE_BUTTON_RIGHT, game_config::mouse_press}] =
+    base[{MOUSE_BUTTON_RIGHT, game_config::mouse_press}] =
         [this](size_t id, float delta) -> void {(void) delta; right_click(id);};
+
+    auto& placing = control_function_maps_[game_config::placing_from_inventory];
+    placing[{MOUSE_BUTTON_LEFT, game_config::mouse_press}] =
+        [this](size_t id, float delta) -> void {(void) delta; placing_from_inventory_left_click(id);};
+    placing[{game_config::key_press_actions::back, game_config::key_press}] =
+        [this](size_t id, float delta) -> void {(void) id; (void) delta; placing_from_inventory_back();};
+    for(auto direction : {game_config::key_hold_actions::move_up, game_config::key_hold_actions::move_down,
+        game_config::key_hold_actions::move_left, game_config::key_hold_actions::move_right}){
+        placing[{direction, game_config::key_hold}] = base[{direction, game_config::key_hold}];
+    }
 }
 
 // ------------------------------- the actions ------------------------------- //
@@ -168,6 +196,46 @@ void systems::control_input_system::queue_key_press(int key){
 
 void systems::control_input_system::back(){
     queue_key_press(game_config::key_press_actions::back);
+}
+void systems::control_input_system::placing_from_inventory_left_click(size_t id){
+    auto* carrier = component_managers::entity_carrier_manager_.get_component(id);
+    if(not carrier or not carrier->is_carrying()){ return; }
+    auto carried = *carrier->get_carried_entity();
+    auto* carried_position = component_managers::entity_positional_manager_.get_component(carried);
+    if(carried_position == nullptr){ return; }
+    movement_system::get_instance().update_position(carried, snapped_to_grid(carried_position->get_position()));
+    if(not spatial_system::get_instance().can_place_entity(carried, id, GetMousePosition())){ return; }
+    carrier->drop();
+    control_state_ = game_config::default_controls;
+    queue_key_press(game_config::key_press_actions::inventory_open);
+    
+}
+void systems::control_input_system::placing_from_inventory_back(){
+    auto* carrier = cursor_id_ == game_config::empty_entity ? nullptr
+        : component_managers::entity_carrier_manager_.get_component(static_cast<size_t>(cursor_id_));
+    if(carrier != nullptr and carrier->is_carrying()){
+        auto carried = *carrier->get_carried_entity();
+        auto* item = component_managers::entity_item_manager_.get_component(carried);
+        if(item != nullptr){
+            auto ref = item->get_ref();
+            std::unique_ptr<events::event> store_item = std::make_unique<events::store_item>(
+                ref.get_category(), ref.get_id());
+            event_interface::queue_event(store_item);
+            if(ref.get_category() == entity_config::station_category){
+                entity_lifespan_system::get_instance().destroy_station(carried);
+            }
+            else{
+                entity_lifespan_system::get_instance().destroy_decoration(carried);
+            }
+        }
+        else{
+            entity_lifespan_system::get_instance().destroy_decoration(carried);
+        }
+        carrier->drop();
+    }
+    control_state_ = game_config::default_controls;
+    menu_navigation_system::get_instance().show(menus::inventory);
+    //queue_key_press(game_config::key_press_actions::inventory_open);
 }
 void systems::control_input_system::open_inventory(){
     queue_key_press(game_config::key_press_actions::inventory_open);
@@ -217,10 +285,12 @@ void systems::control_input_system::left_click(size_t id){
     auto cursor_carrier = component_managers::entity_carrier_manager_.get_component(id);
     if(cursor_carrier and cursor_carrier->is_carrying()){
         auto carried_entity = cursor_carrier->get_carried_entity().value();
+        auto* carried_position = component_managers::entity_positional_manager_.get_component(carried_entity);
+        if(carried_position != nullptr){
+            systems::movement_system::get_instance().update_position(carried_entity, snapped_to_grid(carried_position->get_position()));
+        }
         if(systems::spatial_system::get_instance().can_place_entity(carried_entity,  id, GetMousePosition())){
             cursor_carrier->drop();
-            // TODO AND SNAP TO GRID
-            
         }
     }else{
         // otherwise check for selcting

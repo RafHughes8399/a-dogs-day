@@ -26,14 +26,16 @@ sprite::sprite sprite_builders::build_dog_sprite(int texture_key, const char* pa
         attributes[entity_config::attributes::animations],
         draw_position_offset);
 }
-sprite::sprite sprite_builders::build_dog_part_sprite(int texture_key, const char* path,
-    const float attributes[entity_config::attributes::size],
-    std::vector<animation::animation> animations, Vector2 draw_position_offset){
-    assert(animations.size() == static_cast<size_t>(attributes[entity_config::attributes::animations])
-        and "a dog part needs one animation for every row its sheet declares");
-    return sprite::sprite(textures::textures_.get_texture(texture_key, path),
-        std::move(animations), draw_position_offset);
+
+sprite::sprite sprite_builders::build_dog_part_sprite(int texture_key, const char* path, const float attributes[entity_config::attributes::size], Vector2 draw_position_offset){
+    return build_sprite(textures::textures_.get_texture(texture_key, path),
+        attributes[entity_config::attributes::frame_width],
+        attributes[entity_config::attributes::frame_height],
+        attributes[entity_config::attributes::frames],
+        attributes[entity_config::attributes::animations],
+        draw_position_offset);
 }
+
 namespace{
     std::vector<animation::animation> build_part_animations(size_t slot, float frame_width, float frame_height){
         switch(slot){
@@ -66,10 +68,10 @@ std::vector<std::vector<sprite::sprite>> sprite_builders::build_dog_part_layers(
 
         std::vector<sprite::sprite> directions;
         directions.push_back(build_dog_part_sprite(texture_keys[slot][entity_config::dog_part_left],
-            part.left_path, part.attributes, build_part_animations(slot, width, frame_height),
+            part.left_path, part.attributes,
             Vector2{x_left, part.offset.y}));
         directions.push_back(build_dog_part_sprite(texture_keys[slot][entity_config::dog_part_right],
-            part.right_path, part.attributes, build_part_animations(slot, width, frame_height),
+            part.right_path, part.attributes,
             Vector2{x_right, part.offset.y}));
         layers.push_back(std::move(directions));
     }
@@ -319,10 +321,29 @@ sprite::sprite sprite_builders::build_sell_decoration_button_sprite(){
     return build_button_sprite(textures::sell_decoration_button, hud_config::sell_decoration_path);
 }
 sprite::sprite sprite_builders::build_to_storage_decoration_button_sprite(){
-    return build_button_sprite(textures::to_storage_button, hud_config::store_decoration_path);
+    return build_button_sprite(textures::to_storage_button, hud_config::store_item_path);
 }
-sprite::sprite sprite_builders::build_item_sprite(size_t definition_id){
-    switch(definition_id){
+sprite::sprite sprite_builders::build_item_sprite(size_t category, size_t id){
+    if(category == entity_config::station_category){
+        switch(id){
+            case entity_config::stations::dining_table: return build_dining_table_sprite();
+            case entity_config::stations::tiled_table: return build_tiled_table_sprite();
+            case entity_config::stations::test_table: return build_test_table();
+            case entity_config::stations::tiled_table_orange: return build_tiled_table_orange_sprite();
+            case entity_config::stations::tiled_table_red: return build_tiled_table_red_sprite();
+            case entity_config::stations::tiled_table_green: return build_tiled_table_green_sprite();
+            case entity_config::stations::tiled_table_blue: return build_tiled_table_blue_sprite();
+            case entity_config::stations::wooden_food_counter: return build_wooden_food_counter_sprite();
+            case entity_config::stations::stove: return build_stove_sprite();
+            case entity_config::stations::oven: return build_oven_sprite();
+            case entity_config::stations::espresso_station: return build_espresso_station_sprite();
+            case entity_config::stations::mini_fridge: return build_mini_fridge_sprite();
+            case entity_config::stations::bush: return build_bush_sprite();
+            case entity_config::stations::chopping_board: return build_chopping_board_sprite();
+            default: return build_test_decoration_sprite(entity_config::test_decoration_attributes);
+        }
+    }
+    switch(id){
         case entity_config::decorations::conversation_pit: return build_conversation_pit();
         case entity_config::decorations::gargoyle: return build_gargoyle();
         case entity_config::decorations::pavlov: return build_pavlov();

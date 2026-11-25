@@ -10,7 +10,7 @@
 namespace {
     const Vector2 counter_spot{level_config::edge_weight * 8, level_config::edge_weight * 8};
 
-    components::renderable_component::body* food_slot(size_t counter_id){
+    components::renderable_component::sprite_part* food_slot(size_t counter_id){
         auto* renderable = component_managers::entity_renderable_manager_.get_component(counter_id);
         return renderable == nullptr
             ? nullptr

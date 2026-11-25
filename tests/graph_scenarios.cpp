@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/generators/catch_generators.hpp>
 
 #include <algorithm>
 #include <cmath>
@@ -7,6 +8,7 @@
 #include "component.h"
 #include "component_managers.hpp"
 #include "raymath.h"
+#include "system.h"
 
 SCENARIO("the level graph follows an entity's lifetime", "[ecs][graph][movement]"){
     GIVEN("a fresh ecs world"){
@@ -23,8 +25,8 @@ SCENARIO("the level graph follows an entity's lifetime", "[ecs][graph][movement]
             THEN("the create event marked every node under its hitbox"){
                 REQUIRE(game.graph_marks(dog_id, footprint));
             }
-            THEN("it marks exactly the two nodes the hitbox spans"){
-                REQUIRE(game.graph_occupied_node_count() == 2);
+            THEN("it marks every node the hitbox overlaps"){
+                REQUIRE(game.graph_occupied_node_count() == 4);
             }
             THEN("a node away from the dog is still empty"){
                 REQUIRE(game.graph_occupant_at(Vector2{1024.0f, 1024.0f}) == graph_config::empty_node);
@@ -59,7 +61,7 @@ SCENARIO("the level graph follows an entity's lifetime", "[ecs][graph][movement]
                 REQUIRE(game.graph_marks(dog_id, game.hitbox_of(dog_id)));
             }
             THEN("it occupies no more nodes than it did before"){
-                REQUIRE(game.graph_occupied_node_count() == 2);
+                REQUIRE(game.graph_occupied_node_count() == 4);
             }
         }
 
@@ -147,7 +149,7 @@ SCENARIO("the cursor is spatial but never occupies the graph", "[ecs][graph][mov
             auto dog_id = game.create_khiri();
 
             THEN("only the dog is in the graph"){
-                REQUIRE(game.graph_occupied_node_count() == 2);
+                REQUIRE(game.graph_occupied_node_count() == 4);
                 REQUIRE(game.graph_marks(dog_id, game.hitbox_of(dog_id)));
             }
             THEN("both are in the quadtree"){
@@ -163,7 +165,7 @@ SCENARIO("clear_all_systems empties the graph between scenarios", "[ecs][graph][
         {
             testing::ecs_test_game game;
             auto dog_id = game.create_khiri();
-            REQUIRE(game.graph_occupied_node_count() == 2);
+            REQUIRE(game.graph_occupied_node_count() == 4);
             (void) dog_id;
         }
 
@@ -674,6 +676,45 @@ SCENARIO("only a horizontal difference turns the dog", "[ecs][graph][movement][f
 
             THEN("it turns to face right"){
                 REQUIRE(sprite_index_of(dog) == level_config::directions::right);
+            }
+        }
+    }
+}
+
+SCENARIO("a decoration off the grid claims every cell its hitbox overlaps", "[ecs][graph][movement]"){
+    GIVEN("a poker table moved to a position that is not on the 64 pixel grid"){
+        testing::ecs_test_game game;
+        auto& movement = systems::movement_system::get_instance();
+        auto decoration = systems::entity_lifespan_system::get_instance().create_decoration(
+            entity_config::decorations::poker_table, Vector2{1024.0f, 1024.0f});
+        const Vector2 spots[] = {Vector2{1030.0f, 1045.0f}, Vector2{1317.0f, 1090.0f}, Vector2{1500.0f, 1233.0f}};
+        auto spot = spots[GENERATE(0, 1, 2)];
+        movement.update_position(decoration, spot);
+        auto box = component_managers::entity_collision_manager_.get_component(decoration)->get_hitbox_component().get_hitbox().get_box();
+
+        THEN("a cell is claimed exactly when the hitbox overlaps it"){
+            auto edge = level_config::edge_weight;
+            auto first_col = static_cast<int>(std::floor(box.x / edge)) - 2;
+            auto last_col = static_cast<int>(std::floor((box.x + box.width) / edge)) + 2;
+            auto first_row = static_cast<int>(std::floor(box.y / edge)) - 2;
+            auto last_row = static_cast<int>(std::floor((box.y + box.height) / edge)) + 2;
+            for(auto col = first_col; col <= last_col; ++col){
+                for(auto row = first_row; row <= last_row; ++row){
+                    auto cell = Rectangle{static_cast<float>(col) * edge, static_cast<float>(row) * edge, edge, edge};
+                    auto claimed = movement.graph_occupant_at(Vector2{cell.x + edge * 0.5f, cell.y + edge * 0.5f}) == static_cast<int>(decoration);
+                    CAPTURE(col, row);
+                    REQUIRE(claimed == CheckCollisionRecs(box, cell));
+                }
+            }
+        }
+        THEN("moving it again leaves no cells behind"){
+            movement.update_position(decoration, Vector2{2000.0f, 2000.0f});
+            auto edge = level_config::edge_weight;
+            for(auto col = static_cast<int>(std::floor(box.x / edge)) - 1; col <= static_cast<int>(std::floor((box.x + box.width) / edge)) + 1; ++col){
+                for(auto row = static_cast<int>(std::floor(box.y / edge)) - 1; row <= static_cast<int>(std::floor((box.y + box.height) / edge)) + 1; ++row){
+                    CAPTURE(col, row);
+                    REQUIRE(movement.graph_occupant_at(Vector2{(static_cast<float>(col) + 0.5f) * edge, (static_cast<float>(row) + 0.5f) * edge}) != static_cast<int>(decoration));
+                }
             }
         }
     }

@@ -29,7 +29,7 @@ namespace entity_config{
         lionel,
         waiters_size
     };
-    enum tables{
+    enum stations{
         dining_table = 0,
         tiled_table,
         test_table,
@@ -37,21 +37,24 @@ namespace entity_config{
         tiled_table_red,
         tiled_table_green,
         tiled_table_blue,
-        tables_size
-    };
-    enum counters{
-        wooden_food_counter = 0,
-        counters_size
-    };
-    enum cooking_stations{
-        stove = 0,
+        wooden_food_counter,
+        stove,
         oven,
         espresso_station,
         mini_fridge,
         bush,
         chopping_board,
-        cooking_stations_size
+        stations_size
     };
+    inline bool is_table_station(size_t station){
+        return station >= dining_table and station <= tiled_table_blue;
+    }
+    inline bool is_counter_station(size_t station){
+        return station == wooden_food_counter;
+    }
+    inline bool is_cooking_station(size_t station){
+        return station >= stove and station < stations_size;
+    }
     enum foods{
         lasagna = 0,
         bone_biscuits,
@@ -93,6 +96,13 @@ namespace entity_config{
         ficus_lytra,
         frangipani,
         decorations_size
+    };
+    enum item_categories{
+        decoration_category = 0,
+        station_category,
+        waiter_category,
+        customer_category,
+        item_categories_size
     };
     enum counter_sprite_slots{
         counter_body = 0,
@@ -256,25 +266,25 @@ namespace entity_config{
 
     // TODO (06 / 09 / 26) placeholder splits - advancing widths sum to the matching
     // across width, but the proportions are guesses pending the part art
-    inline const float khiri_head_attributes[attributes::size] = {35.0f, 62.0f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float khiri_head_attributes[attributes::size] = {30.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float khiri_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float khiri_body_attributes[attributes::size] = {88.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float khiri_tail_attributes[attributes::size] = {18.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float khiri_body_attributes[attributes::size] = {87.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float khiri_tail_attributes[attributes::size] = {16.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float mack_head_attributes[attributes::size] = {30.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float mack_head_attributes[attributes::size] = {31.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float mack_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float mack_body_attributes[attributes::size] = {92.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float mack_tail_attributes[attributes::size] = {16.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float mack_body_attributes[attributes::size] = {90.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float mack_tail_attributes[attributes::size] = {13.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
     inline const float gianluca_head_attributes[attributes::size] = {27.0f, 58.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float gianluca_face_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.35f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float gianluca_body_attributes[attributes::size] = {117.0f, 58.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float gianluca_body_attributes[attributes::size] = {110.0f, 58.0f, 1.0f, static_cast<float>(animation_config::body::size)};
     inline const float gianluca_tail_attributes[attributes::size] = {4.0f, 58.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
     inline const float lionel_head_attributes[attributes::size] = {35.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float lionel_face_attributes[attributes::size] = {level_config::edge_weight * 0.30f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
     inline const float lionel_body_attributes[attributes::size] = {90.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float lionel_tail_attributes[attributes::size] = {7.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float lionel_tail_attributes[attributes::size] = {6.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
     inline const dog_part khiri_parts[dog_sprite_slots_size] = {
         {khiri_body_attributes, Vector2{26.0f, 0.0f}, khiri_body_left_path, khiri_body_right_path},

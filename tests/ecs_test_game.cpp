@@ -117,7 +117,7 @@ namespace testing{
 
     size_t ecs_test_game::create_cooking_station(size_t cooking_station, Vector2 position, size_t layer){
         return lifespan_.create([cooking_station, position](size_t id){
-            factories::station_factory().build_cooking_station(cooking_station, id, position);
+            factories::station_factory().build_station(cooking_station, id, position);
         }, layer);
     }
 

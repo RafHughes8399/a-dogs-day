@@ -40,7 +40,7 @@ namespace component_helpers{
     void add_hud_panel(size_t entity_id, sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
     void add_hud_positional_component(size_t hud_id, Vector2 position);
     void add_hud_renderable_component(size_t hud_id,
-        std::vector<components::renderable_component::body>& bodys);
+        std::vector<components::renderable_component::sprite_part>& bodys);
     void add_hud_collision_component(size_t hud_id,
         components::collision_component::hitbox_component hitbox);
     void add_hud_state_machine_component(size_t hud_id, state_machine::state_machine machine);
@@ -49,7 +49,7 @@ namespace component_helpers{
     void add_hud_owner_component(size_t hud_id, size_t owner);
     void add_hud_inventory_storage_component(size_t hud_id);
     void add_entity_renderable_component(size_t entity_id,
-        std::vector<components::renderable_component::body>& bodys);
+        std::vector<components::renderable_component::sprite_part>& bodys);
     void add_entity_collision_component(size_t entity_id,
         components::collision_component::hitbox_component hitbox);
     void add_entity_interactor_component(size_t entity_id, float reach,
@@ -62,8 +62,8 @@ namespace component_helpers{
     void add_entity_selectable_component(size_t entity_id, size_t kind);
     void add_entity_storage_component(size_t entity_id);
     void add_entity_food_component(size_t entity_id, size_t item_id);
-    void add_entity_item_component(size_t entity_id, size_t item_id);
-    void add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<Vector2> offset, std::optional<size_t> carried_entity = std::nullopt);
+    void add_entity_item_component(size_t entity_id, items::item_ref ref);
+    void add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity = std::nullopt);
     void add_stored_item(size_t entity_id, size_t slot, size_t item_id);
     std::optional<size_t> take_stored_item(size_t entity_id, size_t slot);
     void update_item_sprite(size_t entity_id, size_t slot);

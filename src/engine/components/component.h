@@ -17,6 +17,7 @@
 #include "events_interface.h"
 #include "hitbox.h"
 #include "item_stack.hpp"
+#include "items.h"
 #include "path.h"
 #include "raylib.h"
 #include "raymath.h"
@@ -51,7 +52,7 @@ namespace components {
 class carrier_component {
 public:
     ~carrier_component() = default;
-    carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<Vector2> offset, std::optional<size_t> carried_entity = std::nullopt)
+    carrier_component(Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity = std::nullopt)
     : previous_position_(previous_position), current_position_(current_position), carried_entity_(carried_entity), offset_(offset){}
     carrier_component(const carrier_component& other) = default;
     carrier_component(carrier_component&& other) = default;
@@ -62,7 +63,8 @@ public:
     Vector2 get_previous_position() const;
     void set_previous_position(Vector2 position);
     Vector2* get_current_position() const;
-    std::optional<Vector2> get_offset() const;
+    Vector2 get_offset() const;
+    void mirror_offset(float span);
     void set_current_position(Vector2* position);
     std::optional<size_t> get_carried_entity() const;
     void set_carried_entity(std::optional<size_t> entity_id);
@@ -72,7 +74,7 @@ private:
     Vector2 previous_position_;
     Vector2* current_position_;
     std::optional<size_t> carried_entity_;
-    std::optional<Vector2> offset_;
+    Vector2 offset_;
 };
 class recipe_choice{
     public:
@@ -90,15 +92,23 @@ class page_turn{
     private:
         int direction_;
 };
+class category_choice{
+    public:
+        explicit category_choice(size_t category)
+        : category_(category){}
+        size_t get_category() const;
+    private:
+        size_t category_;
+};
 class item_choice{
     public:
-        explicit item_choice(size_t definition_id)
-        : definition_id_(definition_id){}
-        size_t get_definition_id() const;
+        explicit item_choice(items::item_ref ref)
+        : ref_(ref){}
+        const items::item_ref& get_ref() const;
     private:
-        size_t definition_id_;
+        items::item_ref ref_;
 };
-using click_payload = std::variant<std::monostate, recipe_choice, page_turn, item_choice>;
+using click_payload = std::variant<std::monostate, recipe_choice, page_turn, item_choice, category_choice>;
 class clickable_component{
     public:
         ~clickable_component() = default;
@@ -302,17 +312,17 @@ class interactor_component {
 class item_component {
 public:
     ~item_component() = default;
-    item_component(const size_t item_id)
-    : item_id_(item_id){}
+    item_component(const items::item_ref ref)
+    : ref_(ref){}
     item_component(const item_component& other) = default;
     item_component(item_component&& other) = default;
 
     item_component& operator=(const item_component& other) = delete;
     item_component& operator=(item_component&& other) = delete;
 
-    size_t get_item() const;
+    const items::item_ref& get_ref() const;
 private:
-    const size_t item_id_; 
+    const items::item_ref ref_;
 };
 
 
@@ -443,18 +453,18 @@ class recipes_component{
 
 class renderable_component {
 public:
-  class body {
+  class sprite_part {
   public:
-    ~body() = default;
+    ~sprite_part() = default;
     // TODO (25 / 8 / 26) fix magic number what is 0
-    body(std::vector<sprite::sprite> &sprites, size_t index = 0,
+    sprite_part(const std::vector<sprite::sprite> &sprites, size_t index = 0,
         Vector2 scale = Vector2One(), Vector2 offset = Vector2Zero())
         : sprites_(sprites), active_index_(index), scale_(scale), base_scale_(scale), offset_(offset) {}
-    body(const body& other) = default;
-    body(body&& other) = default;
+    sprite_part(const sprite_part& other) = default;
+    sprite_part(sprite_part&& other) = default;
 
-    body& operator=(const body& other) = default;
-    body& operator=(body&& other) = default;
+    sprite_part& operator=(const sprite_part& other) = default;
+    sprite_part& operator=(sprite_part&& other) = default;
 
       sprite::sprite& get_active_sprite();
       std::vector<sprite::sprite>& get_sprites();
@@ -468,7 +478,7 @@ public:
       void reset_scale();
 
   private:
-    // * holds all the parts of the dog
+    // * this handles directions, so each part has its own direction
     std::vector<sprite::sprite> sprites_;
     size_t active_index_;
     Vector2 scale_;
@@ -477,27 +487,27 @@ public:
   };
 
   ~renderable_component() = default;
-  renderable_component(std::vector<body> layers = {})
-      : body_(std::move(layers)) {}
+  renderable_component(std::vector<sprite_part> layers = {})
+      : sprite_(std::move(layers)) {}
   renderable_component(const renderable_component& other) = default;
   renderable_component(renderable_component&& other) = default;
 
   renderable_component& operator=(const renderable_component& other) = default;
   renderable_component& operator=(renderable_component&& other) = default;
 
-  std::vector<body>& get_layers();
-  body* get_body(size_t index);
+  std::vector<sprite_part>& get_layers();
+  sprite_part* get_body(size_t index);
   size_t num_bodys() const;
-  void add_body(body layer);
+  void add_body(sprite_part layer);
   void remove_body(size_t index);
-  void set_body(size_t index, body layer);
+  void set_body(size_t index, sprite_part layer);
 
   void scale_by(Vector2 factor);
   void reset_scale();
 
 private:
-  // * holds the different directions
-  std::vector<body> body_;
+  // * body as in
+  std::vector<sprite_part> sprite_;
 
 };
 
@@ -542,10 +552,15 @@ class inventory_storage_component{
     public:
         ~inventory_storage_component() = default;
         inventory_storage_component()
-        :placements_({}),
+        :slots_({}),
+        freed_slots_(),
+        next_free_slot_(Vector2Zero()),
          cursor_x_(hud_config::page_nav_button_buffer),
          row_y_(hud_config::page_nav_button_buffer),
-         row_height_(0.0f){}
+         row_height_(0.0f){
+            init_empty_slots(hud_config::inventory_slots_row_start, hud_config::inventory_slots_row_end,
+                hud_config::inventory_slots_column_start, hud_config::inventory_slots_column_end);
+         }
 
         inventory_storage_component(const inventory_storage_component& other) = default;
         inventory_storage_component(inventory_storage_component&& other) = default;
@@ -556,11 +571,28 @@ class inventory_storage_component{
         bool empty() const;
         size_t size() const;
 
-        std::optional<Vector2> place(size_t definition_id, Vector2 footprint);
-        size_t take_item(size_t item_id);
+        Vector2 place_at(const items::item_ref& item_reference);
+        bool can_place();
+        void attach_button(size_t button);
+        bool take_item(size_t button);
+        void init_empty_slots(float row_start, float row_end, float column_start, float column_end);
     private:
-        // i think the storage needs to be more like interesting ?
-        std::vector<std::pair<size_t, Rectangle>> placements_;
+        class placement{
+            public:
+                placement(size_t definition_id, Rectangle box)
+                : definition_id_(definition_id), box_(box), button_(game_config::empty_entity){}
+                size_t get_button() const{ return button_; }
+                void set_button(size_t button){ button_ = button; }
+                Vector2 get_position() {return {box_.x, box_.y};}
+            private:
+                int definition_id_;
+                Rectangle box_;
+                int button_;
+        };
+        std::vector<std::vector<placement>> slots_;
+        std::queue<Vector2> freed_slots_;
+        Vector2 next_free_slot_;
+        Vector2 last_placed_ = Vector2{0.0f, 0.0f};
         float cursor_x_;
         float row_y_;
         float row_height_;
@@ -598,9 +630,9 @@ namespace component_builders{
     components::movement_component build_entity_movement_component(Vector2 move_speed,
         Vector2 direction_scalar = level_config::direction_scalars[level_config::directions::right],
         std::queue<path::path> paths = {});
-    components::renderable_component::body build_entity_body(std::vector<sprite::sprite>& sprites, size_t index);
+    components::renderable_component::sprite_part build_entity_sprite_part(const std::vector<sprite::sprite>& sprites, size_t index);
     components::renderable_component build_entity_renderable_component(
-        std::vector<components::renderable_component::body>& bodys);
+        std::vector<components::renderable_component::sprite_part>& bodys);
 
     components::collision_component::hitbox_component build_entity_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
     components::collision_component build_entity_collision_component(
@@ -616,16 +648,16 @@ namespace component_builders{
     components::storage_component build_entity_storage_component();
     components::inventory_storage_component build_hud_inventory_storage_component();
     components::food_component build_entity_food_component(size_t item_id);
-    components::item_component build_entity_item_component(size_t item_id);
-    components::carrier_component build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, std::optional<Vector2> offset, std::optional<size_t> carried_entity = std::nullopt);
+    components::item_component build_entity_item_component(items::item_ref ref);
+    components::carrier_component build_entity_carrier_component(Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity = std::nullopt);
     components::recipes_component build_entity_recipes_component(std::vector<recipe::recipe>& recipes);
     components::hud_component build_hud_component(sprite::nine_sprite& base, Vector2 offset = Vector2Zero());
 
     components::position_component build_hud_positional_component(Vector2 position);
-    components::renderable_component::body build_hud_body(std::vector<sprite::sprite>& sprites, size_t index,
+    components::renderable_component::sprite_part build_hud_body(std::vector<sprite::sprite>& sprites, size_t index,
         Vector2 scale = Vector2One(), Vector2 offset = Vector2Zero());
     components::renderable_component build_hud_renderable_component(
-        std::vector<components::renderable_component::body>& bodys);
+        std::vector<components::renderable_component::sprite_part>& bodys);
     components::collision_component::hitbox_component build_hud_hitbox_component(std::vector<hitbox::hitbox>& hitboxes, size_t index);
     components::collision_component build_hud_collision_component(
         components::collision_component::hitbox_component hitbox);

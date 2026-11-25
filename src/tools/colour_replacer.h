@@ -35,7 +35,7 @@ namespace colour_replacement{
             const Image& get_copy() const;
         private:
             std::string path_;
-            colour_map replacements_;
+            colour_map reslots_;
             Color primary_;
             Image image_;
             Image copy_;

@@ -45,7 +45,7 @@ void systems::rendering_system::render(int frame){
         render_layers_[layer].draw(render_predicate,
             Vector2Zero(), frame, true);
     }
-    movement_system::get_instance().render_graph(view_frame_);
+    //movement_system::get_instance().render_graph(view_frame_);
     Rectangle queue = {0, -2* level_config::edge_weight, level_config::edge_weight * 4.5f, level_config::world_y + (4 * level_config::edge_weight)};
     DrawRectangleLines(static_cast<int>(queue.x), static_cast<int>(queue.y), static_cast<int>(queue.width), static_cast<int>(queue.height), RED);
     EndMode2D();

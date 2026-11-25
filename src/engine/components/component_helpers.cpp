@@ -85,9 +85,9 @@ void component_helpers::add_entity_movement_component(size_t entity_id, Vector2 
         component_builders::build_entity_movement_component(move_speed, direction_scalar, std::move(paths)));
 }
 void component_helpers::add_entity_renderable_component(size_t entity_id,
-    std::vector<components::renderable_component::body>& bodys){
+    std::vector<components::renderable_component::sprite_part>& sprite){
     register_entity_renderable_component(entity_id,
-        component_builders::build_entity_renderable_component(bodys));
+        component_builders::build_entity_renderable_component(sprite));
 }
 void component_helpers::add_entity_collision_component(size_t entity_id,
     components::collision_component::hitbox_component hitbox){
@@ -128,11 +128,11 @@ void component_helpers::add_entity_food_component(size_t entity_id, size_t item_
     register_entity_food_component(entity_id,
         component_builders::build_entity_food_component(item_id));
 }
-void component_helpers::add_entity_item_component(size_t entity_id, size_t item_id){
+void component_helpers::add_entity_item_component(size_t entity_id, items::item_ref ref){
     register_entity_item_component(entity_id,
-        component_builders::build_entity_item_component(item_id));
+        component_builders::build_entity_item_component(ref));
 }
-void component_helpers::add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<Vector2> offset, std::optional<size_t> carried_entity){
+void component_helpers::add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity){
     register_entity_carrier_component(entity_id,
         component_builders::build_entity_carrier_component(previous_position, current_position, offset,  carried_entity));
 }
@@ -156,7 +156,7 @@ void component_helpers::add_hud_positional_component(size_t hud_id, Vector2 posi
         component_builders::build_hud_positional_component(position));
 }
 void component_helpers::add_hud_renderable_component(size_t hud_id,
-    std::vector<components::renderable_component::body>& bodys){
+    std::vector<components::renderable_component::sprite_part>& bodys){
     register_hud_renderable_component(hud_id,
         component_builders::build_hud_renderable_component(bodys));
 }
@@ -255,7 +255,7 @@ void component_helpers::update_item_sprite(size_t entity_id, size_t slot){
     assert(renderable->num_bodys() == slot
         and "stored item sprite must append into its reserved slot");
     renderable->add_body(
-        component_builders::build_entity_body(item_sprites, item_id));
+        component_builders::build_entity_sprite_part(item_sprites, item_id));
 }
 // writes sprite and hitbox indices together. missing either component is fine
 void component_helpers::set_facing_index(size_t entity_id, size_t index){
@@ -269,7 +269,13 @@ void component_helpers::set_facing_index(size_t entity_id, size_t index){
     if(auto* collision = component_managers::entity_collision_manager_.get_component(entity_id)){
         auto& hitboxes = collision->get_hitbox_component();
         if(index < hitboxes.num_hitboxes()){
+            auto previous = hitboxes.get_hitbox_index();
             hitboxes.set_index(index);
+            if(index != previous){
+                if(auto* carrier = component_managers::entity_carrier_manager_.get_component(entity_id)){
+                    carrier->mirror_offset(hitboxes.get_hitbox().get_box().width - entity_config::food_width);
+                }
+            }
         }
     }
 }

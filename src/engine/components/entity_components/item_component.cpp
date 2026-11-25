@@ -1,5 +1,5 @@
 #include "component.h"
 
-size_t components::item_component::get_item() const{
-    return item_id_;
+const items::item_ref& components::item_component::get_ref() const{
+    return ref_;
 }

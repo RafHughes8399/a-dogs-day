@@ -124,16 +124,18 @@ namespace hud_systems{
             defined_clicks_[hud_config::click_actions::change_page] = change_page;
             defined_clicks_[hud_config::click_actions::move_decoration] = move_decoration;
             defined_clicks_[hud_config::click_actions::sell_decoration] = sell_decoration;
-            defined_clicks_[hud_config::click_actions::store_decoration] = store_decoration;
+            defined_clicks_[hud_config::click_actions::store_item] = store_item;
             defined_clicks_[hud_config::click_actions::select_item] = select_item;
+            defined_clicks_[hud_config::click_actions::change_category] = change_category;
         }
 
         static void select_recipe(size_t button, const components::click_payload& payload);
         static void change_page(size_t button, const components::click_payload& payload);
         static void move_decoration(size_t button, const components::click_payload& payload);
         static void sell_decoration(size_t button, const components::click_payload& payload);
-        static void store_decoration(size_t button, const components::click_payload& payload);
+        static void store_item(size_t button, const components::click_payload& payload);
         static void select_item(size_t button, const components::click_payload& payload);
+        static void change_category(size_t button, const components::click_payload& payload);
         std::array<std::function<void(size_t, const components::click_payload&)>, hud_config::click_actions::size> defined_clicks_;
     };
     // owns hud entity creation/destruction - the hud-side counterpart to
@@ -153,9 +155,9 @@ namespace hud_systems{
         hud_lifespan_system& operator=(hud_lifespan_system&& other) = delete;
 
         size_t create_menu_page(std::function<void(size_t)> build);
-        size_t create_inventory_menu();
-        size_t create_inventory_head();
-        size_t create_inventory_tail(size_t previous_tail);
+        size_t create_inventory_menu(size_t category = entity_config::decoration_category);
+        size_t create_inventory_head(size_t category = entity_config::decoration_category);
+        size_t create_inventory_tail(size_t previous_tail, size_t category = entity_config::decoration_category);
         size_t create_shop_menu();
         size_t create_quest_menu();
         size_t create_element(size_t owner, std::function<void(size_t)> build);
