@@ -1,4 +1,5 @@
 #include "component.h"
+#include <algorithm>
 #include "debug_log_interface.h"
 #include <string>
 
@@ -47,9 +48,14 @@ std::optional<Vector2> components::inventory_storage_component::place(size_t def
     return Vector2{x, y};
 }
 
-// it takes in a desired item to take the not the dictioanry id of the item but the physical id
-// what it does return is the dictionary item
-size_t components::inventory_storage_component::take_item(size_t item_id){
-    // TODO
-    return 0;
+void components::inventory_storage_component::attach_button(size_t button){
+    if(placements_.empty()){ return; }
+    placements_.back().set_button(button);
+}
+bool components::inventory_storage_component::take_item(size_t button){
+    auto found = std::find_if(placements_.begin(), placements_.end(),
+        [button](const placement& entry) -> bool { return entry.get_button() == button; });
+    if(found == placements_.end()){ return false; }
+    placements_.erase(found);
+    return true;
 }

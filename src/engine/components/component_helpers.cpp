@@ -132,7 +132,7 @@ void component_helpers::add_entity_item_component(size_t entity_id, items::item_
     register_entity_item_component(entity_id,
         component_builders::build_entity_item_component(ref));
 }
-void component_helpers::add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<Vector2> offset, std::optional<size_t> carried_entity){
+void component_helpers::add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity){
     register_entity_carrier_component(entity_id,
         component_builders::build_entity_carrier_component(previous_position, current_position, offset,  carried_entity));
 }
@@ -269,7 +269,13 @@ void component_helpers::set_facing_index(size_t entity_id, size_t index){
     if(auto* collision = component_managers::entity_collision_manager_.get_component(entity_id)){
         auto& hitboxes = collision->get_hitbox_component();
         if(index < hitboxes.num_hitboxes()){
+            auto previous = hitboxes.get_hitbox_index();
             hitboxes.set_index(index);
+            if(index != previous){
+                if(auto* carrier = component_managers::entity_carrier_manager_.get_component(entity_id)){
+                    carrier->mirror_offset(hitboxes.get_hitbox().get_box().width - entity_config::food_width);
+                }
+            }
         }
     }
 }

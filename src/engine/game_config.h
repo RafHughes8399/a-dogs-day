@@ -26,6 +26,11 @@ namespace game_config {
         int action_;
     };
 
+    enum control_states{
+        default_controls = 0,
+        placing_from_inventory,
+        control_states_size
+    };
     enum key_press_actions{
         dog_switch = KEY_F,
         shop_open = KEY_S,

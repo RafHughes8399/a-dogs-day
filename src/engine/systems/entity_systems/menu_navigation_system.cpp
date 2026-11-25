@@ -45,8 +45,16 @@ void systems::menu_navigation_system::set_group(size_t menu, size_t group){
 size_t systems::menu_navigation_system::group_of(size_t menu){
     return menus_.get_node(menu).get_group();
 }
+std::optional<size_t> systems::menu_navigation_system::active_page_of(size_t menu){
+    return menus_.get_node(menu).get_active_root();
+}
 void systems::menu_navigation_system::clear(){
     menus_.reset();
+}
+void systems::menu_navigation_system::on_item_from_inventory(const events::item_from_inventory& event){
+    (void) event;
+    hide(menus::menu_ids::inventory);
+    //menus_.current_ = menus::menu_ids::blank;
 }
 void systems::menu_navigation_system::show(size_t menu){
     auto root = menus_.get_node(menu).get_active_root();

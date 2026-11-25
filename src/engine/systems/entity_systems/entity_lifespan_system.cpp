@@ -102,6 +102,40 @@ size_t systems::entity_lifespan_system::create_cooking_station(size_t cooking_st
         + ", position: " + raglib::vector_to_string(position));
     return id;
 }
+size_t systems::entity_lifespan_system::create_station(size_t station, Vector2 position){
+    if(entity_config::is_table_station(station)){ return create_table(station, position); }
+    if(entity_config::is_counter_station(station)){ return create_counter(station, position); }
+    return create_cooking_station(station, position);
+}
+void systems::entity_lifespan_system::on_item_from_inventory(const events::item_from_inventory& event){
+    items::item_ref ref{event.get_category(), event.get_item_id()};
+    if(not items::item_encyclopedia::get_instance().has_definition(ref)){
+        debug::log("[entity_lifespan_system::on_item_from_inventory] no definition for category: "
+            + std::to_string(ref.get_category()) + ", id: " + std::to_string(ref.get_id()));
+        return;
+    }
+    auto cursor = control_input_system::get_instance().get_cursor_id();
+    if(cursor == game_config::empty_entity){ return; }
+    auto* carrier = component_managers::entity_carrier_manager_.get_component(static_cast<size_t>(cursor));
+    auto* position = component_managers::entity_positional_manager_.get_component(static_cast<size_t>(cursor));
+    if(carrier == nullptr or position == nullptr){ return; }
+    if(carrier->is_carrying()){
+        debug::log("[entity_lifespan_system::on_item_from_inventory] cursor already carrying, ignoring");
+        return;
+    }
+    size_t created = 0;
+    if(ref.get_category() == entity_config::decoration_category){
+        created = create_decoration(ref.get_id(), position->get_position());
+    }
+    else if(ref.get_category() == entity_config::station_category){
+        created = create_station(ref.get_id(), position->get_position());
+    }
+    else{ return; }
+    carrier->set_carried_entity(created);
+    debug::log("[entity_lifespan_system::on_item_from_inventory] built entity " + std::to_string(created)
+        + " for category: " + std::to_string(ref.get_category()) + ", id: " + std::to_string(ref.get_id())
+        + ", handed to cursor " + std::to_string(cursor));
+}
 void systems::entity_lifespan_system::destroy_station(size_t id){
     auto* item = component_managers::entity_item_manager_.get_component(id);
     if(item == nullptr){

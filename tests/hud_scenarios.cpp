@@ -778,6 +778,7 @@ SCENARIO("clicking a decoration button is consumed and changes nothing yet", "[h
 
         THEN("each click is consumed by the hud and the gargoyle stays selected"){
             for(auto button : elements_of(gargoyle)){
+                if(component_managers::hud_clickable_manager_.get_component(button)->get_action() == hud_config::click_actions::store_decoration){ continue; }
                 game.move_entity(cursor, centre_of(button));
                 controls.simulate_input(game_config::input{MOUSE_BUTTON_LEFT, game_config::mouse_press}, cursor);
                 CAPTURE(button);
@@ -1129,9 +1130,7 @@ SCENARIO("a full inventory page spills onto a second page that can be reached", 
         const auto gargoyle = entity_config::decorations::gargoyle;
         size_t stored = 0;
         while(stored < 200 and navigation.pages_of(menus::menu_ids::inventory).size() < stale_pages + 2){
-            auto decoration = systems::entity_lifespan_system::get_instance().create_decoration(gargoyle,
-                Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
-            inventory.on_stored_decoration(events::store_decoration{decoration, entity_config::decoration_category, gargoyle});
+            inventory.on_stored_decoration(events::store_decoration{entity_config::decoration_category, gargoyle});
             ++stored;
         }
         auto pages = navigation.pages_of(menus::menu_ids::inventory);

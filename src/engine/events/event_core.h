@@ -65,6 +65,7 @@ namespace events{
 		cursor_moved_id,
 		hover_hud_entity_id,
 		cursor_created_id,
+		item_from_inventory_id,
 		size
 	};
 	class event{

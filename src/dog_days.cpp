@@ -17,7 +17,7 @@ int main() {
   SetTextureFilter(canvas.texture, TEXTURE_FILTER_BILINEAR);
 
   bool loop = true;
-
+  SetExitKey(KEY_PERIOD);
   std::cout << "[dog_days init] : start loop " << std::endl;
   auto game = game::game();
   game.init();

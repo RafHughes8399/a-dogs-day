@@ -1,9 +1,13 @@
+#include "component.h"
 #include "component_managers.hpp"
 #include "entity_systems/entity_systems.hpp"
+#include "events_interface.h"
 #include "hud_systems/hud_systems.hpp"
 #include "debug_log_interface.h"
 #include "system.h"
+#include <raylib.h>
 #include <string>
+#include <variant>
 
 // ! THESE FUNCTIONS SHOULD TRIGGER EVENTS ? I THINK MOST OF THEM SHOULD
 
@@ -53,8 +57,12 @@ void hud_systems::click_system::change_category(size_t button, const components:
     systems::menu_navigation_system::get_instance().set_group(menus::menu_ids::inventory, choice->get_category());
 }
 void hud_systems::click_system::select_item(size_t button, const components::click_payload& payload){
-    (void) button;
-    (void) payload;
+    auto* choice = std::get_if<components::item_choice>(&payload);
+    if(not choice){ return; }
+    auto& item_ref = choice->get_ref();
+    std::unique_ptr<events::event> item_from_inventory = std::make_unique<events::item_from_inventory>(
+        item_ref.get_category(), item_ref.get_id(), button);
+    event_interface::queue_event(item_from_inventory);
 }
 void hud_systems::click_system::move_decoration(size_t button, const components::click_payload& payload){
     (void) payload;
@@ -84,13 +92,18 @@ void hud_systems::click_system::sell_decoration(size_t button, const components:
 }
 void hud_systems::click_system::store_decoration(size_t button, const components::click_payload& payload){
     (void) payload;
-    // get the entity through the owner component
     auto owner = component_managers::hud_owner_manager_.get_component(button);
     if(not owner) {return; }
-    // store decoration event  with the owner
-    auto item = component_managers::entity_item_manager_.get_component(owner->get_owner());
+    auto entity = owner->get_owner();
+    auto item = component_managers::entity_item_manager_.get_component(entity);
     if(not item){return;}
-    std::unique_ptr<events::event> store_decoration = std::make_unique<events::store_decoration>(owner->get_owner(),
-        item->get_ref().get_category(), item->get_ref().get_id());
+    auto ref = item->get_ref();
+    std::unique_ptr<events::event> store_decoration = std::make_unique<events::store_decoration>(
+        ref.get_category(), ref.get_id());
     event_interface::queue_event(store_decoration);
+    if(ref.get_category() == entity_config::station_category){
+        systems::entity_lifespan_system::get_instance().destroy_station(entity);
+        return;
+    }
+    systems::entity_lifespan_system::get_instance().destroy_decoration(entity);
 }

@@ -4,6 +4,7 @@
 #include "config.h"
 #include "events.h"
 #include "events_interface.h"
+#include "hud_events.h"
 #include "menus.h"
 #include "menu_factory.hpp"
 #include <optional>
@@ -18,6 +19,7 @@ namespace systems{
         }
         ~inventory_system(){
             event_interface::unsubscribe<events::store_decoration>(store_decoration_handler_);
+            event_interface::unsubscribe<events::item_from_inventory>(item_from_inventory_handler_);
         }
         inventory_system(const inventory_system& other) = delete;
         inventory_system(inventory_system&& other) = delete;
@@ -26,15 +28,19 @@ namespace systems{
         inventory_system& operator=(inventory_system&& other) = delete;
 
         void on_stored_decoration(const events::store_decoration& event);
+        void on_item_from_inventory(const events::item_from_inventory& event);
         void init();
-        std::optional<size_t> take_item(size_t item_id);
+        bool take_item(size_t button);
     private:
         inventory_system()
-        : store_decoration_handler_([this](const events::store_decoration& event) -> void {on_stored_decoration(event);}){
+        : store_decoration_handler_([this](const events::store_decoration& event) -> void {on_stored_decoration(event);}),
+          item_from_inventory_handler_([this](const events::item_from_inventory& event) -> void {on_item_from_inventory(event);}){
             event_interface::subscribe<events::store_decoration>(store_decoration_handler_);
+            event_interface::subscribe<events::item_from_inventory>(item_from_inventory_handler_);
         }
         bool store_item(const items::item_ref& ref);
         events::event_handler<events::store_decoration> store_decoration_handler_;
+        events::event_handler<events::item_from_inventory> item_from_inventory_handler_;
     };
     class menu_navigation_system{
         public:
@@ -44,6 +50,7 @@ namespace systems{
             }
             ~menu_navigation_system(){
                 event_interface::unsubscribe<events::key_press>(key_press_handler_);
+                event_interface::unsubscribe<events::item_from_inventory>(item_from_inventory_handler_);
             }
             menu_navigation_system(const menu_navigation_system& other) = delete;
             menu_navigation_system(menu_navigation_system&& other) = delete;
@@ -60,15 +67,21 @@ namespace systems{
             std::vector<size_t> all_pages_of(size_t menu);
             void set_group(size_t menu, size_t group);
             size_t group_of(size_t menu);
+            std::optional<size_t> active_page_of(size_t menu);
             void clear();
-        private:
-            menu_navigation_system()
-            : key_press_handler_([this](const events::key_press& event) -> void {on_key_press(event);}), menus_(), factory_(){
-                event_interface::subscribe<events::key_press>(key_press_handler_);
-            }
+            void on_item_from_inventory(const events::item_from_inventory& event);
             void show(size_t menu);
             void hide(size_t menu);
+        private:
+            menu_navigation_system()
+            : key_press_handler_([this](const events::key_press& event) -> void {on_key_press(event);}),
+              item_from_inventory_handler_([this](const events::item_from_inventory& event) -> void {on_item_from_inventory(event);}),
+              menus_(), factory_(){
+                event_interface::subscribe<events::key_press>(key_press_handler_);
+                event_interface::subscribe<events::item_from_inventory>(item_from_inventory_handler_);
+            }
             events::event_handler<events::key_press> key_press_handler_;
+            events::event_handler<events::item_from_inventory> item_from_inventory_handler_;
             menus::menu_graph menus_;
             factories::menu_factory factory_;
     };

@@ -211,6 +211,7 @@ namespace systems{
             }
             ~control_input_system(){
                 event_interface::unsubscribe<events::cursor_created>(cursor_created_handler_);
+                event_interface::unsubscribe<events::item_from_inventory>(item_from_inventory_handler_);
             }
             control_input_system(const control_input_system& other) = delete;
             control_input_system(control_input_system&& other) = delete;
@@ -223,8 +224,16 @@ namespace systems{
             void clear(){
                 selected_dog_ = level_config::mack_id;
                 cursor_id_ = game_config::empty_entity;
+                control_state_ = game_config::default_controls;
             }
             void on_cursor_created(const events::cursor_created& event);
+            void on_item_from_inventory(const events::item_from_inventory& event);
+            size_t get_control_state() const{
+                return control_state_;
+            }
+            void set_control_state(size_t state){
+                control_state_ = state;
+            }
             int get_cursor_id() const{
                 return cursor_id_;
             }
@@ -237,11 +246,11 @@ namespace systems{
             void simulate_input(const game_config::input& input, size_t id, float delta = 0.0f){
                 dispatch(input.key_, input.action_, id, delta);
             }
-            bool is_bound(int key, int action){
-                return control_function_map_.find({key, action}) != control_function_map_.end();
+            bool is_bound(int key, int action, size_t state = game_config::default_controls){
+                return control_function_maps_[state].find({key, action}) != control_function_maps_[state].end();
             }
-            size_t bound_count(){
-                return control_function_map_.size();
+            size_t bound_count(size_t state = game_config::default_controls){
+                return control_function_maps_[state].size();
             }
             size_t get_selected_dog(){
                 return selected_dog_;
@@ -249,10 +258,12 @@ namespace systems{
 #endif
         private:
             control_input_system()
-            : control_function_map_({}), selected_dog_(level_config::mack_id),
-              cursor_created_handler_([this](const events::cursor_created& event) -> void {on_cursor_created(event);}){
+            : control_function_maps_(), selected_dog_(level_config::mack_id),
+              cursor_created_handler_([this](const events::cursor_created& event) -> void {on_cursor_created(event);}),
+              item_from_inventory_handler_([this](const events::item_from_inventory& event) -> void {on_item_from_inventory(event);}){
                 build_control_map();
                 event_interface::subscribe<events::cursor_created>(cursor_created_handler_);
+                event_interface::subscribe<events::item_from_inventory>(item_from_inventory_handler_);
             }
 
             void build_control_map();
@@ -263,6 +274,8 @@ namespace systems{
             // the actions, mirroring player::controls' default scheme
             void back();
             void left_click(size_t id);
+            void placing_from_inventory_left_click(size_t id);
+            void placing_from_inventory_back();
             void move_view_frame(Vector2 direction_scalar, float delta);
             void open_inventory();
             void open_map();
@@ -279,11 +292,13 @@ namespace systems{
             // * key_hold_actions::edit_mode and key_press_actions::exit_edit, and
             // * MOUSE_BUTTON_LEFT is 0, which is also a legal KEY_* value, so a
             // * lookup on the raw int would alias all three.
-            std::map<std::pair<int, int>, std::function<void(size_t, float)>> control_function_map_;
+            std::array<std::map<std::pair<int, int>, std::function<void(size_t, float)>>, game_config::control_states_size> control_function_maps_;
             // mirrors player::selected_dog_ - switch_dog flips it, right_click carries it
             size_t selected_dog_;
             events::event_handler<events::cursor_created> cursor_created_handler_;
+            events::event_handler<events::item_from_inventory> item_from_inventory_handler_;
             int cursor_id_ = game_config::empty_entity;
+            size_t control_state_ = game_config::default_controls;
     };
     /**
     // * something of a dense comment here to explain the build relationships
@@ -301,15 +316,21 @@ namespace systems{
                 static entity_lifespan_system instance;
                 return instance;
             }
-            ~entity_lifespan_system() = default;
+            ~entity_lifespan_system(){
+                event_interface::unsubscribe<events::item_from_inventory>(item_from_inventory_handler_);
+            }
             entity_lifespan_system(const entity_lifespan_system& other) = delete;
             entity_lifespan_system(entity_lifespan_system&& other) = delete;
 
             entity_lifespan_system& operator=(const entity_lifespan_system& other) = delete;
             entity_lifespan_system& operator=(entity_lifespan_system&& other) = delete;
         private:
-            entity_lifespan_system() = default;
+            entity_lifespan_system()
+            : item_from_inventory_handler_([this](const events::item_from_inventory& event) -> void {on_item_from_inventory(event);}){
+                event_interface::subscribe<events::item_from_inventory>(item_from_inventory_handler_);
+            }
         public:
+            void on_item_from_inventory(const events::item_from_inventory& event);
 
             // allocate -> build -> announce, so nothing can be built without
             // reaching the spatial index and a render layer
@@ -359,6 +380,7 @@ namespace systems{
             size_t create_cooking_station(size_t cooking_station, Vector2 position);
             void destroy_cooking_station(size_t id);
             void destroy_station(size_t id);
+            size_t create_station(size_t station, Vector2 position);
             void create_decoration_hud(size_t owner);
             void create_cooking_station_hud(size_t owner);
             size_t create_stove(Vector2 position);
@@ -392,6 +414,7 @@ namespace systems{
             factories::station_factory station_factory_;
             factories::food_factory food_factory_;
             factories::decoration_factory decoration_factory_;
+            events::event_handler<events::item_from_inventory> item_from_inventory_handler_;
     };
     class interaction_system{
         // for behavioural interactions

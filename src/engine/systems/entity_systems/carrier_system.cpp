@@ -27,7 +27,7 @@ void systems::carrier_system::update(float delta){
         auto* carried_position = component_managers::entity_positional_manager_.get_component(carried_entity.value());
         if(carried_position == nullptr){ continue; }
 
-        auto target = Vector2Add(*current_position, carrier.get_offset().value_or(mouth_offset(id)));
+        auto target = Vector2Add(*current_position, carrier.get_offset());
         if(Vector2Equals(target, carried_position->get_position())){ continue; }
         movement_system::get_instance().update_position(carried_entity.value(), target);
     }

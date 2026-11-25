@@ -171,9 +171,7 @@ SCENARIO("a stored decoration lands on the decoration pages only", "[hud][invent
         inventory.init();
 
         WHEN("a decoration is stored"){
-            auto decoration = systems::entity_lifespan_system::get_instance().create_decoration(
-                entity_config::decorations::gargoyle, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
-            inventory.on_stored_decoration(events::store_decoration{decoration, entity_config::decoration_category, entity_config::decorations::gargoyle});
+            inventory.on_stored_decoration(events::store_decoration{entity_config::decoration_category, entity_config::decorations::gargoyle});
 
             THEN("the decoration head holds it and the other categories stay empty"){
                 for(size_t category = 0; category < entity_config::item_categories_size; ++category){
@@ -315,8 +313,19 @@ SCENARIO("a stored station lands on the station pages and leaves the map", "[hud
             REQUIRE(item != nullptr);
             REQUIRE(item->get_ref() == items::item_ref{entity_config::station_category, station});
         }
-        WHEN("it is stored"){
-            inventory.on_stored_decoration(events::store_decoration{entity, entity_config::station_category, station});
+        WHEN("its store button is clicked"){
+            auto* entity_hud = component_managers::hud_manager_.get_component(entity);
+            entity_hud->set_active(true);
+            std::optional<size_t> store_button;
+            for(auto element : entity_hud->get_elements()){
+                auto* clickable = component_managers::hud_clickable_manager_.get_component(element);
+                if(clickable != nullptr and clickable->get_action() == hud_config::click_actions::store_decoration){ store_button = element; }
+            }
+            REQUIRE(store_button.has_value());
+            auto box = component_managers::hud_collision_manager_.get_component(*store_button)
+                ->get_hitbox_component().get_hitbox().get_box();
+            REQUIRE(hud_systems::click_system::get_instance().click(Vector2{box.x + box.width * 0.5f, box.y + box.height * 0.5f}));
+            events::global_dispatcher_.process_events(0.0f);
 
             THEN("the station head holds it as a selectable item and the decoration head stays empty"){
                 auto station_head = navigation.pages_of(inventory_menu, station_group)[0];
@@ -349,14 +358,16 @@ SCENARIO("a stored item with no definition is ignored", "[hud][inventory][catego
         systems::rendering_system::get_instance().move_camera(Vector2{300.0f, 2000.0f});
         auto& inventory = systems::inventory_system::get_instance();
         inventory.init();
-        auto decoration = systems::entity_lifespan_system::get_instance().create_decoration(
-            entity_config::decorations::gargoyle, Vector2{level_config::edge_weight * 6, level_config::edge_weight * 6});
+        auto& navigation = systems::menu_navigation_system::get_instance();
 
         WHEN("a store arrives for an id past the end of the catalogue"){
-            inventory.on_stored_decoration(events::store_decoration{decoration, entity_config::station_category, entity_config::stations_size});
+            inventory.on_stored_decoration(events::store_decoration{entity_config::station_category, entity_config::stations_size});
 
-            THEN("nothing is stored and the entity stays"){
-                REQUIRE(component_managers::entity_positional_manager_.get_component(decoration) != nullptr);
+            THEN("nothing is stored on any category"){
+                for(size_t category = 0; category < entity_config::item_categories_size; ++category){
+                    auto head = navigation.pages_of(inventory_menu, category)[0];
+                    REQUIRE(component_managers::hud_inventory_storage_manager_.get_component(head)->size() == 0);
+                }
             }
         }
     }

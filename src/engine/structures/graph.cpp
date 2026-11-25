@@ -465,8 +465,10 @@ void graph::level_graph::insert_edge(int source_num, node& destination, float we
 // returns false otherwise, (to place down, this must be false)
 bool graph::level_graph::check_for_decoration(Rectangle rectangle, int id){
     // Exclusive bounds, matching update_entity (see note there).
-    for(auto col = rectangle.x; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
-        for(auto row = rectangle.y; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
+    auto first_col = area_.x + std::floor((rectangle.x - area_.x) / level_config::edge_weight) * level_config::edge_weight;
+    auto first_row = area_.y + std::floor((rectangle.y - area_.y) / level_config::edge_weight) * level_config::edge_weight;
+    for(auto col = first_col; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
+        for(auto row = first_row; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
 
             int node_index = 0;
@@ -484,8 +486,10 @@ void graph::level_graph::update_entity(Rectangle rectangle, int id){
     // The bound is exclusive - an inclusive `<=` marks one extra column/row on the
     // +x/+y side, wrongly blocking the cell just past the decoration (e.g. a table's
     // right interaction node), which breaks pathing to it.
-    for(auto col = rectangle.x; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
-        for(auto row = rectangle.y; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
+    auto first_col = area_.x + std::floor((rectangle.x - area_.x) / level_config::edge_weight) * level_config::edge_weight;
+    auto first_row = area_.y + std::floor((rectangle.y - area_.y) / level_config::edge_weight) * level_config::edge_weight;
+    for(auto col = first_col; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
+        for(auto row = first_row; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
             int node_index = 0;
             if(not cell_at(position, node_index)){ continue; }
@@ -498,8 +502,10 @@ void graph::level_graph::remove_entity(Rectangle rectangle, int id){
     // Same bounds as update_entity - only erase this entity's own claim on a cell,
     // so another occupant registered on the same cell (e.g. a station under a dog
     // passing through) is left untouched.
-    for(auto col = rectangle.x; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
-        for(auto row = rectangle.y; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
+    auto first_col = area_.x + std::floor((rectangle.x - area_.x) / level_config::edge_weight) * level_config::edge_weight;
+    auto first_row = area_.y + std::floor((rectangle.y - area_.y) / level_config::edge_weight) * level_config::edge_weight;
+    for(auto col = first_col; col < rectangle.x + rectangle.width; col += level_config::edge_weight){
+        for(auto row = first_row; row < rectangle.y + rectangle.height; row += level_config::edge_weight){
             auto position = Vector2{col, row};
             int node_index = 0;
             if(not cell_at(position, node_index)){ continue; }

@@ -63,7 +63,7 @@ namespace component_helpers{
     void add_entity_storage_component(size_t entity_id);
     void add_entity_food_component(size_t entity_id, size_t item_id);
     void add_entity_item_component(size_t entity_id, items::item_ref ref);
-    void add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, std::optional<Vector2> offset, std::optional<size_t> carried_entity = std::nullopt);
+    void add_entity_carrier_component(size_t entity_id, Vector2 previous_position, Vector2* current_position, Vector2 offset, std::optional<size_t> carried_entity = std::nullopt);
     void add_stored_item(size_t entity_id, size_t slot, size_t item_id);
     std::optional<size_t> take_stored_item(size_t entity_id, size_t slot);
     void update_item_sprite(size_t entity_id, size_t slot);

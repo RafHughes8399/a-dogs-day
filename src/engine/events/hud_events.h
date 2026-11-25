@@ -23,5 +23,27 @@ namespace events{
             const int prev_hovered_;
             const int current_hovered_;
     };
+    class item_from_inventory : public event{
+        public:
+            item_from_inventory(size_t category, size_t item_id, size_t button)
+            :event(ids::item_from_inventory_id), category_(category), item_(item_id), button_(button){}
+
+            static int get_static_type(){
+                return ids::item_from_inventory_id;
+            }
+            size_t get_category() const{
+                return category_;
+            }
+            size_t get_item_id() const{
+                return item_;
+            }
+            size_t get_button() const{
+                return button_;
+            }
+        private:
+            const size_t category_;
+            const size_t item_;
+            const size_t button_;
+    };
 }
 #endif

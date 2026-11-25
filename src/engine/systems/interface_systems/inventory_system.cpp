@@ -1,20 +1,18 @@
+#include "hud_events.h"
+#include "interface_systems/interface_systems.hpp"
 #include "menus.h"
 #include "system.h"
 #include "debug_log_interface.h"
 #include <string>
 
 void systems::inventory_system::on_stored_decoration(const events::store_decoration& event){
-    debug::log("[inventory_system::on_stored_decoration] received store_decoration event, entity_id: "
-        + std::to_string(event.get_entity_id()) + ", category: " + std::to_string(event.get_category())
-        + ", definition_id: " + std::to_string(event.get_definition_id()));
     items::item_ref ref{event.get_category(), event.get_definition_id()};
     if(not items::item_encyclopedia::get_instance().has_definition(ref)){ return; }
     if(not store_item(ref)){ return; }
-    if(ref.get_category() == entity_config::station_category){
-        entity_lifespan_system::get_instance().destroy_station(event.get_entity_id());
-        return;
-    }
-    entity_lifespan_system::get_instance().destroy_decoration(event.get_entity_id());
+}
+
+void systems::inventory_system::on_item_from_inventory(const events::item_from_inventory& event){
+    take_item(event.get_button());
 }
 bool systems::inventory_system::store_item(const items::item_ref& ref){
     auto definition_id = ref.get_id();
@@ -59,6 +57,7 @@ bool systems::inventory_system::store_item(const items::item_ref& ref){
     auto button_position = Vector2Add(origin, *position);
     auto button = hud_systems::hud_lifespan_system::get_instance().request_button(page,
         hud_config::button_kinds::inventory_item_button, button_position, ref.pack());
+    if(button.has_value()){ storage->attach_button(*button); }
     debug::log("[inventory_system::store_item] page: " + std::to_string(page)
         + ", relative: " + std::to_string(position->x) + ", " + std::to_string(position->y)
         + ", origin: " + std::to_string(origin.x) + ", " + std::to_string(origin.y)
@@ -66,10 +65,13 @@ bool systems::inventory_system::store_item(const items::item_ref& ref){
         + ", button created: " + std::to_string(button.has_value()));
     return button.has_value();
 }
-std::optional<size_t> systems::inventory_system::take_item(size_t item_id){
-    (void) item_id;
-    // attempt to take teh item from the current page
-    return std::nullopt;
+bool systems::inventory_system::take_item(size_t button){
+    auto page = menu_navigation_system::get_instance().active_page_of(menus::menu_ids::inventory);
+    if(not page){ return false; }
+    auto* storage = component_managers::hud_inventory_storage_manager_.get_component(*page);
+    if(storage == nullptr or not storage->take_item(button)){ return false; }
+    hud_systems::hud_lifespan_system::get_instance().destroy_element(button);
+    return true;
 }
 void systems::inventory_system::init(){
     for(size_t category = 0; category < static_cast<size_t>(entity_config::item_categories_size); ++category){
