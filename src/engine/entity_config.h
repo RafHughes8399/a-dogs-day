@@ -278,13 +278,13 @@ namespace entity_config{
 
     inline const float gianluca_head_attributes[attributes::size] = {27.0f, 58.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float gianluca_face_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.35f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float gianluca_body_attributes[attributes::size] = {117.0f, 58.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float gianluca_body_attributes[attributes::size] = {110.0f, 58.0f, 1.0f, static_cast<float>(animation_config::body::size)};
     inline const float gianluca_tail_attributes[attributes::size] = {4.0f, 58.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
     inline const float lionel_head_attributes[attributes::size] = {35.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float lionel_face_attributes[attributes::size] = {level_config::edge_weight * 0.30f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
     inline const float lionel_body_attributes[attributes::size] = {90.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float lionel_tail_attributes[attributes::size] = {7.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float lionel_tail_attributes[attributes::size] = {6.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
     inline const dog_part khiri_parts[dog_sprite_slots_size] = {
         {khiri_body_attributes, Vector2{26.0f, 0.0f}, khiri_body_left_path, khiri_body_right_path},

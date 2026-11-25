@@ -193,7 +193,7 @@ void ecs_entities::build_waiter_dog(size_t id, Vector2 position,
     void ecs_entities::build_gianluca(size_t id, Vector2 position){
         auto tail_width = entity_config::gianluca_tail_attributes[entity_config::frame_width];
         auto body_width = entity_config::gianluca_body_attributes[entity_config::frame_width];
-        auto head_width = entity_config::gianluca_head_attributes[entity_config::frame_width];
+        auto head_width = entity_config::gianluca_head_attributes[entity_config::frame_width] - 5;
 
         auto head_left = sprite_builders::build_dog_part_sprite(textures::gianluca_head_left, entity_config::gianluca_head_left_path, entity_config::gianluca_head_attributes, Vector2Zero());
         auto body_left = sprite_builders::build_dog_part_sprite(textures::gianluca_body_left, entity_config::gianluca_body_left_path, entity_config::gianluca_body_attributes, {head_width, 0});
@@ -216,12 +216,12 @@ void ecs_entities::build_waiter_dog(size_t id, Vector2 position,
         auto head_width = entity_config::lionel_head_attributes[entity_config::frame_width];
 
         auto head_left = sprite_builders::build_dog_part_sprite(textures::lionel_head_left, entity_config::lionel_head_left_path, entity_config::lionel_head_attributes, Vector2Zero());
-        auto body_left = sprite_builders::build_dog_part_sprite(textures::lionel_body_left, entity_config::lionel_body_left_path, entity_config::lionel_body_attributes, {head_width, 0});
-        auto tail_left = sprite_builders::build_dog_part_sprite(textures::lionel_tail_left, entity_config::lionel_tail_left_path, entity_config::lionel_tail_attributes, {head_width + body_width, 0});
+        auto body_left = sprite_builders::build_dog_part_sprite(textures::lionel_body_left, entity_config::lionel_body_left_path, entity_config::lionel_body_attributes, {head_width - 21, 0});
+        auto tail_left = sprite_builders::build_dog_part_sprite(textures::lionel_tail_left, entity_config::lionel_tail_left_path, entity_config::lionel_tail_attributes, {head_width - 21 + body_width - 3, 0});
 
         auto tail_right = sprite_builders::build_dog_part_sprite(textures::lionel_tail_right, entity_config::lionel_tail_right_path, entity_config::lionel_tail_attributes, Vector2Zero());
-        auto body_right = sprite_builders::build_dog_part_sprite(textures::lionel_body_right, entity_config::lionel_body_right_path, entity_config::lionel_body_attributes, {tail_width, 0});
-        auto head_right = sprite_builders::build_dog_part_sprite(textures::lionel_head_right, entity_config::lionel_head_right_path, entity_config::lionel_head_attributes, {tail_width + body_width, 0});
+        auto body_right = sprite_builders::build_dog_part_sprite(textures::lionel_body_right, entity_config::lionel_body_right_path, entity_config::lionel_body_attributes, {tail_width - 3, 0});
+        auto head_right = sprite_builders::build_dog_part_sprite(textures::lionel_head_right, entity_config::lionel_head_right_path, entity_config::lionel_head_attributes, {tail_width + body_width -21, 0});
 
         std::vector<std::vector<sprite::sprite>> sprites = {
             {tail_left, tail_right},
