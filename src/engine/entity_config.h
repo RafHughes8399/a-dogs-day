@@ -266,15 +266,15 @@ namespace entity_config{
 
     // TODO (06 / 09 / 26) placeholder splits - advancing widths sum to the matching
     // across width, but the proportions are guesses pending the part art
-    inline const float khiri_head_attributes[attributes::size] = {35.0f, 62.0f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float khiri_head_attributes[attributes::size] = {30.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float khiri_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float khiri_body_attributes[attributes::size] = {88.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float khiri_tail_attributes[attributes::size] = {18.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float khiri_body_attributes[attributes::size] = {87.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float khiri_tail_attributes[attributes::size] = {16.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
-    inline const float mack_head_attributes[attributes::size] = {30.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
+    inline const float mack_head_attributes[attributes::size] = {31.0f, 48.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float mack_face_attributes[attributes::size] = {level_config::edge_weight * 0.35f, level_config::edge_weight * 0.30f, 1.0f, static_cast<float>(animation_config::face::size)};
-    inline const float mack_body_attributes[attributes::size] = {92.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
-    inline const float mack_tail_attributes[attributes::size] = {16.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
+    inline const float mack_body_attributes[attributes::size] = {90.0f, 48.0f, 1.0f, static_cast<float>(animation_config::body::size)};
+    inline const float mack_tail_attributes[attributes::size] = {13.0f, 48.0f, 1.0f, static_cast<float>(animation_config::tail::size)};
 
     inline const float gianluca_head_attributes[attributes::size] = {27.0f, 58.0f, 1.0f, static_cast<float>(animation_config::head::size)};
     inline const float gianluca_face_attributes[attributes::size] = {level_config::edge_weight * 0.40f, level_config::edge_weight * 0.35f, 1.0f, static_cast<float>(animation_config::face::size)};

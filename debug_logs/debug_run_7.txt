@@ -1,215 +1,217 @@
-[23:13:09.183 f000000] [game::init, start] building the starting world
-[23:13:09.557 f000000] [build background]: load tile 1 draw onto image at 0.000000,  0.000000, 768.000000, 768.000000
-[23:13:09.582 f000000] [build background]: load tile 2 draw onto image at 768.000000,  0.000000, 1536.000000, 768.000000
-[23:13:09.605 f000000] [build background]: load tile 3 draw onto image at 1536.000000,  0.000000, 2304.000000, 768.000000
-[23:13:09.629 f000000] [build background]: load tile 4 draw onto image at 2304.000000,  0.000000, 3072.000000, 768.000000
-[23:13:09.653 f000000] [build background]: load tile 5 draw onto image at 0.000000,  768.000000, 768.000000, 1536.000000
-[23:13:09.677 f000000] [build background]: load tile 6 draw onto image at 768.000000,  768.000000, 1536.000000, 1536.000000
-[23:13:09.703 f000000] [build background]: load tile 7 draw onto image at 1536.000000,  768.000000, 2304.000000, 1536.000000
-[23:13:09.728 f000000] [build background]: load tile 8 draw onto image at 2304.000000,  768.000000, 3072.000000, 1536.000000
-[23:13:09.753 f000000] [build background]: load tile 9 draw onto image at 0.000000,  1536.000000, 768.000000, 2304.000000
-[23:13:09.781 f000000] [build background]: load tile 10 draw onto image at 768.000000,  1536.000000, 1536.000000, 2304.000000
-[23:13:09.808 f000000] [build background]: load tile 11 draw onto image at 1536.000000,  1536.000000, 2304.000000, 2304.000000
-[23:13:09.832 f000000] [build background]: load tile 12 draw onto image at 2304.000000,  1536.000000, 3072.000000, 2304.000000
-[23:13:09.857 f000000] [build background]: load tile 13 draw onto image at 0.000000,  2304.000000, 768.000000, 3072.000000
-[23:13:09.881 f000000] [build background]: load tile 14 draw onto image at 768.000000,  2304.000000, 1536.000000, 3072.000000
-[23:13:09.907 f000000] [build background]: load tile 15 draw onto image at 1536.000000,  2304.000000, 2304.000000, 3072.000000
-[23:13:09.931 f000000] [build background]: load tile 16 draw onto image at 2304.000000,  2304.000000, 3072.000000, 3072.000000
-[23:13:10.235 f000000] [game::init, built background] id 0
-[23:13:10.235 f000000] [control_input_system::on_cursor_created] cursor id: 1
-[23:13:10.235 f000000] [game::init, built cursor] id 1
-[23:13:10.235 f000000] [control_input_system::on_cursor_created] cursor id: 1
-[23:13:10.235 f000000] [game::init, built player] id 2 holding cursor 1
-[23:13:10.237 f000000] [game::init, built khiri] id 3
-[23:13:10.239 f000000] [game::init, built mack] id 4
-[23:13:10.242 f000000] [game::init, build counter]: id 5 with food items:  3
-[23:13:10.246 f000000] [entity_lifespan_system::create_cooking_station] built cooking station: 8, id: 41, position: {896.000000, 512.000000}
-[23:13:10.258 f000000] [game::init, done] built 7 components on khiri
-[23:13:10.258 f000000] [game::init, done] built 7 components on mack
-[23:13:10.265 f000000] [game::init, stock decorations] created 40
-[23:13:10.265 f000000] [movement_system::create_path_to] dog: 50, source: {1280.000000, 576.000000}, destination: {1408.000000, 384.000000}, checkpoints: 2
-[23:13:10.266 f000000] [movement_system::commit_route] dog: 50, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
-[23:13:10.266 f000000] [waiter_idling_system::build_paths] waiter: 50, points: 3, destination: {1408.000000, 384.000000}, attempt: 1
-[23:13:10.289 f000001] [state_machine_system::transition] entity: 50, transition: 21, state: 0 -> 1
-[23:13:20.564 f000617] [control_input_system::left_click, clicked] asked by: 1, position: {917.250000, 429.000000}
-[23:13:20.564 f000617] [click_system::click] position: 917.250000, 429.000000
-[23:13:20.564 f000617] [hud_spatial_system::check_collision_with] position: 917.250000, 429.000000, tracked elements: 194
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, entity] 228 skipped, filter rejected it
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, entity] 229 skipped, filter rejected it
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, entity] 230 skipped, filter rejected it
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 1
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, entity] 10 skipped, filter rejected it
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {768.000000, -192.000000} -> {1536.000000, 672.000000}, entities here: 0
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {768.000000, 240.000000} -> {1152.000000, 672.000000}, entities here: 0
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {768.000000, 240.000000} -> {960.000000, 456.000000}, entities here: 0
-[23:13:20.564 f000617] [click_system::click] collision check hit: -1
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
-[23:13:20.564 f000617] [ecs_quadtree::is_there_collision, entity] 79 bounds: {1408.000000, 1664.000000, 232.000000, 246.000000} vs position: {917.250000, 429.000000} hit: 0
-[23:13:20.565 f000617] [ecs_quadtree::is_there_collision, entity] 111 bounds: {1520.000000, 2112.000000, 232.000000, 246.000000} vs position: {917.250000, 429.000000} hit: 0
-[23:13:20.565 f000617] [ecs_quadtree::is_there_collision, entity] 167 bounds: {1518.000000, 2390.000000, 72.000000, 168.000000} vs position: {917.250000, 429.000000} hit: 0
-[23:13:20.565 f000617] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 2
-[23:13:20.565 f000617] [ecs_quadtree::is_there_collision, entity] 9 bounds: {1280.000000, 640.000000, 96.000000, 96.000000} vs position: {917.250000, 429.000000} hit: 0
-[23:13:20.565 f000617] [ecs_quadtree::is_there_collision, entity] 55 bounds: {640.000000, 1280.000000, 320.000000, 192.000000} vs position: {917.250000, 429.000000} hit: 0
-[23:13:20.565 f000617] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {768.000000, -192.000000} -> {1536.000000, 672.000000}, entities here: 0
-[23:13:20.565 f000617] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {768.000000, 240.000000} -> {1152.000000, 672.000000}, entities here: 2
-[23:13:20.565 f000617] [ecs_quadtree::is_there_collision, entity] 41 bounds: {896.000000, 512.000000, 96.000000, 96.000000} vs position: {917.250000, 429.000000} hit: 0
-[23:13:20.565 f000617] [ecs_quadtree::is_there_collision, entity] 49 bounds: {832.000000, 384.000000, 144.000000, 58.240002} vs position: {917.250000, 429.000000} hit: 1
-[23:13:20.565 f000617] [control_input_system::left_click, hit entity] selecting: 49
-[23:13:20.565 f000617] [control_input_system::left_click, selection settled] selected: 49
-[23:13:20.864 f000635] [control_input_system::right_click, clicked] asked by: 1, position: {1150.500000, 208.500000}
-[23:13:20.864 f000635] [click_system::click] position: 1150.500000, 208.500000
-[23:13:20.865 f000635] [hud_spatial_system::check_collision_with] position: 1150.500000, 208.500000, tracked elements: 194
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, entity] 228 skipped, filter rejected it
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, entity] 229 skipped, filter rejected it
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, entity] 230 skipped, filter rejected it
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 1
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, entity] 10 skipped, filter rejected it
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {768.000000, -192.000000} -> {1536.000000, 672.000000}, entities here: 0
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {768.000000, -192.000000} -> {1152.000000, 240.000000}, entities here: 0
-[23:13:20.865 f000635] [click_system::click] collision check hit: -1
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, entity] 79 skipped, filter rejected it
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, entity] 111 skipped, filter rejected it
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, entity] 167 skipped, filter rejected it
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 2
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, entity] 9 bounds: {1280.000000, 640.000000, 96.000000, 96.000000} vs position: {1150.500000, 208.500000} hit: 0
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, entity] 55 skipped, filter rejected it
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {768.000000, -192.000000} -> {1536.000000, 672.000000}, entities here: 1
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, entity] 1 skipped, is the querying id
-[23:13:20.865 f000635] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {768.000000, -192.000000} -> {1152.000000, 240.000000}, entities here: 0
-[23:13:20.865 f000635] [control_input_system::right_click, resolved destination] entity: none, bare position
-[23:13:20.865 f000635] [control_input_system::right_click, queued path request] dog: 49, destination: {1150.500000, 208.500000}
-[23:13:20.880 f000636] [movement_system::create_path_to] dog: 49, source: {832.000000, 384.000000}, destination: {1150.500000, 208.500000}, checkpoints: 0
-[23:13:20.881 f000636] [movement_system::commit_route] dog: 49, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
-[23:13:20.881 f000636] [state_machine_system::transition] entity: 49, transition: 21, state: 0 -> 1
-[23:13:27.435 f001029] [interaction_system::on_path_finished] dog: 49 arrived with no destination entity and no interactor target - no interaction
-[23:13:27.435 f001029] [state_machine_system::transition] entity: 49, transition: 15, state: 1 -> 0
-[23:13:29.119 f001130] [dog_factory::build_customer_dog, built customer] id: 268
-[23:13:29.119 f001130] [movement_system::create_path_to] dog: 268, source: {64.000000, -128.000000}, destination: {64.000000, 3200.000000}, checkpoints: 0
-[23:13:29.120 f001130] [movement_system::commit_route] dog: 268, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
-[23:13:29.120 f001130] [customer_table_system::create_customer_dog, built customer] id: 268, spawn: {64.000000, -128.000000}, tracked customers: 1
-[23:13:29.120 f001130] [customer_table_system::send_customer_to_table] customer: 268, table: 13, via entrance: {256.000000, 1536.000000}
-[23:13:29.120 f001130] [interactable_component::get_interaction_offset] direction: left, position: {320.000000, 432.000000}, node_id: 265, distance_from_source: 615.740234
-[23:13:29.120 f001130] [interactable_component::get_interaction_offset] direction: right, position: {512.000000, 432.000000}, node_id: 268, distance_from_source: 717.149902
-[23:13:29.120 f001130] [interactable_component::get_interaction_offset] chosen offset: {-64.000000, 48.000000}
-[23:13:29.120 f001130] [movement_system::create_path_to_entity] dog: 268, source: {64.000000, -128.000000}, destination entity: 13, resolved destination: {320.000000, 384.000000}, checkpoints: 1
-[23:13:29.120 f001130] [movement_system::commit_route] dog: 268, mode: replace, paths before: 1, cleared: yes, legs committed: 2, paths after: 2
-[23:13:29.136 f001131] [state_machine_system::transition] entity: 268, transition: 21 - NO EDGE out of state: 0, state unchanged
-[23:13:29.136 f001131] [state_machine_system::transition] entity: 268, transition: 21 - NO EDGE out of state: 0, state unchanged
-[23:13:31.754 f001288] [control_input_system::left_click, clicked] asked by: 1, position: {338.250000, 244.500000}
-[23:13:31.754 f001288] [click_system::click] position: 338.250000, 244.500000
-[23:13:31.754 f001288] [hud_spatial_system::check_collision_with] position: 338.250000, 244.500000, tracked elements: 194
-[23:13:31.754 f001288] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
-[23:13:31.754 f001288] [ecs_quadtree::is_there_collision, entity] 228 skipped, filter rejected it
-[23:13:31.754 f001288] [ecs_quadtree::is_there_collision, entity] 229 skipped, filter rejected it
-[23:13:31.754 f001288] [ecs_quadtree::is_there_collision, entity] 230 skipped, filter rejected it
-[23:13:31.754 f001288] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 1
-[23:13:31.754 f001288] [ecs_quadtree::is_there_collision, entity] 10 skipped, filter rejected it
-[23:13:31.754 f001288] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 0
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {0.000000, 240.000000} -> {384.000000, 672.000000}, entities here: 1
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, entity] 16 skipped, filter rejected it
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {192.000000, 240.000000} -> {384.000000, 456.000000}, entities here: 2
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, entity] 14 skipped, filter rejected it
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, entity] 15 skipped, filter rejected it
-[23:13:31.755 f001288] [click_system::click] collision check hit: -1
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, entity] 79 bounds: {1408.000000, 1664.000000, 232.000000, 246.000000} vs position: {338.250000, 244.500000} hit: 0
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, entity] 111 bounds: {1520.000000, 2112.000000, 232.000000, 246.000000} vs position: {338.250000, 244.500000} hit: 0
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, entity] 167 bounds: {1518.000000, 2390.000000, 72.000000, 168.000000} vs position: {338.250000, 244.500000} hit: 0
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 2
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, entity] 9 bounds: {1280.000000, 640.000000, 96.000000, 96.000000} vs position: {338.250000, 244.500000} hit: 0
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, entity] 55 bounds: {640.000000, 1280.000000, 320.000000, 192.000000} vs position: {338.250000, 244.500000} hit: 0
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 1
-[23:13:31.755 f001288] [ecs_quadtree::is_there_collision, entity] 3 bounds: {256.000000, 224.000000, 128.000000, 48.000000} vs position: {338.250000, 244.500000} hit: 1
-[23:13:31.755 f001288] [control_input_system::left_click, hit entity] selecting: 3
-[23:13:31.755 f001288] [control_input_system::left_click, selection settled] selected: 3
-[23:13:32.222 f001316] [control_input_system::right_click, clicked] asked by: 1, position: {794.250000, 158.250000}
-[23:13:32.222 f001316] [click_system::click] position: 794.250000, 158.250000
-[23:13:32.222 f001316] [hud_spatial_system::check_collision_with] position: 794.250000, 158.250000, tracked elements: 194
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 228 skipped, filter rejected it
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 229 skipped, filter rejected it
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 230 skipped, filter rejected it
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 1
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 10 skipped, filter rejected it
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {768.000000, -192.000000} -> {1536.000000, 672.000000}, entities here: 0
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {768.000000, -192.000000} -> {1152.000000, 240.000000}, entities here: 0
-[23:13:32.222 f001316] [click_system::click] collision check hit: -1
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 79 skipped, filter rejected it
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 111 skipped, filter rejected it
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 167 skipped, filter rejected it
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 2
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 9 bounds: {1280.000000, 640.000000, 96.000000, 96.000000} vs position: {794.250000, 158.250000} hit: 0
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 55 skipped, filter rejected it
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {768.000000, -192.000000} -> {1536.000000, 672.000000}, entities here: 1
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 49 skipped, filter rejected it
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {768.000000, -192.000000} -> {1152.000000, 240.000000}, entities here: 0
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {768.000000, 24.000000} -> {960.000000, 240.000000}, entities here: 1
-[23:13:32.222 f001316] [ecs_quadtree::is_there_collision, entity] 1 skipped, is the querying id
-[23:13:32.222 f001316] [control_input_system::right_click, resolved destination] entity: none, bare position
-[23:13:32.222 f001316] [control_input_system::right_click, queued path request] dog: 3, destination: {794.250000, 158.250000}
-[23:13:32.238 f001317] [movement_system::create_path_to] dog: 3, source: {256.000000, 224.000000}, destination: {794.250000, 158.250000}, checkpoints: 0
-[23:13:32.238 f001317] [movement_system::commit_route] dog: 3, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
-[23:13:32.238 f001317] [state_machine_system::transition] entity: 3, transition: 21, state: 0 -> 1
-[23:13:37.291 f001620] [movement_system::create_path_to] dog: 49, source: {1152.000000, 192.000000}, destination: {1152.000000, 0.000000}, checkpoints: 2
-[23:13:37.291 f001620] [movement_system::commit_route] dog: 49, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
-[23:13:37.291 f001620] [waiter_idling_system::build_paths] waiter: 49, points: 3, destination: {1152.000000, 0.000000}, attempt: 1
-[23:13:37.308 f001621] [state_machine_system::transition] entity: 49, transition: 21, state: 0 -> 1
-[23:13:42.098 f001908] [interaction_system::on_path_finished] dog: 3 arrived with no destination entity and no interactor target - no interaction
-[23:13:42.098 f001908] [state_machine_system::transition] entity: 3, transition: 15, state: 1 -> 0
-[23:13:42.931 f001958] [interaction_system::on_path_finished] dog: 49 arrived with no destination entity and no interactor target - no interaction
-[23:13:42.931 f001958] [state_machine_system::transition] entity: 49, transition: 15, state: 1 -> 0
-[23:13:49.120 f002329] [dog_factory::build_customer_dog, built customer] id: 269
-[23:13:49.120 f002329] [movement_system::create_path_to] dog: 269, source: {64.000000, -128.000000}, destination: {64.000000, 3200.000000}, checkpoints: 0
-[23:13:49.121 f002329] [movement_system::commit_route] dog: 269, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
-[23:13:49.121 f002329] [customer_table_system::create_customer_dog, built customer] id: 269, spawn: {64.000000, -128.000000}, tracked customers: 2
-[23:13:49.121 f002329] [customer_table_system::send_customer_to_table] customer: 269, table: 17, via entrance: {256.000000, 1536.000000}
-[23:13:49.121 f002329] [interactable_component::get_interaction_offset] direction: left, position: {576.000000, 560.000000}, node_id: 357, distance_from_source: 857.605957
-[23:13:49.121 f002329] [interactable_component::get_interaction_offset] direction: right, position: {768.000000, 560.000000}, node_id: 360, distance_from_source: 984.357666
-[23:13:49.121 f002329] [interactable_component::get_interaction_offset] chosen offset: {-64.000000, 48.000000}
-[23:13:49.121 f002329] [movement_system::create_path_to_entity] dog: 269, source: {64.000000, -128.000000}, destination entity: 17, resolved destination: {576.000000, 512.000000}, checkpoints: 1
-[23:13:49.121 f002329] [movement_system::commit_route] dog: 269, mode: replace, paths before: 1, cleared: yes, legs committed: 2, paths after: 2
-[23:13:49.137 f002330] [state_machine_system::transition] entity: 269, transition: 21 - NO EDGE out of state: 0, state unchanged
-[23:13:49.137 f002330] [state_machine_system::transition] entity: 269, transition: 21 - NO EDGE out of state: 0, state unchanged
-[23:13:51.305 f002460] [movement_system::create_path_to] dog: 49, source: {1152.000000, 0.000000}, destination: {960.000000, 64.000000}, checkpoints: 2
-[23:13:51.305 f002460] [movement_system::commit_route] dog: 49, mode: replace, paths before: 0, cleared: yes, legs committed: 3, paths after: 3
-[23:13:51.305 f002460] [waiter_idling_system::build_paths] waiter: 49, points: 3, destination: {960.000000, 64.000000}, attempt: 1
-[23:13:51.321 f002461] [state_machine_system::transition] entity: 49, transition: 21, state: 0 -> 1
-[23:13:57.894 f002855] [interaction_system::on_path_finished] dog: 49 arrived with no destination entity and no interactor target - no interaction
-[23:13:57.894 f002855] [state_machine_system::transition] entity: 49, transition: 15, state: 1 -> 0
-[23:14:02.315 f003120] [movement_system::create_path_to] dog: 49, source: {960.000000, 64.000000}, destination: {768.000000, 192.000000}, checkpoints: 1
-[23:14:02.315 f003120] [movement_system::commit_route] dog: 49, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
-[23:14:02.315 f003120] [waiter_idling_system::build_paths] waiter: 49, points: 2, destination: {768.000000, 192.000000}, attempt: 1
-[23:14:02.331 f003121] [state_machine_system::transition] entity: 49, transition: 21, state: 0 -> 1
-[23:14:09.122 f003528] [dog_factory::build_customer_dog, built customer] id: 270
-[23:14:09.122 f003528] [movement_system::create_path_to] dog: 270, source: {64.000000, -128.000000}, destination: {64.000000, 3200.000000}, checkpoints: 0
-[23:14:09.122 f003528] [movement_system::commit_route] dog: 270, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
-[23:14:09.122 f003528] [customer_table_system::create_customer_dog, built customer] id: 270, spawn: {64.000000, -128.000000}, tracked customers: 3
-[23:14:09.122 f003528] [customer_table_system::send_customer_to_table] customer: 270, table: 21, via entrance: {256.000000, 1536.000000}
-[23:14:09.122 f003528] [interactable_component::get_interaction_offset] direction: left, position: {1216.000000, 560.000000}, node_id: 367, distance_from_source: 1341.807739
-[23:14:09.122 f003528] [interactable_component::get_interaction_offset] direction: right, position: {1408.000000, 560.000000}, node_id: 370, distance_from_source: 1509.860962
-[23:14:09.122 f003528] [interactable_component::get_interaction_offset] chosen offset: {-64.000000, 48.000000}
-[23:14:09.122 f003528] [movement_system::create_path_to_entity] dog: 270, source: {64.000000, -128.000000}, destination entity: 21, resolved destination: {1216.000000, 512.000000}, checkpoints: 1
-[23:14:09.123 f003528] [movement_system::commit_route] dog: 270, mode: replace, paths before: 1, cleared: yes, legs committed: 2, paths after: 2
-[23:14:09.138 f003529] [state_machine_system::transition] entity: 270, transition: 21 - NO EDGE out of state: 0, state unchanged
-[23:14:09.138 f003529] [state_machine_system::transition] entity: 270, transition: 21 - NO EDGE out of state: 0, state unchanged
-[23:14:12.659 f000140] [interaction_system::on_path_finished] dog: 268, target: 13, overlapping: yes
-[23:14:12.659 f000140] [interaciotn system, determine performable interactions]: interactor interactions 0
-[23:14:12.659 f000140] [interaciotn system, determine performable interactions]: interactee interactions 2
-[23:14:12.659 f000140] add interaction to process
-[23:14:12.659 f000140] [state_machine_system::transition] entity: 268, transition: 15 - NO EDGE out of state: 0, state unchanged
-[23:14:12.659 f000140] [state_machine_system::on_player_work_station] START - interactor: 268, interactee: 13
-[23:14:12.659 f000140] [state_machine_system::transition] entity: 268, transition: 22, state: 0 -> 1
-[23:14:12.659 f000140] [state_machine_system::transition] entity: 13, transition: 25 - NO STATE MACHINE, skipped
-[23:14:12.659 f000140] [interaction system - process interaction] - interactor 268 interactee: 13 interactions to check: 0
-[23:14:12.809 f000149] [interaction_system::on_path_finished] dog: 49 arrived with no destination entity and no interactor target - no interaction
-[23:14:12.809 f000149] [state_machine_system::transition] entity: 49, transition: 15, state: 1 -> 0
-[23:14:15.328 f000300] [movement_system::create_path_to] dog: 49, source: {768.000000, 192.000000}, destination: {704.000000, 0.000000}, checkpoints: 1
-[23:14:15.329 f000300] [movement_system::commit_route] dog: 49, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
-[23:14:15.329 f000300] [waiter_idling_system::build_paths] waiter: 49, points: 2, destination: {704.000000, 0.000000}, attempt: 1
-[23:14:15.345 f000301] [state_machine_system::transition] entity: 49, transition: 21, state: 0 -> 1
-[23:14:21.069 f000644] [interaction_system::on_path_finished] dog: 49 arrived with no destination entity and no interactor target - no interaction
-[23:14:21.069 f000644] [state_machine_system::transition] entity: 49, transition: 15, state: 1 -> 0
+[18:52:28.652 f000000] [game::init, start] building the starting world
+[18:52:29.097 f000000] [build background]: load tile 1 draw onto image at 0.000000,  0.000000, 768.000000, 768.000000
+[18:52:29.142 f000000] [build background]: load tile 2 draw onto image at 768.000000,  0.000000, 1536.000000, 768.000000
+[18:52:29.174 f000000] [build background]: load tile 3 draw onto image at 1536.000000,  0.000000, 2304.000000, 768.000000
+[18:52:29.209 f000000] [build background]: load tile 4 draw onto image at 2304.000000,  0.000000, 3072.000000, 768.000000
+[18:52:29.263 f000000] [build background]: load tile 5 draw onto image at 0.000000,  768.000000, 768.000000, 1536.000000
+[18:52:29.314 f000000] [build background]: load tile 6 draw onto image at 768.000000,  768.000000, 1536.000000, 1536.000000
+[18:52:29.348 f000000] [build background]: load tile 7 draw onto image at 1536.000000,  768.000000, 2304.000000, 1536.000000
+[18:52:29.379 f000000] [build background]: load tile 8 draw onto image at 2304.000000,  768.000000, 3072.000000, 1536.000000
+[18:52:29.410 f000000] [build background]: load tile 9 draw onto image at 0.000000,  1536.000000, 768.000000, 2304.000000
+[18:52:29.444 f000000] [build background]: load tile 10 draw onto image at 768.000000,  1536.000000, 1536.000000, 2304.000000
+[18:52:29.478 f000000] [build background]: load tile 11 draw onto image at 1536.000000,  1536.000000, 2304.000000, 2304.000000
+[18:52:29.645 f000000] [build background]: load tile 12 draw onto image at 2304.000000,  1536.000000, 3072.000000, 2304.000000
+[18:52:29.676 f000000] [build background]: load tile 13 draw onto image at 0.000000,  2304.000000, 768.000000, 3072.000000
+[18:52:29.735 f000000] [build background]: load tile 14 draw onto image at 768.000000,  2304.000000, 1536.000000, 3072.000000
+[18:52:29.767 f000000] [build background]: load tile 15 draw onto image at 1536.000000,  2304.000000, 2304.000000, 3072.000000
+[18:52:29.797 f000000] [build background]: load tile 16 draw onto image at 2304.000000,  2304.000000, 3072.000000, 3072.000000
+[18:52:29.855 f000000] [game::init, built background] id 0
+[18:52:29.859 f000000] [control_input_system::on_cursor_created] cursor id: 1
+[18:52:29.859 f000000] [game::init, built cursor] id 1
+[18:52:29.859 f000000] [control_input_system::on_cursor_created] cursor id: 1
+[18:52:29.859 f000000] [game::init, built player] id 2 holding cursor 1
+[18:52:29.871 f000000] [game::init, built khiri] id 3
+[18:52:29.876 f000000] [game::init, built mack] id 4
+[18:52:29.896 f000000] [game::init, build counter]: id 5 with food items:  3
+[18:52:29.915 f000000] [entity_lifespan_system::create_cooking_station] built cooking station: 8, id: 41, position: {896.000000, 512.000000}
+[18:52:29.943 f000000] [game::init, done] built 7 components on khiri
+[18:52:29.943 f000000] [game::init, done] built 7 components on mack
+[18:52:29.954 f000000] [game::init, stock decorations] created 40
+[18:52:31.595 f000090] [control_input_system::left_click, clicked] asked by: 1, position: {310.000000, 252.000000}
+[18:52:31.595 f000090] [click_system::click] position: 310.000000, 252.000000
+[18:52:31.595 f000090] [hud_spatial_system::check_collision_with] position: 310.000000, 252.000000, tracked elements: 194
+[18:52:31.595 f000090] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:31.595 f000090] [ecs_quadtree::is_there_collision, entity] 228 skipped, filter rejected it
+[18:52:31.595 f000090] [ecs_quadtree::is_there_collision, entity] 229 skipped, filter rejected it
+[18:52:31.595 f000090] [ecs_quadtree::is_there_collision, entity] 230 skipped, filter rejected it
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 1
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, entity] 10 skipped, filter rejected it
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 0
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {0.000000, 240.000000} -> {384.000000, 672.000000}, entities here: 1
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, entity] 16 skipped, filter rejected it
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {192.000000, 240.000000} -> {384.000000, 456.000000}, entities here: 2
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, entity] 14 skipped, filter rejected it
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, entity] 15 skipped, filter rejected it
+[18:52:31.596 f000090] [click_system::click] collision check hit: -1
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, entity] 79 bounds: {1408.000000, 1664.000000, 232.000000, 246.000000} vs position: {310.000000, 252.000000} hit: 0
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, entity] 111 bounds: {1520.000000, 2112.000000, 232.000000, 246.000000} vs position: {310.000000, 252.000000} hit: 0
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, entity] 167 bounds: {1518.000000, 2390.000000, 72.000000, 168.000000} vs position: {310.000000, 252.000000} hit: 0
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 2
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, entity] 9 bounds: {1280.000000, 640.000000, 96.000000, 96.000000} vs position: {310.000000, 252.000000} hit: 0
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, entity] 55 bounds: {640.000000, 1280.000000, 320.000000, 192.000000} vs position: {310.000000, 252.000000} hit: 0
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 1
+[18:52:31.596 f000090] [ecs_quadtree::is_there_collision, entity] 3 bounds: {256.000000, 224.000000, 128.000000, 48.000000} vs position: {310.000000, 252.000000} hit: 1
+[18:52:31.596 f000090] [control_input_system::left_click, hit entity] selecting: 3
+[18:52:31.596 f000090] [control_input_system::left_click, selection settled] selected: 3
+[18:52:31.891 f000104] [control_input_system::right_click, clicked] asked by: 1, position: {766.000000, 179.000000}
+[18:52:31.892 f000104] [click_system::click] position: 766.000000, 179.000000
+[18:52:31.892 f000104] [hud_spatial_system::check_collision_with] position: 766.000000, 179.000000, tracked elements: 194
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 228 skipped, filter rejected it
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 229 skipped, filter rejected it
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 230 skipped, filter rejected it
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 1
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 10 skipped, filter rejected it
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 0
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {384.000000, -192.000000} -> {768.000000, 240.000000}, entities here: 0
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {576.000000, 24.000000} -> {768.000000, 240.000000}, entities here: 0
+[18:52:31.892 f000104] [click_system::click] collision check hit: -1
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 79 skipped, filter rejected it
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 111 skipped, filter rejected it
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 167 skipped, filter rejected it
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 3
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 9 bounds: {1280.000000, 640.000000, 96.000000, 96.000000} vs position: {766.000000, 179.000000} hit: 0
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 55 skipped, filter rejected it
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 1 skipped, is the querying id
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 1
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, entity] 3 skipped, filter rejected it
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {384.000000, -192.000000} -> {768.000000, 240.000000}, entities here: 0
+[18:52:31.892 f000104] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {576.000000, 24.000000} -> {768.000000, 240.000000}, entities here: 0
+[18:52:31.893 f000104] [control_input_system::right_click, resolved destination] entity: none, bare position
+[18:52:31.893 f000104] [control_input_system::right_click, queued path request] dog: 3, destination: {766.000000, 179.000000}
+[18:52:31.908 f000105] [movement_system::create_path_to] dog: 3, source: {256.000000, 224.000000}, destination: {766.000000, 179.000000}, checkpoints: 0
+[18:52:31.908 f000105] [movement_system::commit_route] dog: 3, mode: replace, paths before: 0, cleared: yes, legs committed: 1, paths after: 1
+[18:52:31.908 f000105] [state_machine_system::transition] entity: 3, transition: 21, state: 0 -> 1
+[18:52:35.684 f000329] [control_input_system::left_click, clicked] asked by: 1, position: {453.000000, 87.000000}
+[18:52:35.684 f000329] [click_system::click] position: 453.000000, 87.000000
+[18:52:35.684 f000329] [hud_spatial_system::check_collision_with] position: 453.000000, 87.000000, tracked elements: 194
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 228 skipped, filter rejected it
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 229 skipped, filter rejected it
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 230 skipped, filter rejected it
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 1
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 10 skipped, filter rejected it
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 0
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {384.000000, -192.000000} -> {768.000000, 240.000000}, entities here: 0
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {384.000000, 24.000000} -> {576.000000, 240.000000}, entities here: 3
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 52 skipped, filter rejected it
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 53 skipped, filter rejected it
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 54 skipped, filter rejected it
+[18:52:35.685 f000329] [click_system::click] collision check hit: -1
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 79 bounds: {1408.000000, 1664.000000, 232.000000, 246.000000} vs position: {453.000000, 87.000000} hit: 0
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 111 bounds: {1520.000000, 2112.000000, 232.000000, 246.000000} vs position: {453.000000, 87.000000} hit: 0
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 167 bounds: {1518.000000, 2390.000000, 72.000000, 168.000000} vs position: {453.000000, 87.000000} hit: 0
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 2
+[18:52:35.685 f000329] [ecs_quadtree::is_there_collision, entity] 9 bounds: {1280.000000, 640.000000, 96.000000, 96.000000} vs position: {453.000000, 87.000000} hit: 0
+[18:52:35.686 f000329] [ecs_quadtree::is_there_collision, entity] 55 bounds: {640.000000, 1280.000000, 320.000000, 192.000000} vs position: {453.000000, 87.000000} hit: 0
+[18:52:35.686 f000329] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 0
+[18:52:35.686 f000329] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {384.000000, -192.000000} -> {768.000000, 240.000000}, entities here: 0
+[18:52:35.686 f000329] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {384.000000, 24.000000} -> {576.000000, 240.000000}, entities here: 3
+[18:52:35.686 f000329] [ecs_quadtree::is_there_collision, entity] 51 bounds: {448.000000, 128.000000, 40.000000, 96.000000} vs position: {453.000000, 87.000000} hit: 0
+[18:52:35.686 f000329] [ecs_quadtree::is_there_collision, entity] 1 skipped, is the querying id
+[18:52:35.686 f000329] [ecs_quadtree::is_there_collision, entity] 3 bounds: {385.066681, 64.000000, 128.000000, 48.000000} vs position: {453.000000, 87.000000} hit: 1
+[18:52:35.686 f000329] [control_input_system::left_click, hit entity] selecting: 3
+[18:52:35.686 f000329] [control_input_system::left_click, selection settled] selected: 3
+[18:52:36.304 f000365] [control_input_system::right_click, clicked] asked by: 1, position: {357.000000, 83.000000}
+[18:52:36.304 f000365] [click_system::click] position: 357.000000, 83.000000
+[18:52:36.304 f000365] [hud_spatial_system::check_collision_with] position: 357.000000, 83.000000, tracked elements: 194
+[18:52:36.304 f000365] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:36.304 f000365] [ecs_quadtree::is_there_collision, entity] 228 skipped, filter rejected it
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, entity] 229 skipped, filter rejected it
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, entity] 230 skipped, filter rejected it
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 1
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, entity] 10 skipped, filter rejected it
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 0
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {0.000000, -192.000000} -> {384.000000, 240.000000}, entities here: 0
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {192.000000, 24.000000} -> {384.000000, 240.000000}, entities here: 0
+[18:52:36.305 f000365] [click_system::click] collision check hit: -1
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, entity] 79 skipped, filter rejected it
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, entity] 111 skipped, filter rejected it
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, entity] 167 skipped, filter rejected it
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 2
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, entity] 9 bounds: {1280.000000, 640.000000, 96.000000, 96.000000} vs position: {357.000000, 83.000000} hit: 0
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, entity] 55 skipped, filter rejected it
+[18:52:36.305 f000365] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 0
+[18:52:36.306 f000365] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {0.000000, -192.000000} -> {384.000000, 240.000000}, entities here: 0
+[18:52:36.306 f000365] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {192.000000, 24.000000} -> {384.000000, 240.000000}, entities here: 1
+[18:52:36.306 f000365] [ecs_quadtree::is_there_collision, entity] 1 skipped, is the querying id
+[18:52:36.306 f000365] [control_input_system::right_click, resolved destination] entity: none, bare position
+[18:52:36.306 f000365] [control_input_system::right_click, queued path request] dog: 3, destination: {357.000000, 83.000000}
+[18:52:36.319 f000366] [movement_system::create_path_to] dog: 3, source: {425.837494, 64.000000}, destination: {357.000000, 83.000000}, checkpoints: 0
+[18:52:36.323 f000366] [movement_system::create_path] no route through this graph from {425.837494, 64.000000} to {357.000000, 83.000000}, destination occupant: -1
+[18:52:36.323 f000366] [movement_system::build_leg] no graph planned a leg from {425.837494, 64.000000} to {357.000000, 83.000000}
+[18:52:36.323 f000366] [movement_system::create_path_to] route FAILED from {425.837494, 64.000000} to {357.000000, 83.000000} - whole route abandoned
+[18:52:37.239 f000420] [movement_system::create_path_to] dog: 50, source: {1280.000000, 576.000000}, destination: {1088.000000, 448.000000}, checkpoints: 1
+[18:52:37.239 f000420] [movement_system::commit_route] dog: 50, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[18:52:37.239 f000420] [waiter_idling_system::build_paths] waiter: 50, points: 2, destination: {1088.000000, 448.000000}, attempt: 1
+[18:52:37.255 f000421] [state_machine_system::transition] entity: 50, transition: 21, state: 0 -> 1
+[18:52:40.342 f000604] [control_input_system::left_click, clicked] asked by: 1, position: {753.000000, 124.000000}
+[18:52:40.342 f000604] [click_system::click] position: 753.000000, 124.000000
+[18:52:40.342 f000604] [hud_spatial_system::check_collision_with] position: 753.000000, 124.000000, tracked elements: 194
+[18:52:40.342 f000604] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:40.342 f000604] [ecs_quadtree::is_there_collision, entity] 228 skipped, filter rejected it
+[18:52:40.342 f000604] [ecs_quadtree::is_there_collision, entity] 229 skipped, filter rejected it
+[18:52:40.342 f000604] [ecs_quadtree::is_there_collision, entity] 230 skipped, filter rejected it
+[18:52:40.342 f000604] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 1
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, entity] 10 skipped, filter rejected it
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 0
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {384.000000, -192.000000} -> {768.000000, 240.000000}, entities here: 0
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {576.000000, 24.000000} -> {768.000000, 240.000000}, entities here: 0
+[18:52:40.343 f000604] [click_system::click] collision check hit: -1
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, entity] 79 bounds: {1408.000000, 1664.000000, 232.000000, 246.000000} vs position: {753.000000, 124.000000} hit: 0
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, entity] 111 bounds: {1520.000000, 2112.000000, 232.000000, 246.000000} vs position: {753.000000, 124.000000} hit: 0
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, entity] 167 bounds: {1518.000000, 2390.000000, 72.000000, 168.000000} vs position: {753.000000, 124.000000} hit: 0
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 4
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, entity] 9 bounds: {1280.000000, 640.000000, 96.000000, 96.000000} vs position: {753.000000, 124.000000} hit: 0
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, entity] 55 bounds: {640.000000, 1280.000000, 320.000000, 192.000000} vs position: {753.000000, 124.000000} hit: 0
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, entity] 1 skipped, is the querying id
+[18:52:40.343 f000604] [ecs_quadtree::is_there_collision, entity] 3 bounds: {679.062073, 103.061951, 128.000000, 48.000000} vs position: {753.000000, 124.000000} hit: 1
+[18:52:40.343 f000604] [control_input_system::left_click, hit entity] selecting: 3
+[18:52:40.343 f000604] [control_input_system::left_click, selection settled] selected: 3
+[18:52:40.694 f000625] [control_input_system::right_click, clicked] asked by: 1, position: {558.000000, 100.000000}
+[18:52:40.694 f000625] [click_system::click] position: 558.000000, 100.000000
+[18:52:40.694 f000625] [hud_spatial_system::check_collision_with] position: 558.000000, 100.000000, tracked elements: 194
+[18:52:40.694 f000625] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:40.694 f000625] [ecs_quadtree::is_there_collision, entity] 228 skipped, filter rejected it
+[18:52:40.694 f000625] [ecs_quadtree::is_there_collision, entity] 229 skipped, filter rejected it
+[18:52:40.694 f000625] [ecs_quadtree::is_there_collision, entity] 230 skipped, filter rejected it
+[18:52:40.694 f000625] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 1
+[18:52:40.694 f000625] [ecs_quadtree::is_there_collision, entity] 10 skipped, filter rejected it
+[18:52:40.694 f000625] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 0
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {384.000000, -192.000000} -> {768.000000, 240.000000}, entities here: 0
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {384.000000, 24.000000} -> {576.000000, 240.000000}, entities here: 3
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 52 skipped, filter rejected it
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 53 skipped, filter rejected it
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 54 skipped, filter rejected it
+[18:52:40.695 f000625] [click_system::click] collision check hit: -1
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, node] depth: 0, bounds: {0.000000, -192.000000} -> {3072.000000, 3264.000000}, entities here: 3
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 79 skipped, filter rejected it
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 111 skipped, filter rejected it
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 167 skipped, filter rejected it
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, node] depth: 1, bounds: {0.000000, -192.000000} -> {1536.000000, 1536.000000}, entities here: 3
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 9 bounds: {1280.000000, 640.000000, 96.000000, 96.000000} vs position: {558.000000, 100.000000} hit: 0
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 55 skipped, filter rejected it
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 3 skipped, filter rejected it
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, node] depth: 2, bounds: {0.000000, -192.000000} -> {768.000000, 672.000000}, entities here: 0
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, node] depth: 3, bounds: {384.000000, -192.000000} -> {768.000000, 240.000000}, entities here: 1
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 1 skipped, is the querying id
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, node] depth: 4, bounds: {384.000000, 24.000000} -> {576.000000, 240.000000}, entities here: 1
+[18:52:40.695 f000625] [ecs_quadtree::is_there_collision, entity] 51 skipped, filter rejected it
+[18:52:40.695 f000625] [control_input_system::right_click, resolved destination] entity: none, bare position
+[18:52:40.696 f000625] [control_input_system::right_click, queued path request] dog: 3, destination: {558.000000, 100.000000}
+[18:52:40.711 f000626] [movement_system::create_path_to] dog: 3, source: {695.719666, 119.719582}, destination: {558.000000, 100.000000}, checkpoints: 0
+[18:52:40.724 f000626] [movement_system::commit_route] dog: 3, mode: replace, paths before: 1, cleared: yes, legs committed: 1, paths after: 1
+[18:52:40.724 f000626] [state_machine_system::transition] entity: 3, transition: 21 - NO EDGE out of state: 1, state unchanged
+[18:52:41.280 f000660] [movement_system::create_path_to] dog: 49, source: {832.000000, 384.000000}, destination: {960.000000, 256.000000}, checkpoints: 1
+[18:52:41.280 f000660] [movement_system::commit_route] dog: 49, mode: replace, paths before: 0, cleared: yes, legs committed: 2, paths after: 2
+[18:52:41.280 f000660] [waiter_idling_system::build_paths] waiter: 49, points: 2, destination: {960.000000, 256.000000}, attempt: 1
+[18:52:41.297 f000661] [state_machine_system::transition] entity: 49, transition: 21, state: 0 -> 1
+[18:52:42.049 f000706] [interaction_system::on_path_finished] dog: 50 arrived with no destination entity and no interactor target - no interaction
+[18:52:42.049 f000706] [state_machine_system::transition] entity: 50, transition: 15, state: 1 -> 0
+[18:52:44.671 f000863] [interaction_system::on_path_finished] dog: 3 arrived with no destination entity and no interactor target - no interaction
+[18:52:44.671 f000863] [state_machine_system::transition] entity: 3, transition: 15, state: 1 -> 0

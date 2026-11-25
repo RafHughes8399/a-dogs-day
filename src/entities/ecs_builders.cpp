@@ -60,12 +60,12 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
         auto head_width = entity_config::khiri_head_attributes[entity_config::frame_width];
 
         auto head_left = sprite_builders::build_dog_part_sprite(textures::khiri_head_left, entity_config::khiri_head_left_path, entity_config::khiri_head_attributes, Vector2Zero());
-        auto body_left = sprite_builders::build_dog_part_sprite(textures::khiri_body_left, entity_config::khiri_body_left_path, entity_config::khiri_body_attributes, {head_width, 0});
-        auto tail_left = sprite_builders::build_dog_part_sprite(textures::khiri_tail_left, entity_config::khiri_tail_left_path, entity_config::khiri_tail_attributes, {head_width + body_width, 0});
+        auto body_left = sprite_builders::build_dog_part_sprite(textures::khiri_body_left, entity_config::khiri_body_left_path, entity_config::khiri_body_attributes, {head_width - 8, 0});
+        auto tail_left = sprite_builders::build_dog_part_sprite(textures::khiri_tail_left, entity_config::khiri_tail_left_path, entity_config::khiri_tail_attributes, {head_width + body_width - 8, 0});
 
         auto tail_right = sprite_builders::build_dog_part_sprite(textures::khiri_tail_right, entity_config::khiri_tail_right_path, entity_config::khiri_tail_attributes, Vector2Zero());
         auto body_right = sprite_builders::build_dog_part_sprite(textures::khiri_body_right, entity_config::khiri_body_right_path, entity_config::khiri_body_attributes, {tail_width, 0});
-        auto head_right = sprite_builders::build_dog_part_sprite(textures::khiri_head_right, entity_config::khiri_head_right_path, entity_config::khiri_head_attributes, {tail_width + body_width, 0});
+        auto head_right = sprite_builders::build_dog_part_sprite(textures::khiri_head_right, entity_config::khiri_head_right_path, entity_config::khiri_head_attributes, {tail_width + body_width - 8, 0});
 
         std::vector<std::vector<sprite::sprite>> sprites = {
             {tail_left, tail_right},
@@ -85,13 +85,13 @@ void ecs_entities::build_dog(size_t id, Vector2 position,
         auto body_width = entity_config::mack_body_attributes[entity_config::frame_width];
         auto head_width = entity_config::mack_head_attributes[entity_config::frame_width];
 
-        auto head_left = sprite_builders::build_dog_part_sprite(textures::mack_head_left, entity_config::mack_head_left_path, entity_config::mack_head_attributes, Vector2Zero());
-        auto body_left = sprite_builders::build_dog_part_sprite(textures::mack_body_left, entity_config::mack_body_left_path, entity_config::mack_body_attributes, {head_width, 0});
-        auto tail_left = sprite_builders::build_dog_part_sprite(textures::mack_tail_left, entity_config::mack_tail_left_path, entity_config::mack_tail_attributes, {head_width + body_width, 0});
+        auto head_left = sprite_builders::build_dog_part_sprite(textures::mack_head_left, entity_config::mack_head_left_path, entity_config::mack_head_attributes, {0, -2});
+        auto body_left = sprite_builders::build_dog_part_sprite(textures::mack_body_left, entity_config::mack_body_left_path, entity_config::mack_body_attributes, {head_width - 12, 0});
+        auto tail_left = sprite_builders::build_dog_part_sprite(textures::mack_tail_left, entity_config::mack_tail_left_path, entity_config::mack_tail_attributes, {head_width + body_width - 12, 0});
 
         auto tail_right = sprite_builders::build_dog_part_sprite(textures::mack_tail_right, entity_config::mack_tail_right_path, entity_config::mack_tail_attributes, Vector2Zero());
         auto body_right = sprite_builders::build_dog_part_sprite(textures::mack_body_right, entity_config::mack_body_right_path, entity_config::mack_body_attributes, {tail_width, 0});
-        auto head_right = sprite_builders::build_dog_part_sprite(textures::mack_head_right, entity_config::mack_head_right_path, entity_config::mack_head_attributes, {tail_width + body_width, 0});
+        auto head_right = sprite_builders::build_dog_part_sprite(textures::mack_head_right, entity_config::mack_head_right_path, entity_config::mack_head_attributes, {tail_width + body_width - 12, 0});
 
         std::vector<std::vector<sprite::sprite>> sprites = {
             {tail_left, tail_right},

@@ -28,7 +28,7 @@ namespace hud_config{
         button_kinds_size
     };
     inline const Rectangle inventory_item_slot_dimensions = Rectangle {0.0, 0.0, level_config::edge_weight * 2.5f, level_config::edge_weight * 2.5f};
-    inline const float inventory_item_fit = level_config::edge_weight * 2.0f;
+    inline const float inventory_item_fit = level_config::edge_weight * 3.0f;
     inline const Vector2 button_hover_scale = Vector2 {1.25f, 1.25f};
     inline const Rectangle menu_frame = Rectangle{400.0f, 400.0f, 200.0f, 200.0f};
     inline const float page_nav_button_size = 20;
