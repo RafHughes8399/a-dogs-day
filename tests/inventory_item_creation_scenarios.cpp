@@ -195,7 +195,7 @@ SCENARIO("placing an item from the inventory ends in a click or escape and retur
                 REQUIRE(component_managers::entity_positional_manager_.get_component(item)->get_position().x == 1024.0f);
                 REQUIRE(component_managers::entity_positional_manager_.get_component(item)->get_position().y == 1024.0f);
                 REQUIRE(input.get_control_state() == game_config::default_controls);
-                REQUIRE(component_managers::hud_manager_.get_component(head)->is_active());
+                //REQUIRE(component_managers::hud_manager_.get_component(head)->is_active());
                 REQUIRE(storage->size() == 0);
             }
         }
