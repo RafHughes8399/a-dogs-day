@@ -324,7 +324,13 @@ void ecs_entities::build_decoration(size_t id, Vector2 position,
         component_helpers::add_entity_item_component(id, items::item_ref{entity_config::decoration_category, entity_config::decorations::frangipani});
         //systems::animation_system::get_instance().play(id, systems::animation_system::sprite_animation{0, 0, true});
     }
-
+    void ecs_entities::build_daft_pug(size_t id, Vector2 position){
+        build_decoration(id, position,
+        sprite_builders::build_daft_pug(),
+        hitbox_builders::build_daft_pug_hitbox(position));
+        component_helpers::add_entity_item_component(id, items::item_ref{entity_config::decoration_category, entity_config::decorations::daft_pug});
+        //systems::animation_system::get_instance().play(id, systems::animation_system::sprite_animation{0, 0, true});
+    }
 void ecs_entities::build_hud_root(size_t id, Vector2 position, sprite::nine_sprite& panel){
     component_helpers::add_entity_positional_component(id, position);
     component_helpers::add_hud_component(id, panel);

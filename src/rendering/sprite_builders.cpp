@@ -118,8 +118,11 @@ sprite::sprite sprite_builders::build_javier_ceo(){
 sprite::sprite sprite_builders::build_sam_and_max(){
     return sprite_builders::build_decoration_sprite(textures::sam_and_max, entity_config::sam_and_max_path, entity_config::sam_and_max_attributes);
 }
-sprite::sprite sprite_builders::build_gromit_knitting(){
-    return sprite_builders::build_decoration_sprite(textures::gromit_knitting, entity_config::gromit_knitting_path, entity_config::gromit_knitting_attributes);
+sprite::sprite sprite_builders::build_gromit_plane(){
+    return sprite_builders::build_decoration_sprite(textures::gromit_plane, entity_config::gromit_plane_path, entity_config::gromit_plane_attributes);
+}
+sprite::sprite sprite_builders::build_daft_pug(){
+    return sprite_builders::build_decoration_sprite(textures::daft_pug, entity_config::daft_pug_path, entity_config::daft_pug_attributes);
 }
 sprite::sprite sprite_builders::build_pavlov(){
     return sprite_builders::build_decoration_sprite(textures::pavlov, entity_config::pavlov_path, entity_config::pavlov_attributes);

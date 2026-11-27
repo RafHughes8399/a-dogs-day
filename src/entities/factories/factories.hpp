@@ -140,7 +140,8 @@ namespace factories{
             [](size_t id, Vector2 position) -> void {ecs_entities::build_poker_table(id, position);},
             [](size_t id, Vector2 position) -> void {ecs_entities::build_dog_painting(id, position);},
             [](size_t id, Vector2 position) -> void {ecs_entities::build_ficus_lytra(id, position);},
-            [](size_t id, Vector2 position) -> void {ecs_entities::build_frangipani(id, position);}
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_frangipani(id, position);},
+            [](size_t id, Vector2 position) -> void {ecs_entities::build_daft_pug(id, position);},
         }){
 
         }

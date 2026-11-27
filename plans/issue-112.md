@@ -15,7 +15,7 @@ amongst some art pieces including:
 -> hud elements for recipes 
 -> more recipes including the tiger pie, the bucket of pizzles, the foot fetish (chicken foot, rabbit paw, cow / horse hoof)
 -> daft pug
--> ben
+-> ben but 
 -> dogmatix and the cauldron
 -> gromit on the plane, like on a runway
 -> then that wildwood dog knitting

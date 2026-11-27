@@ -95,6 +95,7 @@ namespace entity_config{
         dog_painting,
         ficus_lytra,
         frangipani,
+        daft_pug,
         decorations_size
     };
     enum item_categories{
@@ -186,6 +187,7 @@ namespace entity_config{
 
     inline const char* mack_left_outline_path = "../sprites/mack_left_outline.png";
     inline const char* mack_right_outline_path = "../sprites/mack_right_outline.png";
+
     // * ------------------------ WAITER DOG PATHS --------------------------------------- *//
     inline const char* gianluca_left_path = "../sprites/gianluca-left.png";
     inline const char* gianluca_right_path = "../sprites/gianluca-right.png";
@@ -207,11 +209,13 @@ namespace entity_config{
     inline const char* lionel_body_right_path = "../sprites/player-dogs/lionel-right-body.png";
     inline const char* lionel_tail_left_path = "../sprites/player-dogs/lionel-left-tail.png";
     inline const char* lionel_tail_right_path = "../sprites/player-dogs/lionel-right-tail.png";
+
     // * ------------------------ DECORATION PATHS --------------------------------------- *//
     inline const char* conversation_pit_path = "../sprites/conversation-pit.png";
     inline const char* javier_ceo_path = "../sprites/javier-ceo.png";
     inline const char* sam_and_max_path = "../sprites/sam-and-max.png";
-    inline const char* gromit_knitting_path = "../sprites/gromit-knitting.png";
+    inline const char* gromit_plane_path = "../sprites/gromit-plane.png";
+    inline const char* daft_pug_path = "../sprites/daft-pug.png";
     inline const char* dog_painting_decoration_path = "../sprites/one-dog-goes-this-way.png";
     inline const char* ficus_lytra_decoration_path = "../sprites/plants/ficus-lytra.png";
     inline const char* frangipani_decoration_path = "../sprites/plants/frangipani.png";
@@ -320,10 +324,10 @@ namespace entity_config{
     inline const float dog_painting_attributes[attributes::size] = {level_config::edge_weight * 2, level_config::edge_weight * 2.25f, 1.0f, 1.0f}; // TODO update values (24/08/26)
     inline const float frangipani_attributes[attributes::size] = {level_config::edge_weight *  1.96875f, level_config::edge_weight * 2.625f, 3.0f, 1.0f}; // TODO update values once exported
     inline const float ficus_lytra_attributes[attributes::size] = {level_config::edge_weight * 1.125f, level_config::edge_weight * 2.625f, 3.0f, 1.0f};
-    inline const float gromit_knitting_attributes[attributes::size] = {40.0f, level_config::edge_weight * 1.5f, 1.0f, 1.0f};
+    inline const float gromit_plane_attributes[attributes::size] = {40.0f, level_config::edge_weight * 1.5f, 1.0f, 1.0f};
     inline const float javier_ceo_attributes[attributes::size] = {40.0f, level_config::edge_weight * 1.5f, 1.0f, 1.0f};
     inline const float sam_and_max_attributes[attributes::size] = {40.0f, level_config::edge_weight * 1.5f, 1.0f, 1.0f};
-    
+    inline const float daft_pug_attributes[attributes::size] = {244.0f, 190.0f, 1.0f, 1.0f};
     inline const float table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float dining_table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
     inline const float tiled_table_attributes[attributes::size] = {station_width, station_height, 1.0f, 1.0f};
