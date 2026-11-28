@@ -85,6 +85,12 @@ the recipe buttons click behaviour is needed.
 and a recipe system is needed to manage the produciton of food and theri creatoin
 
 maybe a recipe_system. it can get all the recipe componetns
+
+unless we introduce some active component for the indivudal hud elemnetns as well as the entity as a whole ? that could solve our problem
+then incoporate that into the render check for the hud system ? so like if it has a hidden_component and is hidden then dont render ?
+
+that would simplify things
+
 amongst some art pieces including:
 -> hud elements for recipes 
 -> more recipes including the tiger pie, the bucket of pizzles, the foot fetish (chicken foot, rabbit paw, cow / horse hoof)
