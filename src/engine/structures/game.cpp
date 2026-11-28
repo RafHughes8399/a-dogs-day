@@ -103,6 +103,7 @@ void game::game::init(){
         Vector2{level_config::edge_weight * 18,level_config::edge_weight * 28});
     lifespan_.create_decoration(entity_config::decorations::conversation_pit,
         Vector2{level_config::edge_weight * 22,level_config::edge_weight * 26});
+    lifespan_.create_decoration(entity_config::daft_pug, {level_config::edge_weight * 30, level_config::edge_weight * 10});
     const std::array<size_t, 8> stock_decorations = {
         entity_config::decorations::gargoyle, entity_config::decorations::poker_table,
         entity_config::decorations::dog_painting, entity_config::decorations::frangipani,

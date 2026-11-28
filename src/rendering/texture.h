@@ -106,7 +106,8 @@ namespace textures{
         lone_mouse,
         javier_ceo,
         sam_and_max,
-        gromit_knitting,
+        gromit_plane,
+        daft_pug,
         size
         // and so on
     };

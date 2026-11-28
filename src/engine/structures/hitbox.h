@@ -54,11 +54,11 @@ namespace hitbox_builders{
     hitbox::hitbox build_polish_cow_hitbox(Vector2 position);
     hitbox::hitbox build_poker_table_hitbox(Vector2 position);
     hitbox::hitbox build_dog_painting_hitbox(Vector2 position);
-    
+    hitbox::hitbox build_daft_pug_hitbox(Vector2 hitbox);
     hitbox::hitbox build_conversation_pit_hitbox(Vector2 position);
     hitbox::hitbox build_sam_and_max_hitbox(Vector2 position);
     hitbox::hitbox build_javier_ceo_hitbox(Vector2 position);
-    hitbox::hitbox build_gromit_knitting_hitbox(Vector2 position);
+    hitbox::hitbox build_gromit_plane_hitbox(Vector2 position);
 
     hitbox::hitbox build_ficus_lytra_hitbox(Vector2 position);
     hitbox::hitbox build_frangipani_hitbox(Vector2 position);

@@ -65,6 +65,12 @@ hitbox::hitbox hitbox_builders::build_ficus_lytra_hitbox(Vector2 position){
         entity_config::ficus_lytra_attributes[entity_config::attributes::frame_height] 
     );
 }
+hitbox::hitbox hitbox_builders::build_daft_pug_hitbox(Vector2 position){
+    return build_hitbox(position, 
+        entity_config::daft_pug_attributes[entity_config::attributes::frame_width], 
+        entity_config::daft_pug_attributes[entity_config::attributes::frame_height] 
+    );
+}
     
 hitbox::hitbox hitbox_builders::build_conversation_pit_hitbox(Vector2 position){
     return build_hitbox(position, entity_config::conversation_pit_attributes[entity_config::attributes::frame_width], entity_config::conversation_pit_attributes[entity_config::attributes::frame_height]);
@@ -75,8 +81,8 @@ hitbox::hitbox hitbox_builders::build_sam_and_max_hitbox(Vector2 position){
 hitbox::hitbox hitbox_builders::build_javier_ceo_hitbox(Vector2 position){
     return build_hitbox(position, entity_config::javier_ceo_attributes[entity_config::attributes::frame_width], entity_config::javier_ceo_attributes[entity_config::attributes::frame_height]);
 }
-hitbox::hitbox hitbox_builders::build_gromit_knitting_hitbox(Vector2 position){
-    return build_hitbox(position, entity_config::gromit_knitting_attributes[entity_config::attributes::frame_width], entity_config::gromit_knitting_attributes[entity_config::attributes::frame_height]);
+hitbox::hitbox hitbox_builders::build_gromit_plane_hitbox(Vector2 position){
+    return build_hitbox(position, entity_config::gromit_plane_attributes[entity_config::attributes::frame_width], entity_config::gromit_plane_attributes[entity_config::attributes::frame_height]);
 }
 hitbox::hitbox hitbox_builders::build_frangipani_hitbox(Vector2 position){
     return build_hitbox(position,

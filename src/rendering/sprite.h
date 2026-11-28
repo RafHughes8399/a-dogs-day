@@ -167,7 +167,8 @@ namespace sprite_builders{
     sprite::sprite build_gargoyle();
     sprite::sprite build_sam_and_max();
     sprite::sprite build_javier_ceo();
-    sprite::sprite build_gromit_knitting();
+    sprite::sprite build_gromit_plane();
+    sprite::sprite build_daft_pug();
     // *-------------------- station sprites --------------------* //
     sprite::sprite build_table_sprite();
     sprite::sprite build_dining_table_sprite();
